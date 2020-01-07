@@ -3,82 +3,70 @@ package no.unit.nva.cristin.projects;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import org.jsoup.HttpStatusException;
+import org.apache.http.client.utils.URIBuilder;
 
 import javax.ws.rs.BadRequestException;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 
 public class CristinApiClient {
 
 
-    private final static String cristinApiURL = "https://api.cristin.no/v2";
-
-    protected String connect(Map<String, String> parameters) throws IOException, BadRequestException {
-
-        URI
-
-        InputStreamReader inputStreamReader = null;
-        BufferedReader in = null;
-        String contents;
+    protected List<Project> queryProjects(Map<String, String> parameters) throws IOException, BadRequestException {
         try {
-            URL url = new URL(cristinApiURL);
+            URIBuilder builder = new URIBuilder()
+                    .setScheme("https")
+                    .setHost("api.cristin.no")
+                    .setPath("/v2/projects");
+
             if (parameters != null) {
-                parameters.keySet().forEach(s -> queryParam(url, s, parameters.get(s)));
+                parameters.keySet().forEach(s -> builder.addParameter(s, parameters.get(s)));
             }
-            inputStreamReader = this.communicateWith(url);
-            in = new BufferedReader(inputStreamReader);
-            contents = in.lines().collect(Collectors.joining());
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (inputStreamReader != null) {
-                inputStreamReader.close();
-            }
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(builder.build())
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            String responseBody = response.body();
+            return asList(fromJson(responseBody, Project[].class));
+        } catch (URISyntaxException | InterruptedException e) {
+            throw new BadRequestException(e.getMessage(), e);
         }
-        return asList(fromJson(getProjects_json(parameters), Project[].class));
     }
 
-    protected InputStreamReader communicateWith(URL url) throws IOException {
-        URLConnection connection = url.openConnection();
-        return new InputStreamReader(connection.getInputStream());
-    }
-
-
-    public String getProjects_json(Map<String, String> parameters) throws IOException, BadRequestException {
+    protected Project getProject(String id) throws IOException, BadRequestException {
         try {
-            final HttpRequest request = http.get(cristinApiURL + "/projects");
-            if (parameters != null) {
-                parameters.keySet().forEach(s -> queryParam(request, s, parameters.get(s)));
-            }
-            return asString(request, 200);
-        } catch (HttpStatusException e) {
-            switch (e.getStatusCode()) {
-                case 400:
-                    throw new BadRequestException(e.getMessage(), e);
-                default:
-                    throw new IOException(e.getMessage(), e);
-            }
+            URIBuilder builder = new URIBuilder()
+                    .setScheme("https")
+                    .setHost("api.cristin.no")
+                    .setPath("/v2/projects/" + id);
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(builder.build())
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            String responseBody = response.body();
+            return fromJson(responseBody, Project.class);
+        } catch (URISyntaxException | InterruptedException e) {
+            throw new BadRequestException(e.getMessage(), e);
         }
     }
 
-    static HttpRequest queryParam(URL url, String key, Object value) {
-        if (key != null && value != null) {
-            url.getQuery().a
-            request.queryString(key, value);
-        }
-        return request;
-    }
 
     static <T> T fromJson(String json, Class<T> classOfT) throws IOException {
         try {
