@@ -48,7 +48,8 @@ Resources:
             Method: get
             RestApiId: !Ref NvaCristinProjectsFunctionApi
             RequestParameters:
-            - method.request.querystring.query
+            - method.request.querystring.language
+            - method.request.querystring.title
 
   NvaCristinProjectsFunctionBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping

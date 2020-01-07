@@ -19,7 +19,7 @@ import static java.util.Arrays.asList;
 public class CristinApiClient {
 
 
-    protected List<Project> queryProjects(Map<String, String> parameters) throws IOException, BadRequestException {
+    List<Project> queryProjects(Map<String, String> parameters) throws IOException, BadRequestException {
         try {
             URIBuilder builder = new URIBuilder()
                     .setScheme("https")
@@ -45,12 +45,13 @@ public class CristinApiClient {
         }
     }
 
-    protected Project getProject(String id) throws IOException, BadRequestException {
+    Project getProject(String id, String language) throws IOException, BadRequestException {
         try {
             URIBuilder builder = new URIBuilder()
                     .setScheme("https")
                     .setHost("api.cristin.no")
-                    .setPath("/v2/projects/" + id);
+                    .setPath("/v2/projects/" + id)
+                    .addParameter("lang", language);
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
@@ -68,7 +69,7 @@ public class CristinApiClient {
     }
 
 
-    static <T> T fromJson(String json, Class<T> classOfT) throws IOException {
+    private static <T> T fromJson(String json, Class<T> classOfT) throws IOException {
         try {
             return new Gson().fromJson(json, classOfT);
         } catch (JsonSyntaxException e) {
