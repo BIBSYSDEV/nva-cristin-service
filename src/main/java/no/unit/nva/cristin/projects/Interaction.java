@@ -1,15 +1,15 @@
 package no.unit.nva.cristin.projects;
 
-public class Interaction {
+class Interaction {
 
-    String cristin_person_id;
-    String date;
+    private String cristin_person_id;
+    private String date;
 
-    public String getCristin_person_id() {
+    String getCristin_person_id() {
         return cristin_person_id;
     }
 
-    public String getDate() {
+    String getDate() {
         return date;
     }
 }

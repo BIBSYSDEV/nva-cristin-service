@@ -1,7 +1,6 @@
 package no.unit.nva.cristin.projects;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -9,31 +8,24 @@ import com.google.gson.reflect.TypeToken;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * Handler for requests to Lambda function.
  */
-public class FetchCristinProjects implements RequestHandler<Map<String, Object>, SimpleResponse> {
+public class FetchCristinProjects implements RequestHandler<Map<String, Object>, GatewayResponse> {
 
-    public static final String X_CUSTOM_HEADER = "X-Custom-Header";
-    private static final String URL_IS_NULL = "The input parameter 'url' is null";
+    private static final String TITLE_IS_NULL = "Parameter 'title' is mandatory";
+    private static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' contains non-alphanumeric characters";
+    private static final String LANGUAGE_INVALID = "Parameter 'language' has invalid value";
     private static final String ERROR_KEY = "error";
-    /**
-     * Connection object handling the direct communication via http for (mock)-testing to be injected
-     */
-    protected transient CristinApiClient cristinApiClient;
-    private LambdaLogger logger;
+    private static final String DEFAULT_LANGUAGE_CODE = "nb";
+    private static final List<String> VALID_LANGUAGE_CODES = Arrays.asList("nb", "en");
 
-    public FetchCristinProjects() {
-        cristinApiClient = new CristinApiClient();
-    }
+
+    private CristinApiClient cristinApiClient;
 
     public FetchCristinProjects(CristinApiClient cristinApiClient) {
         this.cristinApiClient = cristinApiClient;
@@ -41,83 +33,91 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
 
     @Override
     @SuppressWarnings("unchecked")
-    public SimpleResponse handleRequest(Map<String, Object> input, Context context) {
-//        logger = context.getLogger();
+    public GatewayResponse handleRequest(Map<String, Object> input, Context context) {
+
+        GatewayResponse gatewayResponse = new GatewayResponse();
         Map<String, String> queryStringParameters = (Map<String, String>) input.get("queryStringParameters");
-        String title = queryStringParameters.get("title");
-        String language = queryStringParameters.get("language");
-        String json;
-        int statusCode;
-        if (title == null) {
-            statusCode = Response.Status.BAD_REQUEST.getStatusCode();
-            json = getErrorAsJson(URL_IS_NULL);
-        } else {
-            try {
-                statusCode = Response.Status.OK.getStatusCode();
-                Map<String, String> parameters = new TreeMap<>();
-                parameters.put("title", title);
-                parameters.put("lang", language);
-                parameters.put("page", "1");
-                parameters.put("per_page", "5");
+        String title = queryStringParameters.getOrDefault("title", "");
+        String language = queryStringParameters.getOrDefault("language", DEFAULT_LANGUAGE_CODE);
 
-                List<Project> projects = cristinApiClient.queryProjects(parameters);
-
-                List<ProjectPresentation> projectPresentations = new ArrayList<>();
-
-                for (Project project : projects) {
-                    Project enrichedProject = cristinApiClient.getProject(project.cristin_project_id, language);
-                    projectPresentations.add(asProjectPresentation(enrichedProject, language));
-                }
-
-                Type projectListType = new TypeToken<ArrayList<ProjectPresentation>>() {
-                }.getType();
-                json = new Gson().toJson(projectPresentations, projectListType);
-
-            } catch (MalformedURLException | UnsupportedEncodingException e) {
-//                logger.log(e.toString());
-                statusCode = Response.Status.BAD_REQUEST.getStatusCode();
-                json = getErrorAsJson(e.getMessage());
-            } catch (IOException e) {
-//                logger.log(e.getMessage());
-                statusCode = Response.Status.SERVICE_UNAVAILABLE.getStatusCode();
-                json = getErrorAsJson(e.getMessage());
-            }
+        if (title.isEmpty()) {
+            gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+            gatewayResponse.setBody(getErrorAsJson(TITLE_IS_NULL));
+            return gatewayResponse;
         }
-//        logger.log("json: " + json + ", statusCode:" + statusCode);
-        return new SimpleResponse(json, "" + statusCode);
+
+        if (!isAlphanumeric(title)) {
+            gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+            gatewayResponse.setBody(getErrorAsJson(TITLE_ILLEGAL_CHARACTERS));
+            return gatewayResponse;
+        }
+
+        if (!VALID_LANGUAGE_CODES.contains(language)) {
+            gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
+            gatewayResponse.setBody(getErrorAsJson(LANGUAGE_INVALID));
+            return gatewayResponse;
+        }
+
+        try {
+            Map<String, String> parameters = new TreeMap<>();
+            parameters.put("title", title);
+            parameters.put("lang", language);
+            parameters.put("page", "1");
+            parameters.put("per_page", "5");
+
+            List<Project> projects = cristinApiClient.queryProjects(parameters);
+            List<ProjectPresentation> projectPresentations = new ArrayList<>();
+
+            for (Project project : projects) {
+                Project enrichedProject = cristinApiClient.getProject(project.getCristin_project_id(), language);
+                projectPresentations.add(asProjectPresentation(enrichedProject, language));
+            }
+
+            Type projectListType = new TypeToken<ArrayList<ProjectPresentation>>() {
+            }.getType();
+
+            gatewayResponse.setStatusCode(Response.Status.OK.getStatusCode());
+            gatewayResponse.setBody(new Gson().toJson(projectPresentations, projectListType));
+        } catch (IOException | URISyntaxException e) {
+            gatewayResponse.setStatusCode(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+            gatewayResponse.setBody(getErrorAsJson(e.getMessage()));
+        }
+
+        return gatewayResponse;
     }
 
     private ProjectPresentation asProjectPresentation(Project project, String language) {
         ProjectPresentation projectPresentation = new ProjectPresentation();
-        projectPresentation.cristin_project_id = project.cristin_project_id;
+        projectPresentation.cristin_project_id = project.getCristin_project_id();
 
-        for (String key : project.title.keySet()) {
+        for (String key : project.getTitle().keySet()) {
             TitlePresentation titlePresentation = new TitlePresentation();
             titlePresentation.language = key;
-            titlePresentation.title = project.title.get(key);
+            titlePresentation.title = project.getTitle().get(key);
             projectPresentation.titles.add(titlePresentation);
         }
 
-        for (Person person : project.participants) {
+        for (Person person : project.getParticipants()) {
             ParticipantPresentation participantPresentation = new ParticipantPresentation();
-            participantPresentation.cristin_person_id = person.cristin_person_id;
-            participantPresentation.full_name = person.surname + ", " + person.first_name;
+            participantPresentation.cristin_person_id = person.getCristin_person_id();
+            participantPresentation.full_name = person.getSurname() + ", " + person.getFirst_name();
             projectPresentation.participants.add(participantPresentation);
         }
 
         InstitutionPresentation institutionPresentation = new InstitutionPresentation();
-        institutionPresentation.cristin_institution_id = project.coordinating_institution.institution.cristin_institution_id;
-        institutionPresentation.name = project.coordinating_institution.institution.institution_name.get(language);
+        institutionPresentation.cristin_institution_id = project.getCoordinating_institution().getInstitution().getCristin_institution_id();
+        institutionPresentation.name = project.getCoordinating_institution().getInstitution().getInstitution_name().get(language);
         institutionPresentation.language = language;
         projectPresentation.institutions.add(institutionPresentation);
 
-        FundingSourcePresentation fundingSourcePresentation = new FundingSourcePresentation();
-        fundingSourcePresentation.funding_source_code = "";
-        fundingSourcePresentation.project_code = "";
-        projectPresentation.fundings.add(fundingSourcePresentation);
+        for (FundingSource fundingSource : project.getProject_funding_sources()) {
+            FundingSourcePresentation fundingSourcePresentation = new FundingSourcePresentation();
+            fundingSourcePresentation.funding_source_code = fundingSource.getFunding_source_code();
+            fundingSourcePresentation.project_code = fundingSource.getProject_code();
+            projectPresentation.fundings.add(fundingSourcePresentation);
+        }
 
         return projectPresentation;
-
     }
 
     /**
@@ -130,6 +130,15 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
         JsonObject json = new JsonObject();
         json.addProperty(ERROR_KEY, message);
         return json.toString();
+    }
+
+    private boolean isAlphanumeric(String str) {
+        char[] charArray = str.toCharArray();
+        for (char c : charArray) {
+            if (!Character.isLetterOrDigit(c))
+                return false;
+        }
+        return true;
     }
 
 }

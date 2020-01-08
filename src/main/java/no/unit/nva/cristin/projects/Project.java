@@ -5,164 +5,164 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class Project {
+class Project {
 
-    String cristin_project_id;
-    Boolean publishable;
-    Boolean published;
-    Map<String, String> title;
-    String main_language;
-    String url;
-    String start_date;
-    String end_date;
-    String status;
-    Interaction created;
-    Interaction last_modified;
+    private String cristin_project_id;
+    private Boolean publishable;
+    private Boolean published;
+    private Map<String, String> title;
+    private String main_language;
+    private String url;
+    private String start_date;
+    private String end_date;
+    private String status;
+    private Interaction created;
+    private Interaction last_modified;
 
-    Organization coordinating_institution;
-    List<FundingSource> funding_sources;
-    List<Person> participants;
+    private Organization coordinating_institution;
+    private List<FundingSource> project_funding_sources;
+    private List<Person> participants;
 
-    List<Category> project_categories;
-    List<Category> hrcs_categories;
-    List<Category> hrcs_activities;
-    List<Category> academic_disciplines;
-    List<Category> keywords;
+    private List<Category> project_categories;
+    private List<Category> hrcs_categories;
+    private List<Category> hrcs_activities;
+    private List<Category> academic_disciplines;
+    private List<Category> keywords;
 
-    Map<String, String> academic_summary;
-    Map<String, String> popular_scientific_summary;
-    Map<String, String> method;
+    private Map<String, String> academic_summary;
+    private Map<String, String> popular_scientific_summary;
+    private Map<String, String> method;
 
-    List<String> results;
+    private List<String> results;
 
-    List<String> related_projects;
+    private List<String> related_projects;
 
-    List<Map<String, String>> approvals;
+    private List<Map<String, String>> approvals;
 
-    public String getCristin_project_id() {
+    String getCristin_project_id() {
         return cristin_project_id;
     }
 
-    public Boolean getPublishable() {
+    Boolean getPublishable() {
         return publishable;
     }
 
-    public Boolean getPublished() {
+    Boolean getPublished() {
         return published;
     }
 
-    public Map<String, String> getTitle() {
+    Map<String, String> getTitle() {
         if (title == null) {
             title = new TreeMap<>();
         }
         return title;
     }
 
-    public String getMain_language() {
+    String getMain_language() {
         return main_language;
     }
 
-    public String getUrl() {
+    String getUrl() {
         return url;
     }
 
-    public String getStart_date() {
+    String getStart_date() {
         return start_date;
     }
 
-    public String getEnd_date() {
+    String getEnd_date() {
         return end_date;
     }
 
-    public String getStatus() {
+    String getStatus() {
         return status;
     }
 
-    public Interaction getCreated() {
+    Interaction getCreated() {
         return created;
     }
 
-    public Interaction getLast_modified() {
+    Interaction getLast_modified() {
         return last_modified;
     }
 
-    public Organization getCoordinating_institution() {
+    Organization getCoordinating_institution() {
         return coordinating_institution;
     }
 
-    public List<FundingSource> getFunding_sources() {
-        if (funding_sources == null) {
-            funding_sources = new ArrayList<>();
+    List<FundingSource> getProject_funding_sources() {
+        if (project_funding_sources == null) {
+            project_funding_sources = new ArrayList<>();
         }
-        return funding_sources;
+        return project_funding_sources;
     }
 
-    public List<Person> getParticipants() {
+    List<Person> getParticipants() {
         if (participants == null) {
             participants = new ArrayList<>();
         }
         return participants;
     }
 
-    public List<Category> getProject_categories() {
+    List<Category> getProject_categories() {
         if (project_categories == null) {
             project_categories = new ArrayList<>();
         }
         return project_categories;
     }
 
-    public List<Category> getHrcs_categories() {
+    List<Category> getHrcs_categories() {
         if (hrcs_categories == null) {
             hrcs_categories = new ArrayList<>();
         }
         return hrcs_categories;
     }
 
-    public List<Category> getHrcs_activities() {
+    List<Category> getHrcs_activities() {
         if (hrcs_activities == null) {
             hrcs_activities = new ArrayList<>();
         }
         return hrcs_activities;
     }
 
-    public List<Category> getAcademic_disciplines() {
+    List<Category> getAcademic_disciplines() {
         if (academic_disciplines == null) {
             academic_disciplines = new ArrayList<>();
         }
         return academic_disciplines;
     }
 
-    public List<Category> getKeywords() {
+    List<Category> getKeywords() {
         if (keywords == null) {
             keywords = new ArrayList<>();
         }
         return keywords;
     }
 
-    public Map<String, String> getAcademic_summary() {
+    Map<String, String> getAcademic_summary() {
         return academic_summary;
     }
 
-    public Map<String, String> getPopular_scientific_summary() {
+    Map<String, String> getPopular_scientific_summary() {
         return popular_scientific_summary;
     }
 
-    public Map<String, String> getMethod() {
+    Map<String, String> getMethod() {
         return method;
     }
 
-    public List<String> getRelated_projects() {
+    List<String> getRelated_projects() {
         return related_projects;
     }
 
-    public List<String> getResults() {
+    List<String> getResults() {
         if (results == null) {
             results = new ArrayList<>();
         }
         return results;
     }
 
-    public List<Map<String, String>> getApprovals() {
+    List<Map<String, String>> getApprovals() {
         if (approvals == null) {
             approvals = new ArrayList<>();
         }

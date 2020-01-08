@@ -2,56 +2,56 @@ package no.unit.nva.cristin.projects;
 
 import java.util.List;
 
-public class Person {
+class Person {
 
-    String cristin_person_id;
-    String first_name;
-    String surname;
-    String tel;
-    Boolean identified_cristin_person;
-    String cristin_profile_url;
-    String picture_url;
-    String url;
-    List<Role> roles;
-    List<Affiliation> affiliations;
+    private String cristin_person_id;
+    private String first_name;
+    private String surname;
+    private String tel;
+    private Boolean identified_cristin_person;
+    private String cristin_profile_url;
+    private String picture_url;
+    private String url;
+    private List<Role> roles;
+    private List<Affiliation> affiliations;
 
-    public String getCristin_person_id() {
+    String getCristin_person_id() {
         return cristin_person_id;
     }
 
-    public String getFirst_name() {
+    String getFirst_name() {
         return first_name;
     }
 
-    public String getSurname() {
+    String getSurname() {
         return surname;
     }
 
-    public String getUrl() {
+    String getUrl() {
         return url;
     }
 
-    public List<Role> getRoles() {
+    List<Role> getRoles() {
         return roles;
     }
 
-    public String getTel() {
+    String getTel() {
         return tel;
     }
 
-    public Boolean getIdentified_cristin_person() {
+    Boolean getIdentified_cristin_person() {
         return identified_cristin_person;
     }
 
-    public String getCristin_profile_url() {
+    String getCristin_profile_url() {
         return cristin_profile_url;
     }
 
-    public String getPicture_url() {
+    String getPicture_url() {
         return picture_url;
     }
 
-    public List<Affiliation> getAffiliations() {
+    List<Affiliation> getAffiliations() {
         return affiliations;
     }
 }

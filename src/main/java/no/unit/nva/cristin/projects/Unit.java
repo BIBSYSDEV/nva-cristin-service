@@ -3,37 +3,37 @@ package no.unit.nva.cristin.projects;
 import java.util.List;
 import java.util.Map;
 
-public class Unit {
+class Unit {
 
-    String cristin_unit_id;
-    Map<String, String> unit_name;
-    String url;
-    Institution institution;
+    private String cristin_unit_id;
+    private Map<String, String> unit_name;
+    private String url;
+    private Institution institution;
 
-    Unit parent_unit;
-    List<Unit> subunits;
+    private Unit parent_unit;
+    private List<Unit> subunits;
 
-    public String getCristin_unit_id() {
+    String getCristin_unit_id() {
         return cristin_unit_id;
     }
 
-    public Map<String, String> getUnit_name() {
+    Map<String, String> getUnit_name() {
         return unit_name;
     }
 
-    public String getUrl() {
+    String getUrl() {
         return url;
     }
 
-    public Institution getInstitution() {
+    Institution getInstitution() {
         return institution;
     }
 
-    public Unit getParent_unit() {
+    Unit getParent_unit() {
         return parent_unit;
     }
 
-    public List<Unit> getSubunits() {
+    List<Unit> getSubunits() {
         return subunits;
     }
 }

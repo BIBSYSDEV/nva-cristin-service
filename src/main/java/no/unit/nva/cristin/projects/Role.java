@@ -2,23 +2,23 @@ package no.unit.nva.cristin.projects;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Role {
+class Role {
 
-    String role_code;
-    Institution institution;
+    private String role_code;
+    private Institution institution;
 
     @SerializedName("unit")
-    Unit institution_unit;
+    private Unit institution_unit;
 
-    public String getRole_code() {
+    String getRole_code() {
         return role_code;
     }
 
-    public Institution getInstitution() {
+    Institution getInstitution() {
         return institution;
     }
 
-    public Unit getInstitution_unit() {
+    Unit getInstitution_unit() {
         return institution_unit;
     }
 }

@@ -1,0 +1,68 @@
+{
+  "cristin_project_id": "2040291",
+  "publishable": true,
+  "published": true,
+  "title": {
+    "en": "Opportunities and Challenges for Integrating Sámi Reindeer Herding Traditional Environmental Knowledge in Environmental Governance"
+  },
+  "main_language": "en",
+  "start_date": "2018-11-01T00:00:00.000Z",
+  "end_date": "2021-05-01T00:00:00.000Z",
+  "status": "ACTIVE",
+  "created": {
+    "date": "2019-12-31T09:45:17.000Z"
+  },
+  "last_modified": {
+    "date": "2019-12-31T09:48:20.000Z"
+  },
+  "coordinating_institution": {
+    "institution": {
+      "cristin_institution_id": "231",
+      "institution_name": {
+        "en": "Sámi University of Applied Sciences"
+      },
+      "url": "https://api.cristin.no/v2/institutions/231"
+    },
+    "unit": {
+      "cristin_unit_id": "231.0.0.0",
+      "unit_name": {
+        "en": "Sámi University of Applied Sciences"
+      },
+      "url": "https://api.cristin.no/v2/units/231.0.0.0"
+    }
+  },
+  "project_funding_sources": [
+    {
+      "funding_source_code": "NFR",
+      "project_code": "270819",
+      "funding_source_name": {
+        "en": "Research Council of Norway (RCN)"
+      }
+    }
+  ],
+  "participants": [
+    {
+      "cristin_person_id": "327970",
+      "first_name": "Ellen Inga",
+      "surname": "Turi",
+      "url": "https://api.cristin.no/v2/persons/327970",
+      "roles": [
+        {
+          "role_code": "PRO_MANAGER",
+          "institution": {
+            "cristin_institution_id": "231"
+          },
+          "unit": {
+            "cristin_unit_id": "231.0.0.0",
+            "unit_name": {
+              "en": "Sámi University of Applied Sciences"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "popular_scientific_summary": {
+    "en": "<p>The Arctic areas are undergoing major changes in climate, land-use and socio-economic conditions. The rate of change implies need for improved governance systems capable of navigating society through these changes, based on best available knowledge ? including traditional knowledge. However, integrating traditional knowledge in governance has proved challenging. A major challenge is that traditional knowledge is not available or accessible in a format that has been typically applied in environmental governance. There is thus need for research to improve understanding of how the traditional knowledge based spheres of knowing can be utilized in governance in general, and in environmental governance in particular. <br />\r\nThis projects addresses this need by studying challenges for integrating the traditional knowledge of Sámi reindeer husbandry in environmental governance in the Nordics. In order to promote co-production of knowledge - the complementary and joint efforts of developing new knowledge by traditional-knowledge holders and scientists - the project will co-host community based workshop in collaboration with the RIEVDAN project (NFR grant no. #238326) The project is based on and according to goals and strategies set by Sámi University of Applied Science, and contribute knowledge base for a Master-level course in a new Master degree program on sustainable reindeer husbandry.</p>\r\n"
+  }
+}

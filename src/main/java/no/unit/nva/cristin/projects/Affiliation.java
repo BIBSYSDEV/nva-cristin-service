@@ -5,27 +5,27 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class Affiliation {
+class Affiliation {
 
-    Institution institution;
+    private Institution institution;
     @SerializedName("unit")
-    Unit institution_unit;
-    Boolean active;
-    Map<String, String> position;
+    private Unit institution_unit;
+    private Boolean active;
+    private Map<String, String> position;
 
-    public Institution getInstitution() {
+    Institution getInstitution() {
         return institution;
     }
 
-    public Unit getInstitution_unit() {
+    Unit getInstitution_unit() {
         return institution_unit;
     }
 
-    public Boolean getActive() {
+    Boolean getActive() {
         return active;
     }
 
-    public Map<String, String> getPosition() {
+    Map<String, String> getPosition() {
         if (position == null) {
             position = new TreeMap<>();
         }

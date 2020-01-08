@@ -20,36 +20,52 @@ Parameters:
   CustomDomainBasePath:
     Type: String
     Description: Base path mapping in CustomDomain
+  CorsOrigin:
+    Type: String
+    Description: Value to use for Cors 'Allow...' header if value is set
 
 Resources:
 
-  NvaDoiFunctionApi:
+  NvaCristinProjectsFunctionApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Auth:
-        DefaultAuthorizer: MyCognitoAuthorizer
         Authorizers:
           MyCognitoAuthorizer:
             UserPoolArn: !Ref CognitoAuthorizerArn
+      Cors:
+        AllowCredentials: true
+        AllowOrigin: !Sub
+          - "'${Domain}'"
+          - Domain: !Ref  CorsOrigin
+        AllowMethods: "'OPTIONS, GET'"
+      EndpointConfiguration: Regional
+
 
   NvaCristinProjectsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: .
+      Environment:
+        Variables:
+          AllowOrigin: !Sub
+            - "${Domain}"
+            - Domain: !Ref  CorsOrigin
       Handler: no.unit.nva.doi.FetchCristinProjects::handleRequest
       Runtime: java8
-      MemorySize: 1408
+      MemorySize: 512
       Events:
-        NvaCristinProjects:
+        NvaCristinProjectsEvent:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /
-            Method: get
+            Auth:
+              Authorizer: MyCognitoAuthorizer
             RestApiId: !Ref NvaCristinProjectsFunctionApi
+            Path: /
+            Method: post
             RequestParameters:
-            - method.request.querystring.language
-            - method.request.querystring.title
+              - method.request.querystring.language
+              - method.request.querystring.title
 
   NvaCristinProjectsFunctionBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping

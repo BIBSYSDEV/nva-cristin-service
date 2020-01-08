@@ -2,16 +2,16 @@ package no.unit.nva.cristin.projects;
 
 import java.util.Map;
 
-public class Category {
+class Category {
 
-    String code;
-    Map<String, String> name;
+    private String code;
+    private Map<String, String> name;
 
-    public String getCode() {
+    String getCode() {
         return code;
     }
 
-    public Map<String, String> getName() {
+    Map<String, String> getName() {
         return name;
     }
 }
