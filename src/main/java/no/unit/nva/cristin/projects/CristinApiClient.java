@@ -66,7 +66,7 @@ public class CristinApiClient {
         return uri.toURL();
     }
 
-    private static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
+    protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
         try {
             return new Gson().fromJson(reader, classOfT);
         } catch (JsonSyntaxException e) {

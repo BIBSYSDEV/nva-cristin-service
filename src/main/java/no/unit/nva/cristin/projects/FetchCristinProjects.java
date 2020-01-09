@@ -116,12 +116,14 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
         });
 
         InstitutionPresentation institutionPresentation = new InstitutionPresentation();
-        institutionPresentation.cristinInstitutionId = project.coordinatingInstitution.institution
-                .cristinInstitutionId;
-        institutionPresentation.name = project.coordinatingInstitution.institution.institutionName
-                .get(language);
-        institutionPresentation.language = language;
-        projectPresentation.institutions.add(institutionPresentation);
+        if (Optional.ofNullable(project.coordinatingInstitution).isPresent()) {
+            institutionPresentation.cristinInstitutionId = project.coordinatingInstitution.institution
+                    .cristinInstitutionId;
+            institutionPresentation.name = project.coordinatingInstitution.institution.institutionName
+                    .get(language);
+            institutionPresentation.language = language;
+            projectPresentation.institutions.add(institutionPresentation);
+        }
 
         Optional.ofNullable(project.projectFundingSources).orElse(new ArrayList<>()).forEach(fundingSource -> {
             FundingSourcePresentation fundingSourcePresentation = new FundingSourcePresentation();

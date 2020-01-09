@@ -13,15 +13,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -66,6 +66,26 @@ public class FetchCristinProjectsTest {
         when(mockCristinApiClient.getProject(any(), any())).thenCallRealMethod();
         when(mockCristinApiClient.generateQueryProjectsUrl(any())).thenCallRealMethod();
         when(mockCristinApiClient.generateGetProjectUrl(any(), any())).thenCallRealMethod();
+
+        Map<String, Object> event = new HashMap<>();
+        Map<String, String> queryParams = new TreeMap<>();
+        queryParams.put("title", QUERY_PARAM_TITLE_REINDEER);
+        queryParams.put("language", QUERY_PARAM_LANGUAGE_NB);
+        event.put("queryStringParameters", queryParams);
+
+        FetchCristinProjects mockFetchCristinProjects = new FetchCristinProjects(mockCristinApiClient);
+        GatewayResponse response = mockFetchCristinProjects.handleRequest(event, null);
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatusCode());
+        assertEquals(response.getHeaders().get(HttpHeaders.CONTENT_TYPE), MediaType.APPLICATION_JSON);
+    }
+
+    @Test
+    public void testExceptionGettingProject() throws Exception {
+        when(mockCristinApiClient.fetchQueryResults(any())).thenReturn(mockQueryResponseReader());
+        when(mockCristinApiClient.queryProjects(any())).thenCallRealMethod();
+        when(mockCristinApiClient.getProject(any(), any())).thenThrow(new IOException());
+        when(mockCristinApiClient.generateQueryProjectsUrl(any())).thenCallRealMethod();
 
         Map<String, Object> event = new HashMap<>();
         Map<String, String> queryParams = new TreeMap<>();
@@ -182,6 +202,33 @@ public class FetchCristinProjectsTest {
         assertEquals(response.getHeaders().get(HttpHeaders.CONTENT_TYPE), MediaType.APPLICATION_JSON);
         assertEquals(response.getBody(), "{\"error\":\"Parameter 'language' has invalid value\"}");
     }
+
+    @Test (expected = IOException.class)
+    public void testExceptionOnCristinQueryProjectsConnection() throws IOException {
+        CristinApiClient cristinApiClient = new CristinApiClient();
+        URL invalidUrl = new URL("http://iam.an.url");
+        cristinApiClient.fetchQueryResults(invalidUrl);
+        fail();
+    }
+
+    @Test (expected = IOException.class)
+    public void testExceptionOnCristinGetProjectConnection() throws IOException {
+        CristinApiClient cristinApiClient = new CristinApiClient();
+        URL invalidUrl = new URL("http://iam.an.url");
+        cristinApiClient.fetchGetResult(invalidUrl);
+        fail();
+    }
+
+    @Test (expected = IOException.class)
+    public void testExceptionOnInvalidJson() throws IOException {
+        CristinApiClient cristinApiClient = new CristinApiClient();
+        String invalidJson = "asdf";
+        InputStream inputStream = new ByteArrayInputStream(invalidJson.getBytes(Charset.forName("UTF-8")));
+        InputStreamReader reader = new InputStreamReader(inputStream);
+        cristinApiClient.fromJson(reader, Project.class);
+        fail();
+    }
+
 
 
 //    @Test
