@@ -1,16 +1,12 @@
 package no.unit.nva.cristin.projects;
 
-class Interaction {
+import com.google.gson.annotations.SerializedName;
 
-    private String cristin_person_id;
-    private String date;
+public class Interaction {
 
-    String getCristin_person_id() {
-        return cristin_person_id;
-    }
+    @SerializedName("cristin_person_id")
+    public String cristinPersonId;
+    public String date;
 
-    String getDate() {
-        return date;
-    }
 }
 

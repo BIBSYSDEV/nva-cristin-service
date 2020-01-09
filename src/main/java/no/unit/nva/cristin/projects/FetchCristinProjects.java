@@ -10,7 +10,14 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Handler for requests to Lambda function.
@@ -25,7 +32,7 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     private static final List<String> VALID_LANGUAGE_CODES = Arrays.asList("nb", "en");
 
 
-    private CristinApiClient cristinApiClient;
+    private final transient CristinApiClient cristinApiClient;
 
     public FetchCristinProjects(CristinApiClient cristinApiClient) {
         this.cristinApiClient = cristinApiClient;
@@ -38,20 +45,18 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
         GatewayResponse gatewayResponse = new GatewayResponse();
         Map<String, String> queryStringParameters = (Map<String, String>) input.get("queryStringParameters");
         String title = queryStringParameters.getOrDefault("title", "");
-        String language = queryStringParameters.getOrDefault("language", DEFAULT_LANGUAGE_CODE);
-
         if (title.isEmpty()) {
             gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
             gatewayResponse.setBody(getErrorAsJson(TITLE_IS_NULL));
             return gatewayResponse;
         }
-
         if (!isAlphanumeric(title)) {
             gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
             gatewayResponse.setBody(getErrorAsJson(TITLE_ILLEGAL_CHARACTERS));
             return gatewayResponse;
         }
 
+        String language = queryStringParameters.getOrDefault("language", DEFAULT_LANGUAGE_CODE);
         if (!VALID_LANGUAGE_CODES.contains(language)) {
             gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
             gatewayResponse.setBody(getErrorAsJson(LANGUAGE_INVALID));
@@ -59,19 +64,24 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
         }
 
         try {
-            Map<String, String> parameters = new TreeMap<>();
+            Map<String, String> parameters = new ConcurrentHashMap<>();
             parameters.put("title", title);
             parameters.put("lang", language);
             parameters.put("page", "1");
             parameters.put("per_page", "5");
 
             List<Project> projects = cristinApiClient.queryProjects(parameters);
-            List<ProjectPresentation> projectPresentations = new ArrayList<>();
-
-            for (Project project : projects) {
-                Project enrichedProject = cristinApiClient.getProject(project.getCristin_project_id(), language);
-                projectPresentations.add(asProjectPresentation(enrichedProject, language));
-            }
+            List<ProjectPresentation> projectPresentations = projects.stream()
+                    .map(project -> {
+                        try {
+                            return cristinApiClient.getProject(project.cristinProjectId, language);
+                        } catch (IOException | URISyntaxException e) {
+                            System.out.println("Error fetching cristin project with id: " + project.cristinProjectId);
+                        }
+                        return project;
+                    })
+                    .map(project -> asProjectPresentation(project, language))
+                    .collect(Collectors.toList());
 
             Type projectListType = new TypeToken<ArrayList<ProjectPresentation>>() {
             }.getType();
@@ -88,34 +98,37 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
 
     private ProjectPresentation asProjectPresentation(Project project, String language) {
         ProjectPresentation projectPresentation = new ProjectPresentation();
-        projectPresentation.cristin_project_id = project.getCristin_project_id();
+        projectPresentation.cristinProjectId = project.cristinProjectId;
 
-        for (String key : project.getTitle().keySet()) {
+        Optional.ofNullable(project.title).orElse(new TreeMap<String, String>() {
+        }).forEach((key, value) -> {
             TitlePresentation titlePresentation = new TitlePresentation();
             titlePresentation.language = key;
-            titlePresentation.title = project.getTitle().get(key);
+            titlePresentation.title = value;
             projectPresentation.titles.add(titlePresentation);
-        }
+        });
 
-        for (Person person : project.getParticipants()) {
+        Optional.ofNullable(project.participants).orElse(new ArrayList<>()).forEach(person -> {
             ParticipantPresentation participantPresentation = new ParticipantPresentation();
-            participantPresentation.cristin_person_id = person.getCristin_person_id();
-            participantPresentation.full_name = person.getSurname() + ", " + person.getFirst_name();
+            participantPresentation.cristinPersonId = person.cristinPersonId;
+            participantPresentation.fullName = person.surname + ", " + person.firstName;
             projectPresentation.participants.add(participantPresentation);
-        }
+        });
 
         InstitutionPresentation institutionPresentation = new InstitutionPresentation();
-        institutionPresentation.cristin_institution_id = project.getCoordinating_institution().getInstitution().getCristin_institution_id();
-        institutionPresentation.name = project.getCoordinating_institution().getInstitution().getInstitution_name().get(language);
+        institutionPresentation.cristinInstitutionId = project.coordinatingInstitution.institution
+                .cristinInstitutionId;
+        institutionPresentation.name = project.coordinatingInstitution.institution.institutionName
+                .get(language);
         institutionPresentation.language = language;
         projectPresentation.institutions.add(institutionPresentation);
 
-        for (FundingSource fundingSource : project.getProject_funding_sources()) {
+        Optional.ofNullable(project.projectFundingSources).orElse(new ArrayList<>()).forEach(fundingSource -> {
             FundingSourcePresentation fundingSourcePresentation = new FundingSourcePresentation();
-            fundingSourcePresentation.funding_source_code = fundingSource.getFunding_source_code();
-            fundingSourcePresentation.project_code = fundingSource.getProject_code();
+            fundingSourcePresentation.fundingSourceCode = fundingSource.fundingSourceCode;
+            fundingSourcePresentation.projectCode = fundingSource.projectCode;
             projectPresentation.fundings.add(fundingSourcePresentation);
-        }
+        });
 
         return projectPresentation;
     }
@@ -135,8 +148,9 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     private boolean isAlphanumeric(String str) {
         char[] charArray = str.toCharArray();
         for (char c : charArray) {
-            if (!Character.isLetterOrDigit(c))
+            if (!Character.isLetterOrDigit(c)) {
                 return false;
+            }
         }
         return true;
     }

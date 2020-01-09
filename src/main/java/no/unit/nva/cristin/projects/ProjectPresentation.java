@@ -3,12 +3,12 @@ package no.unit.nva.cristin.projects;
 import java.util.ArrayList;
 import java.util.List;
 
-class ProjectPresentation {
+public class ProjectPresentation {
 
-    String cristin_project_id = "";
-    List<TitlePresentation> titles = new ArrayList<>();
-    List<ParticipantPresentation> participants = new ArrayList<>();
-    List<InstitutionPresentation> institutions = new ArrayList<>();
-    List<FundingSourcePresentation> fundings = new ArrayList<>();
+    public String cristinProjectId = "";
+    public List<TitlePresentation> titles = new ArrayList<>();
+    public List<ParticipantPresentation> participants = new ArrayList<>();
+    public List<InstitutionPresentation> institutions = new ArrayList<>();
+    public List<FundingSourcePresentation> fundings = new ArrayList<>();
 
 }

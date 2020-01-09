@@ -1,16 +1,14 @@
 package no.unit.nva.cristin.projects;
 
-class FundingSource {
+import com.google.gson.annotations.SerializedName;
 
-    private String funding_source_code;
-    private String project_code;
+public class FundingSource {
 
-    String getFunding_source_code() {
-        return funding_source_code;
-    }
+    @SerializedName("funding_source_code")
+    public String fundingSourceCode;
 
-    String getProject_code() {
-        return funding_source_code;
-    }
+    @SerializedName("project_code")
+    public String projectCode;
+
 }
 

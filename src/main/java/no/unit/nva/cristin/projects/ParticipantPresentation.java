@@ -1,8 +1,8 @@
 package no.unit.nva.cristin.projects;
 
-class ParticipantPresentation {
+public class ParticipantPresentation {
 
-    String cristin_person_id;
-    String full_name;
+    public String cristinPersonId;
+    public String fullName;
 
 }

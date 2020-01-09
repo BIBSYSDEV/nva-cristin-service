@@ -1,43 +1,22 @@
 package no.unit.nva.cristin.projects;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Map;
 
-class Institution {
+public class Institution {
 
-    private String cristin_institution_id;
-    private Map<String, String> institution_name;
-    private String acronym;
-    private String country;
-    private Boolean cristin_user_institution;
-    private Unit corresponding_unit;
-    private String url;
+    @SerializedName("cristin_institution_id")
+    public String cristinInstitutionId;
+    @SerializedName("institution_name")
+    public Map<String, String> institutionName;
+    public String acronym;
+    public String country;
+    @SerializedName("cristin_user_institution")
+    public Boolean cristinUserInstitution;
+    @SerializedName("corresponding_unit")
+    public Unit correspondingUnit;
+    public String url;
 
-    String getCristin_institution_id() {
-        return cristin_institution_id;
-    }
-
-    Map<String, String> getInstitution_name() {
-        return institution_name;
-    }
-
-    String getAcronym() {
-        return acronym;
-    }
-
-    String getCountry() {
-        return country;
-    }
-
-    Boolean getCristin_user_institution() {
-        return cristin_user_institution;
-    }
-
-    String getUrl() {
-        return url;
-    }
-
-    Unit getCorresponding_unit() {
-        return corresponding_unit;
-    }
 }
 

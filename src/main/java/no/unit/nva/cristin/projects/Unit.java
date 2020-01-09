@@ -1,40 +1,22 @@
 package no.unit.nva.cristin.projects;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 import java.util.Map;
 
-class Unit {
+public class Unit {
 
-    private String cristin_unit_id;
-    private Map<String, String> unit_name;
-    private String url;
-    private Institution institution;
+    @SerializedName("cristin_unit_id")
+    public String cristinUnitId;
+    @SerializedName("unit_name")
+    public Map<String, String> unitName;
+    public String url;
+    public Institution institution;
 
-    private Unit parent_unit;
-    private List<Unit> subunits;
+    @SerializedName("parent_unit")
+    public Unit parentUnit;
+    public List<Unit> subunits;
 
-    String getCristin_unit_id() {
-        return cristin_unit_id;
-    }
-
-    Map<String, String> getUnit_name() {
-        return unit_name;
-    }
-
-    String getUrl() {
-        return url;
-    }
-
-    Institution getInstitution() {
-        return institution;
-    }
-
-    Unit getParent_unit() {
-        return parent_unit;
-    }
-
-    List<Unit> getSubunits() {
-        return subunits;
-    }
 }
 

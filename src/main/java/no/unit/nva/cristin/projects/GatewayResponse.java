@@ -14,16 +14,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GatewayResponse {
 
-    private static final String CORS_ALLOW_ORIGIN_HEADER = "Access-Control-Allow-Origin";
-    private static final String CORS_ALLOW_ORIGIN_HEADER_ENVIRONMENT_NAME = "AllowOrigin";
-    private static final transient String X_CUSTOM_HEADER = "X-Custom-Header";
+    public static final String CORS_ALLOW_ORIGIN_HEADER = "Access-Control-Allow-Origin";
+    public static final String CORS_ALLOW_ORIGIN_HEADER_ENVIRONMENT_NAME = "AllowOrigin";
 
-    private static final String EMPTY_JSON = "{}";
+    public static final String EMPTY_JSON = "{}";
     private String body;
     private final Map<String, String> headers;
     private int statusCode;
 
-    GatewayResponse() {
+    public GatewayResponse() {
         this.statusCode = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
         this.body = EMPTY_JSON;
         this.headers = this.generateDefaultHeaders();
@@ -41,18 +40,17 @@ public class GatewayResponse {
         return statusCode;
     }
 
-    void setBody(String body) {
+    public void setBody(String body) {
         this.body = body;
     }
 
-    void setStatusCode(int status) {
+    public void setStatusCode(int status) {
         this.statusCode = status;
     }
 
     private Map<String, String> generateDefaultHeaders() {
         Map<String, String> headers = new ConcurrentHashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-        headers.put(X_CUSTOM_HEADER, MediaType.APPLICATION_JSON);
         headers.putAll(getHeadersFromEnvironment());
         return Collections.unmodifiableMap(new HashMap<>(headers));
     }

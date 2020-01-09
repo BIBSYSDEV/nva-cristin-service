@@ -1,8 +1,8 @@
 package no.unit.nva.cristin.projects;
 
-class TitlePresentation {
+public class TitlePresentation {
 
-    String title;
-    String language;
+    public String title;
+    public String language;
 
 }

@@ -47,12 +47,14 @@ public class FetchCristinProjectsTest {
 
 
     private InputStreamReader mockGetResponseReader() {
-        InputStream getResultAsStream = FetchCristinProjectsTest.class.getResourceAsStream(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE);
+        InputStream getResultAsStream = FetchCristinProjectsTest.class
+                .getResourceAsStream(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE);
         return new InputStreamReader(getResultAsStream);
     }
 
     private InputStreamReader mockQueryResponseReader() {
-        InputStream queryResultsAsStream = FetchCristinProjectsTest.class.getResourceAsStream(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE);
+        InputStream queryResultsAsStream = FetchCristinProjectsTest.class
+                .getResourceAsStream(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE);
         return new InputStreamReader(queryResultsAsStream);
     }
 
@@ -182,20 +184,18 @@ public class FetchCristinProjectsTest {
     }
 
 
-    //    @Test
-    public void testFetchCristinProjects() {
-        CristinApiClient cristinApiClient = new CristinApiClient();
-        FetchCristinProjects fetchCristinProjects = new FetchCristinProjects(cristinApiClient);
-        String title = "reindeer";
-        String language = "nb";
-        Map<String, Object> event = new HashMap<>();
-        Map<String, String> queryParams = new TreeMap<>();
-        queryParams.put("title", QUERY_PARAM_TITLE_REINDEER);
-        queryParams.put("language", QUERY_PARAM_LANGUAGE_NB);
-        event.put("queryStringParameters", queryParams);
-        GatewayResponse response = fetchCristinProjects.handleRequest(event, null);
-        System.out.println(response.getBody());
-        assertNotNull(response.getBody());
-    }
+//    @Test
+//    public void testFetchCristinProjects() {
+//        CristinApiClient cristinApiClient = new CristinApiClient();
+//        FetchCristinProjects fetchCristinProjects = new FetchCristinProjects(cristinApiClient);
+//        Map<String, Object> event = new HashMap<>();
+//        Map<String, String> queryParams = new TreeMap<>();
+//        queryParams.put("title", QUERY_PARAM_TITLE_REINDEER);
+//        queryParams.put("language", QUERY_PARAM_LANGUAGE_NB);
+//        event.put("queryStringParameters", queryParams);
+//        GatewayResponse response = fetchCristinProjects.handleRequest(event, null);
+//        System.out.println(response.getBody());
+//        assertNotNull(response.getBody());
+//    }
 
 }

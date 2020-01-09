@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.apache.http.client.utils.URIBuilder;
 
-import javax.ws.rs.BadRequestException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -23,14 +22,14 @@ public class CristinApiClient {
     private static final String CRISTIN_API_HOST = "api.cristin.no";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
 
-    List<Project> queryProjects(Map<String, String> parameters) throws IOException, URISyntaxException {
+    protected List<Project> queryProjects(Map<String, String> parameters) throws IOException, URISyntaxException {
         URL url = generateQueryProjectsUrl(parameters);
         try (InputStreamReader streamReader = fetchQueryResults(url)) {
             return asList(fromJson(streamReader, Project[].class));
         }
     }
 
-    Project getProject(String id, String language) throws IOException, URISyntaxException {
+    protected Project getProject(String id, String language) throws IOException, URISyntaxException {
         URL url = generateGetProjectUrl(id, language);
         try (InputStreamReader streamReader = fetchGetResult(url)) {
             return fromJson(streamReader, Project.class);
@@ -45,7 +44,8 @@ public class CristinApiClient {
         return new InputStreamReader(url.openStream());
     }
 
-    protected URL generateQueryProjectsUrl(Map<String, String> parameters) throws MalformedURLException, URISyntaxException {
+    protected URL generateQueryProjectsUrl(Map<String, String> parameters) throws MalformedURLException,
+            URISyntaxException {
         URIBuilder uri = new URIBuilder()
                 .setScheme(HTTPS)
                 .setHost(CRISTIN_API_HOST)

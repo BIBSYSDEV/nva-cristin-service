@@ -1,8 +1,8 @@
 package no.unit.nva.cristin.projects;
 
-class FundingSourcePresentation {
+public class FundingSourcePresentation {
 
-    String funding_source_code;
-    String project_code;
+    public String fundingSourceCode;
+    public String projectCode;
 
 }

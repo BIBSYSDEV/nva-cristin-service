@@ -1,58 +1,26 @@
 package no.unit.nva.cristin.projects;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
-class Person {
+public class Person {
 
-    private String cristin_person_id;
-    private String first_name;
-    private String surname;
-    private String tel;
-    private Boolean identified_cristin_person;
-    private String cristin_profile_url;
-    private String picture_url;
-    private String url;
-    private List<Role> roles;
-    private List<Affiliation> affiliations;
+    @SerializedName("cristin_person_id")
+    public String cristinPersonId;
+    @SerializedName("first_name")
+    public String firstName;
+    public String surname;
+    public String tel;
+    @SerializedName("identified_cristin_person")
+    public Boolean identifiedCristinPerson;
+    @SerializedName("cristin_profile_url")
+    public String cristinProfileUrl;
+    @SerializedName("picture_url")
+    public String pictureUrl;
+    public String url;
+    public List<Role> roles;
+    public List<Affiliation> affiliations;
 
-    String getCristin_person_id() {
-        return cristin_person_id;
-    }
-
-    String getFirst_name() {
-        return first_name;
-    }
-
-    String getSurname() {
-        return surname;
-    }
-
-    String getUrl() {
-        return url;
-    }
-
-    List<Role> getRoles() {
-        return roles;
-    }
-
-    String getTel() {
-        return tel;
-    }
-
-    Boolean getIdentified_cristin_person() {
-        return identified_cristin_person;
-    }
-
-    String getCristin_profile_url() {
-        return cristin_profile_url;
-    }
-
-    String getPicture_url() {
-        return picture_url;
-    }
-
-    List<Affiliation> getAffiliations() {
-        return affiliations;
-    }
 }
 

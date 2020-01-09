@@ -1,9 +1,9 @@
 package no.unit.nva.cristin.projects;
 
-class InstitutionPresentation {
+public class InstitutionPresentation {
 
-    String cristin_institution_id;
-    String name;
-    String language;
+    public String cristinInstitutionId;
+    public String name;
+    public String language;
 
 }
