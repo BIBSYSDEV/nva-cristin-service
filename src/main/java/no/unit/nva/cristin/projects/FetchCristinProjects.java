@@ -31,10 +31,16 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final List<String> VALID_LANGUAGE_CODES = Arrays.asList("nb", "en");
 
+    private transient CristinApiClient cristinApiClient;
 
-    private final transient CristinApiClient cristinApiClient;
+    public FetchCristinProjects() {
+    }
 
     public FetchCristinProjects(CristinApiClient cristinApiClient) {
+        this.cristinApiClient = cristinApiClient;
+    }
+
+    public void setCristinApiClient(CristinApiClient cristinApiClient) {
         this.cristinApiClient = cristinApiClient;
     }
 

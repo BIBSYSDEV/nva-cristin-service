@@ -79,7 +79,8 @@ public class FetchCristinProjectsTest {
         queryParams.put("language", QUERY_PARAM_LANGUAGE_NB);
         event.put("queryStringParameters", queryParams);
 
-        FetchCristinProjects mockFetchCristinProjects = new FetchCristinProjects(mockCristinApiClient);
+        FetchCristinProjects mockFetchCristinProjects = new FetchCristinProjects();
+        mockFetchCristinProjects.setCristinApiClient(mockCristinApiClient);
         GatewayResponse response = mockFetchCristinProjects.handleRequest(event, null);
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatusCode());
