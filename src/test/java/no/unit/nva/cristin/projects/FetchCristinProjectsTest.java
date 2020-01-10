@@ -182,7 +182,7 @@ public class FetchCristinProjectsTest {
 
         Map<String, Object> event = new HashMap<>();
         Map<String, String> queryParams = new TreeMap<>();
-        queryParams.put("title", "?");
+        queryParams.put("title", "abc123- ?");
         event.put("queryStringParameters", queryParams);
 
         FetchCristinProjects mockFetchCristinProjects = new FetchCristinProjects(mockCristinApiClient);
@@ -190,7 +190,8 @@ public class FetchCristinProjectsTest {
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatusCode());
         assertEquals(response.getHeaders().get(HttpHeaders.CONTENT_TYPE), MediaType.APPLICATION_JSON);
-        assertEquals(response.getBody(), "{\"error\":\"Parameter 'title' contains non-alphanumeric characters\"}");
+        assertEquals(response.getBody(), "{\"error\":\"Parameter 'title' may only contain alphanumeric "
+                + "characters, dash and whitespace\"}");
     }
 
     @Test

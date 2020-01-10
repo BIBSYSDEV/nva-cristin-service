@@ -25,7 +25,8 @@ import java.util.stream.Collectors;
 public class FetchCristinProjects implements RequestHandler<Map<String, Object>, GatewayResponse> {
 
     private static final String TITLE_IS_NULL = "Parameter 'title' is mandatory";
-    private static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' contains non-alphanumeric characters";
+    private static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' may only contain alphanumeric " +
+            "characters, dash and whitespace";
     private static final String LANGUAGE_INVALID = "Parameter 'language' has invalid value";
     private static final String ERROR_KEY = "error";
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
@@ -57,7 +58,7 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
             gatewayResponse.setBody(getErrorAsJson(TITLE_IS_NULL));
             return gatewayResponse;
         }
-        if (!isAlphanumeric(title)) {
+        if (!isValidTitle(title)) {
             gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
             gatewayResponse.setBody(getErrorAsJson(TITLE_ILLEGAL_CHARACTERS));
             return gatewayResponse;
@@ -154,10 +155,10 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
         return json.toString();
     }
 
-    private boolean isAlphanumeric(String str) {
+    private boolean isValidTitle(String str) {
         char[] charArray = str.toCharArray();
         for (char c : charArray) {
-            if (!Character.isLetterOrDigit(c)) {
+            if (!Character.isWhitespace(c) && !Character.isLetterOrDigit(c) && c != '-') {
                 return false;
             }
         }
