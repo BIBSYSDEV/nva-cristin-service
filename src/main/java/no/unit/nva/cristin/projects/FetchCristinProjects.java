@@ -34,6 +34,7 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     private transient CristinApiClient cristinApiClient;
 
     public FetchCristinProjects() {
+        cristinApiClient = new CristinApiClient();
     }
 
     public FetchCristinProjects(CristinApiClient cristinApiClient) {
