@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("PMD.ShortClassName")
 public class Unit {
 
     @SerializedName("cristin_unit_id")

@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+
 import java.util.Map;
 
 public class Category {

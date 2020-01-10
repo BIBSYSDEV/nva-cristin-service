@@ -13,15 +13,20 @@ import org.mockito.runners.MockitoJUnitRunner;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +38,7 @@ public class FetchCristinProjectsTest {
 
     private static final String QUERY_PARAM_LANGUAGE_NB = "nb";
     private static final String QUERY_PARAM_TITLE_REINDEER = "reindeer";
+    public static final String AN_URL = "http://iam.an.url";
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -203,23 +209,29 @@ public class FetchCristinProjectsTest {
         assertEquals(response.getBody(), "{\"error\":\"Parameter 'language' has invalid value\"}");
     }
 
-    @Test (expected = IOException.class)
-    public void testExceptionOnCristinQueryProjectsConnection() throws IOException {
+    @Test
+    public void testCristinQueryProjectsConnection() throws IOException {
         CristinApiClient cristinApiClient = new CristinApiClient();
-        URL invalidUrl = new URL("http://iam.an.url");
+        URL invalidUrl = Paths.get("/dev/null").toUri().toURL();
         cristinApiClient.fetchQueryResults(invalidUrl);
-        fail();
     }
 
-    @Test (expected = IOException.class)
-    public void testExceptionOnCristinGetProjectConnection() throws IOException {
+    @Test
+    public void testCristinGetProjectConnection() throws IOException {
         CristinApiClient cristinApiClient = new CristinApiClient();
-        URL invalidUrl = new URL("http://iam.an.url");
+        URL invalidUrl = Paths.get("/dev/null").toUri().toURL();
         cristinApiClient.fetchGetResult(invalidUrl);
-        fail();
+
     }
 
-    @Test (expected = IOException.class)
+    @Test
+    public void testCristinGenerateQueryProjectsUrlFromNull() throws IOException, URISyntaxException {
+        CristinApiClient cristinApiClient = new CristinApiClient();
+        cristinApiClient.generateQueryProjectsUrl(null);
+    }
+
+
+    @Test(expected = IOException.class)
     public void testExceptionOnInvalidJson() throws IOException {
         CristinApiClient cristinApiClient = new CristinApiClient();
         String invalidJson = "asdf";
@@ -228,21 +240,5 @@ public class FetchCristinProjectsTest {
         cristinApiClient.fromJson(reader, Project.class);
         fail();
     }
-
-
-
-//    @Test
-//    public void testFetchCristinProjects() {
-//        CristinApiClient cristinApiClient = new CristinApiClient();
-//        FetchCristinProjects fetchCristinProjects = new FetchCristinProjects(cristinApiClient);
-//        Map<String, Object> event = new HashMap<>();
-//        Map<String, String> queryParams = new TreeMap<>();
-//        queryParams.put("title", QUERY_PARAM_TITLE_REINDEER);
-//        queryParams.put("language", QUERY_PARAM_LANGUAGE_NB);
-//        event.put("queryStringParameters", queryParams);
-//        GatewayResponse response = fetchCristinProjects.handleRequest(event, null);
-//        System.out.println(response.getBody());
-//        assertNotNull(response.getBody());
-//    }
 
 }
