@@ -51,7 +51,7 @@ Resources:
           AllowOrigin: !Sub
             - "${Domain}"
             - Domain: !Ref  CorsOrigin
-      Handler: no.unit.nva.doi.FetchCristinProjects::handleRequest
+      Handler: no.unit.nva.cristin.projects.FetchCristinProjects::handleRequest
       Runtime: java8
       MemorySize: 512
       Events:
