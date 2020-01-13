@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 public class FetchCristinProjects implements RequestHandler<Map<String, Object>, GatewayResponse> {
 
     private static final String TITLE_IS_NULL = "Parameter 'title' is mandatory";
-    private static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' may only contain alphanumeric " +
-            "characters, dash and whitespace";
+    private static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' may only contain alphanumeric "
+            + "characters, dash and whitespace";
     private static final String LANGUAGE_INVALID = "Parameter 'language' has invalid value";
     private static final String ERROR_KEY = "error";
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
