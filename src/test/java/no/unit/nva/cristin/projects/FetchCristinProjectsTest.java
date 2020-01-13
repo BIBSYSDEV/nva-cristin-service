@@ -38,7 +38,6 @@ public class FetchCristinProjectsTest {
 
     private static final String QUERY_PARAM_LANGUAGE_NB = "nb";
     private static final String QUERY_PARAM_TITLE_REINDEER = "reindeer";
-    public static final String AN_URL = "http://iam.an.url";
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -68,6 +67,7 @@ public class FetchCristinProjectsTest {
     public void testSuccessfulResponse() throws Exception {
         when(mockCristinApiClient.fetchQueryResults(any())).thenReturn(mockQueryResponseReader());
         when(mockCristinApiClient.fetchGetResult(any())).thenAnswer(i -> mockGetResponseReader());
+        when(mockCristinApiClient.queryAndEnrichProjects(any(),any())).thenCallRealMethod();
         when(mockCristinApiClient.queryProjects(any())).thenCallRealMethod();
         when(mockCristinApiClient.getProject(any(), any())).thenCallRealMethod();
         when(mockCristinApiClient.generateQueryProjectsUrl(any())).thenCallRealMethod();
@@ -90,6 +90,7 @@ public class FetchCristinProjectsTest {
     @Test
     public void testExceptionGettingProject() throws Exception {
         when(mockCristinApiClient.fetchQueryResults(any())).thenReturn(mockQueryResponseReader());
+        when(mockCristinApiClient.queryAndEnrichProjects(any(), any())).thenCallRealMethod();
         when(mockCristinApiClient.queryProjects(any())).thenCallRealMethod();
         when(mockCristinApiClient.getProject(any(), any())).thenThrow(new IOException());
         when(mockCristinApiClient.generateQueryProjectsUrl(any())).thenCallRealMethod();
@@ -109,7 +110,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void testErrorResponse() throws Exception {
-        when(mockCristinApiClient.queryProjects(any())).thenThrow(new IOException("Mock exception"));
+        when(mockCristinApiClient.queryAndEnrichProjects(any(), any())).thenThrow(new IOException("Mock exception"));
 
         Map<String, Object> event = new HashMap<>();
         Map<String, String> queryParams = new TreeMap<>();
@@ -143,6 +144,7 @@ public class FetchCristinProjectsTest {
     public void testMissingLanguageParam() throws Exception {
         when(mockCristinApiClient.fetchQueryResults(any())).thenReturn(mockQueryResponseReader());
         when(mockCristinApiClient.fetchGetResult(any())).thenAnswer(i -> mockGetResponseReader());
+        when(mockCristinApiClient.queryAndEnrichProjects(any(), any())).thenCallRealMethod();
         when(mockCristinApiClient.queryProjects(any())).thenCallRealMethod();
         when(mockCristinApiClient.getProject(any(), any())).thenCallRealMethod();
         when(mockCristinApiClient.generateQueryProjectsUrl(any())).thenCallRealMethod();

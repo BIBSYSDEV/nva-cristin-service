@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 
@@ -21,6 +22,22 @@ public class CristinApiClient {
     private static final String HTTPS = "https";
     private static final String CRISTIN_API_HOST = "api.cristin.no";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
+
+    protected List<Project> queryAndEnrichProjects(Map<String, String> parameters, String language) throws
+            IOException, URISyntaxException {
+        List<Project> projects = queryProjects(parameters);
+        List<Project> enrichedProjects = projects.stream()
+                .map(project -> {
+                    try {
+                        return getProject(project.cristinProjectId, language);
+                    } catch (IOException | URISyntaxException e) {
+                        System.out.println("Error fetching cristin project with id: " + project.cristinProjectId);
+                    }
+                    return project;
+                })
+                .collect(Collectors.toList());
+        return enrichedProjects;
+    }
 
     protected List<Project> queryProjects(Map<String, String> parameters) throws IOException, URISyntaxException {
         URL url = generateQueryProjectsUrl(parameters);

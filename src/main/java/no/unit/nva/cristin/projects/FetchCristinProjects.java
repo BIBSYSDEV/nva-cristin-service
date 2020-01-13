@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -34,6 +32,7 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     private static final List<String> VALID_LANGUAGE_CODES = Arrays.asList("nb", "en");
 
     private transient CristinApiClient cristinApiClient;
+    private final transient PresentationConverter presentationConverter = new PresentationConverter();
 
     public FetchCristinProjects() {
         cristinApiClient = new CristinApiClient();
@@ -79,17 +78,9 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
             parameters.put("page", "1");
             parameters.put("per_page", "5");
 
-            List<Project> projects = cristinApiClient.queryProjects(parameters);
+            List<Project> projects = cristinApiClient.queryAndEnrichProjects(parameters, language);
             List<ProjectPresentation> projectPresentations = projects.stream()
-                    .map(project -> {
-                        try {
-                            return cristinApiClient.getProject(project.cristinProjectId, language);
-                        } catch (IOException | URISyntaxException e) {
-                            System.out.println("Error fetching cristin project with id: " + project.cristinProjectId);
-                        }
-                        return project;
-                    })
-                    .map(project -> asProjectPresentation(project, language))
+                    .map(project -> presentationConverter.asProjectPresentation(project, language))
                     .collect(Collectors.toList());
 
             Type projectListType = new TypeToken<ArrayList<ProjectPresentation>>() {
@@ -103,45 +94,6 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
         }
 
         return gatewayResponse;
-    }
-
-    private ProjectPresentation asProjectPresentation(Project project, String language) {
-        ProjectPresentation projectPresentation = new ProjectPresentation();
-        projectPresentation.cristinProjectId = project.cristinProjectId;
-
-        Optional.ofNullable(project.title).orElse(new TreeMap<String, String>() {
-        }).forEach((key, value) -> {
-            TitlePresentation titlePresentation = new TitlePresentation();
-            titlePresentation.language = key;
-            titlePresentation.title = value;
-            projectPresentation.titles.add(titlePresentation);
-        });
-
-        Optional.ofNullable(project.participants).orElse(new ArrayList<>()).forEach(person -> {
-            ParticipantPresentation participantPresentation = new ParticipantPresentation();
-            participantPresentation.cristinPersonId = person.cristinPersonId;
-            participantPresentation.fullName = person.surname + ", " + person.firstName;
-            projectPresentation.participants.add(participantPresentation);
-        });
-
-        InstitutionPresentation institutionPresentation = new InstitutionPresentation();
-        if (Optional.ofNullable(project.coordinatingInstitution).isPresent()) {
-            institutionPresentation.cristinInstitutionId = project.coordinatingInstitution.institution
-                    .cristinInstitutionId;
-            institutionPresentation.name = project.coordinatingInstitution.institution.institutionName
-                    .get(language);
-            institutionPresentation.language = language;
-            projectPresentation.institutions.add(institutionPresentation);
-        }
-
-        Optional.ofNullable(project.projectFundingSources).orElse(new ArrayList<>()).forEach(fundingSource -> {
-            FundingSourcePresentation fundingSourcePresentation = new FundingSourcePresentation();
-            fundingSourcePresentation.fundingSourceCode = fundingSource.fundingSourceCode;
-            fundingSourcePresentation.projectCode = fundingSource.projectCode;
-            projectPresentation.fundings.add(fundingSourcePresentation);
-        });
-
-        return projectPresentation;
     }
 
     /**
