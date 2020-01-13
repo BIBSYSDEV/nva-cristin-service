@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
  */
 public class FetchCristinProjects implements RequestHandler<Map<String, Object>, GatewayResponse> {
 
+    private static final String QUERY_STRING_PARAMETERS_KEY = "queryStringParameters";
     private static final String TITLE_IS_NULL = "Parameter 'title' is mandatory";
     private static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' may only contain alphanumeric "
             + "characters, dash and whitespace";
@@ -51,7 +52,7 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     public GatewayResponse handleRequest(Map<String, Object> input, Context context) {
 
         GatewayResponse gatewayResponse = new GatewayResponse();
-        Map<String, String> queryStringParameters = (Map<String, String>) input.get("queryStringParameters");
+        Map<String, String> queryStringParameters = (Map<String, String>) input.get(QUERY_STRING_PARAMETERS_KEY);
         String title = queryStringParameters.getOrDefault("title", "");
         if (title.isEmpty()) {
             gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
