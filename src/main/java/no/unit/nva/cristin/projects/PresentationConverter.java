@@ -9,6 +9,7 @@ public class PresentationConverter {
     protected ProjectPresentation asProjectPresentation(Project project, String language) {
         ProjectPresentation projectPresentation = new ProjectPresentation();
         projectPresentation.cristinProjectId = project.cristinProjectId;
+        projectPresentation.mainLanguage = project.mainLanguage;
 
         Optional.ofNullable(project.title).orElse(new TreeMap<String, String>() {
         }).forEach((key, value) -> {
