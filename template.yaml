@@ -62,7 +62,7 @@ Resources:
               Authorizer: MyCognitoAuthorizer
             RestApiId: !Ref NvaCristinProjectsFunctionApi
             Path: /
-            Method: post
+            Method: get
             RequestParameters:
               - method.request.querystring.language
               - method.request.querystring.title
