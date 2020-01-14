@@ -68,7 +68,7 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
             parameters.put("title", title);
             parameters.put("lang", language);
             parameters.put("page", "1");
-            parameters.put("per_page", "5");
+            parameters.put("per_page", "10");
 
             List<Project> projects = cristinApiClient.queryAndEnrichProjects(parameters, language);
             List<ProjectPresentation> projectPresentations = projects.stream()
