@@ -121,7 +121,7 @@ public class FetchCristinProjectsTest {
         FetchCristinProjects mockFetchCristinProjects = new FetchCristinProjects(mockCristinApiClient);
         GatewayResponse response = mockFetchCristinProjects.handleRequest(event, null);
 
-        assertEquals(Response.Status.SERVICE_UNAVAILABLE.getStatusCode(), response.getStatusCode());
+        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatusCode());
         assertEquals(response.getHeaders().get(HttpHeaders.CONTENT_TYPE), MediaType.APPLICATION_JSON);
     }
 

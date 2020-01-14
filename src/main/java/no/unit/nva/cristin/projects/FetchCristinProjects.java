@@ -10,10 +10,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -51,25 +48,17 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     public GatewayResponse handleRequest(Map<String, Object> input, Context context) {
 
         GatewayResponse gatewayResponse = new GatewayResponse();
-        Map<String, String> queryStringParameters = (Map<String, String>) input.get(QUERY_STRING_PARAMETERS_KEY);
-        String title = queryStringParameters.getOrDefault("title", "");
-        if (title.isEmpty()) {
+        try {
+            this.checkParameters(input);
+        } catch (RuntimeException e) {
+            gatewayResponse.setErrorBody(e.getMessage());
             gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
-            gatewayResponse.setBody(getErrorAsJson(TITLE_IS_NULL));
-            return gatewayResponse;
-        }
-        if (!isValidTitle(title)) {
-            gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
-            gatewayResponse.setBody(getErrorAsJson(TITLE_ILLEGAL_CHARACTERS));
             return gatewayResponse;
         }
 
+        Map<String, String> queryStringParameters = (Map<String, String>) input.get(QUERY_STRING_PARAMETERS_KEY);
+        String title = queryStringParameters.get("title");
         String language = queryStringParameters.getOrDefault("language", DEFAULT_LANGUAGE_CODE);
-        if (!VALID_LANGUAGE_CODES.contains(language)) {
-            gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
-            gatewayResponse.setBody(getErrorAsJson(LANGUAGE_INVALID));
-            return gatewayResponse;
-        }
 
         try {
             Map<String, String> parameters = new ConcurrentHashMap<>();
@@ -89,11 +78,28 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
             gatewayResponse.setStatusCode(Response.Status.OK.getStatusCode());
             gatewayResponse.setBody(new Gson().toJson(projectPresentations, projectListType));
         } catch (IOException | URISyntaxException e) {
-            gatewayResponse.setStatusCode(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+            gatewayResponse.setStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
             gatewayResponse.setBody(getErrorAsJson(e.getMessage()));
         }
 
         return gatewayResponse;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void checkParameters(Map<String, Object> input) {
+        Map<String, String> queryStringParameters = (Map<String, String>) input.get(QUERY_STRING_PARAMETERS_KEY);
+        String title = queryStringParameters.getOrDefault("title", "");
+        if (title.isEmpty()) {
+            throw new RuntimeException(TITLE_IS_NULL);
+        }
+        if (!isValidTitle(title)) {
+            throw new RuntimeException(TITLE_ILLEGAL_CHARACTERS);
+        }
+
+        String language = queryStringParameters.getOrDefault("language", DEFAULT_LANGUAGE_CODE);
+        if (!VALID_LANGUAGE_CODES.contains(language)) {
+            throw new RuntimeException(LANGUAGE_INVALID);
+        }
     }
 
     /**
