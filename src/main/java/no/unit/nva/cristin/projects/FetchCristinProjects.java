@@ -9,10 +9,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -93,7 +90,8 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
 
     @SuppressWarnings("unchecked")
     private void checkParameters(Map<String, Object> input) {
-        Map<String, String> queryStringParameters = (Map<String, String>) input.get(QUERY_STRING_PARAMETERS_KEY);
+        Map<String, String> queryStringParameters = Optional.ofNullable((Map<String, String>) input
+                .get(QUERY_STRING_PARAMETERS_KEY)).orElse(new ConcurrentHashMap<>());
         String title = queryStringParameters.getOrDefault(TITLE_KEY, EMPTY_STRING);
         if (title.isEmpty()) {
             throw new RuntimeException(TITLE_IS_NULL);
