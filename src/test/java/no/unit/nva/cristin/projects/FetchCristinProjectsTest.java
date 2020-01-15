@@ -45,6 +45,7 @@ public class FetchCristinProjectsTest {
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ?";
     private static final String DEV_NULL = "/dev/null";
     private static final String INVALID_JSON = "This is not valid JSON!";
+    private static final String MOCK_EXCEPTION = "Mock exception";
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -117,7 +118,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void testErrorResponse() throws Exception {
-        when(mockCristinApiClient.queryAndEnrichProjects(any(), any())).thenThrow(new IOException("Mock exception"));
+        when(mockCristinApiClient.queryAndEnrichProjects(any(), any())).thenThrow(new IOException(MOCK_EXCEPTION));
 
         Map<String, Object> event = new HashMap<>();
         Map<String, String> queryParams = new TreeMap<>();
