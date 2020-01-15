@@ -28,6 +28,9 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
             + "characters, dash and whitespace";
     private static final String LANGUAGE_INVALID = "Parameter 'language' has invalid value";
     private static final String ERROR_KEY = "error";
+    private static final String LANGUAGE_KEY = "language";
+    private static final String TITLE_KEY = "title";
+    private static final String EMPTY_STRING = "";
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final List<String> VALID_LANGUAGE_CODES = Arrays.asList("nb", "en");
 
@@ -60,8 +63,8 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
         }
 
         Map<String, String> queryStringParameters = (Map<String, String>) input.get(QUERY_STRING_PARAMETERS_KEY);
-        String title = queryStringParameters.get("title");
-        String language = queryStringParameters.getOrDefault("language", DEFAULT_LANGUAGE_CODE);
+        String title = queryStringParameters.get(TITLE_KEY);
+        String language = queryStringParameters.getOrDefault(LANGUAGE_KEY, DEFAULT_LANGUAGE_CODE);
 
         try {
             Map<String, String> parameters = new ConcurrentHashMap<>();
@@ -91,7 +94,7 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     @SuppressWarnings("unchecked")
     private void checkParameters(Map<String, Object> input) {
         Map<String, String> queryStringParameters = (Map<String, String>) input.get(QUERY_STRING_PARAMETERS_KEY);
-        String title = queryStringParameters.getOrDefault("title", "");
+        String title = queryStringParameters.getOrDefault(TITLE_KEY, EMPTY_STRING);
         if (title.isEmpty()) {
             throw new RuntimeException(TITLE_IS_NULL);
         }
@@ -99,7 +102,7 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
             throw new RuntimeException(TITLE_ILLEGAL_CHARACTERS);
         }
 
-        String language = queryStringParameters.getOrDefault("language", DEFAULT_LANGUAGE_CODE);
+        String language = queryStringParameters.getOrDefault(LANGUAGE_KEY, DEFAULT_LANGUAGE_CODE);
         if (!VALID_LANGUAGE_CODES.contains(language)) {
             throw new RuntimeException(LANGUAGE_INVALID);
         }
