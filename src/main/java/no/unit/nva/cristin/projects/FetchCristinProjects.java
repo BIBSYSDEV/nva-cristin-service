@@ -3,7 +3,6 @@ package no.unit.nva.cristin.projects;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import javax.ws.rs.core.Response;
@@ -25,7 +24,6 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     private static final String QUERY_STRING_PARAMETERS_KEY = "queryStringParameters";
     private static final String TITLE_KEY = "title";
     private static final String LANGUAGE_KEY = "language";
-    private static final String ERROR_KEY = "error";
 
     private static final String TITLE_IS_NULL = "Parameter 'title' is mandatory";
     private static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' may only contain alphanumeric "
