@@ -3,7 +3,7 @@
 Lambda for fetching project data from the [Cristin API](https://api.cristin.no/v2/doc/index.html)
 
 
-###GET cristin-projects?{parameters}
+### GET cristin-projects?{parameters}
 
 | Query parameter | Description |
 | ------ | ------ |
@@ -11,7 +11,7 @@ Lambda for fetching project data from the [Cristin API](https://api.cristin.no/v
 | language | Preferred language for titles. Accepts 'nb' or 'en'. (Optional) |
 
 
-####Response
+#### Response
 
 Returns a JSON array of up to 10 projects, or an empty JSON array if no projects are found.
 
@@ -88,7 +88,7 @@ Example response body:
 ```
 
 
-####HTTP Status Codes
+#### HTTP Status Codes
 
 * 200 - Ok, returns an array of 0-10 projects.
 * 400 - Bad request, returned if the parameters are invalid.
