@@ -23,13 +23,15 @@ import java.util.stream.Collectors;
 public class FetchCristinProjects implements RequestHandler<Map<String, Object>, GatewayResponse> {
 
     private static final String QUERY_STRING_PARAMETERS_KEY = "queryStringParameters";
+    private static final String TITLE_KEY = "title";
+    private static final String LANGUAGE_KEY = "language";
+    private static final String ERROR_KEY = "error";
+
     private static final String TITLE_IS_NULL = "Parameter 'title' is mandatory";
     private static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' may only contain alphanumeric "
             + "characters, dash and whitespace";
     private static final String LANGUAGE_INVALID = "Parameter 'language' has invalid value";
-    private static final String ERROR_KEY = "error";
-    private static final String LANGUAGE_KEY = "language";
-    private static final String TITLE_KEY = "title";
+
     private static final String EMPTY_STRING = "";
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final List<String> VALID_LANGUAGE_CODES = Arrays.asList("nb", "en");
