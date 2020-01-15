@@ -87,7 +87,7 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
             gatewayResponse.setBody(new Gson().toJson(projectPresentations, projectListType));
         } catch (IOException | URISyntaxException e) {
             gatewayResponse.setStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
-            gatewayResponse.setBody(getErrorAsJson(e.getMessage()));
+            gatewayResponse.setErrorBody(e.getMessage());
         }
 
         return gatewayResponse;
@@ -108,18 +108,6 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
         if (!VALID_LANGUAGE_CODES.contains(language)) {
             throw new RuntimeException(LANGUAGE_INVALID);
         }
-    }
-
-    /**
-     * Get error message as a json string.
-     *
-     * @param message message from exception
-     * @return String containing an error message as json
-     */
-    private String getErrorAsJson(String message) {
-        JsonObject json = new JsonObject();
-        json.addProperty(ERROR_KEY, message);
-        return json.toString();
     }
 
     private boolean isValidTitle(String str) {
