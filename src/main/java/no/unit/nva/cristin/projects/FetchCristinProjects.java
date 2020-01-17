@@ -9,7 +9,11 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -22,14 +26,22 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     private static final String TITLE_KEY = "title";
     private static final String LANGUAGE_KEY = "language";
 
-    private static final String TITLE_IS_NULL = "Parameter 'title' is mandatory";
-    private static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' may only contain alphanumeric "
+    protected static final String TITLE_IS_NULL = "Parameter 'title' is mandatory";
+    protected static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' may only contain alphanumeric "
             + "characters, dash and whitespace";
-    private static final String LANGUAGE_INVALID = "Parameter 'language' has invalid value";
+    protected static final String LANGUAGE_INVALID = "Parameter 'language' has invalid value";
 
     private static final String EMPTY_STRING = "";
+    private static final char CHARACTER_DASH = '-';
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final List<String> VALID_LANGUAGE_CODES = Arrays.asList("nb", "en");
+
+    private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "name";
+    private static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
+    private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
+    private static final String CRISTIN_QUERY_PARAMETER_PAGE_VALUE = "1";
+    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
+    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
 
     private transient CristinApiClient cristinApiClient;
     private final transient PresentationConverter presentationConverter = new PresentationConverter();
@@ -64,13 +76,9 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
         String language = queryStringParameters.getOrDefault(LANGUAGE_KEY, DEFAULT_LANGUAGE_CODE);
 
         try {
-            Map<String, String> parameters = new ConcurrentHashMap<>();
-            parameters.put("title", title);
-            parameters.put("lang", language);
-            parameters.put("page", "1");
-            parameters.put("per_page", "10");
+            Map<String, String> cristinQueryParameters = createCristinQueryParameters(title, language);
 
-            List<Project> projects = cristinApiClient.queryAndEnrichProjects(parameters, language);
+            List<Project> projects = cristinApiClient.queryAndEnrichProjects(cristinQueryParameters, language);
             List<ProjectPresentation> projectPresentations = projects.stream()
                     .map(project -> presentationConverter.asProjectPresentation(project, language))
                     .collect(Collectors.toList());
@@ -109,11 +117,24 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     private boolean isValidTitle(String str) {
         char[] charArray = str.toCharArray();
         for (char c : charArray) {
-            if (!Character.isWhitespace(c) && !Character.isLetterOrDigit(c) && c != '-') {
+            if (!isValidCharacter(c)) {
                 return false;
             }
         }
         return true;
+    }
+
+    private boolean isValidCharacter(char c) {
+        return Character.isWhitespace(c) || Character.isLetterOrDigit(c) || c == CHARACTER_DASH;
+    }
+
+    private Map<String, String> createCristinQueryParameters(String title, String language) {
+        Map<String, String> queryParameters = new ConcurrentHashMap<>();
+        queryParameters.put(CRISTIN_QUERY_PARAMETER_TITLE_KEY, title);
+        queryParameters.put(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language);
+        queryParameters.put(CRISTIN_QUERY_PARAMETER_PAGE_KEY, CRISTIN_QUERY_PARAMETER_PAGE_VALUE);
+        queryParameters.put(CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY, CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE);
+        return queryParameters;
     }
 
 }

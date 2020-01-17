@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -183,7 +184,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatusCode());
         assertEquals(response.getHeaders().get(HttpHeaders.CONTENT_TYPE), MediaType.APPLICATION_JSON);
-        assertEquals(response.getBody(), "{\"error\":\"Parameter 'title' is mandatory\"}");
+        assertTrue(response.getBody().contains(FetchCristinProjects.TITLE_IS_NULL));
     }
 
 
@@ -200,8 +201,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatusCode());
         assertEquals(response.getHeaders().get(HttpHeaders.CONTENT_TYPE), MediaType.APPLICATION_JSON);
-        assertEquals(response.getBody(), "{\"error\":\"Parameter 'title' may only contain alphanumeric "
-                + "characters, dash and whitespace\"}");
+        assertTrue(response.getBody().contains(FetchCristinProjects.TITLE_ILLEGAL_CHARACTERS));
     }
 
     @Test
@@ -218,7 +218,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatusCode());
         assertEquals(response.getHeaders().get(HttpHeaders.CONTENT_TYPE), MediaType.APPLICATION_JSON);
-        assertEquals(response.getBody(), "{\"error\":\"Parameter 'language' has invalid value\"}");
+        assertTrue(response.getBody().contains(FetchCristinProjects.LANGUAGE_INVALID));
     }
 
     @Test
