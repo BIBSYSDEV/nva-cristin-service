@@ -1,0 +1,44 @@
+[
+  {
+    "cristin_project_id": "2040291",
+    "title": {
+      "en": "Opportunities and Challenges for Integrating Sámi Reindeer Herding Traditional Environmental Knowledge in Environmental Governance"
+    },
+    "main_language": "en",
+    "url": "https://api.cristin.no/v2/projects/2040291"
+  },
+  {
+    "cristin_project_id": "415549",
+    "title": {
+      "en": "Absorption and metabolism of radio active materials and heavy metals in reindeer",
+      "no": "Opptak og omsetning av radioaktive stoffer og tungmetall i reinsdyr"
+    },
+    "main_language": "no",
+    "url": "https://api.cristin.no/v2/projects/415549"
+  },
+  {
+    "cristin_project_id": "418126",
+    "title": {
+      "no": "EALÁT - En studie av reindriftens sårbarhet og tilpasning under klimaendringer",
+      "en": "EALÁT - Reindeer Herders' Vulnerability Network Study: Reindeer Pastoralism in\r\na Changing Climate"
+    },
+    "main_language": "no",
+    "url": "https://api.cristin.no/v2/projects/418126"
+  },
+  {
+    "cristin_project_id": "423190",
+    "title": {
+      "no": "Predicting effects of climate change on Svalbard reindeer population dynamics: a mechanistic approach"
+    },
+    "main_language": "no",
+    "url": "https://api.cristin.no/v2/projects/423190"
+  },
+  {
+    "cristin_project_id": "423211",
+    "title": {
+      "en": "PREDICTING EFFECTS OF CLIMATE CHANGE ON SVALBARD REINDEER POPULATION DYNAMICS: A MECHANISTIC APPROACH"
+    },
+    "main_language": "en",
+    "url": "https://api.cristin.no/v2/projects/423211"
+  }
+]
