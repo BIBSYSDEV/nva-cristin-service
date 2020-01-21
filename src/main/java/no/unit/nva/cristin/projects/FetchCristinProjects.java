@@ -36,7 +36,7 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final List<String> VALID_LANGUAGE_CODES = Arrays.asList("nb", "en");
 
-    private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "name";
+    private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
     private static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_VALUE = "1";
