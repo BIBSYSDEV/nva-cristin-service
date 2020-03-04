@@ -44,7 +44,7 @@ Parameters:
   CorsAllowHeaders:
     Type: String
     Description: String of headers to allow.
-    Default: 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'
+    Default: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Resources:
 
