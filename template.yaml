@@ -5,10 +5,27 @@ Description: >
 
   Sample SAM Template for AWS
 
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: cristin-projects
+    Description: Fetching project data from the Cristin API
+    Author: Unit
+    SemanticVersion: 1.0.0
+    SpdxLicenseId: MIT
+    LicenseUrl: LICENSE
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 20
+  Api:
+    Cors:
+      AllowCredentials: true
+      AllowOrigin: !Sub
+        - "'${Domain}'"
+        - Domain: !Ref  CorsOrigin
+      AllowMethods: "'OPTIONS, GET, PUT'"
+      AllowHeaders: !Ref CorsAllowHeaders
 
 Parameters:
   CognitoAuthorizerArn:
@@ -23,6 +40,11 @@ Parameters:
   CorsOrigin:
     Type: String
     Description: Value to use for Cors 'Allow...' header if value is set
+    Default: '*'
+  CorsAllowHeaders:
+    Type: String
+    Description: String of headers to allow.
+    Default: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Resources:
 
@@ -34,12 +56,6 @@ Resources:
         Authorizers:
           MyCognitoAuthorizer:
             UserPoolArn: !Ref CognitoAuthorizerArn
-      Cors:
-        AllowCredentials: true
-        AllowOrigin: !Sub
-          - "'${Domain}'"
-          - Domain: !Ref  CorsOrigin
-        AllowMethods: "'OPTIONS, GET'"
       EndpointConfiguration: Regional
 
 
@@ -48,9 +64,7 @@ Resources:
     Properties:
       Environment:
         Variables:
-          AllowOrigin: !Sub
-            - "${Domain}"
-            - Domain: !Ref  CorsOrigin
+          AllowOrigin: !Ref  CorsOrigin
       Handler: no.unit.nva.cristin.projects.FetchCristinProjects::handleRequest
       Runtime: java8
       MemorySize: 512
