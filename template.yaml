@@ -5,6 +5,15 @@ Description: >
 
   Sample SAM Template for AWS
 
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: cristin-projects
+    Description: Fetching project data from the Cristin API
+    Author: Unit
+    SemanticVersion: 1.0.0
+    SpdxLicenseId: MIT
+    LicenseUrl: LICENSE
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -31,11 +40,11 @@ Parameters:
   CorsOrigin:
     Type: String
     Description: Value to use for Cors 'Allow...' header if value is set
-    Default: '{{resolve:secretsmanager:DefaultCorsOrigin:SecretString}}'
+    Default: '*'
   CorsAllowHeaders:
     Type: String
     Description: String of headers to allow.
-    Default: '{{resolve:ssm:defaultCorsAllowHeaders:1}}'
+    Default: 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'
 
 Resources:
 
