@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  AWS
+  Template creates lambda, api-gateway and custom domain mapping for fetching project data
 
-  Sample SAM Template for AWS
+
 
 Metadata:
   AWS::ServerlessRepo::Application:
-    Name: cristin-projects
+    Name: Projects
     Description: Fetching project data from the Cristin API
     Author: Unit
     SemanticVersion: 1.0.0
@@ -20,12 +20,9 @@ Globals:
     Timeout: 20
   Api:
     Cors:
-      AllowCredentials: true
-      AllowOrigin: !Sub
-        - "'${Domain}'"
-        - Domain: !Ref  CorsOrigin
+      AllowOrigin: '*'
       AllowMethods: "'OPTIONS, GET, PUT'"
-      AllowHeaders: !Ref CorsAllowHeaders
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Parameters:
   CognitoAuthorizerArn:
@@ -37,14 +34,6 @@ Parameters:
   CustomDomainBasePath:
     Type: String
     Description: Base path mapping in CustomDomain
-  CorsOrigin:
-    Type: String
-    Description: Value to use for Cors 'Allow...' header if value is set
-    Default: '*'
-  CorsAllowHeaders:
-    Type: String
-    Description: String of headers to allow.
-    Default: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Resources:
 
@@ -64,9 +53,9 @@ Resources:
     Properties:
       Environment:
         Variables:
-          AllowOrigin: !Ref  CorsOrigin
+          AllowOrigin: '*'
       Handler: no.unit.nva.cristin.projects.FetchCristinProjects::handleRequest
-      Runtime: java8
+      Runtime: java11
       MemorySize: 512
       Events:
         NvaCristinProjectsEvent:
