@@ -20,7 +20,7 @@ Globals:
     Timeout: 20
   Api:
     Cors:
-      AllowOrigin: "'*'"
+      AllowOrigin: '*'
       AllowMethods: "'OPTIONS, GET, PUT'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
@@ -53,7 +53,7 @@ Resources:
     Properties:
       Environment:
         Variables:
-          AllowOrigin: "'*'"
+          AllowOrigin: '*'
       Handler: no.unit.nva.cristin.projects.FetchCristinProjects::handleRequest
       Runtime: java11
       MemorySize: 512
