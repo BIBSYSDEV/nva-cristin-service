@@ -3,16 +3,14 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Template creates lambda, api-gateway and custom domain mapping for fetching project data
 
-
-
 Metadata:
   AWS::ServerlessRepo::Application:
     Name: Projects
     Description: Fetching project data from the Cristin API
     Author: Unit
-    SemanticVersion: 1.0.0
     SpdxLicenseId: MIT
     LicenseUrl: LICENSE
+    Labels: ['${CODEBUILD_RESOLVED_SOURCE_VERSION}', '${GIT_REPO}']
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
