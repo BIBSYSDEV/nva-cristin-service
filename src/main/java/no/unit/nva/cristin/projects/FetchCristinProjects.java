@@ -28,11 +28,13 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
 
     protected static final String TITLE_IS_NULL = "Parameter 'title' is mandatory";
     protected static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' may only contain alphanumeric "
-            + "characters, dash and whitespace";
+            + "characters, dash, comma, period and whitespace";
     protected static final String LANGUAGE_INVALID = "Parameter 'language' has invalid value";
 
     private static final String EMPTY_STRING = "";
     private static final char CHARACTER_DASH = '-';
+    private static final char CHARACTER_COMMA = ',';
+    private static final char CHARACTER_PERIOD = '.';
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final List<String> VALID_LANGUAGE_CODES = Arrays.asList("nb", "en");
 
@@ -125,7 +127,11 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     }
 
     private boolean isValidCharacter(char c) {
-        return Character.isWhitespace(c) || Character.isLetterOrDigit(c) || c == CHARACTER_DASH;
+        return Character.isWhitespace(c)
+                || Character.isLetterOrDigit(c)
+                || c == CHARACTER_DASH
+                || c == CHARACTER_COMMA
+                || c == CHARACTER_PERIOD;
     }
 
     private Map<String, String> createCristinQueryParameters(String title, String language) {

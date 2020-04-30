@@ -43,7 +43,7 @@ public class FetchCristinProjectsTest {
     private static final String LANGUAGE_NB = "nb";
     private static final String LANGUAGE_INVALID = "invalid";
     private static final String TITLE_REINDEER = "reindeer";
-    private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ?";
+    private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String DEV_NULL = "/dev/null";
     private static final String INVALID_JSON = "This is not valid JSON!";
     private static final String MOCK_EXCEPTION = "Mock exception";
