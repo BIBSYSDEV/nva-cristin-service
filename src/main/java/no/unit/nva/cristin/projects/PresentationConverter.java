@@ -40,6 +40,13 @@ public class PresentationConverter {
             FundingSourcePresentation fundingSourcePresentation = new FundingSourcePresentation();
             fundingSourcePresentation.fundingSourceCode = fundingSource.fundingSourceCode;
             fundingSourcePresentation.projectCode = fundingSource.projectCode;
+            Optional.ofNullable(fundingSource.fundingSourceName).orElse(new TreeMap<String, String>() {
+            }).forEach((key, value) -> {
+                FundingSourceNamePresentation fundingSourceNamePresentation = new FundingSourceNamePresentation();
+                fundingSourceNamePresentation.language = key;
+                fundingSourceNamePresentation.name = value;
+                fundingSourcePresentation.names.add(fundingSourceNamePresentation);
+            });
             projectPresentation.fundings.add(fundingSourcePresentation);
         });
 
