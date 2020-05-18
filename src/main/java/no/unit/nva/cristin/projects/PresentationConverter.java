@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class PresentationConverter {
 
@@ -40,13 +41,9 @@ public class PresentationConverter {
             FundingSourcePresentation fundingSourcePresentation = new FundingSourcePresentation();
             fundingSourcePresentation.fundingSourceCode = fundingSource.fundingSourceCode;
             fundingSourcePresentation.projectCode = fundingSource.projectCode;
-            Optional.ofNullable(fundingSource.fundingSourceName).orElse(new TreeMap<String, String>() {
-            }).forEach((key, value) -> {
-                FundingSourceNamePresentation fundingSourceNamePresentation = new FundingSourceNamePresentation();
-                fundingSourceNamePresentation.language = key;
-                fundingSourceNamePresentation.name = value;
-                fundingSourcePresentation.names.add(fundingSourceNamePresentation);
-            });
+            fundingSource.fundingSourceName.entrySet().stream()
+                    .map(name -> new FundingSourceNamePresentation(name.getKey(), name.getValue()))
+                    .collect(Collectors.toList());
             projectPresentation.fundings.add(fundingSourcePresentation);
         });
 
