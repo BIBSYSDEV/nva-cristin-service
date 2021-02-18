@@ -1,37 +1,30 @@
 package no.unit.nva.cristin.projects;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.runners.MockitoJUnitRunner;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+
 public class FetchCristinProjectsTest {
 
     private static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE = "/cristinQueryProjectsResponse.json";
@@ -44,19 +37,14 @@ public class FetchCristinProjectsTest {
     private static final String LANGUAGE_INVALID = "invalid";
     private static final String TITLE_REINDEER = "reindeer";
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
-    private static final String DEV_NULL = "/dev/null";
     private static final String INVALID_JSON = "This is not valid JSON!";
     private static final String MOCK_EXCEPTION = "Mock exception";
 
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
-    @Mock
     CristinApiClient mockCristinApiClient;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        mockCristinApiClient = mock(CristinApiClient.class);
     }
 
 
@@ -73,7 +61,7 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    public void testSuccessfulResponse() throws Exception {
+    public void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
         when(mockCristinApiClient.fetchQueryResults(any())).thenReturn(mockQueryResponseReader());
         when(mockCristinApiClient.fetchGetResult(any())).thenAnswer(i -> mockGetResponseReader());
         when(mockCristinApiClient.queryAndEnrichProjects(any(),any())).thenCallRealMethod();
@@ -221,20 +209,6 @@ public class FetchCristinProjectsTest {
         assertTrue(response.getBody().contains(FetchCristinProjects.LANGUAGE_INVALID));
     }
 
-    @Test
-    public void testCristinQueryProjectsConnection() throws IOException {
-        CristinApiClient cristinApiClient = new CristinApiClient();
-        URL invalidUrl = Paths.get(DEV_NULL).toUri().toURL();
-        cristinApiClient.fetchQueryResults(invalidUrl);
-    }
-
-    @Test
-    public void testCristinGetProjectConnection() throws IOException {
-        CristinApiClient cristinApiClient = new CristinApiClient();
-        URL invalidUrl = Paths.get(DEV_NULL).toUri().toURL();
-        cristinApiClient.fetchGetResult(invalidUrl);
-
-    }
 
     @Test
     public void testCristinGenerateQueryProjectsUrlFromNull() throws IOException, URISyntaxException {
@@ -243,13 +217,12 @@ public class FetchCristinProjectsTest {
     }
 
 
-    @Test(expected = IOException.class)
-    public void testExceptionOnInvalidJson() throws IOException {
-        CristinApiClient cristinApiClient = new CristinApiClient();
-        InputStream inputStream = new ByteArrayInputStream(INVALID_JSON.getBytes(Charset.forName("UTF-8")));
+    @Test
+    public void testExceptionOnInvalidJson() {
+        InputStream inputStream = new ByteArrayInputStream(INVALID_JSON.getBytes(StandardCharsets.UTF_8));
         InputStreamReader reader = new InputStreamReader(inputStream);
-        cristinApiClient.fromJson(reader, Project.class);
-        fail();
+        Executable action = () -> CristinApiClient.fromJson(reader, Project.class);
+        assertThrows(IOException.class, action);
     }
 
 }
