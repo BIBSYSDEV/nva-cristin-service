@@ -63,14 +63,7 @@ tasks.withType(Checkstyle) {
 
 jacocoTestReport {
     reports {
-        xml.enabled false
-        csv.enabled false
-        html.destination file("${buildDir}/reports/jacoco")
-    }
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: 'no/**')
-        }))
+        xml.enabled true
     }
 }
 
@@ -82,18 +75,13 @@ check.dependsOn jacocoTestCoverageVerification
 jacocoTestCoverageVerification.dependsOn(jacocoTestReport)
 
 jacocoTestCoverageVerification {
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: 'no/**')
-        }))
-    }
 
     violationRules {
         rule {
             limit {
                 counter = 'METHOD'
                 value = 'COVEREDRATIO'
-                minimum = 1.000
+                minimum = 0.800
             }
         }
 
@@ -101,7 +89,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'CLASS'
                 value = 'COVEREDRATIO'
-                minimum = 1.000
+                minimum = 0.800
             }
         }
     }
@@ -172,4 +160,7 @@ task jacocoRootReport(type: JacocoReport, dependsOn: tasks.jacocoMerge) {
 build {
     dependsOn jacocoRootReport
 }
+
+
+
 
