@@ -42,6 +42,7 @@ public class FetchCristinProjectsTest {
 
     CristinApiClient mockCristinApiClient;
 
+    
     @BeforeEach
     public void setUp() {
         mockCristinApiClient = mock(CristinApiClient.class);
