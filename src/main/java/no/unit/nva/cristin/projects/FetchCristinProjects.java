@@ -1,42 +1,22 @@
 package no.unit.nva.cristin.projects;
 
+import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.Environment;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handler for requests to Lambda function.
  */
-public class FetchCristinProjects implements RequestHandler<Map<String, Object>, GatewayResponse> {
-
-    private static final String QUERY_STRING_PARAMETERS_KEY = "queryStringParameters";
-    private static final String TITLE_KEY = "title";
-    private static final String LANGUAGE_KEY = "language";
-
-    protected static final String TITLE_IS_NULL = "Parameter 'title' is mandatory";
-    protected static final String TITLE_ILLEGAL_CHARACTERS = "Parameter 'title' may only contain alphanumeric "
-            + "characters, dash, comma, period and whitespace";
-    protected static final String LANGUAGE_INVALID = "Parameter 'language' has invalid value";
-
-    private static final String EMPTY_STRING = "";
-    private static final char CHARACTER_DASH = '-';
-    private static final char CHARACTER_COMMA = ',';
-    private static final char CHARACTER_PERIOD = '.';
-    private static final String DEFAULT_LANGUAGE_CODE = "nb";
-    private static final List<String> VALID_LANGUAGE_CODES = Arrays.asList("nb", "en");
+public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresentation[]> {
 
     private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
     private static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
@@ -45,94 +25,62 @@ public class FetchCristinProjects implements RequestHandler<Map<String, Object>,
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
 
+    public static final String LANGUAGE_QUERY_PARAMETER = "language";
+    public static final String TITLE_QUERY_PARAMETER = "title";
+    public static final String MISSING_QUERY_PARAMETER_ERROR_MESSAGE = "Missing query parameter: ";
+
     private transient CristinApiClient cristinApiClient;
     private final transient PresentationConverter presentationConverter = new PresentationConverter();
 
-    public FetchCristinProjects() {
-        cristinApiClient = new CristinApiClient();
-    }
-
-    public FetchCristinProjects(CristinApiClient cristinApiClient) {
-        this.cristinApiClient = cristinApiClient;
-    }
-
-    public void setCristinApiClient(CristinApiClient cristinApiClient) {
+    public FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {
+        super(Void.class, environment, LoggerFactory.getLogger(FetchCristinProjects.class));
         this.cristinApiClient = cristinApiClient;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public GatewayResponse handleRequest(Map<String, Object> input, Context context) {
+    protected ProjectPresentation[] processInput(Void input, RequestInfo requestInfo, Context context)
+        throws ApiGatewayException {
+        String language = getQueryParameter(requestInfo, LANGUAGE_QUERY_PARAMETER);
+        String title = getQueryParameter(requestInfo, TITLE_QUERY_PARAMETER);
 
-        GatewayResponse gatewayResponse = new GatewayResponse();
-        try {
-            this.checkParameters(input);
-        } catch (RuntimeException e) {
-            gatewayResponse.setErrorBody(e.getMessage());
-            gatewayResponse.setStatusCode(Response.Status.BAD_REQUEST.getStatusCode());
-            return gatewayResponse;
-        }
-
-        Map<String, String> queryStringParameters = (Map<String, String>) input.get(QUERY_STRING_PARAMETERS_KEY);
-        String title = queryStringParameters.get(TITLE_KEY);
-        String language = queryStringParameters.getOrDefault(LANGUAGE_KEY, DEFAULT_LANGUAGE_CODE);
-
-        try {
-            Map<String, String> cristinQueryParameters = createCristinQueryParameters(title, language);
-
-            List<Project> projects = cristinApiClient.queryAndEnrichProjects(cristinQueryParameters, language);
-            List<ProjectPresentation> projectPresentations = projects.stream()
-                    .map(project -> presentationConverter.asProjectPresentation(project, language))
-                    .collect(Collectors.toList());
-
-            Type projectListType = new TypeToken<ArrayList<ProjectPresentation>>() {
-            }.getType();
-
-            gatewayResponse.setStatusCode(Response.Status.OK.getStatusCode());
-            gatewayResponse.setBody(new Gson().toJson(projectPresentations, projectListType));
-        } catch (IOException | URISyntaxException e) {
-            gatewayResponse.setStatusCode(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
-            gatewayResponse.setErrorBody(e.getMessage());
-        }
-
-        return gatewayResponse;
+        return createProjectPresentations(language, title);
     }
 
-    @SuppressWarnings("unchecked")
-    private void checkParameters(Map<String, Object> input) {
-        Map<String, String> queryStringParameters = Optional.ofNullable((Map<String, String>) input
-                .get(QUERY_STRING_PARAMETERS_KEY)).orElse(new ConcurrentHashMap<>());
-        String title = queryStringParameters.getOrDefault(TITLE_KEY, EMPTY_STRING);
-        if (title.isEmpty()) {
-            throw new RuntimeException(TITLE_IS_NULL);
-        }
-        if (!isValidTitle(title)) {
-            throw new RuntimeException(TITLE_ILLEGAL_CHARACTERS);
-        }
-
-        String language = queryStringParameters.getOrDefault(LANGUAGE_KEY, DEFAULT_LANGUAGE_CODE);
-        if (!VALID_LANGUAGE_CODES.contains(language)) {
-            throw new RuntimeException(LANGUAGE_INVALID);
-        }
+    private String getQueryParameter(RequestInfo requestInfo, String queryParameter)
+        throws BadRequestException {
+        return attempt(() -> requestInfo.getQueryParameter(queryParameter))
+            .orElseThrow(failure -> handleMissingParameter(queryParameter));
     }
 
-    private boolean isValidTitle(String str) {
-        char[] charArray = str.toCharArray();
-        for (char c : charArray) {
-            if (!isValidCharacter(c)) {
-                return false;
-            }
-        }
-        return true;
+    private BadRequestException handleMissingParameter(String queryParameterName) {
+        return new BadRequestException(MISSING_QUERY_PARAMETER_ERROR_MESSAGE + queryParameterName);
     }
 
-    private boolean isValidCharacter(char c) {
-        return Character.isWhitespace(c)
-                || Character.isLetterOrDigit(c)
-                || c == CHARACTER_DASH
-                || c == CHARACTER_COMMA
-                || c == CHARACTER_PERIOD;
+    private ProjectPresentation[] createProjectPresentations(String language, String title) {
+        List<ProjectPresentation> projectPresentations = createProjectPresentationList(language, title);
+        return convertToArray(projectPresentations);
     }
+
+    private ProjectPresentation[] convertToArray(List<ProjectPresentation> projectPresentations) {
+        ProjectPresentation[] projectPresentationsArray = new ProjectPresentation[projectPresentations.size()];
+        projectPresentations.toArray(projectPresentationsArray);
+        return projectPresentationsArray;
+    }
+
+    private List<ProjectPresentation> createProjectPresentationList(String language, String title) {
+        Map<String, String> cristinQueryParameters = createCristinQueryParameters(title, language);
+        List<Project> projects = attempt(()-> cristinApiClient.queryAndEnrichProjects(cristinQueryParameters, language)).orElseThrow();
+
+        return projects.stream()
+            .map(project -> presentationConverter.asProjectPresentation(project, language))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    protected Integer getSuccessStatusCode(Void input, ProjectPresentation[] output) {
+        return HttpURLConnection.HTTP_OK;
+    }
+
 
     private Map<String, String> createCristinQueryParameters(String title, String language) {
         Map<String, String> queryParameters = new ConcurrentHashMap<>();
