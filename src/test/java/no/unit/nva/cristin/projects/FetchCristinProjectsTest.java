@@ -3,9 +3,6 @@ package no.unit.nva.cristin.projects;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,10 +47,7 @@ public class FetchCristinProjectsTest {
 
     CristinApiClient mockCristinApiClient;
 
-    public static final String ALLOW_ALL_ORIGIN = "*";
-    public static final String DEFAULT_TITLE = "Default Title";
-    public static final String DEFAULT_LANGUAGE = "en";
-    private Environment environment;
+    private static final String ALLOW_ALL_ORIGIN = "*";
     private Context context;
     private ByteArrayOutputStream output;
     private FetchCristinProjects handler;
@@ -61,7 +55,7 @@ public class FetchCristinProjectsTest {
     @BeforeEach
     public void setUp() {
         mockCristinApiClient = mock(CristinApiClient.class);
-        environment = mock(Environment.class);
+        Environment environment = mock(Environment.class);
         when(environment.readEnv(anyString())).thenReturn(ALLOW_ALL_ORIGIN);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
@@ -83,16 +77,10 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
-        when(mockCristinApiClient.fetchQueryResults(any())).thenReturn(mockQueryResponseReader());
-        when(mockCristinApiClient.fetchGetResult(any())).thenAnswer(i -> mockGetResponseReader());
-        when(mockCristinApiClient.queryAndEnrichProjects(any(),any())).thenCallRealMethod();
-        when(mockCristinApiClient.queryProjects(any())).thenCallRealMethod();
-        when(mockCristinApiClient.getProject(any(), any())).thenCallRealMethod();
-        when(mockCristinApiClient.generateQueryProjectsUrl(any())).thenCallRealMethod();
-        when(mockCristinApiClient.generateGetProjectUrl(any(), any())).thenCallRealMethod();
+        initDefaultCristinApiClientMocks();
 
         GatewayResponse<ProjectPresentation[]> response = sendDefaultQuery();
-        assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
+        assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
     }
 
     @Test
@@ -103,13 +91,6 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-    }
-
-    private InputStream defaultQuery() throws JsonProcessingException {
-        return new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
-            .withBody(null)
-            .withQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER, LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB))
-            .build();
     }
 
     @Test
@@ -124,7 +105,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void handlerThrowsBadRequestWhenMissingTitleQueryParameter() throws IOException {
-        InputStream input = requestWithMissingTitleParameter();
+        InputStream input = requestWithQueryParameters(Map.of(LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
@@ -133,10 +114,17 @@ public class FetchCristinProjectsTest {
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
-    private GatewayResponse<ProjectPresentation[]> sendDefaultQuery() throws IOException {
-        InputStream input = defaultQuery();
+    @Test
+    public void handlerSetsDefaultValueForMissingOptionalLanguageParameterAndReturnOk() throws Exception {
+        initDefaultCristinApiClientMocks();
+
+        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER));
+
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     private void cristinClientThrowingIoExceptionWhenFetchingProjectInfo() throws IOException, URISyntaxException {
@@ -148,15 +136,14 @@ public class FetchCristinProjectsTest {
         when(mockCristinApiClient.getProject(any(), any())).thenThrow(new IOException());
     }
 
-    private InputStream requestWithMissingTitleParameter() throws JsonProcessingException {
-        return new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
-            .withBody(null)
-            .withQueryParameters(Map.of(LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB))
-            .build();
+    private GatewayResponse<ProjectPresentation[]> sendDefaultQuery() throws IOException {
+        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER,
+            LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB));
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output);
     }
 
-    /*@Test
-    public void testMissingLanguageParam() throws Exception {
+    private void initDefaultCristinApiClientMocks() throws IOException, URISyntaxException {
         when(mockCristinApiClient.fetchQueryResults(any())).thenReturn(mockQueryResponseReader());
         when(mockCristinApiClient.fetchGetResult(any())).thenAnswer(i -> mockGetResponseReader());
         when(mockCristinApiClient.queryAndEnrichProjects(any(), any())).thenCallRealMethod();
@@ -164,20 +151,16 @@ public class FetchCristinProjectsTest {
         when(mockCristinApiClient.getProject(any(), any())).thenCallRealMethod();
         when(mockCristinApiClient.generateQueryProjectsUrl(any())).thenCallRealMethod();
         when(mockCristinApiClient.generateGetProjectUrl(any(), any())).thenCallRealMethod();
-
-        Map<String, Object> event = new HashMap<>();
-        Map<String, String> queryParams = new TreeMap<>();
-        queryParams.put(TITLE_KEY, TITLE_REINDEER);
-        event.put(QUERY_STRING_PARAMETERS_KEY, queryParams);
-
-        FetchCristinProjects mockFetchCristinProjects = new FetchCristinProjects(mockCristinApiClient);
-        GatewayResponse response = mockFetchCristinProjects.handleRequest(event, null);
-
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatusCode());
-        assertEquals(response.getHeaders().get(HttpHeaders.CONTENT_TYPE), MediaType.APPLICATION_JSON);
     }
 
-    @Test
+    private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
+        return new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
+            .withBody(null)
+            .withQueryParameters(map)
+            .build();
+    }
+
+    /*@Test
     public void testEmptyTitleParam() {
 
         Map<String, Object> event = new HashMap<>();

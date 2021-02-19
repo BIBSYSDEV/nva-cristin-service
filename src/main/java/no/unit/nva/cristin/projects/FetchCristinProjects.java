@@ -25,11 +25,12 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
 
+    public static final String MISSING_QUERY_PARAMETER_ERROR_MESSAGE = "Missing mandatory query parameter: ";
+
     public static final String LANGUAGE_QUERY_PARAMETER = "language";
     public static final String TITLE_QUERY_PARAMETER = "title";
-    public static final String MISSING_QUERY_PARAMETER_ERROR_MESSAGE = "Missing query parameter: ";
-
-    private transient CristinApiClient cristinApiClient;
+    private static final String DEFAULT_LANGUAGE_CODE = "nb";
+    private final transient CristinApiClient cristinApiClient;
     private final transient PresentationConverter presentationConverter = new PresentationConverter();
 
     public FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {
@@ -40,7 +41,8 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     @Override
     protected ProjectPresentation[] processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
-        String language = getQueryParameter(requestInfo, LANGUAGE_QUERY_PARAMETER);
+
+        String language = getQueryParameterOrDefault(requestInfo, LANGUAGE_QUERY_PARAMETER, DEFAULT_LANGUAGE_CODE);
         String title = getQueryParameter(requestInfo, TITLE_QUERY_PARAMETER);
 
         return createProjectPresentations(language, title);
@@ -50,6 +52,11 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
         throws BadRequestException {
         return attempt(() -> requestInfo.getQueryParameter(queryParameter))
             .orElseThrow(failure -> handleMissingParameter(queryParameter));
+    }
+
+    private String getQueryParameterOrDefault(RequestInfo requestInfo, String queryParameter, String defaultValue) {
+        return attempt(() -> requestInfo.getQueryParameter(queryParameter))
+            .orElse(failure -> defaultValue);
     }
 
     private BadRequestException handleMissingParameter(String queryParameterName) {
