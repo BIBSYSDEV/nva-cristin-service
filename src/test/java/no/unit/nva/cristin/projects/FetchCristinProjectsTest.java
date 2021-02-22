@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
@@ -125,6 +126,14 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    public void handlerReceivesAllowOriginHeaderValueFromEnvironmentAndPutsItOnResponse() throws Exception {
+        initDefaultCristinApiClientMocks();
+
+        GatewayResponse<ProjectPresentation[]> response = sendDefaultQuery();
+        assertEquals(ALLOW_ALL_ORIGIN, response.getHeaders().get(ApiGatewayHandler.ACCESS_CONTROL_ALLOW_ORIGIN));
     }
 
     private void cristinClientThrowingIoExceptionWhenFetchingProjectInfo() throws IOException, URISyntaxException {

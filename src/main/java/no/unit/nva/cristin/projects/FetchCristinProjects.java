@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -33,6 +34,11 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     private final transient CristinApiClient cristinApiClient;
     private final transient PresentationConverter presentationConverter = new PresentationConverter();
 
+    @SuppressWarnings("unused")
+    public FetchCristinProjects() {
+        this(new CristinApiClient(), new Environment());
+    }
+
     public FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment, LoggerFactory.getLogger(FetchCristinProjects.class));
         this.cristinApiClient = cristinApiClient;
@@ -42,24 +48,19 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     protected ProjectPresentation[] processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        String language = getQueryParameterOrDefault(requestInfo, LANGUAGE_QUERY_PARAMETER, DEFAULT_LANGUAGE_CODE);
-        String title = getQueryParameter(requestInfo, TITLE_QUERY_PARAMETER);
+        String language = getQueryParamOpt(requestInfo, LANGUAGE_QUERY_PARAMETER)
+            .orElse(DEFAULT_LANGUAGE_CODE);
+        String title = getQueryParamOpt(requestInfo, TITLE_QUERY_PARAMETER)
+            .orElseThrow(() -> missingMandatoryParameter(TITLE_QUERY_PARAMETER));
 
         return createProjectPresentations(language, title);
     }
 
-    private String getQueryParameter(RequestInfo requestInfo, String queryParameter)
-        throws BadRequestException {
-        return attempt(() -> requestInfo.getQueryParameter(queryParameter))
-            .orElseThrow(failure -> handleMissingParameter(queryParameter));
+    protected Optional<String> getQueryParamOpt(RequestInfo requestInfo, String queryParameter) {
+        return attempt(() -> requestInfo.getQueryParameter(queryParameter)).toOptional();
     }
 
-    private String getQueryParameterOrDefault(RequestInfo requestInfo, String queryParameter, String defaultValue) {
-        return attempt(() -> requestInfo.getQueryParameter(queryParameter))
-            .orElse(failure -> defaultValue);
-    }
-
-    private BadRequestException handleMissingParameter(String queryParameterName) {
+    private BadRequestException missingMandatoryParameter(String queryParameterName) {
         return new BadRequestException(MISSING_QUERY_PARAMETER_ERROR_MESSAGE + queryParameterName);
     }
 
@@ -76,7 +77,8 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
 
     private List<ProjectPresentation> createProjectPresentationList(String language, String title) {
         Map<String, String> cristinQueryParameters = createCristinQueryParameters(title, language);
-        List<Project> projects = attempt(()-> cristinApiClient.queryAndEnrichProjects(cristinQueryParameters, language)).orElseThrow();
+        List<Project> projects = attempt(() ->
+            cristinApiClient.queryAndEnrichProjects(cristinQueryParameters, language)).orElseThrow();
 
         return projects.stream()
             .map(project -> presentationConverter.asProjectPresentation(project, language))
