@@ -57,7 +57,6 @@ Resources:
     Properties:
       Environment:
         Variables:
-          AllowOrigin: '*' # Remove when deleting Config.class
           ALLOWED_ORIGIN: '*'
       Handler: no.unit.nva.cristin.projects.FetchCristinProjects::handleRequest
       Runtime: java11

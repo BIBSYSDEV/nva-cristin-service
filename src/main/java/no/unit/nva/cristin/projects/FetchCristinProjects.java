@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,14 +20,21 @@ import org.slf4j.LoggerFactory;
  */
 public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresentation[]> {
 
+    protected static final String TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS = "Parameter 'title' is missing or invalid. "
+        + "May only contain alphanumeric characters, dash, comma, period and whitespace";
+    protected static final String LANGUAGE_INVALID = "Parameter 'language' has invalid value";
+
+    private static final char CHARACTER_DASH = '-';
+    private static final char CHARACTER_COMMA = ',';
+    private static final char CHARACTER_PERIOD = '.';
+    private static final List<String> VALID_LANGUAGE_CODES = Arrays.asList("nb", "en");
+
     private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
     private static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
-
-    public static final String MISSING_QUERY_PARAMETER_ERROR_MESSAGE = "Missing mandatory query parameter: ";
 
     public static final String LANGUAGE_QUERY_PARAMETER = "language";
     public static final String TITLE_QUERY_PARAMETER = "title";
@@ -48,20 +56,24 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     protected ProjectPresentation[] processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        String language = getQueryParamOpt(requestInfo, LANGUAGE_QUERY_PARAMETER)
-            .orElse(DEFAULT_LANGUAGE_CODE);
-        String title = getQueryParamOpt(requestInfo, TITLE_QUERY_PARAMETER)
-            .orElseThrow(() -> missingMandatoryParameter(TITLE_QUERY_PARAMETER));
+        return createProjectPresentations(checkLanguageAndFetch(requestInfo), checkTitleAndFetch(requestInfo));
+    }
 
-        return createProjectPresentations(language, title);
+    private String checkTitleAndFetch(RequestInfo requestInfo) throws BadRequestException {
+        return getQueryParamOpt(requestInfo, TITLE_QUERY_PARAMETER)
+            .filter(this::isValidTitle)
+            .orElseThrow(() -> new BadRequestException(TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+    }
+
+    private String checkLanguageAndFetch(RequestInfo requestInfo) throws BadRequestException {
+        return Optional.of(getQueryParamOpt(requestInfo, LANGUAGE_QUERY_PARAMETER)
+            .orElse(DEFAULT_LANGUAGE_CODE))
+            .filter(this::isValidLanguage)
+            .orElseThrow(() -> new BadRequestException(LANGUAGE_INVALID));
     }
 
     protected Optional<String> getQueryParamOpt(RequestInfo requestInfo, String queryParameter) {
         return attempt(() -> requestInfo.getQueryParameter(queryParameter)).toOptional();
-    }
-
-    private BadRequestException missingMandatoryParameter(String queryParameterName) {
-        return new BadRequestException(MISSING_QUERY_PARAMETER_ERROR_MESSAGE + queryParameterName);
     }
 
     private ProjectPresentation[] createProjectPresentations(String language, String title) {
@@ -90,6 +102,46 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
         return HttpURLConnection.HTTP_OK;
     }
 
+
+    /*@SuppressWarnings("unchecked")
+    private void checkParameters(Map<String, Object> input) {
+        Map<String, String> queryStringParameters = Optional.ofNullable((Map<String, String>) input
+            .get(QUERY_STRING_PARAMETERS_KEY)).orElse(new ConcurrentHashMap<>());
+        String title = queryStringParameters.getOrDefault(TITLE_KEY, EMPTY_STRING);
+        if (title.isEmpty()) {
+            throw new RuntimeException(TITLE_IS_NULL);
+        }
+        if (!isValidTitle(title)) {
+            throw new RuntimeException(TITLE_ILLEGAL_CHARACTERS);
+        }
+
+        String language = queryStringParameters.getOrDefault(LANGUAGE_KEY, DEFAULT_LANGUAGE_CODE);
+        if (!VALID_LANGUAGE_CODES.contains(language)) {
+            throw new RuntimeException(LANGUAGE_INVALID);
+        }
+    }*/
+
+    private boolean isValidTitle(String str) {
+        char[] charArray = str.toCharArray();
+        for (char c : charArray) {
+            if (!isValidCharacter(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isValidCharacter(char c) {
+        return Character.isWhitespace(c)
+            || Character.isLetterOrDigit(c)
+            || c == CHARACTER_DASH
+            || c == CHARACTER_COMMA
+            || c == CHARACTER_PERIOD;
+    }
+
+    private boolean isValidLanguage(String language) {
+        return VALID_LANGUAGE_CODES.contains(language);
+    }
 
     private Map<String, String> createCristinQueryParameters(String title, String language) {
         Map<String, String> queryParameters = new ConcurrentHashMap<>();
