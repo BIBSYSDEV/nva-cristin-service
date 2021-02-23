@@ -62,19 +62,6 @@ public class FetchCristinProjectsTest {
         handler = new FetchCristinProjects(mockCristinApiClient, environment);
     }
 
-
-    private InputStreamReader mockGetResponseReader() {
-        InputStream getResultAsStream = FetchCristinProjectsTest.class
-                .getResourceAsStream(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE);
-        return new InputStreamReader(getResultAsStream);
-    }
-
-    private InputStreamReader mockQueryResponseReader() {
-        InputStream queryResultsAsStream = FetchCristinProjectsTest.class
-                .getResourceAsStream(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE);
-        return new InputStreamReader(queryResultsAsStream);
-    }
-
     @Test
     public void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
         initDefaultCristinApiClientMocks();
@@ -135,6 +122,65 @@ public class FetchCristinProjectsTest {
         assertEquals(ALLOW_ALL_ORIGIN, response.getHeaders().get(ApiGatewayHandler.ACCESS_CONTROL_ALLOW_ORIGIN));
     }
 
+    @Test
+    public void handlerReturnsBadRequestWhenTitleQueryParamIsEmpty() throws Exception {
+
+        initDefaultCristinApiClientMocks();
+
+        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, EMPTY_STRING));
+
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertTrue(response.getBody().contains(FetchCristinProjects.TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+    }
+
+    @Test
+    public void handlerReturnsBadRequestWhenReceivingTitleQueryParamWithIllegalCharacters() throws Exception {
+        initDefaultCristinApiClientMocks();
+
+        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_ILLEGAL_CHARACTERS));
+
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertTrue(response.getBody().contains(FetchCristinProjects.TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+    }
+
+    @Test
+    public void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
+        initDefaultCristinApiClientMocks();
+
+        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER,
+            LANGUAGE_KEY, LANGUAGE_INVALID));
+
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertTrue(response.getBody().contains(FetchCristinProjects.LANGUAGE_INVALID));
+    }
+
+    @Test
+    public void cristinApiClientWillStillGenerateQueryProjectsUrlEvenWithoutParameters()
+        throws IOException, URISyntaxException {
+        CristinApiClient cristinApiClient = new CristinApiClient();
+        cristinApiClient.generateQueryProjectsUrl(null);
+    }
+
+    @Test
+    public void readerThrowsIoExceptionWhenReadingInvalidJson() {
+        InputStream inputStream = new ByteArrayInputStream(INVALID_JSON.getBytes(StandardCharsets.UTF_8));
+        InputStreamReader reader = new InputStreamReader(inputStream);
+        Executable action = () -> CristinApiClient.fromJson(reader, Project.class);
+        assertThrows(IOException.class, action);
+    }
+
     private void cristinClientThrowingIoExceptionWhenFetchingProjectInfo() throws IOException, URISyntaxException {
         when(mockCristinApiClient.fetchQueryResults(any())).thenReturn(mockQueryResponseReader());
         when(mockCristinApiClient.queryAndEnrichProjects(any(), any())).thenCallRealMethod();
@@ -168,64 +214,15 @@ public class FetchCristinProjectsTest {
             .build();
     }
 
-    @Test
-    public void handlerReceivesEmptyTitleQueryParamWillReturnBadRequest() throws Exception {
-
-        initDefaultCristinApiClientMocks();
-
-        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, EMPTY_STRING));
-
-        handler.handleRequest(input, output, context);
-        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
-
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(response.getBody().contains(FetchCristinProjects.TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+    private InputStreamReader mockGetResponseReader() {
+        InputStream getResultAsStream = FetchCristinProjectsTest.class
+            .getResourceAsStream(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE);
+        return new InputStreamReader(getResultAsStream);
     }
 
-    @Test
-    public void handlerReceivesTitleQueryParamWithIllegalCharactersWillReturnBadRequest() throws Exception {
-        initDefaultCristinApiClientMocks();
-
-        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_ILLEGAL_CHARACTERS));
-
-        handler.handleRequest(input, output, context);
-        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
-
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(response.getBody().contains(FetchCristinProjects.TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+    private InputStreamReader mockQueryResponseReader() {
+        InputStream queryResultsAsStream = FetchCristinProjectsTest.class
+            .getResourceAsStream(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE);
+        return new InputStreamReader(queryResultsAsStream);
     }
-
-    @Test
-    public void handlerReceivesInvalidLanguageQueryParamWillReturnBadRequest() throws Exception {
-        initDefaultCristinApiClientMocks();
-
-        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER,
-            LANGUAGE_KEY, LANGUAGE_INVALID));
-
-        handler.handleRequest(input, output, context);
-        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
-
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(response.getBody().contains(FetchCristinProjects.LANGUAGE_INVALID));
-    }
-
-
-    @Test
-    public void testCristinGenerateQueryProjectsUrlFromNull() throws IOException, URISyntaxException {
-        CristinApiClient cristinApiClient = new CristinApiClient();
-        cristinApiClient.generateQueryProjectsUrl(null);
-    }
-
-
-    @Test
-    public void testExceptionOnInvalidJson() {
-        InputStream inputStream = new ByteArrayInputStream(INVALID_JSON.getBytes(StandardCharsets.UTF_8));
-        InputStreamReader reader = new InputStreamReader(inputStream);
-        Executable action = () -> CristinApiClient.fromJson(reader, Project.class);
-        assertThrows(IOException.class, action);
-    }
-
 }

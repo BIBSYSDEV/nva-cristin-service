@@ -59,6 +59,11 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
         return createProjectPresentations(checkLanguageAndFetch(requestInfo), checkTitleAndFetch(requestInfo));
     }
 
+    @Override
+    protected Integer getSuccessStatusCode(Void input, ProjectPresentation[] output) {
+        return HttpURLConnection.HTTP_OK;
+    }
+
     private String checkTitleAndFetch(RequestInfo requestInfo) throws BadRequestException {
         return getQueryParamOpt(requestInfo, TITLE_QUERY_PARAMETER)
             .filter(this::isValidTitle)
@@ -96,30 +101,6 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
             .map(project -> presentationConverter.asProjectPresentation(project, language))
             .collect(Collectors.toList());
     }
-
-    @Override
-    protected Integer getSuccessStatusCode(Void input, ProjectPresentation[] output) {
-        return HttpURLConnection.HTTP_OK;
-    }
-
-
-    /*@SuppressWarnings("unchecked")
-    private void checkParameters(Map<String, Object> input) {
-        Map<String, String> queryStringParameters = Optional.ofNullable((Map<String, String>) input
-            .get(QUERY_STRING_PARAMETERS_KEY)).orElse(new ConcurrentHashMap<>());
-        String title = queryStringParameters.getOrDefault(TITLE_KEY, EMPTY_STRING);
-        if (title.isEmpty()) {
-            throw new RuntimeException(TITLE_IS_NULL);
-        }
-        if (!isValidTitle(title)) {
-            throw new RuntimeException(TITLE_ILLEGAL_CHARACTERS);
-        }
-
-        String language = queryStringParameters.getOrDefault(LANGUAGE_KEY, DEFAULT_LANGUAGE_CODE);
-        if (!VALID_LANGUAGE_CODES.contains(language)) {
-            throw new RuntimeException(LANGUAGE_INVALID);
-        }
-    }*/
 
     private boolean isValidTitle(String str) {
         char[] charArray = str.toCharArray();
