@@ -13,11 +13,27 @@ targetCompatibility = JavaVersion.VERSION_11 // bytecode target version
 
 repositories {
     mavenCentral()
+    maven { url 'https://dl.bintray.com/unit-nva/nva-commons' }
+    maven { url 'https://jitpack.io' }
 }
 
-def jupiterVersion = "5.6.0"
+project.ext{
+    nvaCommonsVersion = '1.0.4'
+    jacksonVersion = '2.12.0'
+    jupiterVersion = '5.6.0'
+}
 
 dependencies {
+
+    implementation group: 'no.unit.nva', name: 'core', version: project.ext.nvaCommonsVersion
+    implementation group: 'no.unit.nva', name: 'apigateway', version: project.ext.nvaCommonsVersion
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: project.ext.jacksonVersion
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: project.ext.jacksonVersion
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: project.ext.jacksonVersion
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: project.ext.jacksonVersion
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: project.ext.jacksonVersion
+
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
     implementation group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.1.1'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
@@ -25,10 +41,14 @@ dependencies {
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.0'
     implementation 'org.apache.httpcomponents:httpclient:4.5.10'
+
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: project.ext.jupiterVersion
+
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: jupiterVersion
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: jupiterVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: project.ext.jupiterVersion
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+    testImplementation 'com.github.BIBSYSDEV:nva-testutils:0.1.18'
+    testImplementation group: 'no.unit.nva', name: 'logutils', version: project.ext.nvaCommonsVersion
 
 }
 
