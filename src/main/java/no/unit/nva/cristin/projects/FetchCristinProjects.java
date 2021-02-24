@@ -56,7 +56,10 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     protected ProjectPresentation[] processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        return createProjectPresentations(checkLanguageAndFetch(requestInfo), checkTitleAndFetch(requestInfo));
+        String language = getValidLanguage(requestInfo);
+        String title = getValidTitle(requestInfo);
+
+        return createProjectPresentations(language, title);
     }
 
     @Override
@@ -64,21 +67,21 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
         return HttpURLConnection.HTTP_OK;
     }
 
-    private String checkTitleAndFetch(RequestInfo requestInfo) throws BadRequestException {
-        return getQueryParamOpt(requestInfo, TITLE_QUERY_PARAMETER)
+    protected Optional<String> getQueryParam(RequestInfo requestInfo, String queryParameter) {
+        return attempt(() -> requestInfo.getQueryParameter(queryParameter)).toOptional();
+    }
+
+    private String getValidTitle(RequestInfo requestInfo) throws BadRequestException {
+        return getQueryParam(requestInfo, TITLE_QUERY_PARAMETER)
             .filter(this::isValidTitle)
             .orElseThrow(() -> new BadRequestException(TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
-    private String checkLanguageAndFetch(RequestInfo requestInfo) throws BadRequestException {
-        return Optional.of(getQueryParamOpt(requestInfo, LANGUAGE_QUERY_PARAMETER)
+    private String getValidLanguage(RequestInfo requestInfo) throws BadRequestException {
+        return Optional.of(getQueryParam(requestInfo, LANGUAGE_QUERY_PARAMETER)
             .orElse(DEFAULT_LANGUAGE_CODE))
             .filter(this::isValidLanguage)
             .orElseThrow(() -> new BadRequestException(LANGUAGE_INVALID));
-    }
-
-    protected Optional<String> getQueryParamOpt(RequestInfo requestInfo, String queryParameter) {
-        return attempt(() -> requestInfo.getQueryParameter(queryParameter)).toOptional();
     }
 
     private ProjectPresentation[] createProjectPresentations(String language, String title) {
@@ -87,9 +90,7 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     }
 
     private ProjectPresentation[] convertToArray(List<ProjectPresentation> projectPresentations) {
-        ProjectPresentation[] projectPresentationsArray = new ProjectPresentation[projectPresentations.size()];
-        projectPresentations.toArray(projectPresentationsArray);
-        return projectPresentationsArray;
+        return projectPresentations.toArray(ProjectPresentation[]::new);
     }
 
     private List<ProjectPresentation> createProjectPresentationList(String language, String title) {
@@ -97,6 +98,10 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
         List<Project> projects = attempt(() ->
             cristinApiClient.queryAndEnrichProjects(cristinQueryParameters, language)).orElseThrow();
 
+        return transformProjectsToProjectPresentations(language, projects);
+    }
+
+    private List<ProjectPresentation> transformProjectsToProjectPresentations(String language, List<Project> projects) {
         return projects.stream()
             .map(project -> presentationConverter.asProjectPresentation(project, language))
             .collect(Collectors.toList());
