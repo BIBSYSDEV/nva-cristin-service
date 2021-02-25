@@ -13,7 +13,6 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
-import org.slf4j.LoggerFactory;
 
 /**
  * Handler for requests to Lambda function.
@@ -48,7 +47,7 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     }
 
     public FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {
-        super(Void.class, environment, LoggerFactory.getLogger(FetchCristinProjects.class));
+        super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }
 
