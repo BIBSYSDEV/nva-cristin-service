@@ -13,6 +13,7 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 
 /**
  * Handler for requests to Lambda function.
@@ -42,6 +43,7 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     private final transient PresentationConverter presentationConverter = new PresentationConverter();
 
     @SuppressWarnings("unused")
+    @JacocoGenerated
     public FetchCristinProjects() {
         this(new CristinApiClient(), new Environment());
     }

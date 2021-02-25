@@ -1,22 +1,21 @@
 package no.unit.nva.cristin.projects;
 
-import com.google.gson.annotations.SerializedName;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class Person {
 
-    @SerializedName("cristin_person_id")
+    @JsonProperty("cristin_person_id")
     public String cristinPersonId;
-    @SerializedName("first_name")
+    @JsonProperty("first_name")
     public String firstName;
     public String surname;
     public String tel;
-    @SerializedName("identified_cristin_person")
+    @JsonProperty("identified_cristin_person")
     public Boolean identifiedCristinPerson;
-    @SerializedName("cristin_profile_url")
+    @JsonProperty("cristin_profile_url")
     public String cristinProfileUrl;
-    @SerializedName("picture_url")
+    @JsonProperty("picture_url")
     public String pictureUrl;
     public String url;
     public List<Role> roles;

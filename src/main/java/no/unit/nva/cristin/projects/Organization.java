@@ -1,11 +1,11 @@
 package no.unit.nva.cristin.projects;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Organization {
 
     public Institution institution;
-    @SerializedName("unit")
+    @JsonProperty("unit")
     public Unit institutionUnit;
 
 }

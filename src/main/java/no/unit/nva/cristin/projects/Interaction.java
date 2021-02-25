@@ -1,10 +1,10 @@
 package no.unit.nva.cristin.projects;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Interaction {
 
-    @SerializedName("cristin_person_id")
+    @JsonProperty("cristin_person_id")
     public String cristinPersonId;
     public String date;
 

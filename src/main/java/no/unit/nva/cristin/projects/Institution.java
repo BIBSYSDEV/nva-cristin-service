@@ -1,20 +1,19 @@
 package no.unit.nva.cristin.projects;
 
-import com.google.gson.annotations.SerializedName;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 
 public class Institution {
 
-    @SerializedName("cristin_institution_id")
+    @JsonProperty("cristin_institution_id")
     public String cristinInstitutionId;
-    @SerializedName("institution_name")
+    @JsonProperty("institution_name")
     public Map<String, String> institutionName;
     public String acronym;
     public String country;
-    @SerializedName("cristin_user_institution")
+    @JsonProperty("cristin_user_institution")
     public Boolean cristinUserInstitution;
-    @SerializedName("corresponding_unit")
+    @JsonProperty("corresponding_unit")
     public Unit correspondingUnit;
     public String url;
 
