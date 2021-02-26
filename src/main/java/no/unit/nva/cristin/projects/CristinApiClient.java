@@ -21,7 +21,7 @@ public class CristinApiClient {
     private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
     private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
-    private transient final Environment environment;
+    private final transient Environment environment;
 
     public CristinApiClient(Environment environment) {
         this.environment = environment;
