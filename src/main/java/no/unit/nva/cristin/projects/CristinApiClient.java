@@ -21,10 +21,10 @@ public class CristinApiClient {
     private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
     private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
-    private final transient Environment environment;
+    private final transient String cristinApiHost;
 
     public CristinApiClient(Environment environment) {
-        this.environment = environment;
+        cristinApiHost = environment.readEnv(CRISTIN_API_HOST_ENV);
     }
 
     protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
@@ -65,8 +65,8 @@ public class CristinApiClient {
             URISyntaxException {
         URIBuilder uri = new URIBuilder()
             .setScheme(HTTPS)
-            .setHost(environment.readEnv(CRISTIN_API_HOST_ENV))
-                .setPath(CRISTIN_API_PROJECTS_PATH);
+            .setHost(cristinApiHost)
+            .setPath(CRISTIN_API_PROJECTS_PATH);
         if (parameters != null) {
             parameters.keySet().forEach(s -> uri.addParameter(s, parameters.get(s)));
         }
@@ -76,7 +76,7 @@ public class CristinApiClient {
     protected URL generateGetProjectUrl(String id, String language) throws MalformedURLException, URISyntaxException {
         URI uri = new URIBuilder()
             .setScheme(HTTPS)
-            .setHost(environment.readEnv(CRISTIN_API_HOST_ENV))
+            .setHost(cristinApiHost)
             .setPath(CRISTIN_API_PROJECTS_PATH + id)
             .addParameter("lang", language)
             .build();
