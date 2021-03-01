@@ -47,8 +47,8 @@ public class FetchCristinProjectsTest {
     private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private static final String CRISTIN_API_DUMMY_HOST = "example.com";
     private static final String ALLOW_ALL_ORIGIN = "*";
-    CristinApiClient cristinApiClientStub;
-    Environment environment;
+    private CristinApiClient cristinApiClientStub;
+    private Environment environment;
     private Context context;
     private ByteArrayOutputStream output;
     private FetchCristinProjects handler;
