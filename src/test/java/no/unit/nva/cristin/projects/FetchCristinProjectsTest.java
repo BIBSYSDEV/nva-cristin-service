@@ -1,5 +1,31 @@
 package no.unit.nva.cristin.projects;
 
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.core.Environment;
+import nva.commons.core.JsonUtils;
+import nva.commons.core.ioutils.IoUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
 import static no.unit.nva.cristin.projects.FetchCristinProjects.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
@@ -10,32 +36,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.ApiGatewayHandler;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.core.Environment;
-import nva.commons.core.JsonUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 public class FetchCristinProjectsTest {
 
-    private static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE = "/cristinQueryProjectsResponse.json";
-    private static final String CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE = "/cristinGetProjectResponse.json";
+    private static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE = "cristinQueryProjectsResponse.json";
+    private static final String CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE = "cristinGetProjectResponse.json";
     private static final String LANGUAGE_KEY = "language";
     private static final String EMPTY_STRING = "";
     private static final String LANGUAGE_NB = "nb";
@@ -53,7 +58,7 @@ public class FetchCristinProjectsTest {
     private FetchCristinProjects handler;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mockCristinApiClient = mock(CristinApiClient.class);
         Environment environment = mock(Environment.class);
         when(environment.readEnv(anyString())).thenReturn(ALLOW_ALL_ORIGIN);
@@ -62,10 +67,19 @@ public class FetchCristinProjectsTest {
         handler = new FetchCristinProjects(mockCristinApiClient, environment);
     }
 
+    @ParameterizedTest
+    @ArgumentsSource(TestPairProvider.class)
+    void handlerReturnsExpectedBodyWhenRequestInputIsValid(String queryResponse,
+                                                           String getResponse,
+                                                           String expected) throws IOException, URISyntaxException {
+        initDefaultCristinApiClientMocks(queryResponse, getResponse);
+        var actual = sendDefaultQuery().getBody();
+        assertEquals(expected, actual);
+    }
+
     @Test
     public void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
         initDefaultCristinApiClientMocks();
-
         GatewayResponse<ProjectPresentation[]> response = sendDefaultQuery();
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
     }
@@ -198,8 +212,13 @@ public class FetchCristinProjectsTest {
     }
 
     private void initDefaultCristinApiClientMocks() throws IOException, URISyntaxException {
-        when(mockCristinApiClient.fetchQueryResults(any())).thenReturn(mockQueryResponseReader());
-        when(mockCristinApiClient.fetchGetResult(any())).thenAnswer(i -> mockGetResponseReader());
+        initDefaultCristinApiClientMocks(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE, CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE);
+    }
+
+    private void initDefaultCristinApiClientMocks(String queryData, String getData) throws
+            IOException, URISyntaxException {
+        when(mockCristinApiClient.fetchQueryResults(any())).thenReturn(getReader(queryData));
+        when(mockCristinApiClient.fetchGetResult(any())).thenAnswer(i -> getReader(getData));
         when(mockCristinApiClient.queryAndEnrichProjects(any(), any())).thenCallRealMethod();
         when(mockCristinApiClient.queryProjects(any())).thenCallRealMethod();
         when(mockCristinApiClient.getProject(any(), any())).thenCallRealMethod();
@@ -214,15 +233,12 @@ public class FetchCristinProjectsTest {
             .build();
     }
 
-    private InputStreamReader mockGetResponseReader() {
-        InputStream getResultAsStream = FetchCristinProjectsTest.class
-            .getResourceAsStream(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE);
-        return new InputStreamReader(getResultAsStream);
+    private InputStreamReader mockQueryResponseReader() {
+        return getReader(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE);
     }
 
-    private InputStreamReader mockQueryResponseReader() {
-        InputStream queryResultsAsStream = FetchCristinProjectsTest.class
-            .getResourceAsStream(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE);
+    private InputStreamReader getReader(String resource) {
+        InputStream queryResultsAsStream = IoUtils.inputStreamFromResources(resource);
         return new InputStreamReader(queryResultsAsStream);
     }
 }
