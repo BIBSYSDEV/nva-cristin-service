@@ -1,5 +1,31 @@
 package no.unit.nva.cristin.projects;
 
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.core.Environment;
+import nva.commons.core.JsonUtils;
+import nva.commons.core.ioutils.IoUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
 import static no.unit.nva.cristin.projects.FetchCristinProjects.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
@@ -11,27 +37,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.ApiGatewayHandler;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.core.Environment;
-import nva.commons.core.JsonUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 public class FetchCristinProjectsTest {
 
@@ -54,7 +59,7 @@ public class FetchCristinProjectsTest {
     private FetchCristinProjects handler;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         environment = mock(Environment.class);
         when(environment.readEnv(ALLOWED_ORIGIN_ENV)).thenReturn(ALLOW_ALL_ORIGIN);
         when(environment.readEnv(CRISTIN_API_HOST_ENV)).thenReturn(CRISTIN_API_DUMMY_HOST);
@@ -62,6 +67,18 @@ public class FetchCristinProjectsTest {
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(TestPairProvider.class)
+    void handlerReturnsExpectedBodyWhenRequestInputIsValid(String queryResponse,
+                                                           String getResponse,
+                                                           String expected) throws IOException {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        when(cristinApiClientStub.fetchQueryResults(any())).thenReturn(getReader(queryResponse));
+        when(cristinApiClientStub.fetchGetResult(any())).thenReturn(getReader(getResponse));
+        var actual = sendDefaultQuery().getBody();
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -187,4 +204,8 @@ public class FetchCristinProjectsTest {
             .build();
     }
 
+    private InputStreamReader getReader(String resource) {
+        InputStream queryResultsAsStream = IoUtils.inputStreamFromResources(resource);
+        return new InputStreamReader(queryResultsAsStream);
+    }
 }
