@@ -22,8 +22,4 @@ public class TestPairProvider implements ArgumentsProvider {
                 Arguments.of(CRISTIN_QUERY_PROJECTS_RESPONSE, CRISTIN_GET_PROJECT_RESPONSE, API_QUERY_RESPONSE_JSON)
         );
     }
-
-    private static InputStreamReader resourceAsInputStreamReader(String resource) {
-        return new InputStreamReader(IoUtils.inputStreamFromResources(resource));
-    }
 }
