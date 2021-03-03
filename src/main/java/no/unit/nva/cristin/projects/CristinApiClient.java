@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import static java.util.Arrays.asList;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -10,17 +11,24 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import org.apache.http.client.utils.URIBuilder;
 
 public class CristinApiClient {
 
     private static final String HTTPS = "https";
-    private static final String CRISTIN_API_HOST = "api.cristin.no";
+    private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
+    private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
+    private final transient String cristinApiHost;
+
+    public CristinApiClient(Environment environment) {
+        cristinApiHost = environment.readEnv(CRISTIN_API_HOST_ENV);
+    }
 
     protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
-        return JsonUtils.objectMapper.readValue(reader, classOfT);
+        return OBJECT_MAPPER.readValue(reader, classOfT);
     }
 
     protected List<Project> queryProjects(Map<String, String> parameters) throws IOException, URISyntaxException {
@@ -56,9 +64,9 @@ public class CristinApiClient {
     protected URL generateQueryProjectsUrl(Map<String, String> parameters) throws MalformedURLException,
             URISyntaxException {
         URIBuilder uri = new URIBuilder()
-                .setScheme(HTTPS)
-                .setHost(CRISTIN_API_HOST)
-                .setPath(CRISTIN_API_PROJECTS_PATH);
+            .setScheme(HTTPS)
+            .setHost(cristinApiHost)
+            .setPath(CRISTIN_API_PROJECTS_PATH);
         if (parameters != null) {
             parameters.keySet().forEach(s -> uri.addParameter(s, parameters.get(s)));
         }
@@ -68,7 +76,7 @@ public class CristinApiClient {
     protected URL generateGetProjectUrl(String id, String language) throws MalformedURLException, URISyntaxException {
         URI uri = new URIBuilder()
             .setScheme(HTTPS)
-            .setHost(CRISTIN_API_HOST)
+            .setHost(cristinApiHost)
             .setPath(CRISTIN_API_PROJECTS_PATH + id)
             .addParameter("lang", language)
             .build();

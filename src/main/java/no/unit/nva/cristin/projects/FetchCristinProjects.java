@@ -45,10 +45,14 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     @SuppressWarnings("unused")
     @JacocoGenerated
     public FetchCristinProjects() {
-        this(new CristinApiClient(), new Environment());
+        this(new Environment());
     }
 
-    public FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {
+    public FetchCristinProjects(Environment environment) {
+        this(new CristinApiClient(environment), environment);
+    }
+
+    protected FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }
