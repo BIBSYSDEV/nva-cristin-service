@@ -59,7 +59,7 @@ public class FetchCristinProjectsTest {
     private FetchCristinProjects handler;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         environment = mock(Environment.class);
         when(environment.readEnv(ALLOWED_ORIGIN_ENV)).thenReturn(ALLOW_ALL_ORIGIN);
         when(environment.readEnv(CRISTIN_API_HOST_ENV)).thenReturn(CRISTIN_API_DUMMY_HOST);
