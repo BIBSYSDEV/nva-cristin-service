@@ -1,16 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.FetchCristinProjects.LANGUAGE_QUERY_PARAMETER;
-import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
-import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -44,8 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class FetchCristinProjectsTest {
@@ -83,8 +73,10 @@ public class FetchCristinProjectsTest {
     @ArgumentsSource(TestPairProvider.class)
     void handlerReturnsExpectedBodyWhenRequestInputIsValid(String queryResponse,
                                                            String getResponse,
-                                                           String expected) throws IOException, URISyntaxException {
-        initDefaultCristinApiClientMocks(queryResponse, getResponse);
+                                                           String expected) throws IOException {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        when(cristinApiClientStub.fetchQueryResults(any())).thenReturn(getReader(queryResponse));
+        when(cristinApiClientStub.fetchGetResult(any())).thenReturn(getReader(getResponse));
         var actual = sendDefaultQuery().getBody();
         assertEquals(expected, actual);
     }
@@ -210,10 +202,6 @@ public class FetchCristinProjectsTest {
             .withBody(null)
             .withQueryParameters(map)
             .build();
-    }
-
-    private InputStreamReader mockQueryResponseReader() {
-        return getReader(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE);
     }
 
     private InputStreamReader getReader(String resource) {
