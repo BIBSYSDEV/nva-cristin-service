@@ -20,65 +20,65 @@ Example response body:
 ```json
 [
   {
-    "cristinProjectId": "2040291",
+    "cristinProjectId": "456789",
     "mainLanguage": "en",
     "titles": [
       {
-        "title": "Opportunities and Challenges for Integrating Sámi Reindeer Herding Traditional Environmental Knowledge in Environmental Governance",
+        "title": "Some Example Title",
         "language": "en"
       }
     ],
     "participants": [
       {
-        "cristinPersonId": "327970",
-        "fullName": "Turi, Ellen Inga"
+        "cristinPersonId": "123456",
+        "fullName": "Nordmann, Ola"
       }
     ],
     "institutions": [
       {
-        "cristinInstitutionId": "231",
-        "name": "Sámi allaskuvla/Sámi University of Applied Sciences",
+        "cristinInstitutionId": "1234",
+        "name": "Et universitet i Norge",
         "language": "nb"
       }
     ],
     "fundings": [
       {
         "fundingSourceCode": "NFR",
-        "projectCode": "270819"
+        "projectCode": "654321"
       }
     ]
   },
   {
-    "cristinProjectId": "415549",
+    "cristinProjectId": "345678",
     "mainLanguage": "no",
     "titles": [
       {
-        "title": "Opptak og omsetning av radioaktive stoffer og tungmetall i reinsdyr",
+        "title": "En eller annen tittel",
         "language": "no"
       },
       {
-        "title": "Absorption and metabolism of radio active materials and heavy metals in reindeer",
+        "title": "Some example title",
         "language": "en"
       }
     ],
     "participants": [
       {
-        "cristinPersonId": "135157",
-        "fullName": "Skuterud, Lavrans"
+        "cristinPersonId": "223344",
+        "fullName": "Nordmann, Kari"
       },
       {
-        "cristinPersonId": "317528",
-        "fullName": "Hove, Knut"
+        "cristinPersonId": "443322",
+        "fullName": "Hansen, Knut"
       },
       {
-        "cristinPersonId": "317890",
-        "fullName": "Strand, Per"
+        "cristinPersonId": "111222",
+        "fullName": "Jensen, Per"
       }
     ],
     "institutions": [
       {
-        "cristinInstitutionId": "192",
-        "name": "Norges miljø- og biovitenskapelige universitet",
+        "cristinInstitutionId": "9876",
+        "name": "Et annet universitet",
         "language": "nb"
       }
     ],
