@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import static java.util.Arrays.asList;
+import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -62,7 +63,7 @@ public class CristinApiClient {
     }
 
     protected URL generateQueryProjectsUrl(Map<String, String> parameters) throws MalformedURLException,
-            URISyntaxException {
+                                                                                  URISyntaxException {
         URIBuilder uri = new URIBuilder()
             .setScheme(HTTPS)
             .setHost(cristinApiHost)
@@ -84,15 +85,14 @@ public class CristinApiClient {
     }
 
     private List<Project> enrichProjects(String language, List<Project> projects) {
-        return projects.stream()
-            .map(project -> {
-                try {
-                    return getProject(project.cristinProjectId, language);
-                } catch (IOException | URISyntaxException e) {
-                    System.out.println("Error fetching cristin project with id: " + project.cristinProjectId);
-                }
+        return projects.stream().map(project -> enrichOneProject(language, project)).collect(Collectors.toList());
+    }
+
+    private Project enrichOneProject(String language, Project project) {
+        return attempt(() -> getProject(project.cristinProjectId, language))
+            .orElse((failure) -> {
+                System.out.println("Error fetching cristin project with id: " + project.cristinProjectId);
                 return project;
-            })
-            .collect(Collectors.toList());
+            });
     }
 }

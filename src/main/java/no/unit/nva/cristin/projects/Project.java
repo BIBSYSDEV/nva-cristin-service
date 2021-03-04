@@ -65,7 +65,7 @@ public class Project {
     @JsonProperty(RELATED_PROJECTS)
     public List<String> relatedProjects;
 
-    public List<Map<String, String>> approvals;
+    public List<Map<String, Object>> approvals;
 
 }
 
