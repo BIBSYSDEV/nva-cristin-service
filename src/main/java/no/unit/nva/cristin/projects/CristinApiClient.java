@@ -12,20 +12,18 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import org.apache.http.client.utils.URIBuilder;
 
 public class CristinApiClient {
 
     private static final String HTTPS = "https";
-    private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
     private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
     private final transient String cristinApiHost;
 
-    public CristinApiClient(Environment environment) {
-        cristinApiHost = environment.readEnv(CRISTIN_API_HOST_ENV);
+    public CristinApiClient(String cristinApiHost) {
+        this.cristinApiHost = cristinApiHost;
     }
 
     protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {

@@ -39,6 +39,7 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     public static final String LANGUAGE_QUERY_PARAMETER = "language";
     public static final String TITLE_QUERY_PARAMETER = "title";
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
+    private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private final transient CristinApiClient cristinApiClient;
     private final transient PresentationConverter presentationConverter = new PresentationConverter();
 
@@ -49,7 +50,7 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     }
 
     public FetchCristinProjects(Environment environment) {
-        this(new CristinApiClient(environment), environment);
+        this(new CristinApiClient(environment.readEnv(CRISTIN_API_HOST_ENV)), environment);
     }
 
     protected FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {
