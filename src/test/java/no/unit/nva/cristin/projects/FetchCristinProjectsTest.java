@@ -13,6 +13,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -50,6 +51,7 @@ public class FetchCristinProjectsTest {
     private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private static final String CRISTIN_API_DUMMY_HOST = "example.com";
     private static final String ALLOW_ALL_ORIGIN = "*";
+    private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
     private CristinApiClient cristinApiClientStub;
     private Environment environment;
     private Context context;
@@ -76,7 +78,7 @@ public class FetchCristinProjectsTest {
         when(cristinApiClientStub.fetchQueryResults(any())).thenReturn(getReader(queryResponse));
         when(cristinApiClientStub.fetchGetResult(any())).thenReturn(getReader(getResponse));
         var actual = sendDefaultQuery().getBody();
-        assertEquals(expected, actual);
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }
 
     @Test
