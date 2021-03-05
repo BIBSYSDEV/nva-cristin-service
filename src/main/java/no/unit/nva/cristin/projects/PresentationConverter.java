@@ -12,7 +12,7 @@ public class PresentationConverter {
         projectPresentation.cristinProjectId = project.cristinProjectId;
         projectPresentation.mainLanguage = project.mainLanguage;
 
-        Optional.ofNullable(project.title).orElse(new TreeMap<String, String>() {
+        Optional.ofNullable(project.title).orElse(new TreeMap<>() {
         }).forEach((key, value) -> {
             TitlePresentation titlePresentation = new TitlePresentation();
             titlePresentation.language = key;
@@ -41,7 +41,7 @@ public class PresentationConverter {
             FundingSourcePresentation fundingSourcePresentation = new FundingSourcePresentation();
             fundingSourcePresentation.fundingSourceCode = fundingSource.fundingSourceCode;
             fundingSourcePresentation.projectCode = fundingSource.projectCode;
-            fundingSource.fundingSourceName.entrySet().stream()
+            fundingSourcePresentation.names = fundingSource.fundingSourceName.entrySet().stream()
                     .map(name -> new FundingSourceNamePresentation(name.getKey(), name.getValue()))
                     .collect(Collectors.toList());
             projectPresentation.fundings.add(fundingSourcePresentation);

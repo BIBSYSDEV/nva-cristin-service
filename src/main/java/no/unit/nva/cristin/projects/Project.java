@@ -1,58 +1,71 @@
 package no.unit.nva.cristin.projects;
 
-import com.google.gson.annotations.SerializedName;
-
+import static no.unit.nva.cristin.projects.JsonPropertyNames.ACADEMIC_DISCIPLINES;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.COORDINATING_INSTITUTION;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.CRISTIN_PROJECT_ID;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.END_DATE;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.HRCS_ACTIVITIES;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.HRCS_CATEGORIES;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.LAST_MODIFIED;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.MAIN_LANGUAGE;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.PROJECT_CATEGORIES;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.PROJECT_FUNDING_SOURCES;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.RELATED_PROJECTS;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.START_DATE;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("PMD.TooManyFields")
 public class Project {
 
-    @SerializedName("cristin_project_id")
+    @JsonProperty(CRISTIN_PROJECT_ID)
     public String cristinProjectId;
     public Boolean publishable;
     public Boolean published;
     public Map<String, String> title;
-    @SerializedName("main_language")
+    @JsonProperty(MAIN_LANGUAGE)
     public String mainLanguage;
     public String url;
-    @SerializedName("start_date")
+    @JsonProperty(START_DATE)
     public String startDate;
-    @SerializedName("end_date")
+    @JsonProperty(END_DATE)
     public String endDate;
     public String status;
     public Interaction created;
-    @SerializedName("last_modified")
+    @JsonProperty(LAST_MODIFIED)
     public Interaction lastModified;
 
-    @SerializedName("coordinating_institution")
+    @JsonProperty(COORDINATING_INSTITUTION)
     public Organization coordinatingInstitution;
-    @SerializedName("project_funding_sources")
+    @JsonProperty(PROJECT_FUNDING_SOURCES)
     public List<FundingSource> projectFundingSources;
     public List<Person> participants;
 
-    @SerializedName("project_categories")
+    @JsonProperty(PROJECT_CATEGORIES)
     public List<Category> projectCategories;
-    @SerializedName("hrcs_categories")
+    @JsonProperty(HRCS_CATEGORIES)
     public List<Category> hrcsCategories;
-    @SerializedName("hrcs_activities")
+    @JsonProperty(HRCS_ACTIVITIES)
     public List<Category> hrcsActivities;
-    @SerializedName("academic_disciplines")
+    @JsonProperty(ACADEMIC_DISCIPLINES)
     public List<Category> academicDisciplines;
     public List<Category> keywords;
 
-    @SerializedName("academic_summary")
+    @JsonProperty(ACADEMIC_SUMMARY)
     public Map<String, String> academicSummary;
-    @SerializedName("popular_scientific_summary")
+    @JsonProperty(POPULAR_SCIENTIFIC_SUMMARY)
     public Map<String, String> popularScientificSummary;
     public Map<String, String> method;
 
     public List<String> results;
 
-    @SerializedName("related_projects")
+    @JsonProperty(RELATED_PROJECTS)
     public List<String> relatedProjects;
 
-    public List<Map<String, String>> approvals;
+    public List<Map<String, Object>> approvals;
 
 }
 

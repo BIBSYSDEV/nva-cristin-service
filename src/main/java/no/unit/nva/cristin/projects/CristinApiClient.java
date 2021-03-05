@@ -1,10 +1,8 @@
 package no.unit.nva.cristin.projects;
 
-
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import org.apache.http.client.utils.URIBuilder;
-
+import static java.util.Arrays.asList;
+import static nva.commons.core.attempt.Try.attempt;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -14,29 +12,22 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static java.util.Arrays.asList;
+import nva.commons.core.JsonUtils;
+import org.apache.http.client.utils.URIBuilder;
 
 public class CristinApiClient {
 
     private static final String HTTPS = "https";
-    private static final String CRISTIN_API_HOST = "api.cristin.no";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
+    private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
+    private final transient String cristinApiHost;
 
-    protected List<Project> queryAndEnrichProjects(Map<String, String> parameters, String language) throws
-            IOException, URISyntaxException {
-        List<Project> projects = queryProjects(parameters);
-        List<Project> enrichedProjects = projects.stream()
-                .map(project -> {
-                    try {
-                        return getProject(project.cristinProjectId, language);
-                    } catch (IOException | URISyntaxException e) {
-                        System.out.println("Error fetching cristin project with id: " + project.cristinProjectId);
-                    }
-                    return project;
-                })
-                .collect(Collectors.toList());
-        return enrichedProjects;
+    public CristinApiClient(String cristinApiHost) {
+        this.cristinApiHost = cristinApiHost;
+    }
+
+    protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
+        return OBJECT_MAPPER.readValue(reader, classOfT);
     }
 
     protected List<Project> queryProjects(Map<String, String> parameters) throws IOException, URISyntaxException {
@@ -44,6 +35,14 @@ public class CristinApiClient {
         try (InputStreamReader streamReader = fetchQueryResults(url)) {
             return asList(fromJson(streamReader, Project[].class));
         }
+    }
+
+    protected List<Project> queryAndEnrichProjects(Map<String, String> parameters, String language) throws
+                                                                                                    IOException,
+                                                                                                    URISyntaxException {
+        List<Project> projects = queryProjects(parameters);
+        List<Project> enrichedProjects = enrichProjects(language, projects);
+        return enrichedProjects;
     }
 
     protected Project getProject(String id, String language) throws IOException, URISyntaxException {
@@ -62,11 +61,11 @@ public class CristinApiClient {
     }
 
     protected URL generateQueryProjectsUrl(Map<String, String> parameters) throws MalformedURLException,
-            URISyntaxException {
+                                                                                  URISyntaxException {
         URIBuilder uri = new URIBuilder()
-                .setScheme(HTTPS)
-                .setHost(CRISTIN_API_HOST)
-                .setPath(CRISTIN_API_PROJECTS_PATH);
+            .setScheme(HTTPS)
+            .setHost(cristinApiHost)
+            .setPath(CRISTIN_API_PROJECTS_PATH);
         if (parameters != null) {
             parameters.keySet().forEach(s -> uri.addParameter(s, parameters.get(s)));
         }
@@ -75,21 +74,23 @@ public class CristinApiClient {
 
     protected URL generateGetProjectUrl(String id, String language) throws MalformedURLException, URISyntaxException {
         URI uri = new URIBuilder()
-                .setScheme(HTTPS)
-                .setHost(CRISTIN_API_HOST)
-                .setPath(CRISTIN_API_PROJECTS_PATH + id)
-                .addParameter("lang", language)
-                .build();
+            .setScheme(HTTPS)
+            .setHost(cristinApiHost)
+            .setPath(CRISTIN_API_PROJECTS_PATH + id)
+            .addParameter("lang", language)
+            .build();
         return uri.toURL();
     }
 
-    protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
-        try {
-            return new Gson().fromJson(reader, classOfT);
-        } catch (JsonSyntaxException e) {
-            final String s = e.getMessage() + " " + reader;
-            throw new IOException(s, e);
-        }
+    private List<Project> enrichProjects(String language, List<Project> projects) {
+        return projects.stream().map(project -> enrichOneProject(language, project)).collect(Collectors.toList());
     }
 
+    private Project enrichOneProject(String language, Project project) {
+        return attempt(() -> getProject(project.cristinProjectId, language))
+            .orElse((failure) -> {
+                System.out.println("Error fetching cristin project with id: " + project.cristinProjectId);
+                return project;
+            });
+    }
 }

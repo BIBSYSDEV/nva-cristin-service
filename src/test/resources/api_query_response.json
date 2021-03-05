@@ -1,0 +1,116 @@
+[ {
+  "cristin_project_id" : "456789",
+  "main_language" : "en",
+  "titles" : [ {
+    "title" : "Example Title",
+    "language" : "en"
+  } ],
+  "participants" : [ {
+    "cristinPersonId" : "123456",
+    "fullName" : "Nordmann, Ola"
+  } ],
+  "institutions" : [ {
+    "cristinInstitutionId" : "1234",
+    "language" : "nb"
+  } ],
+  "fundings" : [ {
+    "fundingSourceCode" : "NFR",
+    "projectCode" : "654321",
+    "names" : [ {
+      "name" : "Research Council of Norway (RCN)",
+      "language" : "en"
+    } ]
+  } ]
+}, {
+  "cristin_project_id" : "456789",
+  "main_language" : "en",
+  "titles" : [ {
+    "title" : "Example Title",
+    "language" : "en"
+  } ],
+  "participants" : [ {
+    "cristinPersonId" : "123456",
+    "fullName" : "Nordmann, Ola"
+  } ],
+  "institutions" : [ {
+    "cristinInstitutionId" : "1234",
+    "language" : "nb"
+  } ],
+  "fundings" : [ {
+    "fundingSourceCode" : "NFR",
+    "projectCode" : "654321",
+    "names" : [ {
+      "name" : "Research Council of Norway (RCN)",
+      "language" : "en"
+    } ]
+  } ]
+}, {
+  "cristin_project_id" : "456789",
+  "main_language" : "en",
+  "titles" : [ {
+    "title" : "Example Title",
+    "language" : "en"
+  } ],
+  "participants" : [ {
+    "cristinPersonId" : "123456",
+    "fullName" : "Nordmann, Ola"
+  } ],
+  "institutions" : [ {
+    "cristinInstitutionId" : "1234",
+    "language" : "nb"
+  } ],
+  "fundings" : [ {
+    "fundingSourceCode" : "NFR",
+    "projectCode" : "654321",
+    "names" : [ {
+      "name" : "Research Council of Norway (RCN)",
+      "language" : "en"
+    } ]
+  } ]
+}, {
+  "cristin_project_id" : "456789",
+  "main_language" : "en",
+  "titles" : [ {
+    "title" : "Example Title",
+    "language" : "en"
+  } ],
+  "participants" : [ {
+    "cristinPersonId" : "123456",
+    "fullName" : "Nordmann, Ola"
+  } ],
+  "institutions" : [ {
+    "cristinInstitutionId" : "1234",
+    "language" : "nb"
+  } ],
+  "fundings" : [ {
+    "fundingSourceCode" : "NFR",
+    "projectCode" : "654321",
+    "names" : [ {
+      "name" : "Research Council of Norway (RCN)",
+      "language" : "en"
+    } ]
+  } ]
+}, {
+  "cristin_project_id" : "456789",
+  "main_language" : "en",
+  "titles" : [ {
+    "title" : "Example Title",
+    "language" : "en"
+  } ],
+  "participants" : [ {
+    "cristinPersonId" : "123456",
+    "fullName" : "Nordmann, Ola"
+  } ],
+  "institutions" : [ {
+    "cristinInstitutionId" : "1234",
+    "language" : "nb"
+  } ],
+  "fundings" : [ {
+    "fundingSourceCode" : "NFR",
+    "projectCode" : "654321",
+    "names" : [ {
+      "name" : "Research Council of Norway (RCN)",
+      "language" : "en"
+    } ]
+  } ]
+} ]

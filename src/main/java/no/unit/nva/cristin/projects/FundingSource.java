@@ -1,18 +1,20 @@
 package no.unit.nva.cristin.projects;
 
-import com.google.gson.annotations.SerializedName;
-
+import static no.unit.nva.cristin.projects.JsonPropertyNames.FUNDING_SOURCE_CODE;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.FUNDING_SOURCE_NAME;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.PROJECT_CODE;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 
 public class FundingSource {
 
-    @SerializedName("funding_source_code")
+    @JsonProperty(FUNDING_SOURCE_CODE)
     public String fundingSourceCode;
 
-    @SerializedName("project_code")
+    @JsonProperty(PROJECT_CODE)
     public String projectCode;
 
-    @SerializedName("funding_source_name")
+    @JsonProperty(FUNDING_SOURCE_NAME)
     public Map<String, String> fundingSourceName;
 
 }

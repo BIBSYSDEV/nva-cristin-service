@@ -13,6 +13,7 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 
 /**
  * Handler for requests to Lambda function.
@@ -38,15 +39,21 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectPresent
     public static final String LANGUAGE_QUERY_PARAMETER = "language";
     public static final String TITLE_QUERY_PARAMETER = "title";
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
+    private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private final transient CristinApiClient cristinApiClient;
     private final transient PresentationConverter presentationConverter = new PresentationConverter();
 
     @SuppressWarnings("unused")
+    @JacocoGenerated
     public FetchCristinProjects() {
-        this(new CristinApiClient(), new Environment());
+        this(new Environment());
     }
 
-    public FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {
+    public FetchCristinProjects(Environment environment) {
+        this(new CristinApiClient(environment.readEnv(CRISTIN_API_HOST_ENV)), environment);
+    }
+
+    protected FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }
