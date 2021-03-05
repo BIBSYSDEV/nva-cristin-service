@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("PMD.TooManyFields")
-public class Project {
+public class CristinProject {
 
     @JsonProperty(CRISTIN_PROJECT_ID)
     public String cristinProjectId;
@@ -37,13 +37,11 @@ public class Project {
     public Interaction created;
     @JsonProperty(LAST_MODIFIED)
     public Interaction lastModified;
-
     @JsonProperty(COORDINATING_INSTITUTION)
     public Organization coordinatingInstitution;
     @JsonProperty(PROJECT_FUNDING_SOURCES)
     public List<FundingSource> projectFundingSources;
     public List<Person> participants;
-
     @JsonProperty(PROJECT_CATEGORIES)
     public List<Category> projectCategories;
     @JsonProperty(HRCS_CATEGORIES)
@@ -53,18 +51,14 @@ public class Project {
     @JsonProperty(ACADEMIC_DISCIPLINES)
     public List<Category> academicDisciplines;
     public List<Category> keywords;
-
     @JsonProperty(ACADEMIC_SUMMARY)
     public Map<String, String> academicSummary;
     @JsonProperty(POPULAR_SCIENTIFIC_SUMMARY)
     public Map<String, String> popularScientificSummary;
     public Map<String, String> method;
-
     public List<String> results;
-
     @JsonProperty(RELATED_PROJECTS)
     public List<String> relatedProjects;
-
     public List<Map<String, Object>> approvals;
 
 }

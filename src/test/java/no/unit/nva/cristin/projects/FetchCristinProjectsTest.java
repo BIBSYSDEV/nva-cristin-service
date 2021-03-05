@@ -83,7 +83,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
-        GatewayResponse<ProjectPresentation[]> response = sendDefaultQuery();
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
     }
 
@@ -93,7 +93,7 @@ public class FetchCristinProjectsTest {
         doThrow(new IOException()).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
 
-        GatewayResponse<ProjectPresentation[]> response = sendDefaultQuery();
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -105,7 +105,7 @@ public class FetchCristinProjectsTest {
         doThrow(new IOException()).when(cristinApiClientStub).queryAndEnrichProjects(any(), any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
 
-        GatewayResponse<ProjectPresentation[]> response = sendDefaultQuery();
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -116,7 +116,7 @@ public class FetchCristinProjectsTest {
         InputStream input = requestWithQueryParameters(Map.of(LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB));
 
         handler.handleRequest(input, output, context);
-        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<ProjectsWrapper> response = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -127,7 +127,7 @@ public class FetchCristinProjectsTest {
         InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER));
 
         handler.handleRequest(input, output, context);
-        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<ProjectsWrapper> response = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -135,7 +135,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void handlerReceivesAllowOriginHeaderValueFromEnvironmentAndPutsItOnResponse() throws Exception {
-        GatewayResponse<ProjectPresentation[]> response = sendDefaultQuery();
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
         assertEquals(ALLOW_ALL_ORIGIN, response.getHeaders().get(ApiGatewayHandler.ACCESS_CONTROL_ALLOW_ORIGIN));
     }
 
@@ -144,7 +144,7 @@ public class FetchCristinProjectsTest {
         InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, EMPTY_STRING));
 
         handler.handleRequest(input, output, context);
-        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<ProjectsWrapper> response = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -156,7 +156,7 @@ public class FetchCristinProjectsTest {
         InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_ILLEGAL_CHARACTERS));
 
         handler.handleRequest(input, output, context);
-        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<ProjectsWrapper> response = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -169,7 +169,7 @@ public class FetchCristinProjectsTest {
             LANGUAGE_KEY, LANGUAGE_INVALID));
 
         handler.handleRequest(input, output, context);
-        GatewayResponse<ProjectPresentation[]> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<ProjectsWrapper> response = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -186,11 +186,11 @@ public class FetchCristinProjectsTest {
     public void readerThrowsIoExceptionWhenReadingInvalidJson() {
         InputStream inputStream = new ByteArrayInputStream(INVALID_JSON.getBytes(StandardCharsets.UTF_8));
         InputStreamReader reader = new InputStreamReader(inputStream);
-        Executable action = () -> CristinApiClient.fromJson(reader, Project.class);
+        Executable action = () -> CristinApiClient.fromJson(reader, CristinProject.class);
         assertThrows(IOException.class, action);
     }
 
-    private GatewayResponse<ProjectPresentation[]> sendDefaultQuery() throws IOException {
+    private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER,
             LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB));
         handler.handleRequest(input, output, context);

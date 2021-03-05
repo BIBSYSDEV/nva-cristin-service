@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class PresentationConverter {
 
-    protected ProjectPresentation asProjectPresentation(Project project, String language) {
+    protected ProjectPresentation asProjectPresentation(CristinProject project, String language) {
         ProjectPresentation projectPresentation = new ProjectPresentation();
         projectPresentation.cristinProjectId = project.cristinProjectId;
         projectPresentation.mainLanguage = project.mainLanguage;
@@ -42,7 +42,13 @@ public class PresentationConverter {
             fundingSourcePresentation.fundingSourceCode = fundingSource.fundingSourceCode;
             fundingSourcePresentation.projectCode = fundingSource.projectCode;
             fundingSourcePresentation.names = fundingSource.fundingSourceName.entrySet().stream()
-                    .map(name -> new FundingSourceNamePresentation(name.getKey(), name.getValue()))
+                .map(name -> {
+                    FundingSourceNamePresentation fundingSourceNamePresentation =
+                        new FundingSourceNamePresentation();
+                    fundingSourceNamePresentation.language = name.getKey();
+                    fundingSourceNamePresentation.name = name.getValue();
+                    return fundingSourceNamePresentation;
+                })
                     .collect(Collectors.toList());
             projectPresentation.fundings.add(fundingSourcePresentation);
         });
