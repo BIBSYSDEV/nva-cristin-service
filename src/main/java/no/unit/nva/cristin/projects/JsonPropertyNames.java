@@ -29,6 +29,7 @@ public class JsonPropertyNames {
     public static final String IDENTIFIED_CRISTIN_PERSON = "identified_cristin_person";
     public static final String CRISTIN_PROFILE_URL = "cristin_profile_url";
     public static final String PICTURE_URL = "picture_url";
+    public static final String PARTICIPANT_URL = "participant_url";
     public static final String ROLE_CODE = "role_code";
     public static final String CRISTIN_UNIT_ID = "cristin_unit_id";
     public static final String UNIT_NAME = "unit_name";

@@ -12,10 +12,16 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CristinApiClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
 
     private static final String HTTPS = "https";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
@@ -38,9 +44,9 @@ public class CristinApiClient {
         }
     }
 
-    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> parameters, String language) throws
-                                                                                                           IOException,
-                                                                                                           URISyntaxException {
+    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> parameters,
+                                                          String language) throws IOException,
+                                                                                  URISyntaxException {
         List<CristinProject> projects = queryProjects(parameters);
         List<CristinProject> enrichedProjects = enrichProjects(language, projects);
         return enrichedProjects;
@@ -53,10 +59,12 @@ public class CristinApiClient {
         }
     }
 
+    @JacocoGenerated
     protected InputStreamReader fetchQueryResults(URL url) throws IOException {
         return new InputStreamReader(url.openStream());
     }
 
+    @JacocoGenerated
     protected InputStreamReader fetchGetResult(URL url) throws IOException {
         return new InputStreamReader(url.openStream());
     }
@@ -90,7 +98,7 @@ public class CristinApiClient {
     private CristinProject enrichOneProject(String language, CristinProject project) {
         return attempt(() -> getProject(project.cristinProjectId, language))
             .orElse((failure) -> {
-                System.out.println("Error fetching cristin project with id: " + project.cristinProjectId);
+                logger.error("Error fetching cristin project with id: " + project.cristinProjectId);
                 return project;
             });
     }

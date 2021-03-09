@@ -25,12 +25,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import nva.commons.core.ioutils.IoUtils;
+import org.apache.commons.codec.Charsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -51,6 +53,7 @@ public class FetchCristinProjectsTest {
     private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private static final String CRISTIN_API_DUMMY_HOST = "example.com";
     private static final String ALLOW_ALL_ORIGIN = "*";
+    private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
     private CristinApiClient cristinApiClientStub;
     private Environment environment;
@@ -78,7 +81,19 @@ public class FetchCristinProjectsTest {
         when(cristinApiClientStub.fetchQueryResults(any())).thenReturn(getReader(queryResponse));
         when(cristinApiClientStub.fetchGetResult(any())).thenReturn(getReader(getResponse));
         var actual = sendDefaultQuery().getBody();
-        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
+        assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
+            OBJECT_MAPPER.readTree(actual).toPrettyString());
+    }
+
+    @Test
+    void handlerReturnsNonEnrichedBodyWhenEnrichingFails() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doThrow(new IOException()).when(cristinApiClientStub).getProject(any(), any());
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
+        var expected = getReader(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON);
+        assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
+            OBJECT_MAPPER.readTree(response.getBody()).toPrettyString());
     }
 
     @Test
@@ -206,6 +221,6 @@ public class FetchCristinProjectsTest {
 
     private InputStreamReader getReader(String resource) {
         InputStream queryResultsAsStream = IoUtils.inputStreamFromResources(resource);
-        return new InputStreamReader(queryResultsAsStream);
+        return new InputStreamReader(queryResultsAsStream, Charsets.UTF_8);
     }
 }
