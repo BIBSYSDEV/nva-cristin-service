@@ -20,7 +20,7 @@ public class CristinProject {
     public String status;
     public Map<String, Instant> created;
     public Map<String, Instant> lastModified;
-    public Organization coordinatingInstitution;
+    public CristinOrganization coordinatingInstitution;
     public List<FundingSource> projectFundingSources;
     public List<Person> participants;
 }

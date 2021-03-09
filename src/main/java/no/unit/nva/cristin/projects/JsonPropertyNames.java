@@ -34,4 +34,5 @@ public class JsonPropertyNames {
     public static final String CRISTIN_UNIT_ID = "cristin_unit_id";
     public static final String UNIT_NAME = "unit_name";
     public static final String PARENT_UNIT = "parent_unit";
+    public static final String CONTEXT = "@context";
 }

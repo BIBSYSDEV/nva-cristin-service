@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
+import static nva.commons.core.attempt.Try.attempt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,6 +27,7 @@ import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
@@ -203,6 +205,22 @@ public class FetchCristinProjectsTest {
         InputStreamReader reader = new InputStreamReader(inputStream);
         Executable action = () -> CristinApiClient.fromJson(reader, CristinProject.class);
         assertThrows(IOException.class, action);
+    }
+
+    @Test
+    void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCrisinProject() {
+        var expected = getReader(TestPairProvider.CRISTIN_GET_PROJECT_RESPONSE);
+
+        CristinProject cristinProject =
+            attempt(() -> JsonUtils.objectMapper.readValue(expected, CristinProject.class)).get();
+
+        NvaProject nvaProject =
+            attempt(() -> NvaProjectBuilder.cristinProjectToNvaProject(cristinProject)).orElse(failure -> {
+                System.out.println(failure.getException().getMessage());
+                return null;
+            });
+
+        System.out.println(attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get());
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
