@@ -38,7 +38,7 @@ public class NvaProjectBuilder {
         "PRO_PARTICIPANT", "ProjectParticipant");
 
     /**
-     * Build a NVA project datamodel from a Cristin project datamodel
+     * Build a NVA project datamodel from a Cristin project datamodel.
      *
      * @param cristinProject The model to convert from
      * @return a NvaProject converted from a CristinProject
