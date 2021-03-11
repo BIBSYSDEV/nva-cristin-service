@@ -1,7 +1,19 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import static no.unit.nva.cristin.projects.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTRIBUTORS;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.COORDINATING_INSTITUTION;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.END_DATE;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.GRANT;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.START_DATE;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.TITLE;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
@@ -9,19 +21,23 @@ import java.util.Map;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
+@JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIER, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
+    GRANT, COORDINATING_INSTITUTION, CONTRIBUTORS})
 public class NvaProject {
 
     @JsonProperty(CONTEXT)
     private String context;
     private URI id;
     private String type;
+    @JsonPropertyOrder(alphabetic = true)
     private List<Map<String, String>> identifier;
     private String title;
     private URI language;
+    @JsonPropertyOrder(alphabetic = true)
     private List<Map<String, String>> alternativeTitles;
     private Instant startDate;
     private Instant endDate;
-    //private List<Grant> grant;
+    //private List<NvaGrant> grant;
     private NvaOrganization coordinatingInstitution;
     private List<NvaContributor> contributors;
 

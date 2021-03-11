@@ -1,9 +1,15 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_NAME;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
+@JsonPropertyOrder({ID, TYPE, FIRST_NAME, LAST_NAME})
 public class NvaPerson {
 
     private URI id;

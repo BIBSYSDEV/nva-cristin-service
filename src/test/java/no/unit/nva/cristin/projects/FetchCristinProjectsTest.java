@@ -56,6 +56,8 @@ public class FetchCristinProjectsTest {
     private static final String CRISTIN_API_DUMMY_HOST = "example.com";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
+    private static final String API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON =
+        "api_response_one_cristin_project_to_nva_project.json";
     private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
     private CristinApiClient cristinApiClientStub;
     private Environment environment;
@@ -208,19 +210,19 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCrisinProject() {
-        var expected = getReader(TestPairProvider.CRISTIN_GET_PROJECT_RESPONSE);
+    void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCrisinProject() throws Exception {
+        var expected = getReader(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON);
+        var cristinGetProject = getReader(TestPairProvider.CRISTIN_GET_PROJECT_RESPONSE);
 
         CristinProject cristinProject =
-            attempt(() -> JsonUtils.objectMapper.readValue(expected, CristinProject.class)).get();
+            attempt(() -> JsonUtils.objectMapper.readValue(cristinGetProject, CristinProject.class)).get();
 
-        NvaProject nvaProject =
-            attempt(() -> NvaProjectBuilder.cristinProjectToNvaProject(cristinProject)).orElse(failure -> {
-                System.out.println(failure.getException().getMessage());
-                return null;
-            });
+        NvaProject nvaProject = NvaProjectBuilder.cristinProjectToNvaProject(cristinProject);
 
-        System.out.println(attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get());
+        var actual = attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get();
+
+        assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
+            OBJECT_MAPPER.readTree(actual).toPrettyString());
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {

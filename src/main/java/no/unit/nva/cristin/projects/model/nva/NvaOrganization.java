@@ -1,14 +1,20 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.NAME;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.util.Map;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
+@JsonPropertyOrder({ID, TYPE, NAME})
 public class NvaOrganization {
 
     private URI id;
     private String type;
+    @JsonPropertyOrder(alphabetic = true)
     private Map<String, String> name;
 
     public URI getId() {

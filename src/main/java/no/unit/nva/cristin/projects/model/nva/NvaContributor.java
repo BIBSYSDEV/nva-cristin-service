@@ -1,10 +1,15 @@
 package no.unit.nva.cristin.projects.model.nva;
 
-//import java.time.Instant;
-
+import static no.unit.nva.cristin.projects.JsonPropertyNames.AFFILIATION;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTITY;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import nva.commons.core.JacocoGenerated;
 
+//import java.time.Instant;
+
 @JacocoGenerated
+@JsonPropertyOrder({TYPE, IDENTITY, AFFILIATION})
 public class NvaContributor {
 
     private String type;
