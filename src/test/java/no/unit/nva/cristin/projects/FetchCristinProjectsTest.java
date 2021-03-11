@@ -213,12 +213,9 @@ public class FetchCristinProjectsTest {
     void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCrisinProject() throws Exception {
         var expected = getReader(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON);
         var cristinGetProject = getReader(TestPairProvider.CRISTIN_GET_PROJECT_RESPONSE);
-
         CristinProject cristinProject =
             attempt(() -> JsonUtils.objectMapper.readValue(cristinGetProject, CristinProject.class)).get();
-
-        NvaProject nvaProject = NvaProjectBuilder.cristinProjectToNvaProject(cristinProject);
-
+        NvaProject nvaProject = NvaProjectBuilder.getNvaProjectFromCristinProject(cristinProject);
         var actual = attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get();
 
         assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
