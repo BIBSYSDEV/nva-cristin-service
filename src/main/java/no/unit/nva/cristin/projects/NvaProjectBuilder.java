@@ -37,6 +37,12 @@ public class NvaProjectBuilder {
     private static final Map<String, String> cristinRolesToNva = Map.of("PRO_MANAGER", "ProjectManager",
         "PRO_PARTICIPANT", "ProjectParticipant");
 
+    /**
+     * Build a NVA project datamodel from a Cristin project datamodel
+     *
+     * @param cristinProject The model to convert from
+     * @return a NvaProject converted from a CristinProject
+     */
     public static NvaProject getNvaProjectFromCristinProject(CristinProject cristinProject) {
         NvaProject nvaProject = new NvaProject();
 
