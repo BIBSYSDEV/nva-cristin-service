@@ -6,15 +6,12 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import nva.commons.core.JacocoGenerated;
 
-//import java.time.Instant;
-
 @JacocoGenerated
 @JsonPropertyOrder({TYPE, IDENTITY, AFFILIATION})
 public class NvaContributor {
 
     private String type;
-    //private Instant startDate;
-    //private Instant endDate;
+    // TODO: Do we want startDate and endDate fields as well?
     private NvaPerson identity;
     private NvaOrganization affiliation;
 
