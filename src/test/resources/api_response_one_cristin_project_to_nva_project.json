@@ -1,0 +1,43 @@
+{
+  "@context": "https://example.org/search-api-context.json",
+  "id": "https://sandbox.nva.unit.no/project/456789",
+  "type": "Project",
+  "identifier": [
+    {
+      "type": "CristinIdentifier",
+      "value": "456789"
+    }
+  ],
+  "title": "Example Title",
+  "language": "https://lexvo.org/id/iso639-3/nno",
+  "alternativeTitles": [
+    {}
+  ],
+  "startDate": "2018-11-01T00:00:00Z",
+  "endDate": "2021-05-01T00:00:00Z",
+  "coordinatingInstitution": {
+    "id": "https://api.cristin.no/v2/institutions/1234",
+    "type": "Organization",
+    "name": {
+      "en": "University"
+    }
+  },
+  "contributors": [
+    {
+      "type": "ProjectManager",
+      "identity": {
+        "id": "https://api.cristin.no/v2/persons/123456",
+        "type": "Person",
+        "firstName": "Ola",
+        "lastName": "Nordmann"
+      },
+      "affiliation": {
+        "id": "https://api.cristin.no/v2/institutions/1234",
+        "type": "Organization",
+        "name": {
+          "en": "University"
+        }
+      }
+    }
+  ]
+}
