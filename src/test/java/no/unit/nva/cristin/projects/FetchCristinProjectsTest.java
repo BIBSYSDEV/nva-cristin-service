@@ -215,7 +215,7 @@ public class FetchCristinProjectsTest {
         var cristinGetProject = getReader(TestPairProvider.CRISTIN_GET_PROJECT_RESPONSE);
         CristinProject cristinProject =
             attempt(() -> JsonUtils.objectMapper.readValue(cristinGetProject, CristinProject.class)).get();
-        NvaProject nvaProject = NvaProjectBuilder.getNvaProjectFromCristinProject(cristinProject);
+        NvaProject nvaProject = NvaProjectBuilder.mapCristinProjectToNvaProject(cristinProject);
         var actual = attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get();
 
         assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),

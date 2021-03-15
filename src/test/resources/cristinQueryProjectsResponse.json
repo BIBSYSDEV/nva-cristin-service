@@ -1,44 +1,44 @@
 [
   {
-    "cristin_project_id": "2040291",
+    "cristin_project_id": "555666",
     "title": {
-      "en": "Opportunities and Challenges for Integrating Sámi Reindeer Herding Traditional Environmental Knowledge in Environmental Governance"
+      "en": "Opportunities and Challenges for Integrating Sámi Reindeer"
     },
     "main_language": "en",
-    "url": "https://api.cristin.no/v2/projects/2040291"
+    "url": "https://api.cristin.no/v2/projects/555666"
   },
   {
-    "cristin_project_id": "415549",
+    "cristin_project_id": "999888",
     "title": {
-      "en": "Absorption and metabolism of radio active materials and heavy metals in reindeer",
-      "no": "Opptak og omsetning av radioaktive stoffer og tungmetall i reinsdyr"
+      "en": "Absorption and metabolism of heavy metals",
+      "no": "Opptak og omsetning av tungmetall"
     },
     "main_language": "no",
-    "url": "https://api.cristin.no/v2/projects/415549"
+    "url": "https://api.cristin.no/v2/projects/999888"
   },
   {
-    "cristin_project_id": "418126",
+    "cristin_project_id": "111333",
     "title": {
-      "no": "EALAT - En studie av reindriftens sårbarhet og tilpasning under klimaendringer",
-      "en": "EALAT - Reindeer Herders' Vulnerability Network Study: Reindeer Pastoralism in\r\na Changing Climate"
+      "no": "En studie av reindriftens sårbarhet",
+      "en": "Reindeer Herders' Vulnerability Network Study"
     },
     "main_language": "no",
-    "url": "https://api.cristin.no/v2/projects/418126"
+    "url": "https://api.cristin.no/v2/projects/111333"
   },
   {
-    "cristin_project_id": "423190",
+    "cristin_project_id": "222444",
     "title": {
-      "no": "Predicting effects of climate change on Svalbard reindeer population dynamics: a mechanistic approach"
+      "no": "Predicting effects of climate change on Svalbard"
     },
     "main_language": "no",
-    "url": "https://api.cristin.no/v2/projects/423190"
+    "url": "https://api.cristin.no/v2/projects/222444"
   },
   {
-    "cristin_project_id": "423211",
+    "cristin_project_id": "444222",
     "title": {
-      "en": "PREDICTING EFFECTS OF CLIMATE CHANGE ON SVALBARD REINDEER POPULATION DYNAMICS: A MECHANISTIC APPROACH"
+      "en": "PREDICTING EFFECTS OF CLIMATE CHANGE"
     },
     "main_language": "en",
-    "url": "https://api.cristin.no/v2/projects/423211"
+    "url": "https://api.cristin.no/v2/projects/444222"
   }
 ]

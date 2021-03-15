@@ -2,13 +2,13 @@ package no.unit.nva.cristin.projects;
 
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.Institution;
 import no.unit.nva.cristin.projects.model.cristin.Person;
@@ -43,7 +43,7 @@ public class NvaProjectBuilder {
      * @param cristinProject The model to convert from
      * @return a NvaProject converted from a CristinProject
      */
-    public static NvaProject getNvaProjectFromCristinProject(CristinProject cristinProject) {
+    public static NvaProject mapCristinProjectToNvaProject(CristinProject cristinProject) {
         NvaProject nvaProject = new NvaProject();
 
         nvaProject.setContext(PROJECT_CONTEXT_URL);
@@ -53,33 +53,36 @@ public class NvaProjectBuilder {
             Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.cristinProjectId)));
         nvaProject.setTitle(cristinProject.title.get(cristinProject.mainLanguage));
         nvaProject.setLanguage(buildUri(TEMPORARY_LANGUAGE_URL));
-        nvaProject.setAlternativeTitles(getAlternativeTitlesFromCristinModel(cristinProject));
+        nvaProject.setAlternativeTitles(extractAlternativeTitles(cristinProject));
         nvaProject.setStartDate(cristinProject.startDate);
         nvaProject.setEndDate(cristinProject.endDate);
-        nvaProject.setCoordinatingInstitution(getNvaOrganizationFromCristinModel(
+        nvaProject.setCoordinatingInstitution(mapCristinInstitutionToNvaOrganization(
             cristinProject.coordinatingInstitution.institution));
-        nvaProject.setContributors(getAllNvaContributorsFromCristinModel(cristinProject.participants));
+        nvaProject.setContributors(transformCristinPersonsToNvaContributors(cristinProject.participants));
 
         return nvaProject;
     }
 
-    private static List<NvaContributor> getAllNvaContributorsFromCristinModel(List<Person> participants) {
-        List<NvaContributor> nvaContributors = new ArrayList<>();
-        participants.forEach(person -> person.roles.forEach(role -> {
-            nvaContributors.add(getNvaContributorFromCristinModel(person, role));
-        }));
-        return nvaContributors;
+    private static List<NvaContributor> transformCristinPersonsToNvaContributors(List<Person> participants) {
+        return participants.stream()
+            .flatMap(NvaProjectBuilder::generateRoleBasedContribution)
+            .collect(Collectors.toList());
     }
 
-    private static NvaContributor getNvaContributorFromCristinModel(Person person, Role role) {
+    private static Stream<NvaContributor> generateRoleBasedContribution(Person person) {
+        return person.roles.stream()
+            .map(role -> createNvaContributorFromCristinPersonByRole(person, role));
+    }
+
+    private static NvaContributor createNvaContributorFromCristinPersonByRole(Person person, Role role) {
         NvaContributor nvaContributor = new NvaContributor();
         nvaContributor.setType(cristinRolesToNva.get(role.roleCode));
-        nvaContributor.setIdentity(getNvaPersonFromCristinModel(person));
-        nvaContributor.setAffiliation(getNvaOrganizationFromCristinModel(role.institution));
+        nvaContributor.setIdentity(mapCristinPersonToNvaPerson(person));
+        nvaContributor.setAffiliation(mapCristinInstitutionToNvaOrganization(role.institution));
         return nvaContributor;
     }
 
-    private static NvaPerson getNvaPersonFromCristinModel(Person person) {
+    private static NvaPerson mapCristinPersonToNvaPerson(Person person) {
         NvaPerson identity = new NvaPerson();
         identity.setId(buildUri(CRISTIN_PERSON_BASE_URL, person.cristinPersonId));
         identity.setType(PERSON_TYPE);
@@ -88,7 +91,7 @@ public class NvaProjectBuilder {
         return identity;
     }
 
-    private static NvaOrganization getNvaOrganizationFromCristinModel(Institution institution) {
+    private static NvaOrganization mapCristinInstitutionToNvaOrganization(Institution institution) {
         NvaOrganization nvaOrganization = new NvaOrganization();
         nvaOrganization.setId(buildUri(CRISTIN_INSTITUTION_BASE_URI, institution.cristinInstitutionId));
         nvaOrganization.setType(ORGANIZATION_TYPE);
@@ -96,7 +99,7 @@ public class NvaProjectBuilder {
         return nvaOrganization;
     }
 
-    private static List<Map<String, String>> getAlternativeTitlesFromCristinModel(CristinProject cristinProject) {
+    private static List<Map<String, String>> extractAlternativeTitles(CristinProject cristinProject) {
         return Collections.singletonList(
             cristinProject.title.entrySet().stream()
                 .filter(excludeMainLanguageFromMapFilter(cristinProject.mainLanguage))
