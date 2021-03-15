@@ -50,7 +50,10 @@
         {
           "role_code": "PRO_MANAGER",
           "institution": {
-            "cristin_institution_id": "1234"
+            "cristin_institution_id": "1234",
+            "institution_name": {
+              "en": "University"
+            }
           },
           "unit": {
             "cristin_unit_id": "1234.0.0.0",

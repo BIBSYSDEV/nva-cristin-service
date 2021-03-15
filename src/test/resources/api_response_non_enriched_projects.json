@@ -1,0 +1,63 @@
+{
+  "numberOfResults": 5,
+  "hits": [
+    {
+      "cristin_project_id": "555666",
+      "main_language": "en",
+      "titles": [
+        {
+          "title": "Opportunities and Challenges for Integrating Sámi Reindeer",
+          "language": "en"
+        }
+      ]
+    },
+    {
+      "cristin_project_id": "999888",
+      "main_language": "no",
+      "titles": [
+        {
+          "title": "Absorption and metabolism of heavy metals",
+          "language": "en"
+        },
+        {
+          "title": "Opptak og omsetning av tungmetall",
+          "language": "no"
+        }
+      ]
+    },
+    {
+      "cristin_project_id": "111333",
+      "main_language": "no",
+      "titles": [
+        {
+          "title": "En studie av reindriftens sårbarhet",
+          "language": "no"
+        },
+        {
+          "title": "Reindeer Herders' Vulnerability Network Study",
+          "language": "en"
+        }
+      ]
+    },
+    {
+      "cristin_project_id": "222444",
+      "main_language": "no",
+      "titles": [
+        {
+          "title": "Predicting effects of climate change on Svalbard",
+          "language": "no"
+        }
+      ]
+    },
+    {
+      "cristin_project_id": "444222",
+      "main_language": "en",
+      "titles": [
+        {
+          "title": "PREDICTING EFFECTS OF CLIMATE CHANGE",
+          "language": "en"
+        }
+      ]
+    }
+  ]
+}

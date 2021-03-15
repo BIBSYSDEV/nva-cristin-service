@@ -10,6 +10,9 @@ import java.util.List;
 @JsonPropertyOrder({CRISTIN_PROJECT_ID, MAIN_LANGUAGE})
 public class ProjectPresentation {
 
+    @JsonProperty("@context")
+    public String context;
+    public String id;
     @JsonProperty(CRISTIN_PROJECT_ID)
     public String cristinProjectId = "";
     @JsonProperty(MAIN_LANGUAGE)
