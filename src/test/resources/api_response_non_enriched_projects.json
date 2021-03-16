@@ -1,63 +1,80 @@
 {
-  "numberOfResults": 5,
+  "@context": "https://example.org/search-api-context.json",
+  "id": "https://api.ENVIRONMENT.nva.aws.unit.no/project/search?QUERY_PARAMS",
+  "size": 0,
+  "searchString": "title=reindeer",
+  "processingTime": 1000,
+  "firstRecord": 0,
   "hits": [
     {
-      "cristin_project_id": "555666",
-      "main_language": "en",
-      "titles": [
+      "id": "https://api.dev.nva.unit.no/project/555666",
+      "type": "Project",
+      "identifier": [
         {
-          "title": "Opportunities and Challenges for Integrating Sámi Reindeer",
-          "language": "en"
+          "type": "CristinIdentifier",
+          "value": "555666"
+        }
+      ],
+      "title": "Opportunities and Challenges for Integrating Sámi Reindeer",
+      "language": "https://lexvo.org/id/iso639-3/nno"
+    },
+    {
+      "id": "https://api.dev.nva.unit.no/project/999888",
+      "type": "Project",
+      "identifier": [
+        {
+          "type": "CristinIdentifier",
+          "value": "999888"
+        }
+      ],
+      "title": "Opptak og omsetning av tungmetall",
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [
+        {
+          "en": "Absorption and metabolism of heavy metals"
         }
       ]
     },
     {
-      "cristin_project_id": "999888",
-      "main_language": "no",
-      "titles": [
+      "id": "https://api.dev.nva.unit.no/project/111333",
+      "type": "Project",
+      "identifier": [
         {
-          "title": "Absorption and metabolism of heavy metals",
-          "language": "en"
-        },
+          "type": "CristinIdentifier",
+          "value": "111333"
+        }
+      ],
+      "title": "En studie av reindriftens sårbarhet",
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [
         {
-          "title": "Opptak og omsetning av tungmetall",
-          "language": "no"
+          "en": "Reindeer Herders' Vulnerability Network Study"
         }
       ]
     },
     {
-      "cristin_project_id": "111333",
-      "main_language": "no",
-      "titles": [
+      "id": "https://api.dev.nva.unit.no/project/222444",
+      "type": "Project",
+      "identifier": [
         {
-          "title": "En studie av reindriftens sårbarhet",
-          "language": "no"
-        },
-        {
-          "title": "Reindeer Herders' Vulnerability Network Study",
-          "language": "en"
+          "type": "CristinIdentifier",
+          "value": "222444"
         }
-      ]
+      ],
+      "title": "Predicting effects of climate change on Svalbard",
+      "language": "https://lexvo.org/id/iso639-3/nno"
     },
     {
-      "cristin_project_id": "222444",
-      "main_language": "no",
-      "titles": [
+      "id": "https://api.dev.nva.unit.no/project/444222",
+      "type": "Project",
+      "identifier": [
         {
-          "title": "Predicting effects of climate change on Svalbard",
-          "language": "no"
+          "type": "CristinIdentifier",
+          "value": "444222"
         }
-      ]
-    },
-    {
-      "cristin_project_id": "444222",
-      "main_language": "en",
-      "titles": [
-        {
-          "title": "PREDICTING EFFECTS OF CLIMATE CHANGE",
-          "language": "en"
-        }
-      ]
+      ],
+      "title": "PREDICTING EFFECTS OF CLIMATE CHANGE",
+      "language": "https://lexvo.org/id/iso639-3/nno"
     }
   ]
 }

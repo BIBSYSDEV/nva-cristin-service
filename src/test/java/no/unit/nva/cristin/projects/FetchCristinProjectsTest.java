@@ -58,6 +58,7 @@ public class FetchCristinProjectsTest {
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON =
         "api_response_one_cristin_project_to_nva_project.json";
+    private static final String CRISTIN_GET_PROJECT_RESPONSE = "cristinGetProjectResponse.json";
     private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
     private CristinApiClient cristinApiClientStub;
     private Environment environment;
@@ -78,12 +79,7 @@ public class FetchCristinProjectsTest {
 
     @ParameterizedTest
     @ArgumentsSource(TestPairProvider.class)
-    void handlerReturnsExpectedBodyWhenRequestInputIsValid(String queryResponse,
-                                                           String getResponse,
-                                                           String expected) throws IOException {
-        cristinApiClientStub = spy(cristinApiClientStub);
-        when(cristinApiClientStub.fetchQueryResults(any())).thenReturn(getReader(queryResponse));
-        when(cristinApiClientStub.fetchGetResult(any())).thenReturn(getReader(getResponse));
+    void handlerReturnsExpectedBodyWhenRequestInputIsValid(String expected) throws IOException {
         var actual = sendDefaultQuery().getBody();
         assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
             OBJECT_MAPPER.readTree(actual).toPrettyString());
@@ -212,10 +208,12 @@ public class FetchCristinProjectsTest {
     @Test
     void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCrisinProject() throws Exception {
         var expected = getReader(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON);
-        var cristinGetProject = getReader(TestPairProvider.CRISTIN_GET_PROJECT_RESPONSE);
+        var cristinGetProject = getReader(CRISTIN_GET_PROJECT_RESPONSE);
         CristinProject cristinProject =
             attempt(() -> JsonUtils.objectMapper.readValue(cristinGetProject, CristinProject.class)).get();
         NvaProject nvaProject = NvaProjectBuilder.mapCristinProjectToNvaProject(cristinProject);
+        nvaProject.setContext(
+            "https://example.org/search-api-context.json"); // TODO: Set this in main logic, not in test.
         var actual = attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get();
 
         assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),

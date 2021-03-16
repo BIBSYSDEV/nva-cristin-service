@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -42,7 +40,6 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectsWrappe
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private final transient CristinApiClient cristinApiClient;
-    private final transient PresentationConverter presentationConverter = new PresentationConverter();
 
     @SuppressWarnings("unused")
     @JacocoGenerated
@@ -93,26 +90,11 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectsWrappe
     }
 
     private ProjectsWrapper createProjectsWrapper(String language, String title) {
-        ProjectsWrapper wrapper = new ProjectsWrapper();
-        wrapper.hits = createProjectPresentationList(language, title);
-        wrapper.numberOfResults = wrapper.hits.size();
-
-        return wrapper;
-    }
-
-    private List<ProjectPresentation> createProjectPresentationList(String language, String title) {
         Map<String, String> cristinQueryParameters = createCristinQueryParameters(title, language);
-        List<CristinProject> projects = attempt(() ->
-            cristinApiClient.queryAndEnrichProjects(cristinQueryParameters, language)).orElseThrow();
 
-        return transformProjectsToProjectPresentations(language, projects);
-    }
-
-    private List<ProjectPresentation> transformProjectsToProjectPresentations(String language,
-                                                                              List<CristinProject> projects) {
-        return projects.stream()
-            .map(project -> presentationConverter.asProjectPresentation(project, language))
-            .collect(Collectors.toList());
+        return attempt(() ->
+            cristinApiClient.createProjectsWrapperFromQuery(cristinQueryParameters, language))
+            .orElseThrow();
     }
 
     private boolean isValidTitle(String str) {

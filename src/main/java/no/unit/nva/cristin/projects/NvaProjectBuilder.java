@@ -1,12 +1,10 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.CommonUtil.buildUri;
 import static nva.commons.core.attempt.Try.attempt;
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -20,11 +18,15 @@ import no.unit.nva.cristin.projects.model.nva.NvaProject;
 
 public class NvaProjectBuilder {
 
-    private static final String PROJECT_CONTEXT_URL = "https://example.org/search-api-context.json";
-    private static final String NVA_PROJECT_BASE_URL = "https://sandbox.nva.unit.no/project";
-    private static final String CRISTIN_INSTITUTION_BASE_URI = "https://api.cristin.no/v2/institutions";
-    private static final String CRISTIN_PERSON_BASE_URL = "https://api.cristin.no/v2/persons";
-    private static final String TEMPORARY_LANGUAGE_URL = "https://lexvo.org/id/iso639-3/nno";
+    //private static final String PROJECT_CONTEXT_URL = "https://example.org/search-api-context.json"; // TODO:
+    // Change this?
+    private static final String NVA_PROJECT_BASE_URL = "https://api.dev.nva.unit.no/project"; // TODO: Replace "dev"
+    // with env var. Remember to mock URL in unit tests or pass in right URL for each environment
+    private static final String CRISTIN_INSTITUTION_BASE_URI = "https://api.cristin.no/v2/institutions"; // TODO: Use
+    // env var
+    private static final String CRISTIN_PERSON_BASE_URL = "https://api.cristin.no/v2/persons"; // TODO: Use env var
+    private static final String TEMPORARY_LANGUAGE_URL = "https://lexvo.org/id/iso639-3/nno"; // TODO: Replace with
+    // real values
 
     private static final String PROJECT_TYPE = "Project";
     private static final String CRISTIN_IDENTIFIER_TYPE = "CristinIdentifier";
@@ -46,7 +48,9 @@ public class NvaProjectBuilder {
     public static NvaProject mapCristinProjectToNvaProject(CristinProject cristinProject) {
         NvaProject nvaProject = new NvaProject();
 
-        nvaProject.setContext(PROJECT_CONTEXT_URL);
+        // TODO: If one NvaProject, put context on top in NvaProject.
+        //  If list of NvaProject, put context on top in metadata
+        //nvaProject.setContext(PROJECT_CONTEXT_URL);
         nvaProject.setId(buildUri(NVA_PROJECT_BASE_URL, cristinProject.cristinProjectId));
         nvaProject.setType(PROJECT_TYPE);
         nvaProject.setIdentifier(
@@ -56,9 +60,12 @@ public class NvaProjectBuilder {
         nvaProject.setAlternativeTitles(extractAlternativeTitles(cristinProject));
         nvaProject.setStartDate(cristinProject.startDate);
         nvaProject.setEndDate(cristinProject.endDate);
-        nvaProject.setCoordinatingInstitution(mapCristinInstitutionToNvaOrganization(
-            cristinProject.coordinatingInstitution.institution));
-        nvaProject.setContributors(transformCristinPersonsToNvaContributors(cristinProject.participants));
+        nvaProject.setCoordinatingInstitution(attempt(() ->
+            mapCristinInstitutionToNvaOrganization(cristinProject.coordinatingInstitution.institution))
+            .orElse(failure -> null));
+        nvaProject.setContributors(attempt(() ->
+            transformCristinPersonsToNvaContributors(cristinProject.participants))
+            .orElse(failure -> null));
 
         return nvaProject;
     }
@@ -100,17 +107,10 @@ public class NvaProjectBuilder {
     }
 
     private static List<Map<String, String>> extractAlternativeTitles(CristinProject cristinProject) {
-        return Collections.singletonList(
-            cristinProject.title.entrySet().stream()
-                .filter(excludeMainLanguageFromMapFilter(cristinProject.mainLanguage))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-    }
 
-    private static Predicate<Entry<String, String>> excludeMainLanguageFromMapFilter(String mainLanguage) {
-        return entry -> !entry.getKey().equals(mainLanguage);
-    }
+        Map<String, String> map = cristinProject.title;
+        map.remove(cristinProject.mainLanguage);
 
-    private static URI buildUri(String... parts) {
-        return attempt(() -> new URI(String.join("/", parts))).orElse(failure -> null);
+        return !map.isEmpty() ? Collections.singletonList(map) : null;
     }
 }
