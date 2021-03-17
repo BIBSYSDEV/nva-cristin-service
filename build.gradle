@@ -60,6 +60,9 @@ test {
         events 'skipped', 'passed', 'failed'
     }
     finalizedBy jacocoTestReport
+
+    environment "ALLOWED_ORIGIN", "*"
+    environment "CRISTIN_API_HOST", "example.com"
 }
 
 pmd {

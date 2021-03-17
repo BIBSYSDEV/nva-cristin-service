@@ -35,10 +35,9 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectsWrappe
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
 
-    public static final String LANGUAGE_QUERY_PARAMETER = "language";
-    public static final String TITLE_QUERY_PARAMETER = "title";
+    protected static final String LANGUAGE_QUERY_PARAMETER = "language";
+    protected static final String TITLE_QUERY_PARAMETER = "title";
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
-    private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private final transient CristinApiClient cristinApiClient;
 
     @SuppressWarnings("unused")
@@ -49,7 +48,7 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectsWrappe
 
     @JacocoGenerated
     public FetchCristinProjects(Environment environment) {
-        this(new CristinApiClient(environment.readEnv(CRISTIN_API_HOST_ENV)), environment);
+        this(new CristinApiClient(), environment);
     }
 
     protected FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {

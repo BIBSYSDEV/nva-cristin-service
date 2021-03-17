@@ -38,11 +38,6 @@ public class CristinApiClient {
         + " id: ";
     private static final String CHARACTER_PUNCTUATION = ".";
     private static final String EXCEPTION_MESSAGE_PREFIX = " Exception message: ";
-    private final transient String cristinApiHost;
-
-    public CristinApiClient(String cristinApiHost) {
-        this.cristinApiHost = cristinApiHost;
-    }
 
     protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
         return OBJECT_MAPPER.readValue(reader, classOfT);
@@ -131,7 +126,7 @@ public class CristinApiClient {
                                                                                   URISyntaxException {
         URIBuilder uri = new URIBuilder()
             .setScheme(HTTPS)
-            .setHost(cristinApiHost)
+            .setHost(Constants.CRISTIN_API_HOST)
             .setPath(CRISTIN_API_PROJECTS_PATH);
         if (parameters != null) {
             parameters.keySet().forEach(s -> uri.addParameter(s, parameters.get(s)));
@@ -142,7 +137,7 @@ public class CristinApiClient {
     protected URL generateGetProjectUrl(String id, String language) throws MalformedURLException, URISyntaxException {
         URI uri = new URIBuilder()
             .setScheme(HTTPS)
-            .setHost(cristinApiHost)
+            .setHost(Constants.CRISTIN_API_HOST)
             .setPath(CRISTIN_API_PROJECTS_PATH + id)
             .addParameter("lang", language)
             .build();

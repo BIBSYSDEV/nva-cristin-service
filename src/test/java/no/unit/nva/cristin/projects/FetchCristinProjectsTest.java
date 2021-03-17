@@ -11,7 +11,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,9 +50,6 @@ public class FetchCristinProjectsTest {
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String INVALID_JSON = "This is not valid JSON!";
 
-    private static final String ALLOWED_ORIGIN_ENV = "ALLOWED_ORIGIN";
-    private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
-    private static final String CRISTIN_API_DUMMY_HOST = "example.com";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON =
@@ -61,17 +57,14 @@ public class FetchCristinProjectsTest {
     private static final String CRISTIN_GET_PROJECT_RESPONSE = "cristinGetProjectResponse.json";
     private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
     private CristinApiClient cristinApiClientStub;
-    private Environment environment;
+    private Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
     private FetchCristinProjects handler;
 
     @BeforeEach
     void setUp() {
-        environment = mock(Environment.class);
-        when(environment.readEnv(ALLOWED_ORIGIN_ENV)).thenReturn(ALLOW_ALL_ORIGIN);
-        when(environment.readEnv(CRISTIN_API_HOST_ENV)).thenReturn(CRISTIN_API_DUMMY_HOST);
-        cristinApiClientStub = new CristinApiClientStub(environment.readEnv(CRISTIN_API_HOST_ENV));
+        cristinApiClientStub = new CristinApiClientStub();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
