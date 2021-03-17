@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.PROJECT_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_RECORD;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.HITS;
@@ -19,11 +20,8 @@ import nva.commons.core.JacocoGenerated;
 @JsonPropertyOrder({CONTEXT, ID, SIZE, SEARCH_STRING, PROCESSING_TIME, FIRST_RECORD, NEXT_RESULTS, HITS})
 public class ProjectsWrapper {
 
-    // TODO: Create constants class
-    private static final String CONTEXT_VALUE = "https://example.org/search-api-context.json";
-
     @JsonProperty("@context")
-    private String context = CONTEXT_VALUE;
+    private String context = PROJECT_CONTEXT_URL;
     @JsonProperty
     private URI id;
     @JsonProperty

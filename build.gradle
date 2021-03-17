@@ -62,7 +62,8 @@ test {
     finalizedBy jacocoTestReport
 
     environment "ALLOWED_ORIGIN", "*"
-    environment "CRISTIN_API_HOST", "example.com"
+    environment "CRISTIN_API_HOST", "api.cristin.no"
+    environment "BASE_URL", "https://api.dev.nva.unit.no/project"
 }
 
 pmd {

@@ -1,6 +1,9 @@
 package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.CommonUtil.buildUri;
+import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_BASE_URL;
+import static no.unit.nva.cristin.projects.Constants.INSTITUTION_PATH;
+import static no.unit.nva.cristin.projects.Constants.PERSON_PATH;
 import static nva.commons.core.attempt.Try.attempt;
 import java.util.Collections;
 import java.util.List;
@@ -18,16 +21,7 @@ import no.unit.nva.cristin.projects.model.nva.NvaProject;
 
 public class NvaProjectBuilder {
 
-    // TODO: Change this?
-    //private static final String PROJECT_CONTEXT_URL = "https://example.org/search-api-context.json";
-    // TODO: Replace "dev" with env var.
-    //  Remember to mock URL in unit tests or pass in right URL for each environment
-    private static final String NVA_PROJECT_BASE_URL = "https://api.dev.nva.unit.no/project";
-    // TODO: Use env var
-    private static final String CRISTIN_INSTITUTION_BASE_URI = "https://api.cristin.no/v2/institutions";
-    // TODO: Use env var
-    private static final String CRISTIN_PERSON_BASE_URL = "https://api.cristin.no/v2/persons";
-    // TODO: Replace with real values
+    // TODO: NP-2366: Add dynamic language URIs.
     private static final String TEMPORARY_LANGUAGE_URL = "https://lexvo.org/id/iso639-3/nno";
 
     private static final String PROJECT_TYPE = "Project";
@@ -50,10 +44,8 @@ public class NvaProjectBuilder {
     public static NvaProject mapCristinProjectToNvaProject(CristinProject cristinProject) {
         NvaProject nvaProject = new NvaProject();
 
-        // TODO: If one NvaProject, put context on top in NvaProject.
-        //  If list of NvaProject, put context on top in metadata
-        //nvaProject.setContext(PROJECT_CONTEXT_URL);
-        nvaProject.setId(buildUri(NVA_PROJECT_BASE_URL, cristinProject.cristinProjectId));
+        // TODO: NP-2384: Remember to use setContext when serializing only a single NvaProject
+        nvaProject.setId(buildUri(Constants.BASE_URL, cristinProject.cristinProjectId));
         nvaProject.setType(PROJECT_TYPE);
         nvaProject.setIdentifier(
             Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.cristinProjectId)));
@@ -99,7 +91,7 @@ public class NvaProjectBuilder {
 
     private static NvaPerson mapCristinPersonToNvaPerson(Person person) {
         NvaPerson identity = new NvaPerson();
-        identity.setId(buildUri(CRISTIN_PERSON_BASE_URL, person.cristinPersonId));
+        identity.setId(buildUri(CRISTIN_API_BASE_URL, PERSON_PATH, person.cristinPersonId));
         identity.setType(PERSON_TYPE);
         identity.setFirstName(person.firstName);
         identity.setLastName(person.surname);
@@ -108,7 +100,7 @@ public class NvaProjectBuilder {
 
     private static NvaOrganization mapCristinInstitutionToNvaOrganization(Institution institution) {
         NvaOrganization nvaOrganization = new NvaOrganization();
-        nvaOrganization.setId(buildUri(CRISTIN_INSTITUTION_BASE_URI, institution.cristinInstitutionId));
+        nvaOrganization.setId(buildUri(CRISTIN_API_BASE_URL, INSTITUTION_PATH, institution.cristinInstitutionId));
         nvaOrganization.setType(ORGANIZATION_TYPE);
         nvaOrganization.setName(institution.institutionName);
         return nvaOrganization;

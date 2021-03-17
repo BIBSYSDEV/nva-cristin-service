@@ -37,7 +37,7 @@ public class NvaProject {
     private List<Map<String, String>> alternativeTitles;
     private Instant startDate;
     private Instant endDate;
-    // TODO: Add Grant/Funding field later
+    // TODO: NP-2155: Add Grant/Funding field later
     private NvaOrganization coordinatingInstitution;
     private List<NvaContributor> contributors;
 

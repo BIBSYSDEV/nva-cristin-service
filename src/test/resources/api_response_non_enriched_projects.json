@@ -1,6 +1,6 @@
 {
   "@context": "https://example.org/search-api-context.json",
-  "id": "https://api.ENVIRONMENT.nva.aws.unit.no/project/search?QUERY_PARAMS",
+  "id": "https://api.dev.nva.unit.no/project/search?QUERY_PARAMS",
   "size": 0,
   "searchString": "title=reindeer",
   "processingTime": 1000,

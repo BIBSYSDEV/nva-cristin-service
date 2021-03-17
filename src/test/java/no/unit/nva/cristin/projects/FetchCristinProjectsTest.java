@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.PROJECT_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
@@ -205,8 +206,7 @@ public class FetchCristinProjectsTest {
         CristinProject cristinProject =
             attempt(() -> JsonUtils.objectMapper.readValue(cristinGetProject, CristinProject.class)).get();
         NvaProject nvaProject = NvaProjectBuilder.mapCristinProjectToNvaProject(cristinProject);
-        nvaProject.setContext(
-            "https://example.org/search-api-context.json"); // TODO: Set this in main logic, not in test.
+        nvaProject.setContext(PROJECT_CONTEXT_URL);
         var actual = attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get();
 
         assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
