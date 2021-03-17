@@ -18,15 +18,17 @@ import no.unit.nva.cristin.projects.model.nva.NvaProject;
 
 public class NvaProjectBuilder {
 
-    //private static final String PROJECT_CONTEXT_URL = "https://example.org/search-api-context.json"; // TODO:
-    // Change this?
-    private static final String NVA_PROJECT_BASE_URL = "https://api.dev.nva.unit.no/project"; // TODO: Replace "dev"
-    // with env var. Remember to mock URL in unit tests or pass in right URL for each environment
-    private static final String CRISTIN_INSTITUTION_BASE_URI = "https://api.cristin.no/v2/institutions"; // TODO: Use
-    // env var
-    private static final String CRISTIN_PERSON_BASE_URL = "https://api.cristin.no/v2/persons"; // TODO: Use env var
-    private static final String TEMPORARY_LANGUAGE_URL = "https://lexvo.org/id/iso639-3/nno"; // TODO: Replace with
-    // real values
+    // TODO: Change this?
+    //private static final String PROJECT_CONTEXT_URL = "https://example.org/search-api-context.json";
+    // TODO: Replace "dev" with env var.
+    //  Remember to mock URL in unit tests or pass in right URL for each environment
+    private static final String NVA_PROJECT_BASE_URL = "https://api.dev.nva.unit.no/project";
+    // TODO: Use env var
+    private static final String CRISTIN_INSTITUTION_BASE_URI = "https://api.cristin.no/v2/institutions";
+    // TODO: Use env var
+    private static final String CRISTIN_PERSON_BASE_URL = "https://api.cristin.no/v2/persons";
+    // TODO: Replace with real values
+    private static final String TEMPORARY_LANGUAGE_URL = "https://lexvo.org/id/iso639-3/nno";
 
     private static final String PROJECT_TYPE = "Project";
     private static final String CRISTIN_IDENTIFIER_TYPE = "CristinIdentifier";
@@ -55,17 +57,23 @@ public class NvaProjectBuilder {
         nvaProject.setType(PROJECT_TYPE);
         nvaProject.setIdentifier(
             Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.cristinProjectId)));
-        nvaProject.setTitle(cristinProject.title.get(cristinProject.mainLanguage));
+        if (cristinProject.title != null) {
+            nvaProject.setTitle(cristinProject.title.get(cristinProject.mainLanguage));
+            nvaProject.setAlternativeTitles(extractAlternativeTitles(cristinProject));
+        }
         nvaProject.setLanguage(buildUri(TEMPORARY_LANGUAGE_URL));
-        nvaProject.setAlternativeTitles(extractAlternativeTitles(cristinProject));
         nvaProject.setStartDate(cristinProject.startDate);
         nvaProject.setEndDate(cristinProject.endDate);
-        nvaProject.setCoordinatingInstitution(attempt(() ->
-            mapCristinInstitutionToNvaOrganization(cristinProject.coordinatingInstitution.institution))
-            .orElse(failure -> null));
-        nvaProject.setContributors(attempt(() ->
-            transformCristinPersonsToNvaContributors(cristinProject.participants))
-            .orElse(failure -> null));
+        if (cristinProject.coordinatingInstitution != null) {
+            nvaProject.setCoordinatingInstitution(attempt(() ->
+                mapCristinInstitutionToNvaOrganization(cristinProject.coordinatingInstitution.institution))
+                .orElse(failure -> null));
+        }
+        if (cristinProject.participants != null) {
+            nvaProject.setContributors(attempt(() ->
+                transformCristinPersonsToNvaContributors(cristinProject.participants))
+                .orElse(failure -> null));
+        }
 
         return nvaProject;
     }

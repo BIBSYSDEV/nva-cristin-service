@@ -19,8 +19,8 @@ import nva.commons.core.JacocoGenerated;
 @JsonPropertyOrder({CONTEXT, ID, SIZE, SEARCH_STRING, PROCESSING_TIME, FIRST_RECORD, NEXT_RESULTS, HITS})
 public class ProjectsWrapper {
 
-    private static final String CONTEXT_VALUE = "https://example.org/search-api-context.json"; // TODO: Create
-    // constants class
+    // TODO: Create constants class
+    private static final String CONTEXT_VALUE = "https://example.org/search-api-context.json";
 
     @JsonProperty("@context")
     private String context = CONTEXT_VALUE;
