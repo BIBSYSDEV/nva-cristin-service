@@ -63,7 +63,7 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectsWrappe
         String language = getValidLanguage(requestInfo);
         String title = getValidTitle(requestInfo);
 
-        return createProjectsWrapper(language, title);
+        return getTransformedCristinProjectsUsingWrapperObject(language, title);
     }
 
     @Override
@@ -88,11 +88,12 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectsWrappe
             .orElseThrow(() -> new BadRequestException(LANGUAGE_INVALID));
     }
 
-    private ProjectsWrapper createProjectsWrapper(String language, String title) {
+    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title) {
         Map<String, String> cristinQueryParameters = createCristinQueryParameters(title, language);
 
         return attempt(() ->
-            cristinApiClient.createProjectsWrapperFromQuery(cristinQueryParameters, language))
+            cristinApiClient
+                .queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(cristinQueryParameters, language))
             .orElseThrow();
     }
 

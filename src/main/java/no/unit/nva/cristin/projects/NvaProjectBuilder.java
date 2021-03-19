@@ -4,7 +4,6 @@ import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.INSTITUTION_PATH;
 import static no.unit.nva.cristin.projects.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
-import static nva.commons.core.attempt.Try.attempt;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -60,11 +59,7 @@ public class NvaProjectBuilder {
         nvaProject.setStartDate(cristinProject.startDate);
         nvaProject.setEndDate(cristinProject.endDate);
         nvaProject.setCoordinatingInstitution(extractCoordinatingInstitution());
-        if (cristinProject.participants != null) {
-            nvaProject.setContributors(attempt(() ->
-                transformCristinPersonsToNvaContributors(cristinProject.participants))
-                .orElse(failure -> null));
-        }
+        nvaProject.setContributors(extractContributors());
 
         return nvaProject;
     }
@@ -135,6 +130,12 @@ public class NvaProjectBuilder {
             .filter(elm -> elm.keySet().remove(cristinProject.mainLanguage))
             .filter(elm -> !elm.isEmpty())
             .map(Collections::singletonList)
+            .orElse(null);
+    }
+
+    private List<NvaContributor> extractContributors() {
+        return Optional.ofNullable(cristinProject.participants)
+            .map(NvaProjectBuilder::transformCristinPersonsToNvaContributors)
             .orElse(null);
     }
 }

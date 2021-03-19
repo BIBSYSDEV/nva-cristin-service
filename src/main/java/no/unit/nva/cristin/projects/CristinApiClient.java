@@ -50,7 +50,8 @@ public class CristinApiClient {
      * @throws IOException        if cannot read from connection
      * @throws URISyntaxException if URI is malformed
      */
-    public ProjectsWrapper createProjectsWrapperFromQuery(Map<String, String> parameters, String language)
+    public ProjectsWrapper queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
+        Map<String, String> parameters, String language)
         throws IOException, URISyntaxException {
 
         long startRequestTime = System.currentTimeMillis();
@@ -98,8 +99,7 @@ public class CristinApiClient {
                                                           String language) throws IOException,
                                                                                   URISyntaxException {
         List<CristinProject> projects = queryProjects(parameters);
-        List<CristinProject> enrichedProjects = enrichProjects(language, projects);
-        return enrichedProjects;
+        return enrichProjects(language, projects);
     }
 
     protected CristinProject getProject(String id, String language) throws IOException, URISyntaxException {
