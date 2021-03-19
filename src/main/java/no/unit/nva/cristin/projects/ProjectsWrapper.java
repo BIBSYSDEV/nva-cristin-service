@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.Constants.PROJECT_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_RECORD;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.HITS;
@@ -21,7 +21,7 @@ import nva.commons.core.JacocoGenerated;
 public class ProjectsWrapper {
 
     @JsonProperty("@context")
-    private String context = PROJECT_CONTEXT_URL;
+    private String context = PROJECT_SEARCH_CONTEXT_URL;
     @JsonProperty
     private URI id;
     @JsonProperty

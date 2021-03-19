@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.Constants.PROJECT_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
@@ -200,13 +200,13 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCrisinProject() throws Exception {
+    void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
         var expected = getReader(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON);
         var cristinGetProject = getReader(CRISTIN_GET_PROJECT_RESPONSE);
         CristinProject cristinProject =
             attempt(() -> JsonUtils.objectMapper.readValue(cristinGetProject, CristinProject.class)).get();
-        NvaProject nvaProject = NvaProjectBuilder.mapCristinProjectToNvaProject(cristinProject);
-        nvaProject.setContext(PROJECT_CONTEXT_URL);
+        NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
+        nvaProject.setContext(PROJECT_LOOKUP_CONTEXT_URL);
         var actual = attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get();
 
         assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),

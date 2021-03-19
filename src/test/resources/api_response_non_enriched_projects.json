@@ -1,13 +1,13 @@
 {
   "@context": "https://example.org/search-api-context.json",
-  "id": "https://api.dev.nva.unit.no/project/search?QUERY_PARAMS",
+  "id": "https://api.dev.nva.aws.unit.no/project/search?QUERY_PARAMS",
   "size": 0,
   "searchString": "title=reindeer",
   "processingTime": 1000,
   "firstRecord": 0,
   "hits": [
     {
-      "id": "https://api.dev.nva.unit.no/project/555666",
+      "id": "https://api.dev.nva.aws.unit.no/project/555666",
       "type": "Project",
       "identifier": [
         {
@@ -19,7 +19,7 @@
       "language": "https://lexvo.org/id/iso639-3/nno"
     },
     {
-      "id": "https://api.dev.nva.unit.no/project/999888",
+      "id": "https://api.dev.nva.aws.unit.no/project/999888",
       "type": "Project",
       "identifier": [
         {
@@ -36,7 +36,7 @@
       ]
     },
     {
-      "id": "https://api.dev.nva.unit.no/project/111333",
+      "id": "https://api.dev.nva.aws.unit.no/project/111333",
       "type": "Project",
       "identifier": [
         {
@@ -53,7 +53,7 @@
       ]
     },
     {
-      "id": "https://api.dev.nva.unit.no/project/222444",
+      "id": "https://api.dev.nva.aws.unit.no/project/222444",
       "type": "Project",
       "identifier": [
         {
@@ -65,7 +65,7 @@
       "language": "https://lexvo.org/id/iso639-3/nno"
     },
     {
-      "id": "https://api.dev.nva.unit.no/project/444222",
+      "id": "https://api.dev.nva.aws.unit.no/project/444222",
       "type": "Project",
       "identifier": [
         {

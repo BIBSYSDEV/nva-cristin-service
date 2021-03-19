@@ -63,7 +63,7 @@ test {
 
     environment "ALLOWED_ORIGIN", "*"
     environment "CRISTIN_API_HOST", "api.cristin.no"
-    environment "BASE_URL", "https://api.dev.nva.unit.no/project"
+    environment "BASE_URL", "https://api.dev.nva.aws.unit.no/project"
 }
 
 pmd {

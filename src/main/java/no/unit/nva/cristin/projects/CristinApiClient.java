@@ -1,9 +1,9 @@
 package no.unit.nva.cristin.projects;
 
 import static java.util.Arrays.asList;
-import static no.unit.nva.cristin.projects.CommonUtil.buildUri;
 import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
+import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -82,7 +82,7 @@ public class CristinApiClient {
 
     private List<NvaProject> transformCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
         return cristinProjects.stream()
-            .map(NvaProjectBuilder::mapCristinProjectToNvaProject)
+            .map(cristinProject -> new NvaProjectBuilder(cristinProject).build())
             .collect(Collectors.toList());
     }
 

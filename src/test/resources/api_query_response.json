@@ -1,13 +1,13 @@
 {
   "@context": "https://example.org/search-api-context.json",
-  "id": "https://api.dev.nva.unit.no/project/search?QUERY_PARAMS",
+  "id": "https://api.dev.nva.aws.unit.no/project/search?QUERY_PARAMS",
   "size": 0,
   "searchString": "title=reindeer",
   "processingTime": 1000,
   "firstRecord": 0,
   "hits": [
     {
-      "id": "https://api.dev.nva.unit.no/project/456789",
+      "id": "https://api.dev.nva.aws.unit.no/project/456789",
       "type": "Project",
       "identifier": [
         {
@@ -46,7 +46,7 @@
       ]
     },
     {
-      "id": "https://api.dev.nva.unit.no/project/456789",
+      "id": "https://api.dev.nva.aws.unit.no/project/456789",
       "type": "Project",
       "identifier": [
         {
@@ -85,7 +85,7 @@
       ]
     },
     {
-      "id": "https://api.dev.nva.unit.no/project/456789",
+      "id": "https://api.dev.nva.aws.unit.no/project/456789",
       "type": "Project",
       "identifier": [
         {
@@ -124,7 +124,7 @@
       ]
     },
     {
-      "id": "https://api.dev.nva.unit.no/project/456789",
+      "id": "https://api.dev.nva.aws.unit.no/project/456789",
       "type": "Project",
       "identifier": [
         {
@@ -163,7 +163,7 @@
       ]
     },
     {
-      "id": "https://api.dev.nva.unit.no/project/456789",
+      "id": "https://api.dev.nva.aws.unit.no/project/456789",
       "type": "Project",
       "identifier": [
         {
