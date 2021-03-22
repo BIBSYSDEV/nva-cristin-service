@@ -9,8 +9,9 @@ public class CristinApiClientStub extends CristinApiClient {
     private static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE = "/cristinQueryProjectsResponse.json";
     private static final String CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE = "/cristinGetProjectResponse.json";
 
-    public CristinApiClientStub(String cristinApiHost) {
-        super(cristinApiHost);
+    @Override
+    protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
+        return 1000;
     }
 
     @Override

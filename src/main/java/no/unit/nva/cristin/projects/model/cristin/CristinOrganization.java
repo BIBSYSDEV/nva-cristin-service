@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CristinOrganization {
 
-    public Institution institution;
+    public CristinInstitution institution;
     @JsonProperty(UNIT)
-    public Unit institutionUnit;
+    public CristinUnit institutionUnit;
 }
 

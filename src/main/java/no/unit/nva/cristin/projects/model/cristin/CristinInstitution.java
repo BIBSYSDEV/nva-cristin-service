@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Map;
 
-@SuppressWarnings("PMD.ShortClassName")
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Unit {
+public class CristinInstitution {
 
-    public String cristinUnitId;
-    public Map<String, String> unitName;
+    public String cristinInstitutionId;
+    public Map<String, String> institutionName;
     public String url;
-
 }
 

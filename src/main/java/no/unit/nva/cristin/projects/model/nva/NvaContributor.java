@@ -11,7 +11,6 @@ import nva.commons.core.JacocoGenerated;
 public class NvaContributor {
 
     private String type;
-    // TODO: Do we want startDate and endDate fields as well?
     private NvaPerson identity;
     private NvaOrganization affiliation;
 

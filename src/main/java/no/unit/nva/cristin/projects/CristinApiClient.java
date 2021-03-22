@@ -1,6 +1,9 @@
 package no.unit.nva.cristin.projects;
 
 import static java.util.Arrays.asList;
+import static no.unit.nva.cristin.projects.Constants.BASE_URL;
+import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
+import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -13,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -23,17 +27,64 @@ public class CristinApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
 
+    private static final String TITLE = "title";
+    private static final String CHARACTER_EQUALS = "=";
     private static final String HTTPS = "https";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
     private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
-    private final transient String cristinApiHost;
-
-    public CristinApiClient(String cristinApiHost) {
-        this.cristinApiHost = cristinApiHost;
-    }
+    private static final String SEARCH_PATH = "search?QUERY_PARAMS"; // TODO: NP-2412: Replace QUERY_PARAMS
+    private static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
+        "Error fetching cristin project with id: %s . Exception Message: %s";
 
     protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
         return OBJECT_MAPPER.readValue(reader, classOfT);
+    }
+
+    /**
+     * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
+     * for serialization to the client.
+     *
+     * @param parameters The query params
+     * @param language   Language used for some properties in Cristin API response
+     * @return a ProjectsWrapper filled with transformed Cristin Projects and metadata
+     * @throws IOException        if cannot read from connection
+     * @throws URISyntaxException if URI is malformed
+     */
+    public ProjectsWrapper queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
+        Map<String, String> parameters, String language)
+        throws IOException, URISyntaxException {
+
+        long startRequestTime = System.currentTimeMillis();
+        List<CristinProject> enrichedProjects = queryAndEnrichProjects(parameters, language);
+        long endRequestTime = System.currentTimeMillis();
+
+        ProjectsWrapper projectsWrapper = new ProjectsWrapper();
+
+        projectsWrapper.setId(buildUri(BASE_URL, SEARCH_PATH));
+        projectsWrapper.setSize(0); // TODO: NP-2385: X-Total-Count header from Cristin response
+        projectsWrapper.setSearchString(extractTitleSearchString(parameters));
+        projectsWrapper.setProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
+        // TODO: NP-2385: Use Link header / Pagination data from Cristin response in the next two values
+        projectsWrapper.setFirstRecord(0);
+        projectsWrapper.setNextResults(null);
+        projectsWrapper.setHits(transformCristinProjectsToNvaProjects(enrichedProjects));
+
+        return projectsWrapper;
+    }
+
+    @JacocoGenerated
+    protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
+        return endRequestTime - startRequestTime;
+    }
+
+    private String extractTitleSearchString(Map<String, String> parameters) {
+        return TITLE + CHARACTER_EQUALS + parameters.get(TITLE);
+    }
+
+    private List<NvaProject> transformCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
+        return cristinProjects.stream()
+            .map(cristinProject -> new NvaProjectBuilder(cristinProject).build())
+            .collect(Collectors.toList());
     }
 
     protected List<CristinProject> queryProjects(Map<String, String> parameters) throws IOException,
@@ -48,8 +99,7 @@ public class CristinApiClient {
                                                           String language) throws IOException,
                                                                                   URISyntaxException {
         List<CristinProject> projects = queryProjects(parameters);
-        List<CristinProject> enrichedProjects = enrichProjects(language, projects);
-        return enrichedProjects;
+        return enrichProjects(language, projects);
     }
 
     protected CristinProject getProject(String id, String language) throws IOException, URISyntaxException {
@@ -73,7 +123,7 @@ public class CristinApiClient {
                                                                                   URISyntaxException {
         URIBuilder uri = new URIBuilder()
             .setScheme(HTTPS)
-            .setHost(cristinApiHost)
+            .setHost(CRISTIN_API_HOST)
             .setPath(CRISTIN_API_PROJECTS_PATH);
         if (parameters != null) {
             parameters.keySet().forEach(s -> uri.addParameter(s, parameters.get(s)));
@@ -84,7 +134,7 @@ public class CristinApiClient {
     protected URL generateGetProjectUrl(String id, String language) throws MalformedURLException, URISyntaxException {
         URI uri = new URIBuilder()
             .setScheme(HTTPS)
-            .setHost(cristinApiHost)
+            .setHost(CRISTIN_API_HOST)
             .setPath(CRISTIN_API_PROJECTS_PATH + id)
             .addParameter("lang", language)
             .build();
@@ -98,7 +148,8 @@ public class CristinApiClient {
     private CristinProject enrichOneProject(String language, CristinProject project) {
         return attempt(() -> getProject(project.cristinProjectId, language))
             .orElse((failure) -> {
-                logger.error("Error fetching cristin project with id: " + project.cristinProjectId);
+                logger.error(String.format(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
+                    project.cristinProjectId, failure.getException().getMessage()));
                 return project;
             });
     }

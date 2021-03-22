@@ -18,10 +18,10 @@ public class CristinProject {
     public Instant startDate;
     public Instant endDate;
     public String status;
-    public Map<String, Instant> created;
-    public Map<String, Instant> lastModified;
+    public Map<String, String> created;
+    public Map<String, String> lastModified;
     public CristinOrganization coordinatingInstitution;
-    public List<FundingSource> projectFundingSources;
-    public List<Person> participants;
+    public List<CristinFundingSource> projectFundingSources;
+    public List<CristinPerson> participants;
 }
 

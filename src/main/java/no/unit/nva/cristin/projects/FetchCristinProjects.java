@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -37,12 +35,10 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectsWrappe
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
 
-    public static final String LANGUAGE_QUERY_PARAMETER = "language";
-    public static final String TITLE_QUERY_PARAMETER = "title";
+    protected static final String LANGUAGE_QUERY_PARAMETER = "language";
+    protected static final String TITLE_QUERY_PARAMETER = "title";
     private static final String DEFAULT_LANGUAGE_CODE = "nb";
-    private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
     private final transient CristinApiClient cristinApiClient;
-    private final transient PresentationConverter presentationConverter = new PresentationConverter();
 
     @SuppressWarnings("unused")
     @JacocoGenerated
@@ -52,7 +48,7 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectsWrappe
 
     @JacocoGenerated
     public FetchCristinProjects(Environment environment) {
-        this(new CristinApiClient(environment.readEnv(CRISTIN_API_HOST_ENV)), environment);
+        this(new CristinApiClient(), environment);
     }
 
     protected FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {
@@ -67,7 +63,7 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectsWrappe
         String language = getValidLanguage(requestInfo);
         String title = getValidTitle(requestInfo);
 
-        return createProjectsWrapper(language, title);
+        return getTransformedCristinProjectsUsingWrapperObject(language, title);
     }
 
     @Override
@@ -92,27 +88,13 @@ public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectsWrappe
             .orElseThrow(() -> new BadRequestException(LANGUAGE_INVALID));
     }
 
-    private ProjectsWrapper createProjectsWrapper(String language, String title) {
-        ProjectsWrapper wrapper = new ProjectsWrapper();
-        wrapper.hits = createProjectPresentationList(language, title);
-        wrapper.numberOfResults = wrapper.hits.size();
-
-        return wrapper;
-    }
-
-    private List<ProjectPresentation> createProjectPresentationList(String language, String title) {
+    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title) {
         Map<String, String> cristinQueryParameters = createCristinQueryParameters(title, language);
-        List<CristinProject> projects = attempt(() ->
-            cristinApiClient.queryAndEnrichProjects(cristinQueryParameters, language)).orElseThrow();
 
-        return transformProjectsToProjectPresentations(language, projects);
-    }
-
-    private List<ProjectPresentation> transformProjectsToProjectPresentations(String language,
-                                                                              List<CristinProject> projects) {
-        return projects.stream()
-            .map(project -> presentationConverter.asProjectPresentation(project, language))
-            .collect(Collectors.toList());
+        return attempt(() ->
+            cristinApiClient
+                .queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(cristinQueryParameters, language))
+            .orElseThrow();
     }
 
     private boolean isValidTitle(String str) {

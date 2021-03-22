@@ -60,6 +60,10 @@ test {
         events 'skipped', 'passed', 'failed'
     }
     finalizedBy jacocoTestReport
+
+    environment "ALLOWED_ORIGIN", "*"
+    environment "CRISTIN_API_HOST", "api.cristin.no"
+    environment "BASE_URL", "https://api.dev.nva.aws.unit.no/project"
 }
 
 pmd {
@@ -102,7 +106,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'METHOD'
                 value = 'COVEREDRATIO'
-                minimum = 0.87
+                minimum = 0.90
             }
         }
 
@@ -110,7 +114,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'CLASS'
                 value = 'COVEREDRATIO'
-                minimum = 0.86
+                minimum = 0.90
             }
         }
     }

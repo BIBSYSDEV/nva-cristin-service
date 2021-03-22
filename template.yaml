@@ -59,6 +59,7 @@ Resources:
         Variables:
           ALLOWED_ORIGIN: '*'
           CRISTIN_API_HOST: 'api.cristin.no'
+          BASE_URL: 'https://api.dev.nva.aws.unit.no/project'
       Handler: no.unit.nva.cristin.projects.FetchCristinProjects::handleRequest
       Runtime: java11
       MemorySize: 512

@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.List;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Person {
+public class CristinPerson {
 
     public String cristinPersonId;
     public String firstName;
     public String surname;
     public String url;
-    public List<Role> roles;
+    public List<CristinRole> roles;
 }
 

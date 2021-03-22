@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
@@ -11,7 +12,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,26 +51,21 @@ public class FetchCristinProjectsTest {
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String INVALID_JSON = "This is not valid JSON!";
 
-    private static final String ALLOWED_ORIGIN_ENV = "ALLOWED_ORIGIN";
-    private static final String CRISTIN_API_HOST_ENV = "CRISTIN_API_HOST";
-    private static final String CRISTIN_API_DUMMY_HOST = "example.com";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON =
         "api_response_one_cristin_project_to_nva_project.json";
+    private static final String CRISTIN_GET_PROJECT_RESPONSE = "cristinGetProjectResponse.json";
     private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
     private CristinApiClient cristinApiClientStub;
-    private Environment environment;
+    private Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
     private FetchCristinProjects handler;
 
     @BeforeEach
     void setUp() {
-        environment = mock(Environment.class);
-        when(environment.readEnv(ALLOWED_ORIGIN_ENV)).thenReturn(ALLOW_ALL_ORIGIN);
-        when(environment.readEnv(CRISTIN_API_HOST_ENV)).thenReturn(CRISTIN_API_DUMMY_HOST);
-        cristinApiClientStub = new CristinApiClientStub(environment.readEnv(CRISTIN_API_HOST_ENV));
+        cristinApiClientStub = new CristinApiClientStub();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
@@ -78,15 +73,9 @@ public class FetchCristinProjectsTest {
 
     @ParameterizedTest
     @ArgumentsSource(TestPairProvider.class)
-    void handlerReturnsExpectedBodyWhenRequestInputIsValid(String queryResponse,
-                                                           String getResponse,
-                                                           String expected) throws IOException {
-        cristinApiClientStub = spy(cristinApiClientStub);
-        when(cristinApiClientStub.fetchQueryResults(any())).thenReturn(getReader(queryResponse));
-        when(cristinApiClientStub.fetchGetResult(any())).thenReturn(getReader(getResponse));
+    void handlerReturnsExpectedBodyWhenRequestInputIsValid(String expected) throws IOException {
         var actual = sendDefaultQuery().getBody();
-        assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
-            OBJECT_MAPPER.readTree(actual).toPrettyString());
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }
 
     @Test
@@ -96,8 +85,7 @@ public class FetchCristinProjectsTest {
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
         var expected = getReader(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON);
-        assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
-            OBJECT_MAPPER.readTree(response.getBody()).toPrettyString());
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
     }
 
     @Test
@@ -210,16 +198,16 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCrisinProject() throws Exception {
+    void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
         var expected = getReader(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON);
-        var cristinGetProject = getReader(TestPairProvider.CRISTIN_GET_PROJECT_RESPONSE);
+        var cristinGetProject = getReader(CRISTIN_GET_PROJECT_RESPONSE);
         CristinProject cristinProject =
             attempt(() -> JsonUtils.objectMapper.readValue(cristinGetProject, CristinProject.class)).get();
-        NvaProject nvaProject = NvaProjectBuilder.mapCristinProjectToNvaProject(cristinProject);
+        NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
+        nvaProject.setContext(PROJECT_LOOKUP_CONTEXT_URL);
         var actual = attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get();
 
-        assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
-            OBJECT_MAPPER.readTree(actual).toPrettyString());
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
