@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Map;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class FundingSource {
+public class CristinFundingSource {
 
     public String fundingSourceCode;
     public String projectCode;

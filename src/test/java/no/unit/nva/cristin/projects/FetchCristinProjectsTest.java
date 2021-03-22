@@ -75,8 +75,7 @@ public class FetchCristinProjectsTest {
     @ArgumentsSource(TestPairProvider.class)
     void handlerReturnsExpectedBodyWhenRequestInputIsValid(String expected) throws IOException {
         var actual = sendDefaultQuery().getBody();
-        assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
-            OBJECT_MAPPER.readTree(actual).toPrettyString());
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }
 
     @Test
@@ -86,8 +85,7 @@ public class FetchCristinProjectsTest {
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
         var expected = getReader(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON);
-        assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
-            OBJECT_MAPPER.readTree(response.getBody()).toPrettyString());
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
     }
 
     @Test
@@ -209,8 +207,7 @@ public class FetchCristinProjectsTest {
         nvaProject.setContext(PROJECT_LOOKUP_CONTEXT_URL);
         var actual = attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get();
 
-        assertEquals(OBJECT_MAPPER.readTree(expected).toPrettyString(),
-            OBJECT_MAPPER.readTree(actual).toPrettyString());
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {

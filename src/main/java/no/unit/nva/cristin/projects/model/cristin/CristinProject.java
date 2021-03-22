@@ -21,7 +21,7 @@ public class CristinProject {
     public Map<String, String> created;
     public Map<String, String> lastModified;
     public CristinOrganization coordinatingInstitution;
-    public List<FundingSource> projectFundingSources;
-    public List<Person> participants;
+    public List<CristinFundingSource> projectFundingSources;
+    public List<CristinPerson> participants;
 }
 

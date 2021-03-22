@@ -1,8 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_BASE_URL;
-import static no.unit.nva.cristin.projects.Constants.INSTITUTION_PATH;
-import static no.unit.nva.cristin.projects.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import java.util.Collections;
 import java.util.List;
@@ -10,10 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.cristin.Institution;
-import no.unit.nva.cristin.projects.model.cristin.Person;
-import no.unit.nva.cristin.projects.model.cristin.Role;
+import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
 import no.unit.nva.cristin.projects.model.nva.NvaPerson;
@@ -26,8 +22,6 @@ public class NvaProjectBuilder {
 
     private static final String PROJECT_TYPE = "Project";
     private static final String CRISTIN_IDENTIFIER_TYPE = "CristinIdentifier";
-    private static final String ORGANIZATION_TYPE = "Organization";
-    private static final String PERSON_TYPE = "Person";
 
     private static final String TYPE = "type";
     private static final String VALUE = "value";
@@ -64,35 +58,10 @@ public class NvaProjectBuilder {
         return nvaProject;
     }
 
-    private static NvaPerson mapCristinPersonToNvaPerson(Person person) {
-        if (person == null) {
-            return null;
-        }
-
-        NvaPerson identity = new NvaPerson();
-        identity.setId(buildUri(CRISTIN_API_BASE_URL, PERSON_PATH, person.cristinPersonId));
-        identity.setType(PERSON_TYPE);
-        identity.setFirstName(person.firstName);
-        identity.setLastName(person.surname);
-        return identity;
-    }
-
-    private static NvaOrganization mapCristinInstitutionToNvaOrganization(Institution institution) {
-        if (institution == null) {
-            return null;
-        }
-
-        NvaOrganization nvaOrganization = new NvaOrganization();
-        nvaOrganization.setId(buildUri(CRISTIN_API_BASE_URL, INSTITUTION_PATH, institution.cristinInstitutionId));
-        nvaOrganization.setType(ORGANIZATION_TYPE);
-        nvaOrganization.setName(institution.institutionName);
-        return nvaOrganization;
-    }
-
-    private NvaOrganization extractCoordinatingInstitution() {
-        return Optional.ofNullable(cristinProject.coordinatingInstitution)
-            .map(elm -> mapCristinInstitutionToNvaOrganization(elm.institution))
-            .orElse(null);
+    private static List<NvaContributor> transformCristinPersonsToNvaContributors(List<CristinPerson> participants) {
+        return participants.stream()
+            .flatMap(NvaProjectBuilder::generateRoleBasedContribution)
+            .collect(Collectors.toList());
     }
 
     private List<Map<String, String>> createCristinIdentifier() {
@@ -100,35 +69,36 @@ public class NvaProjectBuilder {
             Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.cristinProjectId));
     }
 
-    private static List<NvaContributor> transformCristinPersonsToNvaContributors(List<Person> participants) {
-        return participants.stream()
-            .flatMap(NvaProjectBuilder::generateRoleBasedContribution)
-            .collect(Collectors.toList());
+    private static Stream<NvaContributor> generateRoleBasedContribution(CristinPerson cristinPerson) {
+        return cristinPerson.roles.stream()
+            .map(role -> createNvaContributorFromCristinPersonByRole(cristinPerson, role));
     }
 
-    private static Stream<NvaContributor> generateRoleBasedContribution(Person person) {
-        return person.roles.stream()
-            .map(role -> createNvaContributorFromCristinPersonByRole(person, role));
-    }
-
-    private static NvaContributor createNvaContributorFromCristinPersonByRole(Person person, Role role) {
+    private static NvaContributor createNvaContributorFromCristinPersonByRole(CristinPerson cristinPerson,
+                                                                              CristinRole role) {
         NvaContributor nvaContributor = new NvaContributor();
         nvaContributor.setType(cristinRolesToNva.get(role.roleCode));
-        nvaContributor.setIdentity(mapCristinPersonToNvaPerson(person));
-        nvaContributor.setAffiliation(mapCristinInstitutionToNvaOrganization(role.institution));
+        nvaContributor.setIdentity(NvaPerson.fromCristinPerson(cristinPerson));
+        nvaContributor.setAffiliation(NvaOrganization.fromCristinInstitution(role.institution));
         return nvaContributor;
+    }
+
+    private NvaOrganization extractCoordinatingInstitution() {
+        return Optional.ofNullable(cristinProject.coordinatingInstitution)
+            .map(coordinatingInstitution -> NvaOrganization.fromCristinInstitution(coordinatingInstitution.institution))
+            .orElse(null);
     }
 
     private String extractMainTitle() {
         return Optional.ofNullable(cristinProject.title)
-            .map(elm -> elm.get(cristinProject.mainLanguage))
+            .map(titles -> titles.get(cristinProject.mainLanguage))
             .orElse(null);
     }
 
     private List<Map<String, String>> extractAlternativeTitles() {
         return Optional.ofNullable(cristinProject.title)
-            .filter(elm -> elm.keySet().remove(cristinProject.mainLanguage))
-            .filter(elm -> !elm.isEmpty())
+            .filter(titles -> titles.keySet().remove(cristinProject.mainLanguage))
+            .filter(remainingTitles -> !remainingTitles.isEmpty())
             .map(Collections::singletonList)
             .orElse(null);
     }

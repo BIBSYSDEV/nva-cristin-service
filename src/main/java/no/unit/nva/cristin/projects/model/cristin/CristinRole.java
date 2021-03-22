@@ -7,12 +7,11 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @SuppressWarnings("PMD.ShortClassName")
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Role {
+public class CristinRole {
 
     public String roleCode;
-    public Institution institution;
+    public CristinInstitution institution;
     @JsonProperty(UNIT)
-    public Unit institutionUnit;
-
+    public CristinUnit institutionUnit;
 }
 
