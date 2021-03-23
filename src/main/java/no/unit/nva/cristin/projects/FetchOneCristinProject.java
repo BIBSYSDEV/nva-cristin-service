@@ -21,7 +21,11 @@ public class FetchOneCristinProject extends ApiGatewayHandler<Void, NvaProject> 
     protected NvaProject processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        return null;
+        NvaProject nvaProject = new NvaProject();
+
+        nvaProject.setTitle("Hello World");
+
+        return nvaProject;
     }
 
     @Override

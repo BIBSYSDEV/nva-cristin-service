@@ -76,6 +76,30 @@ Resources:
               - method.request.querystring.language
               - method.request.querystring.title
 
+  NvaCristinOneProjectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          ALLOWED_ORIGIN: '*'
+          CRISTIN_API_HOST: 'api.cristin.no' # TODO: Put all shared env vars in Globals
+          BASE_URL: 'https://api.dev.nva.aws.unit.no/project' # TODO: Dynamic from CustomDomain and CustomDomainBasePtah
+      Handler: no.unit.nva.cristin.projects.FetchOneCristinProject::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Events:
+        NvaCristinOneProjectEvent:
+          Type: Api
+          Properties:
+            Auth:
+              Authorizer: MyCognitoAuthorizer
+            RestApiId: !Ref NvaCristinProjectsFunctionApi
+            Path: /{id}
+            Method: get
+            RequestParameters:
+              - method.request.querystring.language
+      CodeUri: .
+
   NvaCristinProjectsFunctionBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
