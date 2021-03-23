@@ -73,6 +73,27 @@ public class CristinApiClient {
         return projectsWrapper;
     }
 
+    /**
+     * Creates a NvaProject object containing a single transformed Cristin Project. Is used for serialization to the
+     * client.
+     *
+     * @param id       The Cristin id of the project to query
+     * @param language Language used for some properties in Cristin API response
+     * @return a NvaProject filled with one transformed Cristin Project
+     * @throws IOException        if cannot read from connection
+     * @throws URISyntaxException if URI is malformed
+     */
+    public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
+        throws IOException, URISyntaxException {
+
+        CristinProject cristinProject = getProject(id, language);
+
+        NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
+        nvaProject.setContext(Constants.PROJECT_LOOKUP_CONTEXT_URL);
+
+        return nvaProject;
+    }
+
     @JacocoGenerated
     protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
         return endRequestTime - startRequestTime;
