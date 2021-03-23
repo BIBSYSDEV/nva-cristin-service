@@ -98,7 +98,6 @@ Resources:
             Method: get
             RequestParameters:
               - method.request.querystring.language
-      CodeUri: .
 
   NvaCristinProjectsFunctionBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
