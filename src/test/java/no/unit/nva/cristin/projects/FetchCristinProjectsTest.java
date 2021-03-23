@@ -1,8 +1,8 @@
 package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
-import static no.unit.nva.cristin.projects.FetchCristinProjects.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
+import static no.unit.nva.cristin.projects.RequestUtils.LANGUAGE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.attempt.Try.attempt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -180,7 +180,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(response.getBody().contains(FetchCristinProjects.LANGUAGE_INVALID));
+        assertTrue(response.getBody().contains(RequestUtils.LANGUAGE_INVALID));
     }
 
     @Test

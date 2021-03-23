@@ -69,6 +69,7 @@ public class CristinApiClient {
         projectsWrapper.setNextResults(null);
         projectsWrapper.setHits(transformCristinProjectsToNvaProjects(enrichedProjects));
 
+        // TODO: Return fields with empty values instead of null to avoid "undefined" in frontend
         return projectsWrapper;
     }
 
