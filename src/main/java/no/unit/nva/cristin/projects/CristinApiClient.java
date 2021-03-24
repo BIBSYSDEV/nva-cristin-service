@@ -80,18 +80,28 @@ public class CristinApiClient {
      * @param id       The Cristin id of the project to query
      * @param language Language used for some properties in Cristin API response
      * @return a NvaProject filled with one transformed Cristin Project
-     * @throws IOException        if cannot read from connection
-     * @throws URISyntaxException if URI is malformed
      */
-    public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
-        throws IOException, URISyntaxException {
+    public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language) {
 
-        CristinProject cristinProject = getProject(id, language);
+        CristinProject cristinProject = attemptToGetCristinProject(id, language);
+
+        if (cristinProject == null) {
+            return new NvaProject();
+        }
 
         NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
         nvaProject.setContext(Constants.PROJECT_LOOKUP_CONTEXT_URL);
 
         return nvaProject;
+    }
+
+    private CristinProject attemptToGetCristinProject(String id, String language) {
+        return attempt(() -> getProject(id, language))
+            .orElse(failure -> {
+                logger.error(String.format(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
+                    id, failure.getException().getMessage()));
+                return null;
+            });
     }
 
     @JacocoGenerated

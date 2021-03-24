@@ -60,8 +60,7 @@ public class FetchOneCristinProject extends ApiGatewayHandler<Void, NvaProject> 
     }
 
     private NvaProject getTransformedProjectFromCristin(String id, String language) {
-        return attempt(() -> cristinApiClient
-            .queryOneCristinProjectUsingIdIntoNvaProject(id, language))
+        return attempt(() -> cristinApiClient.queryOneCristinProjectUsingIdIntoNvaProject(id, language))
             .orElseThrow();
     }
 }

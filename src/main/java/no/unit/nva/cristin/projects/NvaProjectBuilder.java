@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import java.util.Collections;
 import java.util.List;
@@ -43,8 +44,7 @@ public class NvaProjectBuilder {
      * @return a NvaProject converted from a CristinProject
      */
     public NvaProject build() {
-        // TODO: NP-2384: Remember to use setContext when serializing only a single NvaProject
-        nvaProject.setId(buildUri(Constants.BASE_URL, cristinProject.cristinProjectId));
+        nvaProject.setId(buildUri(BASE_URL, cristinProject.cristinProjectId));
         nvaProject.setType(PROJECT_TYPE);
         nvaProject.setIdentifier(createCristinIdentifier());
         nvaProject.setTitle(extractMainTitle());
