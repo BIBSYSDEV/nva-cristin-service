@@ -61,7 +61,8 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerReturnsEmptyJsonWhenIdIsNotFound() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(mockGetInvalidIdResponseReader()).when(cristinApiClientStub).fetchGetResult(any());
+        doReturn(getReader(CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON))
+            .when(cristinApiClientStub).fetchGetResult(any());
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
@@ -104,7 +105,7 @@ public class FetchOneCristinProjectTest {
         throws Exception {
 
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(mockGetProjectWithoutInstitutionAndParticipantsResponseReader())
+        doReturn(getReader(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON))
             .when(cristinApiClientStub).fetchGetResult(any());
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
@@ -122,26 +123,15 @@ public class FetchOneCristinProjectTest {
         return GatewayResponse.fromOutputStream(output);
     }
 
-    private InputStream requestWithLanguageAndId(Map<String, String> map, Map<String, String> id)
+    private InputStream requestWithLanguageAndId(Map<String, String> languageQueryParam,
+                                                 Map<String, String> idPathParam)
         throws JsonProcessingException {
 
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withQueryParameters(map)
-            .withPathParameters(id)
+            .withQueryParameters(languageQueryParam)
+            .withPathParameters(idPathParam)
             .build();
-    }
-
-    private InputStreamReader mockGetInvalidIdResponseReader() {
-        InputStream getResultAsStream = IoUtils
-            .inputStreamFromResources(CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON);
-        return new InputStreamReader(getResultAsStream, Charsets.UTF_8);
-    }
-
-    private InputStreamReader mockGetProjectWithoutInstitutionAndParticipantsResponseReader() {
-        InputStream getResultAsStream = IoUtils
-            .inputStreamFromResources(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON);
-        return new InputStreamReader(getResultAsStream, Charsets.UTF_8);
     }
 
     private InputStreamReader getReader(String resource) {
