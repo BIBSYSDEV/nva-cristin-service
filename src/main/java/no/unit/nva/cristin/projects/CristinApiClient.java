@@ -85,7 +85,7 @@ public class CristinApiClient {
 
         CristinProject cristinProject = attemptToGetCristinProject(id, language);
 
-        if (cristinProject == null) {
+        if (cristinProject == null || cristinProject.cristinProjectId == null) {
             return new NvaProject();
         }
 

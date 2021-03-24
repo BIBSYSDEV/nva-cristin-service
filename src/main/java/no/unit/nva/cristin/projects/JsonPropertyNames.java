@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects;
 
 public class JsonPropertyNames {
 
+    // TODO: Remove unused property names
     public static final String CRISTIN_PROJECT_ID = "cristin_project_id";
     public static final String MAIN_LANGUAGE = "main_language";
     public static final String LAST_MODIFIED = "last_modified";

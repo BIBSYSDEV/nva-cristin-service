@@ -15,4 +15,5 @@ public class Constants {
     public static final String PERSON_PATH = "persons";
     private static final String BASE_URL_ENV = "BASE_URL";
     public static final String BASE_URL = ENVIRONMENT.readEnv(BASE_URL_ENV);
+    public static final String ID = "id";
 }

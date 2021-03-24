@@ -218,7 +218,7 @@ public class FetchCristinProjectsTest {
     }
 
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
-        return new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
+        return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
             .withQueryParameters(map)
             .build();

@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.ID;
 import static no.unit.nva.cristin.projects.RequestUtils.getValidLanguage;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -11,12 +12,10 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-@JacocoGenerated // TODO: Implement testing in next commit
 public class FetchOneCristinProject extends ApiGatewayHandler<Void, NvaProject> {
 
     public static final String INVALID_PATH_PARAMETER_FOR_ID_EXCEPTION_MESSAGE =
         "Invalid path parameter for id, needs to be a number";
-    private static final String ID = "id";
 
     private final transient CristinApiClient cristinApiClient;
 
@@ -31,7 +30,6 @@ public class FetchOneCristinProject extends ApiGatewayHandler<Void, NvaProject> 
         this(new CristinApiClient(), environment);
     }
 
-    @JacocoGenerated
     public FetchOneCristinProject(CristinApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;

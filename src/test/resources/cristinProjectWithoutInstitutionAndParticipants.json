@@ -1,0 +1,30 @@
+{
+  "cristin_project_id": "456789",
+  "publishable": true,
+  "published": true,
+  "title": {
+    "en": "Example Title"
+  },
+  "main_language": "en",
+  "start_date": "2018-11-01T00:00:00.000Z",
+  "end_date": "2021-05-01T00:00:00.000Z",
+  "status": "ACTIVE",
+  "created": {
+    "date": "2019-12-31T09:45:17.000Z"
+  },
+  "last_modified": {
+    "date": "2019-12-31T09:48:20.000Z"
+  },
+  "project_funding_sources": [
+    {
+      "funding_source_code": "NFR",
+      "project_code": "654321",
+      "funding_source_name": {
+        "en": "Research Council of Norway (RCN)"
+      }
+    }
+  ],
+  "popular_scientific_summary": {
+    "en": "<p>Some popular scientific summary</p>\r\n"
+  }
+}
