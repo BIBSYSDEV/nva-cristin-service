@@ -1,9 +1,13 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.CommonUtils.hasValidContent;
 import static no.unit.nva.cristin.projects.Constants.ID;
+import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RequestUtils.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.projects.RequestUtils.LANGUAGE_QUERY_PARAMETER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -11,19 +15,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
 import java.util.Map;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
-import nva.commons.core.JsonUtils;
 import nva.commons.core.ioutils.IoUtils;
 import org.apache.commons.codec.Charsets;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +47,6 @@ public class FetchOneCristinProjectTest {
     private static final String NOT_AN_ID = "Not an ID";
     private static final String DEFAULT_ID = "9999";
 
-    private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
     private CristinApiClient cristinApiClientStub;
     private Environment environment = new Environment();
     private Context context;
@@ -113,6 +116,24 @@ public class FetchOneCristinProjectTest {
 
         var expected = getReader(API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON);
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
+    }
+
+    @Test
+    void callingHasValidContentOnCristinProjectOnlyReturnsTrueWhenAllRequiredDataArePresent() {
+        CristinProject cristinProject = null;
+        assertFalse(hasValidContent(cristinProject));
+
+        cristinProject = new CristinProject();
+        assertFalse(hasValidContent(cristinProject));
+
+        cristinProject.cristinProjectId = "1234";
+        assertFalse(hasValidContent(cristinProject));
+
+        cristinProject.title = new HashMap<>();
+        assertFalse(hasValidContent(cristinProject));
+
+        cristinProject.title.put("nb", "Min tittel");
+        assertTrue(hasValidContent(cristinProject));
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {

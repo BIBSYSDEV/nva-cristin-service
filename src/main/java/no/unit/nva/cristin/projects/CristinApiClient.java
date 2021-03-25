@@ -1,11 +1,12 @@
 package no.unit.nva.cristin.projects;
 
 import static java.util.Arrays.asList;
+import static no.unit.nva.cristin.projects.CommonUtils.hasValidContent;
 import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
+import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static nva.commons.core.attempt.Try.attempt;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -18,7 +19,6 @@ import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,6 @@ public class CristinApiClient {
     private static final String CHARACTER_EQUALS = "=";
     private static final String HTTPS = "https";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
-    private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
     private static final String SEARCH_PATH = "search?QUERY_PARAMS"; // TODO: NP-2412: Replace QUERY_PARAMS
     private static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
         "Error fetching cristin project with id: %s . Exception Message: %s";
@@ -85,7 +84,8 @@ public class CristinApiClient {
 
         CristinProject cristinProject = attemptToGetCristinProject(id, language);
 
-        if (cristinProject == null || cristinProject.cristinProjectId == null) {
+        if (!hasValidContent(cristinProject)) {
+            // TODO: Replace with a empty extending class which uses @JsonInclude(NON_NULL) on class level
             return new NvaProject();
         }
 
@@ -115,6 +115,7 @@ public class CristinApiClient {
 
     private List<NvaProject> transformCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
         return cristinProjects.stream()
+            .filter(CommonUtils::hasValidContent)
             .map(cristinProject -> new NvaProjectBuilder(cristinProject).build())
             .collect(Collectors.toList());
     }

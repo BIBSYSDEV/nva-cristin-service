@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.RequestUtils.LANGUAGE_QUERY_PARAMETER;
@@ -14,7 +15,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,7 +32,6 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
-import nva.commons.core.JsonUtils;
 import nva.commons.core.ioutils.IoUtils;
 import org.apache.commons.codec.Charsets;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +55,6 @@ public class FetchCristinProjectsTest {
     private static final String API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON =
         "api_response_one_cristin_project_to_nva_project.json";
     private static final String CRISTIN_GET_PROJECT_RESPONSE = "cristinGetProjectResponse.json";
-    private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
     private CristinApiClient cristinApiClientStub;
     private Environment environment = new Environment();
     private Context context;
@@ -202,10 +200,10 @@ public class FetchCristinProjectsTest {
         var expected = getReader(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON);
         var cristinGetProject = getReader(CRISTIN_GET_PROJECT_RESPONSE);
         CristinProject cristinProject =
-            attempt(() -> JsonUtils.objectMapper.readValue(cristinGetProject, CristinProject.class)).get();
+            attempt(() -> OBJECT_MAPPER.readValue(cristinGetProject, CristinProject.class)).get();
         NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
         nvaProject.setContext(PROJECT_LOOKUP_CONTEXT_URL);
-        var actual = attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get();
+        var actual = attempt(() -> OBJECT_MAPPER.writeValueAsString(nvaProject)).get();
 
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }

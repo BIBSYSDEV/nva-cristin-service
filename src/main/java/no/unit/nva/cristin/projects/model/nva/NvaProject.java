@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTRIBUTORS;
@@ -12,6 +13,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
@@ -21,6 +23,7 @@ import java.util.Map;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
+@JsonInclude(NON_NULL)
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIER, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
     GRANT, COORDINATING_INSTITUTION, CONTRIBUTORS})
 public class NvaProject {
