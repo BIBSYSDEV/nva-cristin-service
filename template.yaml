@@ -16,6 +16,11 @@ Metadata:
 Globals:
   Function:
     Timeout: 20
+    Environment:
+      Variables:
+        ALLOWED_ORIGIN: '*'
+        CRISTIN_API_HOST: 'api.cristin.no'
+        BASE_URL: 'https://api.dev.nva.aws.unit.no/project' # TODO: Dynamic from CustomDomain and CustomDomainBasePtah
   Api:
     Cors:
       AllowOrigin: "'*'"
@@ -55,11 +60,6 @@ Resources:
   NvaCristinProjectsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      Environment:
-        Variables:
-          ALLOWED_ORIGIN: '*'
-          CRISTIN_API_HOST: 'api.cristin.no'
-          BASE_URL: 'https://api.dev.nva.aws.unit.no/project'
       Handler: no.unit.nva.cristin.projects.FetchCristinProjects::handleRequest
       Runtime: java11
       MemorySize: 512
@@ -79,11 +79,6 @@ Resources:
   NvaCristinOneProjectFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Environment:
-        Variables:
-          ALLOWED_ORIGIN: '*'
-          CRISTIN_API_HOST: 'api.cristin.no' # TODO: Put all shared env vars in Globals
-          BASE_URL: 'https://api.dev.nva.aws.unit.no/project' # TODO: Dynamic from CustomDomain and CustomDomainBasePtah
       Handler: no.unit.nva.cristin.projects.FetchOneCristinProject::handleRequest
       Runtime: java11
       MemorySize: 512
