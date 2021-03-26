@@ -5,6 +5,7 @@
   "searchString": "title=reindeer",
   "processingTime": 1000,
   "firstRecord": 0,
+  "nextResults": "",
   "hits": [
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",

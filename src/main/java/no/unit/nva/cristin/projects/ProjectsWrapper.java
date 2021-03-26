@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_RECORD;
@@ -10,7 +9,6 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.NEXT_RESULTS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.PROCESSING_TIME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SEARCH_STRING;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SIZE;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
@@ -19,7 +17,6 @@ import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
-@JsonInclude(NON_NULL)
 @JsonPropertyOrder({CONTEXT, ID, SIZE, SEARCH_STRING, PROCESSING_TIME, FIRST_RECORD, NEXT_RESULTS, HITS})
 public class ProjectsWrapper {
 

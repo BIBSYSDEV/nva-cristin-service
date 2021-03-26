@@ -23,12 +23,13 @@ import java.util.Map;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
-@JsonInclude(NON_NULL)
+@JsonInclude(NON_NULL) // TODO: NP-2424: Remove this when all fields have been initialized as empty instead of null
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIER, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
     GRANT, COORDINATING_INSTITUTION, CONTRIBUTORS})
 public class NvaProject {
 
     @JsonProperty(CONTEXT)
+    @JsonInclude(NON_NULL)
     private String context;
     private URI id;
     private String type;

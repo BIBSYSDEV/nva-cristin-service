@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -49,12 +50,14 @@ public class FetchCristinProjectsTest {
     private static final String TITLE_REINDEER = "reindeer";
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String INVALID_JSON = "This is not valid JSON!";
+    private static final String EMPTY_LIST_STRING = "[]";
 
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON =
         "api_response_one_cristin_project_to_nva_project.json";
     private static final String CRISTIN_GET_PROJECT_RESPONSE = "cristinGetProjectResponse.json";
+    private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
     private CristinApiClient cristinApiClientStub;
     private Environment environment = new Environment();
     private Context context;
@@ -206,6 +209,22 @@ public class FetchCristinProjectsTest {
         var actual = attempt(() -> OBJECT_MAPPER.writeValueAsString(nvaProject)).get();
 
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
+    }
+
+    @Test
+    void handlerReturnsProjectsWrapperWithAllMetadataButEmptyHitsArrayWhenNoMatchesAreFoundInCristin()
+        throws Exception {
+
+        cristinApiClientStub = spy(cristinApiClientStub);
+        var emptyArray = new InputStreamReader(IoUtils.stringToStream(EMPTY_LIST_STRING), Charsets.UTF_8);
+        doReturn(emptyArray)
+            .when(cristinApiClientStub).fetchQueryResults(any());
+        var expected = getReader(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON);
+
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
+
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {

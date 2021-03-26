@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.projects.CommonUtils.hasValidContent;
 import static no.unit.nva.cristin.projects.Constants.BASE_URL;
@@ -7,6 +8,7 @@ import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static nva.commons.core.attempt.Try.attempt;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -65,10 +67,10 @@ public class CristinApiClient {
         projectsWrapper.setProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
         // TODO: NP-2385: Use Link header / Pagination data from Cristin response in the next two values
         projectsWrapper.setFirstRecord(0);
-        projectsWrapper.setNextResults(null);
+        projectsWrapper.setNextResults("");
         projectsWrapper.setHits(transformCristinProjectsToNvaProjects(enrichedProjects));
 
-        // TODO: Return fields with empty values instead of null to avoid "undefined" in frontend
+        // TODO: NP-2424: Return fields with empty values instead of null to avoid "undefined" in frontend
         return projectsWrapper;
     }
 
@@ -85,8 +87,7 @@ public class CristinApiClient {
         CristinProject cristinProject = attemptToGetCristinProject(id, language);
 
         if (!hasValidContent(cristinProject)) {
-            // TODO: Replace with a empty extending class which uses @JsonInclude(NON_NULL) on class level
-            return new NvaProject();
+            return new EmptyNvaProject();
         }
 
         NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
@@ -185,5 +186,13 @@ public class CristinApiClient {
                     project.cristinProjectId, failure.getException().getMessage()));
                 return project;
             });
+    }
+
+    @JsonInclude(NON_NULL)
+    private static class EmptyNvaProject extends NvaProject {
+        /*
+        TODO: NP-2315: Here we can return custom fields like "status": 404 to show that lookup of
+         project with given ID did not match any results or that project contained invalid/insufficient data
+        */
     }
 }
