@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
+import static no.unit.nva.cristin.projects.RequestUtils.LANGUAGE_INVALID_ERROR_MESSAGE;
 import static no.unit.nva.cristin.projects.RequestUtils.LANGUAGE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.attempt.Try.attempt;
@@ -46,7 +47,7 @@ public class FetchCristinProjectsTest {
     private static final String LANGUAGE_KEY = "language";
     private static final String EMPTY_STRING = "";
     private static final String LANGUAGE_NB = "nb";
-    private static final String LANGUAGE_INVALID = "invalid";
+    private static final String INVALID_LANGUAGE_PARAM = "ru";
     private static final String TITLE_REINDEER = "reindeer";
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String INVALID_JSON = "This is not valid JSON!";
@@ -174,14 +175,14 @@ public class FetchCristinProjectsTest {
     @Test
     public void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER,
-            LANGUAGE_KEY, LANGUAGE_INVALID));
+            LANGUAGE_KEY, INVALID_LANGUAGE_PARAM));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> response = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(response.getBody().contains(RequestUtils.LANGUAGE_INVALID));
+        assertTrue(response.getBody().contains(LANGUAGE_INVALID_ERROR_MESSAGE));
     }
 
     @Test

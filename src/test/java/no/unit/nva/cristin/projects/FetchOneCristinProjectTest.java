@@ -1,13 +1,10 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.CommonUtils.hasValidContent;
 import static no.unit.nva.cristin.projects.Constants.ID;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RequestUtils.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.projects.RequestUtils.LANGUAGE_QUERY_PARAMETER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -21,9 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.util.HashMap;
 import java.util.Map;
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -116,24 +111,6 @@ public class FetchOneCristinProjectTest {
 
         var expected = getReader(API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON);
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
-    }
-
-    @Test
-    void callingHasValidContentOnCristinProjectOnlyReturnsTrueWhenAllRequiredDataArePresent() {
-        CristinProject cristinProject = null;
-        assertFalse(hasValidContent(cristinProject));
-
-        cristinProject = new CristinProject();
-        assertFalse(hasValidContent(cristinProject));
-
-        cristinProject.cristinProjectId = "1234";
-        assertFalse(hasValidContent(cristinProject));
-
-        cristinProject.title = new HashMap<>();
-        assertFalse(hasValidContent(cristinProject));
-
-        cristinProject.title.put("nb", "Min tittel");
-        assertTrue(hasValidContent(cristinProject));
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {
