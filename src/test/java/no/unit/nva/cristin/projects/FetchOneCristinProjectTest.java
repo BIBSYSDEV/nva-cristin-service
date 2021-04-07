@@ -2,8 +2,8 @@ package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.ID;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.projects.RequestUtils.DEFAULT_LANGUAGE_CODE;
-import static no.unit.nva.cristin.projects.RequestUtils.LANGUAGE_QUERY_PARAMETER;
+import static no.unit.nva.cristin.projects.CristinHandler.DEFAULT_LANGUAGE_CODE;
+import static no.unit.nva.cristin.projects.CristinHandler.LANGUAGE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;

@@ -1,13 +1,10 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.RequestUtils.getQueryParam;
-import static no.unit.nva.cristin.projects.RequestUtils.getValidLanguage;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
@@ -16,7 +13,7 @@ import nva.commons.core.JacocoGenerated;
 /**
  * Handler for requests to Lambda function.
  */
-public class FetchCristinProjects extends ApiGatewayHandler<Void, ProjectsWrapper> {
+public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> {
 
     protected static final String TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS = "Parameter 'title' is missing or invalid. "
         + "May only contain alphanumeric characters, dash, comma, period and whitespace";
