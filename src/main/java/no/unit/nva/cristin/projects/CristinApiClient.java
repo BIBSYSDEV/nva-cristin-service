@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.attempt.Failure;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,11 +98,8 @@ public class CristinApiClient {
 
     private CristinProject attemptToGetCristinProject(String id, String language) {
         return attempt(() -> getProject(id, language))
-            .orElse(failure -> {
-                logger.error(String.format(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-                    id, failure.getException().getMessage()));
-                return null;
-            });
+            .toOptional(failure -> logError(id, failure))
+            .orElse(null);
     }
 
     @JacocoGenerated
@@ -180,11 +178,13 @@ public class CristinApiClient {
 
     private CristinProject enrichOneProject(String language, CristinProject project) {
         return attempt(() -> getProject(project.getCristinProjectId(), language))
-            .orElse((failure) -> {
-                logger.error(String.format(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-                    project.getCristinProjectId(), failure.getException().getMessage()));
-                return project;
-            });
+            .toOptional(failure -> logError(project.getCristinProjectId(), failure))
+            .orElse(project);
+    }
+
+    private void logError(String id, Failure<CristinProject> failure) {
+        logger.error(String.format(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
+            id, failure.getException().getMessage()));
     }
 
     @JsonInclude(NON_NULL)

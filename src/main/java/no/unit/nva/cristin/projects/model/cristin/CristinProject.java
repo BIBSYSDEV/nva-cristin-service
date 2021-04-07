@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
-import static no.unit.nva.cristin.projects.CommonUtils.hasData;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -8,6 +7,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.StringUtils;
 
 @SuppressWarnings({"PMD.TooManyFields"})
 @JacocoGenerated
@@ -136,8 +136,8 @@ public class CristinProject {
 
     @JsonIgnore
     public boolean hasValidContent() {
-        return hasData(cristinProjectId)
-            && hasData(title);
+        return StringUtils.isNotBlank(cristinProjectId)
+            && title != null && !title.isEmpty();
     }
 }
 
