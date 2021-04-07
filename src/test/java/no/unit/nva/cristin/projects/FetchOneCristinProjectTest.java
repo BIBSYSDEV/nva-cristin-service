@@ -4,6 +4,7 @@ import static no.unit.nva.cristin.projects.Constants.ID;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RequestUtils.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.projects.RequestUtils.LANGUAGE_QUERY_PARAMETER;
+import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -19,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.Map;
+import javax.ws.rs.core.HttpHeaders;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -82,20 +84,22 @@ public class FetchOneCristinProjectTest {
     }
 
     @Test
-    void handlerReturnsEmptyJsonWhenFetchFromBackendFails() throws Exception {
+    void handlerReturnsBadGatewayExceptionWhenFetchFromBackendFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
         doThrow(new IOException()).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
 
-        assertEquals(OBJECT_MAPPER.readTree(EMPTY_JSON), OBJECT_MAPPER.readTree(response.getBody()));
+        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
 
         doThrow(new FileNotFoundException()).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> nextResponse = sendQueryWithId(DEFAULT_ID);
 
-        assertEquals(OBJECT_MAPPER.readTree(EMPTY_JSON), OBJECT_MAPPER.readTree(nextResponse.getBody()));
+        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @Test

@@ -57,7 +57,7 @@ public class FetchOneCristinProject extends ApiGatewayHandler<Void, NvaProject> 
         return requestInfo.getPathParameter(ID);
     }
 
-    private NvaProject getTransformedProjectFromCristin(String id, String language) {
+    private NvaProject getTransformedProjectFromCristin(String id, String language) throws BadGatewayException {
         return cristinApiClient.queryOneCristinProjectUsingIdIntoNvaProject(id, language);
     }
 }

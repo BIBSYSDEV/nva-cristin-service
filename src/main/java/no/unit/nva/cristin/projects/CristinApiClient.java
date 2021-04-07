@@ -35,6 +35,8 @@ public class CristinApiClient {
     private static final String SEARCH_PATH = "search?QUERY_PARAMS"; // TODO: NP-2412: Replace QUERY_PARAMS
     private static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
         "Error fetching cristin project with id: %s . Exception Message: %s";
+    private static final String ERROR_MESSAGE_BACKEND_FETCH_FAILED =
+        "Your request cannot be processed at this time due to an upstream error";
 
     protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
         return OBJECT_MAPPER.readValue(reader, classOfT);
@@ -81,7 +83,8 @@ public class CristinApiClient {
      * @param language Language used for some properties in Cristin API response
      * @return a NvaProject filled with one transformed Cristin Project
      */
-    public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language) {
+    public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
+        throws BadGatewayException {
 
         CristinProject cristinProject = attemptToGetCristinProject(id, language);
 
@@ -95,10 +98,13 @@ public class CristinApiClient {
         return nvaProject;
     }
 
-    private CristinProject attemptToGetCristinProject(String id, String language) {
-        return attempt(() -> getProject(id, language))
-            .toOptional(failure -> logError(id, failure))
-            .orElse(null);
+    // TODO: throw BadGatewayException if this fails as well?
+    protected List<CristinProject> queryProjects(Map<String, String> parameters) throws IOException,
+                                                                                        URISyntaxException {
+        URL url = generateQueryProjectsUrl(parameters);
+        try (InputStreamReader streamReader = fetchQueryResults(url)) {
+            return asList(fromJson(streamReader, CristinProject[].class));
+        }
     }
 
     @JacocoGenerated
@@ -117,12 +123,11 @@ public class CristinApiClient {
             .collect(Collectors.toList());
     }
 
-    protected List<CristinProject> queryProjects(Map<String, String> parameters) throws IOException,
-                                                                                        URISyntaxException {
-        URL url = generateQueryProjectsUrl(parameters);
-        try (InputStreamReader streamReader = fetchQueryResults(url)) {
-            return asList(fromJson(streamReader, CristinProject[].class));
-        }
+    private CristinProject attemptToGetCristinProject(String id, String language) throws BadGatewayException {
+        return attempt(() -> getProject(id, language)).orElseThrow(failure -> {
+            logError(id, failure);
+            return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        });
     }
 
     protected List<CristinProject> queryAndEnrichProjects(Map<String, String> parameters,
