@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.CommonUtils.hasValidContent;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashMap;
@@ -11,19 +10,16 @@ public class CommonUtilsTest {
 
     @Test
     void callingHasValidContentOnCristinProjectOnlyReturnsTrueWhenAllRequiredDataArePresent() {
-        CristinProject cristinProject = null;
-        assertFalse(hasValidContent(cristinProject));
+        CristinProject cristinProject = new CristinProject();
+        assertFalse(cristinProject.hasValidContent());
 
-        cristinProject = new CristinProject();
-        assertFalse(hasValidContent(cristinProject));
+        cristinProject.setCristinProjectId("1234");
+        assertFalse(cristinProject.hasValidContent());
 
-        cristinProject.cristinProjectId = "1234";
-        assertFalse(hasValidContent(cristinProject));
+        cristinProject.setTitle(new HashMap<>());
+        assertFalse(cristinProject.hasValidContent());
 
-        cristinProject.title = new HashMap<>();
-        assertFalse(hasValidContent(cristinProject));
-
-        cristinProject.title.put("nb", "Min tittel");
-        assertTrue(hasValidContent(cristinProject));
+        cristinProject.getTitle().put("nb", "Min tittel");
+        assertTrue(cristinProject.hasValidContent());
     }
 }

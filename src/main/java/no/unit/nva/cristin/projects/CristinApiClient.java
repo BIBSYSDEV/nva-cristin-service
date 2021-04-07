@@ -2,7 +2,6 @@ package no.unit.nva.cristin.projects;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.util.Arrays.asList;
-import static no.unit.nva.cristin.projects.CommonUtils.hasValidContent;
 import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
@@ -86,7 +85,7 @@ public class CristinApiClient {
 
         CristinProject cristinProject = attemptToGetCristinProject(id, language);
 
-        if (!hasValidContent(cristinProject)) {
+        if (cristinProject == null || !cristinProject.hasValidContent()) {
             return new EmptyNvaProject();
         }
 
@@ -116,7 +115,7 @@ public class CristinApiClient {
 
     private List<NvaProject> transformCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
         return cristinProjects.stream()
-            .filter(CommonUtils::hasValidContent)
+            .filter(CristinProject::hasValidContent)
             .map(cristinProject -> new NvaProjectBuilder(cristinProject).build())
             .collect(Collectors.toList());
     }
@@ -180,10 +179,10 @@ public class CristinApiClient {
     }
 
     private CristinProject enrichOneProject(String language, CristinProject project) {
-        return attempt(() -> getProject(project.cristinProjectId, language))
+        return attempt(() -> getProject(project.getCristinProjectId(), language))
             .orElse((failure) -> {
                 logger.error(String.format(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-                    project.cristinProjectId, failure.getException().getMessage()));
+                    project.getCristinProjectId(), failure.getException().getMessage()));
                 return project;
             });
     }

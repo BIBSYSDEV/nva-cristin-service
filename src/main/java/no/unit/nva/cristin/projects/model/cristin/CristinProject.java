@@ -1,27 +1,143 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
+import static no.unit.nva.cristin.projects.CommonUtils.hasData;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings({"PMD.TooManyFields"})
+@JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinProject {
 
-    public String cristinProjectId;
-    public Boolean publishable;
-    public Boolean published;
-    public Map<String, String> title;
-    public String mainLanguage;
-    public Instant startDate;
-    public Instant endDate;
-    public String status;
-    public Map<String, String> created;
-    public Map<String, String> lastModified;
-    public CristinOrganization coordinatingInstitution;
-    public List<CristinFundingSource> projectFundingSources;
-    public List<CristinPerson> participants;
+    private String cristinProjectId;
+    private Boolean publishable;
+    private Boolean published;
+    private Map<String, String> title;
+    private String mainLanguage;
+    private Instant startDate;
+    private Instant endDate;
+    private String status;
+    private Map<String, String> created;
+    private Map<String, String> lastModified;
+    private CristinOrganization coordinatingInstitution; // TODO: NP-2436: Make all fields of Cristin models private
+    private List<CristinFundingSource> projectFundingSources;
+    private List<CristinPerson> participants;
+
+    public String getCristinProjectId() {
+        return cristinProjectId;
+    }
+
+    public void setCristinProjectId(String cristinProjectId) {
+        this.cristinProjectId = cristinProjectId;
+    }
+
+    public Boolean getPublishable() {
+        return publishable;
+    }
+
+    public void setPublishable(Boolean publishable) {
+        this.publishable = publishable;
+    }
+
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
+    }
+
+    public Map<String, String> getTitle() {
+        return title;
+    }
+
+    public void setTitle(Map<String, String> title) {
+        this.title = title;
+    }
+
+    public String getMainLanguage() {
+        return mainLanguage;
+    }
+
+    public void setMainLanguage(String mainLanguage) {
+        this.mainLanguage = mainLanguage;
+    }
+
+    public Instant getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Instant startDate) {
+        this.startDate = startDate;
+    }
+
+    public Instant getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Instant endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Map<String, String> getCreated() {
+        return created;
+    }
+
+    public void setCreated(Map<String, String> created) {
+        this.created = created;
+    }
+
+    public Map<String, String> getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Map<String, String> lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public CristinOrganization getCoordinatingInstitution() {
+        return coordinatingInstitution;
+    }
+
+    public void setCoordinatingInstitution(
+        CristinOrganization coordinatingInstitution) {
+        this.coordinatingInstitution = coordinatingInstitution;
+    }
+
+    public List<CristinFundingSource> getProjectFundingSources() {
+        return projectFundingSources;
+    }
+
+    public void setProjectFundingSources(
+        List<CristinFundingSource> projectFundingSources) {
+        this.projectFundingSources = projectFundingSources;
+    }
+
+    public List<CristinPerson> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<CristinPerson> participants) {
+        this.participants = participants;
+    }
+
+    @JsonIgnore
+    public boolean hasValidContent() {
+        return hasData(cristinProjectId)
+            && hasData(title);
+    }
 }
 
