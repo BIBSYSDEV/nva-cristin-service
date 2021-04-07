@@ -60,7 +60,7 @@ public class FetchCristinProjectsTest {
     private static final String CRISTIN_GET_PROJECT_RESPONSE = "cristinGetProjectResponse.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
     private CristinApiClient cristinApiClientStub;
-    private Environment environment = new Environment();
+    private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
     private FetchCristinProjects handler;

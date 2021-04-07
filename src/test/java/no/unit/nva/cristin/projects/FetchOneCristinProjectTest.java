@@ -43,7 +43,7 @@ public class FetchOneCristinProjectTest {
     private static final String DEFAULT_ID = "9999";
 
     private CristinApiClient cristinApiClientStub;
-    private Environment environment = new Environment();
+    private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
     private FetchOneCristinProject handler;
