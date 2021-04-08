@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import java.util.Collections;
 import java.util.List;
@@ -43,15 +44,14 @@ public class NvaProjectBuilder {
      * @return a NvaProject converted from a CristinProject
      */
     public NvaProject build() {
-        // TODO: NP-2384: Remember to use setContext when serializing only a single NvaProject
-        nvaProject.setId(buildUri(Constants.BASE_URL, cristinProject.cristinProjectId));
+        nvaProject.setId(buildUri(BASE_URL, cristinProject.getCristinProjectId()));
         nvaProject.setType(PROJECT_TYPE);
         nvaProject.setIdentifier(createCristinIdentifier());
         nvaProject.setTitle(extractMainTitle());
         nvaProject.setAlternativeTitles(extractAlternativeTitles());
         nvaProject.setLanguage(buildUri(TEMPORARY_LANGUAGE_URL));
-        nvaProject.setStartDate(cristinProject.startDate);
-        nvaProject.setEndDate(cristinProject.endDate);
+        nvaProject.setStartDate(cristinProject.getStartDate());
+        nvaProject.setEndDate(cristinProject.getEndDate());
         nvaProject.setCoordinatingInstitution(extractCoordinatingInstitution());
         nvaProject.setContributors(extractContributors());
 
@@ -66,7 +66,7 @@ public class NvaProjectBuilder {
 
     private List<Map<String, String>> createCristinIdentifier() {
         return Collections.singletonList(
-            Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.cristinProjectId));
+            Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()));
     }
 
     private static Stream<NvaContributor> generateRoleBasedContribution(CristinPerson cristinPerson) {
@@ -84,27 +84,27 @@ public class NvaProjectBuilder {
     }
 
     private NvaOrganization extractCoordinatingInstitution() {
-        return Optional.ofNullable(cristinProject.coordinatingInstitution)
+        return Optional.ofNullable(cristinProject.getCoordinatingInstitution())
             .map(coordinatingInstitution -> NvaOrganization.fromCristinInstitution(coordinatingInstitution.institution))
             .orElse(null);
     }
 
     private String extractMainTitle() {
-        return Optional.ofNullable(cristinProject.title)
-            .map(titles -> titles.get(cristinProject.mainLanguage))
+        return Optional.ofNullable(cristinProject.getTitle())
+            .map(titles -> titles.get(cristinProject.getMainLanguage()))
             .orElse(null);
     }
 
     private List<Map<String, String>> extractAlternativeTitles() {
-        return Optional.ofNullable(cristinProject.title)
-            .filter(titles -> titles.keySet().remove(cristinProject.mainLanguage))
+        return Optional.ofNullable(cristinProject.getTitle())
+            .filter(titles -> titles.keySet().remove(cristinProject.getMainLanguage()))
             .filter(remainingTitles -> !remainingTitles.isEmpty())
             .map(Collections::singletonList)
             .orElse(null);
     }
 
     private List<NvaContributor> extractContributors() {
-        return Optional.ofNullable(cristinProject.participants)
+        return Optional.ofNullable(cristinProject.getParticipants())
             .map(NvaProjectBuilder::transformCristinPersonsToNvaContributors)
             .orElse(null);
     }

@@ -18,15 +18,15 @@ repositories {
 }
 
 project.ext{
-    nvaCommonsVersion = '1.1.1'
+    nvaCommonsVersion = '1.5.10'
     jacksonVersion = '2.12.1'
     jupiterVersion = '5.7.1'
 }
 
 dependencies {
 
-    implementation group: 'no.unit.nva', name: 'core', version: project.ext.nvaCommonsVersion
-    implementation group: 'no.unit.nva', name: 'apigateway', version: project.ext.nvaCommonsVersion
+    implementation group: 'com.github.bibsysdev', name: 'core', version: project.ext.nvaCommonsVersion
+    implementation group: 'com.github.bibsysdev', name: 'apigateway', version: project.ext.nvaCommonsVersion
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: project.ext.jacksonVersion
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: project.ext.jacksonVersion
@@ -49,7 +49,7 @@ dependencies {
 
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
     testImplementation 'com.github.BIBSYSDEV:nva-testutils:0.1.18'
-    testImplementation group: 'no.unit.nva', name: 'logutils', version: project.ext.nvaCommonsVersion
+    testImplementation group: 'com.github.bibsysdev', name: 'logutils', version: project.ext.nvaCommonsVersion
 
 }
 
@@ -106,7 +106,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'METHOD'
                 value = 'COVEREDRATIO'
-                minimum = 0.90
+                minimum = 0.93
             }
         }
 
@@ -114,7 +114,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'CLASS'
                 value = 'COVEREDRATIO'
-                minimum = 0.90
+                minimum = 0.93
             }
         }
     }

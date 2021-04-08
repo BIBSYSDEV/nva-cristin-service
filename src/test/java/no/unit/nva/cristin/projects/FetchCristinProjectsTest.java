@@ -1,7 +1,9 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
-import static no.unit.nva.cristin.projects.FetchCristinProjects.LANGUAGE_QUERY_PARAMETER;
+import static no.unit.nva.cristin.projects.CristinHandler.LANGUAGE_INVALID_ERROR_MESSAGE;
+import static no.unit.nva.cristin.projects.CristinHandler.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.attempt.Try.attempt;
@@ -9,12 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,7 +34,6 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
-import nva.commons.core.JsonUtils;
 import nva.commons.core.ioutils.IoUtils;
 import org.apache.commons.codec.Charsets;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,19 +47,20 @@ public class FetchCristinProjectsTest {
     private static final String LANGUAGE_KEY = "language";
     private static final String EMPTY_STRING = "";
     private static final String LANGUAGE_NB = "nb";
-    private static final String LANGUAGE_INVALID = "invalid";
+    private static final String INVALID_LANGUAGE_PARAM = "ru";
     private static final String TITLE_REINDEER = "reindeer";
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String INVALID_JSON = "This is not valid JSON!";
+    private static final String EMPTY_LIST_STRING = "[]";
 
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON =
         "api_response_one_cristin_project_to_nva_project.json";
     private static final String CRISTIN_GET_PROJECT_RESPONSE = "cristinGetProjectResponse.json";
-    private static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
+    private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
     private CristinApiClient cristinApiClientStub;
-    private Environment environment = new Environment();
+    private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
     private FetchCristinProjects handler;
@@ -173,14 +175,14 @@ public class FetchCristinProjectsTest {
     @Test
     public void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER,
-            LANGUAGE_KEY, LANGUAGE_INVALID));
+            LANGUAGE_KEY, INVALID_LANGUAGE_PARAM));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> response = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(response.getBody().contains(FetchCristinProjects.LANGUAGE_INVALID));
+        assertTrue(response.getBody().contains(LANGUAGE_INVALID_ERROR_MESSAGE));
     }
 
     @Test
@@ -202,12 +204,28 @@ public class FetchCristinProjectsTest {
         var expected = getReader(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON);
         var cristinGetProject = getReader(CRISTIN_GET_PROJECT_RESPONSE);
         CristinProject cristinProject =
-            attempt(() -> JsonUtils.objectMapper.readValue(cristinGetProject, CristinProject.class)).get();
+            attempt(() -> OBJECT_MAPPER.readValue(cristinGetProject, CristinProject.class)).get();
         NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
         nvaProject.setContext(PROJECT_LOOKUP_CONTEXT_URL);
-        var actual = attempt(() -> JsonUtils.objectMapper.writeValueAsString(nvaProject)).get();
+        var actual = attempt(() -> OBJECT_MAPPER.writeValueAsString(nvaProject)).get();
 
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
+    }
+
+    @Test
+    void handlerReturnsProjectsWrapperWithAllMetadataButEmptyHitsArrayWhenNoMatchesAreFoundInCristin()
+        throws Exception {
+
+        cristinApiClientStub = spy(cristinApiClientStub);
+        var emptyArray = new InputStreamReader(IoUtils.stringToStream(EMPTY_LIST_STRING), Charsets.UTF_8);
+        doReturn(emptyArray)
+            .when(cristinApiClientStub).fetchQueryResults(any());
+        var expected = getReader(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON);
+
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
+
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
@@ -218,7 +236,7 @@ public class FetchCristinProjectsTest {
     }
 
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
-        return new HandlerRequestBuilder<Void>(JsonUtils.objectMapper)
+        return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
             .withQueryParameters(map)
             .build();

@@ -33,7 +33,7 @@ public class ProjectsWrapper {
     @JsonProperty
     private Integer firstRecord;
     @JsonProperty
-    private Integer nextResults;
+    private String nextResults;
     @JsonProperty
     private List<NvaProject> hits;
 
@@ -85,11 +85,11 @@ public class ProjectsWrapper {
         this.firstRecord = firstRecord;
     }
 
-    public Integer getNextResults() {
+    public String getNextResults() {
         return nextResults;
     }
 
-    public void setNextResults(Integer nextResults) {
+    public void setNextResults(String nextResults) {
         this.nextResults = nextResults;
     }
 
