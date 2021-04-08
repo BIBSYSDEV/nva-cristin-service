@@ -112,8 +112,7 @@ public class CristinProject {
         return coordinatingInstitution;
     }
 
-    public void setCoordinatingInstitution(
-        CristinOrganization coordinatingInstitution) {
+    public void setCoordinatingInstitution(CristinOrganization coordinatingInstitution) {
         this.coordinatingInstitution = coordinatingInstitution;
     }
 
@@ -121,8 +120,7 @@ public class CristinProject {
         return projectFundingSources;
     }
 
-    public void setProjectFundingSources(
-        List<CristinFundingSource> projectFundingSources) {
+    public void setProjectFundingSources(List<CristinFundingSource> projectFundingSources) {
         this.projectFundingSources = projectFundingSources;
     }
 
