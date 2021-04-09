@@ -82,6 +82,7 @@ public class CristinApiClient {
      * @param id       The Cristin id of the project to query
      * @param language Language used for some properties in Cristin API response
      * @return a NvaProject filled with one transformed Cristin Project
+     * @throws BadGatewayException when there is a problem with fetch from backend
      */
     public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
         throws BadGatewayException {
