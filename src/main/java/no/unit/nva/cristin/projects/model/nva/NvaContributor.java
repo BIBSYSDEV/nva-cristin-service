@@ -6,6 +6,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import nva.commons.core.JacocoGenerated;
 
+@SuppressWarnings("unused")
 @JacocoGenerated
 @JsonPropertyOrder({TYPE, IDENTITY, AFFILIATION})
 public class NvaContributor {

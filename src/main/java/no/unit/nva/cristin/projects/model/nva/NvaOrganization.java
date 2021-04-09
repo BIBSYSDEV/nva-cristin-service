@@ -13,6 +13,7 @@ import java.util.Map;
 import no.unit.nva.cristin.projects.model.cristin.CristinInstitution;
 import nva.commons.core.JacocoGenerated;
 
+@SuppressWarnings("unused")
 @JacocoGenerated
 @JsonPropertyOrder({ID, TYPE, NAME})
 public class NvaOrganization {

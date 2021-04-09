@@ -16,6 +16,7 @@ import java.util.List;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
 
+@SuppressWarnings("unused")
 @JacocoGenerated
 @JsonPropertyOrder({CONTEXT, ID, SIZE, SEARCH_STRING, PROCESSING_TIME, FIRST_RECORD, NEXT_RESULTS, HITS})
 public class ProjectsWrapper {

@@ -4,6 +4,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.UNIT;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import nva.commons.core.JacocoGenerated;
 
+@SuppressWarnings("unused")
 @JacocoGenerated
 public class CristinOrganization {
 

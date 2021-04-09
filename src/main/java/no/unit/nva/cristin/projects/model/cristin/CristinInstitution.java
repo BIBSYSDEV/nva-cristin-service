@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Map;
 import nva.commons.core.JacocoGenerated;
 
+@SuppressWarnings("unused")
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinInstitution {

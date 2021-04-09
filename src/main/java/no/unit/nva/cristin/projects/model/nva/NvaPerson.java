@@ -13,6 +13,7 @@ import java.net.URI;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import nva.commons.core.JacocoGenerated;
 
+@SuppressWarnings("unused")
 @JacocoGenerated
 @JsonPropertyOrder({ID, TYPE, FIRST_NAME, LAST_NAME})
 public class NvaPerson {
