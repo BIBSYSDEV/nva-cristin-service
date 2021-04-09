@@ -13,6 +13,7 @@ import java.net.URI;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import nva.commons.core.JacocoGenerated;
 
+@SuppressWarnings("unused")
 @JacocoGenerated
 @JsonPropertyOrder({ID, TYPE, FIRST_NAME, LAST_NAME})
 public class NvaPerson {
@@ -69,10 +70,10 @@ public class NvaPerson {
         }
 
         NvaPerson identity = new NvaPerson();
-        identity.setId(buildUri(CRISTIN_API_BASE_URL, PERSON_PATH, cristinPerson.cristinPersonId));
+        identity.setId(buildUri(CRISTIN_API_BASE_URL, PERSON_PATH, cristinPerson.getCristinPersonId()));
         identity.setType(PERSON_TYPE);
-        identity.setFirstName(cristinPerson.firstName);
-        identity.setLastName(cristinPerson.surname);
+        identity.setFirstName(cristinPerson.getFirstName());
+        identity.setLastName(cristinPerson.getSurname());
         return identity;
     }
 }

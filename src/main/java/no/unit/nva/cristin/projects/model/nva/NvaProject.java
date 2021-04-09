@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import nva.commons.core.JacocoGenerated;
 
+@SuppressWarnings("unused")
 @JacocoGenerated
 @JsonInclude(NON_NULL) // TODO: NP-2424: Remove this when all fields have been initialized as empty instead of null
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIER, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
@@ -31,18 +32,28 @@ public class NvaProject {
     @JsonProperty(CONTEXT)
     @JsonInclude(NON_NULL)
     private String context;
+    @JsonProperty
     private URI id;
+    @JsonProperty
     private String type;
+    @JsonProperty
     @JsonPropertyOrder(alphabetic = true)
     private List<Map<String, String>> identifier;
+    @JsonProperty
     private String title;
+    @JsonProperty
     private URI language;
+    @JsonProperty
     @JsonPropertyOrder(alphabetic = true)
     private List<Map<String, String>> alternativeTitles;
+    @JsonProperty
     private Instant startDate;
+    @JsonProperty
     private Instant endDate;
     // TODO: NP-2155: Add Grant/Funding field later
+    @JsonProperty
     private NvaOrganization coordinatingInstitution;
+    @JsonProperty
     private List<NvaContributor> contributors;
 
     public String getContext() {

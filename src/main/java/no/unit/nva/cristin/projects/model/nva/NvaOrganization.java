@@ -13,6 +13,7 @@ import java.util.Map;
 import no.unit.nva.cristin.projects.model.cristin.CristinInstitution;
 import nva.commons.core.JacocoGenerated;
 
+@SuppressWarnings("unused")
 @JacocoGenerated
 @JsonPropertyOrder({ID, TYPE, NAME})
 public class NvaOrganization {
@@ -62,9 +63,9 @@ public class NvaOrganization {
 
         NvaOrganization nvaOrganization = new NvaOrganization();
         nvaOrganization.setId(buildUri(CRISTIN_API_BASE_URL, INSTITUTION_PATH,
-            cristinInstitution.cristinInstitutionId));
+            cristinInstitution.getCristinInstitutionId()));
         nvaOrganization.setType(ORGANIZATION_TYPE);
-        nvaOrganization.setName(cristinInstitution.institutionName);
+        nvaOrganization.setName(cristinInstitution.getInstitutionName());
         return nvaOrganization;
     }
 }
