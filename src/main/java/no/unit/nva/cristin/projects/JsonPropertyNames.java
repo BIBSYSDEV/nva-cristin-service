@@ -1,5 +1,8 @@
 package no.unit.nva.cristin.projects;
 
+import nva.commons.core.JacocoGenerated;
+
+@JacocoGenerated
 public class JsonPropertyNames {
 
     public static final String UNIT = "unit";

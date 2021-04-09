@@ -70,22 +70,23 @@ public class NvaProjectBuilder {
     }
 
     private static Stream<NvaContributor> generateRoleBasedContribution(CristinPerson cristinPerson) {
-        return cristinPerson.roles.stream()
+        return cristinPerson.getRoles().stream()
             .map(role -> createNvaContributorFromCristinPersonByRole(cristinPerson, role));
     }
 
     private static NvaContributor createNvaContributorFromCristinPersonByRole(CristinPerson cristinPerson,
                                                                               CristinRole role) {
         NvaContributor nvaContributor = new NvaContributor();
-        nvaContributor.setType(cristinRolesToNva.get(role.roleCode));
+        nvaContributor.setType(cristinRolesToNva.get(role.getRoleCode()));
         nvaContributor.setIdentity(NvaPerson.fromCristinPerson(cristinPerson));
-        nvaContributor.setAffiliation(NvaOrganization.fromCristinInstitution(role.institution));
+        nvaContributor.setAffiliation(NvaOrganization.fromCristinInstitution(role.getInstitution()));
         return nvaContributor;
     }
 
     private NvaOrganization extractCoordinatingInstitution() {
         return Optional.ofNullable(cristinProject.getCoordinatingInstitution())
-            .map(coordinatingInstitution -> NvaOrganization.fromCristinInstitution(coordinatingInstitution.institution))
+            .map(coordinatingInstitution -> NvaOrganization
+                .fromCristinInstitution(coordinatingInstitution.getInstitution()))
             .orElse(null);
     }
 

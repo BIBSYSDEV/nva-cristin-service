@@ -2,11 +2,29 @@ package no.unit.nva.cristin.projects.model.cristin;
 
 import static no.unit.nva.cristin.projects.JsonPropertyNames.UNIT;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import nva.commons.core.JacocoGenerated;
 
+@JacocoGenerated
 public class CristinOrganization {
 
-    public CristinInstitution institution;
+    private CristinInstitution institution;
     @JsonProperty(UNIT)
-    public CristinUnit institutionUnit;
+    private CristinUnit institutionUnit;
+
+    public CristinInstitution getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(CristinInstitution institution) {
+        this.institution = institution;
+    }
+
+    public CristinUnit getInstitutionUnit() {
+        return institutionUnit;
+    }
+
+    public void setInstitutionUnit(CristinUnit institutionUnit) {
+        this.institutionUnit = institutionUnit;
+    }
 }
 

@@ -24,7 +24,7 @@ public class CristinProject {
     private String status;
     private Map<String, String> created;
     private Map<String, String> lastModified;
-    private CristinOrganization coordinatingInstitution; // TODO: NP-2436: Make all fields of Cristin models private
+    private CristinOrganization coordinatingInstitution;
     private List<CristinFundingSource> projectFundingSources;
     private List<CristinPerson> participants;
 
