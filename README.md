@@ -115,17 +115,16 @@ Example response body:
 
 #### HTTP Status Codes
 
-*  200 - Ok, returns an array of 0-5 projects.
-*  400 - Bad request, returned if the parameters are invalid.
-*  500 - Internal server error, returned if a problem is encountered retrieving project data
-
+*   200 - Ok, returns an array of 0-5 projects.
+*   400 - Bad request, returned if the parameters are invalid.
+*   500 - Internal server error, returned if a problem is encountered retrieving project data
 
 ### GET cristin-projects/{id}?{language_parameter}
+
 | parameter | description |
 | ------ | ------ |
 | id | The unique identifier of one project (Mandatory)
 | language | Preferred language for titles. Accepts 'nb' or 'en'. (Optional) |
-
 
 #### Lookup response
 
@@ -176,10 +175,9 @@ Example response body:
 }
 ```
 
-
 #### HTTP Status Codes lookup
 
-*  200 - Ok, returns one project.
-*  400 - Bad request, returned if the parameters are invalid.
-*  500 - Internal server error, returned if a problem is encountered retrieving project data
-*  502 - Bad Gateway, returned if upstream fetch fails or project not found 
+*   200 - Ok, returns one project.
+*   400 - Bad request, returned if the parameters are invalid.
+*   500 - Internal server error, returned if a problem is encountered retrieving project data
+*   502 - Bad Gateway, returned if upstream fetch fails or project not found
