@@ -32,18 +32,28 @@ public class NvaProject {
     @JsonProperty(CONTEXT)
     @JsonInclude(NON_NULL)
     private String context;
+    @JsonProperty
     private URI id;
+    @JsonProperty
     private String type;
+    @JsonProperty
     @JsonPropertyOrder(alphabetic = true)
     private List<Map<String, String>> identifier;
+    @JsonProperty
     private String title;
+    @JsonProperty
     private URI language;
+    @JsonProperty
     @JsonPropertyOrder(alphabetic = true)
     private List<Map<String, String>> alternativeTitles;
+    @JsonProperty
     private Instant startDate;
+    @JsonProperty
     private Instant endDate;
     // TODO: NP-2155: Add Grant/Funding field later
+    @JsonProperty
     private NvaOrganization coordinatingInstitution;
+    @JsonProperty
     private List<NvaContributor> contributors;
 
     public String getContext() {
