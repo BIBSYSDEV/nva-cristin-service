@@ -24,7 +24,7 @@ import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
-@JsonInclude(NON_NULL) // TODO: NP-2424: Remove this when all fields have been initialized as empty instead of null
+@JsonInclude(NON_NULL)
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIER, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
     GRANT, COORDINATING_INSTITUTION, CONTRIBUTORS})
 public class NvaProject {

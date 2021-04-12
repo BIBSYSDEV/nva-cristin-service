@@ -71,7 +71,6 @@ public class CristinApiClient {
         projectsWrapper.setNextResults(""); // TODO: Change to URI
         projectsWrapper.setHits(transformCristinProjectsToNvaProjects(enrichedProjects));
 
-        // TODO: NP-2424: Return fields with empty values instead of null to avoid "undefined" in frontend
         return projectsWrapper;
     }
 
