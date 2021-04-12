@@ -50,7 +50,9 @@ public class NvaProject {
     private Instant startDate;
     @JsonProperty
     private Instant endDate;
-    // TODO: NP-2155: Add Grant/Funding field later
+    // TODO: NP-2155: Populate Grant/Funding field later
+    @JsonProperty
+    private List<Object> grant;
     @JsonProperty
     private NvaOrganization coordinatingInstitution;
     @JsonProperty
@@ -126,6 +128,14 @@ public class NvaProject {
 
     public void setEndDate(Instant endDate) {
         this.endDate = endDate;
+    }
+
+    public List<Object> getGrant() {
+        return grant;
+    }
+
+    public void setGrant(List<Object> grant) {
+        this.grant = grant;
     }
 
     public NvaOrganization getCoordinatingInstitution() {

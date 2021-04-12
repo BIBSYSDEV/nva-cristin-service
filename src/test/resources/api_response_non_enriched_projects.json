@@ -17,7 +17,10 @@
         }
       ],
       "title": "Opportunities and Challenges for Integrating Sámi Reindeer",
-      "language": "https://lexvo.org/id/iso639-3/nno"
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [],
+      "grant": [],
+      "contributors": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/999888",
@@ -34,7 +37,9 @@
         {
           "en": "Absorption and metabolism of heavy metals"
         }
-      ]
+      ],
+      "grant": [],
+      "contributors": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/111333",
@@ -51,7 +56,9 @@
         {
           "en": "Reindeer Herders' Vulnerability Network Study"
         }
-      ]
+      ],
+      "grant": [],
+      "contributors": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/222444",
@@ -63,7 +70,10 @@
         }
       ],
       "title": "Predicting effects of climate change on Svalbard",
-      "language": "https://lexvo.org/id/iso639-3/nno"
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [],
+      "grant": [],
+      "contributors": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/444222",
@@ -75,7 +85,10 @@
         }
       ],
       "title": "PREDICTING EFFECTS OF CLIMATE CHANGE",
-      "language": "https://lexvo.org/id/iso639-3/nno"
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [],
+      "grant": [],
+      "contributors": []
     }
   ]
 }

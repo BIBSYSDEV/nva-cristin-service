@@ -10,8 +10,10 @@
   ],
   "title": "Example Title",
   "language": "https://lexvo.org/id/iso639-3/nno",
+  "alternativeTitles": [],
   "startDate": "2018-11-01T00:00:00Z",
   "endDate": "2021-05-01T00:00:00Z",
+  "grant": [],
   "coordinatingInstitution": {
     "id": "https://api.cristin.no/v2/institutions/1234",
     "type": "Organization",

@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class NvaProjectBuilder {
         nvaProject.setLanguage(buildUri(TEMPORARY_LANGUAGE_URL));
         nvaProject.setStartDate(cristinProject.getStartDate());
         nvaProject.setEndDate(cristinProject.getEndDate());
+        nvaProject.setGrant(new ArrayList<>());
         nvaProject.setCoordinatingInstitution(extractCoordinatingInstitution());
         nvaProject.setContributors(extractContributors());
 
@@ -101,12 +103,12 @@ public class NvaProjectBuilder {
             .filter(titles -> titles.keySet().remove(cristinProject.getMainLanguage()))
             .filter(remainingTitles -> !remainingTitles.isEmpty())
             .map(Collections::singletonList)
-            .orElse(null);
+            .orElse(new ArrayList<>());
     }
 
     private List<NvaContributor> extractContributors() {
         return Optional.ofNullable(cristinProject.getParticipants())
             .map(NvaProjectBuilder::transformCristinPersonsToNvaContributors)
-            .orElse(null);
+            .orElse(new ArrayList<>());
     }
 }
