@@ -5,6 +5,6 @@
   "searchString": "title=reindeer",
   "processingTime": 1000,
   "firstRecord": 0,
-  "nextResults": "",
+  "nextResults": null,
   "hits": []
 }

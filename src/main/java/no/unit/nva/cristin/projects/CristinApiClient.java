@@ -68,7 +68,7 @@ public class CristinApiClient {
         projectsWrapper.setProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
         // TODO: NP-2385: Use Link header / Pagination data from Cristin response in the next two values
         projectsWrapper.setFirstRecord(0);
-        projectsWrapper.setNextResults(""); // TODO: Change to URI
+        projectsWrapper.setNextResults(null); // TODO: Change to URI
         projectsWrapper.setHits(transformCristinProjectsToNvaProjects(enrichedProjects));
 
         return projectsWrapper;

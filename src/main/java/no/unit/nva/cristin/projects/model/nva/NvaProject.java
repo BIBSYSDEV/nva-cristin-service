@@ -1,14 +1,15 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.END_DATE;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.GRANT;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.GRANTS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TITLE;
@@ -24,9 +25,9 @@ import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
-@JsonInclude(NON_NULL)
-@JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIER, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
-    GRANT, COORDINATING_INSTITUTION, CONTRIBUTORS})
+@JsonInclude(ALWAYS)
+@JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
+    GRANTS, COORDINATING_INSTITUTION, CONTRIBUTORS})
 public class NvaProject {
 
     @JsonProperty(CONTEXT)
@@ -38,7 +39,7 @@ public class NvaProject {
     private String type;
     @JsonProperty
     @JsonPropertyOrder(alphabetic = true)
-    private List<Map<String, String>> identifier;
+    private List<Map<String, String>> identifiers;
     @JsonProperty
     private String title;
     @JsonProperty
@@ -52,7 +53,7 @@ public class NvaProject {
     private Instant endDate;
     // TODO: NP-2155: Populate Grant/Funding field later
     @JsonProperty
-    private List<Object> grant;
+    private List<Object> grants;
     @JsonProperty
     private NvaOrganization coordinatingInstitution;
     @JsonProperty
@@ -82,12 +83,12 @@ public class NvaProject {
         this.type = type;
     }
 
-    public List<Map<String, String>> getIdentifier() {
-        return identifier;
+    public List<Map<String, String>> getIdentifiers() {
+        return identifiers;
     }
 
-    public void setIdentifier(List<Map<String, String>> identifier) {
-        this.identifier = identifier;
+    public void setIdentifiers(List<Map<String, String>> identifiers) {
+        this.identifiers = identifiers;
     }
 
     public String getTitle() {
@@ -130,12 +131,12 @@ public class NvaProject {
         this.endDate = endDate;
     }
 
-    public List<Object> getGrant() {
-        return grant;
+    public List<Object> getGrants() {
+        return grants;
     }
 
-    public void setGrant(List<Object> grant) {
-        this.grant = grant;
+    public void setGrants(List<Object> grants) {
+        this.grants = grants;
     }
 
     public NvaOrganization getCoordinatingInstitution() {
