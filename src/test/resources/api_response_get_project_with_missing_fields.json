@@ -1,0 +1,19 @@
+{
+  "@context": "https://example.org/project-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/project/456789",
+  "type": "Project",
+  "identifiers": [
+    {
+      "type": "CristinIdentifier",
+      "value": "456789"
+    }
+  ],
+  "title": "Example Title",
+  "language": "https://lexvo.org/id/iso639-3/nno",
+  "alternativeTitles": [],
+  "startDate": "2018-11-01T00:00:00Z",
+  "endDate": "2021-05-01T00:00:00Z",
+  "grants": [],
+  "coordinatingInstitution": null,
+  "contributors": []
+}

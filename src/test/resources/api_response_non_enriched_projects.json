@@ -1,0 +1,109 @@
+{
+  "@context": "https://example.org/search-api-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/project/search?QUERY_PARAMS",
+  "size": 0,
+  "searchString": "title=reindeer",
+  "processingTime": 1000,
+  "firstRecord": 0,
+  "nextResults": null,
+  "hits": [
+    {
+      "id": "https://api.dev.nva.aws.unit.no/project/555666",
+      "type": "Project",
+      "identifiers": [
+        {
+          "type": "CristinIdentifier",
+          "value": "555666"
+        }
+      ],
+      "title": "Opportunities and Challenges for Integrating Sámi Reindeer",
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [],
+      "startDate": null,
+      "endDate": null,
+      "grants": [],
+      "coordinatingInstitution": null,
+      "contributors": []
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/project/999888",
+      "type": "Project",
+      "identifiers": [
+        {
+          "type": "CristinIdentifier",
+          "value": "999888"
+        }
+      ],
+      "title": "Opptak og omsetning av tungmetall",
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [
+        {
+          "en": "Absorption and metabolism of heavy metals"
+        }
+      ],
+      "startDate": null,
+      "endDate": null,
+      "grants": [],
+      "coordinatingInstitution": null,
+      "contributors": []
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/project/111333",
+      "type": "Project",
+      "identifiers": [
+        {
+          "type": "CristinIdentifier",
+          "value": "111333"
+        }
+      ],
+      "title": "En studie av reindriftens sårbarhet",
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [
+        {
+          "en": "Reindeer Herders' Vulnerability Network Study"
+        }
+      ],
+      "startDate": null,
+      "endDate": null,
+      "grants": [],
+      "coordinatingInstitution": null,
+      "contributors": []
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/project/222444",
+      "type": "Project",
+      "identifiers": [
+        {
+          "type": "CristinIdentifier",
+          "value": "222444"
+        }
+      ],
+      "title": "Predicting effects of climate change on Svalbard",
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [],
+      "startDate": null,
+      "endDate": null,
+      "grants": [],
+      "coordinatingInstitution": null,
+      "contributors": []
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/project/444222",
+      "type": "Project",
+      "identifiers": [
+        {
+          "type": "CristinIdentifier",
+          "value": "444222"
+        }
+      ],
+      "title": "PREDICTING EFFECTS OF CLIMATE CHANGE",
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [],
+      "startDate": null,
+      "endDate": null,
+      "grants": [],
+      "coordinatingInstitution": null,
+      "contributors": []
+    }
+  ]
+}
