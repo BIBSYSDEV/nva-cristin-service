@@ -5,24 +5,30 @@
   "searchString": "title=reindeer",
   "processingTime": 1000,
   "firstRecord": 0,
-  "nextResults": "",
+  "nextResults": null,
   "hits": [
     {
       "id": "https://api.dev.nva.aws.unit.no/project/555666",
       "type": "Project",
-      "identifier": [
+      "identifiers": [
         {
           "type": "CristinIdentifier",
           "value": "555666"
         }
       ],
       "title": "Opportunities and Challenges for Integrating Sámi Reindeer",
-      "language": "https://lexvo.org/id/iso639-3/nno"
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [],
+      "startDate": null,
+      "endDate": null,
+      "grants": [],
+      "coordinatingInstitution": null,
+      "contributors": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/999888",
       "type": "Project",
-      "identifier": [
+      "identifiers": [
         {
           "type": "CristinIdentifier",
           "value": "999888"
@@ -34,12 +40,17 @@
         {
           "en": "Absorption and metabolism of heavy metals"
         }
-      ]
+      ],
+      "startDate": null,
+      "endDate": null,
+      "grants": [],
+      "coordinatingInstitution": null,
+      "contributors": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/111333",
       "type": "Project",
-      "identifier": [
+      "identifiers": [
         {
           "type": "CristinIdentifier",
           "value": "111333"
@@ -51,31 +62,48 @@
         {
           "en": "Reindeer Herders' Vulnerability Network Study"
         }
-      ]
+      ],
+      "startDate": null,
+      "endDate": null,
+      "grants": [],
+      "coordinatingInstitution": null,
+      "contributors": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/222444",
       "type": "Project",
-      "identifier": [
+      "identifiers": [
         {
           "type": "CristinIdentifier",
           "value": "222444"
         }
       ],
       "title": "Predicting effects of climate change on Svalbard",
-      "language": "https://lexvo.org/id/iso639-3/nno"
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [],
+      "startDate": null,
+      "endDate": null,
+      "grants": [],
+      "coordinatingInstitution": null,
+      "contributors": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/444222",
       "type": "Project",
-      "identifier": [
+      "identifiers": [
         {
           "type": "CristinIdentifier",
           "value": "444222"
         }
       ],
       "title": "PREDICTING EFFECTS OF CLIMATE CHANGE",
-      "language": "https://lexvo.org/id/iso639-3/nno"
+      "language": "https://lexvo.org/id/iso639-3/nno",
+      "alternativeTitles": [],
+      "startDate": null,
+      "endDate": null,
+      "grants": [],
+      "coordinatingInstitution": null,
+      "contributors": []
     }
   ]
 }

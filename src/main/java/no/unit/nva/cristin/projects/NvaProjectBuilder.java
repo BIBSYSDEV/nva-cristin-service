@@ -46,12 +46,13 @@ public class NvaProjectBuilder {
     public NvaProject build() {
         nvaProject.setId(buildUri(BASE_URL, cristinProject.getCristinProjectId()));
         nvaProject.setType(PROJECT_TYPE);
-        nvaProject.setIdentifier(createCristinIdentifier());
+        nvaProject.setIdentifiers(createCristinIdentifier());
         nvaProject.setTitle(extractMainTitle());
         nvaProject.setAlternativeTitles(extractAlternativeTitles());
         nvaProject.setLanguage(buildUri(TEMPORARY_LANGUAGE_URL));
         nvaProject.setStartDate(cristinProject.getStartDate());
         nvaProject.setEndDate(cristinProject.getEndDate());
+        nvaProject.setGrants(Collections.emptyList());
         nvaProject.setCoordinatingInstitution(extractCoordinatingInstitution());
         nvaProject.setContributors(extractContributors());
 
@@ -101,12 +102,12 @@ public class NvaProjectBuilder {
             .filter(titles -> titles.keySet().remove(cristinProject.getMainLanguage()))
             .filter(remainingTitles -> !remainingTitles.isEmpty())
             .map(Collections::singletonList)
-            .orElse(null);
+            .orElse(Collections.emptyList());
     }
 
     private List<NvaContributor> extractContributors() {
         return Optional.ofNullable(cristinProject.getParticipants())
             .map(NvaProjectBuilder::transformCristinPersonsToNvaContributors)
-            .orElse(null);
+            .orElse(Collections.emptyList());
     }
 }

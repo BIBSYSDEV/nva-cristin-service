@@ -9,13 +9,13 @@ public class JsonPropertyNames {
     public static final String CONTEXT = "@context";
     public static final String ID = "id";
     public static final String TYPE = "type";
-    public static final String IDENTIFIER = "identifier";
+    public static final String IDENTIFIERS = "identifiers";
     public static final String TITLE = "title";
     public static final String LANGUAGE = "language";
     public static final String ALTERNATIVE_TITLES = "alternativeTitles";
     public static final String START_DATE = "startDate";
     public static final String END_DATE = "endDate";
-    public static final String GRANT = "grant";
+    public static final String GRANTS = "grants";
     public static final String COORDINATING_INSTITUTION = "coordinatingInstitution";
     public static final String CONTRIBUTORS = "contributors";
     public static final String NAME = "name";
