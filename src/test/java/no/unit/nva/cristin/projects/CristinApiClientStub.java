@@ -2,7 +2,9 @@ package no.unit.nva.cristin.projects;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpResponse;
 
 public class CristinApiClientStub extends CristinApiClient {
 
@@ -24,6 +26,11 @@ public class CristinApiClientStub extends CristinApiClient {
         return mockGetResponseReader();
     }
 
+    @Override
+    protected HttpResponse<InputStream> fetchGetResult(URI uri) {
+        return mockGetResponse();
+    }
+
     private InputStreamReader mockGetResponseReader() {
         InputStream getResultAsStream = CristinApiClientStub.class
             .getResourceAsStream(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE);
@@ -34,5 +41,12 @@ public class CristinApiClientStub extends CristinApiClient {
         InputStream queryResultsAsStream = CristinApiClientStub.class
             .getResourceAsStream(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE);
         return new InputStreamReader(queryResultsAsStream);
+    }
+
+    private HttpResponse<InputStream> mockGetResponse() {
+        InputStream getResultAsStream = CristinApiClientStub.class
+            .getResourceAsStream(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE);
+
+        return new HttpResponseStub(getResultAsStream);
     }
 }

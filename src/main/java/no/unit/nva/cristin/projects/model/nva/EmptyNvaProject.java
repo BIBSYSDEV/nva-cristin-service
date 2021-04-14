@@ -2,8 +2,10 @@ package no.unit.nva.cristin.projects.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import nva.commons.core.JacocoGenerated;
 
 @JsonInclude(NON_NULL)
+@JacocoGenerated
 public class EmptyNvaProject extends NvaProject {
     /*
     TODO: NP-2315: Here we can return custom fields like "status": 404 to show that lookup of

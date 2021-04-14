@@ -7,11 +7,15 @@ import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,7 +23,6 @@ import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.EmptyNvaProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.attempt.Failure;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +40,42 @@ public class CristinApiClient {
         "Error fetching cristin project with id: %s . Exception Message: %s";
     private static final String ERROR_MESSAGE_BACKEND_FETCH_FAILED =
         "Your request cannot be processed at this time due to an upstream error";
+    private static final String ERROR_MESSAGE_NOT_FOUND =
+        "The requested resource %s does not exist";
+    private static final String ERROR_MESSAGE_INTERNAL_ERROR =
+        "Your request cannot be processed at this time because of an internal server error";
+    private static final HttpClient client = HttpClient.newHttpClient();
+    private static final int STATUS_CODE_NOT_FOUND = 404;
+    private static final int STATUS_CODE_START_OF_ERROR_CODES_RANGE = 299;
 
     protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
         return OBJECT_MAPPER.readValue(reader, classOfT);
+    }
+
+    /**
+     * Creates a NvaProject object containing a single transformed Cristin Project. Is used for serialization to the
+     * client.
+     *
+     * @param id       The Cristin id of the project to query
+     * @param language Language used for some properties in Cristin API response
+     * @return a NvaProject filled with one transformed Cristin Project
+     * @throws BadGatewayException          when there is a problem with fetch from backend
+     * @throws InternalServerErrorException when there is an unforeseen error
+     * @throws NotFoundException            when upstream returns 404
+     */
+    public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
+        throws BadGatewayException, InternalServerErrorException, NotFoundException {
+
+        CristinProject cristinProject = attemptToGetCristinProject(id, language);
+
+        if (cristinProject == null || !cristinProject.hasValidContent()) {
+            return new EmptyNvaProject();
+        }
+
+        NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
+        nvaProject.setContext(Constants.PROJECT_LOOKUP_CONTEXT_URL);
+
+        return nvaProject;
     }
 
     /**
@@ -74,28 +110,8 @@ public class CristinApiClient {
         return projectsWrapper;
     }
 
-    /**
-     * Creates a NvaProject object containing a single transformed Cristin Project. Is used for serialization to the
-     * client.
-     *
-     * @param id       The Cristin id of the project to query
-     * @param language Language used for some properties in Cristin API response
-     * @return a NvaProject filled with one transformed Cristin Project
-     * @throws BadGatewayException when there is a problem with fetch from backend
-     */
-    public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
-        throws BadGatewayException {
-
-        CristinProject cristinProject = attemptToGetCristinProject(id, language);
-
-        if (cristinProject == null || !cristinProject.hasValidContent()) {
-            return new EmptyNvaProject();
-        }
-
-        NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
-        nvaProject.setContext(Constants.PROJECT_LOOKUP_CONTEXT_URL);
-
-        return nvaProject;
+    protected static <T> T fromJson(InputStream stream, Class<T> classOfT) throws IOException {
+        return OBJECT_MAPPER.readValue(stream, classOfT);
     }
 
     // TODO: throw BadGatewayException if this fails as well?
@@ -123,11 +139,22 @@ public class CristinApiClient {
             .collect(Collectors.toList());
     }
 
-    private CristinProject attemptToGetCristinProject(String id, String language) throws BadGatewayException {
-        return attempt(() -> getProject(id, language)).orElseThrow(failure -> {
-            logError(id, failure);
-            return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-        });
+    protected CristinProject getProject(String id, String language)
+        throws IOException, URISyntaxException, NotFoundException, BadGatewayException {
+
+        URI uri = generateGetProjectUri(id, language);
+        HttpResponse<InputStream> response = fetchGetResult(uri);
+
+        if (response.statusCode() == STATUS_CODE_NOT_FOUND) {
+            // TODO: NP-2315: Use full Nva resource path instead of only id
+            throw new NotFoundException(String.format(ERROR_MESSAGE_NOT_FOUND, id));
+        }
+
+        if (response.statusCode() > STATUS_CODE_START_OF_ERROR_CODES_RANGE) {
+            throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        }
+
+        return fromJson(response.body(), CristinProject.class);
     }
 
     protected List<CristinProject> queryAndEnrichProjects(Map<String, String> parameters,
@@ -137,11 +164,10 @@ public class CristinApiClient {
         return enrichProjects(language, projects);
     }
 
-    protected CristinProject getProject(String id, String language) throws IOException, URISyntaxException {
-        URL url = generateGetProjectUrl(id, language);
-        try (InputStreamReader streamReader = fetchGetResult(url)) {
-            return fromJson(streamReader, CristinProject.class);
-        }
+    @JacocoGenerated
+    protected InputStreamReader fetchGetResult(URL url) {
+        //return new InputStreamReader(url.openStream());
+        return null;
     }
 
     @JacocoGenerated
@@ -150,8 +176,19 @@ public class CristinApiClient {
     }
 
     @JacocoGenerated
-    protected InputStreamReader fetchGetResult(URL url) throws IOException {
-        return new InputStreamReader(url.openStream());
+    protected HttpResponse<InputStream> fetchGetResult(URI uri) {
+        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+
+        return attempt(() -> client.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream())).orElseThrow();
+    }
+
+    protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {
+        return new URIBuilder() // TODO: Replace URIBuilder() with only URI?
+            .setScheme(HTTPS)
+            .setHost(CRISTIN_API_HOST)
+            .setPath(CRISTIN_API_PROJECTS_PATH + id)
+            .addParameter("lang", language)
+            .build();
     }
 
     protected URL generateQueryProjectsUrl(Map<String, String> parameters) throws MalformedURLException,
@@ -166,14 +203,19 @@ public class CristinApiClient {
         return uri.build().toURL();
     }
 
-    protected URL generateGetProjectUrl(String id, String language) throws MalformedURLException, URISyntaxException {
-        URI uri = new URIBuilder()
-            .setScheme(HTTPS)
-            .setHost(CRISTIN_API_HOST)
-            .setPath(CRISTIN_API_PROJECTS_PATH + id)
-            .addParameter("lang", language)
-            .build();
-        return uri.toURL();
+    private CristinProject attemptToGetCristinProject(String id, String language)
+        throws BadGatewayException, NotFoundException, InternalServerErrorException {
+
+        try {
+            return getProject(id, language);
+            // TODO: NP-2437: Should these be thrown as other than InternalServerErrorException?
+        } catch (URISyntaxException exception) {
+            logError(id, exception);
+            throw new InternalServerErrorException(ERROR_MESSAGE_INTERNAL_ERROR);
+        } catch (IOException exception) {
+            logError(id, exception);
+            throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        }
     }
 
     private List<CristinProject> enrichProjects(String language, List<CristinProject> projects) {
@@ -182,13 +224,13 @@ public class CristinApiClient {
 
     private CristinProject enrichOneProject(String language, CristinProject project) {
         return attempt(() -> getProject(project.getCristinProjectId(), language))
-            .toOptional(failure -> logError(project.getCristinProjectId(), failure))
+            .toOptional(failure -> logError(project.getCristinProjectId(), failure.getException()))
             .orElse(project);
     }
 
-    private void logError(String id, Failure<CristinProject> failure) {
+    private void logError(String id, Exception failure) {
         logger.error(String.format(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-            id, failure.getException().getMessage()));
+            id, failure.getMessage()));
     }
 
 }

@@ -14,11 +14,12 @@ import static org.mockito.Mockito.spy;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -61,13 +62,25 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerReturnsEmptyJsonWhenIdIsNotFound() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(getReader(CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON))
-            .when(cristinApiClientStub).fetchGetResult(any());
+        doReturn(new HttpResponseStub(getStream(CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON), 404))
+            .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
 
-        assertEquals(OBJECT_MAPPER.readTree(EMPTY_JSON), OBJECT_MAPPER.readTree(response.getBody()));
+        assertEquals(HttpURLConnection.HTTP_NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void handlerReturnsBadGatewayWhenStatusCodeFromBackendSignalsError() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseStub(null, 500))
+            .when(cristinApiClientStub).fetchGetResult(any(URI.class));
+
+        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, response.getStatusCode());
     }
 
     @Test
@@ -84,7 +97,7 @@ public class FetchOneCristinProjectTest {
     }
 
     @Test
-    void handlerReturnsBadGatewayExceptionWhenFetchFromBackendFails() throws Exception {
+    void handlerReturnsBadGatewayWhenBackendThrowsIoException() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
         doThrow(new IOException()).when(cristinApiClientStub).getProject(any(), any());
@@ -93,13 +106,18 @@ public class FetchOneCristinProjectTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
 
-        doThrow(new FileNotFoundException()).when(cristinApiClientStub).getProject(any(), any());
+    @Test
+    void handlerReturnsServerErrorExceptionWhenBackendThrowsUriSyntaxException() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+
+        doThrow(URISyntaxException.class).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> nextResponse = sendQueryWithId(DEFAULT_ID);
 
-        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, response.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, nextResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, nextResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @Test
@@ -107,8 +125,9 @@ public class FetchOneCristinProjectTest {
         throws Exception {
 
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(getReader(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON))
-            .when(cristinApiClientStub).fetchGetResult(any());
+
+        doReturn(new HttpResponseStub(getStream(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON)))
+            .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
@@ -139,5 +158,9 @@ public class FetchOneCristinProjectTest {
     private InputStreamReader getReader(String resource) {
         InputStream queryResultsAsStream = IoUtils.inputStreamFromResources(resource);
         return new InputStreamReader(queryResultsAsStream, Charsets.UTF_8);
+    }
+
+    private InputStream getStream(String resource) {
+        return IoUtils.inputStreamFromResources(resource);
     }
 }
