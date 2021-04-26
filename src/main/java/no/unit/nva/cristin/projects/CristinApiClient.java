@@ -16,6 +16,7 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,6 +51,10 @@ public class CristinApiClient {
 
     protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
         return OBJECT_MAPPER.readValue(reader, classOfT);
+    }
+
+    protected static <T> T fromJson(InputStream stream, Class<T> classOfT) throws IOException {
+        return fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8), classOfT);
     }
 
     /**
@@ -110,10 +115,6 @@ public class CristinApiClient {
         return projectsWrapper;
     }
 
-    protected static <T> T fromJson(InputStream stream, Class<T> classOfT) throws IOException {
-        return OBJECT_MAPPER.readValue(stream, classOfT);
-    }
-
     // TODO: throw BadGatewayException if this fails as well?
     protected List<CristinProject> queryProjects(Map<String, String> parameters) throws IOException,
                                                                                         URISyntaxException {
@@ -171,15 +172,15 @@ public class CristinApiClient {
     }
 
     @JacocoGenerated
-    protected InputStreamReader fetchQueryResults(URL url) throws IOException {
-        return new InputStreamReader(url.openStream());
-    }
-
-    @JacocoGenerated
     protected HttpResponse<InputStream> fetchGetResult(URI uri) {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
 
         return attempt(() -> client.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream())).orElseThrow();
+    }
+
+    @JacocoGenerated
+    protected InputStreamReader fetchQueryResults(URL url) throws IOException {
+        return new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
     }
 
     protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {

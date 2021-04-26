@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -86,7 +87,7 @@ public class FetchCristinProjectsTest {
         doThrow(new IOException()).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
-        var expected = getReader(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON);
+        var expected = IoUtils.stringFromResources(Path.of(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON));
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
     }
 
@@ -201,8 +202,8 @@ public class FetchCristinProjectsTest {
 
     @Test
     void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
-        var expected = getReader(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON);
-        var cristinGetProject = getReader(CRISTIN_GET_PROJECT_RESPONSE);
+        var expected = IoUtils.stringFromResources(Path.of(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON));
+        var cristinGetProject = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE));
         CristinProject cristinProject =
             attempt(() -> OBJECT_MAPPER.readValue(cristinGetProject, CristinProject.class)).get();
         NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
@@ -220,7 +221,7 @@ public class FetchCristinProjectsTest {
         var emptyArray = new InputStreamReader(IoUtils.stringToStream(EMPTY_LIST_STRING), Charsets.UTF_8);
         doReturn(emptyArray)
             .when(cristinApiClientStub).fetchQueryResults(any());
-        var expected = getReader(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON);
+        var expected = IoUtils.stringFromResources(Path.of(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON));
 
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
@@ -242,8 +243,4 @@ public class FetchCristinProjectsTest {
             .build();
     }
 
-    private InputStreamReader getReader(String resource) {
-        InputStream queryResultsAsStream = IoUtils.inputStreamFromResources(resource);
-        return new InputStreamReader(queryResultsAsStream, Charsets.UTF_8);
-    }
 }

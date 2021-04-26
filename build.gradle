@@ -13,12 +13,11 @@ targetCompatibility = JavaVersion.VERSION_11 // bytecode target version
 
 repositories {
     mavenCentral()
-    maven { url 'https://dl.bintray.com/unit-nva/nva-commons' }
     maven { url 'https://jitpack.io' }
 }
 
 project.ext{
-    nvaCommonsVersion = '1.5.10'
+    nvaCommonsVersion = '1.5.15'
     jacksonVersion = '2.12.1'
     jupiterVersion = '5.7.1'
 }
