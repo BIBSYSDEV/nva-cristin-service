@@ -75,7 +75,6 @@ public class CristinApiClient {
         if (cristinProject == null || !cristinProject.hasValidContent()) {
             logger.warn(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
             throw new BadGatewayException(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
-            //return new EmptyNvaProject(); // TODO: Remove if unneeded
         }
 
         NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
