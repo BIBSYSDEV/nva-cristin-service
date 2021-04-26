@@ -9,10 +9,8 @@ import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -21,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.nva.EmptyNvaProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
 import org.apache.http.client.utils.URIBuilder;
@@ -48,6 +45,8 @@ public class CristinApiClient {
     private static final HttpClient client = HttpClient.newHttpClient();
     private static final int STATUS_CODE_NOT_FOUND = 404;
     private static final int STATUS_CODE_START_OF_ERROR_CODES_RANGE = 299;
+    private static final String CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
+        "Project matching id %s does not have valid data";
 
     protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
         return OBJECT_MAPPER.readValue(reader, classOfT);
@@ -74,7 +73,9 @@ public class CristinApiClient {
         CristinProject cristinProject = attemptToGetCristinProject(id, language);
 
         if (cristinProject == null || !cristinProject.hasValidContent()) {
-            return new EmptyNvaProject();
+            logger.warn(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
+            throw new BadGatewayException(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
+            //return new EmptyNvaProject(); // TODO: Remove if unneeded
         }
 
         NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
@@ -118,10 +119,10 @@ public class CristinApiClient {
     // TODO: throw BadGatewayException if this fails as well?
     protected List<CristinProject> queryProjects(Map<String, String> parameters) throws IOException,
                                                                                         URISyntaxException {
-        URL url = generateQueryProjectsUrl(parameters);
-        try (InputStreamReader streamReader = fetchQueryResults(url)) {
-            return asList(fromJson(streamReader, CristinProject[].class));
-        }
+        URI uri = generateQueryProjectsUrl(parameters);
+        var response = fetchQueryResults(uri);
+
+        return asList(fromJson(response.body(), CristinProject[].class));
     }
 
     @JacocoGenerated
@@ -166,12 +167,6 @@ public class CristinApiClient {
     }
 
     @JacocoGenerated
-    protected InputStreamReader fetchGetResult(URL url) {
-        //return new InputStreamReader(url.openStream());
-        return null;
-    }
-
-    @JacocoGenerated
     protected HttpResponse<InputStream> fetchGetResult(URI uri) {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
 
@@ -179,12 +174,14 @@ public class CristinApiClient {
     }
 
     @JacocoGenerated
-    protected InputStreamReader fetchQueryResults(URL url) throws IOException {
-        return new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
+    protected HttpResponse<InputStream> fetchQueryResults(URI uri) {
+        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+
+        return attempt(() -> client.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream())).orElseThrow();
     }
 
     protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {
-        return new URIBuilder() // TODO: Replace URIBuilder() with only URI?
+        return new URIBuilder() // TODO: Replace URIBuilder() with only URI and put logic in UriUtils?
             .setScheme(HTTPS)
             .setHost(CRISTIN_API_HOST)
             .setPath(CRISTIN_API_PROJECTS_PATH + id)
@@ -192,8 +189,7 @@ public class CristinApiClient {
             .build();
     }
 
-    protected URL generateQueryProjectsUrl(Map<String, String> parameters) throws MalformedURLException,
-                                                                                  URISyntaxException {
+    protected URI generateQueryProjectsUrl(Map<String, String> parameters) throws URISyntaxException {
         URIBuilder uri = new URIBuilder()
             .setScheme(HTTPS)
             .setHost(CRISTIN_API_HOST)
@@ -201,7 +197,7 @@ public class CristinApiClient {
         if (parameters != null) {
             parameters.keySet().forEach(s -> uri.addParameter(s, parameters.get(s)));
         }
-        return uri.build().toURL();
+        return uri.build();
     }
 
     private CristinProject attemptToGetCristinProject(String id, String language)

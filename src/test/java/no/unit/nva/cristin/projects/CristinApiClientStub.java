@@ -1,11 +1,8 @@
 package no.unit.nva.cristin.projects;
 
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import nva.commons.core.ioutils.IoUtils;
 
 public class CristinApiClientStub extends CristinApiClient {
@@ -19,13 +16,8 @@ public class CristinApiClientStub extends CristinApiClient {
     }
 
     @Override
-    protected InputStreamReader fetchQueryResults(URL url) {
-        return mockQueryResponseReader();
-    }
-
-    @Override
-    protected InputStreamReader fetchGetResult(URL url) {
-        return mockGetResponseReader();
+    protected HttpResponse<InputStream> fetchQueryResults(URI uri) {
+        return mockQueryResponse();
     }
 
     @Override
@@ -33,18 +25,13 @@ public class CristinApiClientStub extends CristinApiClient {
         return mockGetResponse();
     }
 
-    private InputStreamReader mockGetResponseReader() {
-        return new InputStreamReader(IoUtils
-            .inputStreamFromResources(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE), StandardCharsets.UTF_8);
-    }
-
-    private InputStreamReader mockQueryResponseReader() {
-        return new InputStreamReader(IoUtils
-            .inputStreamFromResources(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE), StandardCharsets.UTF_8);
-    }
-
     private HttpResponse<InputStream> mockGetResponse() {
         var stream = IoUtils.inputStreamFromResources(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE);
+        return new HttpResponseStub(stream);
+    }
+
+    private HttpResponse<InputStream> mockQueryResponse() {
+        var stream = IoUtils.inputStreamFromResources(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE);
         return new HttpResponseStub(stream);
     }
 }

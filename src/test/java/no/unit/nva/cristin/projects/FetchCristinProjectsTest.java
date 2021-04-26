@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -36,7 +37,6 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
-import org.apache.commons.codec.Charsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -188,7 +188,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void cristinApiClientWillStillGenerateQueryProjectsUrlEvenWithoutParameters()
-        throws IOException, URISyntaxException {
+        throws URISyntaxException {
         cristinApiClientStub.generateQueryProjectsUrl(null);
     }
 
@@ -218,9 +218,9 @@ public class FetchCristinProjectsTest {
         throws Exception {
 
         cristinApiClientStub = spy(cristinApiClientStub);
-        var emptyArray = new InputStreamReader(IoUtils.stringToStream(EMPTY_LIST_STRING), Charsets.UTF_8);
-        doReturn(emptyArray)
-            .when(cristinApiClientStub).fetchQueryResults(any());
+        var emptyResponse = new HttpResponseStub(IoUtils.stringToStream(EMPTY_LIST_STRING));
+        doReturn(emptyResponse)
+            .when(cristinApiClientStub).fetchQueryResults(any(URI.class));
         var expected = IoUtils.stringFromResources(Path.of(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON));
 
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
