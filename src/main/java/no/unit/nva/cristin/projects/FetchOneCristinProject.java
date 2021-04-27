@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 

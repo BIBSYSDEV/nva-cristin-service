@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 
 public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
