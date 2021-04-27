@@ -3,8 +3,10 @@ package no.unit.nva.cristin.projects;
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
+import static no.unit.nva.cristin.projects.Constants.CRISTIN_LANGUAGE_PARAM;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
+import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +22,6 @@ import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
-import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,23 +176,13 @@ public class CristinApiClient {
     }
 
     protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {
-        return new URIBuilder() // TODO: Replace URIBuilder() with only URI and put logic in UriUtils?
-            .setScheme(HTTPS)
-            .setHost(CRISTIN_API_HOST)
-            .setPath(CRISTIN_API_PROJECTS_PATH + id)
-            .addParameter("lang", language)
-            .build();
+        String query = queryParameters(Map.of(CRISTIN_LANGUAGE_PARAM, language));
+        return new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH + id, query, null);
     }
 
     protected URI generateQueryProjectsUrl(Map<String, String> parameters) throws URISyntaxException {
-        URIBuilder uri = new URIBuilder()
-            .setScheme(HTTPS)
-            .setHost(CRISTIN_API_HOST)
-            .setPath(CRISTIN_API_PROJECTS_PATH);
-        if (parameters != null) {
-            parameters.keySet().forEach(s -> uri.addParameter(s, parameters.get(s)));
-        }
-        return uri.build();
+        String query = queryParameters(parameters);
+        return new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH, query, null);
     }
 
     private CristinProject attemptToGetCristinProject(String id, String language)

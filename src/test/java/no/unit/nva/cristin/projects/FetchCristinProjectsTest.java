@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.CRISTIN_LANGUAGE_PARAM;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.CristinHandler.LANGUAGE_INVALID_ERROR_MESSAGE;
@@ -26,6 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -59,6 +61,8 @@ public class FetchCristinProjectsTest {
         "api_response_one_cristin_project_to_nva_project.json";
     private static final String CRISTIN_GET_PROJECT_RESPONSE = "cristinGetProjectResponse.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
+    private static final String GET_CRISTIN_PROJECTS_EXAMPLE_URI = "https://api.cristin"
+        + ".no/v2/projects/?title=reindeer&lang=nb";
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
     private Context context;
@@ -225,6 +229,15 @@ public class FetchCristinProjectsTest {
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
 
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
+    }
+
+    @Test
+    void getsCorrectUriWhenCallingQueryProjectsUriBuilder() throws Exception {
+        Map<String, String> query = new LinkedHashMap<>();
+        query.put(TITLE_QUERY_PARAMETER, TITLE_REINDEER);
+        query.put(CRISTIN_LANGUAGE_PARAM, LANGUAGE_NB);
+
+        assertEquals(new URI(GET_CRISTIN_PROJECTS_EXAMPLE_URI), cristinApiClientStub.generateQueryProjectsUrl(query));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {

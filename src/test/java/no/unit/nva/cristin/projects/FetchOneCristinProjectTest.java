@@ -45,6 +45,8 @@ public class FetchOneCristinProjectTest {
     private static final String NOT_AN_ID = "Not an ID";
     private static final String DEFAULT_ID = "9999";
     private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
+    private static final String ENGLISH_LANGUAGE = "en";
+    private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI = "https://api.cristin.no/v2/projects/9999?lang=en";
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -147,6 +149,12 @@ public class FetchOneCristinProjectTest {
         GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, response.getStatusCode());
+    }
+
+    @Test
+    void getsCorrectUriWhenCallingGetProjectUriBuilder() throws Exception {
+        assertEquals(new URI(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI),
+            cristinApiClientStub.generateGetProjectUri(DEFAULT_ID, ENGLISH_LANGUAGE));
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {
