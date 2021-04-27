@@ -8,15 +8,14 @@ import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -48,14 +47,6 @@ public class CristinApiClient {
     private static final String CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
         "Project matching id %s does not have valid data";
 
-    protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
-        return OBJECT_MAPPER.readValue(reader, classOfT);
-    }
-
-    protected static <T> T fromJson(InputStream stream, Class<T> classOfT) throws IOException {
-        return fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8), classOfT);
-    }
-
     /**
      * Creates a NvaProject object containing a single transformed Cristin Project. Is used for serialization to the
      * client.
@@ -70,17 +61,21 @@ public class CristinApiClient {
     public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
         throws BadGatewayException, InternalServerErrorException, NotFoundException {
 
-        CristinProject cristinProject = attemptToGetCristinProject(id, language);
+        return Optional.ofNullable(attemptToGetCristinProject(id, language))
+            .filter(CristinProject::hasValidContent)
+            .map(NvaProjectBuilder::new)
+            .map(builder -> builder.withContext(Constants.PROJECT_LOOKUP_CONTEXT_URL))
+            .map(NvaProjectBuilder::build)
+            .orElseThrow(() -> projectHasNotValidContent(id));
+    }
 
-        if (cristinProject == null || !cristinProject.hasValidContent()) {
-            logger.warn(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
-            throw new BadGatewayException(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
-        }
+    protected static <T> T fromJson(InputStream stream, Class<T> classOfT) throws IOException {
+        return OBJECT_MAPPER.readValue(stream, classOfT);
+    }
 
-        NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
-        nvaProject.setContext(Constants.PROJECT_LOOKUP_CONTEXT_URL);
-
-        return nvaProject;
+    private BadGatewayException projectHasNotValidContent(String id) {
+        logger.warn(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
+        return new BadGatewayException(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
     }
 
     /**

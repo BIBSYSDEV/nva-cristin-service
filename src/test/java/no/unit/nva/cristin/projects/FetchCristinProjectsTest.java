@@ -21,7 +21,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -195,8 +194,7 @@ public class FetchCristinProjectsTest {
     @Test
     public void readerThrowsIoExceptionWhenReadingInvalidJson() {
         InputStream inputStream = new ByteArrayInputStream(INVALID_JSON.getBytes(StandardCharsets.UTF_8));
-        InputStreamReader reader = new InputStreamReader(inputStream);
-        Executable action = () -> CristinApiClient.fromJson(reader, CristinProject.class);
+        Executable action = () -> CristinApiClient.fromJson(inputStream, CristinProject.class);
         assertThrows(IOException.class, action);
     }
 

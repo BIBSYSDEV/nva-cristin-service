@@ -44,6 +44,7 @@ public class FetchOneCristinProjectTest {
         "api_response_get_project_with_missing_fields.json";
     private static final String NOT_AN_ID = "Not an ID";
     private static final String DEFAULT_ID = "9999";
+    private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -60,7 +61,7 @@ public class FetchOneCristinProjectTest {
     }
 
     @Test
-    void handlerReturnsEmptyJsonWhenIdIsNotFound() throws Exception {
+    void handlerReturnsNotFoundStatusWhenIdIsNotFound() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
         doReturn(new HttpResponseStub(getStream(CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON), 404))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
@@ -134,6 +135,18 @@ public class FetchOneCristinProjectTest {
 
         var expected = getReader(API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON);
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
+    }
+
+    @Test
+    void handlerThrowsBadGatewayExceptionWhenBackendReturnsInvalidProjectData() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseStub(IoUtils.stringToStream(JSON_WITH_MISSING_REQUIRED_DATA)))
+            .when(cristinApiClientStub).fetchGetResult(any(URI.class));
+
+        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, response.getStatusCode());
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {
