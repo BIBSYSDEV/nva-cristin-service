@@ -35,6 +35,7 @@ public class CristinApiClient {
     private static final String CHARACTER_EQUALS = "=";
     private static final String HTTPS = "https";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
+    private static final String EMPTY_FRAGMENT = null;
     private static final String SEARCH_PATH = "search?QUERY_PARAMS"; // TODO: NP-2412: Replace QUERY_PARAMS
     private static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
         "Error fetching cristin project with id: %s . Exception Message: %s";
@@ -179,12 +180,12 @@ public class CristinApiClient {
 
     protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {
         String query = queryParameters(Map.of(CRISTIN_LANGUAGE_PARAM, language));
-        return new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH + id, query, null);
+        return new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH + id, query, EMPTY_FRAGMENT);
     }
 
     protected URI generateQueryProjectsUrl(Map<String, String> parameters) throws URISyntaxException {
         String query = queryParameters(parameters);
-        return new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH, query, null);
+        return new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH, query, EMPTY_FRAGMENT);
     }
 
     private CristinProject attemptToGetCristinProject(String id, String language)

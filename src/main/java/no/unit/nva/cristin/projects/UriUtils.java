@@ -8,8 +8,13 @@ import java.util.stream.Collectors;
 
 public class UriUtils {
 
+    private static final String SLASH_DELIMITER = "/";
+    private static final String PARAMETER_KEY_VALUE_PAIR_TEMPLATE = "%s=%s";
+    private static final String PARAMETER_DELIMITER = "&";
+    private static final String EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR = null;
+
     public static URI buildUri(String... parts) {
-        return attempt(() -> new URI(String.join("/", parts))).orElseThrow();
+        return attempt(() -> new URI(String.join(SLASH_DELIMITER, parts))).orElseThrow();
     }
 
     /**
@@ -21,12 +26,12 @@ public class UriUtils {
     public static String queryParameters(Map<String, String> queryParameters) {
         return Optional.ofNullable(queryParameters)
             .map(UriUtils::formatQueryParameters)
-            .orElse(null);
+            .orElse(EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR);
     }
 
     private static String formatQueryParameters(Map<String, String> queryParams) {
         return queryParams.entrySet().stream()
-            .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
-            .collect(Collectors.joining("&"));
+            .map(entry -> String.format(PARAMETER_KEY_VALUE_PAIR_TEMPLATE, entry.getKey(), entry.getValue()))
+            .collect(Collectors.joining(PARAMETER_DELIMITER));
     }
 }
