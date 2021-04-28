@@ -16,7 +16,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,13 +26,11 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
-import org.apache.commons.codec.Charsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class FetchOneCristinProjectTest {
 
-    private static final String EMPTY_JSON = "{}";
     private static final String CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON =
         "cristinGetProjectIdNotFoundResponse.json";
     private static final String API_RESPONSE_ONE_PROJECT_JSON =
@@ -95,7 +92,7 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerReturnsNvaProjectFromTransformedCristinProjectWhenIdIsFound() throws Exception {
         GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
-        var expected = getReader(API_RESPONSE_ONE_PROJECT_JSON);
+        var expected = getStream(API_RESPONSE_ONE_PROJECT_JSON);
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
     }
 
@@ -135,7 +132,7 @@ public class FetchOneCristinProjectTest {
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
 
-        var expected = getReader(API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON);
+        var expected = getStream(API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON);
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
     }
 
@@ -174,11 +171,6 @@ public class FetchOneCristinProjectTest {
             .withQueryParameters(languageQueryParam)
             .withPathParameters(idPathParam)
             .build();
-    }
-
-    private InputStreamReader getReader(String resource) {
-        InputStream queryResultsAsStream = IoUtils.inputStreamFromResources(resource);
-        return new InputStreamReader(queryResultsAsStream, Charsets.UTF_8);
     }
 
     private InputStream getStream(String resource) {

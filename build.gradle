@@ -38,7 +38,6 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
-    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: project.ext.jupiterVersion
 
