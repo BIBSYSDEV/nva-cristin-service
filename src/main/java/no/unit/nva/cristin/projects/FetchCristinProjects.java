@@ -1,5 +1,7 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
+import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
@@ -23,14 +25,6 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
     private static final char CHARACTER_COMMA = ',';
     private static final char CHARACTER_PERIOD = '.';
 
-    private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
-    private static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
-    private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
-    private static final String CRISTIN_QUERY_PARAMETER_PAGE_VALUE = "1";
-    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
-    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
-
-    protected static final String TITLE_QUERY_PARAMETER = "title";
     private final transient CristinApiClient cristinApiClient;
 
     @SuppressWarnings("unused")
@@ -65,17 +59,19 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
     }
 
     private String getValidTitle(RequestInfo requestInfo) throws BadRequestException {
-        return getQueryParam(requestInfo, TITLE_QUERY_PARAMETER)
+        return getQueryParam(requestInfo, TITLE)
             .filter(this::isValidTitle)
             .orElseThrow(() -> new BadRequestException(TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title) {
-        Map<String, String> cristinQueryParameters = createCristinQueryParameters(title, language);
+        Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
+        requestQueryParams.put(TITLE, title);
+        requestQueryParams.put(LANGUAGE, language);
 
         return attempt(() ->
             cristinApiClient
-                .queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(cristinQueryParameters, language))
+                .queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParams))
             .orElseThrow();
     }
 
@@ -95,15 +91,6 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
             || c == CHARACTER_DASH
             || c == CHARACTER_COMMA
             || c == CHARACTER_PERIOD;
-    }
-
-    private Map<String, String> createCristinQueryParameters(String title, String language) {
-        Map<String, String> queryParameters = new ConcurrentHashMap<>();
-        queryParameters.put(CRISTIN_QUERY_PARAMETER_TITLE_KEY, title);
-        queryParameters.put(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language);
-        queryParameters.put(CRISTIN_QUERY_PARAMETER_PAGE_KEY, CRISTIN_QUERY_PARAMETER_PAGE_VALUE);
-        queryParameters.put(CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY, CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE);
-        return queryParameters;
     }
 
 }

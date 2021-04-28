@@ -20,4 +20,6 @@ public class Constants {
     public static final String BASE_URL = ENVIRONMENT.readEnv(BASE_URL_ENV);
     public static final String ID = "id";
     public static final String CRISTIN_LANGUAGE_PARAM = "lang";
+    public static final String TITLE = "title";
+    public static final String LANGUAGE = "language";
 }

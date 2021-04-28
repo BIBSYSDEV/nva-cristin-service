@@ -3,9 +3,9 @@ package no.unit.nva.cristin.projects;
 import static no.unit.nva.cristin.projects.Constants.CRISTIN_LANGUAGE_PARAM;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static no.unit.nva.cristin.projects.CristinHandler.LANGUAGE_INVALID_ERROR_MESSAGE;
 import static no.unit.nva.cristin.projects.CristinHandler.LANGUAGE_QUERY_PARAMETER;
-import static no.unit.nva.cristin.projects.FetchCristinProjects.TITLE_QUERY_PARAMETER;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.attempt.Try.attempt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -115,7 +115,7 @@ public class FetchCristinProjectsTest {
     @Test
     public void handlerThrowsInternalErrorWhenQueryingProjectsFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(new IOException()).when(cristinApiClientStub).queryAndEnrichProjects(any(), any());
+        doThrow(new IOException()).when(cristinApiClientStub).queryAndEnrichProjects(any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
 
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
@@ -137,7 +137,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void handlerSetsDefaultValueForMissingOptionalLanguageParameterAndReturnOk() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER));
+        InputStream input = requestWithQueryParameters(Map.of(TITLE, TITLE_REINDEER));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> response = GatewayResponse.fromOutputStream(output);
@@ -154,7 +154,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void handlerReturnsBadRequestWhenTitleQueryParamIsEmpty() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, EMPTY_STRING));
+        InputStream input = requestWithQueryParameters(Map.of(TITLE, EMPTY_STRING));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> response = GatewayResponse.fromOutputStream(output);
@@ -166,7 +166,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void handlerReturnsBadRequestWhenReceivingTitleQueryParamWithIllegalCharacters() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_ILLEGAL_CHARACTERS));
+        InputStream input = requestWithQueryParameters(Map.of(TITLE, TITLE_ILLEGAL_CHARACTERS));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> response = GatewayResponse.fromOutputStream(output);
@@ -178,7 +178,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER,
+        InputStream input = requestWithQueryParameters(Map.of(TITLE, TITLE_REINDEER,
             LANGUAGE_KEY, INVALID_LANGUAGE_PARAM));
 
         handler.handleRequest(input, output, context);
@@ -234,14 +234,14 @@ public class FetchCristinProjectsTest {
     @Test
     void getsCorrectUriWhenCallingQueryProjectsUriBuilder() throws Exception {
         Map<String, String> query = new LinkedHashMap<>();
-        query.put(TITLE_QUERY_PARAMETER, TITLE_REINDEER);
+        query.put(TITLE, TITLE_REINDEER);
         query.put(CRISTIN_LANGUAGE_PARAM, LANGUAGE_NB);
 
         assertEquals(new URI(GET_CRISTIN_PROJECTS_EXAMPLE_URI), cristinApiClientStub.generateQueryProjectsUrl(query));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE_QUERY_PARAMETER, TITLE_REINDEER,
+        InputStream input = requestWithQueryParameters(Map.of(TITLE, TITLE_REINDEER,
             LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);

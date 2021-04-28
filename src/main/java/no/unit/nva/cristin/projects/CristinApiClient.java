@@ -4,7 +4,9 @@ import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
 import static no.unit.nva.cristin.projects.Constants.CRISTIN_LANGUAGE_PARAM;
+import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
@@ -18,6 +20,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -31,12 +34,9 @@ public class CristinApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
 
-    private static final String TITLE = "title";
-    private static final String CHARACTER_EQUALS = "=";
     private static final String HTTPS = "https";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
     private static final String EMPTY_FRAGMENT = null;
-    private static final String SEARCH_PATH = "search?QUERY_PARAMS"; // TODO: NP-2412: Replace QUERY_PARAMS
     private static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
         "Error fetching cristin project with id: %s . Exception Message: %s";
     private static final String ERROR_MESSAGE_BACKEND_FETCH_FAILED =
@@ -50,6 +50,15 @@ public class CristinApiClient {
     private static final int STATUS_CODE_START_OF_ERROR_CODES_RANGE = 299;
     private static final String CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
         "Project matching id %s does not have valid data";
+    private static final String TITLE_AND_LANGUAGE_QUERY_PARAM_PLACEHOLDER = "title=%s&language=%s";
+    private static final String QUESTION_MARK = "?";
+
+    private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
+    private static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
+    private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
+    private static final String CRISTIN_QUERY_PARAMETER_PAGE_VALUE = "1";
+    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
+    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
 
     /**
      * Creates a NvaProject object containing a single transformed Cristin Project. Is used for serialization to the
@@ -86,25 +95,27 @@ public class CristinApiClient {
      * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
      * for serialization to the client.
      *
-     * @param parameters The query params
-     * @param language   Language used for some properties in Cristin API response
+     * @param requestQueryParams Request parameters from client containing title and language
      * @return a ProjectsWrapper filled with transformed Cristin Projects and metadata
      * @throws IOException        if cannot read from connection
      * @throws URISyntaxException if URI is malformed
      */
     public ProjectsWrapper queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
-        Map<String, String> parameters, String language)
-        throws IOException, URISyntaxException {
+        Map<String, String> requestQueryParams)
+    throws IOException, URISyntaxException {
 
         long startRequestTime = System.currentTimeMillis();
-        List<CristinProject> enrichedProjects = queryAndEnrichProjects(parameters, language);
+        List<CristinProject> enrichedProjects = queryAndEnrichProjects(requestQueryParams);
         long endRequestTime = System.currentTimeMillis();
 
         ProjectsWrapper projectsWrapper = new ProjectsWrapper();
 
-        projectsWrapper.setId(buildUri(BASE_URL, SEARCH_PATH));
+        String requestQueryParamsAsString = String.format(TITLE_AND_LANGUAGE_QUERY_PARAM_PLACEHOLDER,
+            requestQueryParams.get(TITLE), requestQueryParams.get(LANGUAGE));
+
+        projectsWrapper.setId(buildUri(BASE_URL, QUESTION_MARK + requestQueryParamsAsString));
         projectsWrapper.setSize(0); // TODO: NP-2385: X-Total-Count header from Cristin response
-        projectsWrapper.setSearchString(extractTitleSearchString(parameters));
+        projectsWrapper.setSearchString(requestQueryParamsAsString);
         projectsWrapper.setProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
         // TODO: NP-2385: Use Link header / Pagination data from Cristin response in the next two values
         projectsWrapper.setFirstRecord(0);
@@ -126,10 +137,6 @@ public class CristinApiClient {
     @JacocoGenerated
     protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
         return endRequestTime - startRequestTime;
-    }
-
-    private String extractTitleSearchString(Map<String, String> parameters) {
-        return TITLE + CHARACTER_EQUALS + parameters.get(TITLE);
     }
 
     private List<NvaProject> transformCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
@@ -157,11 +164,11 @@ public class CristinApiClient {
         return Optional.ofNullable(fromJson(response.body(), CristinProject.class));
     }
 
-    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> parameters,
-                                                          String language) throws IOException,
-                                                                                  URISyntaxException {
-        List<CristinProject> projects = queryProjects(parameters);
-        return enrichProjects(language, projects);
+    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> requestQueryParams)
+        throws IOException, URISyntaxException {
+        
+        List<CristinProject> projects = queryProjects(cristinQueryParamsFromRequestQueryParams(requestQueryParams));
+        return enrichProjects(requestQueryParams.get(LANGUAGE), projects);
     }
 
     @JacocoGenerated
@@ -219,4 +226,12 @@ public class CristinApiClient {
             id, failure.getMessage()));
     }
 
+    private Map<String, String> cristinQueryParamsFromRequestQueryParams(Map<String, String> requestParams) {
+        Map<String, String> cristinQueryParameters = new ConcurrentHashMap<>();
+        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_TITLE_KEY, requestParams.get(TITLE));
+        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, requestParams.get(LANGUAGE));
+        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PAGE_KEY, CRISTIN_QUERY_PARAMETER_PAGE_VALUE);
+        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY, CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE);
+        return cristinQueryParameters;
+    }
 }
