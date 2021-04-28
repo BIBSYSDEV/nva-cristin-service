@@ -65,7 +65,7 @@ public class CristinApiClient {
     public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
         throws BadGatewayException, InternalServerErrorException, NotFoundException {
 
-        return Optional.ofNullable(attemptToGetCristinProject(id, language))
+        return attemptToGetCristinProject(id, language)
             .filter(CristinProject::hasValidContent)
             .map(NvaProjectBuilder::new)
             .map(builder -> builder.withContext(Constants.PROJECT_LOOKUP_CONTEXT_URL))
@@ -139,7 +139,7 @@ public class CristinApiClient {
             .collect(Collectors.toList());
     }
 
-    protected CristinProject getProject(String id, String language)
+    protected Optional<CristinProject> getProject(String id, String language)
         throws IOException, URISyntaxException, NotFoundException, BadGatewayException {
 
         URI uri = generateGetProjectUri(id, language);
@@ -154,7 +154,7 @@ public class CristinApiClient {
             throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
 
-        return fromJson(response.body(), CristinProject.class);
+        return Optional.ofNullable(fromJson(response.body(), CristinProject.class));
     }
 
     protected List<CristinProject> queryAndEnrichProjects(Map<String, String> parameters,
@@ -188,7 +188,7 @@ public class CristinApiClient {
         return new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH, query, EMPTY_FRAGMENT);
     }
 
-    private CristinProject attemptToGetCristinProject(String id, String language)
+    private Optional<CristinProject> attemptToGetCristinProject(String id, String language)
         throws BadGatewayException, NotFoundException, InternalServerErrorException {
 
         try {
@@ -204,13 +204,14 @@ public class CristinApiClient {
     }
 
     private List<CristinProject> enrichProjects(String language, List<CristinProject> projects) {
-        return projects.stream().map(project -> enrichOneProject(language, project)).collect(Collectors.toList());
+        return projects.stream().map(project -> enrichOneProject(language, project)
+            .orElse(project)).collect(Collectors.toList());
     }
 
-    private CristinProject enrichOneProject(String language, CristinProject project) {
+    private Optional<CristinProject> enrichOneProject(String language, CristinProject project) {
         return attempt(() -> getProject(project.getCristinProjectId(), language))
             .toOptional(failure -> logError(project.getCristinProjectId(), failure.getException()))
-            .orElse(project);
+            .orElse(Optional.empty());
     }
 
     private void logError(String id, Exception failure) {
