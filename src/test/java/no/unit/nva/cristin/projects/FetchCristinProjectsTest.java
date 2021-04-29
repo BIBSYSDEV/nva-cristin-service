@@ -50,7 +50,7 @@ public class FetchCristinProjectsTest {
     private static final String EMPTY_STRING = "";
     private static final String LANGUAGE_NB = "nb";
     private static final String INVALID_LANGUAGE_PARAM = "ru";
-    private static final String TITLE_REINDEER = "reindeer";
+    private static final String RANDOM_TITLE = "reindeer";
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String INVALID_JSON = "This is not valid JSON!";
     private static final String EMPTY_LIST_STRING = "[]";
@@ -137,7 +137,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void handlerSetsDefaultValueForMissingOptionalLanguageParameterAndReturnOk() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE, TITLE_REINDEER));
+        InputStream input = requestWithQueryParameters(Map.of(TITLE, RANDOM_TITLE));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> response = GatewayResponse.fromOutputStream(output);
@@ -178,7 +178,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     public void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE, TITLE_REINDEER,
+        InputStream input = requestWithQueryParameters(Map.of(TITLE, RANDOM_TITLE,
             LANGUAGE_KEY, INVALID_LANGUAGE_PARAM));
 
         handler.handleRequest(input, output, context);
@@ -234,14 +234,14 @@ public class FetchCristinProjectsTest {
     @Test
     void getsCorrectUriWhenCallingQueryProjectsUriBuilder() throws Exception {
         Map<String, String> query = new LinkedHashMap<>();
-        query.put(TITLE, TITLE_REINDEER);
+        query.put(TITLE, RANDOM_TITLE);
         query.put(CRISTIN_LANGUAGE_PARAM, LANGUAGE_NB);
 
         assertEquals(new URI(GET_CRISTIN_PROJECTS_EXAMPLE_URI), cristinApiClientStub.generateQueryProjectsUrl(query));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE, TITLE_REINDEER,
+        InputStream input = requestWithQueryParameters(Map.of(TITLE, RANDOM_TITLE,
             LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
