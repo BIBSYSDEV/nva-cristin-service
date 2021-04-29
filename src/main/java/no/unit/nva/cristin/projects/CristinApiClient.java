@@ -7,7 +7,7 @@ import static no.unit.nva.cristin.projects.Constants.CRISTIN_LANGUAGE_PARAM;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
-import static no.unit.nva.cristin.projects.NvaProjectBuilder.nvaProjectsFromCristinProjects;
+import static no.unit.nva.cristin.projects.NvaProjectBuilder.transformToNvaProject;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
@@ -122,7 +122,7 @@ public class CristinApiClient {
         // TODO: NP-2385: Use Link header / Pagination data from Cristin response in the next two values
         projectsWrapper.setFirstRecord(0);
         projectsWrapper.setNextResults(null); // TODO: Change to URI
-        projectsWrapper.setHits(nvaProjectsFromCristinProjects(enrichedProjects));
+        projectsWrapper.setHits(transformToNvaProject(enrichedProjects));
 
         return projectsWrapper;
     }
