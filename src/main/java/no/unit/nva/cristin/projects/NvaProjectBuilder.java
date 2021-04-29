@@ -115,4 +115,11 @@ public class NvaProjectBuilder {
         this.nvaProject.setContext(context);
         return this;
     }
+
+    public static List<NvaProject> nvaProjectsFromCristinProjects(List<CristinProject> cristinProjects) {
+        return cristinProjects.stream()
+            .filter(CristinProject::hasValidContent)
+            .map(cristinProject -> new NvaProjectBuilder(cristinProject).build())
+            .collect(Collectors.toList());
+    }
 }

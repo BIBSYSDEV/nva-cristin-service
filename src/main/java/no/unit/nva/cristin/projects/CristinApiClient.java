@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.projects.Constants.CRISTIN_LANGUAGE_PARAM;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
+import static no.unit.nva.cristin.projects.NvaProjectBuilder.nvaProjectsFromCristinProjects;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
@@ -45,7 +46,6 @@ public class CristinApiClient {
         "The requested resource %s does not exist";
     private static final String ERROR_MESSAGE_INTERNAL_ERROR =
         "Your request cannot be processed at this time because of an internal server error";
-    private static final HttpClient client = HttpClient.newHttpClient();
     private static final int STATUS_CODE_NOT_FOUND = 404;
     private static final int STATUS_CODE_START_OF_ERROR_CODES_RANGE = 299;
     private static final String CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
@@ -59,6 +59,8 @@ public class CristinApiClient {
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
+
+    private static final HttpClient client = HttpClient.newHttpClient();
 
     /**
      * Creates a NvaProject object containing a single transformed Cristin Project. Is used for serialization to the
@@ -120,7 +122,7 @@ public class CristinApiClient {
         // TODO: NP-2385: Use Link header / Pagination data from Cristin response in the next two values
         projectsWrapper.setFirstRecord(0);
         projectsWrapper.setNextResults(null); // TODO: Change to URI
-        projectsWrapper.setHits(transformCristinProjectsToNvaProjects(enrichedProjects));
+        projectsWrapper.setHits(nvaProjectsFromCristinProjects(enrichedProjects));
 
         return projectsWrapper;
     }
@@ -137,13 +139,6 @@ public class CristinApiClient {
     @JacocoGenerated
     protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
         return endRequestTime - startRequestTime;
-    }
-
-    private List<NvaProject> transformCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
-        return cristinProjects.stream()
-            .filter(CristinProject::hasValidContent)
-            .map(cristinProject -> new NvaProjectBuilder(cristinProject).build())
-            .collect(Collectors.toList());
     }
 
     protected Optional<CristinProject> getProject(String id, String language)
