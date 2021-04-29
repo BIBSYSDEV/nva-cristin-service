@@ -14,7 +14,6 @@ import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -44,12 +43,12 @@ public class CristinApiClient {
         "Your request cannot be processed at this time due to an upstream error";
     private static final String ERROR_MESSAGE_NOT_FOUND =
         "The requested resource %s does not exist";
-    private static final String ERROR_MESSAGE_INTERNAL_ERROR =
-        "Your request cannot be processed at this time because of an internal server error";
     private static final int STATUS_CODE_NOT_FOUND = 404;
     private static final int STATUS_CODE_START_OF_ERROR_CODES_RANGE = 299;
     private static final String CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
         "Project matching id %s does not have valid data";
+    private static final String ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED =
+        "Query failed from params: %s with exception: %s";
     private static final String TITLE_AND_LANGUAGE_QUERY_PARAM_PLACEHOLDER = "title=%s&language=%s";
     private static final String QUESTION_MARK = "?";
 
@@ -70,11 +69,10 @@ public class CristinApiClient {
      * @param language Language used for some properties in Cristin API response
      * @return a NvaProject filled with one transformed Cristin Project
      * @throws BadGatewayException          when there is a problem with fetch from backend
-     * @throws InternalServerErrorException when there is an unforeseen error
      * @throws NotFoundException            when upstream returns 404
      */
     public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
-        throws BadGatewayException, InternalServerErrorException, NotFoundException {
+        throws BadGatewayException, NotFoundException {
 
         return attemptToGetCristinProject(id, language)
             .filter(CristinProject::hasValidContent)
@@ -99,12 +97,10 @@ public class CristinApiClient {
      *
      * @param requestQueryParams Request parameters from client containing title and language
      * @return a ProjectsWrapper filled with transformed Cristin Projects and metadata
-     * @throws IOException        if cannot read from connection
-     * @throws URISyntaxException if URI is malformed
+     * @throws IOException if cannot read from connection
      */
     public ProjectsWrapper queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
-        Map<String, String> requestQueryParams)
-        throws IOException, URISyntaxException {
+        Map<String, String> requestQueryParams) throws IOException {
 
         long startRequestTime = System.currentTimeMillis();
         List<CristinProject> enrichedProjects = queryAndEnrichProjects(requestQueryParams);
@@ -128,8 +124,7 @@ public class CristinApiClient {
     }
 
     // TODO: throw BadGatewayException if this fails as well?
-    protected List<CristinProject> queryProjects(Map<String, String> parameters) throws IOException,
-                                                                                        URISyntaxException {
+    protected List<CristinProject> queryProjects(Map<String, String> parameters) throws IOException {
         URI uri = generateQueryProjectsUrl(parameters);
         var response = fetchQueryResults(uri);
 
@@ -142,7 +137,7 @@ public class CristinApiClient {
     }
 
     protected Optional<CristinProject> getProject(String id, String language)
-        throws IOException, URISyntaxException, NotFoundException, BadGatewayException {
+        throws IOException, NotFoundException, BadGatewayException {
 
         URI uri = generateGetProjectUri(id, language);
         HttpResponse<InputStream> response = fetchGetResult(uri);
@@ -159,9 +154,7 @@ public class CristinApiClient {
         return Optional.ofNullable(fromJson(response.body(), CristinProject.class));
     }
 
-    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> requestQueryParams)
-        throws IOException, URISyntaxException {
-
+    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> requestQueryParams) throws IOException {
         List<CristinProject> projects = queryProjects(cristinQueryParamsFromRequestQueryParams(requestQueryParams));
         return enrichProjects(requestQueryParams.get(LANGUAGE), projects);
     }
@@ -180,25 +173,25 @@ public class CristinApiClient {
         return attempt(() -> client.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream())).orElseThrow();
     }
 
-    protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {
+    protected URI generateGetProjectUri(String id, String language) {
         String query = queryParameters(Map.of(CRISTIN_LANGUAGE_PARAM, language));
-        return new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH + id, query, EMPTY_FRAGMENT);
+        return attempt(() ->
+            new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH + id, query, EMPTY_FRAGMENT))
+            .toOptional(failure -> logError(id, failure.getException())).orElseThrow();
     }
 
-    protected URI generateQueryProjectsUrl(Map<String, String> parameters) throws URISyntaxException {
+    protected URI generateQueryProjectsUrl(Map<String, String> parameters) {
         String query = queryParameters(parameters);
-        return new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH, query, EMPTY_FRAGMENT);
+        return attempt(() ->
+            new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH, query, EMPTY_FRAGMENT))
+            .toOptional(failure -> logQueryError(query, failure.getException())).orElseThrow();
     }
 
     private Optional<CristinProject> attemptToGetCristinProject(String id, String language)
-        throws BadGatewayException, NotFoundException, InternalServerErrorException {
+        throws BadGatewayException, NotFoundException {
 
         try {
             return getProject(id, language);
-            // TODO: NP-2437: Should these be thrown as other than InternalServerErrorException?
-        } catch (URISyntaxException exception) {
-            logError(id, exception);
-            throw new InternalServerErrorException(ERROR_MESSAGE_INTERNAL_ERROR);
         } catch (IOException exception) {
             logError(id, exception);
             throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
@@ -219,6 +212,11 @@ public class CristinApiClient {
     private void logError(String id, Exception failure) {
         logger.error(String.format(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
             id, failure.getMessage()));
+    }
+
+    private void logQueryError(String queryParams, Exception failure) {
+        logger.error(String.format(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED,
+            queryParams, failure.getMessage()));
     }
 
     private Map<String, String> cristinQueryParamsFromRequestQueryParams(Map<String, String> requestParams) {

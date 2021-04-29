@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -109,15 +108,15 @@ public class FetchOneCristinProjectTest {
     }
 
     @Test
-    void handlerReturnsServerErrorExceptionWhenBackendThrowsUriSyntaxException() throws Exception {
+    void handlerReturnsServerErrorExceptionWhenBackendThrowsGenericException() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doThrow(URISyntaxException.class).when(cristinApiClientStub).getProject(any(), any());
+        doThrow(RuntimeException.class).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> nextResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
 
-        assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, nextResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON, nextResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @Test

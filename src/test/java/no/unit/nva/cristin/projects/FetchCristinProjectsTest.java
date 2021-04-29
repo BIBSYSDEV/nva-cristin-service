@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -190,9 +189,8 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    public void cristinApiClientWillStillGenerateQueryProjectsUrlEvenWithoutParameters()
-        throws URISyntaxException {
-        cristinApiClientStub.generateQueryProjectsUrl(null);
+    public void cristinApiClientWillStillGenerateQueryProjectsUrlEvenWithoutParameters() {
+        cristinApiClientStub.generateQueryProjectsUrl(null); // TODO: Remove this?
     }
 
     @Test
@@ -238,6 +236,18 @@ public class FetchCristinProjectsTest {
         query.put(CRISTIN_LANGUAGE_PARAM, LANGUAGE_NB);
 
         assertEquals(new URI(GET_CRISTIN_PROJECTS_EXAMPLE_URI), cristinApiClientStub.generateQueryProjectsUrl(query));
+    }
+
+    @Test
+    void handlerReturnsServerErrorExceptionWhenBackendThrowsGenericException() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+
+        doThrow(RuntimeException.class).when(cristinApiClientStub).generateQueryProjectsUrl(any());
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
+
+        assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
