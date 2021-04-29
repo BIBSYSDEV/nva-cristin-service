@@ -102,7 +102,7 @@ public class CristinApiClient {
      */
     public ProjectsWrapper queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
         Map<String, String> requestQueryParams)
-    throws IOException, URISyntaxException {
+        throws IOException, URISyntaxException {
 
         long startRequestTime = System.currentTimeMillis();
         List<CristinProject> enrichedProjects = queryAndEnrichProjects(requestQueryParams);
@@ -166,7 +166,7 @@ public class CristinApiClient {
 
     protected List<CristinProject> queryAndEnrichProjects(Map<String, String> requestQueryParams)
         throws IOException, URISyntaxException {
-        
+
         List<CristinProject> projects = queryProjects(cristinQueryParamsFromRequestQueryParams(requestQueryParams));
         return enrichProjects(requestQueryParams.get(LANGUAGE), projects);
     }
