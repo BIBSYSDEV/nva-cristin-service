@@ -23,9 +23,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.ioutils.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +36,7 @@ public class CristinApiClient {
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
 
     private static final String HTTPS = "https";
-    private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
+    private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/"; // TODO: Put in template instead?
     private static final String EMPTY_FRAGMENT = null;
     private static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
         "Error fetching cristin project with id: %s . Exception Message: %s";
@@ -48,6 +50,8 @@ public class CristinApiClient {
         "Project matching id %s does not have valid data";
     private static final String ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED =
         "Query failed from params: %s with exception: %s";
+    private static final String ERROR_MESSAGE_READING_RESPONSE_FAIL =
+        "Error when reading response with body: %s, causing exception: %s";
     private static final String QUESTION_MARK = "?";
 
     private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
@@ -66,13 +70,12 @@ public class CristinApiClient {
      * @param id       The Cristin id of the project to query
      * @param language Language used for some properties in Cristin API response
      * @return a NvaProject filled with one transformed Cristin Project
-     * @throws BadGatewayException          when there is a problem with fetch from backend
-     * @throws NotFoundException            when upstream returns 404
+     * @throws ApiGatewayException when there is a problem that can be returned to client
      */
     public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
-        throws BadGatewayException, NotFoundException {
+        throws ApiGatewayException {
 
-        return attemptToGetCristinProject(id, language)
+        return Optional.of(getProject(id, language))
             .filter(CristinProject::hasValidContent)
             .map(NvaProjectBuilder::new)
             .map(builder -> builder.withContext(Constants.PROJECT_LOOKUP_CONTEXT_URL))
@@ -95,10 +98,10 @@ public class CristinApiClient {
      *
      * @param requestQueryParams Request parameters from client containing title and language
      * @return a ProjectsWrapper filled with transformed Cristin Projects and metadata
-     * @throws IOException if cannot read from connection
+     * @throws ApiGatewayException if some error happen we should return this to client
      */
     public ProjectsWrapper queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
-        Map<String, String> requestQueryParams) throws IOException {
+        Map<String, String> requestQueryParams) throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
         List<NvaProject> nvaProjects = importProjectsFromCristin(requestQueryParams);
@@ -118,34 +121,22 @@ public class CristinApiClient {
         return projectsWrapper;
     }
 
-    private List<NvaProject> importProjectsFromCristin(Map<String, String> requestQueryParams)
-        throws IOException {
-
-        return queryAndEnrichProjects(requestQueryParams).stream()
-            .filter(CristinProject::hasValidContent)
-            .map(CristinProject::toNvaProject)
-            .collect(Collectors.toList());
-    }
-
-    // TODO: throw BadGatewayException if this fails as well?
-    protected List<CristinProject> queryProjects(Map<String, String> parameters) throws IOException {
+    protected List<CristinProject> queryProjects(Map<String, String> parameters) throws ApiGatewayException {
         URI uri = generateQueryProjectsUrl(parameters);
-        var response = fetchQueryResults(uri);
+        HttpResponse<InputStream> response = fetchQueryResults(uri);
 
-        return asList(fromJson(response.body(), CristinProject[].class));
+        return asList(attempt(() -> fromJson(response.body(), CristinProject[].class))
+            .orElseThrow(failure -> logErrorReadingFromResponseBodyAndReturnErrorToClient(response.body(),
+                failure.getException())));
     }
 
-    @JacocoGenerated
-    protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
-        return endRequestTime - startRequestTime;
-    }
-
-    protected Optional<CristinProject> getProject(String id, String language)
-        throws IOException, NotFoundException, BadGatewayException {
+    protected CristinProject getProject(String id, String language)
+        throws ApiGatewayException {
 
         URI uri = generateGetProjectUri(id, language);
         HttpResponse<InputStream> response = fetchGetResult(uri);
 
+        // TODO: Make a checkHttpStatusCodes method which can be reused
         if (response.statusCode() == STATUS_CODE_NOT_FOUND) {
             // TODO: NP-2315: Use full Nva resource path instead of only id
             throw new NotFoundException(String.format(ERROR_MESSAGE_NOT_FOUND, id));
@@ -155,12 +146,29 @@ public class CristinApiClient {
             throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
 
-        return Optional.ofNullable(fromJson(response.body(), CristinProject.class));
+        return attempt(() -> fromJson(response.body(), CristinProject.class))
+            .orElseThrow(failure -> logErrorReadingFromResponseBodyAndReturnErrorToClient(response.body(),
+                failure.getException()));
     }
 
-    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> requestQueryParams) throws IOException {
+    @JacocoGenerated
+    protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
+        return endRequestTime - startRequestTime;
+    }
+
+    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> requestQueryParams)
+        throws ApiGatewayException {
+
         List<CristinProject> projects = queryProjects(cristinQueryParamsFromRequestQueryParams(requestQueryParams));
         return enrichProjects(requestQueryParams.get(LANGUAGE), projects);
+    }
+
+    // TODO: Move attempt to the outside of these URI methods to simplify unit tests?
+    protected URI generateQueryProjectsUrl(Map<String, String> parameters) {
+        String query = queryParameters(parameters);
+        return attempt(() ->
+            new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH, query, EMPTY_FRAGMENT))
+            .toOptional(failure -> logQueryError(query, failure.getException())).orElseThrow();
     }
 
     @JacocoGenerated
@@ -184,33 +192,23 @@ public class CristinApiClient {
             .toOptional(failure -> logError(id, failure.getException())).orElseThrow();
     }
 
-    protected URI generateQueryProjectsUrl(Map<String, String> parameters) {
-        String query = queryParameters(parameters);
-        return attempt(() ->
-            new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH, query, EMPTY_FRAGMENT))
-            .toOptional(failure -> logQueryError(query, failure.getException())).orElseThrow();
-    }
+    private List<NvaProject> importProjectsFromCristin(Map<String, String> requestQueryParams)
+        throws ApiGatewayException {
 
-    private Optional<CristinProject> attemptToGetCristinProject(String id, String language)
-        throws BadGatewayException, NotFoundException {
-
-        try {
-            return getProject(id, language);
-        } catch (IOException exception) {
-            logError(id, exception);
-            throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-        }
+        return queryAndEnrichProjects(requestQueryParams).stream()
+            .filter(CristinProject::hasValidContent)
+            .map(CristinProject::toNvaProject)
+            .collect(Collectors.toList());
     }
 
     private List<CristinProject> enrichProjects(String language, List<CristinProject> projects) {
-        return projects.stream().map(project -> enrichOneProject(language, project)
-            .orElse(project)).collect(Collectors.toList());
+        return projects.stream().map(project -> enrichOneProject(language, project)).collect(Collectors.toList());
     }
 
-    private Optional<CristinProject> enrichOneProject(String language, CristinProject project) {
+    private CristinProject enrichOneProject(String language, CristinProject project) {
         return attempt(() -> getProject(project.getCristinProjectId(), language))
             .toOptional(failure -> logError(project.getCristinProjectId(), failure.getException()))
-            .orElse(Optional.empty());
+            .orElse(project);
     }
 
     private void logError(String id, Exception failure) {
@@ -223,6 +221,16 @@ public class CristinApiClient {
             queryParams, failure.getMessage()));
     }
 
+    // TODO: Try to share logging and error throwing methods. ApiGatewayException can encapsulate other exceptions
+    private ApiGatewayException logErrorReadingFromResponseBodyAndReturnErrorToClient(InputStream bodyStream,
+                                                                                      Exception failure) {
+
+        var bodyString = IoUtils.streamToString(bodyStream);
+        logger.warn(String.format(ERROR_MESSAGE_READING_RESPONSE_FAIL, bodyString, failure.getMessage()));
+        return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+    }
+
+    // TODO: Should we rather use String.format? Then we can remove a lot of constants
     private Map<String, String> cristinQueryParamsFromRequestQueryParams(Map<String, String> requestParams) {
         Map<String, String> cristinQueryParameters = new ConcurrentHashMap<>();
         cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_TITLE_KEY, requestParams.get(TITLE));

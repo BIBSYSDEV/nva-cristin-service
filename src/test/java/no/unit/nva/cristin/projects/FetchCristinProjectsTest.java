@@ -34,6 +34,7 @@ import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,25 +84,9 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    void handlerReturnsNonEnrichedBodyWhenEnrichingFails() throws Exception {
-        cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(new IOException()).when(cristinApiClientStub).getProject(any(), any());
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
-        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
-        var expected = IoUtils.stringFromResources(Path.of(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON));
-        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
-    }
-
-    @Test
-    public void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
-        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
-        assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
-    }
-
-    @Test
     public void handlerIgnoresErrorsWhenTryingToEnrichProjectInformation() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(new IOException()).when(cristinApiClientStub).getProject(any(), any());
+        doThrow(new BadGatewayException(null)).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
 
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
@@ -111,15 +96,31 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
+    public void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
+        assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
+    }
+
+    @Test
     public void handlerThrowsInternalErrorWhenQueryingProjectsFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(new IOException()).when(cristinApiClientStub).queryAndEnrichProjects(any());
+        doThrow(new RuntimeException()).when(cristinApiClientStub).queryAndEnrichProjects(any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
 
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void handlerReturnsNonEnrichedBodyWhenEnrichingFails() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doThrow(new BadGatewayException(null)).when(cristinApiClientStub).getProject(any(), any());
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
+        var expected = IoUtils.stringFromResources(Path.of(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON));
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(response.getBody()));
     }
 
     @Test
@@ -243,6 +244,19 @@ public class FetchCristinProjectsTest {
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void handlerThrowsBadGatewayExceptionWhenThereIsThrownIoExceptionWhenReadingFromJson() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+
+        doReturn(new HttpResponseStub(IoUtils.stringToStream("")))
+            .when(cristinApiClientStub).fetchQueryResults(any(URI.class));
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
+
+        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 

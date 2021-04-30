@@ -23,6 +23,7 @@ import javax.ws.rs.core.HttpHeaders;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,10 +97,10 @@ public class FetchOneCristinProjectTest {
     }
 
     @Test
-    void handlerReturnsBadGatewayWhenBackendThrowsIoException() throws Exception {
+    void handlerReturnsBadGatewayWhenBackendThrowsException() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doThrow(new IOException()).when(cristinApiClientStub).getProject(any(), any());
+        doThrow(new BadGatewayException(null)).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
 
@@ -151,6 +152,19 @@ public class FetchOneCristinProjectTest {
     void getsCorrectUriWhenCallingGetProjectUriBuilder() throws Exception {
         assertEquals(new URI(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI),
             cristinApiClientStub.generateGetProjectUri(DEFAULT_ID, ENGLISH_LANGUAGE));
+    }
+
+    @Test
+    void handlerThrowsBadGatewayExceptionWhenThereIsThrownExceptionWhenReadingFromJson() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+
+        doReturn(new HttpResponseStub(IoUtils.stringToStream("")))
+            .when(cristinApiClientStub).fetchGetResult(any(URI.class));
+        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {

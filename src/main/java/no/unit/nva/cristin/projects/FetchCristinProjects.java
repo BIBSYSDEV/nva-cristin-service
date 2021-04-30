@@ -2,7 +2,6 @@ package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
-import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Map;
@@ -64,15 +63,14 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
             .orElseThrow(() -> new BadRequestException(TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
-    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title) {
+    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title)
+        throws ApiGatewayException {
+
         Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
         requestQueryParams.put(TITLE, title);
         requestQueryParams.put(LANGUAGE, language);
 
-        return attempt(() ->
-            cristinApiClient
-                .queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParams))
-            .orElseThrow();
+        return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParams);
     }
 
     private boolean isValidTitle(String str) {
