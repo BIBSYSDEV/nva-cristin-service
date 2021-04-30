@@ -45,12 +45,10 @@ public class CristinApiClient {
         "The requested resource %s does not exist";
     private static final String ERROR_MESSAGE_INTERNAL_ERROR =
         "Your request cannot be processed at this time because of an internal server error";
-    private static final HttpClient client = HttpClient.newHttpClient();
     private static final int STATUS_CODE_NOT_FOUND = 404;
     private static final int STATUS_CODE_START_OF_ERROR_CODES_RANGE = 299;
     private static final String CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
         "Project matching id %s does not have valid data";
-    private static final String TITLE_AND_LANGUAGE_QUERY_PARAM_PLACEHOLDER = "title=%s&language=%s";
     private static final String QUESTION_MARK = "?";
 
     private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
@@ -59,6 +57,8 @@ public class CristinApiClient {
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
+
+    private static final HttpClient client = HttpClient.newHttpClient();
 
     /**
      * Creates a NvaProject object containing a single transformed Cristin Project. Is used for serialization to the
@@ -105,24 +105,30 @@ public class CristinApiClient {
         throws IOException, URISyntaxException {
 
         long startRequestTime = System.currentTimeMillis();
-        List<CristinProject> enrichedProjects = queryAndEnrichProjects(requestQueryParams);
+        List<NvaProject> nvaProjects = importProjectsFromCristin(requestQueryParams);
         long endRequestTime = System.currentTimeMillis();
 
         ProjectsWrapper projectsWrapper = new ProjectsWrapper();
 
-        String requestQueryParamsAsString = String.format(TITLE_AND_LANGUAGE_QUERY_PARAM_PLACEHOLDER,
-            requestQueryParams.get(TITLE), requestQueryParams.get(LANGUAGE));
-
-        projectsWrapper.setId(buildUri(BASE_URL, QUESTION_MARK + requestQueryParamsAsString));
+        projectsWrapper.setId(buildUri(BASE_URL, QUESTION_MARK + queryParameters(requestQueryParams)));
         projectsWrapper.setSize(0); // TODO: NP-2385: X-Total-Count header from Cristin response
-        projectsWrapper.setSearchString(requestQueryParamsAsString);
+        projectsWrapper.setSearchString(queryParameters(requestQueryParams));
         projectsWrapper.setProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
         // TODO: NP-2385: Use Link header / Pagination data from Cristin response in the next two values
         projectsWrapper.setFirstRecord(0);
         projectsWrapper.setNextResults(null); // TODO: Change to URI
-        projectsWrapper.setHits(transformCristinProjectsToNvaProjects(enrichedProjects));
+        projectsWrapper.setHits(nvaProjects);
 
         return projectsWrapper;
+    }
+
+    private List<NvaProject> importProjectsFromCristin(Map<String, String> requestQueryParams)
+        throws IOException, URISyntaxException {
+
+        return queryAndEnrichProjects(requestQueryParams).stream()
+            .filter(CristinProject::hasValidContent)
+            .map(CristinProject::toNvaProject)
+            .collect(Collectors.toList());
     }
 
     // TODO: throw BadGatewayException if this fails as well?
@@ -137,13 +143,6 @@ public class CristinApiClient {
     @JacocoGenerated
     protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
         return endRequestTime - startRequestTime;
-    }
-
-    private List<NvaProject> transformCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
-        return cristinProjects.stream()
-            .filter(CristinProject::hasValidContent)
-            .map(cristinProject -> new NvaProjectBuilder(cristinProject).build())
-            .collect(Collectors.toList());
     }
 
     protected Optional<CristinProject> getProject(String id, String language)

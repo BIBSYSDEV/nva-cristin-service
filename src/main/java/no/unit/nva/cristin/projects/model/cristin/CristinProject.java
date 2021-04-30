@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import no.unit.nva.cristin.projects.NvaProjectBuilder;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.StringUtils;
 
@@ -136,6 +138,11 @@ public class CristinProject {
     public boolean hasValidContent() {
         return StringUtils.isNotBlank(cristinProjectId)
             && title != null && !title.isEmpty();
+    }
+
+    @JsonIgnore
+    public NvaProject toNvaProject() {
+        return new NvaProjectBuilder(this).build();
     }
 }
 

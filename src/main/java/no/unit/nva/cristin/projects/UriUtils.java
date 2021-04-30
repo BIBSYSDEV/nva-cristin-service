@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ public class UriUtils {
 
     private static String formatQueryParameters(Map<String, String> queryParams) {
         return queryParams.entrySet().stream()
+            .sorted(Entry.comparingByKey())
             .map(entry -> String.format(PARAMETER_KEY_VALUE_PAIR_TEMPLATE, entry.getKey(), entry.getValue()))
             .collect(Collectors.joining(PARAMETER_DELIMITER));
     }
