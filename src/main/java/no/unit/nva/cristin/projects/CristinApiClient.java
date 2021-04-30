@@ -49,7 +49,6 @@ public class CristinApiClient {
     private static final int STATUS_CODE_START_OF_ERROR_CODES_RANGE = 299;
     private static final String CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
         "Project matching id %s does not have valid data";
-    private static final String TITLE_AND_LANGUAGE_QUERY_PARAM_PLACEHOLDER = "title=%s&language=%s";
     private static final String QUESTION_MARK = "?";
 
     private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
@@ -111,9 +110,9 @@ public class CristinApiClient {
 
         ProjectsWrapper projectsWrapper = new ProjectsWrapper();
 
-        projectsWrapper.setId(buildUri(BASE_URL, QUESTION_MARK + titleAndLanguageQueryString(requestQueryParams)));
+        projectsWrapper.setId(buildUri(BASE_URL, QUESTION_MARK + queryParameters(requestQueryParams)));
         projectsWrapper.setSize(0); // TODO: NP-2385: X-Total-Count header from Cristin response
-        projectsWrapper.setSearchString(titleAndLanguageQueryString(requestQueryParams));
+        projectsWrapper.setSearchString(queryParameters(requestQueryParams));
         projectsWrapper.setProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
         // TODO: NP-2385: Use Link header / Pagination data from Cristin response in the next two values
         projectsWrapper.setFirstRecord(0);
@@ -121,11 +120,6 @@ public class CristinApiClient {
         projectsWrapper.setHits(nvaProjects);
 
         return projectsWrapper;
-    }
-
-    private String titleAndLanguageQueryString(Map<String, String> requestQueryParams) {
-        return String.format(TITLE_AND_LANGUAGE_QUERY_PARAM_PLACEHOLDER,
-            requestQueryParams.get(TITLE), requestQueryParams.get(LANGUAGE));
     }
 
     private List<NvaProject> importProjectsFromCristin(Map<String, String> requestQueryParams)

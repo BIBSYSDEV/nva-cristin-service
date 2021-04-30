@@ -27,7 +27,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -62,7 +61,7 @@ public class FetchCristinProjectsTest {
     private static final String CRISTIN_GET_PROJECT_RESPONSE = "cristinGetProjectResponse.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
     private static final String GET_CRISTIN_PROJECTS_EXAMPLE_URI = "https://api.cristin"
-        + ".no/v2/projects/?title=reindeer&lang=nb";
+        + ".no/v2/projects/?lang=nb&title=reindeer";
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
     private Context context;
@@ -233,11 +232,8 @@ public class FetchCristinProjectsTest {
 
     @Test
     void getsCorrectUriWhenCallingQueryProjectsUriBuilder() throws Exception {
-        Map<String, String> query = new LinkedHashMap<>();
-        query.put(TITLE, RANDOM_TITLE);
-        query.put(CRISTIN_LANGUAGE_PARAM, LANGUAGE_NB);
-
-        assertEquals(new URI(GET_CRISTIN_PROJECTS_EXAMPLE_URI), cristinApiClientStub.generateQueryProjectsUrl(query));
+        assertEquals(new URI(GET_CRISTIN_PROJECTS_EXAMPLE_URI), cristinApiClientStub
+            .generateQueryProjectsUrl(Map.of(TITLE, RANDOM_TITLE, CRISTIN_LANGUAGE_PARAM, LANGUAGE_NB)));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
