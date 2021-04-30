@@ -116,16 +116,4 @@ public class NvaProjectBuilder {
         return this;
     }
 
-    /**
-     * Transforms a list of Cristin projects to a list of Nva projects.
-     *
-     * @param cristinProjects The list of Cristin projects to be transformed
-     * @return a List filled with Nva projects transformed from Cristin projects
-     */
-    public static List<NvaProject> transformToNvaProject(List<CristinProject> cristinProjects) {
-        return cristinProjects.stream()
-            .filter(CristinProject::hasValidContent)
-            .map(cristinProject -> new NvaProjectBuilder(cristinProject).build())
-            .collect(Collectors.toList());
-    }
 }

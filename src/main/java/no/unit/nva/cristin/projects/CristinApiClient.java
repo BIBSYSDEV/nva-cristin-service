@@ -7,7 +7,6 @@ import static no.unit.nva.cristin.projects.Constants.CRISTIN_LANGUAGE_PARAM;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
-import static no.unit.nva.cristin.projects.NvaProjectBuilder.transformToNvaProject;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
@@ -49,7 +48,6 @@ public class CristinApiClient {
         "Project matching id %s does not have valid data";
     private static final String ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED =
         "Query failed from params: %s with exception: %s";
-    private static final String TITLE_AND_LANGUAGE_QUERY_PARAM_PLACEHOLDER = "title=%s&language=%s";
     private static final String QUESTION_MARK = "?";
 
     private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
@@ -103,24 +101,30 @@ public class CristinApiClient {
         Map<String, String> requestQueryParams) throws IOException {
 
         long startRequestTime = System.currentTimeMillis();
-        List<CristinProject> enrichedProjects = queryAndEnrichProjects(requestQueryParams);
+        List<NvaProject> nvaProjects = importProjectsFromCristin(requestQueryParams);
         long endRequestTime = System.currentTimeMillis();
 
         ProjectsWrapper projectsWrapper = new ProjectsWrapper();
 
-        String requestQueryParamsAsString = String.format(TITLE_AND_LANGUAGE_QUERY_PARAM_PLACEHOLDER,
-            requestQueryParams.get(TITLE), requestQueryParams.get(LANGUAGE));
-
-        projectsWrapper.setId(buildUri(BASE_URL, QUESTION_MARK + requestQueryParamsAsString));
+        projectsWrapper.setId(buildUri(BASE_URL, QUESTION_MARK + queryParameters(requestQueryParams)));
         projectsWrapper.setSize(0); // TODO: NP-2385: X-Total-Count header from Cristin response
-        projectsWrapper.setSearchString(requestQueryParamsAsString);
+        projectsWrapper.setSearchString(queryParameters(requestQueryParams));
         projectsWrapper.setProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
         // TODO: NP-2385: Use Link header / Pagination data from Cristin response in the next two values
         projectsWrapper.setFirstRecord(0);
         projectsWrapper.setNextResults(null); // TODO: Change to URI
-        projectsWrapper.setHits(transformToNvaProject(enrichedProjects));
+        projectsWrapper.setHits(nvaProjects);
 
         return projectsWrapper;
+    }
+
+    private List<NvaProject> importProjectsFromCristin(Map<String, String> requestQueryParams)
+        throws IOException {
+
+        return queryAndEnrichProjects(requestQueryParams).stream()
+            .filter(CristinProject::hasValidContent)
+            .map(CristinProject::toNvaProject)
+            .collect(Collectors.toList());
     }
 
     // TODO: throw BadGatewayException if this fails as well?
