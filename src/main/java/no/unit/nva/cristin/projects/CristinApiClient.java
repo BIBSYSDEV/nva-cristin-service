@@ -2,24 +2,25 @@ package no.unit.nva.cristin.projects;
 
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.projects.Constants.BASE_URL;
-import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
-import static no.unit.nva.cristin.projects.Constants.CRISTIN_LANGUAGE_PARAM;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.QUESTION_MARK;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -35,29 +36,16 @@ public class CristinApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
 
-    private static final String HTTPS = "https";
-    private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/"; // TODO: Put in template instead?
-    private static final String EMPTY_FRAGMENT = null;
     private static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
         "Error fetching cristin project with id: %s . Exception Message: %s";
     private static final String ERROR_MESSAGE_BACKEND_FETCH_FAILED =
         "Your request cannot be processed at this time due to an upstream error";
-    private static final int STATUS_CODE_NOT_FOUND = 404;
-    private static final int STATUS_CODE_START_OF_ERROR_CODES_RANGE = 299;
-    private static final String CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
+    private static final String ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
         "Project matching id %s does not have valid data";
     private static final String ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED =
         "Query failed from params: %s with exception: %s";
     private static final String ERROR_MESSAGE_READING_RESPONSE_FAIL =
         "Error when reading response with body: %s, causing exception: %s";
-    private static final String QUESTION_MARK = "?";
-
-    private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
-    private static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
-    private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
-    private static final String CRISTIN_QUERY_PARAMETER_PAGE_VALUE = "1";
-    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
-    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
 
     private static final HttpClient client = HttpClient.newHttpClient();
 
@@ -76,13 +64,19 @@ public class CristinApiClient {
         return Optional.of(getProject(id, language))
             .filter(CristinProject::hasValidContent)
             .map(NvaProjectBuilder::new)
-            .map(builder -> builder.withContext(Constants.PROJECT_LOOKUP_CONTEXT_URL))
+            .map(builder -> builder.withContext(PROJECT_LOOKUP_CONTEXT_URL))
             .map(NvaProjectBuilder::build)
             .orElseThrow(() -> projectHasNotValidContent(id));
     }
 
     protected List<CristinProject> queryProjects(Map<String, String> parameters) throws ApiGatewayException {
-        URI uri = generateQueryProjectsUrl(parameters);
+        URI uri = attempt(() -> generateQueryProjectsUrl(parameters))
+            .toOptional(failure -> logError(
+                ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED,
+                queryParameters(parameters),
+                failure.getException()))
+            .orElseThrow();
+
         HttpResponse<InputStream> response = fetchQueryResults(uri);
 
         checkHttpStatusCode(
@@ -131,8 +125,15 @@ public class CristinApiClient {
         return projectsWrapper;
     }
 
+    // TODO: NP-2537: Change to Optional?
     protected CristinProject getProject(String id, String language) throws ApiGatewayException {
-        URI uri = generateGetProjectUri(id, language);
+        URI uri = attempt(() -> generateGetProjectUri(id, language))
+            .toOptional(failure -> logError(
+                ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
+                id,
+                failure.getException()))
+            .orElseThrow();
+
         HttpResponse<InputStream> response = fetchGetResult(uri);
 
         checkHttpStatusCode(buildUri(BASE_URL, id).toString(), response.statusCode());
@@ -146,27 +147,12 @@ public class CristinApiClient {
             });
     }
 
-    // TODO: Move attempt to the outside of these URI methods to simplify unit tests?
-    protected URI generateQueryProjectsUrl(Map<String, String> parameters) {
-        String query = queryParameters(parameters);
-        return attempt(() ->
-            new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH, query, EMPTY_FRAGMENT))
-            .toOptional(failure -> logError(
-                ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED,
-                query,
-                failure.getException()))
-            .orElseThrow();
+    protected URI generateQueryProjectsUrl(Map<String, String> parameters) throws URISyntaxException {
+        return new CristinQuery().withTitle(parameters.get(TITLE)).withLanguage(parameters.get(LANGUAGE)).toURI();
     }
 
-    protected URI generateGetProjectUri(String id, String language) {
-        String query = queryParameters(Map.of(CRISTIN_LANGUAGE_PARAM, language));
-        return attempt(() ->
-            new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH + id, query, EMPTY_FRAGMENT))
-            .toOptional(failure -> logError(
-                ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-                id,
-                failure.getException()))
-            .orElseThrow();
+    protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {
+        return CristinQuery.fromIdAndLanguage(id, language);
     }
 
     @JacocoGenerated
@@ -174,16 +160,17 @@ public class CristinApiClient {
         return endRequestTime - startRequestTime;
     }
 
+    // TODO: NP-2537: Put logic directly in method
     protected List<CristinProject> queryAndEnrichProjects(Map<String, String> requestQueryParams)
         throws ApiGatewayException {
 
-        List<CristinProject> projects = queryProjects(cristinQueryParamsFromRequestQueryParams(requestQueryParams));
+        List<CristinProject> projects = queryProjects(requestQueryParams);
         return enrichProjects(requestQueryParams.get(LANGUAGE), projects);
     }
 
     private BadGatewayException projectHasNotValidContent(String id) {
-        logger.warn(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
-        return new BadGatewayException(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
+        logger.warn(String.format(ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
+        return new BadGatewayException(String.format(ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
     }
 
     @JacocoGenerated
@@ -203,12 +190,16 @@ public class CristinApiClient {
     private void checkHttpStatusCode(String uri, int statusCode)
         throws NotFoundException, BadGatewayException {
 
-        if (statusCode == STATUS_CODE_NOT_FOUND) {
+        if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
             throw new NotFoundException(uri);
         }
 
-        if (statusCode > STATUS_CODE_START_OF_ERROR_CODES_RANGE) {
+        if (statusCode >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
             throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        }
+
+        if (statusCode >= HttpURLConnection.HTTP_MULT_CHOICE) { // Greater than or equal to 300
+            throw new RuntimeException();
         }
     }
 
@@ -238,12 +229,4 @@ public class CristinApiClient {
         logger.error(String.format(message, data, failure.getMessage()));
     }
 
-    private Map<String, String> cristinQueryParamsFromRequestQueryParams(Map<String, String> requestParams) {
-        Map<String, String> cristinQueryParameters = new ConcurrentHashMap<>();
-        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_TITLE_KEY, requestParams.get(TITLE));
-        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, requestParams.get(LANGUAGE));
-        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PAGE_KEY, CRISTIN_QUERY_PARAMETER_PAGE_VALUE);
-        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY, CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE);
-        return cristinQueryParameters;
-    }
 }

@@ -22,4 +22,5 @@ public class Constants {
     public static final String CRISTIN_LANGUAGE_PARAM = "lang";
     public static final String TITLE = "title";
     public static final String LANGUAGE = "language";
+    public static final String QUESTION_MARK = "?";
 }

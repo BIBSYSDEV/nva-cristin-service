@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -164,6 +165,32 @@ public class FetchOneCristinProjectTest {
         GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void handlerReturnsInternalErrorWhenUriCreationFails() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+
+        doThrow(URISyntaxException.class).when(cristinApiClientStub).generateGetProjectUri(any(), any());
+
+        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
+
+        assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void handlerThrowsInternalErrorWhenHttpStatusCodeIsSomeUnexpectedValue() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+
+        doReturn(new HttpResponseStub(IoUtils.stringToStream(""), 418))
+            .when(cristinApiClientStub).fetchGetResult(any(URI.class));
+        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
+
+        assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 

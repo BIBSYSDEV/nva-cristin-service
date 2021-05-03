@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.Constants.CRISTIN_LANGUAGE_PARAM;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
@@ -24,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Map;
@@ -60,8 +60,8 @@ public class FetchCristinProjectsTest {
         "api_response_one_cristin_project_to_nva_project.json";
     private static final String CRISTIN_GET_PROJECT_RESPONSE = "cristinGetProjectResponse.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
-    private static final String GET_CRISTIN_PROJECTS_EXAMPLE_URI = "https://api.cristin"
-        + ".no/v2/projects/?lang=nb&title=reindeer";
+    private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
+        "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&title=reindeer";
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
     private Context context;
@@ -189,11 +189,6 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    void cristinApiClientWillStillGenerateQueryProjectsUrlEvenWithoutParameters() {
-        cristinApiClientStub.generateQueryProjectsUrl(null); // TODO: Remove this?
-    }
-
-    @Test
     void readerThrowsIoExceptionWhenReadingInvalidJson() {
         InputStream inputStream = new ByteArrayInputStream(INVALID_JSON.getBytes(StandardCharsets.UTF_8));
         Executable action = () -> CristinApiClient.fromJson(inputStream, CristinProject.class);
@@ -231,8 +226,8 @@ public class FetchCristinProjectsTest {
 
     @Test
     void getsCorrectUriWhenCallingQueryProjectsUriBuilder() throws Exception {
-        assertEquals(new URI(GET_CRISTIN_PROJECTS_EXAMPLE_URI), cristinApiClientStub
-            .generateQueryProjectsUrl(Map.of(TITLE, RANDOM_TITLE, CRISTIN_LANGUAGE_PARAM, LANGUAGE_NB)));
+        assertEquals(new URI(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI), cristinApiClientStub
+            .generateQueryProjectsUrl(Map.of(TITLE, RANDOM_TITLE, LANGUAGE_KEY, LANGUAGE_NB)));
     }
 
     @Test
@@ -258,6 +253,27 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, response.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void handlerReturnsInternalErrorWhenUriCreationFails() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+
+        doThrow(URISyntaxException.class).when(cristinApiClientStub).generateQueryProjectsUrl(any());
+
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
+
+        assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, response.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, response.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void cristinQueryClassBuildsCorrectUriWhenSuppliedWithParameters() throws Exception {
+        var uri = new CristinQuery().withTitle(RANDOM_TITLE).withLanguage(LANGUAGE_NB).withItemsPerPage("10")
+            .fromPage("2").toURI();
+        var expected = QUERY_CRISTIN_PROJECTS_EXAMPLE_URI.replace("1", "2").replace("5", "10");
+        assertEquals(expected, uri.toString());
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
