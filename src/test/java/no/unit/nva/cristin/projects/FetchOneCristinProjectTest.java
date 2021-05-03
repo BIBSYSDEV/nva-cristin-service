@@ -100,7 +100,7 @@ public class FetchOneCristinProjectTest {
     void handlerReturnsBadGatewayWhenBackendThrowsException() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doThrow(new BadGatewayException(null)).when(cristinApiClientStub).getProject(any(), any());
+        doThrow(BadGatewayException.class).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> response = sendQueryWithId(DEFAULT_ID);
 

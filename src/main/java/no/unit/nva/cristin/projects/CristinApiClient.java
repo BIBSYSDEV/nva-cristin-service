@@ -42,8 +42,6 @@ public class CristinApiClient {
         "Error fetching cristin project with id: %s . Exception Message: %s";
     private static final String ERROR_MESSAGE_BACKEND_FETCH_FAILED =
         "Your request cannot be processed at this time due to an upstream error";
-    private static final String ERROR_MESSAGE_NOT_FOUND =
-        "The requested resource %s does not exist";
     private static final int STATUS_CODE_NOT_FOUND = 404;
     private static final int STATUS_CODE_START_OF_ERROR_CODES_RANGE = 299;
     private static final String CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
@@ -83,13 +81,25 @@ public class CristinApiClient {
             .orElseThrow(() -> projectHasNotValidContent(id));
     }
 
-    protected static <T> T fromJson(InputStream stream, Class<T> classOfT) throws IOException {
-        return OBJECT_MAPPER.readValue(stream, classOfT);
+    protected List<CristinProject> queryProjects(Map<String, String> parameters) throws ApiGatewayException {
+        URI uri = generateQueryProjectsUrl(parameters);
+        HttpResponse<InputStream> response = fetchQueryResults(uri);
+
+        checkHttpStatusCode(
+            buildUri(BASE_URL, QUESTION_MARK + queryParameters(parameters)).toString(),
+            response.statusCode());
+
+        return asList(attempt(() -> fromJson(response.body(), CristinProject[].class))
+            .orElseThrow(failure -> {
+                logError(ERROR_MESSAGE_READING_RESPONSE_FAIL,
+                    IoUtils.streamToString(response.body()),
+                    failure.getException());
+                return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+            }));
     }
 
-    private BadGatewayException projectHasNotValidContent(String id) {
-        logger.warn(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
-        return new BadGatewayException(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
+    protected static <T> T fromJson(InputStream stream, Class<T> classOfT) throws IOException {
+        return OBJECT_MAPPER.readValue(stream, classOfT);
     }
 
     /**
@@ -121,34 +131,42 @@ public class CristinApiClient {
         return projectsWrapper;
     }
 
-    protected List<CristinProject> queryProjects(Map<String, String> parameters) throws ApiGatewayException {
-        URI uri = generateQueryProjectsUrl(parameters);
-        HttpResponse<InputStream> response = fetchQueryResults(uri);
-
-        return asList(attempt(() -> fromJson(response.body(), CristinProject[].class))
-            .orElseThrow(failure -> logErrorReadingFromResponseBodyAndReturnErrorToClient(response.body(),
-                failure.getException())));
-    }
-
-    protected CristinProject getProject(String id, String language)
-        throws ApiGatewayException {
-
+    protected CristinProject getProject(String id, String language) throws ApiGatewayException {
         URI uri = generateGetProjectUri(id, language);
         HttpResponse<InputStream> response = fetchGetResult(uri);
 
-        // TODO: Make a checkHttpStatusCodes method which can be reused
-        if (response.statusCode() == STATUS_CODE_NOT_FOUND) {
-            // TODO: NP-2315: Use full Nva resource path instead of only id
-            throw new NotFoundException(String.format(ERROR_MESSAGE_NOT_FOUND, id));
-        }
-
-        if (response.statusCode() > STATUS_CODE_START_OF_ERROR_CODES_RANGE) {
-            throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-        }
+        checkHttpStatusCode(buildUri(BASE_URL, id).toString(), response.statusCode());
 
         return attempt(() -> fromJson(response.body(), CristinProject.class))
-            .orElseThrow(failure -> logErrorReadingFromResponseBodyAndReturnErrorToClient(response.body(),
-                failure.getException()));
+            .orElseThrow(failure -> {
+                logError(ERROR_MESSAGE_READING_RESPONSE_FAIL,
+                    IoUtils.streamToString(response.body()),
+                    failure.getException());
+                return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+            });
+    }
+
+    // TODO: Move attempt to the outside of these URI methods to simplify unit tests?
+    protected URI generateQueryProjectsUrl(Map<String, String> parameters) {
+        String query = queryParameters(parameters);
+        return attempt(() ->
+            new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH, query, EMPTY_FRAGMENT))
+            .toOptional(failure -> logError(
+                ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED,
+                query,
+                failure.getException()))
+            .orElseThrow();
+    }
+
+    protected URI generateGetProjectUri(String id, String language) {
+        String query = queryParameters(Map.of(CRISTIN_LANGUAGE_PARAM, language));
+        return attempt(() ->
+            new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH + id, query, EMPTY_FRAGMENT))
+            .toOptional(failure -> logError(
+                ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
+                id,
+                failure.getException()))
+            .orElseThrow();
     }
 
     @JacocoGenerated
@@ -163,12 +181,9 @@ public class CristinApiClient {
         return enrichProjects(requestQueryParams.get(LANGUAGE), projects);
     }
 
-    // TODO: Move attempt to the outside of these URI methods to simplify unit tests?
-    protected URI generateQueryProjectsUrl(Map<String, String> parameters) {
-        String query = queryParameters(parameters);
-        return attempt(() ->
-            new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH, query, EMPTY_FRAGMENT))
-            .toOptional(failure -> logQueryError(query, failure.getException())).orElseThrow();
+    private BadGatewayException projectHasNotValidContent(String id) {
+        logger.warn(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
+        return new BadGatewayException(String.format(CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
     }
 
     @JacocoGenerated
@@ -185,11 +200,16 @@ public class CristinApiClient {
         return attempt(() -> client.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream())).orElseThrow();
     }
 
-    protected URI generateGetProjectUri(String id, String language) {
-        String query = queryParameters(Map.of(CRISTIN_LANGUAGE_PARAM, language));
-        return attempt(() ->
-            new URI(HTTPS, CRISTIN_API_HOST, CRISTIN_API_PROJECTS_PATH + id, query, EMPTY_FRAGMENT))
-            .toOptional(failure -> logError(id, failure.getException())).orElseThrow();
+    private void checkHttpStatusCode(String uri, int statusCode)
+        throws NotFoundException, BadGatewayException {
+
+        if (statusCode == STATUS_CODE_NOT_FOUND) {
+            throw new NotFoundException(uri);
+        }
+
+        if (statusCode > STATUS_CODE_START_OF_ERROR_CODES_RANGE) {
+            throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        }
     }
 
     private List<NvaProject> importProjectsFromCristin(Map<String, String> requestQueryParams)
@@ -207,30 +227,17 @@ public class CristinApiClient {
 
     private CristinProject enrichOneProject(String language, CristinProject project) {
         return attempt(() -> getProject(project.getCristinProjectId(), language))
-            .toOptional(failure -> logError(project.getCristinProjectId(), failure.getException()))
+            .toOptional(failure -> logError(
+                ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
+                project.getCristinProjectId(),
+                failure.getException()))
             .orElse(project);
     }
 
-    private void logError(String id, Exception failure) {
-        logger.error(String.format(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-            id, failure.getMessage()));
+    private void logError(String message, String data, Exception failure) {
+        logger.error(String.format(message, data, failure.getMessage()));
     }
 
-    private void logQueryError(String queryParams, Exception failure) {
-        logger.error(String.format(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED,
-            queryParams, failure.getMessage()));
-    }
-
-    // TODO: Try to share logging and error throwing methods. ApiGatewayException can encapsulate other exceptions
-    private ApiGatewayException logErrorReadingFromResponseBodyAndReturnErrorToClient(InputStream bodyStream,
-                                                                                      Exception failure) {
-
-        var bodyString = IoUtils.streamToString(bodyStream);
-        logger.warn(String.format(ERROR_MESSAGE_READING_RESPONSE_FAIL, bodyString, failure.getMessage()));
-        return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-    }
-
-    // TODO: Should we rather use String.format? Then we can remove a lot of constants
     private Map<String, String> cristinQueryParamsFromRequestQueryParams(Map<String, String> requestParams) {
         Map<String, String> cristinQueryParameters = new ConcurrentHashMap<>();
         cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_TITLE_KEY, requestParams.get(TITLE));

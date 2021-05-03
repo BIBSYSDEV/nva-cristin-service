@@ -84,9 +84,9 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    public void handlerIgnoresErrorsWhenTryingToEnrichProjectInformation() throws Exception {
+    void handlerIgnoresErrorsWhenTryingToEnrichProjectInformation() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(new BadGatewayException(null)).when(cristinApiClientStub).getProject(any(), any());
+        doThrow(BadGatewayException.class).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
 
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
@@ -96,13 +96,13 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    public void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
+    void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
     }
 
     @Test
-    public void handlerThrowsInternalErrorWhenQueryingProjectsFails() throws Exception {
+    void handlerThrowsInternalErrorWhenQueryingProjectsFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
         doThrow(new RuntimeException()).when(cristinApiClientStub).queryAndEnrichProjects(any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
@@ -116,7 +116,7 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerReturnsNonEnrichedBodyWhenEnrichingFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(new BadGatewayException(null)).when(cristinApiClientStub).getProject(any(), any());
+        doThrow(BadGatewayException.class).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
         var expected = IoUtils.stringFromResources(Path.of(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON));
@@ -124,7 +124,7 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    public void handlerThrowsBadRequestWhenMissingTitleQueryParameter() throws IOException {
+    void handlerThrowsBadRequestWhenMissingTitleQueryParameter() throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB));
 
         handler.handleRequest(input, output, context);
@@ -135,7 +135,7 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    public void handlerSetsDefaultValueForMissingOptionalLanguageParameterAndReturnOk() throws Exception {
+    void handlerSetsDefaultValueForMissingOptionalLanguageParameterAndReturnOk() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(TITLE, RANDOM_TITLE));
 
         handler.handleRequest(input, output, context);
@@ -146,13 +146,13 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    public void handlerReceivesAllowOriginHeaderValueFromEnvironmentAndPutsItOnResponse() throws Exception {
+    void handlerReceivesAllowOriginHeaderValueFromEnvironmentAndPutsItOnResponse() throws Exception {
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
         assertEquals(ALLOW_ALL_ORIGIN, response.getHeaders().get(ApiGatewayHandler.ACCESS_CONTROL_ALLOW_ORIGIN));
     }
 
     @Test
-    public void handlerReturnsBadRequestWhenTitleQueryParamIsEmpty() throws Exception {
+    void handlerReturnsBadRequestWhenTitleQueryParamIsEmpty() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(TITLE, EMPTY_STRING));
 
         handler.handleRequest(input, output, context);
@@ -164,7 +164,7 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    public void handlerReturnsBadRequestWhenReceivingTitleQueryParamWithIllegalCharacters() throws Exception {
+    void handlerReturnsBadRequestWhenReceivingTitleQueryParamWithIllegalCharacters() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(TITLE, TITLE_ILLEGAL_CHARACTERS));
 
         handler.handleRequest(input, output, context);
@@ -176,7 +176,7 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    public void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
+    void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(TITLE, RANDOM_TITLE,
             LANGUAGE_KEY, INVALID_LANGUAGE_PARAM));
 
@@ -189,12 +189,12 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    public void cristinApiClientWillStillGenerateQueryProjectsUrlEvenWithoutParameters() {
+    void cristinApiClientWillStillGenerateQueryProjectsUrlEvenWithoutParameters() {
         cristinApiClientStub.generateQueryProjectsUrl(null); // TODO: Remove this?
     }
 
     @Test
-    public void readerThrowsIoExceptionWhenReadingInvalidJson() {
+    void readerThrowsIoExceptionWhenReadingInvalidJson() {
         InputStream inputStream = new ByteArrayInputStream(INVALID_JSON.getBytes(StandardCharsets.UTF_8));
         Executable action = () -> CristinApiClient.fromJson(inputStream, CristinProject.class);
         assertThrows(IOException.class, action);
