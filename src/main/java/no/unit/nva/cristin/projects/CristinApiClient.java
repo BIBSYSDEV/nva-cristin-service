@@ -71,10 +71,8 @@ public class CristinApiClient {
 
     protected List<CristinProject> queryProjects(Map<String, String> parameters) throws ApiGatewayException {
         URI uri = attempt(() -> generateQueryProjectsUrl(parameters))
-            .toOptional(failure -> logError(
-                ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED,
-                queryParameters(parameters),
-                failure.getException()))
+            .toOptional(failure ->
+                logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters), failure.getException()))
             .orElseThrow();
 
         HttpResponse<InputStream> response = fetchQueryResults(uri);
@@ -83,13 +81,7 @@ public class CristinApiClient {
             buildUri(BASE_URL, QUESTION_MARK + queryParameters(parameters)).toString(),
             response.statusCode());
 
-        return asList(attempt(() -> fromJson(response.body(), CristinProject[].class))
-            .orElseThrow(failure -> {
-                logError(ERROR_MESSAGE_READING_RESPONSE_FAIL,
-                    IoUtils.streamToString(response.body()),
-                    failure.getException());
-                return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-            }));
+        return asList(getDeserializedResponse(response, CristinProject[].class));
     }
 
     protected static <T> T fromJson(InputStream stream, Class<T> classOfT) throws IOException {
@@ -128,23 +120,22 @@ public class CristinApiClient {
     // TODO: NP-2537: Change to Optional?
     protected CristinProject getProject(String id, String language) throws ApiGatewayException {
         URI uri = attempt(() -> generateGetProjectUri(id, language))
-            .toOptional(failure -> logError(
-                ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-                id,
-                failure.getException()))
+            .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
             .orElseThrow();
 
         HttpResponse<InputStream> response = fetchGetResult(uri);
 
         checkHttpStatusCode(buildUri(BASE_URL, id).toString(), response.statusCode());
 
-        return attempt(() -> fromJson(response.body(), CristinProject.class))
-            .orElseThrow(failure -> {
-                logError(ERROR_MESSAGE_READING_RESPONSE_FAIL,
-                    IoUtils.streamToString(response.body()),
-                    failure.getException());
-                return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-            });
+        return getDeserializedResponse(response, CristinProject.class);
+    }
+
+    // TODO: NP-2537: Put logic directly in this method
+    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> requestQueryParams)
+        throws ApiGatewayException {
+
+        List<CristinProject> projects = queryProjects(requestQueryParams);
+        return enrichProjects(requestQueryParams.get(LANGUAGE), projects);
     }
 
     protected URI generateQueryProjectsUrl(Map<String, String> parameters) throws URISyntaxException {
@@ -160,12 +151,14 @@ public class CristinApiClient {
         return endRequestTime - startRequestTime;
     }
 
-    // TODO: NP-2537: Put logic directly in method
-    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> requestQueryParams)
-        throws ApiGatewayException {
+    private <T> T getDeserializedResponse(HttpResponse<InputStream> response, Class<T> classOfT)
+        throws BadGatewayException {
 
-        List<CristinProject> projects = queryProjects(requestQueryParams);
-        return enrichProjects(requestQueryParams.get(LANGUAGE), projects);
+        return attempt(() -> fromJson(response.body(), classOfT)).orElseThrow(failure -> {
+            logError(ERROR_MESSAGE_READING_RESPONSE_FAIL, IoUtils.streamToString(response.body()),
+                failure.getException());
+            return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        });
     }
 
     private BadGatewayException projectHasNotValidContent(String id) {
