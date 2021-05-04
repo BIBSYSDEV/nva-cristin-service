@@ -2,7 +2,7 @@ package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
-import static nva.commons.core.attempt.Try.attempt;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Map;
@@ -17,9 +17,6 @@ import nva.commons.core.JacocoGenerated;
  * Handler for requests to Lambda function.
  */
 public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> {
-
-    protected static final String TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS = "Parameter 'title' is missing or invalid. "
-        + "May only contain alphanumeric characters, dash, comma, period and whitespace";
 
     private static final char CHARACTER_DASH = '-';
     private static final char CHARACTER_COMMA = ',';
@@ -61,18 +58,17 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
     private String getValidTitle(RequestInfo requestInfo) throws BadRequestException {
         return getQueryParam(requestInfo, TITLE)
             .filter(this::isValidTitle)
-            .orElseThrow(() -> new BadRequestException(TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
-    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title) {
+    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title)
+        throws ApiGatewayException {
+
         Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
         requestQueryParams.put(TITLE, title);
         requestQueryParams.put(LANGUAGE, language);
 
-        return attempt(() ->
-            cristinApiClient
-                .queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParams))
-            .orElseThrow();
+        return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParams);
     }
 
     private boolean isValidTitle(String str) {
