@@ -111,7 +111,6 @@ public class CristinApiClient {
         return projectsWrapper;
     }
 
-    // TODO: NP-2537: Change to Optional?
     protected CristinProject getProject(String id, String language) throws ApiGatewayException {
         URI uri = attempt(() -> generateGetProjectUri(id, language))
             .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
@@ -124,12 +123,18 @@ public class CristinApiClient {
         return getDeserializedResponse(response, CristinProject.class);
     }
 
-    // TODO: NP-2537: Put logic directly in this method
     protected List<CristinProject> queryAndEnrichProjects(Map<String, String> requestQueryParams)
         throws ApiGatewayException {
 
-        List<CristinProject> projects = queryProjects(requestQueryParams);
-        return enrichProjects(requestQueryParams.get(LANGUAGE), projects);
+        String language = requestQueryParams.get(LANGUAGE);
+
+        return queryProjects(requestQueryParams).stream()
+            .map(project -> attempt(() -> getProject(project.getCristinProjectId(), language))
+                .toOptional(failure -> logError(
+                    ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
+                    project.getCristinProjectId(),
+                    failure.getException()))
+                .orElse(project)).collect(Collectors.toList());
     }
 
     protected URI generateQueryProjectsUrl(Map<String, String> parameters) throws URISyntaxException {
@@ -193,19 +198,6 @@ public class CristinApiClient {
             .filter(CristinProject::hasValidContent)
             .map(CristinProject::toNvaProject)
             .collect(Collectors.toList());
-    }
-
-    private List<CristinProject> enrichProjects(String language, List<CristinProject> projects) {
-        return projects.stream().map(project -> enrichOneProject(language, project)).collect(Collectors.toList());
-    }
-
-    private CristinProject enrichOneProject(String language, CristinProject project) {
-        return attempt(() -> getProject(project.getCristinProjectId(), language))
-            .toOptional(failure -> logError(
-                ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-                project.getCristinProjectId(),
-                failure.getException()))
-            .orElse(project);
     }
 
     private void logError(String message, String data, Exception failure) {
