@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.ID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
@@ -12,9 +13,6 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
-
-    public static final String INVALID_PATH_PARAMETER_FOR_ID_EXCEPTION_MESSAGE =
-        "Invalid path parameter for id, needs to be a number";
 
     private final transient CristinApiClient cristinApiClient;
 
@@ -51,7 +49,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     private String getValidId(RequestInfo requestInfo) throws BadRequestException {
         attempt(() -> Integer.parseInt(requestInfo.getPathParameter(ID)))
-            .orElseThrow(failure -> new BadRequestException(INVALID_PATH_PARAMETER_FOR_ID_EXCEPTION_MESSAGE));
+            .orElseThrow(failure -> new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
 
         return requestInfo.getPathParameter(ID);
     }

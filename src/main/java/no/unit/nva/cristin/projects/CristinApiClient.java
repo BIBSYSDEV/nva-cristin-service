@@ -7,6 +7,11 @@ import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.QUESTION_MARK;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
@@ -35,17 +40,6 @@ import org.slf4j.LoggerFactory;
 public class CristinApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
-
-    private static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
-        "Error fetching cristin project with id: %s . Exception Message: %s";
-    private static final String ERROR_MESSAGE_BACKEND_FETCH_FAILED =
-        "Your request cannot be processed at this time due to an upstream error";
-    private static final String ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
-        "Project matching id %s does not have valid data";
-    private static final String ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED =
-        "Query failed from params: %s with exception: %s";
-    private static final String ERROR_MESSAGE_READING_RESPONSE_FAIL =
-        "Error when reading response with body: %s, causing exception: %s";
 
     private static final HttpClient client = HttpClient.newHttpClient();
 
@@ -185,13 +179,9 @@ public class CristinApiClient {
 
         if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
             throw new NotFoundException(uri);
-        }
-
-        if (statusCode >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
+        } else if (statusCode >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
             throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-        }
-
-        if (statusCode >= HttpURLConnection.HTTP_MULT_CHOICE) { // Greater than or equal to 300
+        } else if (statusCode >= HttpURLConnection.HTTP_MULT_CHOICE) { // Greater than or equal to 300
             throw new RuntimeException();
         }
     }
