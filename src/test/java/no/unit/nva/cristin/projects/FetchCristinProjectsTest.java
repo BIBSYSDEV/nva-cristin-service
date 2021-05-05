@@ -1,7 +1,6 @@
 package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static no.unit.nva.cristin.projects.CristinHandler.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
@@ -9,7 +8,6 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
-import static nva.commons.core.attempt.Try.attempt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,7 +32,6 @@ import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
@@ -60,9 +57,6 @@ public class FetchCristinProjectsTest {
 
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
-    private static final String API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON =
-        "api_response_one_cristin_project_to_nva_project.json";
-    private static final String CRISTIN_GET_PROJECT_RESPONSE = "cristinGetProjectResponse.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
         "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&title=reindeer";
@@ -202,20 +196,6 @@ public class FetchCristinProjectsTest {
         InputStream inputStream = new ByteArrayInputStream(INVALID_JSON.getBytes(StandardCharsets.UTF_8));
         Executable action = () -> CristinApiClient.fromJson(inputStream, CristinProject.class);
         assertThrows(IOException.class, action);
-    }
-
-    // TODO: Put in NvaProjectBuilderTest class
-    @Test
-    void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
-        String expected = IoUtils.stringFromResources(Path.of(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_JSON));
-        String cristinGetProject = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE));
-        CristinProject cristinProject =
-            attempt(() -> OBJECT_MAPPER.readValue(cristinGetProject, CristinProject.class)).get();
-        NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
-        nvaProject.setContext(PROJECT_LOOKUP_CONTEXT_URL);
-        String actual = attempt(() -> OBJECT_MAPPER.writeValueAsString(nvaProject)).get();
-
-        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }
 
     @Test
