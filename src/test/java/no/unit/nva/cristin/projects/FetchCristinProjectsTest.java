@@ -103,7 +103,7 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerThrowsInternalErrorWhenQueryingProjectsFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(RuntimeException.class).when(cristinApiClientStub).queryAndEnrichProjects(any());
+        doThrow(RuntimeException.class).when(cristinApiClientStub).getEnrichedProjectsUsingQueryResponse(any(), any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
 
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
