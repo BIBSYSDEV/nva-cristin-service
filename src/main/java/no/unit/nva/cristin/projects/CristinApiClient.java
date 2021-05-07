@@ -63,25 +63,6 @@ public class CristinApiClient {
             .orElseThrow(() -> projectHasNotValidContent(id));
     }
 
-    protected List<CristinProject> queryProjects(Map<String, String> parameters) throws ApiGatewayException {
-        URI uri = attempt(() -> generateQueryProjectsUrl(parameters))
-            .toOptional(failure ->
-                logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters), failure.getException()))
-            .orElseThrow();
-
-        HttpResponse<InputStream> response = fetchQueryResults(uri);
-
-        checkHttpStatusCode(
-            buildUri(BASE_URL, QUESTION_MARK + queryParameters(parameters)).toString(),
-            response.statusCode());
-
-        return asList(getDeserializedResponse(response, CristinProject[].class));
-    }
-
-    protected static <T> T fromJson(InputStream stream, Class<T> classOfT) throws IOException {
-        return OBJECT_MAPPER.readValue(stream, classOfT);
-    }
-
     /**
      * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
      * for serialization to the client.
@@ -94,8 +75,14 @@ public class CristinApiClient {
         Map<String, String> requestQueryParams) throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
-        List<NvaProject> nvaProjects = importProjectsFromCristin(requestQueryParams);
+        HttpResponse<InputStream> response = queryProjects(requestQueryParams);
+        List<CristinProject> enrichedProjectsFromResponse =
+            getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
+        List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(enrichedProjectsFromResponse);
         long endRequestTime = System.currentTimeMillis();
+
+        // TODO: NP-2385
+        //HttpHeaders headers = response.headers();
 
         ProjectsWrapper projectsWrapper = new ProjectsWrapper();
 
@@ -111,6 +98,25 @@ public class CristinApiClient {
         return projectsWrapper;
     }
 
+    protected static <T> T fromJson(InputStream stream, Class<T> classOfT) throws IOException {
+        return OBJECT_MAPPER.readValue(stream, classOfT);
+    }
+
+    protected HttpResponse<InputStream> queryProjects(Map<String, String> parameters) throws ApiGatewayException {
+        URI uri = attempt(() -> generateQueryProjectsUrl(parameters))
+            .toOptional(failure ->
+                logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters), failure.getException()))
+            .orElseThrow();
+
+        HttpResponse<InputStream> response = fetchQueryResults(uri);
+
+        checkHttpStatusCode(
+            buildUri(BASE_URL, QUESTION_MARK + queryParameters(parameters)).toString(),
+            response.statusCode());
+
+        return response;
+    }
+
     protected CristinProject getProject(String id, String language) throws ApiGatewayException {
         URI uri = attempt(() -> generateGetProjectUri(id, language))
             .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
@@ -123,12 +129,13 @@ public class CristinApiClient {
         return getDeserializedResponse(response, CristinProject.class);
     }
 
-    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> requestQueryParams)
+    protected List<CristinProject> getEnrichedProjectsUsingQueryResponse(HttpResponse<InputStream> response,
+                                                                         String language)
         throws ApiGatewayException {
 
-        String language = requestQueryParams.get(LANGUAGE);
+        List<CristinProject> projectsFromQuery = asList(getDeserializedResponse(response, CristinProject[].class));
 
-        return queryProjects(requestQueryParams).stream()
+        return projectsFromQuery.stream()
             .map(project -> attempt(() -> getProject(project.getCristinProjectId(), language))
                 .toOptional(failure -> logError(
                     ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
@@ -191,10 +198,8 @@ public class CristinApiClient {
         }
     }
 
-    private List<NvaProject> importProjectsFromCristin(Map<String, String> requestQueryParams)
-        throws ApiGatewayException {
-
-        return queryAndEnrichProjects(requestQueryParams).stream()
+    private List<NvaProject> mapValidCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
+        return cristinProjects.stream()
             .filter(CristinProject::hasValidContent)
             .map(CristinProject::toNvaProject)
             .collect(Collectors.toList());
@@ -203,5 +208,4 @@ public class CristinApiClient {
     private void logError(String message, String data, Exception failure) {
         logger.error(String.format(message, data, failure.getMessage()));
     }
-
 }

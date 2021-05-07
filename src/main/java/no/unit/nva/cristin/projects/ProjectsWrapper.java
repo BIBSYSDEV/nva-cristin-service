@@ -37,7 +37,7 @@ public class ProjectsWrapper {
     @JsonProperty
     private Integer firstRecord;
     @JsonProperty
-    private String nextResults;
+    private String nextResults; // TODO: NP-2385: Add previous results as well
     @JsonProperty
     private List<NvaProject> hits;
 
