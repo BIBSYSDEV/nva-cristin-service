@@ -8,6 +8,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,7 +19,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
@@ -47,7 +46,6 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 public class FetchCristinProjectsTest {
 
     private static final String LANGUAGE_KEY = "language";
-    private static final String EMPTY_STRING = "";
     private static final String LANGUAGE_NB = "nb";
     private static final String INVALID_LANGUAGE_PARAM = "ru";
     private static final String RANDOM_TITLE = "reindeer";
@@ -120,7 +118,7 @@ public class FetchCristinProjectsTest {
             .getProject(any(), any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
-        String expected = IoUtils.stringFromResources(Path.of(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON));
+        String expected = getBodyFromResource(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON);
 
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(gatewayResponse.getBody()));
     }
@@ -193,8 +191,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     void readerThrowsIoExceptionWhenReadingInvalidJson() {
-        InputStream inputStream = new ByteArrayInputStream(INVALID_JSON.getBytes(StandardCharsets.UTF_8));
-        Executable action = () -> CristinApiClient.fromJson(inputStream, CristinProject.class);
+        Executable action = () -> CristinApiClient.fromJson(INVALID_JSON, CristinProject.class);
         assertThrows(IOException.class, action);
     }
 
@@ -203,10 +200,10 @@ public class FetchCristinProjectsTest {
         throws Exception {
 
         cristinApiClientStub = spy(cristinApiClientStub);
-        HttpResponse<InputStream> emptyResponse = new HttpResponseStub(IoUtils.stringToStream(EMPTY_LIST_STRING));
+        HttpResponse<String> emptyResponse = new HttpResponseStub(EMPTY_LIST_STRING);
         doReturn(emptyResponse)
             .when(cristinApiClientStub).fetchQueryResults(any(URI.class));
-        String expected = IoUtils.stringFromResources(Path.of(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON));
+        String expected = getBodyFromResource(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON);
 
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
@@ -237,7 +234,7 @@ public class FetchCristinProjectsTest {
     void handlerThrowsBadGatewayExceptionWhenThereIsThrownIoExceptionWhenReadingFromJson() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(IoUtils.stringToStream("")))
+        doReturn(new HttpResponseStub(EMPTY_STRING))
             .when(cristinApiClientStub).fetchQueryResults(any(URI.class));
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
@@ -275,4 +272,7 @@ public class FetchCristinProjectsTest {
             .build();
     }
 
+    private String getBodyFromResource(String resource) {
+        return IoUtils.stringFromResources(Path.of(resource));
+    }
 }

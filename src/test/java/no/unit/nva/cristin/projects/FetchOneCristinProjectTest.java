@@ -9,6 +9,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_P
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,6 +25,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -68,7 +70,7 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerReturnsNotFoundStatusWhenIdIsNotFound() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(new HttpResponseStub(getStream(CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON), 404))
+        doReturn(new HttpResponseStub(getBodyFromResource(CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON), 404))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
@@ -100,7 +102,7 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerReturnsNvaProjectFromTransformedCristinProjectWhenIdIsFound() throws Exception {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
-        InputStream expected = getStream(API_RESPONSE_ONE_PROJECT_JSON);
+        String expected = getBodyFromResource(API_RESPONSE_ONE_PROJECT_JSON);
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(gatewayResponse.getBody()));
     }
 
@@ -137,20 +139,20 @@ public class FetchOneCristinProjectTest {
 
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(getStream(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON)))
+        doReturn(new HttpResponseStub(getBodyFromResource(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON)))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
 
-        InputStream expected = getStream(API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON);
+        String expected = getBodyFromResource(API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON);
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(gatewayResponse.getBody()));
     }
 
     @Test
     void handlerThrowsBadGatewayExceptionWhenBackendReturnsInvalidProjectData() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(new HttpResponseStub(IoUtils.stringToStream(JSON_WITH_MISSING_REQUIRED_DATA)))
+        doReturn(new HttpResponseStub(JSON_WITH_MISSING_REQUIRED_DATA))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
@@ -171,7 +173,7 @@ public class FetchOneCristinProjectTest {
     void handlerThrowsBadGatewayExceptionWhenThereIsThrownExceptionWhenReadingFromJson() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(IoUtils.stringToStream("")))
+        doReturn(new HttpResponseStub(EMPTY_STRING))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
@@ -199,7 +201,7 @@ public class FetchOneCristinProjectTest {
     void handlerThrowsInternalErrorWhenHttpStatusCodeIsSomeUnexpectedValue() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(IoUtils.stringToStream(""), 418))
+        doReturn(new HttpResponseStub(EMPTY_STRING, 418))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
@@ -228,7 +230,7 @@ public class FetchOneCristinProjectTest {
             .build();
     }
 
-    private InputStream getStream(String resource) {
-        return IoUtils.inputStreamFromResources(resource);
+    private String getBodyFromResource(String resource) {
+        return IoUtils.stringFromResources(Path.of(resource));
     }
 }
