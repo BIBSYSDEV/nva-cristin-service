@@ -1,7 +1,9 @@
 package no.unit.nva.cristin.projects;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
+import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.QUESTION_MARK;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_RECORD;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.HITS;
@@ -10,11 +12,15 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.NEXT_RESULTS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.PROCESSING_TIME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SEARCH_STRING;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SIZE;
+import static no.unit.nva.cristin.projects.UriUtils.buildUri;
+import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
+import java.net.http.HttpHeaders;
 import java.util.List;
+import java.util.Map;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
 
@@ -103,5 +109,43 @@ public class ProjectsWrapper {
 
     public void setHits(List<NvaProject> hits) {
         this.hits = hits;
+    }
+
+    /**
+     * Assigns values to some of the fields using supplied query parameters.
+     *
+     * @param queryParams the query params
+     * @return ProjectsWrapper object with field values from query parameters
+     */
+    public ProjectsWrapper usingQueryParams(Map<String, String> queryParams) {
+        String queryParamsAsString = queryParameters(queryParams);
+        this.id = buildUri(BASE_URL, QUESTION_MARK + queryParamsAsString);
+        this.searchString = queryParamsAsString;
+        return this;
+    }
+
+    // TODO: NP-2385
+
+    /**
+     * Assigns values to some of the fields using supplied http headers.
+     *
+     * @param headers the headers
+     * @return ProjectsWrapper object with field values from http headers
+     */
+    public ProjectsWrapper usingHeaders(HttpHeaders headers) {
+        this.size = 0;
+        this.firstRecord = 0;
+        //this.nextResults = null;
+        return this;
+    }
+
+    public ProjectsWrapper withProcessingTime(Long processingTime) {
+        this.processingTime = processingTime;
+        return this;
+    }
+
+    public ProjectsWrapper withHits(List<NvaProject> hits) {
+        this.hits = hits;
+        return this;
     }
 }
