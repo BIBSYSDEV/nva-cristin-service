@@ -6,6 +6,7 @@ import static no.unit.nva.cristin.projects.Constants.EMPTY_FRAGMENT;
 import static no.unit.nva.cristin.projects.Constants.HTTPS;
 import static no.unit.nva.cristin.projects.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_RECORD;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.HITS;
@@ -124,8 +125,6 @@ public class ProjectsWrapper {
             .orElseThrow();
     }
 
-    // TODO: NP-2385
-
     /**
      * Assigns values to some of the fields using supplied http headers.
      *
@@ -133,10 +132,14 @@ public class ProjectsWrapper {
      * @return ProjectsWrapper object with field values from http headers
      */
     public ProjectsWrapper usingHeaders(HttpHeaders headers) {
-        this.size = 0;
+        this.size = getSizeHeader(headers);
         this.firstRecord = 0;
         //this.nextResults = null;
         return this;
+    }
+
+    private int getSizeHeader(HttpHeaders headers) {
+        return (int) headers.firstValueAsLong(X_TOTAL_COUNT).orElse(0);
     }
 
     public ProjectsWrapper withProcessingTime(Long processingTime) {

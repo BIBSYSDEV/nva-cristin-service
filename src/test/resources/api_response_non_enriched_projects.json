@@ -1,7 +1,7 @@
 {
   "@context": "https://example.org/search-api-context.json",
   "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&title=reindeer",
-  "size": 0,
+  "size": 135,
   "searchString": "language=nb&title=reindeer",
   "processingTime": 1000,
   "firstRecord": 0,
