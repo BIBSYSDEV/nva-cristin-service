@@ -12,8 +12,9 @@ public class Constants {
     public static final String PROJECT_SEARCH_CONTEXT_URL = "https://example.org/search-api-context.json";
     public static final String PROJECT_LOOKUP_CONTEXT_URL = "https://example.org/project-context.json";
     public static final String CRISTIN_API_HOST = ENVIRONMENT.readEnv(CRISTIN_API_HOST_ENV);
-    // TODO: Improve this in NP-2281?
     public static final String CRISTIN_API_BASE_URL = "https://" + CRISTIN_API_HOST + "/v2";
+    public static final String HTTPS = "https";
+    public static final String EMPTY_FRAGMENT = null;
     public static final String INSTITUTION_PATH = "institutions";
     public static final String PERSON_PATH = "persons";
     private static final String BASE_URL_ENV = "BASE_URL";
@@ -23,4 +24,7 @@ public class Constants {
     public static final String TITLE = "title";
     public static final String LANGUAGE = "language";
     public static final String QUESTION_MARK = "?";
+    public static final String PROJECTS_PATH = "/project/";
+    private static final String DOMAIN_NAME_ENV = "DOMAIN_NAME";
+    public static final String DOMAIN_NAME = ENVIRONMENT.readEnv(DOMAIN_NAME_ENV);
 }

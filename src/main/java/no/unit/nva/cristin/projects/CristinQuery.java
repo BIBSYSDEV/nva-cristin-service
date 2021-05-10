@@ -1,6 +1,8 @@
 package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
+import static no.unit.nva.cristin.projects.Constants.EMPTY_FRAGMENT;
+import static no.unit.nva.cristin.projects.Constants.HTTPS;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,9 +17,7 @@ public class CristinQuery {
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_DEFAULT_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
-    private static final String HTTPS = "https";
     private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
-    private static final String EMPTY_FRAGMENT = null;
 
     private final transient Map<String, String> cristinQueryParameters;
 

@@ -81,21 +81,11 @@ public class CristinApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(enrichedProjectsFromResponse);
         long endRequestTime = System.currentTimeMillis();
 
-        // TODO: NP-2385
-        //HttpHeaders headers = response.headers();
-
-        ProjectsWrapper projectsWrapper = new ProjectsWrapper();
-
-        projectsWrapper.setId(buildUri(BASE_URL, QUESTION_MARK + queryParameters(requestQueryParams)));
-        projectsWrapper.setSize(0); // TODO: NP-2385: X-Total-Count header from Cristin response
-        projectsWrapper.setSearchString(queryParameters(requestQueryParams));
-        projectsWrapper.setProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
-        // TODO: NP-2385: Use Link header / Pagination data from Cristin response in the next two values
-        projectsWrapper.setFirstRecord(0);
-        projectsWrapper.setNextResults(null); // TODO: Change to URI
-        projectsWrapper.setHits(nvaProjects);
-
-        return projectsWrapper;
+        return new ProjectsWrapper()
+            .usingQueryParams(requestQueryParams)
+            .usingHeaders(response.headers())
+            .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
+            .withHits(nvaProjects);
     }
 
     protected static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
