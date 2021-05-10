@@ -16,13 +16,14 @@ import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +34,6 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.ioutils.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +75,7 @@ public class CristinApiClient {
         Map<String, String> requestQueryParams) throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
-        HttpResponse<InputStream> response = queryProjects(requestQueryParams);
+        HttpResponse<String> response = queryProjects(requestQueryParams);
         List<CristinProject> enrichedProjectsFromResponse =
             getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(enrichedProjectsFromResponse);
@@ -88,17 +88,17 @@ public class CristinApiClient {
             .withHits(nvaProjects);
     }
 
-    protected static <T> T fromJson(InputStream stream, Class<T> classOfT) throws IOException {
-        return OBJECT_MAPPER.readValue(stream, classOfT);
+    protected static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
+        return OBJECT_MAPPER.readValue(body, classOfT);
     }
 
-    protected HttpResponse<InputStream> queryProjects(Map<String, String> parameters) throws ApiGatewayException {
+    protected HttpResponse<String> queryProjects(Map<String, String> parameters) throws ApiGatewayException {
         URI uri = attempt(() -> generateQueryProjectsUrl(parameters))
             .toOptional(failure ->
                 logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters), failure.getException()))
             .orElseThrow();
 
-        HttpResponse<InputStream> response = fetchQueryResults(uri);
+        HttpResponse<String> response = fetchQueryResults(uri);
 
         checkHttpStatusCode(
             buildUri(BASE_URL, QUESTION_MARK + queryParameters(parameters)).toString(),
@@ -112,14 +112,14 @@ public class CristinApiClient {
             .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
             .orElseThrow();
 
-        HttpResponse<InputStream> response = fetchGetResult(uri);
+        HttpResponse<String> response = fetchGetResult(uri);
 
         checkHttpStatusCode(buildUri(BASE_URL, id).toString(), response.statusCode());
 
         return getDeserializedResponse(response, CristinProject.class);
     }
 
-    protected List<CristinProject> getEnrichedProjectsUsingQueryResponse(HttpResponse<InputStream> response,
+    protected List<CristinProject> getEnrichedProjectsUsingQueryResponse(HttpResponse<String> response,
                                                                          String language)
         throws ApiGatewayException {
 
@@ -147,14 +147,11 @@ public class CristinApiClient {
         return endRequestTime - startRequestTime;
     }
 
-    private <T> T getDeserializedResponse(HttpResponse<InputStream> response, Class<T> classOfT)
-        throws BadGatewayException {
+    @JacocoGenerated
+    protected HttpResponse<String> fetchGetResult(URI uri) {
+        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
 
-        return attempt(() -> fromJson(response.body(), classOfT)).orElseThrow(failure -> {
-            logError(ERROR_MESSAGE_READING_RESPONSE_FAIL, IoUtils.streamToString(response.body()),
-                failure.getException());
-            return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-        });
+        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
     private BadGatewayException projectHasNotValidContent(String id) {
@@ -163,17 +160,20 @@ public class CristinApiClient {
     }
 
     @JacocoGenerated
-    protected HttpResponse<InputStream> fetchGetResult(URI uri) {
+    protected HttpResponse<String> fetchQueryResults(URI uri) {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
 
-        return attempt(() -> client.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream())).orElseThrow();
+        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
-    @JacocoGenerated
-    protected HttpResponse<InputStream> fetchQueryResults(URI uri) {
-        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+    private <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
+        throws BadGatewayException {
 
-        return attempt(() -> client.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream())).orElseThrow();
+        return attempt(() -> fromJson(response.body(), classOfT)).orElseThrow(failure -> {
+            logError(ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(),
+                failure.getException());
+            return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        });
     }
 
     private void checkHttpStatusCode(String uri, int statusCode)
