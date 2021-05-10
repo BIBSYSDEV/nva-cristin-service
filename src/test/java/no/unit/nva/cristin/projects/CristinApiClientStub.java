@@ -1,8 +1,8 @@
 package no.unit.nva.cristin.projects;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpResponse;
+import java.nio.file.Path;
 import nva.commons.core.ioutils.IoUtils;
 
 public class CristinApiClientStub extends CristinApiClient {
@@ -16,22 +16,22 @@ public class CristinApiClientStub extends CristinApiClient {
     }
 
     @Override
-    protected HttpResponse<InputStream> fetchQueryResults(URI uri) {
+    protected HttpResponse<String> fetchQueryResults(URI uri) {
         return mockQueryResponse();
     }
 
     @Override
-    protected HttpResponse<InputStream> fetchGetResult(URI uri) {
+    protected HttpResponse<String> fetchGetResult(URI uri) {
         return mockGetResponse();
     }
 
-    private HttpResponse<InputStream> mockGetResponse() {
-        var stream = IoUtils.inputStreamFromResources(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE);
-        return new HttpResponseStub(stream);
+    private HttpResponse<String> mockGetResponse() {
+        String body = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE));
+        return new HttpResponseStub(body);
     }
 
-    private HttpResponse<InputStream> mockQueryResponse() {
-        var stream = IoUtils.inputStreamFromResources(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE);
-        return new HttpResponseStub(stream);
+    private HttpResponse<String> mockQueryResponse() {
+        String body = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE));
+        return new HttpResponseStub(body);
     }
 }

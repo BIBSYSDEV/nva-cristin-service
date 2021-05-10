@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpHeaders;
@@ -11,18 +10,18 @@ import javax.net.ssl.SSLSession;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
-public class HttpResponseStub implements HttpResponse<InputStream> {
+public class HttpResponseStub implements HttpResponse<String> {
 
-    private InputStream inputStream;
+    private String body;
     private int statusCode;
 
-    public HttpResponseStub(InputStream inputStream) {
-        this.inputStream = inputStream;
+    public HttpResponseStub(String body) {
+        this.body = body;
         this.statusCode = 200;
     }
 
-    public HttpResponseStub(InputStream inputStream, int statusCode) {
-        this.inputStream = inputStream;
+    public HttpResponseStub(String body, int statusCode) {
+        this.body = body;
         this.statusCode = statusCode;
     }
 
@@ -37,7 +36,7 @@ public class HttpResponseStub implements HttpResponse<InputStream> {
     }
 
     @Override
-    public Optional<HttpResponse<InputStream>> previousResponse() {
+    public Optional<HttpResponse<String>> previousResponse() {
         return Optional.empty();
     }
 
@@ -47,8 +46,8 @@ public class HttpResponseStub implements HttpResponse<InputStream> {
     }
 
     @Override
-    public InputStream body() {
-        return inputStream;
+    public String body() {
+        return body;
     }
 
     @Override
