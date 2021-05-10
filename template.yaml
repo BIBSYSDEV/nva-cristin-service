@@ -20,7 +20,9 @@ Globals:
       Variables:
         ALLOWED_ORIGIN: '*'
         CRISTIN_API_HOST: 'api.cristin.no'
-        BASE_URL: 'https://api.dev.nva.aws.unit.no/project' # TODO: Dynamic from CustomDomain and CustomDomainBasePtah
+        DOMAIN_NAME: 'api.dev.nva.aws.unit.no' # TODO: NP-2280: Dynamic from CustomDomain
+        # TODO: NP-2280: Replace with CustomDomainBasePath and call it PROJECTS_BASE_PATH
+        BASE_URL: 'https://api.dev.nva.aws.unit.no/project'
   Api:
     Cors:
       AllowOrigin: "'*'"
