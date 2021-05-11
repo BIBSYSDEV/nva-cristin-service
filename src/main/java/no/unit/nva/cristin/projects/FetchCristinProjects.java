@@ -104,7 +104,7 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
 
     private boolean isNumeric(String str) {
         try {
-            Double.parseDouble(str);
+            Integer.parseInt(str);
             return true;
         } catch (NumberFormatException e) {
             return false;

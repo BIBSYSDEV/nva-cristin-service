@@ -8,6 +8,7 @@ import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.QUESTION_MARK;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
@@ -187,10 +188,16 @@ public class CristinApiClient {
         if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
             throw new NotFoundException(uri);
         } else if (statusCode >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
+            logBackendFetchFail(uri, statusCode);
             throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         } else if (statusCode >= HttpURLConnection.HTTP_MULT_CHOICE) { // Greater than or equal to 300
+            logBackendFetchFail(uri, statusCode);
             throw new RuntimeException();
         }
+    }
+
+    private void logBackendFetchFail(String uri, int statusCode) {
+        logger.error(String.format(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE, statusCode, uri));
     }
 
     private List<NvaProject> mapValidCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
