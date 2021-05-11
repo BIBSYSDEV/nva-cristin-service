@@ -27,4 +27,6 @@ public class Constants {
     public static final String PROJECTS_PATH = "/project/";
     private static final String DOMAIN_NAME_ENV = "DOMAIN_NAME";
     public static final String DOMAIN_NAME = ENVIRONMENT.readEnv(DOMAIN_NAME_ENV);
+    public static final String PAGE = "page";
+    public static final String PAGE_NUMBER_ONE = "1";
 }

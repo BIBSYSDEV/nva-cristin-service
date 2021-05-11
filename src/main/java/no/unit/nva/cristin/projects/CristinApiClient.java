@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.QUESTION_MARK;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
@@ -135,7 +136,11 @@ public class CristinApiClient {
     }
 
     protected URI generateQueryProjectsUrl(Map<String, String> parameters) throws URISyntaxException {
-        return new CristinQuery().withTitle(parameters.get(TITLE)).withLanguage(parameters.get(LANGUAGE)).toURI();
+        return new CristinQuery()
+            .withTitle(parameters.get(TITLE))
+            .withLanguage(parameters.get(LANGUAGE))
+            .fromPage(parameters.get(PAGE))
+            .toURI();
     }
 
     protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {

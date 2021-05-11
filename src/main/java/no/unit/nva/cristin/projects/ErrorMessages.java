@@ -23,4 +23,5 @@ public class ErrorMessages {
         "Parameter 'title' is missing or invalid. "
             + "May only contain alphanumeric characters, dash, comma, period and whitespace";
     public static final String ERROR_MESSAGE_LANGUAGE_INVALID = "Parameter 'language' has invalid value";
+    public static final String ERROR_MESSAGE_PAGE_VALUE_INVALID = "Parameter 'page' has invalid value";
 }
