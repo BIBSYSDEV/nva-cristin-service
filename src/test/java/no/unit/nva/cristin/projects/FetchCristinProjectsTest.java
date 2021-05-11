@@ -1,5 +1,7 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.DEFAULT_NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PAGE_NUMBER_ONE;
@@ -7,6 +9,7 @@ import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static no.unit.nva.cristin.projects.CristinHandler.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
@@ -55,17 +58,18 @@ public class FetchCristinProjectsTest {
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String INVALID_JSON = "This is not valid JSON!";
     private static final String EMPTY_LIST_STRING = "[]";
-    public static final String PAGE_NUMBER_TWO = "2";
-    public static final String URI_WITH_PAGE_NUMBER_VALUE_OF_TWO =
-        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&title=reindeer";
+    private static final String PAGE_NUMBER_TWO = "2";
+    private static final String TEN_RESULTS = "10";
+    private static final String URI_WITH_PAGE_NUMBER_VALUE_OF_TWO =
+        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=reindeer";
+    private static final String URI_WITH_TEN_NUMBER_OF_RESULTS =
+        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&results=10&title=reindeer";
 
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
         "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&title=reindeer";
-    private static final String PAGE_PARAM_ONE = "page=1";
-    private static final String PAGE_PARAM_TWO = "page=2";
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
     private Context context;
@@ -221,13 +225,11 @@ public class FetchCristinProjectsTest {
 
     @Test
     void getsCorrectUriWhenCallingQueryProjectsUriBuilder() throws Exception {
-        assertEquals(new URI(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI), cristinApiClientStub
-            .generateQueryProjectsUrl(Map.of(TITLE, RANDOM_TITLE, LANGUAGE_KEY, LANGUAGE_NB, PAGE, PAGE_NUMBER_ONE)));
+        Map<String, String> params = Map.of(TITLE, RANDOM_TITLE, LANGUAGE_KEY, LANGUAGE_NB, PAGE, PAGE_NUMBER_ONE,
+            NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS);
+        URI uri = new URI(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI);
 
-        assertEquals(new URI(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI.replace(PAGE_PARAM_ONE, PAGE_PARAM_TWO)),
-            cristinApiClientStub
-                .generateQueryProjectsUrl(
-                    Map.of(TITLE, RANDOM_TITLE, LANGUAGE_KEY, LANGUAGE_NB, PAGE, PAGE_NUMBER_TWO)));
+        assertEquals(uri, cristinApiClientStub.generateQueryProjectsUrl(params));
     }
 
     @Test
@@ -291,6 +293,29 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_PAGE_VALUE_INVALID));
+    }
+
+    @Test
+    void handlerReturnsCristinProjectsWhenQueryContainsResultsParameter() throws Exception {
+        InputStream input = requestWithQueryParameters(
+            Map.of(TITLE, RANDOM_TITLE, LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB, NUMBER_OF_RESULTS, TEN_RESULTS));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertTrue(gatewayResponse.getBody().contains(URI_WITH_TEN_NUMBER_OF_RESULTS));
+    }
+
+    @Test
+    void handlerThrowsBadRequestWhenQueryHasInvalidResultsParameter() throws Exception {
+        InputStream input = requestWithQueryParameters(
+            Map.of(TITLE, RANDOM_TITLE, LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB,
+                NUMBER_OF_RESULTS, TITLE_ILLEGAL_CHARACTERS));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {

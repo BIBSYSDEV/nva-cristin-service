@@ -2,8 +2,10 @@ package no.unit.nva.cristin.projects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonUtils;
 
+@JacocoGenerated
 public class Constants {
 
     public static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
@@ -29,4 +31,6 @@ public class Constants {
     public static final String DOMAIN_NAME = ENVIRONMENT.readEnv(DOMAIN_NAME_ENV);
     public static final String PAGE = "page";
     public static final String PAGE_NUMBER_ONE = "1";
+    public static final String NUMBER_OF_RESULTS = "results";
+    public static final String DEFAULT_NUMBER_OF_RESULTS = "5";
 }

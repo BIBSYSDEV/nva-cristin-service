@@ -26,4 +26,5 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_PAGE_VALUE_INVALID = "Parameter 'page' has invalid value";
     public static final String ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE =
         "Backend responded with status: %s when client called uri: %s";
+    public static final String ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID = "Parameter 'results' has invalid value";
 }

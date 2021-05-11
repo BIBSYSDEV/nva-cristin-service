@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
+import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
@@ -141,6 +142,7 @@ public class CristinApiClient {
             .withTitle(parameters.get(TITLE))
             .withLanguage(parameters.get(LANGUAGE))
             .fromPage(parameters.get(PAGE))
+            .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
             .toURI();
     }
 
