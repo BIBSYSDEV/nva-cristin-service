@@ -189,7 +189,8 @@ public class FetchCristinProjectsTest {
 
     @Test
     void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE, RANDOM_TITLE,
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
             LANGUAGE, INVALID_LANGUAGE));
 
         handler.handleRequest(input, output, context);
@@ -277,8 +278,10 @@ public class FetchCristinProjectsTest {
 
     @Test
     void handlerReturnsCristinProjectsWhenQueryContainsPageParameter() throws Exception {
-        InputStream input = requestWithQueryParameters(
-            Map.of(TITLE, RANDOM_TITLE, LANGUAGE, LANGUAGE_NB, PAGE, SECOND_PAGE));
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, SECOND_PAGE));
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
@@ -288,8 +291,10 @@ public class FetchCristinProjectsTest {
 
     @Test
     void handlerThrowsBadRequestWhenQueryHasInvalidPageParameter() throws Exception {
-        InputStream input = requestWithQueryParameters(
-            Map.of(TITLE, RANDOM_TITLE, LANGUAGE, LANGUAGE_NB, PAGE, TITLE_ILLEGAL_CHARACTERS));
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, TITLE_ILLEGAL_CHARACTERS));
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
@@ -299,8 +304,10 @@ public class FetchCristinProjectsTest {
 
     @Test
     void handlerReturnsCristinProjectsWhenQueryContainsResultsParameter() throws Exception {
-        InputStream input = requestWithQueryParameters(
-            Map.of(TITLE, RANDOM_TITLE, LANGUAGE, LANGUAGE_NB, NUMBER_OF_RESULTS, TEN_RESULTS));
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            NUMBER_OF_RESULTS, TEN_RESULTS));
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
@@ -310,9 +317,10 @@ public class FetchCristinProjectsTest {
 
     @Test
     void handlerThrowsBadRequestWhenQueryHasInvalidResultsParameter() throws Exception {
-        InputStream input = requestWithQueryParameters(
-            Map.of(TITLE, RANDOM_TITLE, LANGUAGE, LANGUAGE_NB,
-                NUMBER_OF_RESULTS, TITLE_ILLEGAL_CHARACTERS));
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            NUMBER_OF_RESULTS, TITLE_ILLEGAL_CHARACTERS));
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
@@ -321,7 +329,8 @@ public class FetchCristinProjectsTest {
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE, RANDOM_TITLE,
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
