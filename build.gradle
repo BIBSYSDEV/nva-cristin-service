@@ -20,6 +20,7 @@ project.ext{
     nvaCommonsVersion = '1.5.15'
     jacksonVersion = '2.12.1'
     jupiterVersion = '5.7.1'
+    hamcrestVersion = '2.2'
 }
 
 dependencies {
@@ -45,7 +46,7 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: project.ext.jupiterVersion
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: project.ext.jupiterVersion
 
-    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: project.ext.hamcrestVersion
     testImplementation 'com.github.BIBSYSDEV:nva-testutils:0.1.20'
     testImplementation group: 'com.github.bibsysdev', name: 'logutils', version: project.ext.nvaCommonsVersion
 

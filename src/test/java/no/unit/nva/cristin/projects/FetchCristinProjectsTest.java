@@ -15,9 +15,10 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ER
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -119,7 +120,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_SERVER_ERROR));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
     @Test
@@ -143,7 +144,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     @Test
@@ -172,7 +173,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     @Test
@@ -184,7 +185,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     @Test
@@ -198,7 +199,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_LANGUAGE_INVALID));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_LANGUAGE_INVALID));
     }
 
     @Test
@@ -245,7 +246,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_SERVER_ERROR));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
     @Test
@@ -259,7 +260,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
     }
 
     @Test
@@ -273,7 +274,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_SERVER_ERROR));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
     @Test
@@ -286,7 +287,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertTrue(gatewayResponse.getBody().contains(URI_WITH_PAGE_NUMBER_VALUE_OF_TWO));
+        assertThat(gatewayResponse.getBody(), containsString(URI_WITH_PAGE_NUMBER_VALUE_OF_TWO));
     }
 
     @Test
@@ -299,7 +300,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_PAGE_VALUE_INVALID));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_PAGE_VALUE_INVALID));
     }
 
     @Test
@@ -312,7 +313,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertTrue(gatewayResponse.getBody().contains(URI_WITH_TEN_NUMBER_OF_RESULTS));
+        assertThat(gatewayResponse.getBody(), containsString(URI_WITH_TEN_NUMBER_OF_RESULTS));
     }
 
     @Test
@@ -325,7 +326,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
