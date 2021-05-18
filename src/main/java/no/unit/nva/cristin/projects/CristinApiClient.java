@@ -44,6 +44,8 @@ public class CristinApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
 
+    private static final int FIRST_NON_SUCCESS_CODE = 300;
+
     private static final HttpClient client = HttpClient.newHttpClient();
 
     /**
@@ -141,7 +143,7 @@ public class CristinApiClient {
         return new CristinQuery()
             .withTitle(parameters.get(TITLE))
             .withLanguage(parameters.get(LANGUAGE))
-            .fromPage(parameters.get(PAGE))
+            .withFromPage(parameters.get(PAGE))
             .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
             .toURI();
     }
@@ -189,13 +191,26 @@ public class CristinApiClient {
 
         if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
             throw new NotFoundException(uri);
-        } else if (statusCode >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
+        } else if (remoteServerHasInternalProblems(statusCode)) {
             logBackendFetchFail(uri, statusCode);
             throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-        } else if (statusCode >= HttpURLConnection.HTTP_MULT_CHOICE) { // Greater than or equal to 300
+        } else if (errorIsUnknown(statusCode)) {
             logBackendFetchFail(uri, statusCode);
             throw new RuntimeException();
         }
+    }
+
+    private boolean errorIsUnknown(int statusCode) {
+        return responseIsFailure(statusCode)
+            && !remoteServerHasInternalProblems(statusCode);
+    }
+
+    private boolean responseIsFailure(int statusCode) {
+        return statusCode >= FIRST_NON_SUCCESS_CODE;
+    }
+
+    private boolean remoteServerHasInternalProblems(int statusCode) {
+        return statusCode >= HttpURLConnection.HTTP_INTERNAL_ERROR;
     }
 
     private void logBackendFetchFail(String uri, int statusCode) {

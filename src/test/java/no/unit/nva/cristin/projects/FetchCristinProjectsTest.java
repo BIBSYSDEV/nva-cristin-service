@@ -1,10 +1,11 @@
 package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.DEFAULT_NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.projects.Constants.FIRST_PAGE;
+import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
-import static no.unit.nva.cristin.projects.Constants.PAGE_NUMBER_ONE;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static no.unit.nva.cristin.projects.CristinHandler.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
@@ -51,14 +52,13 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 public class FetchCristinProjectsTest {
 
-    private static final String LANGUAGE_KEY = "language";
     private static final String LANGUAGE_NB = "nb";
-    private static final String INVALID_LANGUAGE_PARAM = "ru";
+    private static final String INVALID_LANGUAGE = "ru";
     private static final String RANDOM_TITLE = "reindeer";
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String INVALID_JSON = "This is not valid JSON!";
     private static final String EMPTY_LIST_STRING = "[]";
-    private static final String PAGE_NUMBER_TWO = "2";
+    private static final String SECOND_PAGE = "2";
     private static final String TEN_RESULTS = "10";
     private static final String URI_WITH_PAGE_NUMBER_VALUE_OF_TWO =
         "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=reindeer";
@@ -191,7 +191,7 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(TITLE, RANDOM_TITLE,
-            LANGUAGE_KEY, INVALID_LANGUAGE_PARAM));
+            LANGUAGE, INVALID_LANGUAGE));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
@@ -225,7 +225,10 @@ public class FetchCristinProjectsTest {
 
     @Test
     void getsCorrectUriWhenCallingQueryProjectsUriBuilder() throws Exception {
-        Map<String, String> params = Map.of(TITLE, RANDOM_TITLE, LANGUAGE_KEY, LANGUAGE_NB, PAGE, PAGE_NUMBER_ONE,
+        Map<String, String> params = Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, FIRST_PAGE,
             NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS);
         URI uri = new URI(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI);
 
@@ -276,7 +279,7 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerReturnsCristinProjectsWhenQueryContainsPageParameter() throws Exception {
         InputStream input = requestWithQueryParameters(
-            Map.of(TITLE, RANDOM_TITLE, LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB, PAGE, PAGE_NUMBER_TWO));
+            Map.of(TITLE, RANDOM_TITLE, LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB, PAGE, SECOND_PAGE));
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 

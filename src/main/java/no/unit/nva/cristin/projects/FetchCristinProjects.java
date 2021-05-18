@@ -1,10 +1,10 @@
 package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.DEFAULT_NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.projects.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
-import static no.unit.nva.cristin.projects.Constants.PAGE_NUMBER_ONE;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
@@ -72,7 +72,7 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
 
     private String getValidPage(RequestInfo requestInfo) throws BadRequestException {
         return Optional.of(getQueryParam(requestInfo, PAGE)
-            .orElse(PAGE_NUMBER_ONE))
+            .orElse(FIRST_PAGE))
             .filter(this::isInteger)
             .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_PAGE_VALUE_INVALID));
     }
@@ -119,7 +119,7 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
         try {
             Integer.parseInt(str);
             return true;
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             return false;
         }
     }

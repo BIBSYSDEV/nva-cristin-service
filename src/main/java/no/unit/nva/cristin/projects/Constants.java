@@ -22,7 +22,6 @@ public class Constants {
     private static final String BASE_URL_ENV = "BASE_URL";
     public static final String BASE_URL = ENVIRONMENT.readEnv(BASE_URL_ENV);
     public static final String ID = "id";
-    public static final String CRISTIN_LANGUAGE_PARAM = "lang";
     public static final String TITLE = "title";
     public static final String LANGUAGE = "language";
     public static final String QUESTION_MARK = "?";
@@ -30,7 +29,7 @@ public class Constants {
     private static final String DOMAIN_NAME_ENV = "DOMAIN_NAME";
     public static final String DOMAIN_NAME = ENVIRONMENT.readEnv(DOMAIN_NAME_ENV);
     public static final String PAGE = "page";
-    public static final String PAGE_NUMBER_ONE = "1";
+    public static final String FIRST_PAGE = "1";
     public static final String NUMBER_OF_RESULTS = "results";
     public static final String DEFAULT_NUMBER_OF_RESULTS = "5";
 }

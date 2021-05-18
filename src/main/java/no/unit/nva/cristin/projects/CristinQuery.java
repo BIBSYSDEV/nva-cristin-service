@@ -61,7 +61,7 @@ public class CristinQuery {
         return this;
     }
 
-    public CristinQuery fromPage(String page) {
+    public CristinQuery withFromPage(String page) {
         cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PAGE_KEY, page);
         return this;
     }
