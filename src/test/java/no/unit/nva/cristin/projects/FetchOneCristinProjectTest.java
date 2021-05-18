@@ -1,9 +1,9 @@
 package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.ID;
+import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.CristinHandler.DEFAULT_LANGUAGE_CODE;
-import static no.unit.nva.cristin.projects.CristinHandler.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
@@ -213,7 +213,7 @@ public class FetchOneCristinProjectTest {
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {
         InputStream input = requestWithLanguageAndId(
-            Map.of(LANGUAGE_QUERY_PARAMETER, DEFAULT_LANGUAGE_CODE),
+            Map.of(LANGUAGE, DEFAULT_LANGUAGE_CODE),
             Map.of(ID, id));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
