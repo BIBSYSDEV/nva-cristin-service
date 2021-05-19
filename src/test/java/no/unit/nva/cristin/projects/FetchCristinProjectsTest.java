@@ -15,7 +15,6 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ER
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
-import static nva.commons.core.attempt.Try.attempt;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,11 +32,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
@@ -50,7 +45,6 @@ import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -74,6 +68,7 @@ public class FetchCristinProjectsTest {
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
+    private static final String API_QUERY_RESPONSE_PAGE_TWO_JSON = "api_query_response_page_two.json";
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
         "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&title=reindeer";
     public static final String ZERO_VALUE = "0";
@@ -196,22 +191,6 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    @Disabled
-    void testtest() throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
-
-        HttpRequest request = HttpRequest.newBuilder(new URI("https://api.cristin.no/v2/projects/?page=2&per_page=5"))
-            .build();
-
-        HttpResponse<String> response = attempt(
-            () -> client.send(request, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
-
-        response.headers().map().forEach((k, v) -> System.out.println(k + ":" + v));
-        //System.out.println(response.headers().firstValue("x-total-count").orElse(null));
-        //String linkHeaderValue = response.headers().firstValue("link").orElse(null);
-    }
-
-    @Test
     void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
             TITLE, RANDOM_TITLE,
@@ -330,6 +309,22 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_PAGE_VALUE_INVALID));
+    }
+
+    @Test
+    void handlerReturnsProjectsWrapperWithFirstRecordMatchingPageParameter() throws Exception {
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, SECOND_PAGE));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        String expected = getBodyFromResource(API_QUERY_RESPONSE_PAGE_TWO_JSON);
+        String actual = gatewayResponse.getBody();
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }
 
     @Test

@@ -4,6 +4,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.projects.Constants.EMPTY_FRAGMENT;
 import static no.unit.nva.cristin.projects.Constants.HTTPS;
+import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
@@ -113,11 +115,19 @@ public class ProjectsWrapper {
      * Assigns value to id using supplied query parameters.
      *
      * @param queryParams the query params
-     * @return ProjectsWrapper object with id value from query parameters
+     * @return ProjectsWrapper object with id and firstRecord values from query parameters
      */
     public ProjectsWrapper usingQueryParams(Map<String, String> queryParams) {
         this.id = idUriFromParams(queryParams);
+        this.firstRecord = firstRecordFromParams(queryParams);
         return this;
+    }
+
+    private Integer firstRecordFromParams(Map<String, String> queryParams) {
+        int page = Integer.parseInt(queryParams.get(PAGE));
+        int numberOfResults = Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS));
+
+        return (page - 1) * numberOfResults + 1;
     }
 
     private URI idUriFromParams(Map<String, String> queryParams) {
@@ -133,7 +143,6 @@ public class ProjectsWrapper {
      */
     public ProjectsWrapper usingHeaders(HttpHeaders headers) {
         this.size = getSizeHeader(headers);
-        this.firstRecord = 0;
         //this.nextResults = null;
         return this;
     }
