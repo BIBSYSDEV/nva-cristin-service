@@ -2,25 +2,41 @@ package no.unit.nva.cristin.projects;
 
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.projects.Constants.BASE_URL;
-import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
+import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
+import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.projects.Constants.PAGE;
+import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.QUESTION_MARK;
+import static no.unit.nva.cristin.projects.Constants.TITLE;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
+import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.nva.EmptyNvaProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadGatewayException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.attempt.Failure;
-import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,51 +44,9 @@ public class CristinApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
 
-    private static final String TITLE = "title";
-    private static final String CHARACTER_EQUALS = "=";
-    private static final String HTTPS = "https";
-    private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
-    private static final String SEARCH_PATH = "search?QUERY_PARAMS"; // TODO: NP-2412: Replace QUERY_PARAMS
-    private static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
-        "Error fetching cristin project with id: %s . Exception Message: %s";
-    private static final String ERROR_MESSAGE_BACKEND_FETCH_FAILED =
-        "Your request cannot be processed at this time due to an upstream error";
+    private static final int FIRST_NON_SUCCESS_CODE = 300;
 
-    protected static <T> T fromJson(InputStreamReader reader, Class<T> classOfT) throws IOException {
-        return OBJECT_MAPPER.readValue(reader, classOfT);
-    }
-
-    /**
-     * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
-     * for serialization to the client.
-     *
-     * @param parameters The query params
-     * @param language   Language used for some properties in Cristin API response
-     * @return a ProjectsWrapper filled with transformed Cristin Projects and metadata
-     * @throws IOException        if cannot read from connection
-     * @throws URISyntaxException if URI is malformed
-     */
-    public ProjectsWrapper queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
-        Map<String, String> parameters, String language)
-        throws IOException, URISyntaxException {
-
-        long startRequestTime = System.currentTimeMillis();
-        List<CristinProject> enrichedProjects = queryAndEnrichProjects(parameters, language);
-        long endRequestTime = System.currentTimeMillis();
-
-        ProjectsWrapper projectsWrapper = new ProjectsWrapper();
-
-        projectsWrapper.setId(buildUri(BASE_URL, SEARCH_PATH));
-        projectsWrapper.setSize(0); // TODO: NP-2385: X-Total-Count header from Cristin response
-        projectsWrapper.setSearchString(extractTitleSearchString(parameters));
-        projectsWrapper.setProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
-        // TODO: NP-2385: Use Link header / Pagination data from Cristin response in the next two values
-        projectsWrapper.setFirstRecord(0);
-        projectsWrapper.setNextResults(null); // TODO: Change to URI
-        projectsWrapper.setHits(transformCristinProjectsToNvaProjects(enrichedProjects));
-
-        return projectsWrapper;
-    }
+    private static final HttpClient client = HttpClient.newHttpClient();
 
     /**
      * Creates a NvaProject object containing a single transformed Cristin Project. Is used for serialization to the
@@ -81,30 +55,101 @@ public class CristinApiClient {
      * @param id       The Cristin id of the project to query
      * @param language Language used for some properties in Cristin API response
      * @return a NvaProject filled with one transformed Cristin Project
-     * @throws BadGatewayException when there is a problem with fetch from backend
+     * @throws ApiGatewayException when there is a problem that can be returned to client
      */
     public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
-        throws BadGatewayException {
+        throws ApiGatewayException {
 
-        CristinProject cristinProject = attemptToGetCristinProject(id, language);
-
-        if (cristinProject == null || !cristinProject.hasValidContent()) {
-            return new EmptyNvaProject();
-        }
-
-        NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
-        nvaProject.setContext(Constants.PROJECT_LOOKUP_CONTEXT_URL);
-
-        return nvaProject;
+        return Optional.of(getProject(id, language))
+            .filter(CristinProject::hasValidContent)
+            .map(NvaProjectBuilder::new)
+            .map(builder -> builder.withContext(PROJECT_LOOKUP_CONTEXT_URL))
+            .map(NvaProjectBuilder::build)
+            .orElseThrow(() -> projectHasNotValidContent(id));
     }
 
-    // TODO: throw BadGatewayException if this fails as well?
-    protected List<CristinProject> queryProjects(Map<String, String> parameters) throws IOException,
-                                                                                        URISyntaxException {
-        URL url = generateQueryProjectsUrl(parameters);
-        try (InputStreamReader streamReader = fetchQueryResults(url)) {
-            return asList(fromJson(streamReader, CristinProject[].class));
-        }
+    /**
+     * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
+     * for serialization to the client.
+     *
+     * @param requestQueryParams Request parameters from client containing title and language
+     * @return a ProjectsWrapper filled with transformed Cristin Projects and metadata
+     * @throws ApiGatewayException if some error happen we should return this to client
+     */
+    public ProjectsWrapper queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
+        Map<String, String> requestQueryParams) throws ApiGatewayException {
+
+        long startRequestTime = System.currentTimeMillis();
+        HttpResponse<String> response = queryProjects(requestQueryParams);
+        List<CristinProject> enrichedProjectsFromResponse =
+            getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
+        List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(enrichedProjectsFromResponse);
+        long endRequestTime = System.currentTimeMillis();
+
+        return new ProjectsWrapper()
+            .usingQueryParams(requestQueryParams)
+            .usingHeaders(response.headers())
+            .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
+            .withHits(nvaProjects);
+    }
+
+    protected static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
+        return OBJECT_MAPPER.readValue(body, classOfT);
+    }
+
+    protected HttpResponse<String> queryProjects(Map<String, String> parameters) throws ApiGatewayException {
+        URI uri = attempt(() -> generateQueryProjectsUrl(parameters))
+            .toOptional(failure ->
+                logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters), failure.getException()))
+            .orElseThrow();
+
+        HttpResponse<String> response = fetchQueryResults(uri);
+
+        checkHttpStatusCode(
+            buildUri(BASE_URL, QUESTION_MARK + queryParameters(parameters)).toString(),
+            response.statusCode());
+
+        return response;
+    }
+
+    protected CristinProject getProject(String id, String language) throws ApiGatewayException {
+        URI uri = attempt(() -> generateGetProjectUri(id, language))
+            .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
+            .orElseThrow();
+
+        HttpResponse<String> response = fetchGetResult(uri);
+
+        checkHttpStatusCode(buildUri(BASE_URL, id).toString(), response.statusCode());
+
+        return getDeserializedResponse(response, CristinProject.class);
+    }
+
+    protected List<CristinProject> getEnrichedProjectsUsingQueryResponse(HttpResponse<String> response,
+                                                                         String language)
+        throws ApiGatewayException {
+
+        List<CristinProject> projectsFromQuery = asList(getDeserializedResponse(response, CristinProject[].class));
+
+        return projectsFromQuery.stream()
+            .map(project -> attempt(() -> getProject(project.getCristinProjectId(), language))
+                .toOptional(failure -> logError(
+                    ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
+                    project.getCristinProjectId(),
+                    failure.getException()))
+                .orElse(project)).collect(Collectors.toList());
+    }
+
+    protected URI generateQueryProjectsUrl(Map<String, String> parameters) throws URISyntaxException {
+        return new CristinQuery()
+            .withTitle(parameters.get(TITLE))
+            .withLanguage(parameters.get(LANGUAGE))
+            .withFromPage(parameters.get(PAGE))
+            .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
+            .toURI();
+    }
+
+    protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {
+        return CristinQuery.fromIdAndLanguage(id, language);
     }
 
     @JacocoGenerated
@@ -112,83 +157,74 @@ public class CristinApiClient {
         return endRequestTime - startRequestTime;
     }
 
-    private String extractTitleSearchString(Map<String, String> parameters) {
-        return TITLE + CHARACTER_EQUALS + parameters.get(TITLE);
+    @JacocoGenerated
+    protected HttpResponse<String> fetchGetResult(URI uri) {
+        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+
+        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
-    private List<NvaProject> transformCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
-        return cristinProjects.stream()
-            .filter(CristinProject::hasValidContent)
-            .map(cristinProject -> new NvaProjectBuilder(cristinProject).build())
-            .collect(Collectors.toList());
+    private BadGatewayException projectHasNotValidContent(String id) {
+        logger.warn(String.format(ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
+        return new BadGatewayException(String.format(ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
     }
 
-    private CristinProject attemptToGetCristinProject(String id, String language) throws BadGatewayException {
-        return attempt(() -> getProject(id, language)).orElseThrow(failure -> {
-            logError(id, failure);
+    @JacocoGenerated
+    protected HttpResponse<String> fetchQueryResults(URI uri) {
+        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+
+        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+    }
+
+    private <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
+        throws BadGatewayException {
+
+        return attempt(() -> fromJson(response.body(), classOfT)).orElseThrow(failure -> {
+            logError(ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(),
+                failure.getException());
             return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         });
     }
 
-    protected List<CristinProject> queryAndEnrichProjects(Map<String, String> parameters,
-                                                          String language) throws IOException,
-                                                                                  URISyntaxException {
-        List<CristinProject> projects = queryProjects(parameters);
-        return enrichProjects(language, projects);
-    }
+    private void checkHttpStatusCode(String uri, int statusCode)
+        throws NotFoundException, BadGatewayException {
 
-    protected CristinProject getProject(String id, String language) throws IOException, URISyntaxException {
-        URL url = generateGetProjectUrl(id, language);
-        try (InputStreamReader streamReader = fetchGetResult(url)) {
-            return fromJson(streamReader, CristinProject.class);
+        if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
+            throw new NotFoundException(uri);
+        } else if (remoteServerHasInternalProblems(statusCode)) {
+            logBackendFetchFail(uri, statusCode);
+            throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        } else if (errorIsUnknown(statusCode)) {
+            logBackendFetchFail(uri, statusCode);
+            throw new RuntimeException();
         }
     }
 
-    @JacocoGenerated
-    protected InputStreamReader fetchQueryResults(URL url) throws IOException {
-        return new InputStreamReader(url.openStream());
+    private boolean errorIsUnknown(int statusCode) {
+        return responseIsFailure(statusCode)
+            && !remoteServerHasInternalProblems(statusCode);
     }
 
-    @JacocoGenerated
-    protected InputStreamReader fetchGetResult(URL url) throws IOException {
-        return new InputStreamReader(url.openStream());
+    private boolean responseIsFailure(int statusCode) {
+        return statusCode >= FIRST_NON_SUCCESS_CODE;
     }
 
-    protected URL generateQueryProjectsUrl(Map<String, String> parameters) throws MalformedURLException,
-                                                                                  URISyntaxException {
-        URIBuilder uri = new URIBuilder()
-            .setScheme(HTTPS)
-            .setHost(CRISTIN_API_HOST)
-            .setPath(CRISTIN_API_PROJECTS_PATH);
-        if (parameters != null) {
-            parameters.keySet().forEach(s -> uri.addParameter(s, parameters.get(s)));
-        }
-        return uri.build().toURL();
+    private boolean remoteServerHasInternalProblems(int statusCode) {
+        return statusCode >= HttpURLConnection.HTTP_INTERNAL_ERROR;
     }
 
-    protected URL generateGetProjectUrl(String id, String language) throws MalformedURLException, URISyntaxException {
-        URI uri = new URIBuilder()
-            .setScheme(HTTPS)
-            .setHost(CRISTIN_API_HOST)
-            .setPath(CRISTIN_API_PROJECTS_PATH + id)
-            .addParameter("lang", language)
-            .build();
-        return uri.toURL();
+    private void logBackendFetchFail(String uri, int statusCode) {
+        logger.error(String.format(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE, statusCode, uri));
     }
 
-    private List<CristinProject> enrichProjects(String language, List<CristinProject> projects) {
-        return projects.stream().map(project -> enrichOneProject(language, project)).collect(Collectors.toList());
+    private List<NvaProject> mapValidCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
+        return cristinProjects.stream()
+            .filter(CristinProject::hasValidContent)
+            .map(CristinProject::toNvaProject)
+            .collect(Collectors.toList());
     }
 
-    private CristinProject enrichOneProject(String language, CristinProject project) {
-        return attempt(() -> getProject(project.getCristinProjectId(), language))
-            .toOptional(failure -> logError(project.getCristinProjectId(), failure))
-            .orElse(project);
+    private void logError(String message, String data, Exception failure) {
+        logger.error(String.format(message, data, failure.getMessage()));
     }
-
-    private void logError(String id, Failure<CristinProject> failure) {
-        logger.error(String.format(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-            id, failure.getException().getMessage()));
-    }
-
 }

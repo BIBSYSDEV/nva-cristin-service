@@ -20,7 +20,9 @@ Globals:
       Variables:
         ALLOWED_ORIGIN: '*'
         CRISTIN_API_HOST: 'api.cristin.no'
-        BASE_URL: 'https://api.dev.nva.aws.unit.no/project' # TODO: Dynamic from CustomDomain and CustomDomainBasePtah
+        DOMAIN_NAME: 'api.dev.nva.aws.unit.no' # TODO: NP-2280: Dynamic from CustomDomain
+        # TODO: NP-2280: Replace with CustomDomainBasePath and call it PROJECTS_BASE_PATH
+        BASE_URL: 'https://api.dev.nva.aws.unit.no/project'
   Api:
     Cors:
       AllowOrigin: "'*'"
@@ -28,9 +30,6 @@ Globals:
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Parameters:
-  CognitoAuthorizerArn:
-    Type: String
-    Description: Reference to Cognito UserPool for the stage
   CustomDomain:
     Type: String
     Description: Custom API to connect this lambda to
@@ -51,9 +50,7 @@ Resources:
         Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
       StageName: Prod
       Auth:
-        Authorizers:
-          MyCognitoAuthorizer:
-            UserPoolArn: !Ref CognitoAuthorizerArn
+        DefaultAuthorizer: NONE
       EndpointConfiguration: Regional
 
 
@@ -67,8 +64,6 @@ Resources:
         NvaCristinProjectsEvent:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Auth:
-              Authorizer: MyCognitoAuthorizer
             RestApiId: !Ref NvaCristinProjectsFunctionApi
             Path: /
             Method: get
@@ -86,8 +81,6 @@ Resources:
         NvaCristinOneProjectEvent:
           Type: Api
           Properties:
-            Auth:
-              Authorizer: MyCognitoAuthorizer
             RestApiId: !Ref NvaCristinProjectsFunctionApi
             Path: /{id}
             Method: get

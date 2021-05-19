@@ -110,4 +110,10 @@ public class NvaProjectBuilder {
             .map(NvaProjectBuilder::transformCristinPersonsToNvaContributors)
             .orElse(Collections.emptyList());
     }
+
+    public NvaProjectBuilder withContext(String context) {
+        this.nvaProject.setContext(context);
+        return this;
+    }
+
 }

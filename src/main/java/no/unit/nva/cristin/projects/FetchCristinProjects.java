@@ -1,12 +1,22 @@
 package no.unit.nva.cristin.projects;
 
-import static nva.commons.core.attempt.Try.attempt;
+import static no.unit.nva.cristin.projects.Constants.DEFAULT_NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.projects.Constants.FIRST_PAGE;
+import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
+import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.projects.Constants.PAGE;
+import static no.unit.nva.cristin.projects.Constants.TITLE;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
@@ -15,21 +25,10 @@ import nva.commons.core.JacocoGenerated;
  */
 public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> {
 
-    protected static final String TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS = "Parameter 'title' is missing or invalid. "
-        + "May only contain alphanumeric characters, dash, comma, period and whitespace";
-
     private static final char CHARACTER_DASH = '-';
     private static final char CHARACTER_COMMA = ',';
     private static final char CHARACTER_PERIOD = '.';
 
-    private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
-    private static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
-    private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
-    private static final String CRISTIN_QUERY_PARAMETER_PAGE_VALUE = "1";
-    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
-    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE = "5";
-
-    protected static final String TITLE_QUERY_PARAMETER = "title";
     private final transient CristinApiClient cristinApiClient;
 
     @SuppressWarnings("unused")
@@ -54,8 +53,10 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
 
         String language = getValidLanguage(requestInfo);
         String title = getValidTitle(requestInfo);
+        String page = getValidPage(requestInfo);
+        String numberOfResults = getValidNumberOfResults(requestInfo);
 
-        return getTransformedCristinProjectsUsingWrapperObject(language, title);
+        return getTransformedCristinProjectsUsingWrapperObject(language, title, page, numberOfResults);
     }
 
     @Override
@@ -64,18 +65,36 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
     }
 
     private String getValidTitle(RequestInfo requestInfo) throws BadRequestException {
-        return getQueryParam(requestInfo, TITLE_QUERY_PARAMETER)
+        return getQueryParam(requestInfo, TITLE)
             .filter(this::isValidTitle)
-            .orElseThrow(() -> new BadRequestException(TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
-    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title) {
-        Map<String, String> cristinQueryParameters = createCristinQueryParameters(title, language);
+    private String getValidPage(RequestInfo requestInfo) throws BadRequestException {
+        return Optional.of(getQueryParam(requestInfo, PAGE)
+            .orElse(FIRST_PAGE))
+            .filter(this::isInteger)
+            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_PAGE_VALUE_INVALID));
+    }
 
-        return attempt(() ->
-            cristinApiClient
-                .queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(cristinQueryParameters, language))
-            .orElseThrow();
+    private String getValidNumberOfResults(RequestInfo requestInfo) throws BadRequestException {
+        return Optional.of(getQueryParam(requestInfo, NUMBER_OF_RESULTS)
+            .orElse(DEFAULT_NUMBER_OF_RESULTS))
+            .filter(this::isInteger)
+            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
+    }
+
+    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title, String page,
+                                                                            String numberOfResults)
+        throws ApiGatewayException {
+
+        Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
+        requestQueryParams.put(TITLE, title);
+        requestQueryParams.put(LANGUAGE, language);
+        requestQueryParams.put(PAGE, page);
+        requestQueryParams.put(NUMBER_OF_RESULTS, numberOfResults);
+
+        return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParams);
     }
 
     private boolean isValidTitle(String str) {
@@ -96,13 +115,12 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
             || c == CHARACTER_PERIOD;
     }
 
-    private Map<String, String> createCristinQueryParameters(String title, String language) {
-        Map<String, String> queryParameters = new ConcurrentHashMap<>();
-        queryParameters.put(CRISTIN_QUERY_PARAMETER_TITLE_KEY, title);
-        queryParameters.put(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language);
-        queryParameters.put(CRISTIN_QUERY_PARAMETER_PAGE_KEY, CRISTIN_QUERY_PARAMETER_PAGE_VALUE);
-        queryParameters.put(CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY, CRISTIN_QUERY_PARAMETER_PER_PAGE_VALUE);
-        return queryParameters;
+    private boolean isInteger(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
-
 }
