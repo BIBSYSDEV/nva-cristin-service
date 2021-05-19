@@ -19,7 +19,7 @@ public class CristinQueryTest {
     @Test
     void buildReturnsUriWithCustomParameterValuesWhenCustomParameterValuesAreSupplied() throws Exception {
         URI uri = new CristinQuery().withTitle(RANDOM_TITLE).withLanguage(LANGUAGE_NB).withItemsPerPage(PER_PAGE)
-            .fromPage(FROM_PAGE).toURI();
+            .withFromPage(FROM_PAGE).toURI();
         assertEquals(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI, uri.toString());
     }
 

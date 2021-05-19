@@ -1,18 +1,25 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.DEFAULT_NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.projects.Constants.FIRST_PAGE;
+import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
+import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
-import static no.unit.nva.cristin.projects.CristinHandler.LANGUAGE_QUERY_PARAMETER;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -51,13 +58,18 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 public class FetchCristinProjectsTest {
 
-    private static final String LANGUAGE_KEY = "language";
     private static final String LANGUAGE_NB = "nb";
-    private static final String INVALID_LANGUAGE_PARAM = "ru";
+    private static final String INVALID_LANGUAGE = "ru";
     private static final String RANDOM_TITLE = "reindeer";
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String INVALID_JSON = "This is not valid JSON!";
     private static final String EMPTY_LIST_STRING = "[]";
+    private static final String SECOND_PAGE = "2";
+    private static final String TEN_RESULTS = "10";
+    private static final String URI_WITH_PAGE_NUMBER_VALUE_OF_TWO =
+        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=reindeer";
+    private static final String URI_WITH_TEN_NUMBER_OF_RESULTS =
+        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&results=10&title=reindeer";
 
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
@@ -115,7 +127,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_SERVER_ERROR));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
     @Test
@@ -132,14 +144,14 @@ public class FetchCristinProjectsTest {
 
     @Test
     void handlerThrowsBadRequestWhenMissingTitleQueryParameter() throws IOException {
-        InputStream input = requestWithQueryParameters(Map.of(LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB));
+        InputStream input = requestWithQueryParameters(Map.of(LANGUAGE, LANGUAGE_NB));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     @Test
@@ -168,7 +180,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     @Test
@@ -180,7 +192,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     @Test
@@ -201,15 +213,16 @@ public class FetchCristinProjectsTest {
 
     @Test
     void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE, RANDOM_TITLE,
-            LANGUAGE_KEY, INVALID_LANGUAGE_PARAM));
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, INVALID_LANGUAGE));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_LANGUAGE_INVALID));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_LANGUAGE_INVALID));
     }
 
     @Test
@@ -242,8 +255,14 @@ public class FetchCristinProjectsTest {
 
     @Test
     void getsCorrectUriWhenCallingQueryProjectsUriBuilder() throws Exception {
-        assertEquals(new URI(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI), cristinApiClientStub
-            .generateQueryProjectsUrl(Map.of(TITLE, RANDOM_TITLE, LANGUAGE_KEY, LANGUAGE_NB)));
+        Map<String, String> params = Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, FIRST_PAGE,
+            NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS);
+        URI uri = new URI(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI);
+
+        assertEquals(uri, cristinApiClientStub.generateQueryProjectsUrl(params));
     }
 
     @Test
@@ -256,7 +275,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_SERVER_ERROR));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
     @Test
@@ -270,7 +289,7 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
     }
 
     @Test
@@ -284,12 +303,65 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertTrue(gatewayResponse.getBody().contains(ERROR_MESSAGE_SERVER_ERROR));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
+    }
+
+    @Test
+    void handlerReturnsCristinProjectsWhenQueryContainsPageParameter() throws Exception {
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, SECOND_PAGE));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(URI_WITH_PAGE_NUMBER_VALUE_OF_TWO));
+    }
+
+    @Test
+    void handlerThrowsBadRequestWhenQueryHasInvalidPageParameter() throws Exception {
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, TITLE_ILLEGAL_CHARACTERS));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_PAGE_VALUE_INVALID));
+    }
+
+    @Test
+    void handlerReturnsCristinProjectsWhenQueryContainsResultsParameter() throws Exception {
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            NUMBER_OF_RESULTS, TEN_RESULTS));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(URI_WITH_TEN_NUMBER_OF_RESULTS));
+    }
+
+    @Test
+    void handlerThrowsBadRequestWhenQueryHasInvalidResultsParameter() throws Exception {
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            NUMBER_OF_RESULTS, TITLE_ILLEGAL_CHARACTERS));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE, RANDOM_TITLE,
-            LANGUAGE_QUERY_PARAMETER, LANGUAGE_NB));
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
     }

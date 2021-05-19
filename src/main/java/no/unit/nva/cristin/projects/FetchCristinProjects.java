@@ -1,11 +1,18 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.DEFAULT_NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.projects.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
+import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -46,8 +53,10 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
 
         String language = getValidLanguage(requestInfo);
         String title = getValidTitle(requestInfo);
+        String page = getValidPage(requestInfo);
+        String numberOfResults = getValidNumberOfResults(requestInfo);
 
-        return getTransformedCristinProjectsUsingWrapperObject(language, title);
+        return getTransformedCristinProjectsUsingWrapperObject(language, title, page, numberOfResults);
     }
 
     @Override
@@ -61,12 +70,29 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
             .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
-    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title)
+    private String getValidPage(RequestInfo requestInfo) throws BadRequestException {
+        return Optional.of(getQueryParam(requestInfo, PAGE)
+            .orElse(FIRST_PAGE))
+            .filter(this::isInteger)
+            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_PAGE_VALUE_INVALID));
+    }
+
+    private String getValidNumberOfResults(RequestInfo requestInfo) throws BadRequestException {
+        return Optional.of(getQueryParam(requestInfo, NUMBER_OF_RESULTS)
+            .orElse(DEFAULT_NUMBER_OF_RESULTS))
+            .filter(this::isInteger)
+            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
+    }
+
+    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title, String page,
+                                                                            String numberOfResults)
         throws ApiGatewayException {
 
         Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
         requestQueryParams.put(TITLE, title);
         requestQueryParams.put(LANGUAGE, language);
+        requestQueryParams.put(PAGE, page);
+        requestQueryParams.put(NUMBER_OF_RESULTS, numberOfResults);
 
         return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParams);
     }
@@ -89,4 +115,12 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
             || c == CHARACTER_PERIOD;
     }
 
+    private boolean isInteger(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
