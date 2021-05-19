@@ -47,7 +47,7 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: project.ext.jupiterVersion
 
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: project.ext.hamcrestVersion
-    testImplementation 'com.github.BIBSYSDEV:nva-testutils:0.1.20'
+    testImplementation 'com.github.BIBSYSDEV:nva-testutils:0.1.21'
     testImplementation group: 'com.github.bibsysdev', name: 'logutils', version: project.ext.nvaCommonsVersion
 
 }
