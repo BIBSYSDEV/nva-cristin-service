@@ -112,18 +112,18 @@ public class ProjectsWrapper {
     }
 
     /**
-     * Assigns value to id using supplied query parameters.
+     * Assigns value to some field values using supplied query parameters.
      *
      * @param queryParams the query params
-     * @return ProjectsWrapper object with id and firstRecord values from query parameters
+     * @return ProjectsWrapper object with some of the field values set using query parameters
      */
     public ProjectsWrapper usingQueryParams(Map<String, String> queryParams) {
         this.id = idUriFromParams(queryParams);
-        this.firstRecord = firstRecordFromParams(queryParams);
+        this.firstRecord = indexOfFirstEntryInPageCalculatedFromParams(queryParams);
         return this;
     }
 
-    private Integer firstRecordFromParams(Map<String, String> queryParams) {
+    private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {
         int page = Integer.parseInt(queryParams.get(PAGE));
         int numberOfResults = Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS));
 

@@ -49,6 +49,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class FetchCristinProjectsTest {
 
@@ -68,7 +69,6 @@ public class FetchCristinProjectsTest {
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
-    private static final String API_QUERY_RESPONSE_PAGE_TWO_JSON = "api_query_response_page_two.json";
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
         "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&title=reindeer";
     public static final String ZERO_VALUE = "0";
@@ -311,20 +311,22 @@ public class FetchCristinProjectsTest {
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_PAGE_VALUE_INVALID));
     }
 
-    @Test
-    void handlerReturnsProjectsWrapperWithFirstRecordMatchingPageParameter() throws Exception {
+    @ParameterizedTest(name = "Handler returns firstRecord {0} when record has pagination {1} and is on page {2}")
+    @CsvSource({"1,200,1", "11,5,3", "226,25,10", "55,9,7"})
+    void handlerReturnsProjectWrapperWithFirstRecordWhenInputIsIncludesCurrentPageAndNumberOfResults(int expected,
+                                                                                                     String perPage,
+                                                                                                     String currentPage)
+        throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(
             TITLE, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
-            PAGE, SECOND_PAGE));
+            PAGE, currentPage,
+            NUMBER_OF_RESULTS, perPage
+        ));
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
-
-        String expected = getBodyFromResource(API_QUERY_RESPONSE_PAGE_TWO_JSON);
-        String actual = gatewayResponse.getBody();
-
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
+        Integer actual = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), ProjectsWrapper.class).getFirstRecord();
+        assertEquals(expected, actual);
     }
 
     @Test
