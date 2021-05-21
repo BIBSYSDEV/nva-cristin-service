@@ -49,6 +49,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class FetchCristinProjectsTest {
 
@@ -70,6 +71,7 @@ public class FetchCristinProjectsTest {
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
         "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&title=reindeer";
+    public static final String ZERO_VALUE = "0";
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
     private Context context;
@@ -214,6 +216,12 @@ public class FetchCristinProjectsTest {
 
         cristinApiClientStub = spy(cristinApiClientStub);
         HttpResponse<String> emptyResponse = new HttpResponseStub(EMPTY_LIST_STRING);
+        emptyResponse = spy(emptyResponse);
+
+        java.net.http.HttpHeaders headerWithZeroValue =
+            java.net.http.HttpHeaders.of(HttpResponseStub.headerMap(ZERO_VALUE), HttpResponseStub.filter());
+
+        doReturn(headerWithZeroValue).when(emptyResponse).headers();
         doReturn(emptyResponse)
             .when(cristinApiClientStub).fetchQueryResults(any(URI.class));
         String expected = getBodyFromResource(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON);
@@ -301,6 +309,24 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_PAGE_VALUE_INVALID));
+    }
+
+    @ParameterizedTest(name = "Handler returns firstRecord {0} when record has pagination {1} and is on page {2}")
+    @CsvSource({"1,200,1", "11,5,3", "226,25,10", "55,9,7"})
+    void handlerReturnsProjectWrapperWithFirstRecordWhenInputIsIncludesCurrentPageAndNumberOfResults(int expected,
+                                                                                                     String perPage,
+                                                                                                     String currentPage)
+        throws IOException {
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, currentPage,
+            NUMBER_OF_RESULTS, perPage
+        ));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        Integer actual = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), ProjectsWrapper.class).getFirstRecord();
+        assertEquals(expected, actual);
     }
 
     @Test

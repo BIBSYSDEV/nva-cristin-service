@@ -5,13 +5,18 @@ import java.net.http.HttpClient.Version;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import javax.net.ssl.SSLSession;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
 public class HttpResponseStub implements HttpResponse<String> {
 
+    public static final String TOTAL_COUNT_EXAMPLE_VALUE = "135";
     private String body;
     private int statusCode;
 
@@ -42,7 +47,7 @@ public class HttpResponseStub implements HttpResponse<String> {
 
     @Override
     public HttpHeaders headers() {
-        return null;
+        return HttpHeaders.of(headerMap(TOTAL_COUNT_EXAMPLE_VALUE), filter());
     }
 
     @Override
@@ -63,5 +68,13 @@ public class HttpResponseStub implements HttpResponse<String> {
     @Override
     public Version version() {
         return null;
+    }
+
+    protected static Map<String, List<String>> headerMap(String totalCount) {
+        return Map.of(Constants.X_TOTAL_COUNT, Collections.singletonList(totalCount));
+    }
+
+    protected static BiPredicate<String, String> filter() {
+        return (s, s2) -> true;
     }
 }

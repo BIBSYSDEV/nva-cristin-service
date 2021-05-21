@@ -4,8 +4,11 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.projects.Constants.EMPTY_FRAGMENT;
 import static no.unit.nva.cristin.projects.Constants.HTTPS;
+import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_RECORD;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.HITS;
@@ -109,22 +112,28 @@ public class ProjectsWrapper {
     }
 
     /**
-     * Assigns value to id using supplied query parameters.
+     * Assigns value to some field values using supplied query parameters.
      *
      * @param queryParams the query params
-     * @return ProjectsWrapper object with id value from query parameters
+     * @return ProjectsWrapper object with some of the field values set using query parameters
      */
     public ProjectsWrapper usingQueryParams(Map<String, String> queryParams) {
         this.id = idUriFromParams(queryParams);
+        this.firstRecord = indexOfFirstEntryInPageCalculatedFromParams(queryParams);
         return this;
+    }
+
+    private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {
+        int page = Integer.parseInt(queryParams.get(PAGE));
+        int numberOfResults = Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS));
+
+        return (page - 1) * numberOfResults + 1;
     }
 
     private URI idUriFromParams(Map<String, String> queryParams) {
         return attempt(() -> new URI(HTTPS, DOMAIN_NAME, PROJECTS_PATH, queryParameters(queryParams), EMPTY_FRAGMENT))
             .orElseThrow();
     }
-
-    // TODO: NP-2385
 
     /**
      * Assigns values to some of the fields using supplied http headers.
@@ -133,10 +142,13 @@ public class ProjectsWrapper {
      * @return ProjectsWrapper object with field values from http headers
      */
     public ProjectsWrapper usingHeaders(HttpHeaders headers) {
-        this.size = 0;
-        this.firstRecord = 0;
+        this.size = getSizeHeader(headers);
         //this.nextResults = null;
         return this;
+    }
+
+    private int getSizeHeader(HttpHeaders headers) {
+        return (int) headers.firstValueAsLong(X_TOTAL_COUNT).orElse(0);
     }
 
     public ProjectsWrapper withProcessingTime(Long processingTime) {
