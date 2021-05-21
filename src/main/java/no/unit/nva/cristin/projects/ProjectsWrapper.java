@@ -4,10 +4,13 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.projects.Constants.EMPTY_FRAGMENT;
 import static no.unit.nva.cristin.projects.Constants.HTTPS;
+import static no.unit.nva.cristin.projects.Constants.LINK;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
+import static no.unit.nva.cristin.projects.Constants.REL_PREV;
 import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_RECORD;
@@ -19,6 +22,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.PROCESSING_TIME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SEARCH_STRING;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SIZE;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,6 +31,7 @@ import java.net.URI;
 import java.net.http.HttpHeaders;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
 
@@ -135,6 +140,25 @@ public class ProjectsWrapper {
         this.id = idUriFromParams(queryParams);
         this.firstRecord = indexOfFirstEntryInPageCalculatedFromParams(queryParams);
         setFirstRecordToZeroIfExceedsMaxSizeOfResultSet();
+
+        String linkHeader = headers.firstValue(LINK).orElse(EMPTY_STRING);
+        boolean linkHeaderContainsNextRelElement = linkHeader.contains(REL_NEXT);
+        boolean linkHeaderContainsPrevRelElement = linkHeader.contains(REL_PREV);
+
+        int currentPage = Integer.parseInt(queryParams.get(PAGE));
+
+        if (linkHeaderContainsNextRelElement
+            && this.size >= this.firstRecord + Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS))) {
+            Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
+            newParams.put(PAGE, String.valueOf(currentPage + 1));
+            this.nextResults = idUriFromParams(newParams);
+        }
+
+        if (linkHeaderContainsPrevRelElement && currentPage > 1) {
+            Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
+            newParams.put(PAGE, String.valueOf(currentPage - 1));
+            this.previousResults = idUriFromParams(newParams);
+        }
 
         return this;
     }

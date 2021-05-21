@@ -6,6 +6,8 @@ import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
+import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
+import static no.unit.nva.cristin.projects.Constants.REL_PREV;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
@@ -14,6 +16,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.projects.HttpResponseStub.LINK_EXAMPLE_VALUE;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -36,6 +39,8 @@ import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -49,8 +54,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class FetchCristinProjectsTest {
 
@@ -216,7 +223,7 @@ public class FetchCristinProjectsTest {
     void handlerReturnsProjectsWrapperWithAllMetadataButEmptyHitsArrayWhenNoMatchesAreFoundInCristin()
         throws Exception {
 
-        modifyHttpResponseToClient(EMPTY_LIST_STRING, generateHeaders(ZERO_VALUE));
+        modifyHttpResponseToClient(EMPTY_LIST_STRING, generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE));
         String expected = getBodyFromResource(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
 
@@ -311,7 +318,7 @@ public class FetchCristinProjectsTest {
 
         modifyHttpResponseToClient(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
-            generateHeaders(TOTAL_COUNT_EXAMPLE_VALUE));
+            generateHeaders(TOTAL_COUNT_EXAMPLE_VALUE, LINK_EXAMPLE_VALUE));
 
         InputStream input = requestWithQueryParameters(Map.of(
             TITLE, RANDOM_TITLE,
@@ -351,6 +358,70 @@ public class FetchCristinProjectsTest {
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
     }
 
+    @ParameterizedTest(
+        name = "Test using link {0} to assert next {1} and previous {2} using page {3} with {4} per page")
+    @MethodSource("provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect")
+    void handlerReturnsProjectsWrapperWithCorrectNextResultsAndPreviousResultsWhenLinkHeaderHasRelNextAndPrev(
+        String link, String expectedNext, String expectedPrevious, String currentPage, String perPage)
+        throws Exception {
+
+        modifyHttpResponseToClient(
+            getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
+            generateHeaders(TOTAL_COUNT_EXAMPLE_VALUE, link));
+
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, currentPage,
+            NUMBER_OF_RESULTS, perPage
+        ));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        String actualNext =
+            Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), ProjectsWrapper.class)
+                .getNextResults()).orElse(new URI(EMPTY_STRING)).toString();
+        assertEquals(expectedNext, actualNext);
+
+        String actualPrevious =
+            Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), ProjectsWrapper.class)
+                .getPreviousResults()).orElse(new URI(EMPTY_STRING)).toString();
+        assertEquals(expectedPrevious, actualPrevious);
+    }
+
+    private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
+        return Stream.of(
+            Arguments.of(LINK_EXAMPLE_VALUE,
+                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=201&results=1&title=reindeer",
+                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=199&results=1&title=reindeer",
+                "200", "1"),
+            Arguments.of(LINK_EXAMPLE_VALUE,
+                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=6&results=3&title=reindeer",
+                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=4&results=3&title=reindeer",
+                "5", "3"),
+            Arguments.of(LINK_EXAMPLE_VALUE,
+                "",
+                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=24&results=10&title=reindeer",
+                "25", "10"),
+            Arguments.of(LINK_EXAMPLE_VALUE,
+                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=reindeer",
+                "",
+                "1", "5"),
+            Arguments.of(LINK_EXAMPLE_VALUE,
+                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=10&results=7&title=reindeer",
+                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=8&results=7&title=reindeer",
+                "9", "7"),
+            Arguments.of(REL_NEXT,
+                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=reindeer",
+                "",
+                "1", "5"),
+            Arguments.of(REL_PREV,
+                "",
+                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=49&results=10&title=reindeer",
+                "50", "10")
+        );
+    }
+
     private void modifyHttpResponseToClient(String body, java.net.http.HttpHeaders headers) {
         cristinApiClientStub = spy(cristinApiClientStub);
         HttpResponse<String> response = new HttpResponseStub(body);
@@ -360,8 +431,8 @@ public class FetchCristinProjectsTest {
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
     }
 
-    private java.net.http.HttpHeaders generateHeaders(String totalCount) {
-        return java.net.http.HttpHeaders.of(HttpResponseStub.headerMap(totalCount), HttpResponseStub.filter());
+    private java.net.http.HttpHeaders generateHeaders(String totalCount, String link) {
+        return java.net.http.HttpHeaders.of(HttpResponseStub.headerMap(totalCount, link), HttpResponseStub.filter());
     }
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
