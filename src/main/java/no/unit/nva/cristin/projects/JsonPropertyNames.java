@@ -28,5 +28,6 @@ public class JsonPropertyNames {
     public static final String PROCESSING_TIME = "processingTime";
     public static final String FIRST_RECORD = "firstRecord";
     public static final String NEXT_RESULTS = "nextResults";
+    public static final String PREVIOUS_RESULTS = "previousResults";
     public static final String HITS = "hits";
 }

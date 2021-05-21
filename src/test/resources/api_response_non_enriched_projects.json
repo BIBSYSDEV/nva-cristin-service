@@ -6,6 +6,7 @@
   "processingTime": 1000,
   "firstRecord": 1,
   "nextResults": null,
+  "previousResults": null,
   "hits": [
     {
       "id": "https://api.dev.nva.aws.unit.no/project/555666",

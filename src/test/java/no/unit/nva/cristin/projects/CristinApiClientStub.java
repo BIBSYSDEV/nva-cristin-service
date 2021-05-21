@@ -7,7 +7,7 @@ import nva.commons.core.ioutils.IoUtils;
 
 public class CristinApiClientStub extends CristinApiClient {
 
-    private static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE = "cristinQueryProjectsResponse.json";
+    protected static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE = "cristinQueryProjectsResponse.json";
     private static final String CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE = "cristinGetProjectResponse.json";
 
     @Override

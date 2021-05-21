@@ -14,6 +14,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_RECORD;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.HITS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.NEXT_RESULTS;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.PREVIOUS_RESULTS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.PROCESSING_TIME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SEARCH_STRING;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SIZE;
@@ -32,7 +33,8 @@ import nva.commons.core.JacocoGenerated;
 @SuppressWarnings("unused")
 @JacocoGenerated
 @JsonInclude(ALWAYS)
-@JsonPropertyOrder({CONTEXT, ID, SIZE, SEARCH_STRING, PROCESSING_TIME, FIRST_RECORD, NEXT_RESULTS, HITS})
+@JsonPropertyOrder({CONTEXT, ID, SIZE, SEARCH_STRING, PROCESSING_TIME, FIRST_RECORD, NEXT_RESULTS, PREVIOUS_RESULTS,
+    HITS})
 public class ProjectsWrapper {
 
     @JsonProperty("@context")
@@ -46,7 +48,9 @@ public class ProjectsWrapper {
     @JsonProperty
     private Integer firstRecord;
     @JsonProperty
-    private String nextResults; // TODO: NP-2385: Add previous results as well
+    private URI nextResults;
+    @JsonProperty
+    private URI previousResults;
     @JsonProperty
     private List<NvaProject> hits;
 
@@ -95,12 +99,20 @@ public class ProjectsWrapper {
         this.firstRecord = firstRecord;
     }
 
-    public String getNextResults() {
+    public URI getNextResults() {
         return nextResults;
     }
 
-    public void setNextResults(String nextResults) {
+    public void setNextResults(URI nextResults) {
         this.nextResults = nextResults;
+    }
+
+    public URI getPreviousResults() {
+        return previousResults;
+    }
+
+    public void setPreviousResults(URI previousResults) {
+        this.previousResults = previousResults;
     }
 
     public List<NvaProject> getHits() {
@@ -112,15 +124,25 @@ public class ProjectsWrapper {
     }
 
     /**
-     * Assigns value to some field values using supplied query parameters.
+     * Assigns value to some of the field values using supplied headers and query parameters.
      *
-     * @param queryParams the query params
-     * @return ProjectsWrapper object with some of the field values set using query parameters
+     * @param headers     the headers from response
+     * @param queryParams the query params from request
+     * @return ProjectsWrapper object with some of the field values set using the supplied parameters
      */
-    public ProjectsWrapper usingQueryParams(Map<String, String> queryParams) {
+    public ProjectsWrapper usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams) {
+        this.size = getSizeHeader(headers);
         this.id = idUriFromParams(queryParams);
         this.firstRecord = indexOfFirstEntryInPageCalculatedFromParams(queryParams);
+        setFirstRecordToZeroIfExceedsMaxSizeOfResultSet();
+
         return this;
+    }
+
+    private void setFirstRecordToZeroIfExceedsMaxSizeOfResultSet() {
+        if (this.size < this.firstRecord) {
+            this.firstRecord = 0;
+        }
     }
 
     private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {
@@ -133,18 +155,6 @@ public class ProjectsWrapper {
     private URI idUriFromParams(Map<String, String> queryParams) {
         return attempt(() -> new URI(HTTPS, DOMAIN_NAME, PROJECTS_PATH, queryParameters(queryParams), EMPTY_FRAGMENT))
             .orElseThrow();
-    }
-
-    /**
-     * Assigns values to some of the fields using supplied http headers.
-     *
-     * @param headers the headers
-     * @return ProjectsWrapper object with field values from http headers
-     */
-    public ProjectsWrapper usingHeaders(HttpHeaders headers) {
-        this.size = getSizeHeader(headers);
-        //this.nextResults = null;
-        return this;
     }
 
     private int getSizeHeader(HttpHeaders headers) {

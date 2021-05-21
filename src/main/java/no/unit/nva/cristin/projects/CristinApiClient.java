@@ -87,8 +87,7 @@ public class CristinApiClient {
         long endRequestTime = System.currentTimeMillis();
 
         return new ProjectsWrapper()
-            .usingQueryParams(requestQueryParams)
-            .usingHeaders(response.headers())
+            .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
             .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
             .withHits(nvaProjects);
     }
