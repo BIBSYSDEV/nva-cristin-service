@@ -142,25 +142,31 @@ public class ProjectsWrapper {
         setFirstRecordToZeroIfExceedsMaxSizeOfResultSet();
 
         String linkHeader = headers.firstValue(LINK).orElse(EMPTY_STRING);
-        boolean linkHeaderContainsNextRelElement = linkHeader.contains(REL_NEXT);
-        boolean linkHeaderContainsPrevRelElement = linkHeader.contains(REL_PREV);
-
         int currentPage = Integer.parseInt(queryParams.get(PAGE));
 
-        if (linkHeaderContainsNextRelElement
-            && this.size >= this.firstRecord + Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS))) {
-            Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
-            newParams.put(PAGE, String.valueOf(currentPage + 1));
-            this.nextResults = idUriFromParams(newParams);
+        if (linkHeader.contains(REL_NEXT) && matchesCriteriaForNextRel(queryParams)) {
+            this.nextResults = generateIdUriWithPageFromParams(currentPage + 1, queryParams);
         }
 
-        if (linkHeaderContainsPrevRelElement && currentPage > 1) {
-            Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
-            newParams.put(PAGE, String.valueOf(currentPage - 1));
-            this.previousResults = idUriFromParams(newParams);
+        if (linkHeader.contains(REL_PREV) && matchesCriteriaForPrevRel(currentPage)) {
+            this.previousResults = generateIdUriWithPageFromParams(currentPage - 1, queryParams);
         }
 
         return this;
+    }
+
+    private boolean matchesCriteriaForPrevRel(int currentPage) {
+        return currentPage > 1;
+    }
+
+    private boolean matchesCriteriaForNextRel(Map<String, String> queryParams) {
+        return this.size >= this.firstRecord + Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS));
+    }
+
+    private URI generateIdUriWithPageFromParams(int newPage, Map<String, String> queryParams) {
+        Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
+        newParams.put(PAGE, String.valueOf(newPage));
+        return idUriFromParams(newParams);
     }
 
     private void setFirstRecordToZeroIfExceedsMaxSizeOfResultSet() {
