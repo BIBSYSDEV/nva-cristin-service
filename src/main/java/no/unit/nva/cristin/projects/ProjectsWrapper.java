@@ -21,6 +21,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.SEARCH_STRING;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SIZE;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -38,6 +39,9 @@ import nva.commons.core.JacocoGenerated;
 @JsonPropertyOrder({CONTEXT, ID, SIZE, SEARCH_STRING, PROCESSING_TIME, FIRST_RECORD, NEXT_RESULTS, PREVIOUS_RESULTS,
     HITS})
 public class ProjectsWrapper {
+
+    @JsonIgnore
+    public static final int FIRST_RECORD_ZERO_WHEN_NO_HITS = 0;
 
     @JsonProperty("@context")
     private String context = PROJECT_SEARCH_CONTEXT_URL;
@@ -138,7 +142,8 @@ public class ProjectsWrapper {
 
         this.size = getSizeHeader(headers);
         this.id = idUriFromParams(queryParams);
-        this.firstRecord = this.size > 0 ? indexOfFirstEntryInPageCalculatedFromParams(queryParams) : 0;
+        this.firstRecord = this.size > 0 ? indexOfFirstEntryInPageCalculatedFromParams(queryParams) :
+            FIRST_RECORD_ZERO_WHEN_NO_HITS;
         if (outOfScope(queryParams.get(PAGE))) {
             throw new BadRequestException(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, this.size));
         }
