@@ -9,6 +9,7 @@ import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_RECORD;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.HITS;
@@ -28,6 +29,7 @@ import java.net.http.HttpHeaders;
 import java.util.List;
 import java.util.Map;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
@@ -129,20 +131,22 @@ public class ProjectsWrapper {
      * @param headers     the headers from response
      * @param queryParams the query params from request
      * @return ProjectsWrapper object with some of the field values set using the supplied parameters
+     * @throws BadRequestException if page requested is invalid
      */
-    public ProjectsWrapper usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams) {
+    public ProjectsWrapper usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)
+        throws BadRequestException {
+
         this.size = getSizeHeader(headers);
         this.id = idUriFromParams(queryParams);
-        this.firstRecord = indexOfFirstEntryInPageCalculatedFromParams(queryParams);
-        setFirstRecordToZeroIfExceedsMaxSizeOfResultSet();
+        this.firstRecord = this.size > 0 ? indexOfFirstEntryInPageCalculatedFromParams(queryParams) : 0;
+        if (this.size < this.firstRecord) {
+            throw new BadRequestException(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, this.size));
+        }
+        if (this.size == 0 && Integer.parseInt(queryParams.get(PAGE)) > 1) {
+            throw new BadRequestException(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, this.size));
+        }
 
         return this;
-    }
-
-    private void setFirstRecordToZeroIfExceedsMaxSizeOfResultSet() {
-        if (this.size < this.firstRecord) {
-            this.firstRecord = 0;
-        }
     }
 
     private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {

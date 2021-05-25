@@ -73,14 +73,14 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
     private String getValidPage(RequestInfo requestInfo) throws BadRequestException {
         return Optional.of(getQueryParam(requestInfo, PAGE)
             .orElse(FIRST_PAGE))
-            .filter(this::isInteger)
+            .filter(this::isPositiveInteger)
             .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_PAGE_VALUE_INVALID));
     }
 
     private String getValidNumberOfResults(RequestInfo requestInfo) throws BadRequestException {
         return Optional.of(getQueryParam(requestInfo, NUMBER_OF_RESULTS)
             .orElse(DEFAULT_NUMBER_OF_RESULTS))
-            .filter(this::isInteger)
+            .filter(this::isPositiveInteger)
             .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
     }
 
@@ -115,10 +115,10 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
             || c == CHARACTER_PERIOD;
     }
 
-    private boolean isInteger(String str) {
+    private boolean isPositiveInteger(String str) {
         try {
-            Integer.parseInt(str);
-            return true;
+            int value = Integer.parseInt(str);
+            return value > 0;
         } catch (Exception e) {
             return false;
         }

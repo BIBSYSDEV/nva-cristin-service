@@ -11,11 +11,14 @@ import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PR
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.projects.HttpResponseStub.TOTAL_COUNT_EXAMPLE_VALUE;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,6 +54,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.zalando.problem.Problem;
 
 public class FetchCristinProjectsTest {
 
@@ -73,7 +77,8 @@ public class FetchCristinProjectsTest {
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
         "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&title=reindeer";
     public static final String ZERO_VALUE = "0";
-    public static final String TOTAL_COUNT_EXAMPLE_VALUE = "250";
+    public static final String TOTAL_COUNT_EXAMPLE_250 = "250";
+    public static final String PAGE_15 = "15";
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
     private Context context;
@@ -303,7 +308,7 @@ public class FetchCristinProjectsTest {
     }
 
     @ParameterizedTest(name = "Handler returns firstRecord {0} when record has pagination {1} and is on page {2}")
-    @CsvSource({"1,200,1", "11,5,3", "226,25,10", "55,9,7", "0,50,10"})
+    @CsvSource({"1,200,1", "11,5,3", "226,25,10", "55,9,7"})
     void handlerReturnsProjectWrapperWithFirstRecordWhenInputIsIncludesCurrentPageAndNumberOfResults(int expected,
                                                                                                      String perPage,
                                                                                                      String currentPage)
@@ -311,7 +316,7 @@ public class FetchCristinProjectsTest {
 
         modifyHttpResponseToClient(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
-            generateHeaders(TOTAL_COUNT_EXAMPLE_VALUE));
+            generateHeaders(TOTAL_COUNT_EXAMPLE_250));
 
         InputStream input = requestWithQueryParameters(Map.of(
             TITLE, RANDOM_TITLE,
@@ -323,6 +328,63 @@ public class FetchCristinProjectsTest {
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
         Integer actual = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), ProjectsWrapper.class).getFirstRecord();
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void handlerThrowsBadRequestWhenPaginationExceedsNumberOfResults() throws Exception {
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, PAGE_15,
+            NUMBER_OF_RESULTS, TEN_RESULTS
+        ));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
+            containsString(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, TOTAL_COUNT_EXAMPLE_VALUE)));
+    }
+
+    @Test
+    void handlerThrowsBadRequestWhenRequestingPaginationOnQueryWithZeroResults() throws Exception {
+        modifyHttpResponseToClient(
+            getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
+            generateHeaders(ZERO_VALUE));
+
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, SECOND_PAGE,
+            NUMBER_OF_RESULTS, TEN_RESULTS
+        ));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
+            containsString(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, ZERO_VALUE)));
+    }
+
+    @ParameterizedTest(
+        name = "Handler throws bad request when supplying non positive integer for results {0} or page {1}")
+    @CsvSource({"0,5", "5,0"})
+    void handlerThrowsBadRequestWhenSuppliedWithNonPositiveIntegerForPageOrResults(String perPage, String currentPage)
+        throws Exception {
+
+        InputStream input = requestWithQueryParameters(Map.of(
+            TITLE, RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, currentPage,
+            NUMBER_OF_RESULTS, perPage
+        ));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(), anyOf(
+            containsString(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID),
+            containsString(ERROR_MESSAGE_PAGE_VALUE_INVALID)));
     }
 
     @Test
