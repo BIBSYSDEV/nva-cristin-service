@@ -139,14 +139,15 @@ public class ProjectsWrapper {
         this.size = getSizeHeader(headers);
         this.id = idUriFromParams(queryParams);
         this.firstRecord = this.size > 0 ? indexOfFirstEntryInPageCalculatedFromParams(queryParams) : 0;
-        if (this.size < this.firstRecord) {
-            throw new BadRequestException(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, this.size));
-        }
-        if (this.size == 0 && Integer.parseInt(queryParams.get(PAGE)) > 1) {
+        if (outOfScope(queryParams.get(PAGE))) {
             throw new BadRequestException(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, this.size));
         }
 
         return this;
+    }
+
+    private boolean outOfScope(String page) {
+        return this.size < this.firstRecord || this.size == 0 && Integer.parseInt(page) > 1;
     }
 
     private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {
