@@ -21,6 +21,7 @@ project.ext{
     jacksonVersion = '2.12.1'
     jupiterVersion = '5.7.1'
     hamcrestVersion = '2.2'
+    zalandoProblemVersion = '0.25.0'
 }
 
 dependencies {
@@ -49,6 +50,7 @@ dependencies {
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: project.ext.hamcrestVersion
     testImplementation 'com.github.BIBSYSDEV:nva-testutils:0.1.21'
     testImplementation group: 'com.github.bibsysdev', name: 'logutils', version: project.ext.nvaCommonsVersion
+    testImplementation group: 'org.zalando', name: 'problem', version: project.ext.zalandoProblemVersion
 
 }
 

@@ -9,16 +9,19 @@ import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_RECORD;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.HITS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.NEXT_RESULTS;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.PREVIOUS_RESULTS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.PROCESSING_TIME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SEARCH_STRING;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SIZE;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -27,13 +30,18 @@ import java.net.http.HttpHeaders;
 import java.util.List;
 import java.util.Map;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
 @JsonInclude(ALWAYS)
-@JsonPropertyOrder({CONTEXT, ID, SIZE, SEARCH_STRING, PROCESSING_TIME, FIRST_RECORD, NEXT_RESULTS, HITS})
+@JsonPropertyOrder({CONTEXT, ID, SIZE, SEARCH_STRING, PROCESSING_TIME, FIRST_RECORD, NEXT_RESULTS, PREVIOUS_RESULTS,
+    HITS})
 public class ProjectsWrapper {
+
+    @JsonIgnore
+    public static final int FIRST_RECORD_ZERO_WHEN_NO_HITS = 0;
 
     @JsonProperty("@context")
     private String context = PROJECT_SEARCH_CONTEXT_URL;
@@ -46,7 +54,9 @@ public class ProjectsWrapper {
     @JsonProperty
     private Integer firstRecord;
     @JsonProperty
-    private String nextResults; // TODO: NP-2385: Add previous results as well
+    private URI nextResults;
+    @JsonProperty
+    private URI previousResults;
     @JsonProperty
     private List<NvaProject> hits;
 
@@ -95,12 +105,20 @@ public class ProjectsWrapper {
         this.firstRecord = firstRecord;
     }
 
-    public String getNextResults() {
+    public URI getNextResults() {
         return nextResults;
     }
 
-    public void setNextResults(String nextResults) {
+    public void setNextResults(URI nextResults) {
         this.nextResults = nextResults;
+    }
+
+    public URI getPreviousResults() {
+        return previousResults;
+    }
+
+    public void setPreviousResults(URI previousResults) {
+        this.previousResults = previousResults;
     }
 
     public List<NvaProject> getHits() {
@@ -112,15 +130,29 @@ public class ProjectsWrapper {
     }
 
     /**
-     * Assigns value to some field values using supplied query parameters.
+     * Assigns value to some of the field values using supplied headers and query parameters.
      *
-     * @param queryParams the query params
-     * @return ProjectsWrapper object with some of the field values set using query parameters
+     * @param headers     the headers from response
+     * @param queryParams the query params from request
+     * @return ProjectsWrapper object with some of the field values set using the supplied parameters
+     * @throws BadRequestException if page requested is invalid
      */
-    public ProjectsWrapper usingQueryParams(Map<String, String> queryParams) {
+    public ProjectsWrapper usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)
+        throws BadRequestException {
+
+        this.size = getSizeHeader(headers);
         this.id = idUriFromParams(queryParams);
-        this.firstRecord = indexOfFirstEntryInPageCalculatedFromParams(queryParams);
+        this.firstRecord = this.size > 0 ? indexOfFirstEntryInPageCalculatedFromParams(queryParams) :
+            FIRST_RECORD_ZERO_WHEN_NO_HITS;
+        if (outOfScope(queryParams.get(PAGE))) {
+            throw new BadRequestException(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, this.size));
+        }
+
         return this;
+    }
+
+    private boolean outOfScope(String page) {
+        return this.size < this.firstRecord || this.size == 0 && Integer.parseInt(page) > 1;
     }
 
     private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {
@@ -133,18 +165,6 @@ public class ProjectsWrapper {
     private URI idUriFromParams(Map<String, String> queryParams) {
         return attempt(() -> new URI(HTTPS, DOMAIN_NAME, PROJECTS_PATH, queryParameters(queryParams), EMPTY_FRAGMENT))
             .orElseThrow();
-    }
-
-    /**
-     * Assigns values to some of the fields using supplied http headers.
-     *
-     * @param headers the headers
-     * @return ProjectsWrapper object with field values from http headers
-     */
-    public ProjectsWrapper usingHeaders(HttpHeaders headers) {
-        this.size = getSizeHeader(headers);
-        //this.nextResults = null;
-        return this;
     }
 
     private int getSizeHeader(HttpHeaders headers) {
