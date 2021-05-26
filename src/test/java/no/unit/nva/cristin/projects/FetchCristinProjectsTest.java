@@ -7,7 +7,6 @@ import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
-import static no.unit.nva.cristin.projects.Constants.REL_PREV;
 import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
@@ -60,8 +59,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.zalando.problem.Problem;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.zalando.problem.Problem;
 
 public class FetchCristinProjectsTest {
 
@@ -357,7 +356,7 @@ public class FetchCristinProjectsTest {
     void handlerThrowsBadRequestWhenRequestingPaginationOnQueryWithZeroResults() throws Exception {
         modifyHttpResponseToClient(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
-            generateHeaders(ZERO_VALUE));
+            generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE));
 
         InputStream input = requestWithQueryParameters(Map.of(
             TITLE, RANDOM_TITLE,
@@ -429,7 +428,7 @@ public class FetchCristinProjectsTest {
 
         modifyHttpResponseToClient(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
-            generateHeaders(TOTAL_COUNT_EXAMPLE_VALUE, link));
+            generateHeaders(TOTAL_COUNT_EXAMPLE_250, link));
 
         InputStream input = requestWithQueryParameters(Map.of(
             TITLE, RANDOM_TITLE,
@@ -476,11 +475,7 @@ public class FetchCristinProjectsTest {
             Arguments.of(REL_NEXT,
                 "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=reindeer",
                 "",
-                "1", "5"),
-            Arguments.of(REL_PREV,
-                "",
-                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=49&results=10&title=reindeer",
-                "50", "10")
+                "1", "5")
         );
     }
 
