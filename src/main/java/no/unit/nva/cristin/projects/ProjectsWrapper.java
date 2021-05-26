@@ -149,12 +149,14 @@ public class ProjectsWrapper {
         this.id = idUriFromParams(queryParams);
         this.firstRecord = this.size > 0 ? indexOfFirstEntryInPageCalculatedFromParams(queryParams) :
             FIRST_RECORD_ZERO_WHEN_NO_HITS;
-        if (outOfScope(queryParams.get(PAGE))) {
+
+        int currentPage = Integer.parseInt(queryParams.get(PAGE));
+
+        if (outOfScope(currentPage)) {
             throw new BadRequestException(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, this.size));
         }
 
         String linkHeader = headers.firstValue(LINK).orElse(EMPTY_STRING);
-        int currentPage = Integer.parseInt(queryParams.get(PAGE));
 
         if (linkHeader.contains(REL_NEXT) && matchesCriteriaForNextRel(queryParams)) {
             this.nextResults = generateIdUriWithPageFromParams(currentPage + 1, queryParams);
@@ -167,8 +169,8 @@ public class ProjectsWrapper {
         return this;
     }
 
-    private boolean outOfScope(String page) {
-        return this.size < this.firstRecord || this.size == 0 && Integer.parseInt(page) > 1;
+    private boolean outOfScope(int currentPage) {
+        return this.size < this.firstRecord || this.size == 0 && currentPage > 1;
     }
 
     private boolean matchesCriteriaForPrevRel(int currentPage) {
