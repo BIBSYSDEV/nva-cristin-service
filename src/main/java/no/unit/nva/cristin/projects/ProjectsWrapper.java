@@ -4,10 +4,13 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.projects.Constants.EMPTY_FRAGMENT;
 import static no.unit.nva.cristin.projects.Constants.HTTPS;
+import static no.unit.nva.cristin.projects.Constants.LINK;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
+import static no.unit.nva.cristin.projects.Constants.REL_PREV;
 import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
@@ -20,6 +23,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.PROCESSING_TIME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SEARCH_STRING;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SIZE;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -29,6 +33,7 @@ import java.net.URI;
 import java.net.http.HttpHeaders;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.JacocoGenerated;
@@ -144,15 +149,42 @@ public class ProjectsWrapper {
         this.id = idUriFromParams(queryParams);
         this.firstRecord = this.size > 0 ? indexOfFirstEntryInPageCalculatedFromParams(queryParams) :
             FIRST_RECORD_ZERO_WHEN_NO_HITS;
-        if (outOfScope(queryParams.get(PAGE))) {
+
+        int currentPage = Integer.parseInt(queryParams.get(PAGE));
+
+        if (outOfScope(currentPage)) {
             throw new BadRequestException(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, this.size));
+        }
+
+        String linkHeader = headers.firstValue(LINK).orElse(EMPTY_STRING);
+
+        if (linkHeader.contains(REL_NEXT) && matchesCriteriaForNextRel(queryParams)) {
+            this.nextResults = generateIdUriWithPageFromParams(currentPage + 1, queryParams);
+        }
+
+        if (linkHeader.contains(REL_PREV) && matchesCriteriaForPrevRel(currentPage)) {
+            this.previousResults = generateIdUriWithPageFromParams(currentPage - 1, queryParams);
         }
 
         return this;
     }
 
-    private boolean outOfScope(String page) {
-        return this.size < this.firstRecord || this.size == 0 && Integer.parseInt(page) > 1;
+    private boolean outOfScope(int currentPage) {
+        return this.size < this.firstRecord || this.size == 0 && currentPage > 1;
+    }
+
+    private boolean matchesCriteriaForPrevRel(int currentPage) {
+        return currentPage > 1;
+    }
+
+    private boolean matchesCriteriaForNextRel(Map<String, String> queryParams) {
+        return this.size >= this.firstRecord + Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS));
+    }
+
+    private URI generateIdUriWithPageFromParams(int newPage, Map<String, String> queryParams) {
+        Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
+        newParams.put(PAGE, String.valueOf(newPage));
+        return idUriFromParams(newParams);
     }
 
     private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {

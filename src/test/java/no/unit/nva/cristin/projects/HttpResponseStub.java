@@ -1,5 +1,9 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.LINK;
+import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
+import static no.unit.nva.cristin.projects.Constants.REL_PREV;
+import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
 import java.net.URI;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpHeaders;
@@ -17,6 +21,7 @@ import nva.commons.core.JacocoGenerated;
 public class HttpResponseStub implements HttpResponse<String> {
 
     public static final String TOTAL_COUNT_EXAMPLE_VALUE = "135";
+    public static final String LINK_EXAMPLE_VALUE = String.join(";", REL_PREV, REL_NEXT);
     private String body;
     private int statusCode;
 
@@ -47,7 +52,7 @@ public class HttpResponseStub implements HttpResponse<String> {
 
     @Override
     public HttpHeaders headers() {
-        return HttpHeaders.of(headerMap(TOTAL_COUNT_EXAMPLE_VALUE), filter());
+        return HttpHeaders.of(headerMap(TOTAL_COUNT_EXAMPLE_VALUE, LINK_EXAMPLE_VALUE), filter());
     }
 
     @Override
@@ -70,8 +75,10 @@ public class HttpResponseStub implements HttpResponse<String> {
         return null;
     }
 
-    protected static Map<String, List<String>> headerMap(String totalCount) {
-        return Map.of(Constants.X_TOTAL_COUNT, Collections.singletonList(totalCount));
+    protected static Map<String, List<String>> headerMap(String totalCount, String link) {
+        return Map.of(
+            X_TOTAL_COUNT, Collections.singletonList(totalCount),
+            LINK, Collections.singletonList(link));
     }
 
     protected static BiPredicate<String, String> filter() {
