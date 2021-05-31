@@ -41,7 +41,7 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '\\w'
+            pattern: '.+'
           example: 'Helse'
         - name: language
           in: query
@@ -119,16 +119,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OneProject'
+                $ref: '#/components/schemas/Project'
               examples:
                 objectExample:
-                  $ref: '#/components/examples/OneProjectExample'
+                  $ref: '#/components/examples/ProjectExample'
             application/ld+json:
               schema:
-                $ref: '#/components/schemas/OneProject'
+                $ref: '#/components/schemas/Project'
               examples:
                 objectExample:
-                  $ref: '#/components/examples/OneProjectExample'
+                  $ref: '#/components/examples/ProjectExample'
         400:
           $ref: '#/components/responses/400'
         404:
@@ -198,8 +198,8 @@ components:
           type: array
           description: The list of projects returned by the query
           items:
-            $ref: '#/components/schemas/OneProject'
-    OneProject:
+            $ref: '#/components/schemas/Project'
+    Project:
       type: object
       properties:
         '@context':
@@ -226,7 +226,7 @@ components:
                 description: Cristin ID of project
         title:
           type: string
-          pattern: '\\w'
+          pattern: '.+'
           description: Title of the project
         language:
           type: string
@@ -239,11 +239,11 @@ components:
             $ref: '#/components/schemas/Languages'
         startDate:
           type: string
-          #pattern: ''
+          pattern: '.+'
           description: Project start date
         endDate:
           type: string
-          #pattern: ''
+          pattern: '.+'
           description: Project end date
         coordinatingInstitution:
           $ref: '#/components/schemas/Organization'
@@ -271,11 +271,11 @@ components:
                     description: Type of identity. Always Person
                   firstName:
                     type: string
-                    pattern: '\\w'
+                    pattern: '.+'
                     description: First name
                   lastName:
                     type: string
-                    pattern: '\\w'
+                    pattern: '.+'
                     description: Last name
               affiliation:
                 $ref: '#/components/schemas/Organization'
@@ -308,7 +308,7 @@ components:
       pattern: '^[a-z]{2}$'
       additionalProperties:
         type: string
-        pattern: '\\w'
+        pattern: '.+'
     Organization:
       type: object
       description: Affiliated organization
@@ -372,7 +372,7 @@ components:
                   type: 'Organization'
                   name:
                     'nb': 'OsloMet - storbyuniversitetet'
-    OneProjectExample:
+    ProjectExample:
       value:
         '@context': 'https://example.org/project-context.json'
         id: 'https://api.dev.nva.aws.unit.no/project/359084'
