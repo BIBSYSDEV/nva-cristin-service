@@ -21,6 +21,9 @@ externalDocs:
   url: https://nva.unit.no
 servers:
   - url: https://api.nva.unit.no/project
+  - url: https://api.dev.nva.aws.unit.no/project
+  - url: https://api.sandbox.nva.aws.unit.no/project
+  - url: https://api.test.nva.aws.unit.no/project
 paths:
   /:
     get:
@@ -48,17 +51,14 @@ paths:
           description: Preferred language for some fields
           required: false
           schema:
-            type: string
-            pattern: '^[a-z]{2}$'
-            default: 'nb'
+            $ref: '#/components/schemas/LanguageParam'
           example: 'nb'
         - name: page
           in: query
           description: Current page requested
           required: false
           schema:
-            type: string
-            pattern: '^[0-9]+$'
+            type: number
             default: '1'
           example: '3'
         - name: results
@@ -66,8 +66,7 @@ paths:
           description: Results per page
           required: false
           schema:
-            type: string
-            pattern: '^[0-9]+$'
+            type: number
             default: '5'
           example: '10'
       responses:
@@ -113,6 +112,13 @@ paths:
             type: string
             pattern: '^[0-9]+$'
           example: '495216'
+        - name: language
+          in: query
+          description: Preferred language for some fields
+          required: false
+          schema:
+            $ref: '#/components/schemas/LanguageParam'
+          example: 'nb'
       responses:
         200:
           description: successful operation
@@ -295,6 +301,13 @@ components:
         requestId:
           type: string
           description: Unique id for the request
+    LanguageParam:
+      type: string
+      enum:
+        - nb
+        - nn
+        - en
+      default: 'nb'
     Context:
       type: string
       pattern: 'https:\/\/.*$'
