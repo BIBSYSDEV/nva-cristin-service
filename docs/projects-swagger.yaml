@@ -38,9 +38,9 @@ paths:
       description: Returns a list of projects based on query parameters
       operationId: ListProjects
       parameters:
-        - name: title
+        - name: query
           in: query
-          description: Title search string
+          description: Search string. Either title search or grant id search
           required: true
           schema:
             type: string

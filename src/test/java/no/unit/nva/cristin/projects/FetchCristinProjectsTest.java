@@ -6,16 +6,16 @@ import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
+import static no.unit.nva.cristin.projects.Constants.QUERY;
 import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
-import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static no.unit.nva.cristin.projects.HttpResponseStub.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.projects.HttpResponseStub.TOTAL_COUNT_EXAMPLE_VALUE;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
@@ -73,9 +73,9 @@ public class FetchCristinProjectsTest {
     private static final String SECOND_PAGE = "2";
     private static final String TEN_RESULTS = "10";
     private static final String URI_WITH_PAGE_NUMBER_VALUE_OF_TWO =
-        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=reindeer";
+        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&query=reindeer&results=5";
     private static final String URI_WITH_TEN_NUMBER_OF_RESULTS =
-        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&results=10&title=reindeer";
+        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer&results=10";
 
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
@@ -159,12 +159,12 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     @Test
     void handlerSetsDefaultValueForMissingOptionalLanguageParameterAndReturnOk() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE, RANDOM_TITLE));
+        InputStream input = requestWithQueryParameters(Map.of(QUERY, RANDOM_TITLE));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
@@ -181,32 +181,32 @@ public class FetchCristinProjectsTest {
 
     @Test
     void handlerReturnsBadRequestWhenTitleQueryParamIsEmpty() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE, EMPTY_STRING));
+        InputStream input = requestWithQueryParameters(Map.of(QUERY, EMPTY_STRING));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     @Test
     void handlerReturnsBadRequestWhenReceivingTitleQueryParamWithIllegalCharacters() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(TITLE, TITLE_ILLEGAL_CHARACTERS));
+        InputStream input = requestWithQueryParameters(Map.of(QUERY, TITLE_ILLEGAL_CHARACTERS));
 
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     @Test
     void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, INVALID_LANGUAGE));
 
         handler.handleRequest(input, output, context);
@@ -237,7 +237,7 @@ public class FetchCristinProjectsTest {
     @Test
     void getsCorrectUriWhenCallingQueryProjectsUriBuilder() throws Exception {
         Map<String, String> params = Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
             PAGE, FIRST_PAGE,
             NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS);
@@ -290,7 +290,7 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerReturnsCristinProjectsWhenQueryContainsPageParameter() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
             PAGE, SECOND_PAGE));
         handler.handleRequest(input, output, context);
@@ -303,7 +303,7 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerThrowsBadRequestWhenQueryHasInvalidPageParameter() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
             PAGE, TITLE_ILLEGAL_CHARACTERS));
         handler.handleRequest(input, output, context);
@@ -325,7 +325,7 @@ public class FetchCristinProjectsTest {
             generateHeaders(TOTAL_COUNT_EXAMPLE_250, LINK_EXAMPLE_VALUE));
 
         InputStream input = requestWithQueryParameters(Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
             PAGE, currentPage,
             NUMBER_OF_RESULTS, perPage
@@ -339,7 +339,7 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerThrowsBadRequestWhenPaginationExceedsNumberOfResults() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
             PAGE, PAGE_15,
             NUMBER_OF_RESULTS, TEN_RESULTS
@@ -359,7 +359,7 @@ public class FetchCristinProjectsTest {
             generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE));
 
         InputStream input = requestWithQueryParameters(Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
             PAGE, SECOND_PAGE,
             NUMBER_OF_RESULTS, TEN_RESULTS
@@ -379,7 +379,7 @@ public class FetchCristinProjectsTest {
         throws Exception {
 
         InputStream input = requestWithQueryParameters(Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
             PAGE, currentPage,
             NUMBER_OF_RESULTS, perPage
@@ -396,7 +396,7 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerReturnsCristinProjectsWhenQueryContainsResultsParameter() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
             NUMBER_OF_RESULTS, TEN_RESULTS));
         handler.handleRequest(input, output, context);
@@ -409,7 +409,7 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerThrowsBadRequestWhenQueryHasInvalidResultsParameter() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
             NUMBER_OF_RESULTS, TITLE_ILLEGAL_CHARACTERS));
         handler.handleRequest(input, output, context);
@@ -431,7 +431,7 @@ public class FetchCristinProjectsTest {
             generateHeaders(TOTAL_COUNT_EXAMPLE_250, link));
 
         InputStream input = requestWithQueryParameters(Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
             PAGE, currentPage,
             NUMBER_OF_RESULTS, perPage
@@ -453,30 +453,35 @@ public class FetchCristinProjectsTest {
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
         return Stream.of(
             Arguments.of(LINK_EXAMPLE_VALUE,
-                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=201&results=1&title=reindeer",
-                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=199&results=1&title=reindeer",
+                exampleUriFromPageAndResults("201", "1"),
+                exampleUriFromPageAndResults("199", "1"),
                 "200", "1"),
             Arguments.of(LINK_EXAMPLE_VALUE,
-                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=6&results=3&title=reindeer",
-                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=4&results=3&title=reindeer",
+                exampleUriFromPageAndResults("6", "3"),
+                exampleUriFromPageAndResults("4", "3"),
                 "5", "3"),
             Arguments.of(LINK_EXAMPLE_VALUE,
-                "",
-                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=24&results=10&title=reindeer",
+                EMPTY_STRING,
+                exampleUriFromPageAndResults("24", "10"),
                 "25", "10"),
             Arguments.of(LINK_EXAMPLE_VALUE,
-                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=reindeer",
-                "",
+                exampleUriFromPageAndResults("2", "5"),
+                EMPTY_STRING,
                 "1", "5"),
             Arguments.of(LINK_EXAMPLE_VALUE,
-                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=10&results=7&title=reindeer",
-                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=8&results=7&title=reindeer",
+                exampleUriFromPageAndResults("10", "7"),
+                exampleUriFromPageAndResults("8", "7"),
                 "9", "7"),
             Arguments.of(REL_NEXT,
-                "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=reindeer",
-                "",
+                exampleUriFromPageAndResults("2", "5"),
+                EMPTY_STRING,
                 "1", "5")
         );
+    }
+
+    private static String exampleUriFromPageAndResults(String page, String results) {
+        String url = "https://api.dev.nva.aws.unit.no/project/?language=nb&page=%s&query=reindeer&results=%s";
+        return String.format(url, page, results);
     }
 
     private void modifyHttpResponseToClient(String body, java.net.http.HttpHeaders headers) {
@@ -494,7 +499,7 @@ public class FetchCristinProjectsTest {
 
     private GatewayResponse<ProjectsWrapper> sendDefaultQuery() throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(
-            TITLE, RANDOM_TITLE,
+            QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
