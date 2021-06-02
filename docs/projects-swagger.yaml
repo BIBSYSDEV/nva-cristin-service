@@ -344,7 +344,7 @@ components:
         processingTime: 800
         firstRecord: 1
         nextResults: 'https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=helse'
-        previousResults: null
+        previousResults: ''
         hits:
           - id: 'https://api.dev.nva.aws.unit.no/project/359084'
             type: 'Project'
