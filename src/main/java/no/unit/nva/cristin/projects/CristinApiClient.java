@@ -80,22 +80,13 @@ public class CristinApiClient {
         Map<String, String> requestQueryParams) throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
-
-        List<CristinProject> cristinProjects;
-        HttpResponse<String> response;
-
-        if (queryIsNumeric(requestQueryParams)) {
-            response = queryProjects(requestQueryParams, true);
-            cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
-            if (cristinProjects.isEmpty()) {
-                response = queryProjects(requestQueryParams, false);
-                cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
-            }
-        } else {
+        HttpResponse<String> response = queryProjects(requestQueryParams, hasNumericQuery(requestQueryParams));
+        List<CristinProject> cristinProjects =
+            getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
+        if (cristinProjects.isEmpty() && hasNumericQuery(requestQueryParams)) {
             response = queryProjects(requestQueryParams, false);
             cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
         }
-
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
@@ -153,7 +144,7 @@ public class CristinApiClient {
                 .orElse(project)).collect(Collectors.toList());
     }
 
-    private boolean queryIsNumeric(Map<String, String> requestQueryParams) {
+    private boolean hasNumericQuery(Map<String, String> requestQueryParams) {
         return Utils.isPositiveInteger(requestQueryParams.get(QUERY));
     }
 

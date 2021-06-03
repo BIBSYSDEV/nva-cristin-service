@@ -26,6 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -468,12 +469,57 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    void handlerReturnsProjectWhenDoingQueryWithNumericGrantId() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE));
+    void handlerReturnsMatchingProjectsFromGrantIdSearchWhenSuppliedWithOnlyNumber() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
 
+        doReturn(new HttpResponseStub(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE))
+            .when(cristinApiClientStub).queryProjects(any(), eq(Boolean.TRUE));
+
+        doThrow(RuntimeException.class)
+            .when(cristinApiClientStub).queryProjects(any(), eq(Boolean.FALSE));
+
+        InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE));
         handler.handleRequest(input, output, context);
         GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(MediaType.APPLICATION_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void handlerReturnsProjectsFromTitleSearchWhenSuppliedWithQueryStringIncludingNumber() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+
+        doThrow(RuntimeException.class)
+            .when(cristinApiClientStub).queryProjects(any(), eq(Boolean.TRUE));
+
+        doReturn(new HttpResponseStub(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE))
+            .when(cristinApiClientStub).queryProjects(any(), eq(Boolean.FALSE));
+
+        InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE + RANDOM_TITLE));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(MediaType.APPLICATION_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void handlerReturnsProjectsFromTitleSearchWhenGrantIdSearchReturnsZeroResults() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+
+        doReturn(new HttpResponseStub(EMPTY_LIST_STRING))
+            .when(cristinApiClientStub).queryProjects(any(), eq(Boolean.TRUE));
+
+        doReturn(new HttpResponseStub(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE))
+            .when(cristinApiClientStub).queryProjects(any(), eq(Boolean.FALSE));
+
+        InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        ProjectsWrapper actual = gatewayResponse.getBodyObject(ProjectsWrapper.class);
+        assertEquals(5, actual.getHits().size());
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MediaType.APPLICATION_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
