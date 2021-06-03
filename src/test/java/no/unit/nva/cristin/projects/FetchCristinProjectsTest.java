@@ -85,6 +85,10 @@ public class FetchCristinProjectsTest {
     public static final String ZERO_VALUE = "0";
     public static final String TOTAL_COUNT_EXAMPLE_250 = "250";
     public static final String PAGE_15 = "15";
+    public static final String CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI =
+        "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&project_code=1234567";
+    private static final String GRANT_ID_EXAMPLE = "1234567";
+
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
     private Context context;
@@ -244,6 +248,18 @@ public class FetchCristinProjectsTest {
         URI uri = new URI(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI);
 
         assertEquals(uri, cristinApiClientStub.generateQueryProjectsUrl(params));
+    }
+
+    @Test
+    void getsCorrectUriWhenCallingQueryGrantIdUriBuilder() throws Exception {
+        Map<String, String> params = Map.of(
+            QUERY, GRANT_ID_EXAMPLE,
+            LANGUAGE, LANGUAGE_NB,
+            PAGE, FIRST_PAGE,
+            NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS);
+        URI uri = new URI(CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI);
+
+        assertEquals(uri, cristinApiClientStub.generateQueryGrantIdUrl(params));
     }
 
     @Test
@@ -448,6 +464,17 @@ public class FetchCristinProjectsTest {
             Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), ProjectsWrapper.class)
                 .getPreviousResults()).orElse(new URI(EMPTY_STRING)).toString();
         assertEquals(expectedPrevious, actualPrevious);
+    }
+
+    @Test
+    void handlerReturnsProjectWhenDoingQueryWithNumericGrantId() throws Exception {
+        InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE));
+
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(MediaType.APPLICATION_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
