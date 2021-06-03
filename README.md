@@ -7,8 +7,10 @@ Lambda for fetching project data from the [Cristin API](https://api.cristin.no/v
 
 | Query parameter | Description |
 | ------ | ------ |
-| title | Title of the project, or part of the title. Accepts letters, digits, dash and whitespace. (Mandatory) |
-| language | Preferred language for titles. Accepts 'nb' or 'en'. (Optional) |
+| query | Either title of the project, part of the title, or a grant id. Accepts letters, digits, dash and whitespace. (Mandatory) |
+| language | Preferred language for titles. Accepts 'nb', 'nn' or 'en'. (Optional) |
+| page | Pagination for current page requested. |
+| results | Results per page. |
 
 
 #### Response
@@ -23,12 +25,13 @@ Example response body:
 ```json
 {
   "@context": "https://example.org/search-api-context.json",
-  "id": "https://api.dev.nva.aws.unit.no/project/search?QUERY_PARAMS",
-  "size": 0,
-  "searchString": "title=reindeer",
+  "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer&results=5",
+  "size": 135,
+  "searchString": "language=nb&page=1&query=reindeer&results=5",
   "processingTime": 1000,
-  "firstRecord": 0,
-  "nextResults": "",
+  "firstRecord": 1,
+  "nextResults": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&query=reindeer&results=5",
+  "previousResults": null,
   "hits": [
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",

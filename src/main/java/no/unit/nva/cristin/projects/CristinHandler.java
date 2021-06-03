@@ -13,7 +13,7 @@ import nva.commons.core.Environment;
 public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
 
     protected static final String DEFAULT_LANGUAGE_CODE = "nb";
-    private static final Set<String> VALID_LANGUAGE_CODES = Set.of("en", "nb");
+    private static final Set<String> VALID_LANGUAGE_CODES = Set.of("en", "nb", "nn");
 
     public CristinHandler(Class<I> iclass, Environment environment) {
         super(iclass, environment);

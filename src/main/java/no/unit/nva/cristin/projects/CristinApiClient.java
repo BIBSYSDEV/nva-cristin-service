@@ -7,8 +7,8 @@ import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.QUERY;
 import static no.unit.nva.cristin.projects.Constants.QUESTION_MARK;
-import static no.unit.nva.cristin.projects.Constants.TITLE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
@@ -140,7 +140,7 @@ public class CristinApiClient {
 
     protected URI generateQueryProjectsUrl(Map<String, String> parameters) throws URISyntaxException {
         return new CristinQuery()
-            .withTitle(parameters.get(TITLE))
+            .withTitle(parameters.get(QUERY))
             .withLanguage(parameters.get(LANGUAGE))
             .withFromPage(parameters.get(PAGE))
             .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))

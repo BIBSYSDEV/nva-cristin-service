@@ -74,7 +74,9 @@ Resources:
             Method: get
             RequestParameters:
               - method.request.querystring.language
-              - method.request.querystring.title
+              - method.request.querystring.query
+              - method.request.querystring.page
+              - method.request.querystring.results
 
   NvaCristinOneProjectFunction:
     Type: AWS::Serverless::Function
