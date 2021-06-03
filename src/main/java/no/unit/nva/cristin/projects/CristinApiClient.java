@@ -85,14 +85,14 @@ public class CristinApiClient {
         HttpResponse<String> response;
 
         if (queryIsNumeric(requestQueryParams)) {
-            response = queryProjectsUsingGrantId(requestQueryParams);
+            response = queryProjects(requestQueryParams, true);
             cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
             if (cristinProjects.isEmpty()) {
-                response = queryProjects(requestQueryParams);
+                response = queryProjects(requestQueryParams, false);
                 cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
             }
         } else {
-            response = queryProjects(requestQueryParams);
+            response = queryProjects(requestQueryParams, false);
             cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
         }
 
@@ -105,38 +105,14 @@ public class CristinApiClient {
             .withHits(nvaProjects);
     }
 
-    protected HttpResponse<String> queryProjectsUsingGrantId(Map<String, String> parameters)
-        throws ApiGatewayException {
-
-        URI uri = attempt(() -> generateQueryGrantIdUrl(parameters))
-            .toOptional(failure ->
-                logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters), failure.getException()))
-            .orElseThrow();
-
-        HttpResponse<String> response = fetchQueryResults(uri);
-
-        checkHttpStatusCode(
-            buildUri(BASE_URL, QUESTION_MARK + queryParameters(parameters)).toString(),
-            response.statusCode());
-
-        return response;
-    }
-
     protected static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
         return OBJECT_MAPPER.readValue(body, classOfT);
     }
 
-    protected URI generateQueryGrantIdUrl(Map<String, String> parameters) throws URISyntaxException {
-        return new CristinQuery()
-            .withGrantId(parameters.get(QUERY))
-            .withLanguage(parameters.get(LANGUAGE))
-            .withFromPage(parameters.get(PAGE))
-            .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
-            .toURI();
-    }
+    protected HttpResponse<String> queryProjects(Map<String, String> parameters, boolean useGrantId)
+        throws ApiGatewayException {
 
-    protected HttpResponse<String> queryProjects(Map<String, String> parameters) throws ApiGatewayException {
-        URI uri = attempt(() -> generateQueryProjectsUrl(parameters))
+        URI uri = attempt(() -> generateQueryProjectsUrl(parameters, useGrantId))
             .toOptional(failure ->
                 logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters), failure.getException()))
             .orElseThrow();
@@ -181,13 +157,16 @@ public class CristinApiClient {
         return Utils.isPositiveInteger(requestQueryParams.get(QUERY));
     }
 
-    protected URI generateQueryProjectsUrl(Map<String, String> parameters) throws URISyntaxException {
-        return new CristinQuery()
-            .withTitle(parameters.get(QUERY))
+    protected URI generateQueryProjectsUrl(Map<String, String> parameters, boolean useGrantId)
+        throws URISyntaxException {
+
+        CristinQuery query = new CristinQuery()
             .withLanguage(parameters.get(LANGUAGE))
             .withFromPage(parameters.get(PAGE))
-            .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
-            .toURI();
+            .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
+
+        return useGrantId ? query.withGrantId(parameters.get(QUERY)).toURI() :
+            query.withTitle(parameters.get(QUERY)).toURI();
     }
 
     protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {

@@ -247,7 +247,7 @@ public class FetchCristinProjectsTest {
             NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS);
         URI uri = new URI(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI);
 
-        assertEquals(uri, cristinApiClientStub.generateQueryProjectsUrl(params));
+        assertEquals(uri, cristinApiClientStub.generateQueryProjectsUrl(params, false));
     }
 
     @Test
@@ -259,14 +259,14 @@ public class FetchCristinProjectsTest {
             NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS);
         URI uri = new URI(CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI);
 
-        assertEquals(uri, cristinApiClientStub.generateQueryGrantIdUrl(params));
+        assertEquals(uri, cristinApiClientStub.generateQueryProjectsUrl(params, true));
     }
 
     @Test
     void handlerReturnsServerErrorExceptionWhenBackendThrowsGenericException() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doThrow(RuntimeException.class).when(cristinApiClientStub).generateQueryProjectsUrl(any());
+        doThrow(RuntimeException.class).when(cristinApiClientStub).generateQueryProjectsUrl(any(), any(Boolean.class));
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
 
@@ -293,7 +293,8 @@ public class FetchCristinProjectsTest {
     void handlerReturnsInternalErrorWhenUriCreationFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doThrow(URISyntaxException.class).when(cristinApiClientStub).generateQueryProjectsUrl(any());
+        doThrow(URISyntaxException.class).when(cristinApiClientStub)
+            .generateQueryProjectsUrl(any(), any(Boolean.class));
 
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
