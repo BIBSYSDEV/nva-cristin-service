@@ -1,7 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.Constants.DEFAULT_NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.projects.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
@@ -68,9 +66,9 @@ import org.zalando.problem.Problem;
 
 public class FetchCristinProjectsTest {
 
-    private static final String LANGUAGE_NB = "nb";
+    public static final String LANGUAGE_NB = "nb";
     private static final String INVALID_LANGUAGE = "ru";
-    private static final String RANDOM_TITLE = "reindeer";
+    public static final String RANDOM_TITLE = "reindeer";
     private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String INVALID_JSON = "This is not valid JSON!";
     private static final String EMPTY_LIST_STRING = "[]";
@@ -84,14 +82,10 @@ public class FetchCristinProjectsTest {
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
-    private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
-        "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&title=reindeer";
     public static final String ZERO_VALUE = "0";
     public static final String TOTAL_COUNT_EXAMPLE_250 = "250";
     public static final String PAGE_15 = "15";
-    public static final String CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI =
-        "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&project_code=1234567";
-    private static final String GRANT_ID_EXAMPLE = "1234567";
+    public static final String GRANT_ID_EXAMPLE = "1234567";
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -240,30 +234,6 @@ public class FetchCristinProjectsTest {
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
 
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(gatewayResponse.getBody()));
-    }
-
-    @Test
-    void getsCorrectUriWhenCallingQueryProjectsUriBuilder() throws Exception {
-        Map<String, String> params = Map.of(
-            QUERY, RANDOM_TITLE,
-            LANGUAGE, LANGUAGE_NB,
-            PAGE, FIRST_PAGE,
-            NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS);
-        URI uri = new URI(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI);
-
-        assertEquals(uri, cristinApiClientStub.generateQueryProjectsUrl(params, QUERY_USING_TITLE));
-    }
-
-    @Test
-    void getsCorrectUriWhenCallingQueryGrantIdUriBuilder() throws Exception {
-        Map<String, String> params = Map.of(
-            QUERY, GRANT_ID_EXAMPLE,
-            LANGUAGE, LANGUAGE_NB,
-            PAGE, FIRST_PAGE,
-            NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS);
-        URI uri = new URI(CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI);
-
-        assertEquals(uri, cristinApiClientStub.generateQueryProjectsUrl(params, QUERY_USING_GRANT_ID));
     }
 
     @Test
