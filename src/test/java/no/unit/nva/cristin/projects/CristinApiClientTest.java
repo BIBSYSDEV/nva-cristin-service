@@ -26,7 +26,7 @@ public class CristinApiClientTest {
     CristinApiClient cristinApiClient = new CristinApiClient();
 
     @Test
-    void getsCorrectUriWhenCallingQueryProjectsUriBuilder() throws Exception {
+    void getsCristinUriWithTitleParamWhenCallingUriBuilderWithTitleQueryRequested() throws Exception {
         Map<String, String> params = Map.of(
             QUERY, RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB,
@@ -38,7 +38,7 @@ public class CristinApiClientTest {
     }
 
     @Test
-    void getsCorrectUriWhenCallingQueryGrantIdUriBuilder() throws Exception {
+    void getsCristinUriWithProjectCodeParamWhenCallingUriBuilderWithGrantIdQueryRequested() throws Exception {
         Map<String, String> params = Map.of(
             QUERY, GRANT_ID_EXAMPLE,
             LANGUAGE, LANGUAGE_NB,
