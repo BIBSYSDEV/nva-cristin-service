@@ -446,11 +446,13 @@ public class FetchCristinProjectsTest {
     void handlerReturnsMatchingProjectsFromGrantIdSearchWhenSuppliedWithOnlyNumber() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE))
+        doReturn(new HttpResponseStub(getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
         doThrow(RuntimeException.class)
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
+
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
 
         InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE));
         handler.handleRequest(input, output, context);
@@ -467,8 +469,10 @@ public class FetchCristinProjectsTest {
         doThrow(RuntimeException.class)
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
-        doReturn(new HttpResponseStub(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE))
+        doReturn(new HttpResponseStub(getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
+
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
 
         InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE + RANDOM_TITLE));
         handler.handleRequest(input, output, context);
@@ -485,8 +489,10 @@ public class FetchCristinProjectsTest {
         doReturn(new HttpResponseStub(EMPTY_LIST_STRING))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
-        doReturn(new HttpResponseStub(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE))
+        doReturn(new HttpResponseStub(getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
+
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
 
         InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE));
         handler.handleRequest(input, output, context);
