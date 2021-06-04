@@ -83,11 +83,11 @@ public class CristinApiClient {
         Map<String, String> requestQueryParams) throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
-        QueryType queryType = hasNumericQuery(requestQueryParams) ? QUERY_USING_GRANT_ID : QUERY_USING_TITLE;
+        QueryType queryType = getQueryTypeBasedOnParams(requestQueryParams);
         HttpResponse<String> response = queryProjects(requestQueryParams, queryType);
         List<CristinProject> cristinProjects =
             getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
-        if (cristinProjects.isEmpty() && hasNumericQuery(requestQueryParams)) {
+        if (cristinProjects.isEmpty() && queryType == QUERY_USING_GRANT_ID) {
             response = queryProjects(requestQueryParams, QUERY_USING_TITLE);
             cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
         }
@@ -148,8 +148,8 @@ public class CristinApiClient {
                 .orElse(project)).collect(Collectors.toList());
     }
 
-    private boolean hasNumericQuery(Map<String, String> requestQueryParams) {
-        return Utils.isPositiveInteger(requestQueryParams.get(QUERY));
+    private QueryType getQueryTypeBasedOnParams(Map<String, String> requestQueryParams) {
+        return Utils.isPositiveInteger(requestQueryParams.get(QUERY)) ? QUERY_USING_GRANT_ID : QUERY_USING_TITLE;
     }
 
     protected URI generateQueryProjectsUrl(Map<String, String> parameters, QueryType queryType)
