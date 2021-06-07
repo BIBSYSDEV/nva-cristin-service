@@ -20,6 +20,7 @@ import static no.unit.nva.cristin.projects.HttpResponseStub.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.projects.HttpResponseStub.TOTAL_COUNT_EXAMPLE_VALUE;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static nva.commons.core.attempt.Try.attempt;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,10 +39,19 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -51,7 +61,9 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.Environment;
+import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
+import nva.commons.core.parallel.ParallelMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -448,6 +460,82 @@ public class FetchCristinProjectsTest {
             Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), ProjectsWrapper.class)
                 .getPreviousResults()).orElse(new URI(EMPTY_STRING)).toString();
         assertEquals(expectedPrevious, actualPrevious);
+    }
+
+    // Doing a preliminary request speeds up subsequent calls by priming the client.
+    HttpClient client = primedClient();
+    //HttpClient client = HttpClient.newHttpClient();
+
+    @Test
+    void checkProcessingTimeOfDifferentQueryMethods() throws Exception {
+        queryCristinUsingHttpClientRegular();
+        queryCristinUsingParallelMapper();
+        queryCristinUsingHttpClientAsync();
+    }
+
+    //@Test
+    void queryCristinUsingHttpClientRegular() {
+        long startTime = System.currentTimeMillis();
+        getSomeCristinUris().stream().map(this::uriToResponse).map(HttpResponse::statusCode)
+            .forEach(System.out::println);
+        long endTime = System.currentTimeMillis();
+
+        System.out.println(
+            "Processing time is: " + (endTime - startTime) + " milliseconds for regular Http Request");
+    }
+
+    //@Test
+    void queryCristinUsingParallelMapper() throws Exception {
+        long startTime = System.currentTimeMillis();
+        ParallelMapper<URI, HttpResponse<String>> mapper =
+            new ParallelMapper<>(getSomeCristinUris(), this::uriToResponse).map();
+        mapper.getSuccesses().stream().map(HttpResponse::statusCode).forEach(System.out::println);
+        long endTime = System.currentTimeMillis();
+
+        System.out.println(
+            "Processing time is: " + (endTime - startTime) + " milliseconds for ParallelMapper");
+    }
+
+    //@Test
+    void queryCristinUsingHttpClientAsync() {
+        long startTime = System.currentTimeMillis();
+        List<CompletableFuture<Integer>> futures = getSomeCristinUris().stream()
+            .map(target -> client
+                .sendAsync(
+                    HttpRequest.newBuilder(target).GET().build(),
+                    HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::statusCode))
+            .collect(Collectors.toList());
+        futures.stream().map(attempt(CompletableFuture::get)).map(Try::get).forEach(System.out::println);
+        long endTime = System.currentTimeMillis();
+
+        System.out.println(
+            "Processing time is: " + (endTime - startTime) + " milliseconds for async HttpRequest");
+    }
+
+    private HttpClient primedClient() {
+        HttpClient client = HttpClient.newHttpClient();
+        URI uri = attempt(() -> CristinQuery.fromIdAndLanguage("1234", "nb")).orElseThrow();
+        HttpRequest request = HttpRequest.newBuilder(uri).build();
+        attempt(() -> client.send(request, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+        return client;
+    }
+
+    private HttpResponse<String> uriToResponse(URI uri) {
+        HttpRequest request = HttpRequest.newBuilder(uri).build();
+
+        return attempt(() ->
+            client.send(request, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+    }
+
+    private List<URI> getSomeCristinUris() {
+        List<URI> uris = new ArrayList<>();
+
+        List<String> ids = Arrays.asList("2057367", "2062372", "2472630", "2493276", "2495322", "2495322", "2495322",
+            "2495322", "2495322", "2495322");
+        ids.forEach(id -> attempt(() -> uris.add(CristinQuery.fromIdAndLanguage(id, "nb"))).orElseThrow());
+
+        return uris;
     }
 
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
