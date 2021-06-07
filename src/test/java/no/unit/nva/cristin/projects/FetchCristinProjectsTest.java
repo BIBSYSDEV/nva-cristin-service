@@ -76,7 +76,6 @@ public class FetchCristinProjectsTest {
         "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&query=reindeer&results=5";
     private static final String URI_WITH_TEN_NUMBER_OF_RESULTS =
         "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer&results=10";
-
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
@@ -85,6 +84,10 @@ public class FetchCristinProjectsTest {
     public static final String ZERO_VALUE = "0";
     public static final String TOTAL_COUNT_EXAMPLE_250 = "250";
     public static final String PAGE_15 = "15";
+    public static final String WHITESPACE = " ";
+    public static final String URI_WITH_ESCAPED_WHITESPACE =
+        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer+reindeer&results=5";
+
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
     private Context context;
@@ -448,6 +451,18 @@ public class FetchCristinProjectsTest {
             Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), ProjectsWrapper.class)
                 .getPreviousResults()).orElse(new URI(EMPTY_STRING)).toString();
         assertEquals(expectedPrevious, actualPrevious);
+    }
+
+    @Test
+    void handlerReturnsCristinProjectsWhenQueryContainsTitleWithWhitespace() throws Exception {
+        InputStream input = requestWithQueryParameters(Map.of(
+            QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE,
+            LANGUAGE, LANGUAGE_NB));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<ProjectsWrapper> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(URI_WITH_ESCAPED_WHITESPACE));
     }
 
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {

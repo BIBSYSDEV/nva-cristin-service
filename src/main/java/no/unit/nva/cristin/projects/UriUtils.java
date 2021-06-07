@@ -14,6 +14,10 @@ public class UriUtils {
     private static final String PARAMETER_DELIMITER = "&";
     private static final String EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR = null;
 
+    public static String escapeWhiteSpace(String text) {
+        return text.replaceAll(" +", "+");
+    }
+
     public static URI buildUri(String... parts) {
         return attempt(() -> new URI(String.join(SLASH_DELIMITER, parts))).orElseThrow();
     }
