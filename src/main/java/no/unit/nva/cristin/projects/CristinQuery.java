@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CristinQuery {
 
+    private static final String CRISTIN_QUERY_PARAMETER_PROJECT_CODE_KEY = "project_code";
     private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
     private static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
@@ -49,6 +50,11 @@ public class CristinQuery {
             CRISTIN_API_PROJECTS_PATH + id,
             queryParameters(Map.of(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language)),
             EMPTY_FRAGMENT);
+    }
+
+    public CristinQuery withGrantId(String grantId) {
+        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PROJECT_CODE_KEY, grantId);
+        return this;
     }
 
     public CristinQuery withTitle(String title) {
