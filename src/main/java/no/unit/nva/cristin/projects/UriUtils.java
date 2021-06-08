@@ -13,9 +13,11 @@ public class UriUtils {
     private static final String PARAMETER_KEY_VALUE_PAIR_TEMPLATE = "%s=%s";
     private static final String PARAMETER_DELIMITER = "&";
     private static final String EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR = null;
+    public static final String WHITESPACE_REGEX = "\\s+";
+    public static final String WHITESPACE_REPLACEMENT = "+";
 
     public static String escapeWhiteSpace(String text) {
-        return text.replaceAll(" +", "+");
+        return text.replaceAll(WHITESPACE_REGEX, WHITESPACE_REPLACEMENT);
     }
 
     public static URI buildUri(String... parts) {

@@ -85,7 +85,6 @@ public class FetchCristinProjectsTest {
     public static final String TOTAL_COUNT_EXAMPLE_250 = "250";
     public static final String PAGE_15 = "15";
     public static final String GRANT_ID_EXAMPLE = "1234567";
-
     public static final String WHITESPACE = " ";
     public static final String URI_WITH_ESCAPED_WHITESPACE =
         "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer+reindeer&results=5";
