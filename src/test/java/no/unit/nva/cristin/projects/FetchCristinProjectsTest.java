@@ -67,6 +67,7 @@ import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.parallel.ParallelMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -76,6 +77,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.zalando.problem.Problem;
 
+@Disabled
 public class FetchCristinProjectsTest {
 
     public static final String LANGUAGE_NB = "nb";
@@ -565,6 +567,24 @@ public class FetchCristinProjectsTest {
 
         System.out.println(
             "Processing time is: " + (endTime - startTime) + " milliseconds for async HttpRequest");
+    }
+
+    @Test
+    void queryCristinUsingHttpClientAsyncMatchingMainLogic() {
+        long startTime = System.currentTimeMillis();
+
+        List<CompletableFuture<HttpResponse<String>>> responsesContainer = getSomeCristinUris().stream()
+            .map(uri -> client.sendAsync(
+                HttpRequest.newBuilder(uri).GET().build(),
+                BodyHandlers.ofString(StandardCharsets.UTF_8)))
+            .collect(Collectors.toList());
+        List<HttpResponse<String>> responses = responsesContainer.stream().map(attempt(CompletableFuture::get))
+            .map(Try::get).collect(Collectors.toList());
+
+        long endTime = System.currentTimeMillis();
+
+        System.out.println(endTime - startTime);
+        System.out.println("Response size: " + responses.size());
     }
 
     private HttpClient primedClient() {
