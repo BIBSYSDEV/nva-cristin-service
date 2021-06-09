@@ -67,6 +67,7 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
     private String getValidQuery(RequestInfo requestInfo) throws BadRequestException {
         return getQueryParam(requestInfo, QUERY)
             .filter(this::isValidQuery)
+            .map(UriUtils::escapeWhiteSpace)
             .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
