@@ -20,7 +20,6 @@ import static no.unit.nva.cristin.projects.HttpResponseStub.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.projects.HttpResponseStub.TOTAL_COUNT_EXAMPLE_VALUE;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
-import static nva.commons.core.attempt.Try.attempt;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,19 +39,11 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -61,13 +52,9 @@ import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.Environment;
-import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
-import nva.commons.core.parallel.ParallelMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -77,7 +64,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.zalando.problem.Problem;
 
-@Disabled
 public class FetchCristinProjectsTest {
 
     public static final String LANGUAGE_NB = "nb";
@@ -127,8 +113,7 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerIgnoresErrorsWhenTryingToEnrichProjectInformation() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED)).when(cristinApiClientStub)
-            .getProject(any(), any());
+        doReturn(false).when(cristinApiClientStub).isSuccessfulRequest(any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
 
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
@@ -159,8 +144,7 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerReturnsNonEnrichedBodyWhenEnrichingFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED)).when(cristinApiClientStub)
-            .getProject(any(), any());
+        doReturn(Collections.emptyList()).when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
         String expected = getBodyFromResource(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON);
@@ -245,7 +229,13 @@ public class FetchCristinProjectsTest {
     void handlerReturnsProjectsWrapperWithAllMetadataButEmptyHitsArrayWhenNoMatchesAreFoundInCristin()
         throws Exception {
 
-        modifyHttpResponseToClient(EMPTY_LIST_STRING, generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE));
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseStub(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
+            generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
+            .when(cristinApiClientStub).queryProjects(any(), any());
+        doReturn(Collections.emptyList()).when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+
         String expected = getBodyFromResource(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
 
@@ -328,7 +318,7 @@ public class FetchCristinProjectsTest {
                                                                                                      String currentPage)
         throws IOException {
 
-        modifyHttpResponseToClient(
+        modifyQueryResponseToClient(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
             generateHeaders(TOTAL_COUNT_EXAMPLE_250, LINK_EXAMPLE_VALUE));
 
@@ -362,7 +352,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     void handlerThrowsBadRequestWhenRequestingPaginationOnQueryWithZeroResults() throws Exception {
-        modifyHttpResponseToClient(
+        modifyQueryResponseToClient(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
             generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE));
 
@@ -434,7 +424,7 @@ public class FetchCristinProjectsTest {
         String link, String expectedNext, String expectedPrevious, String currentPage, String perPage)
         throws Exception {
 
-        modifyHttpResponseToClient(
+        modifyQueryResponseToClient(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
             generateHeaders(TOTAL_COUNT_EXAMPLE_250, link));
 
@@ -532,100 +522,6 @@ public class FetchCristinProjectsTest {
         assertThat(gatewayResponse.getBody(), containsString(URI_WITH_ESCAPED_WHITESPACE));
     }
 
-    // Doing a preliminary request speeds up subsequent calls by priming the client.
-    HttpClient client = primedClient();
-    //HttpClient client = HttpClient.newHttpClient();
-
-    @Test
-    void checkProcessingTimeOfDifferentQueryMethods() throws Exception {
-        queryCristinUsingHttpClientRegular();
-        queryCristinUsingParallelMapper();
-        queryCristinUsingHttpClientAsync();
-    }
-
-    //@Test
-    void queryCristinUsingHttpClientRegular() {
-        long startTime = System.currentTimeMillis();
-        getSomeCristinUris().stream().map(this::uriToResponse).map(HttpResponse::statusCode)
-            .forEach(System.out::println);
-        long endTime = System.currentTimeMillis();
-
-        System.out.println(
-            "Processing time is: " + (endTime - startTime) + " milliseconds for regular Http Request");
-    }
-
-    //@Test
-    void queryCristinUsingParallelMapper() throws Exception {
-        long startTime = System.currentTimeMillis();
-        ParallelMapper<URI, HttpResponse<String>> mapper =
-            new ParallelMapper<>(getSomeCristinUris(), this::uriToResponse).map();
-        mapper.getSuccesses().stream().map(HttpResponse::statusCode).forEach(System.out::println);
-        long endTime = System.currentTimeMillis();
-
-        System.out.println(
-            "Processing time is: " + (endTime - startTime) + " milliseconds for ParallelMapper");
-    }
-
-    //@Test
-    void queryCristinUsingHttpClientAsync() {
-        long startTime = System.currentTimeMillis();
-        List<CompletableFuture<Integer>> futures = getSomeCristinUris().stream()
-            .map(target -> client
-                .sendAsync(
-                    HttpRequest.newBuilder(target).GET().build(),
-                    HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::statusCode))
-            .collect(Collectors.toList());
-        futures.stream().map(attempt(CompletableFuture::get)).map(Try::get).forEach(System.out::println);
-        long endTime = System.currentTimeMillis();
-
-        System.out.println(
-            "Processing time is: " + (endTime - startTime) + " milliseconds for async HttpRequest");
-    }
-
-    @Test
-    void queryCristinUsingHttpClientAsyncMatchingMainLogic() {
-        long startTime = System.currentTimeMillis();
-
-        List<CompletableFuture<HttpResponse<String>>> responsesContainer = getSomeCristinUris().stream()
-            .map(uri -> client.sendAsync(
-                HttpRequest.newBuilder(uri).GET().build(),
-                BodyHandlers.ofString(StandardCharsets.UTF_8)))
-            .collect(Collectors.toList());
-        List<HttpResponse<String>> responses = responsesContainer.stream().map(attempt(CompletableFuture::get))
-            .map(Try::get).collect(Collectors.toList());
-
-        long endTime = System.currentTimeMillis();
-
-        System.out.println(endTime - startTime);
-        System.out.println("Response size: " + responses.size());
-    }
-
-    private HttpClient primedClient() {
-        HttpClient client = HttpClient.newHttpClient();
-        URI uri = attempt(() -> CristinQuery.fromIdAndLanguage("1234", "nb")).orElseThrow();
-        HttpRequest request = HttpRequest.newBuilder(uri).build();
-        attempt(() -> client.send(request, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
-        return client;
-    }
-
-    private HttpResponse<String> uriToResponse(URI uri) {
-        HttpRequest request = HttpRequest.newBuilder(uri).build();
-
-        return attempt(() ->
-            client.send(request, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
-    }
-
-    private List<URI> getSomeCristinUris() {
-        List<URI> uris = new ArrayList<>();
-
-        List<String> ids = Arrays.asList("2057367", "2062372", "2472630", "2493276", "2495322", "2495322", "2495322",
-            "2495322", "2495322", "2495322");
-        ids.forEach(id -> attempt(() -> uris.add(CristinQuery.fromIdAndLanguage(id, "nb"))).orElseThrow());
-
-        return uris;
-    }
-
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
         return Stream.of(
             Arguments.of(LINK_EXAMPLE_VALUE,
@@ -660,7 +556,7 @@ public class FetchCristinProjectsTest {
         return String.format(url, page, results);
     }
 
-    private void modifyHttpResponseToClient(String body, java.net.http.HttpHeaders headers) {
+    private void modifyQueryResponseToClient(String body, java.net.http.HttpHeaders headers) {
         cristinApiClientStub = spy(cristinApiClientStub);
         HttpResponse<String> response = new HttpResponseStub(body);
         response = spy(response);

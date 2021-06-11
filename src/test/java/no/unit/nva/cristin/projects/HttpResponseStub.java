@@ -24,15 +24,28 @@ public class HttpResponseStub implements HttpResponse<String> {
     public static final String LINK_EXAMPLE_VALUE = String.join(";", REL_PREV, REL_NEXT);
     private String body;
     private int statusCode;
+    private HttpHeaders headers;
+    private URI uri;
 
     public HttpResponseStub(String body) {
-        this.body = body;
-        this.statusCode = 200;
+        this(body, 200);
     }
 
     public HttpResponseStub(String body, int statusCode) {
+        this(body, statusCode, defaultHeaders());
+    }
+
+    /**
+     * Main constructor for a stub of HttpResponse.
+     *
+     * @param body       Body content of HttpResponse
+     * @param statusCode Http status code of HttpResponse
+     * @param headers    HttpHeaders used in the HttpResponse
+     */
+    public HttpResponseStub(String body, int statusCode, HttpHeaders headers) {
         this.body = body;
         this.statusCode = statusCode;
+        this.headers = headers;
     }
 
     @Override
@@ -52,7 +65,7 @@ public class HttpResponseStub implements HttpResponse<String> {
 
     @Override
     public HttpHeaders headers() {
-        return HttpHeaders.of(headerMap(TOTAL_COUNT_EXAMPLE_VALUE, LINK_EXAMPLE_VALUE), filter());
+        return headers;
     }
 
     @Override
@@ -67,7 +80,7 @@ public class HttpResponseStub implements HttpResponse<String> {
 
     @Override
     public URI uri() {
-        return null;
+        return uri;
     }
 
     @Override
@@ -83,5 +96,13 @@ public class HttpResponseStub implements HttpResponse<String> {
 
     protected static BiPredicate<String, String> filter() {
         return (s, s2) -> true;
+    }
+
+    protected static HttpHeaders defaultHeaders() {
+        return HttpHeaders.of(headerMap(TOTAL_COUNT_EXAMPLE_VALUE, LINK_EXAMPLE_VALUE), filter());
+    }
+
+    protected void setUri(URI uri) {
+        this.uri = uri;
     }
 }

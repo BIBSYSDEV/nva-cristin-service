@@ -89,6 +89,7 @@ public class CristinApiClient {
         HttpResponse<String> response = queryProjects(requestQueryParams, queryType);
         List<CristinProject> cristinProjects =
             getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
+        // TODO: Unit test for empty search result when querying grant id
         if (cristinProjects.isEmpty() && queryType == QUERY_USING_GRANT_ID) {
             response = queryProjects(requestQueryParams, QUERY_USING_TITLE);
             cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
@@ -147,14 +148,6 @@ public class CristinApiClient {
             combineResultsWithQueryInCaseEnrichmentFails(projectsFromQuery, enrichedCristinProjects);
 
         return enrichedCristinProjects;
-
-        /*return projectsFromQuery.stream()
-            .map(project -> attempt(() -> getProject(project.getCristinProjectId(), language))
-                .toOptional(failure -> logError(
-                    ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-                    project.getCristinProjectId(),
-                    failure.getException()))
-                .orElse(project)).collect(Collectors.toList());*/
     }
 
     protected List<CristinProject> combineResultsWithQueryInCaseEnrichmentFails(
@@ -175,6 +168,7 @@ public class CristinApiClient {
         return enrichedProjects;
     }
 
+    // TODO: Split and test
     @JacocoGenerated
     protected List<HttpResponse<String>> fetchQueryResultsOneByOne(List<URI> uris) {
         List<CompletableFuture<HttpResponse<String>>> responsesContainer =
@@ -184,11 +178,20 @@ public class CristinApiClient {
                     BodyHandlers.ofString(StandardCharsets.UTF_8)))
                 .collect(Collectors.toList());
 
-        // TODO: Warning message if enrich fail just as before?
         return responsesContainer.stream()
             .map(attempt(CompletableFuture::get))
             .map(Try::get)
+            .filter(this::isSuccessfulRequest)
             .collect(Collectors.toList());
+    }
+
+    protected boolean isSuccessfulRequest(HttpResponse<String> response) {
+        try {
+            checkHttpStatusCode(response.uri().toString(), response.statusCode());
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     private List<URI> extractCristinUrisFromProjects(String language, List<CristinProject> projectsFromQuery) {

@@ -3,6 +3,9 @@ package no.unit.nva.cristin.projects;
 import java.net.URI;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import nva.commons.core.ioutils.IoUtils;
 
 public class CristinApiClientStub extends CristinApiClient {
@@ -23,6 +26,15 @@ public class CristinApiClientStub extends CristinApiClient {
     @Override
     protected HttpResponse<String> fetchGetResult(URI uri) {
         return mockGetResponse();
+    }
+
+    @Override
+    protected List<HttpResponse<String>> fetchQueryResultsOneByOne(List<URI> uris) {
+        return mockGetResponseAsList();
+    }
+
+    private List<HttpResponse<String>> mockGetResponseAsList() {
+        return IntStream.range(0, 5).mapToObj(elm -> mockGetResponse()).collect(Collectors.toList());
     }
 
     private HttpResponse<String> mockGetResponse() {

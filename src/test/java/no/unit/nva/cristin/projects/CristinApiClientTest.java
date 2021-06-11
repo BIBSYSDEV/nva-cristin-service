@@ -16,6 +16,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,8 @@ public class CristinApiClientTest {
     private static final String CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI =
         "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&project_code=1234567";
     public static final String EXAMPLE_TITLE = "Example Title";
+    public static final String EXAMPLE_BODY = "Example Body";
+    public static final String EMPTY_URL = "";
     private Set<String> ids = Set.of("123", "456", "789");
 
     CristinApiClient cristinApiClient = new CristinApiClient();
@@ -73,6 +76,24 @@ public class CristinApiClientTest {
 
         assertThat(combinedProjects.size(), equalTo(queryProjects.size()));
         assertThat(idsMatchesOriginalSet(combinedProjects), equalTo(true));
+    }
+
+    @Test
+    void isSuccessfulRequestReturnsCorrectEvaluationWhenSuppliedWithBothValidResponseAndInvalidResponse()
+        throws Exception {
+
+        HttpResponseStub response = defaultResponseWithStatus(200);
+        assertThat(cristinApiClient.isSuccessfulRequest(response), equalTo(true));
+        response = defaultResponseWithStatus(404);
+        assertThat(cristinApiClient.isSuccessfulRequest(response), equalTo(false));
+        response = defaultResponseWithStatus(500);
+        assertThat(cristinApiClient.isSuccessfulRequest(response), equalTo(false));
+    }
+
+    private HttpResponseStub defaultResponseWithStatus(int status) throws URISyntaxException {
+        HttpResponseStub response = new HttpResponseStub(EXAMPLE_BODY, status);
+        response.setUri(new URI(EMPTY_URL));
+        return response;
     }
 
     private boolean idsMatchesOriginalSet(List<CristinProject> projects) {
