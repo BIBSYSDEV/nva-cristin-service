@@ -52,6 +52,7 @@ import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -229,13 +230,7 @@ public class FetchCristinProjectsTest {
     void handlerReturnsProjectsWrapperWithAllMetadataButEmptyHitsArrayWhenNoMatchesAreFoundInCristin()
         throws Exception {
 
-        cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(new HttpResponseStub(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
-            generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
-            .when(cristinApiClientStub).queryProjects(any(), any());
-        doReturn(Collections.emptyList()).when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
-
+        fakeAnEmptyResponseFromQueryAndEnrichment();
         String expected = getBodyFromResource(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
 
@@ -520,6 +515,15 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(URI_WITH_ESCAPED_WHITESPACE));
+    }
+
+    private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseStub(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
+            generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
+            .when(cristinApiClientStub).queryProjects(any(), any());
+        doReturn(Collections.emptyList()).when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
     }
 
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {

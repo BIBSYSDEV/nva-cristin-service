@@ -14,6 +14,7 @@ import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.RANDOM_TITLE
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -63,19 +64,20 @@ public class CristinApiClientTest {
     }
 
     @Test
-    void usesQueryResultWhenEnrichingFails() {
+    void returnsListOfResultsFromBothQueryAndEnrichmentIfAnyEnrichmentsFail() {
         List<CristinProject> queryProjects = getSomeCristinProjects();
         List<CristinProject> enrichedProjects = new ArrayList<>(queryProjects);
+        // Remove one element to fake a failed enrichment
         enrichedProjects.remove(enrichedProjects.size() - 1);
 
         assertThat(enrichedProjects.size(), not(queryProjects.size()));
-        assertThat(idsMatchesOriginalSet(enrichedProjects), equalTo(false));
+        assertThat(getCristinIdsFromProjects(enrichedProjects), not(containsInAnyOrder(ids.toArray(String[]::new))));
 
         List<CristinProject> combinedProjects =
             cristinApiClient.combineResultsWithQueryInCaseEnrichmentFails(queryProjects, enrichedProjects);
 
         assertThat(combinedProjects.size(), equalTo(queryProjects.size()));
-        assertThat(idsMatchesOriginalSet(combinedProjects), equalTo(true));
+        assertThat(getCristinIdsFromProjects(combinedProjects), containsInAnyOrder(ids.toArray(String[]::new)));
     }
 
     @Test
@@ -94,10 +96,6 @@ public class CristinApiClientTest {
         HttpResponseStub response = new HttpResponseStub(EXAMPLE_BODY, status);
         response.setUri(new URI(EMPTY_URL));
         return response;
-    }
-
-    private boolean idsMatchesOriginalSet(List<CristinProject> projects) {
-        return getCristinIdsFromProjects(projects).containsAll(ids);
     }
 
     private Set<String> getCristinIdsFromProjects(List<CristinProject> projects) {

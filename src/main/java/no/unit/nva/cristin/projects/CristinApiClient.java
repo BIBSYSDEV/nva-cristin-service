@@ -29,9 +29,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.Constants.QueryType;
@@ -143,44 +145,59 @@ public class CristinApiClient {
         List<CristinProject> projectsFromQuery = asList(getDeserializedResponse(response, CristinProject[].class));
         List<URI> cristinUris = extractCristinUrisFromProjects(language, projectsFromQuery);
         List<HttpResponse<String>> individualResponses = fetchQueryResultsOneByOne(cristinUris);
-        List<CristinProject> enrichedCristinProjects = mapValidResponsesToCristinProjects(individualResponses);
-        enrichedCristinProjects =
-            combineResultsWithQueryInCaseEnrichmentFails(projectsFromQuery, enrichedCristinProjects);
 
-        return enrichedCristinProjects;
+        List<CristinProject> enrichedCristinProjects = mapValidResponsesToCristinProjects(individualResponses);
+
+        return allProjectsWereEnriched(projectsFromQuery, enrichedCristinProjects)
+            ? enrichedCristinProjects
+            : combineResultsWithQueryInCaseEnrichmentFails(projectsFromQuery, enrichedCristinProjects);
     }
 
     protected List<CristinProject> combineResultsWithQueryInCaseEnrichmentFails(
         List<CristinProject> projectsFromQuery,
         List<CristinProject> enrichedProjects) {
 
-        if (projectsFromQuery.size() == enrichedProjects.size()) {
-            return enrichedProjects;
-        }
+        Set<String> enrichedProjectIds = enrichedProjects.stream()
+            .map(CristinProject::getCristinProjectId)
+            .collect(Collectors.toSet());
 
         List<CristinProject> missingProjects = projectsFromQuery.stream()
-            .filter(queryProject -> enrichedProjects.stream().noneMatch(
-                enrichedProject -> enrichedProject.getCristinProjectId().equals(queryProject.getCristinProjectId())))
+            .filter(queryProject -> !enrichedProjectIds.contains(
+                queryProject.getCristinProjectId()))
             .collect(Collectors.toList());
 
-        enrichedProjects.addAll(missingProjects);
-
-        return enrichedProjects;
+        ArrayList<CristinProject> result = new ArrayList<>();
+        result.addAll(enrichedProjects);
+        result.addAll(missingProjects);
+        return result;
     }
 
-    // TODO: Split and test
-    @JacocoGenerated
     protected List<HttpResponse<String>> fetchQueryResultsOneByOne(List<URI> uris) {
         List<CompletableFuture<HttpResponse<String>>> responsesContainer =
-            uris.stream().map(uri ->
-                client.sendAsync(
-                    HttpRequest.newBuilder(uri).GET().build(),
-                    BodyHandlers.ofString(StandardCharsets.UTF_8)))
-                .collect(Collectors.toList());
+            uris.stream().map(this::fetchGetResultAsync).collect(Collectors.toList());
+
+        return collectSuccessfulResponsesOrThrowException(responsesContainer);
+    }
+
+    @JacocoGenerated
+    private boolean allProjectsWereEnriched(List<CristinProject> projectsFromQuery,
+                                            List<CristinProject> enrichedCristinProjects) {
+        return projectsFromQuery.size() == enrichedCristinProjects.size();
+    }
+
+    @JacocoGenerated
+    private CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
+        return client.sendAsync(
+            HttpRequest.newBuilder(uri).GET().build(),
+            BodyHandlers.ofString(StandardCharsets.UTF_8));
+    }
+
+    private List<HttpResponse<String>> collectSuccessfulResponsesOrThrowException(
+        List<CompletableFuture<HttpResponse<String>>> responsesContainer) {
 
         return responsesContainer.stream()
             .map(attempt(CompletableFuture::get))
-            .map(Try::get)
+            .map(Try::orElseThrow)
             .filter(this::isSuccessfulRequest)
             .collect(Collectors.toList());
     }
@@ -196,8 +213,8 @@ public class CristinApiClient {
 
     private List<URI> extractCristinUrisFromProjects(String language, List<CristinProject> projectsFromQuery) {
         return projectsFromQuery.stream()
-            .map(project -> attempt(() -> generateGetProjectUri(project.getCristinProjectId(), language))
-                .orElseThrow())
+            .map(attempt(project -> generateGetProjectUri(project.getCristinProjectId(), language)))
+            .map(Try::orElseThrow)
             .collect(Collectors.toList());
     }
 
@@ -235,7 +252,8 @@ public class CristinApiClient {
 
     private List<CristinProject> mapValidResponsesToCristinProjects(List<HttpResponse<String>> responses) {
         return responses.stream()
-            .map(response -> attempt(() -> getDeserializedResponse(response, CristinProject.class)).get())
+            .map(attempt(response -> getDeserializedResponse(response, CristinProject.class)))
+            .map(Try::orElseThrow)
             .filter(CristinProject::hasValidContent)
             .collect(Collectors.toList());
     }
