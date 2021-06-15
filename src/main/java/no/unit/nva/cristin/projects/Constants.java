@@ -19,12 +19,10 @@ public class Constants {
     public static final String EMPTY_FRAGMENT = null;
     public static final String INSTITUTION_PATH = "institutions";
     public static final String PERSON_PATH = "persons";
-    private static final String BASE_URL_ENV = "BASE_URL";
-    public static final String BASE_URL = ENVIRONMENT.readEnv(BASE_URL_ENV);
+    private static final String BASE_PATH_ENV = "BASE_PATH";
+    public static final String BASE_PATH = ENVIRONMENT.readEnv(BASE_PATH_ENV);
     public static final String ID = "id";
-    public static final String TITLE = "title";
     public static final String LANGUAGE = "language";
-    public static final String QUESTION_MARK = "?";
     public static final String PROJECTS_PATH = "/project/";
     private static final String DOMAIN_NAME_ENV = "DOMAIN_NAME";
     public static final String DOMAIN_NAME = ENVIRONMENT.readEnv(DOMAIN_NAME_ENV);

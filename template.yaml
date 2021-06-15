@@ -19,10 +19,9 @@ Globals:
     Environment:
       Variables:
         ALLOWED_ORIGIN: '*'
-        CRISTIN_API_HOST: 'api.cristin.no'
-        DOMAIN_NAME: 'api.dev.nva.aws.unit.no' # TODO: NP-2280: Dynamic from CustomDomain
-        # TODO: NP-2280: Replace with CustomDomainBasePath and call it PROJECTS_BASE_PATH
-        BASE_URL: 'https://api.dev.nva.aws.unit.no/project'
+        CRISTIN_API_HOST: !Ref CristinApiHost
+        DOMAIN_NAME: !Ref CustomDomain
+        BASE_PATH: !Ref CustomDomainBasePath
   Api:
     Cors:
       AllowOrigin: "'*'"
@@ -33,9 +32,15 @@ Parameters:
   CustomDomain:
     Type: String
     Description: Custom API to connect this lambda to
+    Default: 'api.dev.nva.aws.unit.no'
   CustomDomainBasePath:
     Type: String
     Description: Base path mapping in CustomDomain
+    Default: 'project'
+  CristinApiHost:
+    Type: String
+    Description: Hostname for Cristin API
+    Default: 'api.cristin.no'
 
 Resources:
 
