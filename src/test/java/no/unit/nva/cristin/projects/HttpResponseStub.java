@@ -25,7 +25,6 @@ public class HttpResponseStub implements HttpResponse<String> {
     private String body;
     private int statusCode;
     private HttpHeaders headers;
-    private URI uri;
 
     public HttpResponseStub(String body) {
         this(body, 200);
@@ -80,7 +79,7 @@ public class HttpResponseStub implements HttpResponse<String> {
 
     @Override
     public URI uri() {
-        return uri;
+        return null;
     }
 
     @Override
@@ -102,7 +101,4 @@ public class HttpResponseStub implements HttpResponse<String> {
         return HttpHeaders.of(headerMap(TOTAL_COUNT_EXAMPLE_VALUE, LINK_EXAMPLE_VALUE), filter());
     }
 
-    protected void setUri(URI uri) {
-        this.uri = uri;
-    }
 }

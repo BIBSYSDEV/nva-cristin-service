@@ -19,6 +19,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_WIT
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -91,7 +92,6 @@ public class CristinApiClient {
         HttpResponse<String> response = queryProjects(requestQueryParams, queryType);
         List<CristinProject> cristinProjects =
             getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
-        // TODO: Unit test for empty search result when querying grant id
         if (cristinProjects.isEmpty() && queryType == QUERY_USING_GRANT_ID) {
             response = queryProjects(requestQueryParams, QUERY_USING_TITLE);
             cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
@@ -179,14 +179,13 @@ public class CristinApiClient {
         return collectSuccessfulResponsesOrThrowException(responsesContainer);
     }
 
-    @JacocoGenerated
     private boolean allProjectsWereEnriched(List<CristinProject> projectsFromQuery,
                                             List<CristinProject> enrichedCristinProjects) {
         return projectsFromQuery.size() == enrichedCristinProjects.size();
     }
 
     @JacocoGenerated
-    private CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
+    protected CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
         return client.sendAsync(
             HttpRequest.newBuilder(uri).GET().build(),
             BodyHandlers.ofString(StandardCharsets.UTF_8));
@@ -204,11 +203,15 @@ public class CristinApiClient {
 
     protected boolean isSuccessfulRequest(HttpResponse<String> response) {
         try {
-            checkHttpStatusCode(response.uri().toString(), response.statusCode());
+            checkHttpStatusCode(nullableUriToString(response.uri()), response.statusCode());
             return true;
         } catch (Exception ex) {
             return false;
         }
+    }
+
+    private String nullableUriToString(URI uri) throws URISyntaxException {
+        return Optional.ofNullable(uri).orElse(new URI(EMPTY_STRING)).toString();
     }
 
     private List<URI> extractCristinUrisFromProjects(String language, List<CristinProject> projectsFromQuery) {

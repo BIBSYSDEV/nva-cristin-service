@@ -17,7 +17,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,24 +77,6 @@ public class CristinApiClientTest {
 
         assertThat(combinedProjects.size(), equalTo(queryProjects.size()));
         assertThat(getCristinIdsFromProjects(combinedProjects), containsInAnyOrder(ids.toArray(String[]::new)));
-    }
-
-    @Test
-    void isSuccessfulRequestReturnsCorrectEvaluationWhenSuppliedWithBothValidResponseAndInvalidResponse()
-        throws Exception {
-
-        HttpResponseStub response = defaultResponseWithStatus(200);
-        assertThat(cristinApiClient.isSuccessfulRequest(response), equalTo(true));
-        response = defaultResponseWithStatus(404);
-        assertThat(cristinApiClient.isSuccessfulRequest(response), equalTo(false));
-        response = defaultResponseWithStatus(500);
-        assertThat(cristinApiClient.isSuccessfulRequest(response), equalTo(false));
-    }
-
-    private HttpResponseStub defaultResponseWithStatus(int status) throws URISyntaxException {
-        HttpResponseStub response = new HttpResponseStub(EXAMPLE_BODY, status);
-        response.setUri(new URI(EMPTY_URL));
-        return response;
     }
 
     private Set<String> getCristinIdsFromProjects(List<CristinProject> projects) {

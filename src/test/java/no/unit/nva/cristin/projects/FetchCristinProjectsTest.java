@@ -44,6 +44,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -112,18 +113,6 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    void handlerIgnoresErrorsWhenTryingToEnrichProjectInformation() throws Exception {
-        cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(false).when(cristinApiClientStub).isSuccessfulRequest(any());
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
-
-        GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
-
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(MediaType.APPLICATION_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-    }
-
-    @Test
     void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
@@ -145,7 +134,9 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerReturnsNonEnrichedBodyWhenEnrichingFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(Collections.emptyList()).when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
+        HttpResponse<String> response =
+            new HttpResponseStub(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
+        doReturn(CompletableFuture.completedFuture(response)).when(cristinApiClientStub).fetchGetResultAsync(any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
         String expected = getBodyFromResource(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON);
