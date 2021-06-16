@@ -43,6 +43,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.attempt.Failure;
 import nva.commons.core.attempt.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,8 +160,7 @@ public class CristinApiClient {
             .collect(Collectors.toSet());
 
         List<CristinProject> missingProjects = projectsFromQuery.stream()
-            .filter(queryProject -> !enrichedProjectIds.contains(
-                queryProject.getCristinProjectId()))
+            .filter(queryProject -> !enrichedProjectIds.contains(queryProject.getCristinProjectId()))
             .collect(Collectors.toList());
 
         ArrayList<CristinProject> result = new ArrayList<>();
@@ -273,11 +273,13 @@ public class CristinApiClient {
     private <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
         throws BadGatewayException {
 
-        return attempt(() -> fromJson(response.body(), classOfT)).orElseThrow(failure -> {
-            logError(ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(),
-                failure.getException());
-            return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-        });
+        return attempt(() -> fromJson(response.body(), classOfT))
+            .orElseThrow(failure -> logAndThrowDeserializationError(response, failure));
+    }
+
+    private <T> BadGatewayException logAndThrowDeserializationError(HttpResponse<String> response, Failure<T> failure) {
+        logError(ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(), failure.getException());
+        return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
     }
 
     private void checkHttpStatusCode(String uri, int statusCode)
