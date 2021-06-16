@@ -41,8 +41,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -51,7 +53,7 @@ import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.BadGatewayException;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -111,19 +113,6 @@ public class FetchCristinProjectsTest {
     }
 
     @Test
-    void handlerIgnoresErrorsWhenTryingToEnrichProjectInformation() throws Exception {
-        cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED)).when(cristinApiClientStub)
-            .getProject(any(), any());
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
-
-        GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
-
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(MediaType.APPLICATION_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-    }
-
-    @Test
     void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
         GatewayResponse<ProjectsWrapper> response = sendDefaultQuery();
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
@@ -145,8 +134,9 @@ public class FetchCristinProjectsTest {
     @Test
     void handlerReturnsNonEnrichedBodyWhenEnrichingFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED)).when(cristinApiClientStub)
-            .getProject(any(), any());
+        HttpResponse<String> response =
+            new HttpResponseStub(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
+        doReturn(CompletableFuture.completedFuture(response)).when(cristinApiClientStub).fetchGetResultAsync(any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
         String expected = getBodyFromResource(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON);
@@ -231,7 +221,7 @@ public class FetchCristinProjectsTest {
     void handlerReturnsProjectsWrapperWithAllMetadataButEmptyHitsArrayWhenNoMatchesAreFoundInCristin()
         throws Exception {
 
-        modifyHttpResponseToClient(EMPTY_LIST_STRING, generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE));
+        fakeAnEmptyResponseFromQueryAndEnrichment();
         String expected = getBodyFromResource(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON);
         GatewayResponse<ProjectsWrapper> gatewayResponse = sendDefaultQuery();
 
@@ -314,7 +304,7 @@ public class FetchCristinProjectsTest {
                                                                                                      String currentPage)
         throws IOException {
 
-        modifyHttpResponseToClient(
+        modifyQueryResponseToClient(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
             generateHeaders(TOTAL_COUNT_EXAMPLE_250, LINK_EXAMPLE_VALUE));
 
@@ -348,7 +338,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     void handlerThrowsBadRequestWhenRequestingPaginationOnQueryWithZeroResults() throws Exception {
-        modifyHttpResponseToClient(
+        modifyQueryResponseToClient(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
             generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE));
 
@@ -420,7 +410,7 @@ public class FetchCristinProjectsTest {
         String link, String expectedNext, String expectedPrevious, String currentPage, String perPage)
         throws Exception {
 
-        modifyHttpResponseToClient(
+        modifyQueryResponseToClient(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
             generateHeaders(TOTAL_COUNT_EXAMPLE_250, link));
 
@@ -518,6 +508,15 @@ public class FetchCristinProjectsTest {
         assertThat(gatewayResponse.getBody(), containsString(URI_WITH_ESCAPED_WHITESPACE));
     }
 
+    private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseStub(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
+            generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
+            .when(cristinApiClientStub).queryProjects(any(), any());
+        doReturn(Collections.emptyList()).when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
+        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+    }
+
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
         return Stream.of(
             Arguments.of(LINK_EXAMPLE_VALUE,
@@ -552,7 +551,7 @@ public class FetchCristinProjectsTest {
         return String.format(url, page, results);
     }
 
-    private void modifyHttpResponseToClient(String body, java.net.http.HttpHeaders headers) {
+    private void modifyQueryResponseToClient(String body, java.net.http.HttpHeaders headers) {
         cristinApiClientStub = spy(cristinApiClientStub);
         HttpResponse<String> response = new HttpResponseStub(body);
         response = spy(response);

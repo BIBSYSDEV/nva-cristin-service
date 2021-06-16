@@ -18,6 +18,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_READING_R
 import static no.unit.nva.cristin.projects.UriUtils.getNvaProjectUriWithId;
 import static no.unit.nva.cristin.projects.UriUtils.getNvaProjectUriWithParams;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -28,9 +29,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.Constants.QueryType;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -39,6 +43,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.attempt.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,14 +140,82 @@ public class CristinApiClient {
         throws ApiGatewayException {
 
         List<CristinProject> projectsFromQuery = asList(getDeserializedResponse(response, CristinProject[].class));
+        List<URI> cristinUris = extractCristinUrisFromProjects(language, projectsFromQuery);
+        List<HttpResponse<String>> individualResponses = fetchQueryResultsOneByOne(cristinUris);
 
+        List<CristinProject> enrichedCristinProjects = mapValidResponsesToCristinProjects(individualResponses);
+
+        return allProjectsWereEnriched(projectsFromQuery, enrichedCristinProjects)
+            ? enrichedCristinProjects
+            : combineResultsWithQueryInCaseEnrichmentFails(projectsFromQuery, enrichedCristinProjects);
+    }
+
+    protected List<CristinProject> combineResultsWithQueryInCaseEnrichmentFails(
+        List<CristinProject> projectsFromQuery,
+        List<CristinProject> enrichedProjects) {
+
+        Set<String> enrichedProjectIds = enrichedProjects.stream()
+            .map(CristinProject::getCristinProjectId)
+            .collect(Collectors.toSet());
+
+        List<CristinProject> missingProjects = projectsFromQuery.stream()
+            .filter(queryProject -> !enrichedProjectIds.contains(
+                queryProject.getCristinProjectId()))
+            .collect(Collectors.toList());
+
+        ArrayList<CristinProject> result = new ArrayList<>();
+        result.addAll(enrichedProjects);
+        result.addAll(missingProjects);
+        return result;
+    }
+
+    protected List<HttpResponse<String>> fetchQueryResultsOneByOne(List<URI> uris) {
+        List<CompletableFuture<HttpResponse<String>>> responsesContainer =
+            uris.stream().map(this::fetchGetResultAsync).collect(Collectors.toList());
+
+        return collectSuccessfulResponsesOrThrowException(responsesContainer);
+    }
+
+    private boolean allProjectsWereEnriched(List<CristinProject> projectsFromQuery,
+                                            List<CristinProject> enrichedCristinProjects) {
+        return projectsFromQuery.size() == enrichedCristinProjects.size();
+    }
+
+    @JacocoGenerated
+    protected CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
+        return client.sendAsync(
+            HttpRequest.newBuilder(uri).GET().build(),
+            BodyHandlers.ofString(StandardCharsets.UTF_8));
+    }
+
+    private List<HttpResponse<String>> collectSuccessfulResponsesOrThrowException(
+        List<CompletableFuture<HttpResponse<String>>> responsesContainer) {
+
+        return responsesContainer.stream()
+            .map(attempt(CompletableFuture::get))
+            .map(Try::orElseThrow)
+            .filter(this::isSuccessfulRequest)
+            .collect(Collectors.toList());
+    }
+
+    protected boolean isSuccessfulRequest(HttpResponse<String> response) {
+        try {
+            checkHttpStatusCode(nullableUriToString(response.uri()), response.statusCode());
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    private String nullableUriToString(URI uri) throws URISyntaxException {
+        return Optional.ofNullable(uri).orElse(new URI(EMPTY_STRING)).toString();
+    }
+
+    private List<URI> extractCristinUrisFromProjects(String language, List<CristinProject> projectsFromQuery) {
         return projectsFromQuery.stream()
-            .map(project -> attempt(() -> getProject(project.getCristinProjectId(), language))
-                .toOptional(failure -> logError(
-                    ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-                    project.getCristinProjectId(),
-                    failure.getException()))
-                .orElse(project)).collect(Collectors.toList());
+            .map(attempt(project -> generateGetProjectUri(project.getCristinProjectId(), language)))
+            .map(Try::orElseThrow)
+            .collect(Collectors.toList());
     }
 
     private QueryType getQueryTypeBasedOnParams(Map<String, String> requestQueryParams) {
@@ -175,6 +248,14 @@ public class CristinApiClient {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
 
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+    }
+
+    private List<CristinProject> mapValidResponsesToCristinProjects(List<HttpResponse<String>> responses) {
+        return responses.stream()
+            .map(attempt(response -> getDeserializedResponse(response, CristinProject.class)))
+            .map(Try::orElseThrow)
+            .filter(CristinProject::hasValidContent)
+            .collect(Collectors.toList());
     }
 
     private BadGatewayException projectHasNotValidContent(String id) {

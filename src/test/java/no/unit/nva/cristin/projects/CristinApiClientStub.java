@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import java.net.URI;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 import nva.commons.core.ioutils.IoUtils;
 
 public class CristinApiClientStub extends CristinApiClient {
@@ -23,6 +24,11 @@ public class CristinApiClientStub extends CristinApiClient {
     @Override
     protected HttpResponse<String> fetchGetResult(URI uri) {
         return mockGetResponse();
+    }
+
+    @Override
+    protected CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
+        return CompletableFuture.completedFuture(mockGetResponse());
     }
 
     private HttpResponse<String> mockGetResponse() {
