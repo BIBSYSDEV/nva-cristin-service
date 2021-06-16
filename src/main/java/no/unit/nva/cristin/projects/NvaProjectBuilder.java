@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.UriUtils.getNvaProjectUriWithId;
 import java.util.Collections;
 import java.util.List;
