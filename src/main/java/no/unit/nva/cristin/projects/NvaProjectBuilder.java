@@ -15,11 +15,9 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
 import no.unit.nva.cristin.projects.model.nva.NvaPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import nva.commons.core.language.LanguageMapper;
 
 public class NvaProjectBuilder {
-
-    // TODO: NP-2366: Add dynamic language URIs.
-    private static final String TEMPORARY_LANGUAGE_URL = "https://lexvo.org/id/iso639-3/nno";
 
     private static final String PROJECT_TYPE = "Project";
     private static final String CRISTIN_IDENTIFIER_TYPE = "CristinIdentifier";
@@ -49,7 +47,7 @@ public class NvaProjectBuilder {
         nvaProject.setIdentifiers(createCristinIdentifier());
         nvaProject.setTitle(extractMainTitle());
         nvaProject.setAlternativeTitles(extractAlternativeTitles());
-        nvaProject.setLanguage(buildUri(TEMPORARY_LANGUAGE_URL));
+        nvaProject.setLanguage(LanguageMapper.toUri(cristinProject.getMainLanguage()));
         nvaProject.setStartDate(cristinProject.getStartDate());
         nvaProject.setEndDate(cristinProject.getEndDate());
         nvaProject.setGrants(Collections.emptyList());
