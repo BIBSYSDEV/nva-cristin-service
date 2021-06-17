@@ -1,14 +1,12 @@
 package no.unit.nva.cristin.projects;
 
 import static java.util.Arrays.asList;
-import static no.unit.nva.cristin.projects.Constants.BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.QUERY;
-import static no.unit.nva.cristin.projects.Constants.QUESTION_MARK;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_GRANT_ID;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_TITLE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
@@ -17,7 +15,8 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_P
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
-import static no.unit.nva.cristin.projects.UriUtils.buildUri;
+import static no.unit.nva.cristin.projects.UriUtils.getNvaProjectUriWithId;
+import static no.unit.nva.cristin.projects.UriUtils.getNvaProjectUriWithParams;
 import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
@@ -44,6 +43,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.attempt.Failure;
 import nva.commons.core.attempt.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,9 +119,7 @@ public class CristinApiClient {
 
         HttpResponse<String> response = fetchQueryResults(uri);
 
-        checkHttpStatusCode(
-            buildUri(BASE_URL, QUESTION_MARK + queryParameters(parameters)).toString(),
-            response.statusCode());
+        checkHttpStatusCode(getNvaProjectUriWithParams(parameters).toString(), response.statusCode());
 
         return response;
     }
@@ -133,7 +131,7 @@ public class CristinApiClient {
 
         HttpResponse<String> response = fetchGetResult(uri);
 
-        checkHttpStatusCode(buildUri(BASE_URL, id).toString(), response.statusCode());
+        checkHttpStatusCode(getNvaProjectUriWithId(id).toString(), response.statusCode());
 
         return getDeserializedResponse(response, CristinProject.class);
     }
@@ -162,8 +160,7 @@ public class CristinApiClient {
             .collect(Collectors.toSet());
 
         List<CristinProject> missingProjects = projectsFromQuery.stream()
-            .filter(queryProject -> !enrichedProjectIds.contains(
-                queryProject.getCristinProjectId()))
+            .filter(queryProject -> !enrichedProjectIds.contains(queryProject.getCristinProjectId()))
             .collect(Collectors.toList());
 
         ArrayList<CristinProject> result = new ArrayList<>();
@@ -276,11 +273,13 @@ public class CristinApiClient {
     private <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
         throws BadGatewayException {
 
-        return attempt(() -> fromJson(response.body(), classOfT)).orElseThrow(failure -> {
-            logError(ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(),
-                failure.getException());
-            return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-        });
+        return attempt(() -> fromJson(response.body(), classOfT))
+            .orElseThrow(failure -> logAndThrowDeserializationError(response, failure));
+    }
+
+    private <T> BadGatewayException logAndThrowDeserializationError(HttpResponse<String> response, Failure<T> failure) {
+        logError(ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(), failure.getException());
+        return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
     }
 
     private void checkHttpStatusCode(String uri, int statusCode)

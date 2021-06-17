@@ -1,13 +1,9 @@
 package no.unit.nva.cristin.projects;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
-import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.projects.Constants.EMPTY_FRAGMENT;
-import static no.unit.nva.cristin.projects.Constants.HTTPS;
 import static no.unit.nva.cristin.projects.Constants.LINK;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
-import static no.unit.nva.cristin.projects.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
 import static no.unit.nva.cristin.projects.Constants.REL_PREV;
@@ -22,9 +18,8 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.PREVIOUS_RESULTS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.PROCESSING_TIME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SEARCH_STRING;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SIZE;
-import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
+import static no.unit.nva.cristin.projects.UriUtils.getNvaProjectUriWithParams;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
-import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -146,7 +141,7 @@ public class ProjectsWrapper {
         throws BadRequestException {
 
         this.size = getSizeHeader(headers);
-        this.id = idUriFromParams(queryParams);
+        this.id = getNvaProjectUriWithParams(queryParams);
         this.firstRecord = this.size > 0 ? indexOfFirstEntryInPageCalculatedFromParams(queryParams) :
             FIRST_RECORD_ZERO_WHEN_NO_HITS;
 
@@ -184,7 +179,7 @@ public class ProjectsWrapper {
     private URI generateIdUriWithPageFromParams(int newPage, Map<String, String> queryParams) {
         Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
         newParams.put(PAGE, String.valueOf(newPage));
-        return idUriFromParams(newParams);
+        return getNvaProjectUriWithParams(newParams);
     }
 
     private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {
@@ -192,11 +187,6 @@ public class ProjectsWrapper {
         int numberOfResults = Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS));
 
         return (page - 1) * numberOfResults + 1;
-    }
-
-    private URI idUriFromParams(Map<String, String> queryParams) {
-        return attempt(() -> new URI(HTTPS, DOMAIN_NAME, PROJECTS_PATH, queryParameters(queryParams), EMPTY_FRAGMENT))
-            .orElseThrow();
     }
 
     private int getSizeHeader(HttpHeaders headers) {
