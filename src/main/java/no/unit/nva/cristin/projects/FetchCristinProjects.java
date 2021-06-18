@@ -56,6 +56,8 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
         String page = getValidPage(requestInfo);
         String numberOfResults = getValidNumberOfResults(requestInfo);
 
+        addContentTypeJsonLdToResponseIfRequested(requestInfo);
+
         return getTransformedCristinProjectsUsingWrapperObject(language, query, page, numberOfResults);
     }
 

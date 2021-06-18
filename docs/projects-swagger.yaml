@@ -37,6 +37,9 @@ paths:
       summary: List projects matching query
       description: Returns a list of projects based on query parameters
       operationId: ListProjects
+      produces:
+        - application/json
+        - application/ld+json
       parameters:
         - name: query
           in: query
@@ -103,6 +106,9 @@ paths:
       summary: Find project by ID
       description: Returns a single project matching id parameter
       operationId: GetProjectById
+      produces:
+        - application/json
+        - application/ld+json
       parameters:
         - name: id
           in: path

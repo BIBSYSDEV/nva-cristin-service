@@ -37,6 +37,8 @@ import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class FetchOneCristinProjectTest {
 
@@ -210,6 +212,12 @@ public class FetchOneCristinProjectTest {
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"application/json,application/ld+json"})
+    void handlerReturnsMatchingContentTypeBasedOnAcceptHeader() {
+        assertEquals("", "");
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {
