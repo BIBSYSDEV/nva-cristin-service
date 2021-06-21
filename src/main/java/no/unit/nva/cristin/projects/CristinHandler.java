@@ -17,7 +17,7 @@ public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
 
     protected static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final Set<String> VALID_LANGUAGE_CODES = Set.of("en", "nb", "nn");
-    public static final String APPLICATION_LD_JSON = "application/ld+json";
+    private static final Set<String> VALID_CONTENT_TYPES = Set.of("application/json", "application/ld+json");
     private final transient Map<String, String> additionalHeaders;
 
     public CristinHandler(Class<I> iclass, Environment environment) {
@@ -43,19 +43,18 @@ public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
         return attempt(() -> requestInfo.getQueryParameter(queryParameter)).toOptional();
     }
 
-    protected void addContentTypeJsonLdToResponseIfRequested(RequestInfo requestInfo) {
-        if (clientRequestsContentTypeJsonLd(requestInfo)) {
-            this.additionalHeaders.put(HttpHeaders.CONTENT_TYPE, CristinHandler.APPLICATION_LD_JSON);
-        }
+    protected void addRequestedContentTypeToResponseIfSupported(RequestInfo requestInfo) {
+        getRequestedContentType(requestInfo)
+            .map(String::toLowerCase)
+            .filter(VALID_CONTENT_TYPES::contains)
+            .ifPresent(this::addContentTypeHeader);
     }
 
-    private static boolean clientRequestsContentTypeJsonLd(RequestInfo requestInfo) {
-        return getRequestedContentType(requestInfo)
-            .map(acceptHeader -> acceptHeader.equalsIgnoreCase(APPLICATION_LD_JSON))
-            .orElse(false);
+    private void addContentTypeHeader(String contentType) {
+        this.additionalHeaders.put(HttpHeaders.CONTENT_TYPE, contentType);
     }
 
-    private static Optional<String> getRequestedContentType(RequestInfo requestInfo) {
+    private Optional<String> getRequestedContentType(RequestInfo requestInfo) {
         return Optional.ofNullable(requestInfo.getHeaders().get(HttpHeaders.ACCEPT));
     }
 }

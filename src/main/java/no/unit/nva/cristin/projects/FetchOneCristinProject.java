@@ -39,7 +39,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
         String language = getValidLanguage(requestInfo);
         String id = getValidId(requestInfo);
 
-        addContentTypeJsonLdToResponseIfRequested(requestInfo);
+        addRequestedContentTypeToResponseIfSupported(requestInfo);
 
         return getTransformedProjectFromCristin(id, language);
     }

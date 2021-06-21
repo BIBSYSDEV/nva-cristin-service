@@ -9,6 +9,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_P
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
+import static nva.commons.apigateway.ContentTypes.APPLICATION_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -215,9 +216,38 @@ public class FetchOneCristinProjectTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"application/json,application/ld+json"})
-    void handlerReturnsMatchingContentTypeBasedOnAcceptHeader() {
-        assertEquals("", "");
+    @ValueSource(strings = {"application/json", "application/ld+json"})
+    void handlerReturnsMatchingContentTypeBasedOnAcceptHeader(String contentTypeRequested) throws Exception {
+
+        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+            .withBody(null)
+            .withPathParameters(Map.of(ID, DEFAULT_ID))
+            .withHeaders(Map.of(HttpHeaders.ACCEPT, contentTypeRequested))
+            .build();
+        handler.handleRequest(input, output, context);
+
+        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(contentTypeRequested, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "text/plain", "*/*"})
+    void handlerReturnsDefaultContentTypeWhenAcceptHeaderMissingUnsupportedOrDefault(String contentTypeRequested)
+        throws Exception {
+
+        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+            .withBody(null)
+            .withPathParameters(Map.of(ID, DEFAULT_ID))
+            .withHeaders(Map.of(HttpHeaders.ACCEPT, contentTypeRequested))
+            .build();
+        handler.handleRequest(input, output, context);
+
+        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {
