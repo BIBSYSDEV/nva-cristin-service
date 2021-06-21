@@ -55,6 +55,8 @@ public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
     }
 
     private Optional<String> getRequestedContentType(RequestInfo requestInfo) {
-        return Optional.ofNullable(requestInfo.getHeaders().get(HttpHeaders.ACCEPT));
+        return Optional.ofNullable(requestInfo)
+            .map(RequestInfo::getHeaders)
+            .map(headers -> headers.get(HttpHeaders.ACCEPT));
     }
 }
