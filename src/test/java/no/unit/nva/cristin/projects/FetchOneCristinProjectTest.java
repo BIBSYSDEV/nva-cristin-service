@@ -8,6 +8,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_F
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_UNACCEPTABLE_CONTENT_TYPE;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
 import static nva.commons.apigateway.ContentTypes.APPLICATION_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
@@ -40,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.zalando.problem.Problem;
 
 public class FetchOneCristinProjectTest {
 
@@ -233,8 +235,24 @@ public class FetchOneCristinProjectTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "text/plain", "*/*"})
-    void handlerReturnsDefaultContentTypeWhenAcceptHeaderMissingUnsupportedOrDefault(String contentTypeRequested)
+    @ValueSource(strings = {"*/*", ""})
+    void handlerReturnsDefaultContentTypeWhenAcceptHeaderSetToDefault(String acceptHeader) throws Exception {
+        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+            .withBody(null)
+            .withPathParameters(Map.of(ID, DEFAULT_ID))
+            .withHeaders(Map.of(HttpHeaders.ACCEPT, acceptHeader))
+            .build();
+        handler.handleRequest(input, output, context);
+
+        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"image/jpeg", "application/xml", "application/rdf+xml", "text/plain"})
+    void handlerThrowsNotAcceptableWhenAcceptHeaderUnsupported(String contentTypeRequested)
         throws Exception {
 
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
@@ -244,10 +262,11 @@ public class FetchOneCristinProjectTest {
             .build();
         handler.handleRequest(input, output, context);
 
-        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(HttpURLConnection.HTTP_NOT_ACCEPTABLE, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
+            containsString(String.format(ERROR_MESSAGE_UNACCEPTABLE_CONTENT_TYPE, contentTypeRequested)));
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {

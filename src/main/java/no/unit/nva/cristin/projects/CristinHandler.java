@@ -2,6 +2,8 @@ package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_UNACCEPTABLE_CONTENT_TYPE;
+import static nva.commons.apigateway.ContentTypes.APPLICATION_JSON;
 import static nva.commons.core.attempt.Try.attempt;
 import java.util.Map;
 import java.util.Optional;
@@ -17,7 +19,8 @@ public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
 
     protected static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final Set<String> VALID_LANGUAGE_CODES = Set.of("en", "nb", "nn");
-    private static final Set<String> VALID_CONTENT_TYPES = Set.of("application/json", "application/ld+json");
+    private static final Set<String> SUPPORTED_CONTENT_TYPES = Set.of(APPLICATION_JSON, "application/ld+json");
+    private static final Set<String> DEFAULT_ACCEPT_HEADERS = Set.of("*/*", "");
     private final transient Map<String, String> additionalHeaders;
 
     public CristinHandler(Class<I> iclass, Environment environment) {
@@ -43,11 +46,16 @@ public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
         return attempt(() -> requestInfo.getQueryParameter(queryParameter)).toOptional();
     }
 
-    protected void addRequestedContentTypeToResponseIfSupported(RequestInfo requestInfo) {
-        getRequestedContentType(requestInfo)
-            .map(String::toLowerCase)
-            .filter(VALID_CONTENT_TYPES::contains)
-            .ifPresent(this::addContentTypeHeader);
+    protected void addRequestedContentTypeToResponseIfSupported(RequestInfo requestInfo) throws NotAcceptableException {
+        Optional<String> acceptHeader = getRequestedContentType(requestInfo);
+        if (acceptHeader.isPresent()) {
+            String contentType = getValidContentTypeOrElseThrow(acceptHeader.get());
+            addContentTypeHeader(contentType);
+        }
+    }
+
+    private String convertAcceptHeaderIfDefault(String acceptHeader) {
+        return DEFAULT_ACCEPT_HEADERS.contains(acceptHeader) ? APPLICATION_JSON : acceptHeader;
     }
 
     private void addContentTypeHeader(String contentType) {
@@ -58,5 +66,14 @@ public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
         return Optional.ofNullable(requestInfo)
             .map(RequestInfo::getHeaders)
             .map(headers -> headers.get(HttpHeaders.ACCEPT));
+    }
+
+    private String getValidContentTypeOrElseThrow(String acceptHeader) throws NotAcceptableException {
+        return Optional.of(acceptHeader)
+            .map(String::toLowerCase)
+            .map(this::convertAcceptHeaderIfDefault)
+            .filter(SUPPORTED_CONTENT_TYPES::contains)
+            .orElseThrow(() -> new NotAcceptableException(
+                String.format(ERROR_MESSAGE_UNACCEPTABLE_CONTENT_TYPE, acceptHeader)));
     }
 }
