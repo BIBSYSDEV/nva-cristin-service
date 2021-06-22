@@ -226,11 +226,11 @@ public class FetchOneCristinProjectTest {
         handler.handleRequest(input, output, context);
 
         GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        Problem body = gatewayResponse.getBodyObject(Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
-            containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP));
+        assertThat(body.getDetail(), containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP));
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {
