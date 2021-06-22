@@ -4,6 +4,7 @@ import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_UNACCEPTABLE_CONTENT_TYPE;
 import static nva.commons.apigateway.ContentTypes.APPLICATION_JSON;
+import static nva.commons.apigateway.ContentTypes.APPLICATION_JSON_LD;
 import static nva.commons.core.attempt.Try.attempt;
 import java.util.Map;
 import java.util.Optional;
@@ -19,7 +20,7 @@ public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
 
     protected static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final Set<String> VALID_LANGUAGE_CODES = Set.of("en", "nb", "nn");
-    private static final Set<String> SUPPORTED_CONTENT_TYPES = Set.of(APPLICATION_JSON, "application/ld+json");
+    private static final Set<String> SUPPORTED_CONTENT_TYPES = Set.of(APPLICATION_JSON, APPLICATION_JSON_LD);
     private static final Set<String> DEFAULT_ACCEPT_HEADERS = Set.of("*/*", "");
     private final transient Map<String, String> additionalHeaders;
 
