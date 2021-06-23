@@ -1,5 +1,5 @@
 {
-  "@context": "https://example.org/project-context.json",
+  "@context": "https://bibsysdev.github.io/src/project-context.json",
   "id": "https://api.dev.nva.aws.unit.no/project/456789",
   "type": "Project",
   "identifiers": [

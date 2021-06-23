@@ -1,5 +1,5 @@
 {
-  "@context": "https://example.org/search-api-context.json",
+  "@context": "https://bibsysdev.github.io/src/project-search-context.json",
   "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer&results=5",
   "size": 135,
   "searchString": "language=nb&page=1&query=reindeer&results=5",
