@@ -10,6 +10,7 @@ import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_TITLE
 import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
 import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
@@ -90,6 +91,8 @@ public class FetchCristinProjectsTest {
     public static final String WHITESPACE = " ";
     public static final String URI_WITH_ESCAPED_WHITESPACE =
         "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer+reindeer&results=5";
+    public static final String INVALID_QUERY_PARAM_KEY = "invalid";
+    public static final String INVALID_QUERY_PARAM_VALUE = "value";
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -506,6 +509,22 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(URI_WITH_ESCAPED_WHITESPACE));
+    }
+
+    @Test
+    void handlerThrowsBadRequestWhenQueryParamsIsNotSupported() throws IOException {
+        InputStream input = requestWithQueryParameters(Map.of(
+            INVALID_QUERY_PARAM_KEY, INVALID_QUERY_PARAM_VALUE,
+            QUERY, RANDOM_TITLE));
+
+        handler.handleRequest(input, output, context);
+
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        Problem body = gatewayResponse.getBodyObject(Problem.class);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(body.getDetail(), containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH));
     }
 
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
