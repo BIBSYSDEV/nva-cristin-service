@@ -29,4 +29,6 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID = "Parameter 'results' has invalid value";
     public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
         "Page requested is out of scope. Query contains %s results";
+    public static final String ERROR_MESSAGE_UNACCEPTABLE_CONTENT_TYPE =
+        "Your request cannot be processed because the supplied content-type '%s' cannot be understood";
 }

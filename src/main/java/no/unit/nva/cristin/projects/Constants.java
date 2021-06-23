@@ -10,8 +10,10 @@ public class Constants {
 
     public static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
     private static final Environment ENVIRONMENT = new Environment();
-    public static final String PROJECT_SEARCH_CONTEXT_URL = "https://example.org/search-api-context.json";
-    public static final String PROJECT_LOOKUP_CONTEXT_URL = "https://example.org/project-context.json";
+    public static final String PROJECT_SEARCH_CONTEXT_URL =
+        "https://bibsysdev.github.io/src/project-search-context.json";
+    public static final String PROJECT_LOOKUP_CONTEXT_URL =
+        "https://bibsysdev.github.io/src/project-context.json";
     public static final String CRISTIN_API_HOST = ENVIRONMENT.readEnvOpt("CRISTIN_API_HOST")
         .orElse("api.cristin.no");
     public static final String CRISTIN_API_BASE_URL = "https://" + CRISTIN_API_HOST + "/v2";
