@@ -43,7 +43,7 @@ Example response body:
         }
       ],
       "title": "Example Title",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/nno",
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",
       "coordinatingInstitution": {
@@ -82,7 +82,7 @@ Example response body:
         }
       ],
       "title": "Example Title",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/nno",
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",
       "coordinatingInstitution": {
@@ -147,7 +147,7 @@ Example response body:
     }
   ],
   "title": "Example Title",
-  "language": "https://lexvo.org/id/iso639-3/nno",
+  "language": "http://lexvo.org/id/iso639-3/nno",
   "startDate": "2018-11-01T00:00:00Z",
   "endDate": "2021-05-01T00:00:00Z",
   "coordinatingInstitution": {

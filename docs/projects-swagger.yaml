@@ -358,7 +358,7 @@ components:
               - type: 'CristinIdentifier'
                 value: '359084'
             title: 'Example Title'
-            language: 'https://lexvo.org/id/iso639-3/nno'
+            language: 'http://lexvo.org/id/iso639-3/nno'
             alternativeTitles:
               - 'nb': 'Eksempel på tittel'
             startDate: '2012-01-09T00:00:00Z'
@@ -400,7 +400,7 @@ components:
           - type: 'CristinIdentifier'
             value: '359084'
         title: 'Example Title'
-        language: 'https://lexvo.org/id/iso639-3/nno'
+        language: 'http://lexvo.org/id/iso639-3/nno'
         alternativeTitles:
           - 'nb': 'Eksempel på tittel'
         startDate: '2012-01-09T00:00:00Z'
