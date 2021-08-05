@@ -5,14 +5,16 @@ import static no.unit.nva.cristin.projects.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
-import static no.unit.nva.cristin.projects.Constants.TITLE;
+import static no.unit.nva.cristin.projects.Constants.QUERY;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -28,6 +30,7 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
     private static final char CHARACTER_DASH = '-';
     private static final char CHARACTER_COMMA = ',';
     private static final char CHARACTER_PERIOD = '.';
+    private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
 
     private final transient CristinApiClient cristinApiClient;
 
@@ -51,12 +54,22 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
     protected ProjectsWrapper processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
+        validateThatSuppliedQueryParamsIsSupported(requestInfo);
+
         String language = getValidLanguage(requestInfo);
-        String title = getValidTitle(requestInfo);
+        String query = getValidQuery(requestInfo);
         String page = getValidPage(requestInfo);
         String numberOfResults = getValidNumberOfResults(requestInfo);
 
-        return getTransformedCristinProjectsUsingWrapperObject(language, title, page, numberOfResults);
+        addRequestedContentTypeToResponseIfSupported(requestInfo);
+
+        return getTransformedCristinProjectsUsingWrapperObject(language, query, page, numberOfResults);
+    }
+
+    private void validateThatSuppliedQueryParamsIsSupported(RequestInfo requestInfo) throws BadRequestException {
+        if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH);
+        }
     }
 
     @Override
@@ -64,32 +77,33 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
         return HttpURLConnection.HTTP_OK;
     }
 
-    private String getValidTitle(RequestInfo requestInfo) throws BadRequestException {
-        return getQueryParam(requestInfo, TITLE)
-            .filter(this::isValidTitle)
-            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+    private String getValidQuery(RequestInfo requestInfo) throws BadRequestException {
+        return getQueryParam(requestInfo, QUERY)
+            .filter(this::isValidQuery)
+            .map(UriUtils::escapeWhiteSpace)
+            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     private String getValidPage(RequestInfo requestInfo) throws BadRequestException {
         return Optional.of(getQueryParam(requestInfo, PAGE)
             .orElse(FIRST_PAGE))
-            .filter(this::isInteger)
+            .filter(Utils::isPositiveInteger)
             .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_PAGE_VALUE_INVALID));
     }
 
     private String getValidNumberOfResults(RequestInfo requestInfo) throws BadRequestException {
         return Optional.of(getQueryParam(requestInfo, NUMBER_OF_RESULTS)
             .orElse(DEFAULT_NUMBER_OF_RESULTS))
-            .filter(this::isInteger)
+            .filter(Utils::isPositiveInteger)
             .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
     }
 
-    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String title, String page,
+    private ProjectsWrapper getTransformedCristinProjectsUsingWrapperObject(String language, String query, String page,
                                                                             String numberOfResults)
         throws ApiGatewayException {
 
         Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
-        requestQueryParams.put(TITLE, title);
+        requestQueryParams.put(QUERY, query);
         requestQueryParams.put(LANGUAGE, language);
         requestQueryParams.put(PAGE, page);
         requestQueryParams.put(NUMBER_OF_RESULTS, numberOfResults);
@@ -97,7 +111,7 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
         return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParams);
     }
 
-    private boolean isValidTitle(String str) {
+    private boolean isValidQuery(String str) {
         char[] charArray = str.toCharArray();
         for (char c : charArray) {
             if (!isValidCharacter(c)) {
@@ -115,12 +129,4 @@ public class FetchCristinProjects extends CristinHandler<Void, ProjectsWrapper> 
             || c == CHARACTER_PERIOD;
     }
 
-    private boolean isInteger(String str) {
-        try {
-            Integer.parseInt(str);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }

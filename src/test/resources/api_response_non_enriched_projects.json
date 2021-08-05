@@ -1,11 +1,12 @@
 {
-  "@context": "https://example.org/search-api-context.json",
-  "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&results=5&title=reindeer",
-  "size": 0,
-  "searchString": "language=nb&page=1&results=5&title=reindeer",
+  "@context": "https://bibsysdev.github.io/src/project-search-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer&results=5",
+  "size": 135,
+  "searchString": "language=nb&page=1&query=reindeer&results=5",
   "processingTime": 1000,
-  "firstRecord": 0,
-  "nextResults": null,
+  "firstRecord": 1,
+  "nextResults": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&query=reindeer&results=5",
+  "previousResults": null,
   "hits": [
     {
       "id": "https://api.dev.nva.aws.unit.no/project/555666",
@@ -17,7 +18,7 @@
         }
       ],
       "title": "Opportunities and Challenges for Integrating Sámi Reindeer",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/eng",
       "alternativeTitles": [],
       "startDate": null,
       "endDate": null,
@@ -35,7 +36,7 @@
         }
       ],
       "title": "Opptak og omsetning av tungmetall",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/nor",
       "alternativeTitles": [
         {
           "en": "Absorption and metabolism of heavy metals"
@@ -57,7 +58,7 @@
         }
       ],
       "title": "En studie av reindriftens sårbarhet",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/nor",
       "alternativeTitles": [
         {
           "en": "Reindeer Herders' Vulnerability Network Study"
@@ -79,7 +80,7 @@
         }
       ],
       "title": "Predicting effects of climate change on Svalbard",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/nor",
       "alternativeTitles": [],
       "startDate": null,
       "endDate": null,
@@ -97,7 +98,7 @@
         }
       ],
       "title": "PREDICTING EFFECTS OF CLIMATE CHANGE",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/eng",
       "alternativeTitles": [],
       "startDate": null,
       "endDate": null,

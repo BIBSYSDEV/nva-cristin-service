@@ -19,12 +19,20 @@ public class ErrorMessages {
         "Internal server error. Contact application administrator.";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID =
         "Invalid path parameter for id, needs to be a number";
-    public static final String ERROR_MESSAGE_TITLE_MISSING_OR_HAS_ILLEGAL_CHARACTERS =
-        "Parameter 'title' is missing or invalid. "
+    public static final String ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS =
+        "Parameter 'query' is missing or invalid. "
             + "May only contain alphanumeric characters, dash, comma, period and whitespace";
     public static final String ERROR_MESSAGE_LANGUAGE_INVALID = "Parameter 'language' has invalid value";
     public static final String ERROR_MESSAGE_PAGE_VALUE_INVALID = "Parameter 'page' has invalid value";
     public static final String ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE =
         "Remote service responded with status: %s when client called uri: %s";
     public static final String ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID = "Parameter 'results' has invalid value";
+    public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
+        "Page requested is out of scope. Query contains %s results";
+    public static final String ERROR_MESSAGE_UNACCEPTABLE_CONTENT_TYPE =
+        "Your request cannot be processed because the supplied content-type '%s' cannot be understood";
+    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH =
+        "Invalid query param supplied. Valid ones are 'query', 'page', 'results' and 'language'";
+    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP =
+        "Invalid query param supplied. Valid one are 'language'";
 }

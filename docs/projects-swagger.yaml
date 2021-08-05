@@ -1,0 +1,435 @@
+openapi: 3.0.3
+info:
+  title: NVA Project API
+  description: >
+    The NVA Project API.
+
+      This API provides transformed project data from projects stored in [Cristin](https://api.cristin.no/v2).
+
+      The data is reformatted as JSON-LD with a schema defined in the [search ontology REPLACE URL](https://bibsysdev.github.io/src/search-ontology.ttl) and the [project ontology REPLACE URL](https://bibsysdev.github.io/src/publication-channel-ontology.ttl).
+
+      To understand the semantic layer, take a look at the @context URI returned by the API, the data is marked up according to this and may be interpreted directly to RDF using this.
+  termsOfService: http://nva.unit.no/terms/
+  contact:
+    email: nva@unit.no
+  license:
+    name: MIT/NLOD 2.0
+    url: https://link.to.license
+  version: 1.0.0
+externalDocs:
+  description: Find out more about NVA
+  url: https://nva.unit.no
+servers:
+  - url: https://api.nva.unit.no/project
+  - url: https://api.dev.nva.aws.unit.no/project
+  - url: https://api.sandbox.nva.aws.unit.no/project
+  - url: https://api.test.nva.aws.unit.no/project
+paths:
+  /:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinProjectsFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Project
+      summary: List projects matching query
+      description: Returns a list of projects based on query parameters
+      operationId: ListProjects
+      produces:
+        - application/json
+        - application/ld+json
+      parameters:
+        - name: query
+          in: query
+          description: Search string. Either title search or grant id search
+          required: true
+          schema:
+            type: string
+            pattern: '.+'
+          example: 'Helse'
+        - name: language
+          in: query
+          description: Preferred language for some fields
+          required: false
+          schema:
+            $ref: '#/components/schemas/LanguageParam'
+          example: 'nb'
+        - name: page
+          in: query
+          description: Current page requested
+          required: false
+          schema:
+            type: number
+            default: '1'
+          example: '3'
+        - name: results
+          in: query
+          description: Results per page
+          required: false
+          schema:
+            type: number
+            default: '5'
+          example: '10'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectsExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectsExample'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+  /{id}:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinOneProjectFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Project
+      summary: Find project by ID
+      description: Returns a single project matching id parameter
+      operationId: GetProjectById
+      produces:
+        - application/json
+        - application/ld+json
+      parameters:
+        - name: id
+          in: path
+          description: ID of project to return
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9]+$'
+          example: '495216'
+        - name: language
+          in: query
+          description: Preferred language for some fields
+          required: false
+          schema:
+            $ref: '#/components/schemas/LanguageParam'
+          example: 'nb'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Project'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectExample'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+components:
+  responses:
+    400:
+      description: Invalid parameters supplied
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    404:
+      description: ID not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    500:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    502:
+      description: Bad Gateway from upstream
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    Projects:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of projects returned by the query
+          items:
+            $ref: '#/components/schemas/Project'
+    Project:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        type:
+          type: string
+          pattern: 'Project'
+          description: The type of the returned object, always Project
+        identifiers:
+          type: array
+          description: Identifiers for this project
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'CristinIdentifier'
+                description: Name of identifier, always CristinIdentifier
+              value:
+                type: integer
+                format: int32
+                description: Cristin ID of project
+        title:
+          type: string
+          pattern: '.+'
+          description: Title of the project
+        language:
+          type: string
+          pattern: '^http:\/\/lexvo.org\/id\/iso639-3\/[a-z]{3}$'
+          description: The lexvo URI for the language of the Project
+        alternativeTitles:
+          type: array
+          description: Titles in alternative languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        startDate:
+          type: string
+          pattern: '.+'
+          description: Project start date
+        endDate:
+          type: string
+          pattern: '.+'
+          description: Project end date
+        coordinatingInstitution:
+          $ref: '#/components/schemas/Organization'
+        contributors:
+          type: array
+          description: List of contributors on the project
+          items:
+            type: object
+            description: One contributor
+            properties:
+              type:
+                type: string
+                enum:
+                  - ProjectManager
+                  - ProjectParticipant
+                description: Type of contributor. Can be ProjectManager or ProjectParticipant
+              identity:
+                type: object
+                properties:
+                  id:
+                    $ref: '#/components/schemas/Id'
+                  type:
+                    type: string
+                    pattern: 'Person'
+                    description: Type of identity. Always Person
+                  firstName:
+                    type: string
+                    pattern: '.+'
+                    description: First name
+                  lastName:
+                    type: string
+                    pattern: '.+'
+                    description: Last name
+              affiliation:
+                $ref: '#/components/schemas/Organization'
+    Problem:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Human-readable description of the error status
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code associated with the problem
+        detail:
+          type: string
+          description: A more detailed error message describing the error and potential mitigations
+        requestId:
+          type: string
+          description: Unique id for the request
+    LanguageParam:
+      type: string
+      enum:
+        - nb
+        - nn
+        - en
+      default: 'nb'
+    Context:
+      type: string
+      pattern: 'https:\/\/.*$'
+      description: The JSON-LD context object for the data, which describes the object in the data and allows machine processing of the data at a semantic level
+    Id:
+      type: string
+      pattern: 'https:\/\/.*$'
+      description: The URI of the object ID
+    Languages:
+      type: object
+      pattern: '^[a-z]{2}$'
+      additionalProperties:
+        type: string
+        pattern: '.+'
+    Organization:
+      type: object
+      description: Affiliated organization
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        type:
+          type: string
+          pattern: 'Organization'
+          description: Always Organization
+        name:
+          $ref: '#/components/schemas/Languages'
+  examples:
+    ProjectsExample:
+      value:
+        '@context': 'https://example.org/search-api-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&results=5&title=helse'
+        size: 150
+        searchString: 'language=nb&page=1&results=5&title=helse'
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=helse'
+        previousResults: ''
+        hits:
+          - id: 'https://api.dev.nva.aws.unit.no/project/359084'
+            type: 'Project'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '359084'
+            title: 'Example Title'
+            language: 'http://lexvo.org/id/iso639-3/nno'
+            alternativeTitles:
+              - 'nb': 'Eksempel på tittel'
+            startDate: '2012-01-09T00:00:00Z'
+            endDate: '2017-12-31T00:00:00Z'
+            coordinatingInstitution:
+              id: 'https://api.cristin.no/v2/institutions/215'
+              type: 'Organization'
+              name:
+                'nb': 'OsloMet - storbyuniversitetet'
+            contributors:
+              - type: 'ProjectManager'
+                identity:
+                  id: 'https://api.cristin.no/v2/persons/325953'
+                  type: 'Person'
+                  firstName: 'Ola'
+                  lastName: 'Nordmann'
+                affiliation:
+                  id: 'https://api.cristin.no/v2/institutions/215'
+                  type: 'Organization'
+                  name:
+                    'nb': 'OsloMet - storbyuniversitetet'
+              - type: 'ProjectParticipant'
+                identity:
+                  id: 'https://api.cristin.no/v2/persons/326035'
+                  type: 'Person'
+                  firstName: 'Kari'
+                  lastName: 'Olsen'
+                affiliation:
+                  id: 'https://api.cristin.no/v2/institutions/215'
+                  type: 'Organization'
+                  name:
+                    'nb': 'OsloMet - storbyuniversitetet'
+    ProjectExample:
+      value:
+        '@context': 'https://example.org/project-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/project/359084'
+        type: 'Project'
+        identifiers:
+          - type: 'CristinIdentifier'
+            value: '359084'
+        title: 'Example Title'
+        language: 'http://lexvo.org/id/iso639-3/nno'
+        alternativeTitles:
+          - 'nb': 'Eksempel på tittel'
+        startDate: '2012-01-09T00:00:00Z'
+        endDate: '2017-12-31T00:00:00Z'
+        coordinatingInstitution:
+          id: 'https://api.cristin.no/v2/institutions/215'
+          type: 'Organization'
+          name:
+            'nb': 'OsloMet - storbyuniversitetet'
+        contributors:
+          - type: 'ProjectManager'
+            identity:
+              id: 'https://api.cristin.no/v2/persons/325953'
+              type: 'Person'
+              firstName: 'Ola'
+              lastName: 'Nordmann'
+            affiliation:
+              id: 'https://api.cristin.no/v2/institutions/215'
+              type: 'Organization'
+              name:
+                'nb': 'OsloMet - storbyuniversitetet'
+          - type: 'ProjectParticipant'
+            identity:
+              id: 'https://api.cristin.no/v2/persons/326035'
+              type: 'Person'
+              firstName: 'Kari'
+              lastName: 'Olsen'
+            affiliation:
+              id: 'https://api.cristin.no/v2/institutions/215'
+              type: 'Organization'
+              name:
+                'nb': 'OsloMet - storbyuniversitetet'

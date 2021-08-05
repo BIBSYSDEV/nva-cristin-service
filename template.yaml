@@ -19,23 +19,28 @@ Globals:
     Environment:
       Variables:
         ALLOWED_ORIGIN: '*'
-        CRISTIN_API_HOST: 'api.cristin.no'
-        DOMAIN_NAME: 'api.dev.nva.aws.unit.no' # TODO: NP-2280: Dynamic from CustomDomain
-        # TODO: NP-2280: Replace with CustomDomainBasePath and call it PROJECTS_BASE_PATH
-        BASE_URL: 'https://api.dev.nva.aws.unit.no/project'
+        CRISTIN_API_HOST: !Ref CristinApiHost
+        DOMAIN_NAME: !Ref CustomDomain
+        BASE_PATH: !Ref CustomDomainBasePath
   Api:
     Cors:
       AllowOrigin: "'*'"
-      AllowMethods: "'OPTIONS, GET, PUT'"
+      AllowMethods: "'OPTIONS, GET'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Parameters:
   CustomDomain:
     Type: String
     Description: Custom API to connect this lambda to
+    Default: 'api.dev.nva.aws.unit.no'
   CustomDomainBasePath:
     Type: String
     Description: Base path mapping in CustomDomain
+    Default: 'project'
+  CristinApiHost:
+    Type: String
+    Description: Hostname for Cristin API
+    Default: 'api.cristin.no'
 
 Resources:
 
@@ -45,6 +50,11 @@ Resources:
   NvaCristinProjectsFunctionApi:
     Type: AWS::Serverless::Api
     Properties:
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: ./docs/projects-swagger.yaml
       AccessLogSetting:
         DestinationArn: !GetAtt ApiAccessLogGroup.Arn
         Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
@@ -69,7 +79,9 @@ Resources:
             Method: get
             RequestParameters:
               - method.request.querystring.language
-              - method.request.querystring.title
+              - method.request.querystring.query
+              - method.request.querystring.page
+              - method.request.querystring.results
 
   NvaCristinOneProjectFunction:
     Type: AWS::Serverless::Function

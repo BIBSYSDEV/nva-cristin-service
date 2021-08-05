@@ -1,5 +1,9 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.Constants.BASE_PATH;
+import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.projects.Constants.EMPTY_FRAGMENT;
+import static no.unit.nva.cristin.projects.Constants.HTTPS;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.util.Map;
@@ -13,9 +17,25 @@ public class UriUtils {
     private static final String PARAMETER_KEY_VALUE_PAIR_TEMPLATE = "%s=%s";
     private static final String PARAMETER_DELIMITER = "&";
     private static final String EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR = null;
+    public static final String WHITESPACE_REGEX = "\\s+";
+    public static final String WHITESPACE_REPLACEMENT = "+";
+
+    public static String escapeWhiteSpace(String text) {
+        return text.replaceAll(WHITESPACE_REGEX, WHITESPACE_REPLACEMENT);
+    }
 
     public static URI buildUri(String... parts) {
         return attempt(() -> new URI(String.join(SLASH_DELIMITER, parts))).orElseThrow();
+    }
+
+    public static URI getNvaProjectUriWithParams(Map<String, String> parameters) {
+        return attempt(() -> new URI(HTTPS, DOMAIN_NAME, SLASH_DELIMITER + BASE_PATH + SLASH_DELIMITER,
+            queryParameters(parameters), EMPTY_FRAGMENT)).orElseThrow();
+    }
+
+    public static URI getNvaProjectUriWithId(String id) {
+        return attempt(() -> new URI(HTTPS, DOMAIN_NAME, SLASH_DELIMITER + BASE_PATH + SLASH_DELIMITER + id,
+            EMPTY_FRAGMENT)).orElseThrow();
     }
 
     /**

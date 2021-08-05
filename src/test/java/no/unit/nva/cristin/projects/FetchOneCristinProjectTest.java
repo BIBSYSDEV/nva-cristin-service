@@ -7,8 +7,13 @@ import static no.unit.nva.cristin.projects.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_UNACCEPTABLE_CONTENT_TYPE;
+import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_KEY;
+import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_VALUE;
 import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
+import static nva.commons.apigateway.ContentTypes.APPLICATION_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,6 +42,9 @@ import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.zalando.problem.Problem;
 
 public class FetchOneCristinProjectTest {
 
@@ -210,6 +218,75 @@ public class FetchOneCristinProjectTest {
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"application/json", "application/ld+json"})
+    void handlerReturnsMatchingContentTypeBasedOnAcceptHeader(String contentTypeRequested) throws Exception {
+
+        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+            .withBody(null)
+            .withPathParameters(Map.of(ID, DEFAULT_ID))
+            .withHeaders(Map.of(HttpHeaders.ACCEPT, contentTypeRequested))
+            .build();
+        handler.handleRequest(input, output, context);
+
+        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(contentTypeRequested, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"*/*", ""})
+    void handlerReturnsDefaultContentTypeWhenAcceptHeaderSetToDefault(String acceptHeader) throws Exception {
+        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+            .withBody(null)
+            .withPathParameters(Map.of(ID, DEFAULT_ID))
+            .withHeaders(Map.of(HttpHeaders.ACCEPT, acceptHeader))
+            .build();
+        handler.handleRequest(input, output, context);
+
+        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"image/jpeg", "application/xml", "application/rdf+xml", "text/plain"})
+    void handlerThrowsNotAcceptableWhenAcceptHeaderUnsupported(String contentTypeRequested)
+        throws Exception {
+
+        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+            .withBody(null)
+            .withPathParameters(Map.of(ID, DEFAULT_ID))
+            .withHeaders(Map.of(HttpHeaders.ACCEPT, contentTypeRequested))
+            .build();
+        handler.handleRequest(input, output, context);
+
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_NOT_ACCEPTABLE, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
+            containsString(String.format(ERROR_MESSAGE_UNACCEPTABLE_CONTENT_TYPE, contentTypeRequested)));
+    }
+
+    @Test
+    void handlerThrowsBadRequestWhenQueryParamsIsNotSupported() throws Exception {
+        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+            .withBody(null)
+            .withQueryParameters(Map.of(INVALID_QUERY_PARAM_KEY, INVALID_QUERY_PARAM_VALUE))
+            .withPathParameters(Map.of(ID, DEFAULT_ID))
+            .build();
+        handler.handleRequest(input, output, context);
+
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        Problem body = gatewayResponse.getBodyObject(Problem.class);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(body.getDetail(), containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP));
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {

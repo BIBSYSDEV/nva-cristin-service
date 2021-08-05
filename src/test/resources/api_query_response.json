@@ -1,11 +1,12 @@
 {
-  "@context": "https://example.org/search-api-context.json",
-  "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&results=5&title=reindeer",
-  "size": 0,
-  "searchString": "language=nb&page=1&results=5&title=reindeer",
+  "@context": "https://bibsysdev.github.io/src/project-search-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer&results=5",
+  "size": 135,
+  "searchString": "language=nb&page=1&query=reindeer&results=5",
   "processingTime": 1000,
-  "firstRecord": 0,
-  "nextResults": null,
+  "firstRecord": 1,
+  "nextResults": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&query=reindeer&results=5",
+  "previousResults": null,
   "hits": [
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -17,7 +18,7 @@
         }
       ],
       "title": "Example Title",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/eng",
       "alternativeTitles": [],
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",
@@ -58,7 +59,7 @@
         }
       ],
       "title": "Example Title",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/eng",
       "alternativeTitles": [],
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",
@@ -99,7 +100,7 @@
         }
       ],
       "title": "Example Title",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/eng",
       "alternativeTitles": [],
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",
@@ -140,7 +141,7 @@
         }
       ],
       "title": "Example Title",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/eng",
       "alternativeTitles": [],
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",
@@ -181,7 +182,7 @@
         }
       ],
       "title": "Example Title",
-      "language": "https://lexvo.org/id/iso639-3/nno",
+      "language": "http://lexvo.org/id/iso639-3/eng",
       "alternativeTitles": [],
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",

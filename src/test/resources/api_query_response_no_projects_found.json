@@ -1,10 +1,11 @@
 {
-  "@context": "https://example.org/search-api-context.json",
-  "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&results=5&title=reindeer",
+  "@context": "https://bibsysdev.github.io/src/project-search-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer&results=5",
   "size": 0,
-  "searchString": "language=nb&page=1&results=5&title=reindeer",
+  "searchString": "language=nb&page=1&query=reindeer&results=5",
   "processingTime": 1000,
   "firstRecord": 0,
   "nextResults": null,
+  "previousResults": null,
   "hits": []
 }
