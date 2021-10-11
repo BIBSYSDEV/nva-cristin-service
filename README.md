@@ -1,4 +1,4 @@
-# nva-cristin-projects
+# nva-cristin-service
 
 Lambda for fetching project data from the [Cristin API](https://api.cristin.no/v2/doc/index.html)
 

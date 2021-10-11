@@ -1,6 +1,9 @@
 package no.unit.nva.cristin.projects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.net.MediaType;
+import java.util.List;
+import nva.commons.apigateway.MediaTypes;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonUtils;
@@ -35,6 +38,8 @@ public class Constants {
     public static final String REL_NEXT = "rel=\"next\"";
     public static final String REL_PREV = "rel=\"prev\"";
     public static final String QUERY = "query";
+    public static final List<MediaType> DEFAULT_RESPONSE_MEDIA_TYPES = List.of(MediaType.JSON_UTF_8,
+        MediaTypes.APPLICATION_JSON_LD);
 
     enum QueryType {
         QUERY_USING_GRANT_ID,
