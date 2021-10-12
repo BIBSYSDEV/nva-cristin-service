@@ -11,7 +11,7 @@ import nva.commons.core.JsonUtils;
 @JacocoGenerated
 public class Constants {
 
-    public static final ObjectMapper OBJECT_MAPPER = JsonUtils.objectMapper;
+    public static final ObjectMapper OBJECT_MAPPER = JsonUtils.dtoObjectMapper;
     private static final Environment ENVIRONMENT = new Environment();
     public static final String PROJECT_SEARCH_CONTEXT_URL =
         "https://bibsysdev.github.io/src/project-search-context.json";

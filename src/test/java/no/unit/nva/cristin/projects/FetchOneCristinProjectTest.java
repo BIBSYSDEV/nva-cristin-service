@@ -61,6 +61,7 @@ public class FetchOneCristinProjectTest {
     private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
     private static final String ENGLISH_LANGUAGE = "en";
     private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI = "https://api.cristin.no/v2/projects/9999?lang=en";
+    private static final String DEFAULT_ACCEPT_HEADER = "*/*";
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -237,13 +238,12 @@ public class FetchOneCristinProjectTest {
         assertEquals(contentTypeRequested, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"*/*", ""})
-    void handlerReturnsDefaultContentTypeWhenAcceptHeaderSetToDefault(String acceptHeader) throws Exception {
+    @Test
+    void handlerReturnsDefaultContentTypeWhenAcceptHeaderSetToDefault() throws Exception {
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
             .withPathParameters(Map.of(ID, DEFAULT_ID))
-            .withHeaders(Map.of(HttpHeaders.ACCEPT, acceptHeader))
+            .withHeaders(Map.of(HttpHeaders.ACCEPT, DEFAULT_ACCEPT_HEADER))
             .build();
         handler.handleRequest(input, output, context);
 
