@@ -9,11 +9,10 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_P
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_UNACCEPTABLE_CONTENT_TYPE;
+import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_KEY;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_VALUE;
-import static nva.commons.apigateway.ApiGatewayHandler.APPLICATION_PROBLEM_JSON;
-import static nva.commons.apigateway.ContentTypes.APPLICATION_JSON;
+import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.MediaType;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,6 +61,7 @@ public class FetchOneCristinProjectTest {
     private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
     private static final String ENGLISH_LANGUAGE = "en";
     private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI = "https://api.cristin.no/v2/projects/9999?lang=en";
+    private static final String DEFAULT_ACCEPT_HEADER = "*/*";
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -125,7 +126,7 @@ public class FetchOneCristinProjectTest {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
     }
 
@@ -138,7 +139,7 @@ public class FetchOneCristinProjectTest {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
@@ -188,7 +189,7 @@ public class FetchOneCristinProjectTest {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
     }
 
@@ -202,7 +203,7 @@ public class FetchOneCristinProjectTest {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
@@ -216,12 +217,12 @@ public class FetchOneCristinProjectTest {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"application/json", "application/ld+json"})
+    @ValueSource(strings = {"application/json; charset=utf-8", "application/ld+json"})
     void handlerReturnsMatchingContentTypeBasedOnAcceptHeader(String contentTypeRequested) throws Exception {
 
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
@@ -237,20 +238,19 @@ public class FetchOneCristinProjectTest {
         assertEquals(contentTypeRequested, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"*/*", ""})
-    void handlerReturnsDefaultContentTypeWhenAcceptHeaderSetToDefault(String acceptHeader) throws Exception {
+    @Test
+    void handlerReturnsDefaultContentTypeWhenAcceptHeaderSetToDefault() throws Exception {
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
             .withPathParameters(Map.of(ID, DEFAULT_ID))
-            .withHeaders(Map.of(HttpHeaders.ACCEPT, acceptHeader))
+            .withHeaders(Map.of(HttpHeaders.ACCEPT, DEFAULT_ACCEPT_HEADER))
             .build();
         handler.handleRequest(input, output, context);
 
         GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(MediaType.JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @ParameterizedTest
@@ -267,9 +267,9 @@ public class FetchOneCristinProjectTest {
 
         GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
-        assertEquals(HttpURLConnection.HTTP_NOT_ACCEPTABLE, gatewayResponse.getStatusCode());
+        assertEquals(HttpURLConnection.HTTP_UNSUPPORTED_TYPE, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
-            containsString(String.format(ERROR_MESSAGE_UNACCEPTABLE_CONTENT_TYPE, contentTypeRequested)));
+            containsString(String.format(ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE, contentTypeRequested)));
     }
 
     @Test
@@ -285,7 +285,7 @@ public class FetchOneCristinProjectTest {
         Problem body = gatewayResponse.getBodyObject(Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(body.getDetail(), containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP));
     }
 

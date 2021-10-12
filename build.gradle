@@ -17,7 +17,7 @@ repositories {
 }
 
 project.ext{
-    nvaCommonsVersion = '1.7.6'
+    nvaCommonsVersion = '1.15.1'
     jacksonVersion = '2.12.1'
     jupiterVersion = '5.7.1'
     hamcrestVersion = '2.2'
