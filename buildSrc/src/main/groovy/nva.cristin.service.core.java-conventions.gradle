@@ -54,8 +54,8 @@ checkstyle {
 
 tasks.withType(Checkstyle) {
     reports {
-        xml.required
-        html.required
+        xml.enabled true
+        html.enabled true
         html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
     }
 }
