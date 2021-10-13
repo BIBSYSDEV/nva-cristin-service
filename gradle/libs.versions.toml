@@ -40,7 +40,7 @@ aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core',
 #jupiter-engine = { group = 'org.junit.jupiter', name = 'junit-jupiter-engine', version.ref = 'jupiter' }
 
 [bundles]
-nva-commons = ['nva-commons-core', 'nva-commons-apigateway']
+nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
 testing = ['junit-jupiter-api', 'junit-jupiter-params', 'junit-jupiter-engine', 'mockito-core', 'hamcrest', 'nva-testutils', 'nva-logutils', 'zalando']
 jackson = ['jackson-core', 'jackson-databind', 'jackson-annotations', 'jackson-datatype-jdk8', 'jackson-datatype-jsr310']
 others = ['apache-commons', 'javax-ws-rs', 'sl4j', 'jsoup', 'aws-lambda-java-core']

@@ -11,7 +11,7 @@ version '1.0-SNAPSHOT'
 
 dependencies {
     testImplementation libs.bundles.testing
-    implementation libs.bundles.nva-common
+    implementation libs.bundles.nvaCommons
     implementation libs.bundles.jackson
     implementation libs.bundles.others
 }
