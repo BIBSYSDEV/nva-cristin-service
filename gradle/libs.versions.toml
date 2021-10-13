@@ -34,10 +34,11 @@ javax-ws-rs = { group = 'javax.ws.rs', name = 'javax.ws.rs-api', version = '2.1.
 sl4j = { group = 'org.slf4j', name = 'slf4j-api', version = '1.7.31' }
 jsoup = { group = 'org.jsoup', name = 'jsoup', version = '1.13.1' }
 aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version = '1.2.1' }
+google-guava = { group = 'com.google.guava', name = 'guava', version = '11.0.2' }
 
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
 testing = ['junit-jupiter-api', 'junit-jupiter-params', 'junit-jupiter-engine', 'mockito-core', 'hamcrest', 'nva-testutils', 'nva-logutils', 'zalando']
 jackson = ['jackson-core', 'jackson-databind', 'jackson-annotations', 'jackson-datatype-jdk8', 'jackson-datatype-jsr310']
-others = ['apache-commons', 'javax-ws-rs', 'sl4j', 'jsoup', 'aws-lambda-java-core']
+others = ['apache-commons', 'javax-ws-rs', 'sl4j', 'jsoup', 'aws-lambda-java-core', 'google-guava']
