@@ -1,0 +1,14 @@
+plugins{
+    /*id 'io.github.gradle-nexus.publish-plugin'
+    id 'nva.language.core.java-conventions'
+    id 'nva.language.core.gradlelint'
+    id 'nva.language.core.jacoco-merge'*/
+    id 'nva.cristin.service.core.java-conventions'
+    id 'nva.cristin.service.core.gradlelint'
+    id 'nva.cristin.service.core.jacoco-merge'
+}
+
+allprojects {
+    //workaround for jacoco-merge to work
+    apply plugin: 'nva.cristin.service.core.java-conventions'
+}
