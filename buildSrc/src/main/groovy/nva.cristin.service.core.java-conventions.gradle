@@ -25,18 +25,12 @@ repositories {
 }
 
 tasks.named('test') {
-//test {
     useJUnitPlatform()
     failFast = true
     testLogging {
         events 'skipped', 'passed', 'failed'
     }
     finalizedBy jacocoTestReport
-
-    /*environment "ALLOWED_ORIGIN", "*"
-    environment "CRISTIN_API_HOST", "api.cristin.no"
-    environment "BASE_PATH", "project"
-    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"*/
 }
 
 test {
@@ -90,14 +84,3 @@ jacocoTestCoverageVerification {
     }
 
 }
-
-// publish submodules
-/*
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives sourcesJar
-}*/
