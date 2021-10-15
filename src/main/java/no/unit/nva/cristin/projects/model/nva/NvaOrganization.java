@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.util.Map;
+import java.util.Objects;
+
 import no.unit.nva.cristin.projects.model.cristin.CristinInstitution;
 import nva.commons.core.JacocoGenerated;
 
@@ -67,5 +69,27 @@ public class NvaOrganization {
         nvaOrganization.setType(ORGANIZATION_TYPE);
         nvaOrganization.setName(cristinInstitution.getInstitutionName());
         return nvaOrganization;
+    }
+
+    @Override
+    public String toString() {
+        return "NvaOrganization{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                ", name=" + name +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof NvaOrganization)) return false;
+        NvaOrganization that = (NvaOrganization) o;
+        return getId().equals(that.getId()) && getType().equals(that.getType()) && Objects.equals(getName(), that.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getType(), getName());
     }
 }

@@ -1,16 +1,22 @@
 package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.projects.UriUtils.getNvaProjectUriWithId;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
+import no.unit.nva.cristin.projects.model.nva.Funding;
+import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
 import no.unit.nva.cristin.projects.model.nva.NvaPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -49,7 +55,7 @@ public class NvaProjectBuilder {
         nvaProject.setLanguage(LanguageMapper.toUri(cristinProject.getMainLanguage()));
         nvaProject.setStartDate(cristinProject.getStartDate());
         nvaProject.setEndDate(cristinProject.getEndDate());
-        nvaProject.setGrants(Collections.emptyList());
+        nvaProject.setFunding(extractFunding());
         nvaProject.setCoordinatingInstitution(extractCoordinatingInstitution());
         nvaProject.setContributors(extractContributors());
 
@@ -106,6 +112,17 @@ public class NvaProjectBuilder {
         return Optional.ofNullable(cristinProject.getParticipants())
             .map(NvaProjectBuilder::transformCristinPersonsToNvaContributors)
             .orElse(Collections.emptyList());
+    }
+
+    private List<Funding> extractFunding() {
+        List<CristinFundingSource> cristinFundings = cristinProject.getProjectFundingSources();
+        List<Funding> nvaFundings = new ArrayList<>();
+        for(CristinFundingSource cristinFunding: cristinFundings) {
+            FundingSource nvaFundingSource = new FundingSource.Builder().withCode(cristinFunding.getFundingSourceCode()).withNames(cristinFunding.getFundingSourceName()).build();
+            Funding nvaFunding = new Funding.Builder().withCode(cristinFunding.getProjectCode()).withSource(nvaFundingSource).build();
+            nvaFundings.add(nvaFunding);
+        }
+        return nvaFundings;
     }
 
     public NvaProjectBuilder withContext(String context) {
