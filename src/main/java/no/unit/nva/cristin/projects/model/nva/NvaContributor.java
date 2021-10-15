@@ -6,6 +6,8 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import nva.commons.core.JacocoGenerated;
 
+import java.util.Objects;
+
 @SuppressWarnings("unused")
 @JacocoGenerated
 @JsonPropertyOrder({TYPE, IDENTITY, AFFILIATION})
@@ -37,5 +39,27 @@ public class NvaContributor {
 
     public void setAffiliation(NvaOrganization affiliation) {
         this.affiliation = affiliation;
+    }
+
+    @Override
+    public String toString() {
+        return "NvaContributor{" +
+                "type='" + type + '\'' +
+                ", identity=" + identity +
+                ", affiliation=" + affiliation +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof NvaContributor)) return false;
+        NvaContributor that = (NvaContributor) o;
+        return getType().equals(that.getType()) && getIdentity().equals(that.getIdentity()) && getAffiliation().equals(that.getAffiliation());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getType(), getIdentity(), getAffiliation());
     }
 }

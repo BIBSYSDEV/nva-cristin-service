@@ -18,10 +18,19 @@ repositories {
 
 project.ext{
     nvaCommonsVersion = '1.15.1'
-    jacksonVersion = '2.12.1'
-    jupiterVersion = '5.7.1'
+    jacksonVersion = '2.13.0'
+    jupiterVersion = '5.8.1'
     hamcrestVersion = '2.2'
     zalandoProblemVersion = '0.25.0'
+
+//    def awsSdkVersion = "1.12.85"
+//    def awsSdk2Version = '2.17.57'
+//    def mockitoVersion = '4.0.0'
+//    def hamcrestVersion = '2.2'
+//    def javaFaker = '1.0.2'
+//    def apacheCommons= '3.12.0'
+//    def commonsValidator = '1.7'
+
 }
 
 dependencies {
@@ -48,7 +57,8 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: project.ext.jupiterVersion
 
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: project.ext.hamcrestVersion
-    testImplementation 'com.github.BIBSYSDEV:nva-testutils:0.1.22'
+    testImplementation 'com.github.BIBSYSDEV:nva-testutils:0.1.26'
+
     testImplementation group: 'com.github.bibsysdev', name: 'logutils', version: project.ext.nvaCommonsVersion
     testImplementation group: 'org.zalando', name: 'problem', version: project.ext.zalandoProblemVersion
 

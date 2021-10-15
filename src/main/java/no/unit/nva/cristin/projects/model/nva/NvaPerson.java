@@ -10,6 +10,8 @@ import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
+import java.util.Objects;
+
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import nva.commons.core.JacocoGenerated;
 
@@ -75,5 +77,28 @@ public class NvaPerson {
         identity.setFirstName(cristinPerson.getFirstName());
         identity.setLastName(cristinPerson.getSurname());
         return identity;
+    }
+
+    @Override
+    public String toString() {
+        return "NvaPerson{" +
+                "id=" + id +
+                ", type='" + type + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof NvaPerson)) return false;
+        NvaPerson nvaPerson = (NvaPerson) o;
+        return getId().equals(nvaPerson.getId()) && getType().equals(nvaPerson.getType()) && Objects.equals(getFirstName(), nvaPerson.getFirstName()) && Objects.equals(getLastName(), nvaPerson.getLastName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getType(), getFirstName(), getLastName());
     }
 }
