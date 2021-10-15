@@ -80,21 +80,18 @@ public class NvaPerson {
     }
 
     @Override
-    public String toString() {
-        return "NvaPerson{" +
-                "id=" + id +
-                ", type='" + type + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof NvaPerson)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof NvaPerson)) {
+            return false;
+        }
         NvaPerson nvaPerson = (NvaPerson) o;
-        return getId().equals(nvaPerson.getId()) && getType().equals(nvaPerson.getType()) && Objects.equals(getFirstName(), nvaPerson.getFirstName()) && Objects.equals(getLastName(), nvaPerson.getLastName());
+        return getId().equals(nvaPerson.getId())
+                && getType().equals(nvaPerson.getType())
+                && Objects.equals(getFirstName(), nvaPerson.getFirstName())
+                && Objects.equals(getLastName(), nvaPerson.getLastName());
     }
 
     @Override
