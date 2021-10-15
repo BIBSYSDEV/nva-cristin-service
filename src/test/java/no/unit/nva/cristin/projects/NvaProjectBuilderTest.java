@@ -18,7 +18,8 @@ public class NvaProjectBuilderTest {
 
     @Test
     void returnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
-        String expected = IoUtils.stringFromResources(Path.of(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_WITH_FUNDING_JSON));
+        String expected = IoUtils.stringFromResources(
+                Path.of(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_WITH_FUNDING_JSON));
         String cristinGetProject = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE));
         CristinProject cristinProject =
             attempt(() -> OBJECT_MAPPER.readValue(cristinGetProject, CristinProject.class)).get();

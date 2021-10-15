@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 public class TestPairProvider implements ArgumentsProvider {
 
     public static final String API_QUERY_RESPONSE_JSON =
-        IoUtils.stringFromResources(Path.of("api_query_response.json"));
+        IoUtils.stringFromResources(Path.of("api_query_response_with_funding.json"));
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {

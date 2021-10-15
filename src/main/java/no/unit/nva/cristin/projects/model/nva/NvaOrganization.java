@@ -72,20 +72,17 @@ public class NvaOrganization {
     }
 
     @Override
-    public String toString() {
-        return "NvaOrganization{" +
-                "id=" + id +
-                ", type='" + type + '\'' +
-                ", name=" + name +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof NvaOrganization)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof NvaOrganization)) {
+            return false;
+        }
         NvaOrganization that = (NvaOrganization) o;
-        return getId().equals(that.getId()) && getType().equals(that.getType()) && Objects.equals(getName(), that.getName());
+        return getId().equals(that.getId())
+                && getType().equals(that.getType())
+                && Objects.equals(getName(), that.getName());
     }
 
     @Override

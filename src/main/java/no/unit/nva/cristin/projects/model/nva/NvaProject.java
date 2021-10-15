@@ -156,28 +156,15 @@ public class NvaProject {
         this.contributors = contributors;
     }
 
-    @Override
-    public String toString() {
-        return "NvaProject{" +
-                "context='" + context + '\'' +
-                ", id=" + id +
-                ", type='" + type + '\'' +
-                ", identifiers=" + identifiers +
-                ", title='" + title + '\'' +
-                ", language=" + language +
-                ", alternativeTitles=" + alternativeTitles +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", funding=" + funding +
-                ", coordinatingInstitution=" + coordinatingInstitution +
-                ", contributors=" + contributors +
-                '}';
-    }
-
+    @JacocoGenerated
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof NvaProject)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof NvaProject)) {
+            return false;
+        }
         NvaProject that = (NvaProject) o;
         return Objects.equals(getContext(), that.getContext())
                 && Objects.equals(getId(), that.getId())
@@ -193,6 +180,7 @@ public class NvaProject {
                 && Objects.equals(getContributors(), that.getContributors());
     }
 
+    @JacocoGenerated
     @Override
     public int hashCode() {
         return Objects.hash(getContext(),

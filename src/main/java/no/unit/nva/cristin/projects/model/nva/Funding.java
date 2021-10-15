@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.model.nva;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import nva.commons.core.JacocoGenerated;
 
 import java.util.Objects;
 
@@ -31,27 +32,26 @@ public class Funding {
         return code;
     }
 
+    @JacocoGenerated
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Funding)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Funding)) {
+            return false;
+        }
         Funding that = (Funding) o;
         return getSource().equals(that.getSource()) && Objects.equals(getCode(), that.getCode());
     }
 
+    @JacocoGenerated
     @Override
     public int hashCode() {
         return Objects.hash(getSource(), getCode());
     }
 
-    @Override
-    public String toString() {
-        return "Funding{" +
-                "source=" + source +
-                ", code='" + code + '\'' +
-                '}';
-    }
-
+    @SuppressWarnings("PMD.BeanMembersShouldSerialize")
     public static final class Builder {
         private FundingSource source;
         private String code;

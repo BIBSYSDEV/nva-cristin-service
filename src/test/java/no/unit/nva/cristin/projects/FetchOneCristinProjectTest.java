@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.projects;
 
-import static java.util.Map.*;
+import static java.util.Map.of;
 import static no.unit.nva.cristin.projects.Constants.ID;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
@@ -13,7 +13,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ER
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_KEY;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_VALUE;
-import static no.unit.nva.testutils.RandomDataGenerator.*;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -286,26 +286,13 @@ public class FetchOneCristinProjectTest {
     void handlerReturnsNvaProjectContainingFundingFromCristingWhenFundingHasValuesInCristin() throws Exception {
 
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
-        String expectedResponseBody = getBodyFromResource(API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON);
-        final NvaProject expectedNvaProject= OBJECT_MAPPER.readValue(expectedResponseBody, NvaProject.class);
+        final NvaProject expectedNvaProject = OBJECT_MAPPER.readValue(
+                getBodyFromResource(API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON), NvaProject.class);
         final List<Funding> funding = notRandomFunding();
         expectedNvaProject.setFunding(funding);
+        final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
 
-        final String actualResponseBody = gatewayResponse.getBody();
-        final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(actualResponseBody, NvaProject.class);
-
-        assertEquals(toPrettyJson(expectedNvaProject), toPrettyJson(actualNvaProject));
         assertEquals(expectedNvaProject, actualNvaProject);
-
-
-    }
-
-    private String toPrettyJson(Object object) throws JsonProcessingException {
-        return OBJECT_MAPPER.writeValueAsString(object);
-    }
-
-    private String CristinFunding() {
-        return IoUtils.stringFromResources(Path.of(SAMPLE_FUNDING_SOURCE));
     }
 
     private List<Funding> notRandomFunding() {
@@ -313,9 +300,11 @@ public class FetchOneCristinProjectTest {
         final String language = "en";
         final String name = "Research Council of Norway (RCN)";
         final String fundingCode = "654321";
-        FundingSource fundingSource = new FundingSource.Builder().withCode(fundingSourceCode).withNames(Map.of(language, name)).build();
-        Funding nvaFunding = new Funding.Builder().withSource(fundingSource).withCode(fundingCode).build();
-        return List.of(nvaFunding);
+        FundingSource fundingSource = new FundingSource.Builder()
+                .withCode(fundingSourceCode)
+                .withNames(Map.of(language, name))
+                .build();
+        return List.of(new Funding.Builder().withSource(fundingSource).withCode(fundingCode).build());
     }
 
 
@@ -324,7 +313,10 @@ public class FetchOneCristinProjectTest {
         final String language = randomString();
         final String name = randomString();
         final String fundingCode = randomString();
-        FundingSource fundingSource = new FundingSource.Builder().withCode(fundingSourceCode).withNames(Map.of(language, name)).build();
+        FundingSource fundingSource = new FundingSource.Builder()
+                .withCode(fundingSourceCode)
+                .withNames(Map.of(language, name))
+                .build();
         Funding nvaFunding = new Funding.Builder().withSource(fundingSource).withCode(fundingCode).build();
         return List.of(nvaFunding);
     }
