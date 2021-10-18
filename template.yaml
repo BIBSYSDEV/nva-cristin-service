@@ -67,6 +67,7 @@ Resources:
   NvaCristinProjectsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
+      CodeUri: cristin-project
       Handler: no.unit.nva.cristin.projects.FetchCristinProjects::handleRequest
       Runtime: java11
       MemorySize: 512
@@ -86,6 +87,7 @@ Resources:
   NvaCristinOneProjectFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: cristin-project
       Handler: no.unit.nva.cristin.projects.FetchOneCristinProject::handleRequest
       Runtime: java11
       MemorySize: 512
