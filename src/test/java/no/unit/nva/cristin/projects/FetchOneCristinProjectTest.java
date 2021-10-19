@@ -1,5 +1,34 @@
 package no.unit.nva.cristin.projects;
 
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.MediaType;
+import no.unit.nva.cristin.projects.model.nva.Funding;
+import no.unit.nva.cristin.projects.model.nva.FundingSource;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.BadGatewayException;
+import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.zalando.problem.Problem;
+
+import javax.ws.rs.core.HttpHeaders;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Map.of;
 import static no.unit.nva.cristin.projects.Constants.ID;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
@@ -22,29 +51,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.MediaType;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.util.Map;
-import javax.ws.rs.core.HttpHeaders;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.BadGatewayException;
-import nva.commons.core.Environment;
-import nva.commons.core.ioutils.IoUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import org.zalando.problem.Problem;
 
 public class FetchOneCristinProjectTest {
 
@@ -52,6 +58,8 @@ public class FetchOneCristinProjectTest {
         "cristinGetProjectIdNotFoundResponse.json";
     private static final String API_RESPONSE_ONE_PROJECT_JSON =
         "api_response_one_cristin_project_to_nva_project.json";
+    private static final String API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON =
+            "api_response_one_cristin_project_to_nva_project_with_funding.json";
     private static final String CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON =
         "cristinProjectWithoutInstitutionAndParticipants.json";
     private static final String API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON =
@@ -62,6 +70,7 @@ public class FetchOneCristinProjectTest {
     private static final String ENGLISH_LANGUAGE = "en";
     private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI = "https://api.cristin.no/v2/projects/9999?lang=en";
     private static final String DEFAULT_ACCEPT_HEADER = "*/*";
+    private static final String SAMPLE_FUNDING_SOURCE = "sample_cristin_project_funding.json";
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -112,7 +121,7 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerReturnsNvaProjectFromTransformedCristinProjectWhenIdIsFound() throws Exception {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
-        String expected = getBodyFromResource(API_RESPONSE_ONE_PROJECT_JSON);
+        String expected = getBodyFromResource(API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON);
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(gatewayResponse.getBody()));
     }
 
@@ -227,8 +236,8 @@ public class FetchOneCristinProjectTest {
 
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withPathParameters(Map.of(ID, DEFAULT_ID))
-            .withHeaders(Map.of(HttpHeaders.ACCEPT, contentTypeRequested))
+            .withPathParameters(of(ID, DEFAULT_ID))
+            .withHeaders(of(HttpHeaders.ACCEPT, contentTypeRequested))
             .build();
         handler.handleRequest(input, output, context);
 
@@ -242,8 +251,8 @@ public class FetchOneCristinProjectTest {
     void handlerReturnsDefaultContentTypeWhenAcceptHeaderSetToDefault() throws Exception {
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withPathParameters(Map.of(ID, DEFAULT_ID))
-            .withHeaders(Map.of(HttpHeaders.ACCEPT, DEFAULT_ACCEPT_HEADER))
+            .withPathParameters(of(ID, DEFAULT_ID))
+            .withHeaders(of(HttpHeaders.ACCEPT, DEFAULT_ACCEPT_HEADER))
             .build();
         handler.handleRequest(input, output, context);
 
@@ -260,8 +269,8 @@ public class FetchOneCristinProjectTest {
 
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withPathParameters(Map.of(ID, DEFAULT_ID))
-            .withHeaders(Map.of(HttpHeaders.ACCEPT, contentTypeRequested))
+            .withPathParameters(of(ID, DEFAULT_ID))
+            .withHeaders(of(HttpHeaders.ACCEPT, contentTypeRequested))
             .build();
         handler.handleRequest(input, output, context);
 
@@ -273,12 +282,34 @@ public class FetchOneCristinProjectTest {
     }
 
     @Test
+    void handlerReturnsNvaProjectContainingFundingFromCristingWhenFundingHasValuesInCristin() throws Exception {
+
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        final NvaProject expectedNvaProject = OBJECT_MAPPER.readValue(
+                getBodyFromResource(API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON), NvaProject.class);
+        final List<Funding> funding = notRandomFunding();
+        expectedNvaProject.setFunding(funding);
+        final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
+
+        assertEquals(expectedNvaProject, actualNvaProject);
+    }
+
+    private List<Funding> notRandomFunding() {
+        final String fundingSourceCode = "NFR";
+        final String language = "en";
+        final String name = "Research Council of Norway (RCN)";
+        final String fundingCode = "654321";
+        FundingSource fundingSource = new FundingSource(Map.of(language, name), fundingSourceCode);
+        return List.of(new Funding(fundingSource,fundingCode));
+    }
+
+    @Test
     void handlerThrowsBadRequestWhenQueryParamsIsNotSupported() throws Exception {
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-            .withBody(null)
-            .withQueryParameters(Map.of(INVALID_QUERY_PARAM_KEY, INVALID_QUERY_PARAM_VALUE))
-            .withPathParameters(Map.of(ID, DEFAULT_ID))
-            .build();
+                .withBody(null)
+                .withQueryParameters(of(INVALID_QUERY_PARAM_KEY, INVALID_QUERY_PARAM_VALUE))
+                .withPathParameters(of(ID, DEFAULT_ID))
+                .build();
         handler.handleRequest(input, output, context);
 
         GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
@@ -291,8 +322,8 @@ public class FetchOneCristinProjectTest {
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {
         InputStream input = requestWithLanguageAndId(
-            Map.of(LANGUAGE, DEFAULT_LANGUAGE_CODE),
-            Map.of(ID, id));
+            of(LANGUAGE, DEFAULT_LANGUAGE_CODE),
+            of(ID, id));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
     }

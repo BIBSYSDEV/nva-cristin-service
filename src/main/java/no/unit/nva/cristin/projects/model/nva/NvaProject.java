@@ -1,5 +1,16 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import nva.commons.core.JacocoGenerated;
+
+import java.net.URI;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ALTERNATIVE_TITLES;
@@ -7,27 +18,20 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.END_DATE;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.GRANTS;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.net.URI;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import nva.commons.core.JacocoGenerated;
+import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
 @JsonInclude(ALWAYS)
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
-    GRANTS, COORDINATING_INSTITUTION, CONTRIBUTORS})
+        FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS})
 public class NvaProject {
 
     @JsonProperty(CONTEXT)
@@ -51,9 +55,8 @@ public class NvaProject {
     private Instant startDate;
     @JsonProperty
     private Instant endDate;
-    // TODO: NP-2155: Populate Grant/Funding field later
     @JsonProperty
-    private List<Object> grants;
+    private List<Funding> funding;
     @JsonProperty
     private NvaOrganization coordinatingInstitution;
     @JsonProperty
@@ -84,7 +87,7 @@ public class NvaProject {
     }
 
     public List<Map<String, String>> getIdentifiers() {
-        return identifiers;
+        return nonEmptyOrDefault(identifiers);
     }
 
     public void setIdentifiers(List<Map<String, String>> identifiers) {
@@ -108,7 +111,7 @@ public class NvaProject {
     }
 
     public List<Map<String, String>> getAlternativeTitles() {
-        return alternativeTitles;
+        return nonEmptyOrDefault(alternativeTitles);
     }
 
     public void setAlternativeTitles(List<Map<String, String>> alternativeTitles) {
@@ -131,12 +134,12 @@ public class NvaProject {
         this.endDate = endDate;
     }
 
-    public List<Object> getGrants() {
-        return grants;
+    public List<Funding> getFunding() {
+        return nonEmptyOrDefault(funding);
     }
 
-    public void setGrants(List<Object> grants) {
-        this.grants = grants;
+    public void setFunding(List<Funding> funding) {
+        this.funding = funding;
     }
 
     public NvaOrganization getCoordinatingInstitution() {
@@ -148,10 +151,51 @@ public class NvaProject {
     }
 
     public List<NvaContributor> getContributors() {
-        return contributors;
+        return nonEmptyOrDefault(contributors);
     }
 
     public void setContributors(List<NvaContributor> contributors) {
         this.contributors = contributors;
+    }
+
+    @JacocoGenerated
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof NvaProject)) {
+            return false;
+        }
+        NvaProject that = (NvaProject) o;
+        return Objects.equals(getContext(), that.getContext())
+                && Objects.equals(getId(), that.getId())
+                && Objects.equals(getType(), that.getType())
+                && Objects.equals(getIdentifiers(), that.getIdentifiers())
+                && Objects.equals(getTitle(), that.getTitle())
+                && Objects.equals(getLanguage(), that.getLanguage())
+                && Objects.equals(getAlternativeTitles(), that.getAlternativeTitles())
+                && Objects.equals(getStartDate(), that.getStartDate())
+                && Objects.equals(getEndDate(), that.getEndDate())
+                && Objects.equals(getFunding(), that.getFunding())
+                && Objects.equals(getCoordinatingInstitution(), that.getCoordinatingInstitution())
+                && Objects.equals(getContributors(), that.getContributors());
+    }
+
+    @JacocoGenerated
+    @Override
+    public int hashCode() {
+        return Objects.hash(getContext(),
+                getId(),
+                getType(),
+                getIdentifiers(),
+                getTitle(),
+                getLanguage(),
+                getAlternativeTitles(),
+                getStartDate(),
+                getEndDate(),
+                getFunding(),
+                getCoordinatingInstitution(),
+                getContributors());
     }
 }

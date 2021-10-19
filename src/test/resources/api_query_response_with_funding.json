@@ -1,0 +1,277 @@
+{
+  "@context": "https://bibsysdev.github.io/src/project-search-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer&results=5",
+  "size": 135,
+  "searchString": "language=nb&page=1&query=reindeer&results=5",
+  "processingTime": 1000,
+  "firstRecord": 1,
+  "nextResults": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&query=reindeer&results=5",
+  "previousResults": null,
+  "hits": [
+    {
+      "id": "https://api.dev.nva.aws.unit.no/project/456789",
+      "type": "Project",
+      "identifiers": [
+        {
+          "type": "CristinIdentifier",
+          "value": "456789"
+        }
+      ],
+      "title": "Example Title",
+      "language": "http://lexvo.org/id/iso639-3/eng",
+      "alternativeTitles": [],
+      "startDate": "2018-11-01T00:00:00Z",
+      "endDate": "2021-05-01T00:00:00Z",
+      "funding": [
+        {
+          "type": "Funding",
+          "source": {
+            "type": "FundingSource",
+            "names": {
+              "en": "Research Council of Norway (RCN)"
+            },
+            "code": "NFR"
+          },
+          "code": "654321"
+        }
+      ],
+      "coordinatingInstitution": {
+        "id": "https://api.cristin.no/v2/institutions/1234",
+        "type": "Organization",
+        "name": {
+          "en": "University"
+        }
+      },
+      "contributors": [
+        {
+          "type": "ProjectManager",
+          "identity": {
+            "id": "https://api.cristin.no/v2/persons/123456",
+            "type": "Person",
+            "firstName": "Ola",
+            "lastName": "Nordmann"
+          },
+          "affiliation": {
+            "id": "https://api.cristin.no/v2/institutions/1234",
+            "type": "Organization",
+            "name": {
+              "en": "University"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/project/456789",
+      "type": "Project",
+      "identifiers": [
+        {
+          "type": "CristinIdentifier",
+          "value": "456789"
+        }
+      ],
+      "title": "Example Title",
+      "language": "http://lexvo.org/id/iso639-3/eng",
+      "alternativeTitles": [],
+      "startDate": "2018-11-01T00:00:00Z",
+      "endDate": "2021-05-01T00:00:00Z",
+      "funding": [
+        {
+          "type": "Funding",
+          "source": {
+            "type": "FundingSource",
+            "names": {
+              "en": "Research Council of Norway (RCN)"
+            },
+            "code": "NFR"
+          },
+          "code": "654321"
+        }
+      ],
+      "coordinatingInstitution": {
+        "id": "https://api.cristin.no/v2/institutions/1234",
+        "type": "Organization",
+        "name": {
+          "en": "University"
+        }
+      },
+      "contributors": [
+        {
+          "type": "ProjectManager",
+          "identity": {
+            "id": "https://api.cristin.no/v2/persons/123456",
+            "type": "Person",
+            "firstName": "Ola",
+            "lastName": "Nordmann"
+          },
+          "affiliation": {
+            "id": "https://api.cristin.no/v2/institutions/1234",
+            "type": "Organization",
+            "name": {
+              "en": "University"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/project/456789",
+      "type": "Project",
+      "identifiers": [
+        {
+          "type": "CristinIdentifier",
+          "value": "456789"
+        }
+      ],
+      "title": "Example Title",
+      "language": "http://lexvo.org/id/iso639-3/eng",
+      "alternativeTitles": [],
+      "startDate": "2018-11-01T00:00:00Z",
+      "endDate": "2021-05-01T00:00:00Z",
+      "funding": [
+        {
+          "type": "Funding",
+          "source": {
+            "type": "FundingSource",
+            "names": {
+              "en": "Research Council of Norway (RCN)"
+            },
+            "code": "NFR"
+          },
+          "code": "654321"
+        }
+      ],
+      "coordinatingInstitution": {
+        "id": "https://api.cristin.no/v2/institutions/1234",
+        "type": "Organization",
+        "name": {
+          "en": "University"
+        }
+      },
+      "contributors": [
+        {
+          "type": "ProjectManager",
+          "identity": {
+            "id": "https://api.cristin.no/v2/persons/123456",
+            "type": "Person",
+            "firstName": "Ola",
+            "lastName": "Nordmann"
+          },
+          "affiliation": {
+            "id": "https://api.cristin.no/v2/institutions/1234",
+            "type": "Organization",
+            "name": {
+              "en": "University"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/project/456789",
+      "type": "Project",
+      "identifiers": [
+        {
+          "type": "CristinIdentifier",
+          "value": "456789"
+        }
+      ],
+      "title": "Example Title",
+      "language": "http://lexvo.org/id/iso639-3/eng",
+      "alternativeTitles": [],
+      "startDate": "2018-11-01T00:00:00Z",
+      "endDate": "2021-05-01T00:00:00Z",
+      "funding": [
+        {
+          "type": "Funding",
+          "source": {
+            "type": "FundingSource",
+            "names": {
+              "en": "Research Council of Norway (RCN)"
+            },
+            "code": "NFR"
+          },
+          "code": "654321"
+        }
+      ],
+      "coordinatingInstitution": {
+        "id": "https://api.cristin.no/v2/institutions/1234",
+        "type": "Organization",
+        "name": {
+          "en": "University"
+        }
+      },
+      "contributors": [
+        {
+          "type": "ProjectManager",
+          "identity": {
+            "id": "https://api.cristin.no/v2/persons/123456",
+            "type": "Person",
+            "firstName": "Ola",
+            "lastName": "Nordmann"
+          },
+          "affiliation": {
+            "id": "https://api.cristin.no/v2/institutions/1234",
+            "type": "Organization",
+            "name": {
+              "en": "University"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/project/456789",
+      "type": "Project",
+      "identifiers": [
+        {
+          "type": "CristinIdentifier",
+          "value": "456789"
+        }
+      ],
+      "title": "Example Title",
+      "language": "http://lexvo.org/id/iso639-3/eng",
+      "alternativeTitles": [],
+      "startDate": "2018-11-01T00:00:00Z",
+      "endDate": "2021-05-01T00:00:00Z",
+      "funding": [
+        {
+          "type": "Funding",
+          "source": {
+            "type": "FundingSource",
+            "names": {
+              "en": "Research Council of Norway (RCN)"
+            },
+            "code": "NFR"
+          },
+          "code": "654321"
+        }
+      ],
+      "coordinatingInstitution": {
+        "id": "https://api.cristin.no/v2/institutions/1234",
+        "type": "Organization",
+        "name": {
+          "en": "University"
+        }
+      },
+      "contributors": [
+        {
+          "type": "ProjectManager",
+          "identity": {
+            "id": "https://api.cristin.no/v2/persons/123456",
+            "type": "Person",
+            "firstName": "Ola",
+            "lastName": "Nordmann"
+          },
+          "affiliation": {
+            "id": "https://api.cristin.no/v2/institutions/1234",
+            "type": "Organization",
+            "name": {
+              "en": "University"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

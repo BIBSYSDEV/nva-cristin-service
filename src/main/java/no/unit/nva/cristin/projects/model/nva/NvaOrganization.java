@@ -1,20 +1,23 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import no.unit.nva.cristin.projects.model.cristin.CristinInstitution;
+
+import java.net.URI;
+import java.util.Map;
+import java.util.Objects;
+
 import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.INSTITUTION_PATH;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.net.URI;
-import java.util.Map;
-import no.unit.nva.cristin.projects.model.cristin.CristinInstitution;
-import nva.commons.core.JacocoGenerated;
+import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
 
 @SuppressWarnings("unused")
-@JacocoGenerated
+
 @JsonPropertyOrder({ID, TYPE, NAME})
 public class NvaOrganization {
 
@@ -43,7 +46,7 @@ public class NvaOrganization {
     }
 
     public Map<String, String> getName() {
-        return name;
+        return nonEmptyOrDefault(name);
     }
 
     public void setName(Map<String, String> name) {
@@ -67,5 +70,24 @@ public class NvaOrganization {
         nvaOrganization.setType(ORGANIZATION_TYPE);
         nvaOrganization.setName(cristinInstitution.getInstitutionName());
         return nvaOrganization;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof NvaOrganization)) {
+            return false;
+        }
+        NvaOrganization that = (NvaOrganization) o;
+        return getId().equals(that.getId())
+                && getType().equals(that.getType())
+                && Objects.equals(getName(), that.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getType(), getName());
     }
 }

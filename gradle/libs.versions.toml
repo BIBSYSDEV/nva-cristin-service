@@ -4,7 +4,7 @@ nva-commons = {strictly = '1.15.1'}
 jackson = {strictly = '2.12.1'}
 mockito = {strictly = '3.11.2'}
 hamcrest = {strictly = '2.2'}
-nva-testutils = {strictly = '0.1.22'}
+nva-testutils = {strictly = '0.1.26'}
 zalando = {strictly = '0.25.0'}
 apache-commons = {strictly = '3.12.0'}
 javax-ws-rs = {strictly = '2.1.1'}
