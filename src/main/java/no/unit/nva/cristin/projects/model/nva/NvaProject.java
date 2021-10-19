@@ -1,5 +1,16 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import nva.commons.core.JacocoGenerated;
+
+import java.net.URI;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ALTERNATIVE_TITLES;
@@ -14,18 +25,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.net.URI;
-import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-
-import nva.commons.core.JacocoGenerated;
+import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
@@ -87,7 +87,7 @@ public class NvaProject {
     }
 
     public List<Map<String, String>> getIdentifiers() {
-        return Optional.ofNullable(identifiers).orElse(Collections.emptyList());
+        return nonEmptyOrDefault(identifiers);
     }
 
     public void setIdentifiers(List<Map<String, String>> identifiers) {
@@ -111,7 +111,7 @@ public class NvaProject {
     }
 
     public List<Map<String, String>> getAlternativeTitles() {
-        return Optional.ofNullable(alternativeTitles).orElse(Collections.emptyList());
+        return nonEmptyOrDefault(alternativeTitles);
     }
 
     public void setAlternativeTitles(List<Map<String, String>> alternativeTitles) {
@@ -135,7 +135,7 @@ public class NvaProject {
     }
 
     public List<Funding> getFunding() {
-        return Optional.ofNullable(funding).orElse(Collections.emptyList());
+        return nonEmptyOrDefault(funding);
     }
 
     public void setFunding(List<Funding> funding) {
@@ -151,7 +151,7 @@ public class NvaProject {
     }
 
     public List<NvaContributor> getContributors() {
-        return Optional.ofNullable(contributors).orElse(Collections.emptyList());
+        return nonEmptyOrDefault(contributors);
     }
 
     public void setContributors(List<NvaContributor> contributors) {

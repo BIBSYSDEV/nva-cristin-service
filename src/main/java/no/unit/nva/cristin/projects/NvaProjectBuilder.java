@@ -30,7 +30,7 @@ public class NvaProjectBuilder {
     private static final String VALUE = "value";
 
     private static final Map<String, String> cristinRolesToNva = Map.of("PRO_MANAGER", "ProjectManager",
-        "PRO_PARTICIPANT", "ProjectParticipant");
+            "PRO_PARTICIPANT", "ProjectParticipant");
 
     private final transient CristinProject cristinProject;
     private final transient NvaProject nvaProject;
@@ -38,6 +38,26 @@ public class NvaProjectBuilder {
     public NvaProjectBuilder(CristinProject cristinProject) {
         this.cristinProject = cristinProject;
         nvaProject = new NvaProject();
+    }
+
+    private static List<NvaContributor> transformCristinPersonsToNvaContributors(List<CristinPerson> participants) {
+        return participants.stream()
+                .flatMap(NvaProjectBuilder::generateRoleBasedContribution)
+                .collect(Collectors.toList());
+    }
+
+    private static Stream<NvaContributor> generateRoleBasedContribution(CristinPerson cristinPerson) {
+        return cristinPerson.getRoles().stream()
+                .map(role -> createNvaContributorFromCristinPersonByRole(cristinPerson, role));
+    }
+
+    private static NvaContributor createNvaContributorFromCristinPersonByRole(CristinPerson cristinPerson,
+                                                                              CristinRole role) {
+        NvaContributor nvaContributor = new NvaContributor();
+        nvaContributor.setType(cristinRolesToNva.get(role.getRoleCode()));
+        nvaContributor.setIdentity(NvaPerson.fromCristinPerson(cristinPerson));
+        nvaContributor.setAffiliation(NvaOrganization.fromCristinInstitution(role.getInstitution()));
+        return nvaContributor;
     }
 
     /**
@@ -61,62 +81,42 @@ public class NvaProjectBuilder {
         return nvaProject;
     }
 
-    private static List<NvaContributor> transformCristinPersonsToNvaContributors(List<CristinPerson> participants) {
-        return participants.stream()
-            .flatMap(NvaProjectBuilder::generateRoleBasedContribution)
-            .collect(Collectors.toList());
-    }
-
     private List<Map<String, String>> createCristinIdentifier() {
         return Collections.singletonList(
-            Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()));
-    }
-
-    private static Stream<NvaContributor> generateRoleBasedContribution(CristinPerson cristinPerson) {
-        return cristinPerson.getRoles().stream()
-            .map(role -> createNvaContributorFromCristinPersonByRole(cristinPerson, role));
-    }
-
-    private static NvaContributor createNvaContributorFromCristinPersonByRole(CristinPerson cristinPerson,
-                                                                              CristinRole role) {
-        NvaContributor nvaContributor = new NvaContributor();
-        nvaContributor.setType(cristinRolesToNva.get(role.getRoleCode()));
-        nvaContributor.setIdentity(NvaPerson.fromCristinPerson(cristinPerson));
-        nvaContributor.setAffiliation(NvaOrganization.fromCristinInstitution(role.getInstitution()));
-        return nvaContributor;
+                Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()));
     }
 
     private NvaOrganization extractCoordinatingInstitution() {
         return Optional.ofNullable(cristinProject.getCoordinatingInstitution())
-            .map(coordinatingInstitution -> NvaOrganization
-                .fromCristinInstitution(coordinatingInstitution.getInstitution()))
-            .orElse(null);
+                .map(coordinatingInstitution -> NvaOrganization
+                        .fromCristinInstitution(coordinatingInstitution.getInstitution()))
+                .orElse(null);
     }
 
     private String extractMainTitle() {
         return Optional.ofNullable(cristinProject.getTitle())
-            .map(titles -> titles.get(cristinProject.getMainLanguage()))
-            .orElse(null);
+                .map(titles -> titles.get(cristinProject.getMainLanguage()))
+                .orElse(null);
     }
 
     private List<Map<String, String>> extractAlternativeTitles() {
         return Optional.ofNullable(cristinProject.getTitle())
-            .filter(titles -> titles.keySet().remove(cristinProject.getMainLanguage()))
-            .filter(remainingTitles -> !remainingTitles.isEmpty())
-            .map(Collections::singletonList)
-            .orElse(Collections.emptyList());
+                .filter(titles -> titles.keySet().remove(cristinProject.getMainLanguage()))
+                .filter(remainingTitles -> !remainingTitles.isEmpty())
+                .map(Collections::singletonList)
+                .orElse(Collections.emptyList());
     }
 
     private List<NvaContributor> extractContributors() {
         return Optional.ofNullable(cristinProject.getParticipants())
-            .map(NvaProjectBuilder::transformCristinPersonsToNvaContributors)
-            .orElse(Collections.emptyList());
+                .map(NvaProjectBuilder::transformCristinPersonsToNvaContributors)
+                .orElse(Collections.emptyList());
     }
 
     private List<Funding> extractFunding() {
-        return Optional.ofNullable(cristinProject.getProjectFundingSources().stream()
+        return cristinProject.getProjectFundingSources().stream()
                 .map(this::createFunding)
-                .collect(Collectors.toList())).orElse(Collections.emptyList());
+                .collect(Collectors.toList());
     }
 
     private Funding createFunding(CristinFundingSource cristinFunding) {

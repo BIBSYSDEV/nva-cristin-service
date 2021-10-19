@@ -9,10 +9,10 @@ import nva.commons.core.JacocoGenerated;
 import nva.commons.core.StringUtils;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
+import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused"})
 @JacocoGenerated
@@ -58,7 +58,7 @@ public class CristinProject {
     }
 
     public Map<String, String> getTitle() {
-        return Optional.ofNullable(title).orElse(Collections.emptyMap());
+        return nonEmptyOrDefault(title);
     }
 
     public void setTitle(Map<String, String> title) {
@@ -98,7 +98,7 @@ public class CristinProject {
     }
 
     public Map<String, String> getCreated() {
-        return Optional.ofNullable(created).orElse(Collections.emptyMap());
+        return nonEmptyOrDefault(created);
     }
 
     public void setCreated(Map<String, String> created) {
@@ -106,7 +106,7 @@ public class CristinProject {
     }
 
     public Map<String, String> getLastModified() {
-        return Optional.ofNullable(lastModified).orElse(Collections.emptyMap());
+        return nonEmptyOrDefault(lastModified);
     }
 
     public void setLastModified(Map<String, String> lastModified) {
@@ -122,7 +122,7 @@ public class CristinProject {
     }
 
     public List<CristinFundingSource> getProjectFundingSources() {
-        return Optional.ofNullable(projectFundingSources).orElse(Collections.emptyList());
+        return nonEmptyOrDefault(projectFundingSources);
     }
 
     public void setProjectFundingSources(List<CristinFundingSource> projectFundingSources) {
@@ -130,7 +130,7 @@ public class CristinProject {
     }
 
     public List<CristinPerson> getParticipants() {
-        return Optional.ofNullable(participants).orElse(Collections.emptyList());
+        return nonEmptyOrDefault(participants);
     }
 
     public void setParticipants(List<CristinPerson> participants) {

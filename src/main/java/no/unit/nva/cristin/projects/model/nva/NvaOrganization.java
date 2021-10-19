@@ -14,6 +14,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.UriUtils.buildUri;
+import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
 
 @SuppressWarnings("unused")
 
@@ -45,7 +46,7 @@ public class NvaOrganization {
     }
 
     public Map<String, String> getName() {
-        return name;
+        return nonEmptyOrDefault(name);
     }
 
     public void setName(Map<String, String> name) {

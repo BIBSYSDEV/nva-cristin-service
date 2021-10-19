@@ -1,8 +1,11 @@
 package no.unit.nva.cristin.projects;
 
-import nva.commons.core.JacocoGenerated;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-@JacocoGenerated
+import static java.util.Objects.nonNull;
+
 public class Utils {
 
     /**
@@ -18,5 +21,13 @@ public class Utils {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static <K, V> Map<K, V> nonEmptyOrDefault(Map<K, V> map) {
+        return nonNull(map) ? map : Collections.emptyMap();
+    }
+
+    public static <E> List<E> nonEmptyOrDefault(List<E> list) {
+        return nonNull(list) ? list : Collections.emptyList();
     }
 }

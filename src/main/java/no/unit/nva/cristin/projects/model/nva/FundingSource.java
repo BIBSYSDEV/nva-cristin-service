@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import nva.commons.core.JacocoGenerated;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+
+import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class FundingSource {
@@ -25,7 +25,7 @@ public class FundingSource {
     }
 
     public Map<String, String> getNames() {
-        return Optional.of(names).orElse(Collections.emptyMap());
+        return nonEmptyOrDefault(names);
     }
 
     public String getCode() {
