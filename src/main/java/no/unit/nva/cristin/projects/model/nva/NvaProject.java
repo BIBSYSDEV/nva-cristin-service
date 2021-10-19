@@ -19,9 +19,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import nva.commons.core.JacocoGenerated;
 
@@ -85,7 +87,7 @@ public class NvaProject {
     }
 
     public List<Map<String, String>> getIdentifiers() {
-        return identifiers;
+        return Optional.ofNullable(identifiers).orElse(Collections.emptyList());
     }
 
     public void setIdentifiers(List<Map<String, String>> identifiers) {
@@ -109,7 +111,7 @@ public class NvaProject {
     }
 
     public List<Map<String, String>> getAlternativeTitles() {
-        return alternativeTitles;
+        return Optional.ofNullable(alternativeTitles).orElse(Collections.emptyList());
     }
 
     public void setAlternativeTitles(List<Map<String, String>> alternativeTitles) {
@@ -133,7 +135,7 @@ public class NvaProject {
     }
 
     public List<Funding> getFunding() {
-        return funding;
+        return Optional.ofNullable(funding).orElse(Collections.emptyList());
     }
 
     public void setFunding(List<Funding> funding) {
@@ -149,7 +151,7 @@ public class NvaProject {
     }
 
     public List<NvaContributor> getContributors() {
-        return contributors;
+        return Optional.ofNullable(contributors).orElse(Collections.emptyList());
     }
 
     public void setContributors(List<NvaContributor> contributors) {

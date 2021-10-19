@@ -300,11 +300,8 @@ public class FetchOneCristinProjectTest {
         final String language = "en";
         final String name = "Research Council of Norway (RCN)";
         final String fundingCode = "654321";
-        FundingSource fundingSource = new FundingSource.Builder()
-                .withCode(fundingSourceCode)
-                .withNames(Map.of(language, name))
-                .build();
-        return List.of(new Funding.Builder().withSource(fundingSource).withCode(fundingCode).build());
+        FundingSource fundingSource = new FundingSource(Map.of(language, name), fundingSourceCode);
+        return List.of(new Funding(fundingSource,fundingCode));
     }
 
 
@@ -313,11 +310,8 @@ public class FetchOneCristinProjectTest {
         final String language = randomString();
         final String name = randomString();
         final String fundingCode = randomString();
-        FundingSource fundingSource = new FundingSource.Builder()
-                .withCode(fundingSourceCode)
-                .withNames(Map.of(language, name))
-                .build();
-        Funding nvaFunding = new Funding.Builder().withSource(fundingSource).withCode(fundingCode).build();
+        FundingSource fundingSource = new FundingSource(Map.of(language, name),fundingSourceCode);
+        Funding nvaFunding = new Funding(fundingSource,fundingCode);
         return List.of(nvaFunding);
     }
 

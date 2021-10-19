@@ -13,11 +13,6 @@ public class Funding {
     private final FundingSource source;
     private final String code;
 
-    private Funding(Builder builder) {
-        this.source = builder.source;
-        this.code = builder.code;
-    }
-
     @JsonCreator
     public Funding(@JsonProperty("source") FundingSource source, @JsonProperty("code") String code) {
         this.source = source;
@@ -51,23 +46,4 @@ public class Funding {
         return Objects.hash(getSource(), getCode());
     }
 
-    @SuppressWarnings("PMD.BeanMembersShouldSerialize")
-    public static final class Builder {
-        private FundingSource source;
-        private String code;
-
-        public Funding build() {
-            return new Funding(this);
-        }
-
-        public Builder withSource(FundingSource source) {
-            this.source = source;
-            return this;
-        }
-
-        public Builder withCode(String code) {
-            this.code = code;
-            return this;
-        }
-    }
 }

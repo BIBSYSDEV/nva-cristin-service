@@ -6,8 +6,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import nva.commons.core.JacocoGenerated;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class FundingSource {
@@ -16,11 +18,6 @@ public class FundingSource {
     private final Map<String, String> names;
     private final String code;
 
-    private FundingSource(Builder builder) {
-        this.names = builder.names;
-        this.code = builder.code;
-    }
-
     @JsonCreator
     public FundingSource(@JsonProperty("names") Map<String, String> names, @JsonProperty("code") String code) {
         this.names = names;
@@ -28,7 +25,7 @@ public class FundingSource {
     }
 
     public Map<String, String> getNames() {
-        return names;
+        return Optional.of(names).orElse(Collections.emptyMap());
     }
 
     public String getCode() {
@@ -52,25 +49,5 @@ public class FundingSource {
     @Override
     public int hashCode() {
         return Objects.hash(getNames(), getCode());
-    }
-
-    @SuppressWarnings("PMD.BeanMembersShouldSerialize")
-    public static final class Builder {
-        private Map<String, String> names;
-        private String code;
-
-        public FundingSource build() {
-            return new FundingSource(this);
-        }
-
-        public Builder withNames(Map<String, String> names) {
-            this.names = names;
-            return this;
-        }
-
-        public Builder withCode(String code) {
-            this.code = code;
-            return this;
-        }
     }
 }

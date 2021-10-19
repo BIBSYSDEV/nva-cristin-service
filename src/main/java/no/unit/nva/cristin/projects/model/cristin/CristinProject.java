@@ -3,13 +3,16 @@ package no.unit.nva.cristin.projects.model.cristin;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
 import no.unit.nva.cristin.projects.NvaProjectBuilder;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.StringUtils;
+
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused"})
 @JacocoGenerated
@@ -55,7 +58,7 @@ public class CristinProject {
     }
 
     public Map<String, String> getTitle() {
-        return title;
+        return Optional.ofNullable(title).orElse(Collections.emptyMap());
     }
 
     public void setTitle(Map<String, String> title) {
@@ -95,7 +98,7 @@ public class CristinProject {
     }
 
     public Map<String, String> getCreated() {
-        return created;
+        return Optional.ofNullable(created).orElse(Collections.emptyMap());
     }
 
     public void setCreated(Map<String, String> created) {
@@ -103,7 +106,7 @@ public class CristinProject {
     }
 
     public Map<String, String> getLastModified() {
-        return lastModified;
+        return Optional.ofNullable(lastModified).orElse(Collections.emptyMap());
     }
 
     public void setLastModified(Map<String, String> lastModified) {
@@ -119,7 +122,7 @@ public class CristinProject {
     }
 
     public List<CristinFundingSource> getProjectFundingSources() {
-        return projectFundingSources;
+        return Optional.ofNullable(projectFundingSources).orElse(Collections.emptyList());
     }
 
     public void setProjectFundingSources(List<CristinFundingSource> projectFundingSources) {
@@ -127,7 +130,7 @@ public class CristinProject {
     }
 
     public List<CristinPerson> getParticipants() {
-        return participants;
+        return Optional.ofNullable(participants).orElse(Collections.emptyList());
     }
 
     public void setParticipants(List<CristinPerson> participants) {

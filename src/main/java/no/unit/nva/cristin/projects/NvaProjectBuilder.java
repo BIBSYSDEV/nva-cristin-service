@@ -114,19 +114,15 @@ public class NvaProjectBuilder {
     }
 
     private List<Funding> extractFunding() {
-        if (cristinProject.getProjectFundingSources() == null) {
-            return Collections.emptyList();
-        }
-        return cristinProject.getProjectFundingSources().stream()
+        return Optional.ofNullable(cristinProject.getProjectFundingSources().stream()
                 .map(this::createFunding)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())).orElse(Collections.emptyList());
     }
 
     private Funding createFunding(CristinFundingSource cristinFunding) {
-        FundingSource nvaFundingSource = new FundingSource.Builder()
-                .withCode(cristinFunding.getFundingSourceCode())
-                .withNames(cristinFunding.getFundingSourceName()).build();
-        return new Funding.Builder().withCode(cristinFunding.getProjectCode()).withSource(nvaFundingSource).build();
+        FundingSource nvaFundingSource =
+                new FundingSource(cristinFunding.getFundingSourceName(), cristinFunding.getFundingSourceCode());
+        return new Funding(nvaFundingSource, cristinFunding.getProjectCode());
     }
 
     public NvaProjectBuilder withContext(String context) {

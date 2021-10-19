@@ -1,15 +1,14 @@
 package no.unit.nva.cristin.projects.model.nva;
 
-import static no.unit.nva.cristin.projects.JsonPropertyNames.AFFILIATION;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTITY;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import nva.commons.core.JacocoGenerated;
 
 import java.util.Objects;
 
+import static no.unit.nva.cristin.projects.JsonPropertyNames.AFFILIATION;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTITY;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
+
 @SuppressWarnings("unused")
-@JacocoGenerated
 @JsonPropertyOrder({TYPE, IDENTITY, AFFILIATION})
 public class NvaContributor {
 
