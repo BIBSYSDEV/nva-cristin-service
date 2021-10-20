@@ -2,7 +2,11 @@ package no.unit.nva.cristin.projects;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.net.MediaType;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -24,6 +28,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +37,7 @@ import static java.util.Map.of;
 import static no.unit.nva.cristin.projects.Constants.ID;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
@@ -46,6 +52,7 @@ import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -282,7 +289,7 @@ public class FetchOneCristinProjectTest {
     }
 
     @Test
-    void handlerReturnsNvaProjectContainingFundingFromCristingWhenFundingHasValuesInCristin() throws Exception {
+    void handlerReturnsNvaProjectContainingFundingFromCristinWhenFundingHasValuesInCristin() throws Exception {
 
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
         final NvaProject expectedNvaProject = OBJECT_MAPPER.readValue(
@@ -292,15 +299,6 @@ public class FetchOneCristinProjectTest {
         final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
 
         assertEquals(expectedNvaProject, actualNvaProject);
-    }
-
-    private List<Funding> notRandomFunding() {
-        final String fundingSourceCode = "NFR";
-        final String language = "en";
-        final String name = "Research Council of Norway (RCN)";
-        final String fundingCode = "654321";
-        FundingSource fundingSource = new FundingSource(Map.of(language, name), fundingSourceCode);
-        return List.of(new Funding(fundingSource,fundingCode));
     }
 
     @Test
@@ -318,6 +316,42 @@ public class FetchOneCristinProjectTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(body.getDetail(), containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP));
+    }
+
+    @Test
+    void handlerReturnsNvaProjectContainingStatusFromCristinWhenStatusHasLegalValue() throws Exception {
+
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
+
+        final ProjectStatus expectedProjectStatus = ProjectStatus.ACTIVE;
+        assertEquals(expectedProjectStatus, actualNvaProject.getStatus());
+    }
+
+    @Test
+    void handlerReturnsHttp502WhenStatusHasIllegalValue() throws Exception {
+        JsonNode cristinProjectSource =
+                OBJECT_MAPPER.readTree(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
+        ((ObjectNode) cristinProjectSource).put("status", "tull");
+
+        CristinApiClient cristinApiClient =
+                new CristinApiClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
+        FetchOneCristinProject fetchHandler = new FetchOneCristinProject(cristinApiClient, environment);
+        InputStream input = requestWithLanguageAndId(of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(ID, DEFAULT_ID));
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        fetchHandler.handleRequest(input, outputStream, mock(Context.class));
+        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(outputStream);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
+    }
+
+    private List<Funding> notRandomFunding() {
+        final String fundingSourceCode = "NFR";
+        final String language = "en";
+        final String name = "Research Council of Norway (RCN)";
+        final String fundingCode = "654321";
+        FundingSource fundingSource = new FundingSource(Map.of(language, name), fundingSourceCode);
+        return List.of(new Funding(fundingSource,fundingCode));
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {

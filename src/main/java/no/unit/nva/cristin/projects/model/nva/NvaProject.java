@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.model.nva;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import no.unit.nva.cristin.projects.ProjectStatus;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.URI;
@@ -61,6 +62,8 @@ public class NvaProject {
     private NvaOrganization coordinatingInstitution;
     @JsonProperty
     private List<NvaContributor> contributors;
+    @JsonProperty
+    private ProjectStatus status;
 
     public String getContext() {
         return context;
@@ -157,6 +160,15 @@ public class NvaProject {
     public void setContributors(List<NvaContributor> contributors) {
         this.contributors = contributors;
     }
+
+    public ProjectStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProjectStatus status) {
+        this.status = status;
+    }
+
 
     @JacocoGenerated
     @Override

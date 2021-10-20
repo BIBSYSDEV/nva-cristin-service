@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import no.unit.nva.cristin.projects.NvaProjectBuilder;
+import no.unit.nva.cristin.projects.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.StringUtils;
@@ -140,7 +141,16 @@ public class CristinProject {
     @JsonIgnore
     public boolean hasValidContent() {
         return StringUtils.isNotBlank(cristinProjectId)
-            && title != null && !title.isEmpty();
+                && title != null && !title.isEmpty() && hasLegalStatus();
+    }
+
+    private boolean hasLegalStatus() {
+        try {
+            ProjectStatus.lookup(status);
+        } catch (IllegalArgumentException ignored) {
+            return false;
+        }
+        return true;
     }
 
     @JsonIgnore

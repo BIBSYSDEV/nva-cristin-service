@@ -47,7 +47,8 @@
             }
           }
         }
-      ]
+      ],
+      "status":"ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -88,7 +89,8 @@
             }
           }
         }
-      ]
+      ],
+      "status":"ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -129,7 +131,8 @@
             }
           }
         }
-      ]
+      ],
+      "status":"ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -170,7 +173,8 @@
             }
           }
         }
-      ]
+      ],
+      "status":"ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -211,7 +215,8 @@
             }
           }
         }
-      ]
+      ],
+      "status":"ACTIVE"
     }
   ]
 }
