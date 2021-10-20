@@ -30,4 +30,5 @@ public class JsonPropertyNames {
     public static final String NEXT_RESULTS = "nextResults";
     public static final String PREVIOUS_RESULTS = "previousResults";
     public static final String HITS = "hits";
+    public static final String STATUS = "status";
 }

@@ -24,6 +24,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.START_DATE;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
@@ -32,7 +33,7 @@ import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
 @JacocoGenerated
 @JsonInclude(ALWAYS)
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
-        FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS})
+        FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS})
 public class NvaProject {
 
     @JsonProperty(CONTEXT)

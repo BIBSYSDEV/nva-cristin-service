@@ -11,14 +11,14 @@ public class CristinApiClientStub extends CristinApiClient {
 
     public static final String CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE = "cristinGetProjectResponse.json";
     public static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE = "cristinQueryProjectsResponse.json";
-    private HttpResponse<String> httpGetResponse;
+    private final String responseBody;
 
     public CristinApiClientStub() {
         this(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
     }
 
     public CristinApiClientStub(String sampleResponse) {
-        httpGetResponse = new HttpResponseStub(sampleResponse);
+        responseBody = sampleResponse;
     }
 
     @Override
@@ -36,13 +36,13 @@ public class CristinApiClientStub extends CristinApiClient {
         return CompletableFuture.completedFuture(mockGetResponse());
     }
 
-    private HttpResponse<String> mockGetResponse() {
-        return httpGetResponse;
-    }
-
     @Override
     protected HttpResponse<String> fetchQueryResults(URI uri) {
         return mockQueryResponse();
+    }
+
+    private HttpResponse<String> mockGetResponse() {
+        return new HttpResponseStub(responseBody);
     }
 
     private HttpResponse<String> mockQueryResponse() {

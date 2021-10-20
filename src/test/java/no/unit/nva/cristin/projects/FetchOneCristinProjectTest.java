@@ -4,9 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.net.MediaType;
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -28,7 +26,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +49,6 @@ import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -63,8 +59,6 @@ public class FetchOneCristinProjectTest {
 
     private static final String CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON =
         "cristinGetProjectIdNotFoundResponse.json";
-    private static final String API_RESPONSE_ONE_PROJECT_JSON =
-        "api_response_one_cristin_project_to_nva_project.json";
     private static final String API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON =
             "api_response_one_cristin_project_to_nva_project_with_funding.json";
     private static final String CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON =
@@ -77,7 +71,6 @@ public class FetchOneCristinProjectTest {
     private static final String ENGLISH_LANGUAGE = "en";
     private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI = "https://api.cristin.no/v2/projects/9999?lang=en";
     private static final String DEFAULT_ACCEPT_HEADER = "*/*";
-    private static final String SAMPLE_FUNDING_SOURCE = "sample_cristin_project_funding.json";
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -321,28 +314,28 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerReturnsNvaProjectContainingStatusFromCristinWhenStatusHasLegalValue() throws Exception {
 
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        final GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
         final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
-
         final ProjectStatus expectedProjectStatus = ProjectStatus.ACTIVE;
         assertEquals(expectedProjectStatus, actualNvaProject.getStatus());
     }
 
     @Test
     void handlerReturnsHttp502WhenStatusHasIllegalValue() throws Exception {
+        final FetchOneCristinProject fetchHandler =
+                new FetchOneCristinProject(createCristinApiClientWithResponseContainingError(), environment);
+        final InputStream input = requestWithLanguageAndId(of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(ID, DEFAULT_ID));
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        fetchHandler.handleRequest(input, outputStream, mock(Context.class));
+        final GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(outputStream);
+        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
+    }
+
+    private CristinApiClient createCristinApiClientWithResponseContainingError() throws JsonProcessingException {
         JsonNode cristinProjectSource =
                 OBJECT_MAPPER.readTree(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
         ((ObjectNode) cristinProjectSource).put("status", "tull");
-
-        CristinApiClient cristinApiClient =
-                new CristinApiClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
-        FetchOneCristinProject fetchHandler = new FetchOneCristinProject(cristinApiClient, environment);
-        InputStream input = requestWithLanguageAndId(of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(ID, DEFAULT_ID));
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        fetchHandler.handleRequest(input, outputStream, mock(Context.class));
-        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(outputStream);
-
-        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
+        return new CristinApiClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
     }
 
     private List<Funding> notRandomFunding() {

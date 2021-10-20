@@ -1,9 +1,8 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.Constants.LINK;
-import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
-import static no.unit.nva.cristin.projects.Constants.REL_PREV;
-import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
+import nva.commons.core.JacocoGenerated;
+
+import javax.net.ssl.SSLSession;
 import java.net.URI;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpHeaders;
@@ -14,17 +13,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
-import javax.net.ssl.SSLSession;
-import nva.commons.core.JacocoGenerated;
+
+import static no.unit.nva.cristin.projects.Constants.LINK;
+import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
+import static no.unit.nva.cristin.projects.Constants.REL_PREV;
+import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
 
 @JacocoGenerated
 public class HttpResponseStub implements HttpResponse<String> {
 
     public static final String TOTAL_COUNT_EXAMPLE_VALUE = "135";
     public static final String LINK_EXAMPLE_VALUE = String.join(";", REL_PREV, REL_NEXT);
-    private String body;
-    private int statusCode;
-    private HttpHeaders headers;
+    private final String body;
+    private final int statusCode;
+    private final HttpHeaders headers;
 
     public HttpResponseStub(String body) {
         this(body, 200);
@@ -45,6 +47,20 @@ public class HttpResponseStub implements HttpResponse<String> {
         this.body = body;
         this.statusCode = statusCode;
         this.headers = headers;
+    }
+
+    protected static Map<String, List<String>> headerMap(String totalCount, String link) {
+        return Map.of(
+                X_TOTAL_COUNT, Collections.singletonList(totalCount),
+                LINK, Collections.singletonList(link));
+    }
+
+    protected static BiPredicate<String, String> filter() {
+        return (s, s2) -> true;
+    }
+
+    protected static HttpHeaders defaultHeaders() {
+        return HttpHeaders.of(headerMap(TOTAL_COUNT_EXAMPLE_VALUE, LINK_EXAMPLE_VALUE), filter());
     }
 
     @Override
@@ -85,20 +101,6 @@ public class HttpResponseStub implements HttpResponse<String> {
     @Override
     public Version version() {
         return null;
-    }
-
-    protected static Map<String, List<String>> headerMap(String totalCount, String link) {
-        return Map.of(
-            X_TOTAL_COUNT, Collections.singletonList(totalCount),
-            LINK, Collections.singletonList(link));
-    }
-
-    protected static BiPredicate<String, String> filter() {
-        return (s, s2) -> true;
-    }
-
-    protected static HttpHeaders defaultHeaders() {
-        return HttpHeaders.of(headerMap(TOTAL_COUNT_EXAMPLE_VALUE, LINK_EXAMPLE_VALUE), filter());
     }
 
 }

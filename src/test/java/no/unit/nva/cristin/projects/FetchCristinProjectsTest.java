@@ -133,7 +133,7 @@ public class FetchCristinProjectsTest {
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
-//    @Test TODO
+    @Test
     void handlerReturnsNonEnrichedBodyWhenEnrichingFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
         HttpResponse<String> response =
@@ -440,7 +440,8 @@ public class FetchCristinProjectsTest {
     void handlerReturnsMatchingProjectsFromGrantIdSearchWhenSuppliedWithOnlyNumber() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(getBodyFromResource(CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
+        doReturn(new HttpResponseStub(
+                getBodyFromResource(CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
         doThrow(RuntimeException.class)
@@ -463,7 +464,8 @@ public class FetchCristinProjectsTest {
         doThrow(RuntimeException.class)
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
-        doReturn(new HttpResponseStub(getBodyFromResource(CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
+        doReturn(new HttpResponseStub(
+                getBodyFromResource(CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
 
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
@@ -483,7 +485,8 @@ public class FetchCristinProjectsTest {
         doReturn(new HttpResponseStub(EMPTY_LIST_STRING))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
-        doReturn(new HttpResponseStub(getBodyFromResource(CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
+        doReturn(new HttpResponseStub(
+                getBodyFromResource(CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
 
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
