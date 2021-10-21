@@ -44,6 +44,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ER
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_KEY;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_VALUE;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -330,6 +331,27 @@ public class FetchOneCristinProjectTest {
         final GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(outputStream);
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
     }
+
+    @Test
+    void handlerReturnsNvaProjectWithSummaryWhenCristinProjectHasAcademicSummary() throws Exception {
+        final String summary = "";
+        final CristinApiClient cristinApiClient = createCristinApiClientWithAcademicSummary(summary);
+        final InputStream input = requestWithLanguageAndId(of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(ID, DEFAULT_ID));
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        new FetchOneCristinProject(cristinApiClient, environment)
+                .handleRequest(input, outputStream, mock(Context.class));
+        final GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(outputStream);
+        final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
+        assertEquals(summary, actualNvaProject.getAcademicSummary());
+    }
+
+    private CristinApiClient createCristinApiClientWithAcademicSummary(String summary) throws JsonProcessingException {
+        JsonNode cristinProjectSource =
+                OBJECT_MAPPER.readTree(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
+        ((ObjectNode) cristinProjectSource).put( ACADEMIC_SUMMARY,  "summary");
+        return new CristinApiClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
+    }
+
 
     private CristinApiClient createCristinApiClientWithResponseContainingError() throws JsonProcessingException {
         JsonNode cristinProjectSource =
