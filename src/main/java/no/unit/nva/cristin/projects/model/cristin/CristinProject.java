@@ -1,19 +1,18 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import no.unit.nva.cristin.projects.NvaProjectBuilder;
 import no.unit.nva.cristin.projects.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
 import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
+import static nva.commons.core.StringUtils.isNotBlank;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused"})
 @JacocoGenerated
@@ -138,22 +137,16 @@ public class CristinProject {
         this.participants = participants;
     }
 
-    @JsonIgnore
+    /**
+     * Varifies CristinProject has enough data to be considered as legal.
+     * @return project has enough data to be considered legal
+     */
     public boolean hasValidContent() {
-        return StringUtils.isNotBlank(cristinProjectId)
-                && title != null && !title.isEmpty() && hasLegalStatus();
+        return isNotBlank(cristinProjectId)
+                && !getTitle().isEmpty()
+                && ProjectStatus.isValidStatus(status);
     }
 
-    private boolean hasLegalStatus() {
-        try {
-            ProjectStatus.lookup(status);
-        } catch (IllegalArgumentException ignored) {
-            return false;
-        }
-        return true;
-    }
-
-    @JsonIgnore
     public NvaProject toNvaProject() {
         return new NvaProjectBuilder(this).build();
     }

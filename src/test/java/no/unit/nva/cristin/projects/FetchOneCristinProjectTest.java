@@ -315,13 +315,13 @@ public class FetchOneCristinProjectTest {
     void handlerReturnsNvaProjectContainingStatusFromCristinWhenStatusHasLegalValue() throws Exception {
 
         final GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
-        final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
+        final NvaProject actualNvaProject = gatewayResponse.getBodyObject(NvaProject.class);
         final ProjectStatus expectedProjectStatus = ProjectStatus.ACTIVE;
         assertEquals(expectedProjectStatus, actualNvaProject.getStatus());
     }
 
     @Test
-    void handlerReturnsHttp502WhenStatusHasIllegalValue() throws Exception {
+    void handlerReturnsBadGatewayWhenCristinProjectHasIllegalStatusValue() throws Exception {
         final FetchOneCristinProject fetchHandler =
                 new FetchOneCristinProject(createCristinApiClientWithResponseContainingError(), environment);
         final InputStream input = requestWithLanguageAndId(of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(ID, DEFAULT_ID));
