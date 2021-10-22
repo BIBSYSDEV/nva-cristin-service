@@ -6,13 +6,13 @@ import no.unit.nva.cristin.projects.NvaProjectBuilder;
 import no.unit.nva.cristin.projects.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
 import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
-import static nva.commons.core.StringUtils.isNotBlank;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused"})
 @JacocoGenerated
@@ -138,11 +138,11 @@ public class CristinProject {
     }
 
     /**
-     * Varifies CristinProject has enough data to be considered as legal.
-     * @return project has enough data to be considered legal
+     * Verifies CristinProject has enough data to be considered as valid.
+     * @return project has enough data to be considered valid
      */
     public boolean hasValidContent() {
-        return isNotBlank(cristinProjectId)
+        return StringUtils.isNotBlank(cristinProjectId)
                 && !getTitle().isEmpty()
                 && ProjectStatus.isValidStatus(status);
     }
