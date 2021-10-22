@@ -25,7 +25,9 @@
       "funding": [],
       "coordinatingInstitution": null,
       "contributors": [],
-      "status":"ACTIVE"
+      "status": "ACTIVE",
+      "academicSummary": {},
+      "popularScientificSummary": {}
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/999888",
@@ -48,7 +50,9 @@
       "funding": [],
       "coordinatingInstitution": null,
       "contributors": [],
-      "status":"ACTIVE"
+      "status": "ACTIVE",
+      "academicSummary": {},
+      "popularScientificSummary": {}
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/111333",
@@ -71,7 +75,9 @@
       "funding": [],
       "coordinatingInstitution": null,
       "contributors": [],
-      "status":"ACTIVE"
+      "status": "ACTIVE",
+      "academicSummary": {},
+      "popularScientificSummary": {}
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/222444",
@@ -90,7 +96,9 @@
       "funding": [],
       "coordinatingInstitution": null,
       "contributors": [],
-      "status":"ACTIVE"
+      "status": "ACTIVE",
+      "academicSummary": {},
+      "popularScientificSummary": {}
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/444222",
@@ -109,7 +117,9 @@
       "funding": [],
       "coordinatingInstitution": null,
       "contributors": [],
-      "status":"ACTIVE"
+      "status": "ACTIVE",
+      "academicSummary": {},
+      "popularScientificSummary": {}
     }
   ]
 }

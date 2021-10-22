@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import no.unit.nva.cristin.projects.NvaProjectBuilder;
@@ -13,6 +14,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import static no.unit.nva.cristin.projects.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused"})
@@ -33,6 +36,10 @@ public class CristinProject {
     private CristinOrganization coordinatingInstitution;
     private List<CristinFundingSource> projectFundingSources;
     private List<CristinPerson> participants;
+    @JsonProperty(ACADEMIC_SUMMARY)
+    private Map<String, String> academicSummary;
+    @JsonProperty(POPULAR_SCIENTIFIC_SUMMARY)
+    private Map<String, String> popularScientificSummary;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -138,7 +145,22 @@ public class CristinProject {
         this.participants = participants;
     }
 
-    @JsonIgnore
+    public Map<String, String> getAcademicSummary() {
+        return nonEmptyOrDefault(academicSummary);
+    }
+
+    public void setAcademicSummary(Map<String, String> academicSummary) {
+        this.academicSummary = academicSummary;
+    }
+
+    public Map<String, String> getPopularScientificSummary() {
+        return nonEmptyOrDefault(popularScientificSummary);
+    }
+
+    public void setPopularScientificSummary(Map<String, String> popularScientificSummary) {
+        this.popularScientificSummary = popularScientificSummary;
+    }
+
     public boolean hasValidContent() {
         return StringUtils.isNotBlank(cristinProjectId)
                 && title != null && !title.isEmpty() && hasLegalStatus();

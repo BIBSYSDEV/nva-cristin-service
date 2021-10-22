@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
 import no.unit.nva.cristin.projects.model.nva.Funding;
@@ -72,6 +73,8 @@ public class FetchOneCristinProjectTest {
     private static final String ENGLISH_LANGUAGE = "en";
     private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI = "https://api.cristin.no/v2/projects/9999?lang=en";
     private static final String DEFAULT_ACCEPT_HEADER = "*/*";
+    public static final String FIELD_STATUS = "status";
+    public static final String NOT_LEGAL_STATUS = "not_legal_status";
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -123,7 +126,8 @@ public class FetchOneCristinProjectTest {
     void handlerReturnsNvaProjectFromTransformedCristinProjectWhenIdIsFound() throws Exception {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
         String expected = getBodyFromResource(API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON);
-        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(gatewayResponse.getBody()));
+        assertEquals(OBJECT_MAPPER.readValue(expected, NvaProject.class),
+                gatewayResponse.getBodyObject(NvaProject.class));
     }
 
     @Test
@@ -166,7 +170,8 @@ public class FetchOneCristinProjectTest {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
 
         String expected = getBodyFromResource(API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON);
-        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(gatewayResponse.getBody()));
+        assertEquals(OBJECT_MAPPER.readValue(expected, NvaProject.class),
+                gatewayResponse.getBodyObject(NvaProject.class));
     }
 
     @Test
@@ -334,21 +339,33 @@ public class FetchOneCristinProjectTest {
 
     @Test
     void handlerReturnsNvaProjectWithSummaryWhenCristinProjectHasAcademicSummary() throws Exception {
-        final String summary = "";
-        final CristinApiClient cristinApiClient = createCristinApiClientWithAcademicSummary(summary);
+        final String summaryLanguage = randomLanguageCode();
+        final String summary = randomSummary();
+        final Map<String, String> expectedSummary = Map.of(summaryLanguage, summary);
+        final CristinApiClient cristinApiClient = createCristinApiClientWithAcademicSummary(summaryLanguage, summary);
         final InputStream input = requestWithLanguageAndId(of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(ID, DEFAULT_ID));
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         new FetchOneCristinProject(cristinApiClient, environment)
                 .handleRequest(input, outputStream, mock(Context.class));
         final GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(outputStream);
         final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
-        assertEquals(summary, actualNvaProject.getAcademicSummary());
+        assertEquals(expectedSummary, actualNvaProject.getAcademicSummary());
     }
 
-    private CristinApiClient createCristinApiClientWithAcademicSummary(String summary) throws JsonProcessingException {
+    private String randomLanguageCode() {
+        return "lalaland";
+    }
+
+    private String randomSummary() {
+        return "summary summary summary";
+    }
+
+    private CristinApiClient createCristinApiClientWithAcademicSummary(String language, String summary)
+            throws JsonProcessingException {
         JsonNode cristinProjectSource =
                 OBJECT_MAPPER.readTree(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
-        ((ObjectNode) cristinProjectSource).put( ACADEMIC_SUMMARY,  "summary");
+        ObjectNode summaryNode = JsonNodeFactory.instance.objectNode().put(language, summary);
+        ((ObjectNode) cristinProjectSource).set(ACADEMIC_SUMMARY, summaryNode);
         return new CristinApiClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
     }
 
@@ -356,7 +373,7 @@ public class FetchOneCristinProjectTest {
     private CristinApiClient createCristinApiClientWithResponseContainingError() throws JsonProcessingException {
         JsonNode cristinProjectSource =
                 OBJECT_MAPPER.readTree(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
-        ((ObjectNode) cristinProjectSource).put("status", "tull");
+        ((ObjectNode) cristinProjectSource).put(FIELD_STATUS, NOT_LEGAL_STATUS);
         return new CristinApiClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
     }
 

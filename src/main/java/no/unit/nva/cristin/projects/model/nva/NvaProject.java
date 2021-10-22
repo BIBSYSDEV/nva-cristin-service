@@ -14,7 +14,6 @@ import java.util.Objects;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTRIBUTORS;
@@ -30,10 +29,9 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
 
-@SuppressWarnings("unused")
 @JsonInclude(ALWAYS)
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
-        FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS, ACADEMIC_SUMMARY})
+        FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS, "academicSummary", "popularScientificSummary" })
 public class NvaProject {
 
     @JsonProperty(CONTEXT)
@@ -66,7 +64,10 @@ public class NvaProject {
     @JsonProperty
     private ProjectStatus status;
     @JsonProperty
-    private String academicSummary;
+    private Map<String, String>  academicSummary;
+    @JsonProperty
+    private Map<String, String>  popularScientificSummary;
+
 
     public String getContext() {
         return context;
@@ -172,13 +173,22 @@ public class NvaProject {
         this.status = status;
     }
 
-    public String getAcademicSummary() {
-        return academicSummary;
+    public Map<String, String> getAcademicSummary() {
+        return nonEmptyOrDefault(academicSummary);
     }
 
-    public void setAcademicSummary(String academicSummary) {
+    public void setAcademicSummary(Map<String, String> academicSummary) {
         this.academicSummary = academicSummary;
     }
+
+    public Map<String, String> getPopularScientificSummary() {
+        return nonEmptyOrDefault(popularScientificSummary);
+    }
+
+    public void setPopularScientificSummary(Map<String, String> popularScientificSummary) {
+        this.popularScientificSummary = popularScientificSummary;
+    }
+
 
     @JacocoGenerated
     @Override

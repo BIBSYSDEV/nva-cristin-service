@@ -60,7 +60,11 @@
           }
         }
       ],
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "academicSummary": {},
+      "popularScientificSummary": {
+        "en": "<p>Some popular scientific summary</p>\r\n"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -114,7 +118,11 @@
           }
         }
       ],
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "academicSummary": {},
+      "popularScientificSummary": {
+        "en": "<p>Some popular scientific summary</p>\r\n"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -168,7 +176,11 @@
           }
         }
       ],
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "academicSummary": {},
+      "popularScientificSummary": {
+        "en": "<p>Some popular scientific summary</p>\r\n"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -222,7 +234,11 @@
           }
         }
       ],
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "academicSummary": {},
+      "popularScientificSummary": {
+        "en": "<p>Some popular scientific summary</p>\r\n"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -276,7 +292,11 @@
           }
         }
       ],
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "academicSummary": {},
+      "popularScientificSummary": {
+        "en": "<p>Some popular scientific summary</p>\r\n"
+      }
     }
   ]
 }
