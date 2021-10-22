@@ -259,6 +259,8 @@ components:
           description: Project end date
         coordinatingInstitution:
           $ref: '#/components/schemas/Organization'
+        funding:
+          $ref: '#/components/schemas/Funding'
         contributors:
           type: array
           description: List of contributors on the project
@@ -340,6 +342,30 @@ components:
           description: Always Organization
         name:
           $ref: '#/components/schemas/Languages'
+    Funding:
+      type: object
+      description: Funding
+      properties:
+        code:
+          type: string
+        type:
+          type: string
+          pattern: 'Funding'
+          description: Always Funding
+        source:
+          $ref: '#/components/schemas/FundingSource'
+    FundingSource:
+      type: object
+      description: Funding source
+      properties:
+        type:
+          type: string
+          pattern: 'FundingSource'
+          description: Always FundingSource
+        names:
+          $ref: '#/components/schemas/Languages'
+        code:
+          type: string
   examples:
     ProjectsExample:
       value:

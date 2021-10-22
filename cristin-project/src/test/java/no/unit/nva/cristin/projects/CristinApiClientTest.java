@@ -32,11 +32,9 @@ public class CristinApiClientTest {
     private static final String CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI =
         "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&project_code=1234567";
     public static final String EXAMPLE_TITLE = "Example Title";
-    public static final String EXAMPLE_BODY = "Example Body";
-    public static final String EMPTY_URL = "";
-    private Set<String> ids = Set.of("123", "456", "789");
+    private final Set<String> ids = Set.of("123", "456", "789");
 
-    CristinApiClient cristinApiClient = new CristinApiClient();
+    final CristinApiClient cristinApiClient = new CristinApiClient();
 
     @Test
     void getsCristinUriWithTitleParamWhenCallingUriBuilderWithTitleQueryRequested() throws Exception {

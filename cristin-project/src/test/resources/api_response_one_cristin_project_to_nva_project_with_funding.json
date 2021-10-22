@@ -26,7 +26,30 @@
       "code": "654321"
     }
   ],
-  "coordinatingInstitution": null,
-  "contributors": [],
+  "coordinatingInstitution": {
+    "id": "https://api.cristin.no/v2/institutions/1234",
+    "type": "Organization",
+    "name": {
+      "en": "University"
+    }
+  },
+  "contributors": [
+    {
+      "type": "ProjectManager",
+      "identity": {
+        "id": "https://api.cristin.no/v2/persons/123456",
+        "type": "Person",
+        "firstName": "Ola",
+        "lastName": "Nordmann"
+      },
+      "affiliation": {
+        "id": "https://api.cristin.no/v2/institutions/1234",
+        "type": "Organization",
+        "name": {
+          "en": "University"
+        }
+      }
+    }
+  ],
   "status":"ACTIVE"
 }

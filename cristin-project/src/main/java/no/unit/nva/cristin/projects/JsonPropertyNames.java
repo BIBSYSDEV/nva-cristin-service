@@ -15,7 +15,7 @@ public class JsonPropertyNames {
     public static final String ALTERNATIVE_TITLES = "alternativeTitles";
     public static final String START_DATE = "startDate";
     public static final String END_DATE = "endDate";
-    public static final String GRANTS = "grants";
+    public static final String FUNDING = "funding";
     public static final String COORDINATING_INSTITUTION = "coordinatingInstitution";
     public static final String CONTRIBUTORS = "contributors";
     public static final String NAME = "name";
@@ -30,4 +30,5 @@ public class JsonPropertyNames {
     public static final String NEXT_RESULTS = "nextResults";
     public static final String PREVIOUS_RESULTS = "previousResults";
     public static final String HITS = "hits";
+    public static final String STATUS = "status";
 }

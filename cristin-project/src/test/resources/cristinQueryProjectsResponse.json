@@ -5,7 +5,8 @@
       "en": "Opportunities and Challenges for Integrating Sámi Reindeer"
     },
     "main_language": "en",
-    "url": "https://api.cristin.no/v2/projects/555666"
+    "url": "https://api.cristin.no/v2/projects/555666",
+    "status":"ACTIVE"
   },
   {
     "cristin_project_id": "999888",
@@ -14,7 +15,8 @@
       "no": "Opptak og omsetning av tungmetall"
     },
     "main_language": "no",
-    "url": "https://api.cristin.no/v2/projects/999888"
+    "url": "https://api.cristin.no/v2/projects/999888",
+    "status":"ACTIVE"
   },
   {
     "cristin_project_id": "111333",
@@ -23,7 +25,8 @@
       "en": "Reindeer Herders' Vulnerability Network Study"
     },
     "main_language": "no",
-    "url": "https://api.cristin.no/v2/projects/111333"
+    "url": "https://api.cristin.no/v2/projects/111333",
+    "status":"ACTIVE"
   },
   {
     "cristin_project_id": "222444",
@@ -31,7 +34,8 @@
       "no": "Predicting effects of climate change on Svalbard"
     },
     "main_language": "no",
-    "url": "https://api.cristin.no/v2/projects/222444"
+    "url": "https://api.cristin.no/v2/projects/222444",
+    "status":"ACTIVE"
   },
   {
     "cristin_project_id": "444222",
@@ -39,6 +43,7 @@
       "en": "PREDICTING EFFECTS OF CLIMATE CHANGE"
     },
     "main_language": "en",
-    "url": "https://api.cristin.no/v2/projects/444222"
+    "url": "https://api.cristin.no/v2/projects/444222",
+    "status":"ACTIVE"
   }
 ]

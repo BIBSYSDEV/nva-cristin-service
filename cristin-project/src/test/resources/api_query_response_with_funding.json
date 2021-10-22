@@ -22,7 +22,19 @@
       "alternativeTitles": [],
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",
-      "grants": [],
+      "funding": [
+        {
+          "type": "Funding",
+          "source": {
+            "type": "FundingSource",
+            "names": {
+              "en": "Research Council of Norway (RCN)"
+            },
+            "code": "NFR"
+          },
+          "code": "654321"
+        }
+      ],
       "coordinatingInstitution": {
         "id": "https://api.cristin.no/v2/institutions/1234",
         "type": "Organization",
@@ -48,7 +60,7 @@
           }
         }
       ],
-      "status":"ACTIVE"
+      "status": "ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -64,7 +76,19 @@
       "alternativeTitles": [],
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",
-      "grants": [],
+      "funding": [
+        {
+          "type": "Funding",
+          "source": {
+            "type": "FundingSource",
+            "names": {
+              "en": "Research Council of Norway (RCN)"
+            },
+            "code": "NFR"
+          },
+          "code": "654321"
+        }
+      ],
       "coordinatingInstitution": {
         "id": "https://api.cristin.no/v2/institutions/1234",
         "type": "Organization",
@@ -90,7 +114,7 @@
           }
         }
       ],
-      "status":"ACTIVE"
+      "status": "ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -106,7 +130,19 @@
       "alternativeTitles": [],
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",
-      "grants": [],
+      "funding": [
+        {
+          "type": "Funding",
+          "source": {
+            "type": "FundingSource",
+            "names": {
+              "en": "Research Council of Norway (RCN)"
+            },
+            "code": "NFR"
+          },
+          "code": "654321"
+        }
+      ],
       "coordinatingInstitution": {
         "id": "https://api.cristin.no/v2/institutions/1234",
         "type": "Organization",
@@ -132,7 +168,7 @@
           }
         }
       ],
-      "status":"ACTIVE"
+      "status": "ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -148,7 +184,19 @@
       "alternativeTitles": [],
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",
-      "grants": [],
+      "funding": [
+        {
+          "type": "Funding",
+          "source": {
+            "type": "FundingSource",
+            "names": {
+              "en": "Research Council of Norway (RCN)"
+            },
+            "code": "NFR"
+          },
+          "code": "654321"
+        }
+      ],
       "coordinatingInstitution": {
         "id": "https://api.cristin.no/v2/institutions/1234",
         "type": "Organization",
@@ -174,7 +222,7 @@
           }
         }
       ],
-      "status":"ACTIVE"
+      "status": "ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/456789",
@@ -190,7 +238,19 @@
       "alternativeTitles": [],
       "startDate": "2018-11-01T00:00:00Z",
       "endDate": "2021-05-01T00:00:00Z",
-      "grants": [],
+      "funding": [
+        {
+          "type": "Funding",
+          "source": {
+            "type": "FundingSource",
+            "names": {
+              "en": "Research Council of Norway (RCN)"
+            },
+            "code": "NFR"
+          },
+          "code": "654321"
+        }
+      ],
       "coordinatingInstitution": {
         "id": "https://api.cristin.no/v2/institutions/1234",
         "type": "Organization",
@@ -216,7 +276,7 @@
           }
         }
       ],
-      "status":"ACTIVE"
+      "status": "ACTIVE"
     }
   ]
 }

@@ -130,11 +130,11 @@ public class ProjectsWrapper {
     }
 
     /**
-     * Assigns value to some of the field values using supplied headers and query parameters.
+     * Assigns value to some field values using supplied headers and query parameters.
      *
      * @param headers     the headers from response
      * @param queryParams the query params from request
-     * @return ProjectsWrapper object with some of the field values set using the supplied parameters
+     * @return ProjectsWrapper object with some field values set using the supplied parameters
      * @throws BadRequestException if page requested is invalid
      */
     public ProjectsWrapper usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)
