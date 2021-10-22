@@ -18,7 +18,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.PREVIOUS_RESULTS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.PROCESSING_TIME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SEARCH_STRING;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.SIZE;
-import static no.unit.nva.cristin.projects.UriUtils.getNvaProjectUriWithParams;
+import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithParams;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import static java.util.Arrays.asList;
+import static no.unit.nva.cristin.common.util.UriUtils.queryParameters;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
@@ -15,9 +16,8 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_P
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
-import static no.unit.nva.cristin.projects.UriUtils.getNvaProjectUriWithId;
-import static no.unit.nva.cristin.projects.UriUtils.getNvaProjectUriWithParams;
-import static no.unit.nva.cristin.projects.UriUtils.queryParameters;
+import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithId;
+import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithParams;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
