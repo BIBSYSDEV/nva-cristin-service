@@ -145,37 +145,16 @@ public class CristinProject {
         this.participants = participants;
     }
 
-    public Map<String, String> getAcademicSummary() {
-        return nonEmptyOrDefault(academicSummary);
-    }
-
-    public void setAcademicSummary(Map<String, String> academicSummary) {
-        this.academicSummary = academicSummary;
-    }
-
-    public Map<String, String> getPopularScientificSummary() {
-        return nonEmptyOrDefault(popularScientificSummary);
-    }
-
-    public void setPopularScientificSummary(Map<String, String> popularScientificSummary) {
-        this.popularScientificSummary = popularScientificSummary;
-    }
-
+    /**
+     * Verifies CristinProject has enough data to be considered as valid.
+     * @return project has enough data to be considered valid
+     */
     public boolean hasValidContent() {
         return StringUtils.isNotBlank(cristinProjectId)
-                && title != null && !title.isEmpty() && hasLegalStatus();
+                && !getTitle().isEmpty()
+                && ProjectStatus.isValidStatus(status);
     }
 
-    private boolean hasLegalStatus() {
-        try {
-            ProjectStatus.lookup(status);
-        } catch (IllegalArgumentException ignored) {
-            return false;
-        }
-        return true;
-    }
-
-    @JsonIgnore
     public NvaProject toNvaProject() {
         return new NvaProjectBuilder(this).build();
     }

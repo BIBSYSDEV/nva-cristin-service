@@ -34,7 +34,7 @@ public class CristinApiClientTest {
     public static final String EXAMPLE_TITLE = "Example Title";
     private final Set<String> ids = Set.of("123", "456", "789");
 
-    CristinApiClient cristinApiClient = new CristinApiClient();
+    final CristinApiClient cristinApiClient = new CristinApiClient();
 
     @Test
     void getsCristinUriWithTitleParamWhenCallingUriBuilderWithTitleQueryRequested() throws Exception {
