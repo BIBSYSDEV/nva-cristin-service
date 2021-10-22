@@ -34,4 +34,5 @@ public class JsonPropertyNames {
     public static final String ACADEMIC_SUMMARY = "academic_summary";
     public static final String POPULAR_SCIENTIFIC_SUMMARY = "popular_scientific_summary";
 
+
 }

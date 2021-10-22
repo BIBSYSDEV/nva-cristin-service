@@ -1,13 +1,11 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import no.unit.nva.cristin.projects.NvaProjectBuilder;
 import no.unit.nva.cristin.projects.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import nva.commons.core.JacocoGenerated;
 import nva.commons.core.StringUtils;
 
 import java.time.Instant;
@@ -19,7 +17,6 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.POPULAR_SCIENTIFIC_
 import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused"})
-@JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinProject {
 
@@ -144,6 +141,23 @@ public class CristinProject {
     public void setParticipants(List<CristinPerson> participants) {
         this.participants = participants;
     }
+
+    public Map<String, String> getAcademicSummary() {
+        return nonEmptyOrDefault(academicSummary);
+    }
+
+    public void setAcademicSummary(Map<String, String> academicSummary) {
+        this.academicSummary = academicSummary;
+    }
+
+    public Map<String, String> getPopularScientificSummary() {
+        return nonEmptyOrDefault(popularScientificSummary);
+    }
+
+    public void setPopularScientificSummary(Map<String, String> popularScientificSummary) {
+        this.popularScientificSummary = popularScientificSummary;
+    }
+
 
     /**
      * Verifies CristinProject has enough data to be considered as valid.

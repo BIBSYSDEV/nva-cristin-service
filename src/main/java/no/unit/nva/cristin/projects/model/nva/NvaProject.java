@@ -28,11 +28,16 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
+import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_POPULAR_SCIENTIFIC_SUMMARY;
 
 @JsonInclude(ALWAYS)
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
-        FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS, "academicSummary", "popularScientificSummary" })
+        FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS, NVA_ACADEMIC_SUMMARY, NVA_POPULAR_SCIENTIFIC_SUMMARY})
 public class NvaProject {
+
+    public static final String NVA_ACADEMIC_SUMMARY = "academicSummary";
+    public static final String NVA_POPULAR_SCIENTIFIC_SUMMARY = "popularScientificSummary";
 
     @JsonProperty(CONTEXT)
     @JsonInclude(NON_NULL)
