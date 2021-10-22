@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.model.nva;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import no.unit.nva.cristin.projects.ProjectStatus;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.URI;
@@ -23,15 +24,14 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.START_DATE;
+import static no.unit.nva.cristin.projects.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
 
-@SuppressWarnings("unused")
-@JacocoGenerated
 @JsonInclude(ALWAYS)
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
-        FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS})
+        FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS})
 public class NvaProject {
 
     @JsonProperty(CONTEXT)
@@ -61,6 +61,8 @@ public class NvaProject {
     private NvaOrganization coordinatingInstitution;
     @JsonProperty
     private List<NvaContributor> contributors;
+    @JsonProperty
+    private ProjectStatus status;
 
     public String getContext() {
         return context;
@@ -157,6 +159,15 @@ public class NvaProject {
     public void setContributors(List<NvaContributor> contributors) {
         this.contributors = contributors;
     }
+
+    public ProjectStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProjectStatus status) {
+        this.status = status;
+    }
+
 
     @JacocoGenerated
     @Override

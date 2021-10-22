@@ -1,9 +1,9 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import no.unit.nva.cristin.projects.NvaProjectBuilder;
+import no.unit.nva.cristin.projects.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.StringUtils;
@@ -137,13 +137,16 @@ public class CristinProject {
         this.participants = participants;
     }
 
-    @JsonIgnore
+    /**
+     * Verifies CristinProject has enough data to be considered as valid.
+     * @return project has enough data to be considered valid
+     */
     public boolean hasValidContent() {
         return StringUtils.isNotBlank(cristinProjectId)
-            && title != null && !title.isEmpty();
+                && !getTitle().isEmpty()
+                && ProjectStatus.isValidStatus(status);
     }
 
-    @JsonIgnore
     public NvaProject toNvaProject() {
         return new NvaProjectBuilder(this).build();
     }

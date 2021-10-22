@@ -77,7 +77,7 @@ public class NvaProjectBuilder {
         nvaProject.setFunding(extractFunding());
         nvaProject.setCoordinatingInstitution(extractCoordinatingInstitution());
         nvaProject.setContributors(extractContributors());
-
+        nvaProject.setStatus(extractProjectStatus());
         return nvaProject;
     }
 
@@ -130,4 +130,7 @@ public class NvaProjectBuilder {
         return this;
     }
 
+    private ProjectStatus extractProjectStatus() {
+        return ProjectStatus.lookup(cristinProject.getStatus());
+    }
 }

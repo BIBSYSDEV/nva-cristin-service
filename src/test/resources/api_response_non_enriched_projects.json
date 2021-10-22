@@ -24,7 +24,8 @@
       "endDate": null,
       "funding": [],
       "coordinatingInstitution": null,
-      "contributors": []
+      "contributors": [],
+      "status":"ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/999888",
@@ -46,7 +47,8 @@
       "endDate": null,
       "funding": [],
       "coordinatingInstitution": null,
-      "contributors": []
+      "contributors": [],
+      "status":"ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/111333",
@@ -68,7 +70,8 @@
       "endDate": null,
       "funding": [],
       "coordinatingInstitution": null,
-      "contributors": []
+      "contributors": [],
+      "status":"ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/222444",
@@ -86,7 +89,8 @@
       "endDate": null,
       "funding": [],
       "coordinatingInstitution": null,
-      "contributors": []
+      "contributors": [],
+      "status":"ACTIVE"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/project/444222",
@@ -104,7 +108,8 @@
       "endDate": null,
       "funding": [],
       "coordinatingInstitution": null,
-      "contributors": []
+      "contributors": [],
+      "status":"ACTIVE"
     }
   ]
 }
