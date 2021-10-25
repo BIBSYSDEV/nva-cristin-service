@@ -54,7 +54,7 @@ public class CristinApiClient {
 
     private static final int FIRST_NON_SUCCESS_CODE = 300;
 
-    private transient final HttpClient client;
+    private final transient HttpClient client;
 
     public CristinApiClient() {
         this(HttpClient.newHttpClient());
