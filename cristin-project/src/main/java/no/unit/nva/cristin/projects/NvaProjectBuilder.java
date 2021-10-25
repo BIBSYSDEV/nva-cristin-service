@@ -1,5 +1,12 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithId;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -11,15 +18,6 @@ import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
 import no.unit.nva.cristin.projects.model.nva.NvaPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.language.LanguageMapper;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static no.unit.nva.cristin.projects.UriUtils.getNvaProjectUriWithId;
 
 public class NvaProjectBuilder {
 

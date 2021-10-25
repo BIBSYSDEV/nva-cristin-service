@@ -1,20 +1,18 @@
 package no.unit.nva.cristin.projects.model.nva;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import no.unit.nva.cristin.projects.model.cristin.CristinInstitution;
-
-import java.net.URI;
-import java.util.Map;
-import java.util.Objects;
-
+import static no.unit.nva.cristin.common.util.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_BASE_URL;
 import static no.unit.nva.cristin.projects.Constants.INSTITUTION_PATH;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
-import static no.unit.nva.cristin.projects.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.net.URI;
+import java.util.Map;
+import java.util.Objects;
+import no.unit.nva.cristin.projects.model.cristin.CristinInstitution;
 
 @SuppressWarnings("unused")
 
