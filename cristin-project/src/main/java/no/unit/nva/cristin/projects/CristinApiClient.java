@@ -54,7 +54,15 @@ public class CristinApiClient {
 
     private static final int FIRST_NON_SUCCESS_CODE = 300;
 
-    private static final HttpClient client = HttpClient.newHttpClient();
+    private transient final HttpClient client;
+
+    public CristinApiClient() {
+        this(HttpClient.newHttpClient());
+    }
+
+    public CristinApiClient(HttpClient client) {
+        this.client = client;
+    }
 
     /**
      * Creates a NvaProject object containing a single transformed Cristin Project. Is used for serialization to the
@@ -238,15 +246,12 @@ public class CristinApiClient {
         return CristinQuery.fromIdAndLanguage(id, language);
     }
 
-    @JacocoGenerated
     protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
         return endRequestTime - startRequestTime;
     }
 
-    @JacocoGenerated
     protected HttpResponse<String> fetchGetResult(URI uri) {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
-
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
@@ -263,10 +268,8 @@ public class CristinApiClient {
         return new BadGatewayException(String.format(ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, id));
     }
 
-    @JacocoGenerated
     protected HttpResponse<String> fetchQueryResults(URI uri) {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
-
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 

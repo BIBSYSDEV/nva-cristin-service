@@ -1,10 +1,10 @@
 [versions]
 junit = {strictly = '5.8.1'}
-nva-commons = {strictly = '1.15.1'}
+nva-commons = {strictly = '1.16.0'}
 jackson = {strictly = '2.12.1'}
 mockito = {strictly = '3.11.2'}
 hamcrest = {strictly = '2.2'}
-nva-testutils = {strictly = '0.1.26'}
+nva-testutils = {strictly = '0.1.27'}
 zalando = {strictly = '0.25.0'}
 apache-commons = {strictly = '3.12.0'}
 javax-ws-rs = {strictly = '2.1.1'}

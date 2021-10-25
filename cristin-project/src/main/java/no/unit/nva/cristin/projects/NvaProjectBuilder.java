@@ -76,6 +76,8 @@ public class NvaProjectBuilder {
         nvaProject.setCoordinatingInstitution(extractCoordinatingInstitution());
         nvaProject.setContributors(extractContributors());
         nvaProject.setStatus(extractProjectStatus());
+        nvaProject.setAcademicSummary(cristinProject.getAcademicSummary());
+        nvaProject.setPopularScientificSummary(cristinProject.getPopularScientificSummary());
         return nvaProject;
     }
 

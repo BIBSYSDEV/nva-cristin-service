@@ -51,5 +51,9 @@
       }
     }
   ],
-  "status":"ACTIVE"
+  "status":"ACTIVE",
+  "academicSummary": { },
+  "popularScientificSummary": {
+    "en": "<p>Some popular scientific summary</p>\r\n"
+  }
 }

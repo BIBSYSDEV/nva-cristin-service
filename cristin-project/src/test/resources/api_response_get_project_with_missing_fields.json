@@ -28,5 +28,8 @@
   ],
   "coordinatingInstitution": null,
   "contributors": [],
-  "status":"ACTIVE"
+  "status":"ACTIVE",
+  "popularScientificSummary": {
+    "en": "<p>Some popular scientific summary</p>\r\n"
+  }
 }
