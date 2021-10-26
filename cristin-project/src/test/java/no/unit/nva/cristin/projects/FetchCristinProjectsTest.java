@@ -53,7 +53,6 @@ import javax.ws.rs.core.HttpHeaders;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.projects.Constants.QueryType;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.nva.ProjectSearchResponse;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -320,8 +319,8 @@ public class FetchCristinProjectsTest {
             NUMBER_OF_RESULTS, perPage
         ));
         handler.handleRequest(input, output, context);
-        GatewayResponse<ProjectSearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
-        Integer actual = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), ProjectSearchResponse.class)
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        Integer actual = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
             .getFirstRecord();
         assertEquals(expected, actual);
     }
@@ -427,15 +426,15 @@ public class FetchCristinProjectsTest {
             NUMBER_OF_RESULTS, perPage
         ));
         handler.handleRequest(input, output, context);
-        GatewayResponse<ProjectSearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         String actualNext =
-            Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), ProjectSearchResponse.class)
+            Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
                 .getNextResults()).orElse(new URI(EMPTY_STRING)).toString();
         assertEquals(expectedNext, actualNext);
 
         String actualPrevious =
-            Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), ProjectSearchResponse.class)
+            Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
                 .getPreviousResults()).orElse(new URI(EMPTY_STRING)).toString();
         assertEquals(expectedPrevious, actualPrevious);
     }
@@ -497,9 +496,9 @@ public class FetchCristinProjectsTest {
 
         InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE));
         handler.handleRequest(input, output, context);
-        GatewayResponse<ProjectSearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
-        SearchResponse actual = gatewayResponse.getBodyObject(ProjectSearchResponse.class);
+        SearchResponse actual = gatewayResponse.getBodyObject(SearchResponse.class);
         assertEquals(5, actual.getHits().size());
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MediaType.JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));

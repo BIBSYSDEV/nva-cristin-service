@@ -40,7 +40,6 @@ import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.projects.Constants.QueryType;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.cristin.projects.model.nva.ProjectSearchResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
@@ -109,11 +108,11 @@ public class CristinApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        ProjectSearchResponse searchResponse = new ProjectSearchResponse();
+        SearchResponse searchResponse = new SearchResponse();
         searchResponse.withContext(Constants.PROJECT_SEARCH_CONTEXT_URL)
             .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
             .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
-        searchResponse.withHits(nvaProjects);
+        searchResponse.setHits(nvaProjects);
 
         return searchResponse;
 
