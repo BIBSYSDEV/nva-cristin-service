@@ -23,7 +23,7 @@ import nva.commons.core.JacocoGenerated;
     JsonPropertyNames.PROCESSING_TIME, JsonPropertyNames.FIRST_RECORD, JsonPropertyNames.NEXT_RESULTS,
     JsonPropertyNames.PREVIOUS_RESULTS,
     JsonPropertyNames.HITS})
-public abstract class SearchResponse {
+public class SearchResponse {
 
     @JsonIgnore
     public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
@@ -45,6 +45,9 @@ public abstract class SearchResponse {
     private URI nextResults;
     @JsonProperty
     private URI previousResults;
+
+    @JsonProperty
+    private List<?> hits;
 
     public String getContext() {
         return context;
@@ -107,7 +110,13 @@ public abstract class SearchResponse {
         this.previousResults = previousResults;
     }
 
-    public abstract List getHits();
+    public List<?> getHits() {
+        return hits;
+    }
+
+    public void setHits(List<?> hits) {
+        this.hits = hits;
+    }
 
     public SearchResponse withContext(String context) {
         this.context = context;
@@ -157,9 +166,8 @@ public abstract class SearchResponse {
         return currentPage > 1;
     }
 
-    public SearchResponse withProcessingTime(Long processingTime) {
+    public void withProcessingTime(Long processingTime) {
         this.processingTime = processingTime;
-        return this;
     }
 
     private boolean matchesCriteriaForNextRel(Map<String, String> queryParams) {
@@ -182,9 +190,4 @@ public abstract class SearchResponse {
     private int getSizeHeader(HttpHeaders headers) {
         return (int) headers.firstValueAsLong(Constants.X_TOTAL_COUNT).orElse(0);
     }
-
-    /*public SearchResponse withHits(List hits) {
-        this.hits = hits;
-        return this;
-    }*/
 }
