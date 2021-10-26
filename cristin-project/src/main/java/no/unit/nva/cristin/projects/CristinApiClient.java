@@ -108,20 +108,11 @@ public class CristinApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        SearchResponse searchResponse = new SearchResponse();
-        searchResponse.withContext(Constants.PROJECT_SEARCH_CONTEXT_URL)
-            .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
-            .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
-        searchResponse.setHits(nvaProjects);
-
-        return searchResponse;
-
-
-        /*return new ProjectSearchResponse()
+        return new SearchResponse()
             .withContext(Constants.PROJECT_SEARCH_CONTEXT_URL)
             .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
             .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
-            .withHits(nvaProjects);*/
+            .withHits(nvaProjects);
     }
 
     protected static <T> T fromJson(String body, Class<T> classOfT) throws IOException {

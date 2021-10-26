@@ -45,7 +45,6 @@ public class SearchResponse {
     private URI nextResults;
     @JsonProperty
     private URI previousResults;
-
     @JsonProperty
     private List<?> hits;
 
@@ -123,6 +122,16 @@ public class SearchResponse {
         return this;
     }
 
+    public SearchResponse withProcessingTime(Long processingTime) {
+        this.processingTime = processingTime;
+        return this;
+    }
+
+    public SearchResponse withHits(List<?> hits) {
+        this.hits = hits;
+        return this;
+    }
+
     /**
      * Assigns value to some field values using supplied headers and query parameters.
      *
@@ -164,10 +173,6 @@ public class SearchResponse {
 
     private boolean matchesCriteriaForPrevRel(int currentPage) {
         return currentPage > 1;
-    }
-
-    public void withProcessingTime(Long processingTime) {
-        this.processingTime = processingTime;
     }
 
     private boolean matchesCriteriaForNextRel(Map<String, String> queryParams) {
