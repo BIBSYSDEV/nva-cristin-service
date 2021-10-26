@@ -8,5 +8,4 @@ public class Constants {
     public static final String LINK = "link";
     public static final String REL_NEXT = "rel=\"next\"";
     public static final String REL_PREV = "rel=\"prev\"";
-    public static final String HTTPS = "https";
 }
