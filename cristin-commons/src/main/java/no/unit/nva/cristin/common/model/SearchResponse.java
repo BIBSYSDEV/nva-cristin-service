@@ -1,24 +1,6 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.common.model;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
-import static no.unit.nva.cristin.projects.Constants.LINK;
-import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.projects.Constants.PAGE;
-import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
-import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
-import static no.unit.nva.cristin.projects.Constants.REL_PREV;
-import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_RECORD;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.HITS;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.NEXT_RESULTS;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.PREVIOUS_RESULTS;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.PROCESSING_TIME;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.SEARCH_STRING;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.SIZE;
-import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithParams;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -29,22 +11,28 @@ import java.net.http.HttpHeaders;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.common.util.UriUtils;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
 @JsonInclude(ALWAYS)
-@JsonPropertyOrder({CONTEXT, ID, SIZE, SEARCH_STRING, PROCESSING_TIME, FIRST_RECORD, NEXT_RESULTS, PREVIOUS_RESULTS,
-    HITS})
-public class ProjectsWrapper {
+@JsonPropertyOrder({
+    JsonPropertyNames.CONTEXT, JsonPropertyNames.ID, JsonPropertyNames.SIZE, JsonPropertyNames.SEARCH_STRING,
+    JsonPropertyNames.PROCESSING_TIME, JsonPropertyNames.FIRST_RECORD, JsonPropertyNames.NEXT_RESULTS,
+    JsonPropertyNames.PREVIOUS_RESULTS,
+    JsonPropertyNames.HITS})
+public abstract class SearchResponse {
 
+    @JsonIgnore
+    public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
+        "Page requested is out of scope. Query contains %s results";
     @JsonIgnore
     public static final int FIRST_RECORD_ZERO_WHEN_NO_HITS = 0;
 
     @JsonProperty("@context")
-    private String context = PROJECT_SEARCH_CONTEXT_URL;
+    private String context;
     @JsonProperty
     private URI id;
     @JsonProperty
@@ -57,8 +45,6 @@ public class ProjectsWrapper {
     private URI nextResults;
     @JsonProperty
     private URI previousResults;
-    @JsonProperty
-    private List<NvaProject> hits;
 
     public String getContext() {
         return context;
@@ -121,12 +107,11 @@ public class ProjectsWrapper {
         this.previousResults = previousResults;
     }
 
-    public List<NvaProject> getHits() {
-        return hits;
-    }
+    public abstract List getHits();
 
-    public void setHits(List<NvaProject> hits) {
-        this.hits = hits;
+    public SearchResponse withContext(String context) {
+        this.context = context;
+        return this;
     }
 
     /**
@@ -137,27 +122,27 @@ public class ProjectsWrapper {
      * @return ProjectsWrapper object with some field values set using the supplied parameters
      * @throws BadRequestException if page requested is invalid
      */
-    public ProjectsWrapper usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)
+    public SearchResponse usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)
         throws BadRequestException {
 
         this.size = getSizeHeader(headers);
-        this.id = getNvaProjectUriWithParams(queryParams);
+        this.id = UriUtils.getNvaProjectUriWithParams(queryParams);
         this.firstRecord = this.size > 0 ? indexOfFirstEntryInPageCalculatedFromParams(queryParams) :
             FIRST_RECORD_ZERO_WHEN_NO_HITS;
 
-        int currentPage = Integer.parseInt(queryParams.get(PAGE));
+        int currentPage = Integer.parseInt(queryParams.get(Constants.PAGE));
 
         if (outOfScope(currentPage)) {
             throw new BadRequestException(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, this.size));
         }
 
-        String linkHeader = headers.firstValue(LINK).orElse(EMPTY_STRING);
+        String linkHeader = headers.firstValue(Constants.LINK).orElse(EMPTY_STRING);
 
-        if (linkHeader.contains(REL_NEXT) && matchesCriteriaForNextRel(queryParams)) {
+        if (linkHeader.contains(Constants.REL_NEXT) && matchesCriteriaForNextRel(queryParams)) {
             this.nextResults = generateIdUriWithPageFromParams(currentPage + 1, queryParams);
         }
 
-        if (linkHeader.contains(REL_PREV) && matchesCriteriaForPrevRel(currentPage)) {
+        if (linkHeader.contains(Constants.REL_PREV) && matchesCriteriaForPrevRel(currentPage)) {
             this.previousResults = generateIdUriWithPageFromParams(currentPage - 1, queryParams);
         }
 
@@ -172,34 +157,34 @@ public class ProjectsWrapper {
         return currentPage > 1;
     }
 
+    public SearchResponse withProcessingTime(Long processingTime) {
+        this.processingTime = processingTime;
+        return this;
+    }
+
     private boolean matchesCriteriaForNextRel(Map<String, String> queryParams) {
-        return this.size >= this.firstRecord + Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS));
+        return this.size >= this.firstRecord + Integer.parseInt(queryParams.get(Constants.NUMBER_OF_RESULTS));
     }
 
     private URI generateIdUriWithPageFromParams(int newPage, Map<String, String> queryParams) {
         Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
-        newParams.put(PAGE, String.valueOf(newPage));
-        return getNvaProjectUriWithParams(newParams);
+        newParams.put(Constants.PAGE, String.valueOf(newPage));
+        return UriUtils.getNvaProjectUriWithParams(newParams);
     }
 
     private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {
-        int page = Integer.parseInt(queryParams.get(PAGE));
-        int numberOfResults = Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS));
+        int page = Integer.parseInt(queryParams.get(Constants.PAGE));
+        int numberOfResults = Integer.parseInt(queryParams.get(Constants.NUMBER_OF_RESULTS));
 
         return (page - 1) * numberOfResults + 1;
     }
 
     private int getSizeHeader(HttpHeaders headers) {
-        return (int) headers.firstValueAsLong(X_TOTAL_COUNT).orElse(0);
+        return (int) headers.firstValueAsLong(Constants.X_TOTAL_COUNT).orElse(0);
     }
 
-    public ProjectsWrapper withProcessingTime(Long processingTime) {
-        this.processingTime = processingTime;
-        return this;
-    }
-
-    public ProjectsWrapper withHits(List<NvaProject> hits) {
+    /*public SearchResponse withHits(List hits) {
         this.hits = hits;
         return this;
-    }
+    }*/
 }

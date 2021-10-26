@@ -1,6 +1,8 @@
 package no.unit.nva.cristin.common.util;
 
+import static no.unit.nva.cristin.common.model.Constants.HTTPS;
 import static nva.commons.core.attempt.Try.attempt;
+import static nva.commons.core.paths.UriWrapper.EMPTY_FRAGMENT;
 import java.net.URI;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,5 +43,10 @@ public class UriUtils {
             .sorted(Entry.comparingByKey())
             .map(entry -> String.format(PARAMETER_KEY_VALUE_PAIR_TEMPLATE, entry.getKey(), entry.getValue()))
             .collect(Collectors.joining(PARAMETER_DELIMITER));
+    }
+
+    public static URI getNvaProjectUriWithParams(Map<String, String> parameters) {
+        return attempt(() -> new URI(HTTPS, "api.dev.nva.aws.unit.no", SLASH_DELIMITER + "project" + SLASH_DELIMITER,
+            queryParameters(parameters), EMPTY_FRAGMENT)).orElseThrow();
     }
 }
