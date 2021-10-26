@@ -1,6 +1,12 @@
 package no.unit.nva.cristin.common.model;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
+import static no.unit.nva.cristin.common.model.Constants.LINK;
+import static no.unit.nva.cristin.common.model.Constants.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.common.model.Constants.PAGE;
+import static no.unit.nva.cristin.common.model.Constants.REL_NEXT;
+import static no.unit.nva.cristin.common.model.Constants.REL_PREV;
+import static no.unit.nva.cristin.common.model.Constants.X_TOTAL_COUNT;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -154,19 +160,19 @@ public class SearchResponse {
         this.firstRecord = this.size > 0 ? indexOfFirstEntryInPageCalculatedFromParams(queryParams) :
             FIRST_RECORD_ZERO_WHEN_NO_HITS;
 
-        int currentPage = Integer.parseInt(queryParams.get(Constants.PAGE));
+        int currentPage = Integer.parseInt(queryParams.get(PAGE));
 
         if (outOfScope(currentPage)) {
             throw new BadRequestException(String.format(ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, this.size));
         }
 
-        String linkHeader = headers.firstValue(Constants.LINK).orElse(EMPTY_STRING);
+        String linkHeader = headers.firstValue(LINK).orElse(EMPTY_STRING);
 
-        if (linkHeader.contains(Constants.REL_NEXT) && matchesCriteriaForNextRel(queryParams)) {
+        if (linkHeader.contains(REL_NEXT) && matchesCriteriaForNextRel(queryParams)) {
             this.nextResults = generateIdUriWithPageFromParams(currentPage + 1, queryParams);
         }
 
-        if (linkHeader.contains(Constants.REL_PREV) && matchesCriteriaForPrevRel(currentPage)) {
+        if (linkHeader.contains(REL_PREV) && matchesCriteriaForPrevRel(currentPage)) {
             this.previousResults = generateIdUriWithPageFromParams(currentPage - 1, queryParams);
         }
 
@@ -182,23 +188,23 @@ public class SearchResponse {
     }
 
     private boolean matchesCriteriaForNextRel(Map<String, String> queryParams) {
-        return this.size >= this.firstRecord + Integer.parseInt(queryParams.get(Constants.NUMBER_OF_RESULTS));
+        return this.size >= this.firstRecord + Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS));
     }
 
     private URI generateIdUriWithPageFromParams(int newPage, Map<String, String> queryParams) {
         Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
-        newParams.put(Constants.PAGE, String.valueOf(newPage));
+        newParams.put(PAGE, String.valueOf(newPage));
         return UriUtils.getUriFromOtherUriUsingNewParams(id, newParams);
     }
 
     private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {
-        int page = Integer.parseInt(queryParams.get(Constants.PAGE));
-        int numberOfResults = Integer.parseInt(queryParams.get(Constants.NUMBER_OF_RESULTS));
+        int page = Integer.parseInt(queryParams.get(PAGE));
+        int numberOfResults = Integer.parseInt(queryParams.get(NUMBER_OF_RESULTS));
 
         return (page - 1) * numberOfResults + 1;
     }
 
     private int getSizeHeader(HttpHeaders headers) {
-        return (int) headers.firstValueAsLong(Constants.X_TOTAL_COUNT).orElse(0);
+        return (int) headers.firstValueAsLong(X_TOTAL_COUNT).orElse(0);
     }
 }

@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.QUERY;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_GRANT_ID;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_TITLE;
@@ -109,7 +110,7 @@ public class CristinApiClient {
         long endRequestTime = System.currentTimeMillis();
 
         return new SearchResponse(getNvaProjectUriWithParams(requestQueryParams))
-            .withContext(Constants.PROJECT_SEARCH_CONTEXT_URL)
+            .withContext(PROJECT_SEARCH_CONTEXT_URL)
             .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
             .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
             .withHits(nvaProjects);

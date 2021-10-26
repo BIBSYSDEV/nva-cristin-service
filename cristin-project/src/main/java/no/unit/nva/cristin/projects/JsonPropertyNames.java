@@ -23,13 +23,6 @@ public class JsonPropertyNames {
     public static final String AFFILIATION = "affiliation";
     public static final String FIRST_NAME = "firstName";
     public static final String LAST_NAME = "lastName";
-    public static final String SIZE = "size";
-    public static final String SEARCH_STRING = "searchString";
-    public static final String PROCESSING_TIME = "processingTime";
-    public static final String FIRST_RECORD = "firstRecord";
-    public static final String NEXT_RESULTS = "nextResults";
-    public static final String PREVIOUS_RESULTS = "previousResults";
-    public static final String HITS = "hits";
     public static final String STATUS = "status";
     public static final String ACADEMIC_SUMMARY = "academic_summary";
     public static final String POPULAR_SCIENTIFIC_SUMMARY = "popular_scientific_summary";
