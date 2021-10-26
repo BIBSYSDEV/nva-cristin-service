@@ -293,6 +293,21 @@ components:
                     description: Last name
               affiliation:
                 $ref: '#/components/schemas/Organization'
+        status:
+          type: string
+          enum:
+            - NOTSTARTED
+            - ACTIVE
+            - CONCLUDED
+          description: Project status, based on start_date and end_date.
+        academicSummary:
+          type: string
+          description: Summary intended for an academic audience
+          $ref: '#/components/schemas/Languages'
+        popularScientificSummary:
+          type: String
+          description: Summary intended for not so academic audience
+          $ref: '#/components/schemas/Languages'
     Problem:
       type: object
       properties:
@@ -389,6 +404,13 @@ components:
               - 'nb': 'Eksempel på tittel'
             startDate: '2012-01-09T00:00:00Z'
             endDate: '2017-12-31T00:00:00Z'
+            funding:
+              type: 'Funding'
+              source:
+                type: "FundingSource"
+                names:
+                  nb: "Egen institusjon"
+                code: "EI"
             coordinatingInstitution:
               id: 'https://api.cristin.no/v2/institutions/215'
               type: 'Organization'
@@ -417,6 +439,11 @@ components:
                   type: 'Organization'
                   name:
                     'nb': 'OsloMet - storbyuniversitetet'
+            status: CONCLUDED
+            academicSummary:
+              no: "Jeg arbeider med å skrive en bok, med foreløpig tittel, Digitale bilder. "
+            popularScientificSummary:
+              no: "<p>FoU-prosjektet skal fremme forskningsbasert undervisning i digitale medier knyttet til Faglærerutdanningen i formgiving, kunst og håndverk på Institutt for estetiske fag."
     ProjectExample:
       value:
         '@context': 'https://example.org/project-context.json'
@@ -431,6 +458,13 @@ components:
           - 'nb': 'Eksempel på tittel'
         startDate: '2012-01-09T00:00:00Z'
         endDate: '2017-12-31T00:00:00Z'
+        funding:
+          type: 'Funding'
+          source:
+            type: "FundingSource"
+            names:
+              nb: "Egen institusjon"
+            code: "EI"
         coordinatingInstitution:
           id: 'https://api.cristin.no/v2/institutions/215'
           type: 'Organization'
@@ -459,3 +493,8 @@ components:
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
+            status: CONCLUDED
+            academicSummary:
+              en: "Summary in an academic manner"
+            popularScientificSummary:
+              en: "popularScientificSummary popularScientificSummary popularScientificSummary"
