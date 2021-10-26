@@ -108,7 +108,7 @@ public class CristinApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        return new SearchResponse()
+        return new SearchResponse(getNvaProjectUriWithParams(requestQueryParams))
             .withContext(Constants.PROJECT_SEARCH_CONTEXT_URL)
             .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
             .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))

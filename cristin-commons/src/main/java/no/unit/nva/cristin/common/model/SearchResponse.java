@@ -21,8 +21,7 @@ import nva.commons.core.JacocoGenerated;
 @JsonPropertyOrder({
     JsonPropertyNames.CONTEXT, JsonPropertyNames.ID, JsonPropertyNames.SIZE, JsonPropertyNames.SEARCH_STRING,
     JsonPropertyNames.PROCESSING_TIME, JsonPropertyNames.FIRST_RECORD, JsonPropertyNames.NEXT_RESULTS,
-    JsonPropertyNames.PREVIOUS_RESULTS,
-    JsonPropertyNames.HITS})
+    JsonPropertyNames.PREVIOUS_RESULTS, JsonPropertyNames.HITS})
 public class SearchResponse {
 
     @JsonIgnore
@@ -47,6 +46,14 @@ public class SearchResponse {
     private URI previousResults;
     @JsonProperty
     private List<?> hits;
+
+    public SearchResponse() {
+
+    }
+
+    public SearchResponse(URI id) {
+        this.id = id;
+    }
 
     public String getContext() {
         return context;
@@ -144,7 +151,6 @@ public class SearchResponse {
         throws BadRequestException {
 
         this.size = getSizeHeader(headers);
-        this.id = UriUtils.getNvaProjectUriWithParams(queryParams);
         this.firstRecord = this.size > 0 ? indexOfFirstEntryInPageCalculatedFromParams(queryParams) :
             FIRST_RECORD_ZERO_WHEN_NO_HITS;
 
@@ -182,7 +188,7 @@ public class SearchResponse {
     private URI generateIdUriWithPageFromParams(int newPage, Map<String, String> queryParams) {
         Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
         newParams.put(Constants.PAGE, String.valueOf(newPage));
-        return UriUtils.getNvaProjectUriWithParams(newParams);
+        return UriUtils.getUriFromOtherUriUsingNewParams(id, newParams);
     }
 
     private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {

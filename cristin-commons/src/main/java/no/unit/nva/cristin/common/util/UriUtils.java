@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.common.util;
 
-import static no.unit.nva.cristin.common.model.Constants.HTTPS;
 import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.paths.UriWrapper.EMPTY_FRAGMENT;
 import java.net.URI;
@@ -45,8 +44,16 @@ public class UriUtils {
             .collect(Collectors.joining(PARAMETER_DELIMITER));
     }
 
-    public static URI getNvaProjectUriWithParams(Map<String, String> parameters) {
-        return attempt(() -> new URI(HTTPS, "api.dev.nva.aws.unit.no", SLASH_DELIMITER + "project" + SLASH_DELIMITER,
-            queryParameters(parameters), EMPTY_FRAGMENT)).orElseThrow();
+    /**
+     * Creates a new URI from another URI using new query parameters.
+     *
+     * @param uri         The uri to be transformed
+     * @param queryParams The query params
+     * @return a URI from another URI but with new query parameters
+     */
+    public static URI getUriFromOtherUriUsingNewParams(URI uri, Map<String, String> queryParams) {
+        return attempt(() ->
+            new URI(uri.getScheme(), uri.getHost(), uri.getPath(), queryParameters(queryParams), EMPTY_FRAGMENT))
+            .orElseThrow();
     }
 }
