@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.QUERY;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_GRANT_ID;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_TITLE;
@@ -36,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.projects.Constants.QueryType;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -92,7 +94,7 @@ public class CristinApiClient {
      * @return a ProjectsWrapper filled with transformed Cristin Projects and metadata
      * @throws ApiGatewayException if some error happen we should return this to client
      */
-    public ProjectsWrapper queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
+    public SearchResponse queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
         Map<String, String> requestQueryParams) throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
@@ -107,7 +109,8 @@ public class CristinApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        return new ProjectsWrapper()
+        return new SearchResponse(getNvaProjectUriWithParams(requestQueryParams))
+            .withContext(PROJECT_SEARCH_CONTEXT_URL)
             .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
             .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
             .withHits(nvaProjects);
