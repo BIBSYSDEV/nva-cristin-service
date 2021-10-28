@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: NVA Project API
+  title: NVA Cristin Proxy API
   description: >
-    The NVA Project API.
+    The NVA Cristin Proxy API.
 
       This API provides transformed project data from projects stored in [Cristin](https://api.cristin.no/v2).
 
@@ -20,12 +20,12 @@ externalDocs:
   description: Find out more about NVA
   url: https://nva.unit.no
 servers:
-  - url: https://api.nva.unit.no/project
-  - url: https://api.dev.nva.aws.unit.no/project
-  - url: https://api.sandbox.nva.aws.unit.no/project
-  - url: https://api.test.nva.aws.unit.no/project
+  - url: https://api.nva.unit.no/cristin
+  - url: https://api.dev.nva.aws.unit.no/cristin
+  - url: https://api.sandbox.nva.aws.unit.no/cristin
+  - url: https://api.test.nva.aws.unit.no/cristin
 paths:
-  /:
+  /project:
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -94,7 +94,7 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
-  /{id}:
+  /project/{id}:
     get:
       x-amazon-apigateway-integration:
         uri:
