@@ -3,18 +3,13 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Template creates lambda, api-gateway and custom domain mapping for fetching project data
 
-Metadata:
-  AWS::ServerlessRepo::Application:
-    Name: Projects
-    Description: Fetching project data from the Cristin API
-    Author: Unit
-    SpdxLicenseId: MIT
-    LicenseUrl: LICENSE
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 20
+    Architectures:
+      - arm64
     Environment:
       Variables:
         ALLOWED_ORIGIN: '*'
@@ -35,7 +30,7 @@ Parameters:
   CustomDomainBasePath:
     Type: String
     Description: Base path mapping in CustomDomain
-    Default: 'project'
+    Default: 'cristin'
   CristinApiHost:
     Type: String
     Description: Hostname for Cristin API
@@ -46,14 +41,14 @@ Resources:
   ApiAccessLogGroup:
     Type: AWS::Logs::LogGroup
 
-  NvaCristinProjectsFunctionApi:
+  NvaCristinProxyApi:
     Type: AWS::Serverless::Api
     Properties:
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
           Parameters:
-            Location: ./docs/projects-swagger.yaml
+            Location: ./docs/cristin-proxy-swagger.yaml
       AccessLogSetting:
         DestinationArn: !GetAtt ApiAccessLogGroup.Arn
         Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
@@ -74,8 +69,8 @@ Resources:
         NvaCristinProjectsEvent:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            RestApiId: !Ref NvaCristinProjectsFunctionApi
-            Path: /
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /project/
             Method: get
             RequestParameters:
               - method.request.querystring.language
@@ -94,8 +89,8 @@ Resources:
         NvaCristinOneProjectEvent:
           Type: Api
           Properties:
-            RestApiId: !Ref NvaCristinProjectsFunctionApi
-            Path: /{id}
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /project/{id}
             Method: get
             RequestParameters:
               - method.request.querystring.language
@@ -105,6 +100,6 @@ Resources:
     Properties:
       BasePath: !Ref CustomDomainBasePath
       DomainName: !Ref CustomDomain
-      RestApiId: !Ref NvaCristinProjectsFunctionApi
-      Stage: !Ref NvaCristinProjectsFunctionApi.Stage
+      RestApiId: !Ref NvaCristinProxyApi
+      Stage: !Ref NvaCristinProxyApi.Stage
 

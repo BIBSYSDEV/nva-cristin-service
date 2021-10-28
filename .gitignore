@@ -286,3 +286,4 @@ gradle-app.setting
 # AWS Build folder
 .aws-sam
 
+/samconfig.toml
