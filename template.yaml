@@ -41,7 +41,7 @@ Resources:
   ApiAccessLogGroup:
     Type: AWS::Logs::LogGroup
 
-  NvaCristinProxyFunctionApi:
+  NvaCristinProxyApi:
     Type: AWS::Serverless::Api
     Properties:
       DefinitionBody:
@@ -69,7 +69,7 @@ Resources:
         NvaCristinProjectsEvent:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            RestApiId: !Ref NvaCristinProxyFunctionApi
+            RestApiId: !Ref NvaCristinProxyApi
             Path: /project/
             Method: get
             RequestParameters:
@@ -89,7 +89,7 @@ Resources:
         NvaCristinOneProjectEvent:
           Type: Api
           Properties:
-            RestApiId: !Ref NvaCristinProxyFunctionApi
+            RestApiId: !Ref NvaCristinProxyApi
             Path: /project/{id}
             Method: get
             RequestParameters:
@@ -100,6 +100,6 @@ Resources:
     Properties:
       BasePath: !Ref CustomDomainBasePath
       DomainName: !Ref CustomDomain
-      RestApiId: !Ref NvaCristinProxyFunctionApi
-      Stage: !Ref NvaCristinProxyFunctionApi.Stage
+      RestApiId: !Ref NvaCristinProxyApi
+      Stage: !Ref NvaCristinProxyApi.Stage
 
