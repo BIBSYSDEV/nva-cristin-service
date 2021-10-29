@@ -12,14 +12,21 @@ import java.util.Map;
 
 public class ProjectUriUtils {
 
+    private static final String PROJECT = "project";
+
     public static URI getNvaProjectUriWithParams(Map<String, String> parameters) {
-        return attempt(() -> new URI(HTTPS, DOMAIN_NAME, SLASH_DELIMITER + BASE_PATH + SLASH_DELIMITER,
+        return attempt(() -> new URI(HTTPS, DOMAIN_NAME, getCommonPath(),
             queryParameters(parameters), EMPTY_FRAGMENT)).orElseThrow();
     }
 
     public static URI getNvaProjectUriWithId(String id) {
-        return attempt(() -> new URI(HTTPS, DOMAIN_NAME, SLASH_DELIMITER + BASE_PATH + SLASH_DELIMITER + id,
+        return attempt(() -> new URI(HTTPS, DOMAIN_NAME, getCommonPath() + id,
             EMPTY_FRAGMENT)).orElseThrow();
     }
+
+    private static String getCommonPath() {
+        return SLASH_DELIMITER + BASE_PATH + SLASH_DELIMITER + PROJECT + SLASH_DELIMITER;
+    }
+
 
 }
