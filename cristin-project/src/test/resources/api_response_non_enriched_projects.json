@@ -1,15 +1,15 @@
 {
   "@context": "https://bibsysdev.github.io/src/project-search-context.json",
-  "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer&results=5",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=1&query=reindeer&results=5",
   "size": 135,
   "searchString": "language=nb&page=1&query=reindeer&results=5",
   "processingTime": 1000,
   "firstRecord": 1,
-  "nextResults": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&query=reindeer&results=5",
+  "nextResults": "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=2&query=reindeer&results=5",
   "previousResults": null,
   "hits": [
     {
-      "id": "https://api.dev.nva.aws.unit.no/project/555666",
+      "id": "https://api.dev.nva.aws.unit.no/cristin/project/555666",
       "type": "Project",
       "identifiers": [
         {
@@ -30,7 +30,7 @@
       "popularScientificSummary": {}
     },
     {
-      "id": "https://api.dev.nva.aws.unit.no/project/999888",
+      "id": "https://api.dev.nva.aws.unit.no/cristin/project/999888",
       "type": "Project",
       "identifiers": [
         {
@@ -55,7 +55,7 @@
       "popularScientificSummary": {}
     },
     {
-      "id": "https://api.dev.nva.aws.unit.no/project/111333",
+      "id": "https://api.dev.nva.aws.unit.no/cristin/project/111333",
       "type": "Project",
       "identifiers": [
         {
@@ -80,7 +80,7 @@
       "popularScientificSummary": {}
     },
     {
-      "id": "https://api.dev.nva.aws.unit.no/project/222444",
+      "id": "https://api.dev.nva.aws.unit.no/cristin/project/222444",
       "type": "Project",
       "identifiers": [
         {
@@ -101,7 +101,7 @@
       "popularScientificSummary": {}
     },
     {
-      "id": "https://api.dev.nva.aws.unit.no/project/444222",
+      "id": "https://api.dev.nva.aws.unit.no/cristin/project/444222",
       "type": "Project",
       "identifiers": [
         {

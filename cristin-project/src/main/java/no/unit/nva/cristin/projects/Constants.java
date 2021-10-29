@@ -24,7 +24,7 @@ public class Constants {
     public static final String EMPTY_FRAGMENT = null;
     public static final String INSTITUTION_PATH = "institutions";
     public static final String PERSON_PATH = "persons";
-    public static final String BASE_PATH = ENVIRONMENT.readEnvOpt("BASE_PATH").orElse("project");
+    public static final String BASE_PATH = ENVIRONMENT.readEnvOpt("BASE_PATH").orElseThrow(); //.orElse("cristin/project");
     public static final String ID = "id";
     public static final String LANGUAGE = "language";
     public static final String DOMAIN_NAME = ENVIRONMENT.readEnvOpt("DOMAIN_NAME")

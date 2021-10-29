@@ -1,15 +1,15 @@
 {
   "@context": "https://bibsysdev.github.io/src/project-search-context.json",
-  "id": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer&results=5",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=1&query=reindeer&results=5",
   "size": 135,
   "searchString": "language=nb&page=1&query=reindeer&results=5",
   "processingTime": 1000,
   "firstRecord": 1,
-  "nextResults": "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&query=reindeer&results=5",
+  "nextResults": "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=2&query=reindeer&results=5",
   "previousResults": null,
   "hits": [
     {
-      "id": "https://api.dev.nva.aws.unit.no/project/456789",
+      "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
       "type": "Project",
       "identifiers": [
         {
@@ -67,7 +67,7 @@
       }
     },
     {
-      "id": "https://api.dev.nva.aws.unit.no/project/456789",
+      "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
       "type": "Project",
       "identifiers": [
         {
@@ -125,7 +125,7 @@
       }
     },
     {
-      "id": "https://api.dev.nva.aws.unit.no/project/456789",
+      "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
       "type": "Project",
       "identifiers": [
         {
@@ -183,7 +183,7 @@
       }
     },
     {
-      "id": "https://api.dev.nva.aws.unit.no/project/456789",
+      "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
       "type": "Project",
       "identifiers": [
         {
@@ -241,7 +241,7 @@
       }
     },
     {
-      "id": "https://api.dev.nva.aws.unit.no/project/456789",
+      "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
       "type": "Project",
       "identifiers": [
         {
