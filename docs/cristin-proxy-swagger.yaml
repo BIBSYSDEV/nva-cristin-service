@@ -167,7 +167,7 @@ paths:
       parameters:
         - name: query
           in: query
-          description: Search for organization with name
+          description: Search for organization by name
           required: false
           schema:
             type: string
