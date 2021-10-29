@@ -4,9 +4,9 @@ info:
   description: >
     The NVA Cristin Proxy API.
 
-      This API provides transformed project data from projects stored in [Cristin](https://api.cristin.no/v2).
+      This API provides transformed Cristin data stored in [Cristin](https://api.cristin.no/v2).
 
-      The data is reformatted as JSON-LD with a schema defined in the [search ontology REPLACE URL](https://bibsysdev.github.io/src/search-ontology.ttl) and the [project ontology REPLACE URL](https://bibsysdev.github.io/src/publication-channel-ontology.ttl).
+      The data is reformatted as JSON-LD with a schema defined in the [search ontology](https://bibsysdev.github.io/src/search-ontology.ttl), the [Organization ontology](https://bibsysdev.github.io/src/organization-ontology.ttl) and the [project ontology](https://bibsysdev.github.io/src/publication-channel-ontology.ttl).
 
       To understand the semantic layer, take a look at the @context URI returned by the API, the data is marked up according to this and may be interpreted directly to RDF using this.
   termsOfService: http://nva.unit.no/terms/
@@ -149,16 +149,129 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /organization:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinQueryOrganizationFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Organization
+      summary: List organizations matching query
+      description: Returns a list of organizations based on query parameters
+      operationId: ListOrganizations
+      produces:
+        - application/json
+        - application/ld+json
+      parameters:
+        - name: query
+          in: query
+          description: Search string. Either name search or id search
+          required: false
+          schema:
+            type: string
+            pattern: '.+'
+          example: 'Universitetet i Nesna'
+        - name: page
+          in: query
+          description: Current page requested
+          required: false
+          schema:
+            type: number
+            default: '1'
+          example: '3'
+        - name: results
+          in: query
+          description: Results per page
+          required: false
+          schema:
+            type: number
+            default: '10'
+          example: '10'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organizations'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/OrganizationsExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Organizations'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/OrganizationsExample'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+  /organization/{identifier}:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinGetOrganizationFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Organization
+      summary: Fetch Organization by identifier
+      description: Returns a single Organization matching identifier parameter
+      operationId: GetOrganizationByIdentifier
+      produces:
+        - application/json
+        - application/ld+json
+      parameters:
+        - name: identifier
+          in: path
+          description: Identifier of Organization to return
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9]+$'
+          example: '495216'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/OrganizationExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/OrganizationExample'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+
 components:
   responses:
     400:
-      description: Invalid parameters supplied
+      description: Bad Request
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
     404:
-      description: ID not found
+      description: Not found
       content:
         application/problem+json:
           schema:
@@ -308,6 +421,7 @@ components:
           type: String
           description: Summary intended for not so academic audience
           $ref: '#/components/schemas/Languages'
+
     Problem:
       type: object
       properties:
@@ -345,6 +459,41 @@ components:
       additionalProperties:
         type: string
         pattern: '.+'
+    Organizations:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of organizations returned by the query
+          items:
+            $ref: '#/components/schemas/Organization'
     Organization:
       type: object
       description: Affiliated organization
@@ -356,7 +505,21 @@ components:
           pattern: 'Organization'
           description: Always Organization
         name:
-          $ref: '#/components/schemas/Languages'
+          type: array
+          items:
+            $ref: '#/components/schemas/Languages'
+        acronym:
+          type: string
+          pattern: '.*'
+          description: 'Short mnemonic identifying Organization'
+        partOf:
+          description: List of Organizations this organization is part of
+          type: array
+          items:
+            type: object
+            properties:
+              organization:
+                $ref:  '#/components/schemas/Organization'
     Funding:
       type: object
       description: Funding
@@ -498,3 +661,30 @@ components:
               en: "Summary in an academic manner"
             popularScientificSummary:
               en: "popularScientificSummary popularScientificSummary popularScientificSummary"
+    OrganizationsExample:
+      value:
+        '@context': 'https://example.org/search-api-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/organization/?results=5&title=storby'
+        size: 150
+        searchString: 'language=nb&page=1&results=5&title=storby'
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/organization/?page=2&results=5&title=storby'
+        previousResults: ''
+        hits:
+          organization:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/359084'
+            type: 'Organization'
+            name:
+              'nb': 'OsloMet - storbyuniversitetet'
+              'en': 'Oslomet - Oslo Metropolitan University'
+            acronym: 'OSLOMET'
+    OrganizationExample:
+      value:
+        '@context': 'https://example.org/search-api-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/organization/359084'
+        type: 'Organization'
+        name:
+          'nb': 'OsloMet - storbyuniversitetet'
+          'en': 'Oslomet - Oslo Metropolitan University'
+        acronym: 'OSLOMET'
