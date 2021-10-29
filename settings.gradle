@@ -2,3 +2,4 @@ enableFeaturePreview('VERSION_CATALOGS')
 rootProject.name = 'nva-cristin-service'
 include 'cristin-commons'
 include 'cristin-project'
+include 'cristin-organization'
