@@ -28,7 +28,7 @@ paths:
           example: 'Ola Nordmann'
         - name: language
           in: query
-          description: Preferred language for some fields
+          description: Preferred language for fields that have language-based representations
           required: false
           schema:
             $ref: '#/components/schemas/LanguageParam'
@@ -80,7 +80,7 @@ paths:
       #type: "AWS_PROXY"
       tags:
         - Person
-      summary: Find person by ID
+      summary: Find person by identifier
       description: Returns a single person matching id parameter
       operationId: GetPersonById
       parameters:
@@ -94,7 +94,7 @@ paths:
           example: '495216'
         - name: language
           in: query
-          description: Preferred language for some fields
+          description: Preferred language for fields that have language-based representations
           required: false
           schema:
             $ref: '#/components/schemas/LanguageParam'
@@ -126,13 +126,13 @@ paths:
 components:
   responses:
     400:
-      description: Invalid parameters supplied
+      description: Bad Request
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
     404:
-      description: ID not found
+      description: Not Found
       content:
         application/problem+json:
           schema:
@@ -232,7 +232,7 @@ components:
           description: Phone number
         identifiedCristinPerson:
           type: boolean
-          description: Valid Cristin user (Has Feide / Employed at valid Cristin Institution)?
+          description: Person has verified identity in Cristin
         pictureUrl:
           $ref: '#/components/schemas/Id'
           #description: Url to picture of person
@@ -275,7 +275,7 @@ components:
     Id:
       type: string
       pattern: 'https:\/\/.*$'
-      description: The URI of the object ID
+      description: The URI of the resource
     Languages:
       type: object
       pattern: '^[a-z]{2}$'
