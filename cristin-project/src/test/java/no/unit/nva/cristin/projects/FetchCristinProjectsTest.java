@@ -79,9 +79,9 @@ public class FetchCristinProjectsTest {
     private static final String SECOND_PAGE = "2";
     private static final String TEN_RESULTS = "10";
     private static final String URI_WITH_PAGE_NUMBER_VALUE_OF_TWO =
-        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&query=reindeer&results=5";
+        "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=2&query=reindeer&results=5";
     private static final String URI_WITH_TEN_NUMBER_OF_RESULTS =
-        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer&results=10";
+        "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=1&query=reindeer&results=10";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
@@ -91,7 +91,7 @@ public class FetchCristinProjectsTest {
     public static final String GRANT_ID_EXAMPLE = "1234567";
     public static final String WHITESPACE = " ";
     public static final String URI_WITH_ESCAPED_WHITESPACE =
-        "https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&query=reindeer+reindeer&results=5";
+        "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=1&query=reindeer+reindeer&results=5";
     public static final String INVALID_QUERY_PARAM_KEY = "invalid";
     public static final String INVALID_QUERY_PARAM_VALUE = "value";
 
@@ -571,7 +571,7 @@ public class FetchCristinProjectsTest {
     }
 
     private static String exampleUriFromPageAndResults(String page, String results) {
-        String url = "https://api.dev.nva.aws.unit.no/project/?language=nb&page=%s&query=reindeer&results=%s";
+        String url = "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=%s&query=reindeer&results=%s";
         return String.format(url, page, results);
     }
 
