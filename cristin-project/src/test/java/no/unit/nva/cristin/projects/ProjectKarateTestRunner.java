@@ -2,7 +2,7 @@ package no.unit.nva.cristin.projects;
 
 import com.intuit.karate.junit5.Karate;
 
-class ProjectTestRunner {
+class ProjectKarateTestRunner {
 
     @Karate.Test
     Karate testProject() {
