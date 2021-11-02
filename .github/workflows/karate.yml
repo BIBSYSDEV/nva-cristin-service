@@ -20,7 +20,6 @@ jobs:
       - run: sam build --use-container
       # Prevent prompts and failure when the stack is unchanged
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
-        -
       # Run karate tests on deployed api
       - name: Run Karate tests with Gradle
       - run: ./gradlew test
