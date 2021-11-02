@@ -19,25 +19,3 @@ dependencies {
     implementation group: 'org.jacoco', name: 'org.jacoco.report', version: '0.8.7'
 }
 
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
-}
-test {
-    useJUnitPlatform()
-    systemProperty "karate.options", System.properties.getProperty("karate.options")
-    systemProperty "karate.env", System.properties.getProperty("karate.env")
-    outputs.upToDateWhen { false }
-
-    options {
-        systemProperties(System.getProperties())
-    }
-}
-
-task karateDebug(type: JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-}

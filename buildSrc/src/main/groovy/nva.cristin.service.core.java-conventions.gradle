@@ -24,6 +24,15 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+sourceSets {
+    test {
+        resources {
+            srcDir file('src/test/java')
+            exclude '**/*.java'
+        }
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
     failFast = true
