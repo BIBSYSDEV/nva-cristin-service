@@ -26,13 +26,6 @@ paths:
             type: string
             pattern: '.+'
           example: 'Ola Nordmann'
-        - name: language
-          in: query
-          description: Preferred language for fields that have language-based representations
-          required: false
-          schema:
-            $ref: '#/components/schemas/LanguageParam'
-          example: 'nb'
         - name: page
           in: query
           description: Current page requested
@@ -91,14 +84,7 @@ paths:
           schema:
             type: string
             pattern: '^[0-9]+$'
-          example: '495216'
-        - name: language
-          in: query
-          description: Preferred language for fields that have language-based representations
-          required: false
-          schema:
-            $ref: '#/components/schemas/LanguageParam'
-          example: 'nb'
+          example: '359084'
       responses:
         200:
           description: successful operation
@@ -204,46 +190,43 @@ components:
             properties:
               type:
                 type: string
-                pattern: 'CristinIdentifier'
-                description: Name of identifier, always CristinIdentifier
+                pattern: 'CristinIdentifier|ORCID'
+                description: Name of identifier
               value:
-                type: integer
-                format: int32
-                description: Cristin ID of person
-        firstName:
-          type: string
-          pattern: '.+'
-          description: First name of person
-        lastName:
-          type: string
-          pattern: '.+'
-          description: Last name of person
-        firstNamePreferred:
-          type: string
-          pattern: '.+'
-          description: Preferred first name of person
-        lastNamePreferred:
-          type: string
-          pattern: '.+'
-          description: Preferred last name of person
-        telephone:
-          type: string
-          #pattern: '.+'
-          description: Phone number
-        identifiedCristinPerson:
-          type: boolean
-          description: Person has verified identity in Cristin
-        pictureUrl:
+                type: string
+                pattern: '\d+|\d{4}-\d{4}-\d{4}-\d{4}'
+                description: Value of identifier
+        names:
+          type: array
+          description: Names for this person
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'PreferredFirstName|PreferredLastName|FirstName|LastName'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '.+'
+                description: Value of identifier
+        contactDetails:
+          type: object
+          description: Contact information
+          properties:
+            telephone:
+              type: string
+              pattern: '\+?\d+'
+            email:
+              type: string
+              pattern: '.+[@].+[.]\w+'
+        image:
           $ref: '#/components/schemas/Id'
-          #description: Url to picture of person
-        cristinProfileUrl:
-          $ref: '#/components/schemas/Id'
-          #description: Url to Cristin profile of person
         affiliations:
           type: array
           description: The list of person affiliations
           items:
-            $ref: '#/components/schemas/Organization'
+            $ref: '#/components/schemas/Affiliation'
 
     Problem:
       type: object
@@ -261,13 +244,6 @@ components:
         requestId:
           type: string
           description: Unique id for the request
-    LanguageParam:
-      type: string
-      enum:
-        - nb
-        - nn
-        - en
-      default: 'nb'
     Context:
       type: string
       pattern: 'https:\/\/.*$'
@@ -282,33 +258,42 @@ components:
       additionalProperties:
         type: string
         pattern: '.+'
-    Organization:
+    Affiliation:
       type: object
-      description: Affiliated organization
+      description: Person affiliation
       properties:
-        id:
-          $ref: '#/components/schemas/Id'
         type:
           type: string
-          pattern: 'Organization'
-          description: Always Organization
-        name:
-          $ref: '#/components/schemas/Languages'
+          pattern: 'Affiliation'
+          description: Always Affiliation
+        organization:
+          $ref: '#/components/schemas/Id'
         active:
           type: boolean
-          description: Is active at this organizaiton
-        position:
-          $ref: '#/components/schemas/Languages'
+          description: Person has active affiliation
+        role:
+          type: object
+          description: Person's role at affiliated organization
+          properties:
+            id:
+              $ref: '#/components/schemas/Id'
+            type:
+              type: string
+              pattern: 'Role'
+              description: Always Role
+            labels:
+              $ref: '#/components/schemas/Languages'
+
   examples:
     PersonsExample:
       value:
         '@context': 'https://example.org/search-api-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?language=nb&page=1&results=5&query=Ola Nordmann'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?page=1&query=Ola+Nordmann&results=5'
         size: 150
-        searchString: 'language=nb&page=1&results=5&query=Ola Nordmann'
+        searchString: 'page=1&query=Ola+Nordmann&results=5'
         processingTime: 800
         firstRecord: 1
-        nextResults: 'https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&query=Ola Nordmann'
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?page=2&query=Ola+Nordmann&results=5'
         previousResults: ''
         hits:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
@@ -316,71 +301,103 @@ components:
             identifiers:
               - type: 'CristinIdentifier'
                 value: '359084'
-            firstName: 'Kjell Ola'
-            lastName: 'Nordmann'
-            firstNamePreferred: 'Ola'
-            lastNamePreferred: 'Nordmann'
-            telephone: '+4712341234'
-            identifiedCristinPerson: true
-            cristinUrl: 'https://app.cristin.no/persons/show.jsf?id=359084'
-            cristinProfileUrl: 'https://api.cristin.no/v2/persons/359084/picture'
+              - type: 'ORCID'
+                value: '1234-1234-1234-1234'
+            names:
+              - type: 'PreferredFirstName'
+                value: 'Ola'
+              - type: 'PreferredLastName'
+                value: 'Nordmann'
+              - type: 'FirstName'
+                value: 'Kjell Ola'
+              - type: 'LastName'
+                value: 'Nordmann'
+            contactDetails:
+              telephone: '+4799885566'
+              email: 'kjell@epost.no'
+            image: 'https://api.cristin.no/v2/persons/359084/picture'
             affiliations:
-              # Split into Unit and Institution?
-              - id: 'https://api.cristin.no/v2/institutions/215'
-                type: 'Organization'
-                name:
-                  'nb': 'OsloMet - storbyuniversitetet'
+              - type: 'Affiliation'
+                organization: 'https://api.cristin.no/v2/units/185.11.0.0'
                 active: true
-                position:
-                  'nb': 'Utvikler'
-              - id: 'https://api.cristin.no/v2/institutions/186'
-                type: 'Organization'
-                name:
-                  'nb': 'UiT Norges arktiske universitet'
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Researcher'
+                    nb: 'Forsker'
+                    nn: 'Forskar'
+              - type: 'Affiliation'
+                organization: 'https://api.cristin.no/v2/units/185.90.0.0'
                 active: true
-                position:
-                  'nb': 'Gjest'
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Head Engineer'
+                    nb: 'Overingeniør'
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
             type: 'Person'
             identifiers:
               - type: 'CristinIdentifier'
                 value: '567987'
-            firstName: 'Kjetil'
-            lastName: 'Nordmann'
+            names:
+              - type: 'FirstName'
+                value: 'Kjetil'
+              - type: 'LastName'
+                value: 'Nordmann'
+            contactDetails:
+              telephone: '+4744335566'
             affiliations:
-              # Split into Unit and Institution?
-              - id: 'https://api.cristin.no/v2/institutions/215'
-                type: 'Organization'
-                name:
-                  'nb': 'OsloMet - storbyuniversitetet'
+              - type: 'Affiliation'
+                organization: 'https://api.cristin.no/v2/units/185.90.0.0'
                 active: true
-                position:
-                  'nb': 'Konsulent'
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Consultant'
 
     PersonExample:
       value:
-        '@context': 'https://example.org/project-context.json'
+        '@context': 'https://example.org/person-context.json'
         id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
         type: 'Person'
         identifiers:
           - type: 'CristinIdentifier'
             value: '359084'
-        firstName: 'Ola'
-        lastName: 'Nordmann'
-        identifiedCristinPerson: true
+          - type: 'ORCID'
+            value: '1234-1234-1234-1234'
+        names:
+          - type: 'PreferredFirstName'
+            value: 'Ola'
+          - type: 'PreferredLastName'
+            value: 'Nordmann'
+          - type: 'FirstName'
+            value: 'Kjell Ola'
+          - type: 'LastName'
+            value: 'Nordmann'
+        contactDetails:
+          telephone: '+4799885566'
+          email: 'kjell@epost.no'
+        image: 'https://api.cristin.no/v2/persons/359084/picture'
         affiliations:
-          # Split into Unit and Institution?
-          - id: 'https://api.cristin.no/v2/institutions/215'
-            type: 'Organization'
-            name:
-              'nb': 'OsloMet - storbyuniversitetet'
+          - type: 'Affiliation'
+            organization: 'https://api.cristin.no/v2/units/185.11.0.0'
             active: true
-            position:
-              'nb': 'Utvikler'
-          - id: 'https://api.cristin.no/v2/institutions/186'
-            type: 'Organization'
-            name:
-              'nb': 'UiT Norges arktiske universitet'
+            role:
+              id: 'https://example.org/link/to/ontology#1026'
+              type: 'Role'
+              labels:
+                en: 'Researcher'
+                nb: 'Forsker'
+                nn: 'Forskar'
+          - type: 'Affiliation'
+            organization: 'https://api.cristin.no/v2/units/185.90.0.0'
             active: true
-            position:
-              'nb': 'Gjest'
+            role:
+              id: 'https://example.org/link/to/ontology#1026'
+              type: 'Role'
+              labels:
+                en: 'Head Engineer'
+                nb: 'Overingeniør'
