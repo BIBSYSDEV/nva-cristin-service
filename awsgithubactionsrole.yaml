@@ -6,36 +6,48 @@
 #  https://github:blog/changelog/2021-10-27-github-actions-secure-cloud-deployments-with-openid-connect/
 #
 Parameters:
-  GithubOrg: # can also be a regular user
+  GitHubOrg:
     Type: String
     Default: BIBSYS
-  FullRepoName:
+  RepositoryName:
     Type: String
-    Default: BIBSYS/nva-cristin-service
+  OIDCProviderArn:
+    Description: Arn for the GitHub OIDC Provider.
+    Default: ""
+    Type: String
+
+Conditions:
+  CreateOIDCProvider: !Equals
+    - !Ref OIDCProviderArn
+    - ""
 
 Resources:
-  GithubActionsRole:
+  Role:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: GithubActionsRole
-      ManagedPolicyArns: [ arn:aws:iam::aws:policy/ReadOnlyAccess ]
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
             Action: sts:AssumeRoleWithWebIdentity
             Principal:
-              Federated: !Ref GithubOidc
+              Federated: !If
+                - CreateOIDCProvider
+                - !Ref GithubOidc
+                - !Ref OIDCProviderArn
             Condition:
               StringLike:
-                token.actions.githubusercontent.com:sub: !Sub repo:${FullRepoName}:*
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${RepositoryName}:*
 
   GithubOidc:
     Type: AWS::IAM::OIDCProvider
+    Condition: CreateOIDCProvider
     Properties:
       Url: https://token.actions.githubusercontent.com
-      ThumbprintList: [ a031c46782e6e6c662c2c87c76da9aa62ccabd8e ]
       ClientIdList:
-        - !Sub https://github.com/${GithubOrg}
+        - sts.amazonaws.com
+      ThumbprintList:
+        - a031c46782e6e6c662c2c87c76da9aa62ccabd8e
+
 Outputs:
-  GithubActionsRole:
-    Value: !GetAtt GithubActionsRole.Arn
+  Role:
+    Value: !GetAtt Role.Arn

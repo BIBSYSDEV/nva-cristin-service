@@ -3,15 +3,20 @@ on:
   push:
 
 jobs:
-  build:
+  deploy:
+    name: Connect to Amazon
     runs-on: ubuntu-latest
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
     permissions:
       id-token: write
       contents: read
     steps:
-      - name: Configure AWS Credentials
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials from Test account
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::884807050265:role/GithubActionsRole
+          role-to-assume: arn:aws:iam::884807050265:role/nva-github-role-Role-OSRQ8CB5KSO9
           aws-region: eu-west-1
       - run: aws sts get-caller-identity # just an example. why not deploy something?
