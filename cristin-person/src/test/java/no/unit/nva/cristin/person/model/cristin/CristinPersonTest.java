@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Test;
 public class CristinPersonTest {
 
     private static final ObjectMapper OBJECT_MAPPER = JsonUtils.dtoObjectMapper;
-    private static final String CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON =
+    private static final String CRISTIN_GET_PERSON_JSON =
         "cristinGetPersonResponse.json";
 
     @Test
     void cristinModelBuildsCorrectlyWhenDeserializingPersonJson() throws IOException {
-        String body = getBodyFromResource(CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON);
+        String body = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
         CristinPerson person = fromJson(body, CristinPerson.class);
         assertEquals("55577", person.getCristinPersonId());
         //assertEquals("", OBJECT_MAPPER.writeValueAsString(person));
