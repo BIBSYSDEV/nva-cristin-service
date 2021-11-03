@@ -217,6 +217,7 @@ components:
             telephone:
               type: string
               pattern: '\+?\d+'
+            # I dont think we receive email from Cristin. Maybe delete this
             email:
               type: string
               pattern: '.+[@].+[.]\w+'
