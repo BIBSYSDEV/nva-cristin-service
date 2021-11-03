@@ -11,11 +11,11 @@ jobs:
         with:
           python-version: "3.8"
       - uses: aws-actions/setup-sam@v1
-      - uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-1
+      - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@master
+          with:
+            role-to-assume: arn:aws:iam::884807050265:role/nva-dev-github-actions-role
+            aws-region: eu-west-1
       # Build inside Docker containers
       - run: sam build --use-container
       # Prevent prompts and failure when the stack is unchanged

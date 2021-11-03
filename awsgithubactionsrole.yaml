@@ -2,13 +2,16 @@
 #  OpenIdConnect Role seupt for GitHub-Actions
 #  Maybe move to a common NVA template?
 #
+#  https://github.com/aws-actions/configure-aws-credentials
+#
+#  Older readings:
 #  https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
 #  https://github:blog/changelog/2021-10-27-github-actions-secure-cloud-deployments-with-openid-connect/
 #
 Parameters:
   GitHubOrg:
     Type: String
-    Default: BIBSYS
+    Default: BIBSYSDEV
   RepositoryName:
     Type: String
   OIDCProviderArn:
@@ -25,6 +28,7 @@ Resources:
   Role:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: nva-dev-github-actions-role
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -47,7 +51,6 @@ Resources:
         - sts.amazonaws.com
       ThumbprintList:
         - a031c46782e6e6c662c2c87c76da9aa62ccabd8e
-
 Outputs:
   Role:
     Value: !GetAtt Role.Arn

@@ -16,6 +16,6 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@master
         with:
-          role-to-assume: arn:aws:iam::884807050265:role/nva-github-role-Role-OSRQ8CB5KSO9
+          role-to-assume: arn:aws:iam::884807050265:role/nva-dev-github-actions-role
           aws-region: eu-west-1
       - run: aws sts get-caller-identity # just an example. why not deploy something?
