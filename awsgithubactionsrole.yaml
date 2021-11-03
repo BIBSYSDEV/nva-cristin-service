@@ -1,0 +1,41 @@
+#
+#  OpenIdConnect Role seupt for GitHub-Actions
+#  Maybe move to a common NVA template?
+#
+#  https://awsteele.com/blog/2021/09/15/aws-federation-comes-to-github-actions.html
+#  https://github:blog/changelog/2021-10-27-github-actions-secure-cloud-deployments-with-openid-connect/
+#
+Parameters:
+  GithubOrg: # can also be a regular user
+    Type: String
+    Default: BIBSYS
+  FullRepoName:
+    Type: String
+    Default: BIBSYS/nva-cristin-service
+
+Resources:
+  GithubActionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: GithubActionsRole
+      ManagedPolicyArns: [ arn:aws:iam::aws:policy/ReadOnlyAccess ]
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !Ref GithubOidc
+            Condition:
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub repo:${FullRepoName}:*
+
+  GithubOidc:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ThumbprintList: [ a031c46782e6e6c662c2c87c76da9aa62ccabd8e ]
+      ClientIdList:
+        - !Sub https://github.com/${GithubOrg}
+Outputs:
+  GithubActionsRole:
+    Value: !GetAtt GithubActionsRole.Arn

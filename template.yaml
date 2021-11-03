@@ -136,4 +136,3 @@ Resources:
       DomainName: !Ref CustomDomain
       RestApiId: !Ref NvaCristinProxyApi
       Stage: !Ref NvaCristinProxyApi.Stage
-
