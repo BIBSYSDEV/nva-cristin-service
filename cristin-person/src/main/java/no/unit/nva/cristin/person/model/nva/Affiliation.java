@@ -1,10 +1,12 @@
 package no.unit.nva.cristin.person.model.nva;
 
+import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Objects;
+import no.unit.nva.cristin.person.model.cristin.CristinAffiliation;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
@@ -88,5 +90,20 @@ public class Affiliation {
         public Affiliation build() {
             return new Affiliation(this.organization, this.active, this.role);
         }
+    }
+
+    /**
+     * Creates an Affiliation from a CristinAffiliation.
+     *
+     * @param cristinAffiliation Cristin model used to create an Affiliation.
+     * @return The transformed Cristin model.
+     */
+    public static Affiliation fromCristinAffiliation(CristinAffiliation cristinAffiliation) {
+        // TODO: URI Null safe?
+        URI organization = attempt(() -> new URI(cristinAffiliation.getUnit().getUrl())).orElseThrow();
+        Boolean active = cristinAffiliation.getActive();
+        Role role = Role.fromCristinAffiliation(cristinAffiliation);
+
+        return new Builder().withOrganization(organization).withActive(active).withRole(role).build();
     }
 }

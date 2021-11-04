@@ -2,8 +2,12 @@ package no.unit.nva.cristin.person.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.StringUtils;
 
 @JacocoGenerated
 public class NvaIdentifier {
@@ -63,5 +67,61 @@ public class NvaIdentifier {
         public NvaIdentifier build() {
             return new NvaIdentifier(this.type, this.value);
         }
+    }
+
+    // TODO: Is there a better way to do this?
+
+    /**
+     * Transforms identifiers from Cristin into a List.
+     *
+     * @param cristinPerson Cristin model containing identifiers.
+     * @return List of transformed identifiers
+     */
+    public static List<NvaIdentifier> identifiersFromCristinPerson(CristinPerson cristinPerson) {
+        List<NvaIdentifier> identifiers = new ArrayList<>();
+
+        if (!StringUtils.isBlank(cristinPerson.getCristinPersonId())) {
+            identifiers.add(new NvaIdentifier.Builder()
+                .withType("CristinIdentifier").withValue(cristinPerson.getCristinPersonId()).build());
+        }
+
+        if (cristinPerson.getOrcid() != null && !StringUtils.isBlank(cristinPerson.getOrcid().getId())) {
+            identifiers.add(new NvaIdentifier.Builder()
+                .withType("ORCID").withValue(cristinPerson.getOrcid().getId()).build());
+        }
+
+        return identifiers;
+    }
+
+    /**
+     * Transforms names from a Cristin person into a List.
+     *
+     * @param cristinPerson Cristin model containing name identifiers.
+     * @return List of transformed names
+     */
+    public static List<NvaIdentifier> namesFromCristinPerson(CristinPerson cristinPerson) {
+        List<NvaIdentifier> names = new ArrayList<>();
+
+        if (!StringUtils.isBlank(cristinPerson.getFirstName())) {
+            names.add(new NvaIdentifier.Builder()
+                .withType("FirstName").withValue(cristinPerson.getFirstName()).build());
+        }
+
+        if (!StringUtils.isBlank(cristinPerson.getSurname())) {
+            names.add(new NvaIdentifier.Builder()
+                .withType("LastName").withValue(cristinPerson.getSurname()).build());
+        }
+
+        if (!StringUtils.isBlank(cristinPerson.getFirstNamePreferred())) {
+            names.add(new NvaIdentifier.Builder()
+                .withType("PreferredFirstName").withValue(cristinPerson.getFirstNamePreferred()).build());
+        }
+
+        if (!StringUtils.isBlank(cristinPerson.getSurnamePreferred())) {
+            names.add(new NvaIdentifier.Builder()
+                .withType("PreferredLastName").withValue(cristinPerson.getSurnamePreferred()).build());
+        }
+
+        return names;
     }
 }

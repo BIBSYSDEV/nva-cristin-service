@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,6 +9,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import no.unit.nva.cristin.person.PersonUriUtils;
+import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
@@ -15,7 +19,7 @@ import nva.commons.core.JacocoGenerated;
 public class Person {
 
     @JsonInclude(NON_NULL)
-    private final String context;
+    private String context;
     private final URI id;
     private final List<NvaIdentifier> identifiers;
     private final List<NvaIdentifier> names;
@@ -51,6 +55,23 @@ public class Person {
 
     public String getContext() {
         return context;
+    }
+
+    /**
+     * Creates a Nva person model from a Cristin person model.
+     *
+     * @param cristinPerson Cristin model.
+     * @return Nva person model.
+     */
+    public static Person fromCristinPerson(CristinPerson cristinPerson) {
+        return new Person.Builder()
+            .withId(PersonUriUtils.getPersonUriWithId(cristinPerson.getCristinPersonId()))
+            .withIdentifiers(NvaIdentifier.identifiersFromCristinPerson(cristinPerson))
+            .withNames(NvaIdentifier.namesFromCristinPerson(cristinPerson))
+            .withContactDetails(extractContactDetails(cristinPerson))
+            .withImage(extractImage(cristinPerson))
+            .withAffiliations(extractAffiliations(cristinPerson))
+            .build();
     }
 
     public URI getId() {
@@ -153,5 +174,22 @@ public class Person {
             return new Person(this.context, this.id, this.identifiers, this.names, this.contactDetails,
                 this.image, this.affiliations);
         }
+    }
+
+    public void setContext(String context) {
+        this.context = context;
+    }
+
+    private static ContactDetails extractContactDetails(CristinPerson cristinPerson) {
+        return new ContactDetails.Builder().withTelephone(cristinPerson.getTel()).build();
+    }
+
+    private static URI extractImage(CristinPerson cristinPerson) {
+        return attempt(() -> new URI(cristinPerson.getPictureUrl())).orElse(null);
+    }
+
+    private static List<Affiliation> extractAffiliations(CristinPerson cristinPerson) {
+        return cristinPerson.getAffiliations().stream().map(Affiliation::fromCristinAffiliation).collect(
+            Collectors.toList());
     }
 }
