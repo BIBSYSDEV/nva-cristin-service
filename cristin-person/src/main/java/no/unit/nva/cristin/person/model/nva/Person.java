@@ -17,19 +17,17 @@ public class Person {
     @JsonInclude(NON_NULL)
     private final String context;
     private final URI id;
-    private final String type;
     private final List<NvaIdentifier> identifiers;
     private final List<NvaIdentifier> names;
     private final ContactDetails contactDetails;
     private final URI image;
-    private final List<PersonAffiliation> affiliations;
+    private final List<Affiliation> affiliations;
 
     /**
      * Creates a Person for serialization to client.
      *
      * @param context        The ontology context.
      * @param id             Identifier of Person.
-     * @param type           Type of object, always Person.
      * @param identifiers    Different identifiers related to this object.
      * @param names          Different names for this Person.
      * @param contactDetails How to contact this Person.
@@ -38,13 +36,12 @@ public class Person {
      */
     @JsonCreator
     public Person(@JsonProperty("@context") String context, @JsonProperty("id") URI id,
-                  @JsonProperty("type") String type, @JsonProperty("identifiers") List<NvaIdentifier> identifiers,
+                  @JsonProperty("identifiers") List<NvaIdentifier> identifiers,
                   @JsonProperty("names") List<NvaIdentifier> names,
                   @JsonProperty("contactDetails") ContactDetails contactDetails, @JsonProperty("image") URI image,
-                  @JsonProperty("affiliations") List<PersonAffiliation> affiliations) {
+                  @JsonProperty("affiliations") List<Affiliation> affiliations) {
         this.context = context;
         this.id = id;
-        this.type = type;
         this.identifiers = identifiers;
         this.names = names;
         this.contactDetails = contactDetails;
@@ -58,10 +55,6 @@ public class Person {
 
     public URI getId() {
         return id;
-    }
-
-    public String getType() {
-        return type;
     }
 
     public List<NvaIdentifier> getIdentifiers() {
@@ -80,7 +73,7 @@ public class Person {
         return image;
     }
 
-    public List<PersonAffiliation> getAffiliations() {
+    public List<Affiliation> getAffiliations() {
         return affiliations;
     }
 
@@ -96,7 +89,6 @@ public class Person {
         Person that = (Person) o;
         return getContext().equals(that.getContext())
             && getId().equals(that.getId())
-            && getType().equals(that.getType())
             && getIdentifiers().equals(that.getIdentifiers())
             && getNames().equals(that.getNames())
             && getContactDetails().equals(that.getContactDetails())
@@ -107,7 +99,59 @@ public class Person {
     @JacocoGenerated
     @Override
     public int hashCode() {
-        return Objects.hash(getContext(), getId(), getType(), getIdentifiers(), getNames(), getContactDetails(),
+        return Objects.hash(getContext(), getId(), getIdentifiers(), getNames(), getContactDetails(),
             getImage(), getAffiliations());
+    }
+
+    @JacocoGenerated
+    public static final class Builder {
+
+        private transient String context;
+        private transient URI id;
+        private transient List<NvaIdentifier> identifiers;
+        private transient List<NvaIdentifier> names;
+        private transient ContactDetails contactDetails;
+        private transient URI image;
+        private transient List<Affiliation> affiliations;
+
+        public Builder withContext(String context) {
+            this.context = context;
+            return this;
+        }
+
+        public Builder withId(URI id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder withIdentifiers(List<NvaIdentifier> identifiers) {
+            this.identifiers = identifiers;
+            return this;
+        }
+
+        public Builder withNames(List<NvaIdentifier> names) {
+            this.names = names;
+            return this;
+        }
+
+        public Builder withContactDetails(ContactDetails contactDetails) {
+            this.contactDetails = contactDetails;
+            return this;
+        }
+
+        public Builder withImage(URI image) {
+            this.image = image;
+            return this;
+        }
+
+        public Builder withAffiliations(List<Affiliation> affiliations) {
+            this.affiliations = affiliations;
+            return this;
+        }
+
+        public Person build() {
+            return new Person(this.context, this.id, this.identifiers, this.names, this.contactDetails,
+                this.image, this.affiliations);
+        }
     }
 }

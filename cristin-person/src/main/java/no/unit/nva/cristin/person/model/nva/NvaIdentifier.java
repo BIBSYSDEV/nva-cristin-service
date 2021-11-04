@@ -2,12 +2,10 @@ package no.unit.nva.cristin.person.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.Objects;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class NvaIdentifier {
 
     private final String type;
@@ -44,5 +42,26 @@ public class NvaIdentifier {
     @Override
     public int hashCode() {
         return Objects.hash(getType(), getValue());
+    }
+
+    @JacocoGenerated
+    public static final class Builder {
+
+        private transient String type;
+        private transient String value;
+
+        public Builder withType(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder withValue(String value) {
+            this.value = value;
+            return this;
+        }
+
+        public NvaIdentifier build() {
+            return new NvaIdentifier(this.type, this.value);
+        }
     }
 }

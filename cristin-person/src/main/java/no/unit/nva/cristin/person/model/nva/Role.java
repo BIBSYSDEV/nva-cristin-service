@@ -8,35 +8,28 @@ import java.util.Map;
 import java.util.Objects;
 import nva.commons.core.JacocoGenerated;
 
+@SuppressWarnings("PMD.ShortClassName")
 @JacocoGenerated
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-public class PersonAffiliationRole {
+public class Role {
 
     private final URI id;
-    private final String type;
     private final Map<String, String> labels;
 
     /**
-     * Creates a PersonAffiliationRole for serialization to client.
+     * Creates a Role for serialization to client.
      *
      * @param id     URI to ontology.
-     * @param type   Type of object, always Role.
      * @param labels Labels in different languages describing this role.
      */
     @JsonCreator
-    public PersonAffiliationRole(@JsonProperty("id") URI id, @JsonProperty("type") String type,
-                                 @JsonProperty("labels") Map<String, String> labels) {
+    public Role(@JsonProperty("id") URI id, @JsonProperty("labels") Map<String, String> labels) {
         this.id = id;
-        this.type = type;
         this.labels = labels;
     }
 
     public URI getId() {
         return id;
-    }
-
-    public String getType() {
-        return type;
     }
 
     public Map<String, String> getLabels() {
@@ -49,18 +42,37 @@ public class PersonAffiliationRole {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PersonAffiliationRole)) {
+        if (!(o instanceof Role)) {
             return false;
         }
-        PersonAffiliationRole that = (PersonAffiliationRole) o;
-        return getId().equals(that.getId())
-            && getType().equals(that.getType())
-            && getLabels().equals(that.getLabels());
+        Role that = (Role) o;
+        return getId().equals(that.getId()) && getLabels().equals(that.getLabels());
     }
 
     @JacocoGenerated
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getType(), getLabels());
+        return Objects.hash(getId(), getLabels());
+    }
+
+    @JacocoGenerated
+    public static final class Builder {
+
+        private transient URI id;
+        private transient Map<String, String> labels;
+
+        public Builder withId(URI id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder withLabels(Map<String, String> labels) {
+            this.labels = labels;
+            return this;
+        }
+
+        public Role build() {
+            return new Role(this.id, this.labels);
+        }
     }
 }

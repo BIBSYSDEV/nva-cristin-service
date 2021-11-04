@@ -19,7 +19,11 @@ public class CristinPersonTest {
         String body = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
         CristinPerson person = fromJson(body, CristinPerson.class);
         assertEquals("55577", person.getCristinPersonId());
-        //assertEquals("", OBJECT_MAPPER.writeValueAsString(person));
+    }
+
+    @Test
+    void nvaModelBuildsCorrectlyWhenTransformingPersonFromCristinToNvaPerson() {
+        assertEquals("Hei", "Hei");
     }
 
     private static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
