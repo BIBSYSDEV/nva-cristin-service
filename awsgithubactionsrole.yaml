@@ -41,7 +41,41 @@ Resources:
             Condition:
               StringLike:
                 token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${RepositoryName}:*
-
+      Policies:
+        - PolicyName: UpdateS3AndCFNPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - iam:PassRole
+                  - iam:GetRole
+                Effect: Allow
+                Resource: '*'
+              - Action:
+                  - lambda:UpdateFunctionCode
+                Effect: Allow
+                Resource: '*'
+              - Action:
+                  - s3:ListBucket
+                  - s3:GetBucketVersioning
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                Effect: Allow
+                Resource: '*'
+              - Action:
+                  - cloudformation:DescribeStacks
+                  - cloudformation:CreateStack
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:UpdateStack
+                  - cloudformation:DeleteStack
+                  - cloudformation:GetTemplateSummary
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:DescribeStackSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DescribeStackEvents
+                Effect: Allow
+                Resource: '*'
   GithubOidc:
     Type: AWS::IAM::OIDCProvider
     Condition: CreateOIDCProvider
