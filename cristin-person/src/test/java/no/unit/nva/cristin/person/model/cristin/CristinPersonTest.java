@@ -18,7 +18,7 @@ public class CristinPersonTest {
     void cristinModelBuildsCorrectlyWhenDeserializingPersonJson() throws IOException {
         String body = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
         CristinPerson person = fromJson(body, CristinPerson.class);
-        assertEquals("55577", person.getCristinPersonId());
+        assertEquals("359084", person.getCristinPersonId());
     }
 
     @Test
