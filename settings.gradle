@@ -4,4 +4,3 @@ include 'cristin-commons'
 include 'cristin-project'
 include 'cristin-organization'
 include 'cristin-person'
-

@@ -2,12 +2,10 @@ package no.unit.nva.cristin.person.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.Objects;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class ContactDetails {
 
     private final String telephone;
