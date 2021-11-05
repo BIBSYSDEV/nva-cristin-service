@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.file.Path;
+import no.unit.nva.cristin.person.Constants;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.core.JsonUtils;
 import nva.commons.core.ioutils.IoUtils;
@@ -52,11 +53,12 @@ public class CristinPersonTest {
         CristinPerson cristinPerson = fromJson(cristinBody, CristinPerson.class);
 
         String nvaBody = getBodyFromResource(NVA_API_GET_PERSON_JSON);
-        Person nvaPerson = fromJson(nvaBody, Person.class);
+        Person expectedNvaPerson = fromJson(nvaBody, Person.class);
 
-        // TODO: Compare nvaPerson created from Json with nvaPerson built from cristinPerson
+        Person actualNvaPerson = Person.fromCristinPerson(cristinPerson);
+        actualNvaPerson.setContext(Constants.PERSON_CONTEXT);
 
-        //assertEquals("", OBJECT_MAPPER.writeValueAsString(nvaPerson));
+        assertEquals(expectedNvaPerson, actualNvaPerson);
     }
 
     private static <T> T fromJson(String body, Class<T> classOfT) throws IOException {

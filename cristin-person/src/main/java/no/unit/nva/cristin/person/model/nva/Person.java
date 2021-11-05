@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -108,20 +109,30 @@ public class Person {
             return false;
         }
         Person that = (Person) o;
+        // TODO: Make null safe when calling equals
         return getContext().equals(that.getContext())
             && getId().equals(that.getId())
-            && getIdentifiers().equals(that.getIdentifiers())
-            && getNames().equals(that.getNames())
+            && sortedListOfIdentifiers(getIdentifiers()).equals(sortedListOfIdentifiers(that.getIdentifiers()))
+            && sortedListOfIdentifiers(getNames()).equals(sortedListOfIdentifiers(that.getNames()))
             && getContactDetails().equals(that.getContactDetails())
             && getImage().equals(that.getImage())
-            && getAffiliations().equals(that.getAffiliations());
+            && sortedListOfAffiliations(getAffiliations()).equals(sortedListOfAffiliations(that.getAffiliations()));
     }
 
     @JacocoGenerated
     @Override
     public int hashCode() {
-        return Objects.hash(getContext(), getId(), getIdentifiers(), getNames(), getContactDetails(),
-            getImage(), getAffiliations());
+        return Objects.hash(getContext(), getId(), sortedListOfIdentifiers(getIdentifiers()),
+            sortedListOfIdentifiers(getNames()), getContactDetails(), getImage(),
+            sortedListOfAffiliations(getAffiliations()));
+    }
+
+    private static URI extractImage(CristinPerson cristinPerson) {
+        return attempt(() -> new URI(cristinPerson.getPictureUrl())).orElse(uriFailure -> null);
+    }
+
+    private List<NvaIdentifier> sortedListOfIdentifiers(List<NvaIdentifier> listToSort) {
+        return listToSort.stream().sorted(Comparator.comparing(NvaIdentifier::getType)).collect(Collectors.toList());
     }
 
     @JacocoGenerated
@@ -184,8 +195,8 @@ public class Person {
         return new ContactDetails.Builder().withTelephone(cristinPerson.getTel()).build();
     }
 
-    private static URI extractImage(CristinPerson cristinPerson) {
-        return attempt(() -> new URI(cristinPerson.getPictureUrl())).orElse(null);
+    private List<Affiliation> sortedListOfAffiliations(List<Affiliation> listToSort) {
+        return listToSort.stream().sorted(Comparator.comparing(Affiliation::hashCode)).collect(Collectors.toList());
     }
 
     private static List<Affiliation> extractAffiliations(CristinPerson cristinPerson) {

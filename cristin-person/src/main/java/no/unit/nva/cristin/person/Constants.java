@@ -14,5 +14,5 @@ public class Constants {
     public static final String DOMAIN_NAME = ENVIRONMENT.readEnvOpt("DOMAIN_NAME")
         .orElse("api.dev.nva.aws.unit.no");
 
-    //public static final String PERSON_CONTEXT = "https://example.org/person-context.json";
+    public static final String PERSON_CONTEXT = "https://example.org/person-context.json";
 }

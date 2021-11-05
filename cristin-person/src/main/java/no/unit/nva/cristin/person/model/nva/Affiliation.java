@@ -99,8 +99,7 @@ public class Affiliation {
      * @return The transformed Cristin model.
      */
     public static Affiliation fromCristinAffiliation(CristinAffiliation cristinAffiliation) {
-        // TODO: URI Null safe?
-        URI organization = attempt(() -> new URI(cristinAffiliation.getUnit().getUrl())).orElseThrow();
+        URI organization = attempt(() -> new URI(cristinAffiliation.getUnit().getUrl())).orElse(uriFailure -> null);
         Boolean active = cristinAffiliation.getActive();
         Role role = Role.fromCristinAffiliation(cristinAffiliation);
 
