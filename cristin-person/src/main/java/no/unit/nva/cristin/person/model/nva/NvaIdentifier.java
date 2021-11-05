@@ -5,9 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import no.unit.nva.cristin.person.model.cristin.CristinOrcid;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.StringUtils;
 
 @JacocoGenerated
 public class NvaIdentifier {
@@ -69,8 +70,6 @@ public class NvaIdentifier {
         }
     }
 
-    // TODO: Is there a better way to create identifiers from CristinPerson?
-
     /**
      * Transforms identifiers from Cristin into a List.
      *
@@ -80,15 +79,14 @@ public class NvaIdentifier {
     public static List<NvaIdentifier> identifiersFromCristinPerson(CristinPerson cristinPerson) {
         List<NvaIdentifier> identifiers = new ArrayList<>();
 
-        if (!StringUtils.isBlank(cristinPerson.getCristinPersonId())) {
-            identifiers.add(new NvaIdentifier.Builder()
-                .withType("CristinIdentifier").withValue(cristinPerson.getCristinPersonId()).build());
-        }
+        Optional.of(cristinPerson)
+            .map(CristinPerson::getCristinPersonId)
+            .ifPresent(id -> identifiers.add(createOneIdentifier("CristinIdentifier", id)));
 
-        if (cristinPerson.getOrcid() != null && !StringUtils.isBlank(cristinPerson.getOrcid().getId())) {
-            identifiers.add(new NvaIdentifier.Builder()
-                .withType("ORCID").withValue(cristinPerson.getOrcid().getId()).build());
-        }
+        Optional.of(cristinPerson)
+            .map(CristinPerson::getOrcid)
+            .map(CristinOrcid::getId)
+            .ifPresent(id -> identifiers.add(createOneIdentifier("ORCID", id)));
 
         return identifiers;
     }
@@ -102,26 +100,26 @@ public class NvaIdentifier {
     public static List<NvaIdentifier> namesFromCristinPerson(CristinPerson cristinPerson) {
         List<NvaIdentifier> names = new ArrayList<>();
 
-        if (!StringUtils.isBlank(cristinPerson.getFirstName())) {
-            names.add(new NvaIdentifier.Builder()
-                .withType("FirstName").withValue(cristinPerson.getFirstName()).build());
-        }
+        Optional.of(cristinPerson)
+            .map(CristinPerson::getFirstName)
+            .ifPresent(id -> names.add(createOneIdentifier("FirstName", id)));
 
-        if (!StringUtils.isBlank(cristinPerson.getSurname())) {
-            names.add(new NvaIdentifier.Builder()
-                .withType("LastName").withValue(cristinPerson.getSurname()).build());
-        }
+        Optional.of(cristinPerson)
+            .map(CristinPerson::getSurname)
+            .ifPresent(id -> names.add(createOneIdentifier("LastName", id)));
 
-        if (!StringUtils.isBlank(cristinPerson.getFirstNamePreferred())) {
-            names.add(new NvaIdentifier.Builder()
-                .withType("PreferredFirstName").withValue(cristinPerson.getFirstNamePreferred()).build());
-        }
+        Optional.of(cristinPerson)
+            .map(CristinPerson::getFirstNamePreferred)
+            .ifPresent(id -> names.add(createOneIdentifier("PreferredFirstName", id)));
 
-        if (!StringUtils.isBlank(cristinPerson.getSurnamePreferred())) {
-            names.add(new NvaIdentifier.Builder()
-                .withType("PreferredLastName").withValue(cristinPerson.getSurnamePreferred()).build());
-        }
+        Optional.of(cristinPerson)
+            .map(CristinPerson::getSurnamePreferred)
+            .ifPresent(id -> names.add(createOneIdentifier("PreferredLastName", id)));
 
         return names;
+    }
+
+    private static NvaIdentifier createOneIdentifier(String type, String value) {
+        return new NvaIdentifier.Builder().withType(type).withValue(value).build();
     }
 }

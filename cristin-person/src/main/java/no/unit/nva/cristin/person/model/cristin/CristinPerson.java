@@ -2,6 +2,7 @@ package no.unit.nva.cristin.person.model.cristin;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.util.Collections;
 import java.util.List;
 import nva.commons.core.JacocoGenerated;
 
@@ -85,7 +86,7 @@ public class CristinPerson {
     }
 
     public List<CristinAffiliation> getAffiliations() {
-        return affiliations;
+        return affiliations != null ? affiliations : Collections.emptyList();
     }
 
     public void setAffiliations(List<CristinAffiliation> affiliations) {

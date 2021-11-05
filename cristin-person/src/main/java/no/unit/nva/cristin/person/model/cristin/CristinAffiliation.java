@@ -2,6 +2,7 @@ package no.unit.nva.cristin.person.model.cristin;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.util.Collections;
 import java.util.Map;
 import nva.commons.core.JacocoGenerated;
 
@@ -23,7 +24,7 @@ public class CristinAffiliation {
     }
 
     public Map<String, String> getPosition() {
-        return position;
+        return position != null ? position : Collections.emptyMap();
     }
 
     public void setPosition(Map<String, String> position) {

@@ -5,6 +5,7 @@ import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Collections;
@@ -18,9 +19,11 @@ import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonPropertyOrder({"@context"})
 public class Person {
 
     @JsonInclude(NON_NULL)
+    @JsonProperty("@context")
     private String context;
     private final URI id;
     private final List<NvaIdentifier> identifiers;
