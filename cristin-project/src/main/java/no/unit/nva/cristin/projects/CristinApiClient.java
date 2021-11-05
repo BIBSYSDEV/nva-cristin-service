@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.projects.Constants.QueryType;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
@@ -328,5 +329,9 @@ public class CristinApiClient {
 
     private void logError(String message, String data, Exception failure) {
         logger.error(String.format(message, data, failure.getMessage()));
+    }
+
+    public NvaOrganization getOrganizationByIdentifier(String identifier) throws ApiGatewayException {
+        return null;
     }
 }

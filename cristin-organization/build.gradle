@@ -1,3 +1,7 @@
 dependencies {
     implementation project(":cristin-commons")
+    implementation project(":cristin-project")
+
+    implementation libs.httpcore
+
 }

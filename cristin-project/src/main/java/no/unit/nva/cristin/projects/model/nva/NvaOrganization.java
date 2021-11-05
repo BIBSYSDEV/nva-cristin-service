@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+
 import no.unit.nva.cristin.projects.model.cristin.CristinInstitution;
 
 @SuppressWarnings("unused")
@@ -26,6 +28,7 @@ public class NvaOrganization {
     private String type;
     @JsonPropertyOrder(alphabetic = true)
     private Map<String, String> name;
+    private Set<NvaOrganization> partOf;
 
     public URI getId() {
         return id;
@@ -49,6 +52,14 @@ public class NvaOrganization {
 
     public void setName(Map<String, String> name) {
         this.name = name;
+    }
+
+    public Set<NvaOrganization> getPartOf() {
+        return partOf;
+    }
+
+    public void setPartOf(Set<NvaOrganization> partOf) {
+        this.partOf = partOf;
     }
 
     /**
