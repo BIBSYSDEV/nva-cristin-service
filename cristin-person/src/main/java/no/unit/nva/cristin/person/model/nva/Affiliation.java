@@ -54,9 +54,9 @@ public class Affiliation {
             return false;
         }
         Affiliation that = (Affiliation) o;
-        return getOrganization().equals(that.getOrganization())
-            && getActive().equals(that.getActive())
-            && getRole().equals(that.getRole());
+        return Objects.equals(getOrganization(), that.getOrganization())
+            && Objects.equals(getActive(), that.getActive())
+            && Objects.equals(getRole(), that.getRole());
     }
 
     @JacocoGenerated

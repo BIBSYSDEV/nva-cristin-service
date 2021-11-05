@@ -39,7 +39,7 @@ public class NvaIdentifier {
             return false;
         }
         NvaIdentifier that = (NvaIdentifier) o;
-        return getType().equals(that.getType()) && getValue().equals(that.getValue());
+        return Objects.equals(getType(), that.getType()) && Objects.equals(getValue(), that.getValue());
     }
 
     @JacocoGenerated
@@ -69,7 +69,7 @@ public class NvaIdentifier {
         }
     }
 
-    // TODO: Is there a better way to do this?
+    // TODO: Is there a better way to create identifiers from CristinPerson?
 
     /**
      * Transforms identifiers from Cristin into a List.

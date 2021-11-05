@@ -29,7 +29,7 @@ public class ContactDetails {
             return false;
         }
         ContactDetails that = (ContactDetails) o;
-        return getTelephone().equals(that.getTelephone());
+        return Objects.equals(getTelephone(), that.getTelephone());
     }
 
     @JacocoGenerated

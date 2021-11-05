@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -80,11 +81,11 @@ public class Person {
     }
 
     public List<NvaIdentifier> getIdentifiers() {
-        return identifiers;
+        return identifiers != null ? identifiers : Collections.emptyList();
     }
 
     public List<NvaIdentifier> getNames() {
-        return names;
+        return names != null ? names : Collections.emptyList();
     }
 
     public ContactDetails getContactDetails() {
@@ -96,7 +97,7 @@ public class Person {
     }
 
     public List<Affiliation> getAffiliations() {
-        return affiliations;
+        return affiliations != null ? affiliations : Collections.emptyList();
     }
 
     @JacocoGenerated
@@ -109,13 +110,12 @@ public class Person {
             return false;
         }
         Person that = (Person) o;
-        // TODO: Make null safe when calling equals
-        return getContext().equals(that.getContext())
-            && getId().equals(that.getId())
+        return Objects.equals(getContext(), that.getContext())
+            && Objects.equals(getId(), that.getId())
             && sortedListOfIdentifiers(getIdentifiers()).equals(sortedListOfIdentifiers(that.getIdentifiers()))
             && sortedListOfIdentifiers(getNames()).equals(sortedListOfIdentifiers(that.getNames()))
-            && getContactDetails().equals(that.getContactDetails())
-            && getImage().equals(that.getImage())
+            && Objects.equals(getContactDetails(), that.getContactDetails())
+            && Objects.equals(getImage(), that.getImage())
             && sortedListOfAffiliations(getAffiliations()).equals(sortedListOfAffiliations(that.getAffiliations()));
     }
 

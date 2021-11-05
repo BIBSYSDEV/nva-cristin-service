@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.cristin.person.model.cristin.CristinAffiliation;
@@ -35,7 +36,7 @@ public class Role {
     }
 
     public Map<String, String> getLabels() {
-        return labels;
+        return labels != null ? labels : Collections.emptyMap();
     }
 
     @JacocoGenerated
@@ -48,7 +49,7 @@ public class Role {
             return false;
         }
         Role that = (Role) o;
-        return getId().equals(that.getId()) && getLabels().equals(that.getLabels());
+        return Objects.equals(getId(), that.getId()) && getLabels().equals(that.getLabels());
     }
 
     @JacocoGenerated
