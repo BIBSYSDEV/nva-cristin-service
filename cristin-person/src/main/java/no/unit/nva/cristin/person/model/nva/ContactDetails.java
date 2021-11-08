@@ -38,18 +38,4 @@ public class ContactDetails {
         return Objects.hash(getTelephone());
     }
 
-    @JacocoGenerated
-    public static final class Builder {
-
-        private transient String telephone;
-
-        public Builder withTelephone(String telephone) {
-            this.telephone = telephone;
-            return this;
-        }
-
-        public ContactDetails build() {
-            return new ContactDetails(this.telephone);
-        }
-    }
 }

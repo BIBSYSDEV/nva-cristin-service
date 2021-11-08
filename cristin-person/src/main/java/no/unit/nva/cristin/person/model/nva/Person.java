@@ -1,13 +1,8 @@
 package no.unit.nva.cristin.person.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static no.unit.nva.cristin.person.Constants.BASE_PATH;
-import static no.unit.nva.cristin.person.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.person.Constants.HTTPS;
 import static no.unit.nva.cristin.person.Constants.PERSON_CONTEXT;
-import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -18,17 +13,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.paths.UriWrapper;
 
 @JacocoGenerated
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonPropertyOrder({"@context"})
 public class Person {
-
-    @JsonIgnore
-    public static final String PERSON_PATH = "person";
 
     @JsonInclude(NON_NULL)
     @JsonProperty("@context")
@@ -67,23 +57,6 @@ public class Person {
         return context;
     }
 
-    /**
-     * Creates a Nva person model from a Cristin person model.
-     *
-     * @param cristinPerson Cristin model.
-     * @return Nva person model.
-     */
-    public static Person fromCristinPerson(CristinPerson cristinPerson) {
-        return new Person.Builder()
-            .withId(extractIdUri(cristinPerson.getCristinPersonId()))
-            .withIdentifiers(NvaIdentifier.identifiersFromCristinPerson(cristinPerson))
-            .withNames(NvaIdentifier.namesFromCristinPerson(cristinPerson))
-            .withContactDetails(extractContactDetails(cristinPerson))
-            .withImage(extractImage(cristinPerson))
-            .withAffiliations(extractAffiliations(cristinPerson))
-            .build();
-    }
-
     public List<NvaIdentifier> getIdentifiers() {
         return Objects.nonNull(identifiers) ? identifiers : Collections.emptyList();
     }
@@ -106,11 +79,6 @@ public class Person {
 
     public URI getImage() {
         return image;
-    }
-
-    private static URI extractIdUri(String cristinPersonId) {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH).addChild(cristinPersonId)
-            .getUri();
     }
 
     @JacocoGenerated
@@ -140,12 +108,12 @@ public class Person {
             sortedListOfAffiliations(getAffiliations()));
     }
 
-    private static URI extractImage(CristinPerson cristinPerson) {
-        return attempt(() -> new URI(cristinPerson.getPictureUrl())).orElse(uriFailure -> null);
-    }
-
     private List<NvaIdentifier> sortedListOfIdentifiers(List<NvaIdentifier> listToSort) {
         return listToSort.stream().sorted(Comparator.comparing(NvaIdentifier::getType)).collect(Collectors.toList());
+    }
+
+    private List<Affiliation> sortedListOfAffiliations(List<Affiliation> listToSort) {
+        return listToSort.stream().sorted(Comparator.comparing(Affiliation::hashCode)).collect(Collectors.toList());
     }
 
     public void setContext(String thatContext) {
@@ -198,16 +166,4 @@ public class Person {
         }
     }
 
-    private static ContactDetails extractContactDetails(CristinPerson cristinPerson) {
-        return new ContactDetails.Builder().withTelephone(cristinPerson.getTel()).build();
-    }
-
-    private List<Affiliation> sortedListOfAffiliations(List<Affiliation> listToSort) {
-        return listToSort.stream().sorted(Comparator.comparing(Affiliation::hashCode)).collect(Collectors.toList());
-    }
-
-    private static List<Affiliation> extractAffiliations(CristinPerson cristinPerson) {
-        return cristinPerson.getAffiliations().stream().map(Affiliation::fromCristinAffiliation).collect(
-            Collectors.toList());
-    }
 }

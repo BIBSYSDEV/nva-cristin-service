@@ -43,7 +43,7 @@ public class CristinPersonTest {
         String nvaBody = getBodyFromResource(NVA_API_GET_PERSON_JSON);
         Person expectedNvaPerson = fromJson(nvaBody, Person.class);
 
-        Person actualNvaPerson = Person.fromCristinPerson(cristinPerson);
+        Person actualNvaPerson = cristinPerson.toPerson();
 
         assertThat(actualNvaPerson, equalTo(expectedNvaPerson));
     }

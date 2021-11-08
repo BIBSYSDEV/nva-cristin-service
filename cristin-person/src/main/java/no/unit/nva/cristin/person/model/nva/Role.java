@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.person.model.nva;
 
-import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -8,7 +7,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import no.unit.nva.cristin.person.model.cristin.CristinAffiliation;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("PMD.ShortClassName")
@@ -79,8 +77,4 @@ public class Role {
         }
     }
 
-    public static Role fromCristinAffiliation(CristinAffiliation cristinAffiliation) {
-        URI uri = attempt(() -> new URI("https://example.org/link/to/ontology#1026")).orElseThrow();
-        return new Builder().withId(uri).withLabels(cristinAffiliation.getPosition()).build();
-    }
 }
