@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
@@ -86,7 +87,7 @@ public class CristinPerson {
     }
 
     public List<CristinAffiliation> getAffiliations() {
-        return affiliations != null ? affiliations : Collections.emptyList();
+        return Objects.nonNull(affiliations) ? affiliations : Collections.emptyList();
     }
 
     public void setAffiliations(List<CristinAffiliation> affiliations) {

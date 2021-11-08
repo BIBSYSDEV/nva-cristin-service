@@ -36,7 +36,7 @@ public class Role {
     }
 
     public Map<String, String> getLabels() {
-        return labels != null ? labels : Collections.emptyMap();
+        return Objects.nonNull(labels) ? labels : Collections.emptyMap();
     }
 
     @JacocoGenerated

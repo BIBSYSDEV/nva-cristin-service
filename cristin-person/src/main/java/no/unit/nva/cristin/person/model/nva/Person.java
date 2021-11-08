@@ -1,8 +1,12 @@
 package no.unit.nva.cristin.person.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static no.unit.nva.cristin.person.Constants.BASE_PATH;
+import static no.unit.nva.cristin.person.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.person.Constants.HTTPS;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -13,14 +17,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import no.unit.nva.cristin.person.PersonUriUtils;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.paths.UriWrapper;
 
 @JacocoGenerated
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonPropertyOrder({"@context"})
 public class Person {
+
+    @JsonIgnore
+    public static final String PERSON_PATH = "person";
 
     @JsonInclude(NON_NULL)
     @JsonProperty("@context")
@@ -70,7 +77,7 @@ public class Person {
      */
     public static Person fromCristinPerson(CristinPerson cristinPerson) {
         return new Person.Builder()
-            .withId(PersonUriUtils.getPersonUriWithId(cristinPerson.getCristinPersonId()))
+            .withId(extractIdUri(cristinPerson.getCristinPersonId()))
             .withIdentifiers(NvaIdentifier.identifiersFromCristinPerson(cristinPerson))
             .withNames(NvaIdentifier.namesFromCristinPerson(cristinPerson))
             .withContactDetails(extractContactDetails(cristinPerson))
@@ -79,16 +86,20 @@ public class Person {
             .build();
     }
 
+    public List<NvaIdentifier> getIdentifiers() {
+        return Objects.nonNull(identifiers) ? identifiers : Collections.emptyList();
+    }
+
     public URI getId() {
         return id;
     }
 
-    public List<NvaIdentifier> getIdentifiers() {
-        return identifiers != null ? identifiers : Collections.emptyList();
+    public List<NvaIdentifier> getNames() {
+        return Objects.nonNull(names) ? names : Collections.emptyList();
     }
 
-    public List<NvaIdentifier> getNames() {
-        return names != null ? names : Collections.emptyList();
+    public List<Affiliation> getAffiliations() {
+        return Objects.nonNull(affiliations) ? affiliations : Collections.emptyList();
     }
 
     public ContactDetails getContactDetails() {
@@ -99,8 +110,9 @@ public class Person {
         return image;
     }
 
-    public List<Affiliation> getAffiliations() {
-        return affiliations != null ? affiliations : Collections.emptyList();
+    private static URI extractIdUri(String cristinPersonId) {
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH).addChild(cristinPersonId)
+            .getUri();
     }
 
     @JacocoGenerated

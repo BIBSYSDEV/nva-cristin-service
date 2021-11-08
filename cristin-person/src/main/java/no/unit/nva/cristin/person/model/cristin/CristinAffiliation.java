@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
@@ -24,7 +25,7 @@ public class CristinAffiliation {
     }
 
     public Map<String, String> getPosition() {
-        return position != null ? position : Collections.emptyMap();
+        return Objects.nonNull(position) ? position : Collections.emptyMap();
     }
 
     public void setPosition(Map<String, String> position) {
