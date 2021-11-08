@@ -9,6 +9,7 @@ import no.unit.nva.cristin.organization.exception.NonExistingUnitError;
 import no.unit.nva.cristin.organization.utils.InstitutionUtils;
 import no.unit.nva.cristin.organization.utils.Language;
 import no.unit.nva.cristin.organization.utils.UriUtils;
+import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.attempt.Failure;
 import nva.commons.core.attempt.Try;
@@ -27,6 +28,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static no.unit.nva.cristin.common.util.UriUtils.buildUri;
+import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_BASE_URL;
+import static no.unit.nva.cristin.projects.Constants.INSTITUTION_PATH;
 import static nva.commons.core.attempt.Try.attempt;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.USER_AGENT;
@@ -182,11 +186,20 @@ public class HttpExecutorImpl extends HttpExecutor {
     }
 
     @Override
-    public JsonNode getSingleUnit(URI uri, Language language)
+    public NvaOrganization getSingleUnit(URI uri, Language language)
         throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
         SingleUnitHierarchyGenerator singleUnitHierarchyGenerator =
             new SingleUnitHierarchyGenerator(uri, language, httpClient);
-        return singleUnitHierarchyGenerator.toJsonLd();
+        SubSubUnitDto subSubUnitDto = singleUnitHierarchyGenerator.fetch(uri);
+        return toNvaOrganization(subSubUnitDto);
+    }
+
+    private NvaOrganization toNvaOrganization(SubSubUnitDto subSubUnitDto) {
+        NvaOrganization nvaOrganization =  new NvaOrganization();
+        nvaOrganization.setId(buildUri(CRISTIN_API_BASE_URL, INSTITUTION_PATH,
+                subSubUnitDto.getId()));
+        nvaOrganization.setName(subSubUnitDto.getUnitName());
+        return nvaOrganization;
     }
 
     public URI getInstitutionUnitUri(URI uri, Language language) throws HttpClientFailureException {

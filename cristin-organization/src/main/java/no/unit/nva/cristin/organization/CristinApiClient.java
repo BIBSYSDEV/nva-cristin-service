@@ -6,6 +6,7 @@ import no.unit.nva.cristin.organization.exception.HttpClientFailureException;
 import no.unit.nva.cristin.organization.exception.InvalidUriException;
 import no.unit.nva.cristin.organization.exception.NonExistingUnitError;
 import no.unit.nva.cristin.organization.utils.Language;
+import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,10 +53,10 @@ public class CristinApiClient {
      * @throws NonExistingUnitError       when the URI does not correspond to an existing unit.
      * @throws HttpClientFailureException when Cristin server reports failure
      */
-    public JsonNode getSingleUnit(URI uri, Language language)
+    public NvaOrganization getSingleUnit(URI uri, Language language)
         throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
         logger.info("Fetching resutls for: " + uri.toString());
-        JsonNode result = httpExecutor.getSingleUnit(uri, language);
+        NvaOrganization result = httpExecutor.getSingleUnit(uri, language);
         return result;
     }
 }

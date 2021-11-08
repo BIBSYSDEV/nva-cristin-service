@@ -76,7 +76,7 @@ public class SingleUnitHierarchyGenerator {
         return current;
     }
 
-    private SubSubUnitDto fetch(URI uri)
+    SubSubUnitDto fetch(URI uri)
         throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
 
         HttpRequest httpRequest = createHttpRequest(uri);
@@ -117,7 +117,5 @@ public class SingleUnitHierarchyGenerator {
             .build();
     }
 
-    public JsonNode toJsonLd() {
-        return null;
-    }
+
 }

@@ -6,6 +6,7 @@ import no.unit.nva.cristin.organization.exception.HttpClientFailureException;
 import no.unit.nva.cristin.organization.exception.InvalidUriException;
 import no.unit.nva.cristin.organization.exception.NonExistingUnitError;
 import no.unit.nva.cristin.organization.utils.Language;
+import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
 import org.apache.http.HttpStatus;
 
 import java.net.URI;
@@ -25,7 +26,7 @@ public abstract class HttpExecutor {
     public abstract JsonNode getNestedInstitution(URI uri, Language language)
         throws HttpClientFailureException, InvalidUriException, FailedHttpRequestException;
 
-    public abstract JsonNode getSingleUnit(URI uri, Language language)
+    public abstract NvaOrganization getSingleUnit(URI uri, Language language)
         throws NonExistingUnitError, HttpClientFailureException, InterruptedException;
 
     protected HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response)
