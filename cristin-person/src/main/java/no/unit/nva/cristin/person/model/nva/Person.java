@@ -4,6 +4,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.person.Constants.BASE_PATH;
 import static no.unit.nva.cristin.person.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.person.Constants.HTTPS;
+import static no.unit.nva.cristin.person.Constants.PERSON_CONTEXT;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,7 +32,7 @@ public class Person {
 
     @JsonInclude(NON_NULL)
     @JsonProperty("@context")
-    private String context;
+    private static String context = PERSON_CONTEXT;
     private final URI id;
     private final List<NvaIdentifier> identifiers;
     private final List<NvaIdentifier> names;
@@ -42,7 +43,6 @@ public class Person {
     /**
      * Creates a Person for serialization to client.
      *
-     * @param context        The ontology context.
      * @param id             Identifier of Person.
      * @param identifiers    Different identifiers related to this object.
      * @param names          Different names for this Person.
@@ -51,12 +51,10 @@ public class Person {
      * @param affiliations   This person's organization affiliations.
      */
     @JsonCreator
-    public Person(@JsonProperty("@context") String context, @JsonProperty("id") URI id,
-                  @JsonProperty("identifiers") List<NvaIdentifier> identifiers,
+    public Person(@JsonProperty("id") URI id, @JsonProperty("identifiers") List<NvaIdentifier> identifiers,
                   @JsonProperty("names") List<NvaIdentifier> names,
                   @JsonProperty("contactDetails") ContactDetails contactDetails, @JsonProperty("image") URI image,
                   @JsonProperty("affiliations") List<Affiliation> affiliations) {
-        this.context = context;
         this.id = id;
         this.identifiers = identifiers;
         this.names = names;
@@ -150,21 +148,19 @@ public class Person {
         return listToSort.stream().sorted(Comparator.comparing(NvaIdentifier::getType)).collect(Collectors.toList());
     }
 
+    public void setContext(String thatContext) {
+        context = thatContext;
+    }
+
     @JacocoGenerated
     public static final class Builder {
 
-        private transient String context;
         private transient URI id;
         private transient List<NvaIdentifier> identifiers;
         private transient List<NvaIdentifier> names;
         private transient ContactDetails contactDetails;
         private transient URI image;
         private transient List<Affiliation> affiliations;
-
-        public Builder withContext(String context) {
-            this.context = context;
-            return this;
-        }
 
         public Builder withId(URI id) {
             this.id = id;
@@ -197,13 +193,9 @@ public class Person {
         }
 
         public Person build() {
-            return new Person(this.context, this.id, this.identifiers, this.names, this.contactDetails,
+            return new Person(this.id, this.identifiers, this.names, this.contactDetails,
                 this.image, this.affiliations);
         }
-    }
-
-    public void setContext(String context) {
-        this.context = context;
     }
 
     private static ContactDetails extractContactDetails(CristinPerson cristinPerson) {
