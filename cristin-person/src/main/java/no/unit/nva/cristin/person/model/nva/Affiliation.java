@@ -12,7 +12,7 @@ import nva.commons.core.JacocoGenerated;
 public class Affiliation {
 
     private final URI organization;
-    private final Boolean active;
+    private final boolean active;
     private final Role role;
 
     /**
@@ -34,7 +34,7 @@ public class Affiliation {
         return organization;
     }
 
-    public Boolean getActive() {
+    public boolean isActive() {
         return active;
     }
 
@@ -53,14 +53,14 @@ public class Affiliation {
         }
         Affiliation that = (Affiliation) o;
         return Objects.equals(getOrganization(), that.getOrganization())
-            && Objects.equals(getActive(), that.getActive())
+            && Objects.equals(isActive(), that.isActive())
             && Objects.equals(getRole(), that.getRole());
     }
 
     @JacocoGenerated
     @Override
     public int hashCode() {
-        return Objects.hash(getOrganization(), getActive(), getRole());
+        return Objects.hash(getOrganization(), isActive(), getRole());
     }
 
 }

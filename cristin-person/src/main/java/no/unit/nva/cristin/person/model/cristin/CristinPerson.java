@@ -3,7 +3,6 @@ package no.unit.nva.cristin.person.model.cristin;
 import static no.unit.nva.cristin.person.Constants.BASE_PATH;
 import static no.unit.nva.cristin.person.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.person.Constants.HTTPS;
-import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -59,8 +58,8 @@ public class CristinPerson {
         this.cristinPersonId = cristinPersonId;
     }
 
-    public CristinOrcid getOrcid() {
-        return orcid;
+    public Optional<CristinOrcid> getOrcid() {
+        return Optional.ofNullable(orcid);
     }
 
     public void setOrcid(CristinOrcid orcid) {
@@ -83,32 +82,32 @@ public class CristinPerson {
         this.surname = surname;
     }
 
-    public String getFirstNamePreferred() {
-        return firstNamePreferred;
+    public Optional<String> getFirstNamePreferred() {
+        return Optional.ofNullable(firstNamePreferred);
     }
 
     public void setFirstNamePreferred(String firstNamePreferred) {
         this.firstNamePreferred = firstNamePreferred;
     }
 
-    public String getSurnamePreferred() {
-        return surnamePreferred;
+    public Optional<String> getSurnamePreferred() {
+        return Optional.ofNullable(surnamePreferred);
     }
 
     public void setSurnamePreferred(String surnamePreferred) {
         this.surnamePreferred = surnamePreferred;
     }
 
-    public String getTel() {
-        return tel;
+    public Optional<String> getTel() {
+        return Optional.ofNullable(tel);
     }
 
     public void setTel(String tel) {
         this.tel = tel;
     }
 
-    public String getPictureUrl() {
-        return pictureUrl;
+    public Optional<String> getPictureUrl() {
+        return Optional.ofNullable(pictureUrl);
     }
 
     public void setPictureUrl(String pictureUrl) {
@@ -133,10 +132,14 @@ public class CristinPerson {
             .withId(extractIdUri())
             .withIdentifiers(extractIdentifiers())
             .withNames(extractNames())
-            .withContactDetails(new ContactDetails(getTel()))
+            .withContactDetails(extractContactDetails())
             .withImage(extractImage())
             .withAffiliations(extractAffiliations())
             .build();
+    }
+
+    private ContactDetails extractContactDetails() {
+        return getTel().map(ContactDetails::new).orElse(null);
     }
 
     private URI extractIdUri() {
@@ -152,11 +155,8 @@ public class CristinPerson {
     private List<TypedValue> extractIdentifiers() {
         List<TypedValue> identifiers = new ArrayList<>();
 
-        Optional.ofNullable(getCristinPersonId())
-            .ifPresent(id -> identifiers.add(new TypedValue(CRISTIN_IDENTIFIER, id)));
-        Optional.ofNullable(getOrcid())
-            .map(CristinOrcid::getId)
-            .ifPresent(id -> identifiers.add(new TypedValue(ORCID, id)));
+        identifiers.add(new TypedValue(CRISTIN_IDENTIFIER, getCristinPersonId()));
+        getOrcid().flatMap(CristinOrcid::getId).ifPresent(id -> identifiers.add(new TypedValue(ORCID, id)));
 
         return identifiers;
     }
@@ -169,20 +169,16 @@ public class CristinPerson {
     private List<TypedValue> extractNames() {
         List<TypedValue> names = new ArrayList<>();
 
-        Optional.ofNullable(getFirstName())
-            .ifPresent(id -> names.add(new TypedValue(FIRST_NAME, id)));
-        Optional.ofNullable(getSurname())
-            .ifPresent(id -> names.add(new TypedValue(LAST_NAME, id)));
-        Optional.ofNullable(getFirstNamePreferred())
-            .ifPresent(id -> names.add(new TypedValue(PREFERRED_FIRST_NAME, id)));
-        Optional.ofNullable(getSurnamePreferred())
-            .ifPresent(id -> names.add(new TypedValue(PREFERRED_LAST_NAME, id)));
+        names.add(new TypedValue(FIRST_NAME, getFirstName()));
+        names.add(new TypedValue(LAST_NAME, getSurname()));
+        getFirstNamePreferred().ifPresent(id -> names.add(new TypedValue(PREFERRED_FIRST_NAME, id)));
+        getSurnamePreferred().ifPresent(id -> names.add(new TypedValue(PREFERRED_LAST_NAME, id)));
 
         return names;
     }
 
     private URI extractImage() {
-        return attempt(() -> new URI(getPictureUrl())).orElse(uriFailure -> null);
+        return getPictureUrl().map(UriWrapper::new).map(UriWrapper::getUri).orElse(null);
     }
 
     private List<Affiliation> extractAffiliations() {

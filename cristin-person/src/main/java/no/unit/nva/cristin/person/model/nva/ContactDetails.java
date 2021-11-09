@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person.model.nva;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
+import java.util.Optional;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
@@ -15,8 +16,8 @@ public class ContactDetails {
         this.telephone = telephone;
     }
 
-    public String getTelephone() {
-        return telephone;
+    public Optional<String> getTelephone() {
+        return Optional.ofNullable(telephone);
     }
 
     @JacocoGenerated

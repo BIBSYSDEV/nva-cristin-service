@@ -24,7 +24,7 @@ public class CristinPersonTest {
         "nvaApiGetPersonResponse.json";
 
     @Test
-    void cristinModelBuildsCorrectlyWhenDeserializingPersonJson() throws IOException {
+    void shouldBuildCristinModelCorrectlyWhenParsingFromCristinJson() throws IOException {
         String body = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
         CristinPerson cristinPerson = fromJson(body, CristinPerson.class);
 
@@ -36,7 +36,7 @@ public class CristinPersonTest {
     }
 
     @Test
-    void nvaModelBuildsCorrectlyWhenTransformingPersonFromCristinToNvaPerson() throws IOException {
+    void shouldBuildNvaModelCorrectlyWhenConvertingCristinPersonToNvaPerson() throws IOException {
         String cristinBody = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
         CristinPerson cristinPerson = fromJson(cristinBody, CristinPerson.class);
 

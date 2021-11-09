@@ -85,10 +85,6 @@ public class Person {
         return image;
     }
 
-    public void setContext(String thatContext) {
-        context = thatContext;
-    }
-
     public void setId(URI id) {
         this.id = id;
     }
@@ -155,11 +151,6 @@ public class Person {
 
         public Builder() {
             person = new Person();
-        }
-
-        public Builder withContext(String context) {
-            person.setContext(context);
-            return this;
         }
 
         public Builder withId(URI id) {
