@@ -4,8 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.unit.nva.cristin.projects.CristinApiClient;
-import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
+import no.unit.nva.cristin.organization.exception.NonExistingUnitError;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -21,8 +20,6 @@ import org.zalando.problem.Problem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.time.Clock;
 import java.util.Map;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
@@ -33,13 +30,11 @@ import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEP
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasKey;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -72,11 +67,11 @@ class FetchCristinOrganizationTest {
 
     @Test
     @DisplayName("handler Returns NotFound Response On Organization Missing")
-    public void handlerReturnsNotFoundResponseOnPublicationMissing() throws IOException, ApiGatewayException {
+    public void handlerReturnsNotFoundResponseOnPublicationMissing() throws IOException, ApiGatewayException, InterruptedException {
 
         cristinApiClientStub = spy(cristinApiClientStub);
-        doThrow(new NotFoundException("Organization not found: "+IDENTIFIER_VALUE))
-                .when(cristinApiClientStub).getOrganizationByIdentifier(any());
+            doThrow(new NonExistingUnitError("Organization not found: "+IDENTIFIER_VALUE))
+                    .when(cristinApiClientStub).getSingleUnit(any(), any());
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClientStub, environment);
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
@@ -120,11 +115,15 @@ class FetchCristinOrganizationTest {
     @Test
     @DisplayName("handler Returns InternalServerError Response On Unexpected Exception")
     public void handlerReturnsInternalServerErrorResponseOnUnexpectedException()
-            throws IOException, ApiGatewayException {
+            throws IOException, ApiGatewayException, InterruptedException {
         CristinApiClient serviceThrowingException = spy(cristinApiClientStub);
-        doThrow(new NullPointerException())
-                .when(serviceThrowingException)
-                .getOrganizationByIdentifier(any());
+        try {
+            doThrow(new NullPointerException())
+                    .when(serviceThrowingException)
+                    .getSingleUnit(any(), any());
+        } catch (ApiGatewayException e) {
+            e.printStackTrace();
+        }
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(serviceThrowingException, environment);
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);

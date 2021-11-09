@@ -7,6 +7,7 @@ import no.unit.nva.cristin.organization.exception.InvalidUriException;
 import no.unit.nva.cristin.organization.exception.NonExistingUnitError;
 import no.unit.nva.cristin.organization.utils.Language;
 import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -84,8 +84,10 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Nva
                 .filter(VALID_LANGUAGE_CODES::contains)
                 .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_LANGUAGE_INVALID));
     }
+
     private NvaOrganization getTransformedOrganizationFromCristin(String identifier) throws ApiGatewayException, InterruptedException {
-        return cristinApiClient.getSingleUnit(URI.create(identifier), Language.DEFAULT_LANGUAGE); //cristinApiClient.queryOneCristinProjectUsingIdIntoNvaProject(id, language);
+        return Optional.of(cristinApiClient.getSingleUnit(URI.create(identifier), Language.DEFAULT_LANGUAGE))
+                          .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_LANGUAGE_INVALID));
     }
 
     protected static Optional<String> getQueryParam(RequestInfo requestInfo, String queryParameter) {
