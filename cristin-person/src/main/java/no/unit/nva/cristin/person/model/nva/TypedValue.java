@@ -6,13 +6,13 @@ import java.util.Objects;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
-public class NvaIdentifier {
+public class TypedValue {
 
     private final String type;
     private final String value;
 
     @JsonCreator
-    public NvaIdentifier(@JsonProperty("type") String type, @JsonProperty("value") String value) {
+    public TypedValue(@JsonProperty("type") String type, @JsonProperty("value") String value) {
         this.type = type;
         this.value = value;
     }
@@ -31,10 +31,10 @@ public class NvaIdentifier {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof NvaIdentifier)) {
+        if (!(o instanceof TypedValue)) {
             return false;
         }
-        NvaIdentifier that = (NvaIdentifier) o;
+        TypedValue that = (TypedValue) o;
         return Objects.equals(getType(), that.getType()) && Objects.equals(getValue(), that.getValue());
     }
 

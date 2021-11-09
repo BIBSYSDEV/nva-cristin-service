@@ -16,8 +16,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
 import no.unit.nva.cristin.person.model.nva.ContactDetails;
-import no.unit.nva.cristin.person.model.nva.NvaIdentifier;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.TypedValue;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
 
@@ -149,14 +149,14 @@ public class CristinPerson {
      *
      * @return List of transformed identifiers
      */
-    private List<NvaIdentifier> extractIdentifiers() {
-        List<NvaIdentifier> identifiers = new ArrayList<>();
+    private List<TypedValue> extractIdentifiers() {
+        List<TypedValue> identifiers = new ArrayList<>();
 
         Optional.ofNullable(getCristinPersonId())
-            .ifPresent(id -> identifiers.add(new NvaIdentifier(CRISTIN_IDENTIFIER, id)));
+            .ifPresent(id -> identifiers.add(new TypedValue(CRISTIN_IDENTIFIER, id)));
         Optional.ofNullable(getOrcid())
             .map(CristinOrcid::getId)
-            .ifPresent(id -> identifiers.add(new NvaIdentifier(ORCID, id)));
+            .ifPresent(id -> identifiers.add(new TypedValue(ORCID, id)));
 
         return identifiers;
     }
@@ -166,17 +166,17 @@ public class CristinPerson {
      *
      * @return List of transformed names
      */
-    private List<NvaIdentifier> extractNames() {
-        List<NvaIdentifier> names = new ArrayList<>();
+    private List<TypedValue> extractNames() {
+        List<TypedValue> names = new ArrayList<>();
 
         Optional.ofNullable(getFirstName())
-            .ifPresent(id -> names.add(new NvaIdentifier(FIRST_NAME, id)));
+            .ifPresent(id -> names.add(new TypedValue(FIRST_NAME, id)));
         Optional.ofNullable(getSurname())
-            .ifPresent(id -> names.add(new NvaIdentifier(LAST_NAME, id)));
+            .ifPresent(id -> names.add(new TypedValue(LAST_NAME, id)));
         Optional.ofNullable(getFirstNamePreferred())
-            .ifPresent(id -> names.add(new NvaIdentifier(PREFERRED_FIRST_NAME, id)));
+            .ifPresent(id -> names.add(new TypedValue(PREFERRED_FIRST_NAME, id)));
         Optional.ofNullable(getSurnamePreferred())
-            .ifPresent(id -> names.add(new NvaIdentifier(PREFERRED_LAST_NAME, id)));
+            .ifPresent(id -> names.add(new TypedValue(PREFERRED_LAST_NAME, id)));
 
         return names;
     }

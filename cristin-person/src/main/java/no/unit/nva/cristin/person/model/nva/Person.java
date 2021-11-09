@@ -24,8 +24,8 @@ public class Person {
     @JsonProperty("@context")
     private static String context = PERSON_CONTEXT;
     private URI id;
-    private List<NvaIdentifier> identifiers;
-    private List<NvaIdentifier> names;
+    private List<TypedValue> identifiers;
+    private List<TypedValue> names;
     private ContactDetails contactDetails;
     private URI image;
     private List<Affiliation> affiliations;
@@ -45,8 +45,8 @@ public class Person {
      * @param affiliations   This person's organization affiliations.
      */
     @JsonCreator
-    public Person(@JsonProperty("id") URI id, @JsonProperty("identifiers") List<NvaIdentifier> identifiers,
-                  @JsonProperty("names") List<NvaIdentifier> names,
+    public Person(@JsonProperty("id") URI id, @JsonProperty("identifiers") List<TypedValue> identifiers,
+                  @JsonProperty("names") List<TypedValue> names,
                   @JsonProperty("contactDetails") ContactDetails contactDetails, @JsonProperty("image") URI image,
                   @JsonProperty("affiliations") List<Affiliation> affiliations) {
         this.id = id;
@@ -61,7 +61,7 @@ public class Person {
         return context;
     }
 
-    public List<NvaIdentifier> getIdentifiers() {
+    public List<TypedValue> getIdentifiers() {
         return Objects.nonNull(identifiers) ? identifiers : Collections.emptyList();
     }
 
@@ -69,8 +69,8 @@ public class Person {
         return id;
     }
 
-    public List<NvaIdentifier> getNames() {
-        return Objects.nonNull(names) ? names : Collections.emptyList();
+    public void setIdentifiers(List<TypedValue> identifiers) {
+        this.identifiers = identifiers;
     }
 
     public List<Affiliation> getAffiliations() {
@@ -93,11 +93,11 @@ public class Person {
         this.id = id;
     }
 
-    public void setIdentifiers(List<NvaIdentifier> identifiers) {
-        this.identifiers = identifiers;
+    public List<TypedValue> getNames() {
+        return Objects.nonNull(names) ? names : Collections.emptyList();
     }
 
-    public void setNames(List<NvaIdentifier> names) {
+    public void setNames(List<TypedValue> names) {
         this.names = names;
     }
 
@@ -140,8 +140,8 @@ public class Person {
             sortedListOfAffiliations(getAffiliations()));
     }
 
-    private List<NvaIdentifier> sortedListOfIdentifiers(List<NvaIdentifier> listToSort) {
-        return listToSort.stream().sorted(Comparator.comparing(NvaIdentifier::getType)).collect(Collectors.toList());
+    private List<TypedValue> sortedListOfIdentifiers(List<TypedValue> listToSort) {
+        return listToSort.stream().sorted(Comparator.comparing(TypedValue::getType)).collect(Collectors.toList());
     }
 
     private List<Affiliation> sortedListOfAffiliations(List<Affiliation> listToSort) {
@@ -167,12 +167,12 @@ public class Person {
             return this;
         }
 
-        public Builder withIdentifiers(List<NvaIdentifier> identifiers) {
+        public Builder withIdentifiers(List<TypedValue> identifiers) {
             person.setIdentifiers(identifiers);
             return this;
         }
 
-        public Builder withNames(List<NvaIdentifier> names) {
+        public Builder withNames(List<TypedValue> names) {
             person.setNames(names);
             return this;
         }
