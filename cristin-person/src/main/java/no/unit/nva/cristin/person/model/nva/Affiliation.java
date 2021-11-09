@@ -63,31 +63,4 @@ public class Affiliation {
         return Objects.hash(getOrganization(), getActive(), getRole());
     }
 
-    @JacocoGenerated
-    public static final class Builder {
-
-        private transient URI organization;
-        private transient Boolean active;
-        private transient Role role;
-
-        public Builder withOrganization(URI organization) {
-            this.organization = organization;
-            return this;
-        }
-
-        public Builder withActive(Boolean active) {
-            this.active = active;
-            return this;
-        }
-
-        public Builder withRole(Role role) {
-            this.role = role;
-            return this;
-        }
-
-        public Affiliation build() {
-            return new Affiliation(this.organization, this.active, this.role);
-        }
-    }
-
 }

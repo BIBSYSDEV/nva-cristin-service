@@ -23,12 +23,16 @@ public class Person {
     @JsonInclude(NON_NULL)
     @JsonProperty("@context")
     private static String context = PERSON_CONTEXT;
-    private final URI id;
-    private final List<NvaIdentifier> identifiers;
-    private final List<NvaIdentifier> names;
-    private final ContactDetails contactDetails;
-    private final URI image;
-    private final List<Affiliation> affiliations;
+    private URI id;
+    private List<NvaIdentifier> identifiers;
+    private List<NvaIdentifier> names;
+    private ContactDetails contactDetails;
+    private URI image;
+    private List<Affiliation> affiliations;
+
+    public Person() {
+
+    }
 
     /**
      * Creates a Person for serialization to client.
@@ -81,6 +85,34 @@ public class Person {
         return image;
     }
 
+    public void setContext(String thatContext) {
+        context = thatContext;
+    }
+
+    public void setId(URI id) {
+        this.id = id;
+    }
+
+    public void setIdentifiers(List<NvaIdentifier> identifiers) {
+        this.identifiers = identifiers;
+    }
+
+    public void setNames(List<NvaIdentifier> names) {
+        this.names = names;
+    }
+
+    public void setContactDetails(ContactDetails contactDetails) {
+        this.contactDetails = contactDetails;
+    }
+
+    public void setImage(URI image) {
+        this.image = image;
+    }
+
+    public void setAffiliations(List<Affiliation> affiliations) {
+        this.affiliations = affiliations;
+    }
+
     @JacocoGenerated
     @Override
     public boolean equals(Object o) {
@@ -116,53 +148,52 @@ public class Person {
         return listToSort.stream().sorted(Comparator.comparing(Affiliation::hashCode)).collect(Collectors.toList());
     }
 
-    public void setContext(String thatContext) {
-        context = thatContext;
-    }
-
     @JacocoGenerated
     public static final class Builder {
 
-        private transient URI id;
-        private transient List<NvaIdentifier> identifiers;
-        private transient List<NvaIdentifier> names;
-        private transient ContactDetails contactDetails;
-        private transient URI image;
-        private transient List<Affiliation> affiliations;
+        private final transient Person person;
+
+        public Builder() {
+            person = new Person();
+        }
+
+        public Builder withContext(String context) {
+            person.setContext(context);
+            return this;
+        }
 
         public Builder withId(URI id) {
-            this.id = id;
+            person.setId(id);
             return this;
         }
 
         public Builder withIdentifiers(List<NvaIdentifier> identifiers) {
-            this.identifiers = identifiers;
+            person.setIdentifiers(identifiers);
             return this;
         }
 
         public Builder withNames(List<NvaIdentifier> names) {
-            this.names = names;
+            person.setNames(names);
             return this;
         }
 
         public Builder withContactDetails(ContactDetails contactDetails) {
-            this.contactDetails = contactDetails;
+            person.setContactDetails(contactDetails);
             return this;
         }
 
         public Builder withImage(URI image) {
-            this.image = image;
+            person.setImage(image);
             return this;
         }
 
         public Builder withAffiliations(List<Affiliation> affiliations) {
-            this.affiliations = affiliations;
+            person.setAffiliations(affiliations);
             return this;
         }
 
         public Person build() {
-            return new Person(this.id, this.identifiers, this.names, this.contactDetails,
-                this.image, this.affiliations);
+            return person;
         }
     }
 

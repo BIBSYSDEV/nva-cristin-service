@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
 import no.unit.nva.cristin.person.model.nva.Role;
-import no.unit.nva.cristin.person.model.nva.Role.Builder;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
@@ -52,14 +51,11 @@ public class CristinAffiliation {
      */
     public Affiliation toAffiliation() {
         URI organization = attempt(() -> new URI(getUnit().getUrl())).orElse(uriFailure -> null);
-        Boolean active = getActive();
-        Role role = toAffiliationRole();
-
-        return new Affiliation.Builder().withOrganization(organization).withActive(active).withRole(role).build();
+        return new Affiliation(organization, getActive(), extractAffiliationRole());
     }
 
-    private Role toAffiliationRole() {
+    private Role extractAffiliationRole() {
         URI uri = attempt(() -> new URI("https://example.org/link/to/ontology#1026")).orElseThrow();
-        return new Builder().withId(uri).withLabels(getPosition()).build();
+        return new Role(uri, getPosition());
     }
 }

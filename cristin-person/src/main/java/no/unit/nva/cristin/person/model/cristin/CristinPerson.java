@@ -140,8 +140,8 @@ public class CristinPerson {
     }
 
     private URI extractIdUri() {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH).addChild(cristinPersonId)
-            .getUri();
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH)
+            .addChild(getCristinPersonId()).getUri();
     }
 
     /**

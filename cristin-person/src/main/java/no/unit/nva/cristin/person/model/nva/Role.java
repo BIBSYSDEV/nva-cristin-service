@@ -56,25 +56,4 @@ public class Role {
         return Objects.hash(getId(), getLabels());
     }
 
-    @JacocoGenerated
-    public static final class Builder {
-
-        private transient URI id;
-        private transient Map<String, String> labels;
-
-        public Builder withId(URI id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder withLabels(Map<String, String> labels) {
-            this.labels = labels;
-            return this;
-        }
-
-        public Role build() {
-            return new Role(this.id, this.labels);
-        }
-    }
-
 }
