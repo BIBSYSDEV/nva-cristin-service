@@ -2,7 +2,6 @@ package no.unit.nva.cristin.organization;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.exception.HttpClientFailureException;
@@ -76,7 +75,7 @@ public class SingleUnitHierarchyGenerator {
         return current;
     }
 
-    SubSubUnitDto fetch(URI uri)
+    public SubSubUnitDto fetch(URI uri)
         throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
 
         HttpRequest httpRequest = createHttpRequest(uri);
@@ -116,6 +115,5 @@ public class SingleUnitHierarchyGenerator {
             .uri(uri)
             .build();
     }
-
 
 }

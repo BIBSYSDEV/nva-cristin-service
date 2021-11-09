@@ -67,10 +67,11 @@ class FetchCristinOrganizationTest {
 
     @Test
     @DisplayName("handler Returns NotFound Response On Organization Missing")
-    public void handlerReturnsNotFoundResponseOnPublicationMissing() throws IOException, ApiGatewayException, InterruptedException {
+    public void handlerReturnsNotFoundResponseOnPublicationMissing()
+            throws IOException, ApiGatewayException, InterruptedException {
 
         cristinApiClientStub = spy(cristinApiClientStub);
-            doThrow(new NonExistingUnitError("Organization not found: "+IDENTIFIER_VALUE))
+            doThrow(new NonExistingUnitError("Organization not found: " + IDENTIFIER_VALUE))
                     .when(cristinApiClientStub).getSingleUnit(any(), any());
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClientStub, environment);

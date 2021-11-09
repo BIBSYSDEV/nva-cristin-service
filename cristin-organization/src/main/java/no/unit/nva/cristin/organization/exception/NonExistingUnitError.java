@@ -13,6 +13,6 @@ public class NonExistingUnitError extends ApiGatewayException {
 
     @Override
     protected Integer statusCode() {
-        return HttpStatus.SC_BAD_GATEWAY;
+        return HttpStatus.SC_NOT_FOUND;
     }
 }

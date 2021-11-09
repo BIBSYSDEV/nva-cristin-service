@@ -23,7 +23,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_Q
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
 import static nva.commons.core.attempt.Try.attempt;
 
-public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, NvaOrganization> {
+public class QueryCristinOrganizationHandler extends ApiGatewayHandler<Void, NvaOrganization> {
 
     public static final String IDENTIFIER_PATTERN = "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$";
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(LANGUAGE);
@@ -32,15 +32,15 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Nva
 
     private final transient CristinApiClient cristinApiClient;
 
-    public FetchCristinOrganizationHandler() {
+    public QueryCristinOrganizationHandler() {
         this(new Environment());
     }
 
-    public FetchCristinOrganizationHandler(Environment environment) {
+    public QueryCristinOrganizationHandler(Environment environment) {
         this(new CristinApiClient(), environment);
     }
 
-    public FetchCristinOrganizationHandler(CristinApiClient cristinApiClient, Environment environment) {
+    public QueryCristinOrganizationHandler(CristinApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }

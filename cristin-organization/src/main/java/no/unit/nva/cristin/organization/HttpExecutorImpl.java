@@ -47,7 +47,7 @@ public class HttpExecutorImpl extends HttpExecutor {
     public static final int MAX_EFFORTS = 2;
     public static final int WAITING_TIME = 500; //500 milliseconds
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
-    private final HttpClient httpClient;
+    private transient final HttpClient httpClient;
 
     private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
 
