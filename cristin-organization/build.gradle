@@ -3,5 +3,5 @@ dependencies {
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
     implementation libs.httpcore
-
+    implementation libs.nva.logutils
 }

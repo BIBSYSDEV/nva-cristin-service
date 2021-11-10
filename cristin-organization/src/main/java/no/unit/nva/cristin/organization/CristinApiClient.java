@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.organization;
 
+import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.model.nva.Organization;
 import no.unit.nva.cristin.organization.exception.HttpClientFailureException;
 import no.unit.nva.cristin.organization.exception.NonExistingUnitError;
@@ -8,11 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.Map;
 
 public class CristinApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
+
     private final transient HttpExecutor httpExecutor;
 
     public CristinApiClient() {
@@ -32,14 +35,17 @@ public class CristinApiClient {
      */
     public Organization getSingleUnit(URI uri, Language language)
             throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
-        logger.info("Fetching resutls for: " + uri.toString());
+        logger.info("Fetching results for: " + uri.toString());
         Organization result = httpExecutor.getSingleUnit(uri, language);
         return result;
     }
 
 
-    public OrganizationListResponse queryInstitutions(Map<String, String> requestQueryParams)
+    public SearchResponse<Organization> queryInstitutions(Map<String, String> requestQueryParams)
             throws HttpClientFailureException {
-        return null;
+        return new SearchResponse()
+                .withProcessingTime(0L)
+                .withHits(Collections.emptyList());
     }
+
 }

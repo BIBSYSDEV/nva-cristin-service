@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.organization.utils;
 
+import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.model.nva.Organization;
-import no.unit.nva.cristin.organization.OrganizationListResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import nva.commons.core.JsonUtils;
 
@@ -25,15 +25,15 @@ public final class InstitutionUtils {
      * @return a list of institutions
      * @throws IOException when the parsing of the JSON string fails.
      */
-    public static OrganizationListResponse toInstitutionListResponse(String institutionsJson)
-        throws IOException {
+    public static SearchResponse<Organization> toInstitutionListResponse(String institutionsJson)
+            throws IOException {
         try {
             List<InstitutionDto> institutions = Arrays.asList(
                     JsonUtils.dtoObjectMapper.readValue(institutionsJson, InstitutionDto[].class));
-            return new OrganizationListResponse(institutions
-                .stream()
-                .map(InstitutionUtils::toInstitutionResponse)
-                .collect(Collectors.toList()));
+            return new SearchResponse<Organization>().withHits(institutions
+                    .stream()
+                    .map(InstitutionUtils::toInstitutionResponse)
+                    .collect(Collectors.toList()));
         } catch (IOException e) {
             throw new IOException(PARSE_ERROR + institutionsJson, e);
         }
@@ -41,10 +41,10 @@ public final class InstitutionUtils {
 
     private static Organization toInstitutionResponse(InstitutionDto institutionDto) {
         return new Organization.Builder()
-            .withId(institutionDto.getUri())
-            .withName(institutionDto.getName())
-            .withAcronym(institutionDto.getAcronym())
-            .build();
+                .withId(institutionDto.getUri())
+                .withName(institutionDto.getName())
+                .withAcronym(institutionDto.getAcronym())
+                .build();
     }
 
 }

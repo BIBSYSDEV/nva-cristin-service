@@ -28,7 +28,7 @@ import nva.commons.core.JacocoGenerated;
     JsonPropertyNames.CONTEXT, JsonPropertyNames.ID, JsonPropertyNames.SIZE, JsonPropertyNames.SEARCH_STRING,
     JsonPropertyNames.PROCESSING_TIME, JsonPropertyNames.FIRST_RECORD, JsonPropertyNames.NEXT_RESULTS,
     JsonPropertyNames.PREVIOUS_RESULTS, JsonPropertyNames.HITS})
-public class SearchResponse {
+public class SearchResponse<E> {
 
     @JsonIgnore
     public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
@@ -51,7 +51,7 @@ public class SearchResponse {
     @JsonProperty
     private URI previousResults;
     @JsonProperty
-    private List<?> hits;
+    private List<E> hits;
 
     public SearchResponse() {
 
@@ -126,7 +126,7 @@ public class SearchResponse {
         return hits;
     }
 
-    public void setHits(List<?> hits) {
+    public void setHits(List<E> hits) {
         this.hits = hits;
     }
 
@@ -140,7 +140,7 @@ public class SearchResponse {
         return this;
     }
 
-    public SearchResponse withHits(List<?> hits) {
+    public SearchResponse withHits(List<E> hits) {
         this.hits = hits;
         return this;
     }

@@ -117,7 +117,7 @@ Resources:
   NvaCristinFetchOrganizationFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: cristin-project
+      CodeUri: cristin-organization
       Handler: no.unit.nva.cristin.organization.FetchCristinOrganizationHandler::handleRequest
       Runtime: java11
       MemorySize: 512

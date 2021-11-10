@@ -3,12 +3,15 @@ package no.unit.nva.cristin.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.common.util.UriUtils;
+import no.unit.nva.cristin.model.nva.Organization;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 import java.util.Map;
@@ -30,7 +33,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_MIS
 import static nva.commons.core.attempt.Try.attempt;
 
 @SuppressWarnings("unused")
-public class QueryCristinOrganizationHandler extends ApiGatewayHandler<Void, OrganizationListResponse> {
+public class QueryCristinOrganizationHandler extends ApiGatewayHandler<Void, SearchResponse<Organization>> {
 
     protected static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final char CHARACTER_DASH = '-';
@@ -39,6 +42,16 @@ public class QueryCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
     private static final Set<String> VALID_LANGUAGE_CODES = Set.of("en", "nb", "nn");
     private final transient CristinApiClient cristinApiClient;
+
+    @JacocoGenerated
+    public QueryCristinOrganizationHandler() {
+        this(new Environment());
+    }
+
+    @JacocoGenerated
+    public QueryCristinOrganizationHandler(Environment environment) {
+        this(new CristinApiClient(), environment);
+    }
 
     public QueryCristinOrganizationHandler(CristinApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment);
@@ -57,7 +70,7 @@ public class QueryCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
     }
 
     @Override
-    protected OrganizationListResponse processInput(Void input, RequestInfo requestInfo, Context context)
+    protected SearchResponse<Organization> processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 
         validateThatSuppliedQueryParamsIsSupported(requestInfo);
@@ -76,7 +89,7 @@ public class QueryCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
     }
 
     @Override
-    protected Integer getSuccessStatusCode(Void input, OrganizationListResponse output) {
+    protected Integer getSuccessStatusCode(Void input, SearchResponse<Organization> output) {
         return HttpURLConnection.HTTP_OK;
     }
 
@@ -86,7 +99,7 @@ public class QueryCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
         }
     }
 
-    private OrganizationListResponse queryOrganizationsFromCristin(Map<String, String> requestQueryParams)
+    private SearchResponse<Organization> queryOrganizationsFromCristin(Map<String, String> requestQueryParams)
             throws ApiGatewayException, InterruptedException {
 
         return Optional.of(cristinApiClient.queryInstitutions(requestQueryParams))

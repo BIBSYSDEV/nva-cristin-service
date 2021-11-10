@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.organization;
 
+import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.model.nva.Organization;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.exception.HttpClientFailureException;
@@ -58,7 +59,7 @@ public class HttpExecutorImpl extends HttpExecutor {
     }
 
     @Override
-    public OrganizationListResponse getInstitutions(Language language) throws HttpClientFailureException {
+    public SearchResponse<Organization> getInstitutions(Language language) throws HttpClientFailureException {
 
         return attempt(() -> URI.create(generateInstitutionsQueryUri(language)))
                 .flatMap(this::sendRequestMultipleTimes)
@@ -128,18 +129,17 @@ public class HttpExecutorImpl extends HttpExecutor {
     }
 
     private Organization toNvaOrganization(SubSubUnitDto subSubUnitDto) {
-        Organization nvaOrganization = new Organization.Builder()
+        return new Organization.Builder()
                 .withId(buildUri(CRISTIN_API_BASE_URL, INSTITUTION_PATH,
                 subSubUnitDto.getId()))
                 .withName(subSubUnitDto.getUnitName()).build();
-        return nvaOrganization;
     }
 
     private <T> HttpClientFailureException handleError(Failure<T> failure) {
         return new HttpClientFailureException(failure.getException(), failure.getException().getMessage());
     }
 
-    private OrganizationListResponse toInstitutionListResponse(String institutionDto) throws IOException {
+    private SearchResponse<Organization> toInstitutionListResponse(String institutionDto) throws IOException {
         return InstitutionUtils.toInstitutionListResponse(institutionDto);
     }
 
