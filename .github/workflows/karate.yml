@@ -24,5 +24,9 @@ jobs:
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
       # Run karate tests on deployed api
       - name: Run Karate tests with Gradle
-        run: ./gradlew test
+        uses: erikbos/karate-action@main
+        with:
+          url: https://api.dev.nva.aws.unit.no/test-cristin/
+          tests: |
+            cristin-organization/src/test/java/no/unit/nva/cristin/organization/organization.feature
 
