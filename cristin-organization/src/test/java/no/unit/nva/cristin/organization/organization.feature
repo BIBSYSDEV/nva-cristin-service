@@ -3,7 +3,7 @@ Feature: API tests for Cristin Organization retrieve and search
   Background:
     * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
     * def testOrganizationNameSearchTerm = 'univers'
-    * def CRISTIN_BASE = SERVER_URL + '/test-cristin'
+    * def CRISTIN_BASE = SERVER_URL + '/karate-cristin'
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingOrganizationId = '0'
     Given url CRISTIN_BASE
@@ -49,4 +49,4 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'https://api.dev.nva.aws.unit.no/test-cristin/project/0'
+    And match response.detail == 'https://api.dev.nva.aws.unit.no/karate-cristin/project/0'
