@@ -1,0 +1,66 @@
+{
+  "@context": "https://example.org/person-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/person/359084",
+  "type": "Person",
+  "identifiers": [
+    {
+      "type": "CristinIdentifier",
+      "value": "359084"
+    },
+    {
+      "type": "ORCID",
+      "value": "1234-1234-1234-1234"
+    }
+  ],
+  "names": [
+    {
+      "type": "PreferredFirstName",
+      "value": "Ola"
+    },
+    {
+      "type": "PreferredLastName",
+      "value": "Nordmann"
+    },
+    {
+      "type": "FirstName",
+      "value": "Kjell Ola"
+    },
+    {
+      "type": "LastName",
+      "value": "Nordmann"
+    }
+  ],
+  "contactDetails": {
+    "telephone": "+4799885566"
+  },
+  "image": "https://api.cristin.no/v2/persons/359084/picture",
+  "affiliations": [
+    {
+      "type": "Affiliation",
+      "organization": "https://api.cristin.no/v2/units/185.11.0.0",
+      "active": true,
+      "role": {
+        "id": "https://example.org/link/to/ontology#1026",
+        "type": "Role",
+        "labels": {
+          "en": "Researcher",
+          "nb": "Forsker",
+          "nn": "Forskar"
+        }
+      }
+    },
+    {
+      "type": "Affiliation",
+      "organization": "https://api.cristin.no/v2/units/185.90.0.0",
+      "active": true,
+      "role": {
+        "id": "https://example.org/link/to/ontology#1026",
+        "type": "Role",
+        "labels": {
+          "en": "Head Engineer",
+          "nb": "Overingeniør"
+        }
+      }
+    }
+  ]
+}
