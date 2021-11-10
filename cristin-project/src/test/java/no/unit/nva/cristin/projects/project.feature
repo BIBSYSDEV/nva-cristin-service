@@ -7,7 +7,7 @@ Feature: API tests for Cristin Project retrieve and search
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingProjectId = '0'
 #    Given url CRISTIN_BASE
-    * url url
+    Given url url
 
 
 #  Scenario: GET organization returns list of search results

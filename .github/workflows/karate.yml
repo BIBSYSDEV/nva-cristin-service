@@ -23,7 +23,7 @@ jobs:
       # Prevent prompts and failure when the stack is unchanged
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
       # Run karate tests on deployed api
-      - name: Run Karate tests with Gradle
+      - name: Run Karate tests erikbos/karate-action@main
         uses: erikbos/karate-action@main
         with:
           url: https://api.dev.nva.aws.unit.no/test-cristin/
