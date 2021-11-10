@@ -26,7 +26,7 @@ jobs:
       - name: Run Karate tests erikbos/karate-action@main
         uses: erikbos/karate-action@main
         with:
-          url: https://api.dev.nva.aws.unit.no/test-cristin/
+          url: https://api.dev.nva.aws.unit.no/karate-cristin/
           tests: |
             cristin-organization/src/test/java/no/unit/nva/cristin/organization/organization.feature
             cristin-project/src/test/java/no/unit/nva/cristin/projects/project.feature
