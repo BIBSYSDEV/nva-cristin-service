@@ -26,13 +26,13 @@ tasks.named('test') {
 }
 
 
-tasks.register('karateTesting', Test) {
-    useJUnitPlatform {
-        includeEngines 'junit-jupiter'
-        includeTags("karateTest")
-    }
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-}
+//tasks.register('karateTesting', Test) {
+//    useJUnitPlatform {
+//        includeEngines 'junit-jupiter'
+//        includeTags("karateTest")
+//    }
+//    testLogging {
+//        events 'skipped', 'passed', 'failed'
+//    }
+//}
 
