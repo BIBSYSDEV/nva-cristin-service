@@ -99,7 +99,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-organization
-      Handler: no.unit.nva.cristin.organization.QueryCristinOrganization::handleRequest
+      Handler: no.unit.nva.cristin.organization.QueryCristinOrganizationHandler::handleRequest
       Runtime: java11
       MemorySize: 512
       Events:
@@ -114,11 +114,11 @@ Resources:
               - method.request.querystring.page
               - method.request.querystring.results
 
-  NvaCristinGetOrganizationFunction:
+  NvaCristinFetchOrganizationFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-project
-      Handler: no.unit.nva.cristin.organization.FetchCristinOrganization::handleRequest
+      Handler: no.unit.nva.cristin.organization.FetchCristinOrganizationHandler::handleRequest
       Runtime: java11
       MemorySize: 512
       Events:
@@ -136,3 +136,4 @@ Resources:
       DomainName: !Ref CustomDomain
       RestApiId: !Ref NvaCristinProxyApi
       Stage: !Ref NvaCristinProxyApi.Stage
+

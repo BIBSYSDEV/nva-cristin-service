@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.model.nva;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import no.unit.nva.cristin.model.nva.Organization;
 import no.unit.nva.cristin.projects.ProjectStatus;
 import nva.commons.core.JacocoGenerated;
 
@@ -27,7 +28,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
-import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_POPULAR_SCIENTIFIC_SUMMARY;
 
@@ -63,7 +64,7 @@ public class NvaProject {
     @JsonProperty
     private List<Funding> funding;
     @JsonProperty
-    private NvaOrganization coordinatingInstitution;
+    private Organization coordinatingInstitution;
     @JsonProperty
     private List<NvaContributor> contributors;
     @JsonProperty
@@ -154,11 +155,11 @@ public class NvaProject {
         this.funding = funding;
     }
 
-    public NvaOrganization getCoordinatingInstitution() {
+    public Organization getCoordinatingInstitution() {
         return coordinatingInstitution;
     }
 
-    public void setCoordinatingInstitution(NvaOrganization coordinatingInstitution) {
+    public void setCoordinatingInstitution(Organization coordinatingInstitution) {
         this.coordinatingInstitution = coordinatingInstitution;
     }
 

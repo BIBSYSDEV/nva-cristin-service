@@ -26,6 +26,7 @@ public class Constants {
     public static final String PERSON_PATH = "persons";
     public static final String BASE_PATH = ENVIRONMENT.readEnv("BASE_PATH");
     public static final String ID = "id";
+    public static final String IDENTIFIER = "identifier";
     public static final String LANGUAGE = "language";
     public static final String DOMAIN_NAME = ENVIRONMENT.readEnvOpt("DOMAIN_NAME")
         .orElse("api.dev.nva.aws.unit.no");

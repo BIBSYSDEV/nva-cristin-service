@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.common.util.UriUtils;
+import no.unit.nva.cristin.common.Utils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;

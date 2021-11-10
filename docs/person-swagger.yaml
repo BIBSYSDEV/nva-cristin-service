@@ -1,0 +1,403 @@
+openapi: 3.0.3
+
+info:
+  title: NVA Cristin API
+  version: 1.0.0
+
+paths:
+  /:
+    get:
+      #x-amazon-apigateway-integration:
+      #uri:
+      #Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinProjectsFunction.Arn}/invocations
+      #httpMethod: POST
+      #type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: List persons matching query
+      description: Returns a list of persons based on query parameters
+      operationId: ListPersons
+      parameters:
+        - name: query
+          in: query
+          description: Search string. First name and/or last name
+          required: true
+          schema:
+            type: string
+            pattern: '.+'
+          example: 'Ola Nordmann'
+        - name: page
+          in: query
+          description: Current page requested
+          required: false
+          schema:
+            type: number
+            default: '1'
+          example: '3'
+        - name: results
+          in: query
+          description: Results per page
+          required: false
+          schema:
+            type: number
+            default: '5'
+          example: '10'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Persons'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonsExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Persons'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonsExample'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+  /{id}:
+    get:
+      #x-amazon-apigateway-integration:
+      #uri:
+      #Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinOneProjectFunction.Arn}/invocations
+      #httpMethod: POST
+      #type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Find person by identifier
+      description: Returns a single person matching id parameter
+      operationId: GetPersonById
+      parameters:
+        - name: id
+          in: path
+          description: ID of person to return
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9]+$'
+          example: '359084'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Person'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonExample'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+components:
+  responses:
+    400:
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    404:
+      description: Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    500:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    502:
+      description: Bad Gateway from upstream
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    Persons:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of persons returned by the query
+          items:
+            $ref: '#/components/schemas/Person'
+    Person:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        type:
+          type: string
+          pattern: 'Person'
+          description: The type of the returned object, always Person
+        identifiers:
+          type: array
+          description: Identifiers for this person
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'CristinIdentifier|ORCID'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '\d+|\d{4}-\d{4}-\d{4}-\d{4}'
+                description: Value of identifier
+        names:
+          type: array
+          description: Names for this person
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'PreferredFirstName|PreferredLastName|FirstName|LastName'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '.+'
+                description: Value of identifier
+        contactDetails:
+          type: object
+          description: Contact information
+          properties:
+            telephone:
+              type: string
+              pattern: '\+?\d+'
+            email:
+              type: string
+              pattern: '.+[@].+[.]\w+'
+        image:
+          $ref: '#/components/schemas/Id'
+        affiliations:
+          type: array
+          description: The list of person affiliations
+          items:
+            $ref: '#/components/schemas/Affiliation'
+
+    Problem:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Human-readable description of the error status
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code associated with the problem
+        detail:
+          type: string
+          description: A more detailed error message describing the error and potential mitigations
+        requestId:
+          type: string
+          description: Unique id for the request
+    Context:
+      type: string
+      pattern: 'https:\/\/.*$'
+      description: The JSON-LD context object for the data, which describes the object in the data and allows machine processing of the data at a semantic level
+    Id:
+      type: string
+      pattern: 'https:\/\/.*$'
+      description: The URI of the resource
+    Languages:
+      type: object
+      pattern: '^[a-z]{2}$'
+      additionalProperties:
+        type: string
+        pattern: '.+'
+    Affiliation:
+      type: object
+      description: Person affiliation
+      properties:
+        type:
+          type: string
+          pattern: 'Affiliation'
+          description: Always Affiliation
+        organization:
+          $ref: '#/components/schemas/Id'
+        active:
+          type: boolean
+          description: Person has active affiliation
+        role:
+          type: object
+          description: Person's role at affiliated organization
+          properties:
+            id:
+              $ref: '#/components/schemas/Id'
+            type:
+              type: string
+              pattern: 'Role'
+              description: Always Role
+            labels:
+              $ref: '#/components/schemas/Languages'
+
+  examples:
+    PersonsExample:
+      value:
+        '@context': 'https://example.org/search-api-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?page=1&query=Ola+Nordmann&results=5'
+        size: 150
+        searchString: 'page=1&query=Ola+Nordmann&results=5'
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?page=2&query=Ola+Nordmann&results=5'
+        previousResults: ''
+        hits:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
+            type: 'Person'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '359084'
+              - type: 'ORCID'
+                value: '1234-1234-1234-1234'
+            names:
+              - type: 'PreferredFirstName'
+                value: 'Ola'
+              - type: 'PreferredLastName'
+                value: 'Nordmann'
+              - type: 'FirstName'
+                value: 'Kjell Ola'
+              - type: 'LastName'
+                value: 'Nordmann'
+            contactDetails:
+              telephone: '+4799885566'
+              email: 'kjell@epost.no'
+            image: 'https://api.cristin.no/v2/persons/359084/picture'
+            affiliations:
+              - type: 'Affiliation'
+                organization: 'https://api.cristin.no/v2/units/185.11.0.0'
+                active: true
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Researcher'
+                    nb: 'Forsker'
+                    nn: 'Forskar'
+              - type: 'Affiliation'
+                organization: 'https://api.cristin.no/v2/units/185.90.0.0'
+                active: true
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Head Engineer'
+                    nb: 'Overingeniør'
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
+            type: 'Person'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '567987'
+            names:
+              - type: 'FirstName'
+                value: 'Kjetil'
+              - type: 'LastName'
+                value: 'Nordmann'
+            contactDetails:
+              telephone: '+4744335566'
+            affiliations:
+              - type: 'Affiliation'
+                organization: 'https://api.cristin.no/v2/units/185.90.0.0'
+                active: true
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Consultant'
+
+    PersonExample:
+      value:
+        '@context': 'https://example.org/person-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
+        type: 'Person'
+        identifiers:
+          - type: 'CristinIdentifier'
+            value: '359084'
+          - type: 'ORCID'
+            value: '1234-1234-1234-1234'
+        names:
+          - type: 'PreferredFirstName'
+            value: 'Ola'
+          - type: 'PreferredLastName'
+            value: 'Nordmann'
+          - type: 'FirstName'
+            value: 'Kjell Ola'
+          - type: 'LastName'
+            value: 'Nordmann'
+        contactDetails:
+          telephone: '+4799885566'
+          email: 'kjell@epost.no'
+        image: 'https://api.cristin.no/v2/persons/359084/picture'
+        affiliations:
+          - type: 'Affiliation'
+            organization: 'https://api.cristin.no/v2/units/185.11.0.0'
+            active: true
+            role:
+              id: 'https://example.org/link/to/ontology#1026'
+              type: 'Role'
+              labels:
+                en: 'Researcher'
+                nb: 'Forsker'
+                nn: 'Forskar'
+          - type: 'Affiliation'
+            organization: 'https://api.cristin.no/v2/units/185.90.0.0'
+            active: true
+            role:
+              id: 'https://example.org/link/to/ontology#1026'
+              type: 'Role'
+              labels:
+                en: 'Head Engineer'
+                nb: 'Overingeniør'

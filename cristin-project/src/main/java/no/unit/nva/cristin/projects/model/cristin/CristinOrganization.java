@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects.model.cristin;
 
 import static no.unit.nva.cristin.projects.JsonPropertyNames.UNIT;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import no.unit.nva.cristin.common.model.cristin.CristinInstitution;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")

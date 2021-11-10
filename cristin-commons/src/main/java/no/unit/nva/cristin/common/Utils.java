@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.common;
 
 import java.util.Collections;
 import java.util.List;

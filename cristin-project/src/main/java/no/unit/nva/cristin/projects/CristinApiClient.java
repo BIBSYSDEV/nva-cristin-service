@@ -1,5 +1,36 @@
 package no.unit.nva.cristin.projects;
 
+import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.common.model.SearchResponse;
+import no.unit.nva.cristin.projects.Constants.QueryType;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadGatewayException;
+import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.attempt.Failure;
+import nva.commons.core.attempt.Try;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.common.util.UriUtils.queryParameters;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
@@ -21,34 +52,6 @@ import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithI
 import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithParams;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import no.unit.nva.cristin.common.model.SearchResponse;
-import no.unit.nva.cristin.projects.Constants.QueryType;
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.BadGatewayException;
-import nva.commons.apigateway.exceptions.NotFoundException;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.attempt.Failure;
-import nva.commons.core.attempt.Try;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CristinApiClient {
 
@@ -121,29 +124,26 @@ public class CristinApiClient {
     }
 
     protected HttpResponse<String> queryProjects(Map<String, String> parameters, QueryType queryType)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         URI uri = attempt(() -> generateQueryProjectsUrl(parameters, queryType))
-            .toOptional(failure ->
-                logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters), failure.getException()))
-            .orElseThrow();
+                .toOptional(failure ->
+                        logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED,
+                                queryParameters(parameters), failure.getException()))
+                .orElseThrow();
 
         HttpResponse<String> response = fetchQueryResults(uri);
-
         checkHttpStatusCode(getNvaProjectUriWithParams(parameters).toString(), response.statusCode());
-
         return response;
     }
 
     protected CristinProject getProject(String id, String language) throws ApiGatewayException {
         URI uri = attempt(() -> generateGetProjectUri(id, language))
-            .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
-            .orElseThrow();
+                .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
+                .orElseThrow();
 
         HttpResponse<String> response = fetchGetResult(uri);
-
         checkHttpStatusCode(getNvaProjectUriWithId(id).toString(), response.statusCode());
-
         return getDeserializedResponse(response, CristinProject.class);
     }
 

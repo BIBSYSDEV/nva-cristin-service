@@ -1,7 +1,3 @@
 plugins {
     id 'nva.cristin.service.core.rootplugin'
 }
-
-repositories {
-    mavenCentral()
-}

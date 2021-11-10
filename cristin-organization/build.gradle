@@ -2,4 +2,6 @@ dependencies {
     implementation project(":cristin-commons")
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
+    implementation libs.httpcore
+
 }

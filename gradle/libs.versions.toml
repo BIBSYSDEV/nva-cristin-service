@@ -12,9 +12,11 @@ sl4j = {strictly = '1.7.31'}
 jsoup = {strictly = '1.13.1'}
 aws-lambda-java-core = {strictly = '1.2.1'}
 google-guava = {strictly = '31.0.1-jre'}
+apacheHttpCore = { strictly = "4.4.14" }
 karate-core = {strictly = '1.1.0'}
 karate-apache = {strictly = '0.9.6'}
 karate-junit5 = {strictly = '1.1.0'}
+
 
 [libraries]
 
@@ -51,6 +53,7 @@ sl4j = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'sl4j' }
 jsoup = { group = 'org.jsoup', name = 'jsoup', version.ref = 'jsoup' }
 aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version.ref = 'aws-lambda-java-core' }
 google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'google-guava' }
+httpcore = { group = "org.apache.httpcomponents", name = "httpcore", version.ref = "apacheHttpCore" }
 
 
 [bundles]
