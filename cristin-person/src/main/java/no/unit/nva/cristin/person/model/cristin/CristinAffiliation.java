@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.model.cristin;
 
 import static nva.commons.core.attempt.Try.attempt;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
@@ -16,24 +17,25 @@ import nva.commons.core.JacocoGenerated;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinAffiliation {
 
-    private Boolean active;
-    private Map<String, String> position;
+    private boolean active;
+    @JsonProperty("position")
+    private Map<String, String> roleLabel;
     private CristinUnit unit;
 
-    public Boolean getActive() {
+    public boolean isActive() {
         return active;
     }
 
-    public void setActive(Boolean active) {
+    public void setActive(boolean active) {
         this.active = active;
     }
 
-    public Map<String, String> getPosition() {
-        return Objects.nonNull(position) ? position : Collections.emptyMap();
+    public Map<String, String> getRoleLabel() {
+        return Objects.nonNull(roleLabel) ? roleLabel : Collections.emptyMap();
     }
 
-    public void setPosition(Map<String, String> position) {
-        this.position = position;
+    public void setRoleLabel(Map<String, String> roleLabel) {
+        this.roleLabel = roleLabel;
     }
 
     public CristinUnit getUnit() {
@@ -51,11 +53,11 @@ public class CristinAffiliation {
      */
     public Affiliation toAffiliation() {
         URI organization = attempt(() -> new URI(getUnit().getUrl())).orElse(uriFailure -> null);
-        return new Affiliation(organization, getActive(), extractAffiliationRole());
+        return new Affiliation(organization, isActive(), extractAffiliationRole());
     }
 
     private Role extractAffiliationRole() {
         URI uri = attempt(() -> new URI("https://example.org/link/to/ontology#1026")).orElseThrow();
-        return new Role(uri, getPosition());
+        return new Role(uri, getRoleLabel());
     }
 }
