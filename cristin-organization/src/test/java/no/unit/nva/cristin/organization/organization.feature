@@ -15,25 +15,25 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.hits == '#array'
     And match response.size == '#number'
 
-  Scenario: GET organization with query returns list of search results
-    Given path '/organization'
-    And param query = testOrganizationNameSearchTerm
-    When method GET
-    Then status 200
-    And match response.hits == '#[10]' // hits array length == 6
-#    And match response.total == 6
-    And match response.firstRecord == 1
+#  Scenario: GET organization with query returns list of search results
+#    Given path '/organization'
+#    And param query = testOrganizationNameSearchTerm
+#    When method GET
+#    Then status 200
+#    And match response.hits == '#[10]' // hits array length == 6
+##    And match response.total == 6
+#    And match response.firstRecord == 1
 
 
-  Scenario: GET organization with query and result returns list of search results limited to results with position
-    Given path '/organization'
-    And param query = testOrganizationNameSearchTerm
-    And param results = '2'
-    And param page = '4'
-    When method GET
-    Then status 200
-    And match response.hits == '#[2]' // hits array length == 2
-    And match response.firstRecord == 7
+#  Scenario: GET organization with query and result returns list of search results limited to results with position
+#    Given path '/organization'
+#    And param query = testOrganizationNameSearchTerm
+#    And param results = '2'
+#    And param page = '4'
+#    When method GET
+#    Then status 200
+#    And match response.hits == '#[2]' // hits array length == 2
+#    And match response.firstRecord == 7
 
   Scenario: GET returns status Bad request when requesting illegal organization identifier
     Given path '/organization/' + illegalIdentifier
