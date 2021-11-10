@@ -1,13 +1,12 @@
 Feature: API tests for Cristin Project retrieve and search
 
   Background:
-#    * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
-#    * def CRISTIN_BASE = SERVER_URL + '/karate-cristin'
+    * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
+    * def CRISTIN_BASE = SERVER_URL + '/karate-cristin'
     * def testProjectNameSearchTerm = 'univers'
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingProjectId = '0'
-#    Given url CRISTIN_BASE
-    Given url url
+    Given url CRISTIN_BASE
 
 
 #  Scenario: GET organization returns list of search results
