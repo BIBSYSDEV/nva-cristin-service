@@ -19,11 +19,9 @@ import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.core.JacocoGenerated;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 
-@JacocoGenerated // TODO: Test later
 public class CristinPersonApiClient {
 
     private static final String PERSON_QUERY_CONTEXT = "https://example.org/person-search-context.json";
@@ -40,12 +38,13 @@ public class CristinPersonApiClient {
     public SearchResponse generateQueryResponse(Map<String, String> requestQueryParams) throws BadRequestException {
         return new SearchResponse(getPersonUriWithParams(requestQueryParams))
             .withContext(PERSON_QUERY_CONTEXT)
+            .withProcessingTime(1000L)
             .usingHeadersAndQueryParams(dummyHeaders(), requestQueryParams)
             .withHits(getDummyHits());
     }
 
     private HttpHeaders dummyHeaders() {
-        return HttpHeaders.of(Collections.emptyMap(), (s, s2) -> true);
+        return HttpHeaders.of(Map.of("x-total-count", Collections.singletonList("1")), (s, s2) -> true);
     }
 
     private List<Person> getDummyHits() {

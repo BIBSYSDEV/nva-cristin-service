@@ -7,6 +7,7 @@ public class JsonPropertyNames {
 
     public static final String CONTEXT = "@context";
     public static final String ID = "id";
+    public static final String TYPE_PROPERTY = "type";
     public static final String LANGUAGE = "language";
     public static final String SIZE = "size";
     public static final String SEARCH_STRING = "searchString";

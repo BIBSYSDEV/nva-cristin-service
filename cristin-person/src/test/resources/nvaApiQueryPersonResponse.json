@@ -1,0 +1,77 @@
+{
+  "@context": "https://example.org/person-search-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/person?query=John+Smith&page=1&results=5",
+  "size": 1,
+  "searchString": "query=John+Smith&page=1&results=5",
+  "processingTime": 1000,
+  "firstRecord": 1,
+  "nextResults": null,
+  "previousResults": null,
+  "hits": [
+    {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/person/359084",
+      "type": "Person",
+      "identifiers": [
+        {
+          "type": "CristinIdentifier",
+          "value": "359084"
+        },
+        {
+          "type": "ORCID",
+          "value": "1234-1234-1234-1234"
+        }
+      ],
+      "names": [
+        {
+          "type": "FirstName",
+          "value": "Kjell Ola"
+        },
+        {
+          "type": "LastName",
+          "value": "Nordmann"
+        },
+        {
+          "type": "PreferredFirstName",
+          "value": "Ola"
+        },
+        {
+          "type": "PreferredLastName",
+          "value": "Nordmann"
+        }
+      ],
+      "contactDetails": {
+        "telephone": "+4799885566"
+      },
+      "image": "https://api.cristin.no/v2/persons/359084/picture",
+      "affiliations": [
+        {
+          "type": "Affiliation",
+          "organization": "https://api.cristin.no/v2/units/185.11.0.0",
+          "active": true,
+          "role": {
+            "type": "Role",
+            "id": "https://example.org/link/to/ontology#1026",
+            "labels": {
+              "en": "Researcher",
+              "nb": "Forsker",
+              "nn": "Forskar"
+            }
+          }
+        },
+        {
+          "type": "Affiliation",
+          "organization": "https://api.cristin.no/v2/units/185.90.0.0",
+          "active": true,
+          "role": {
+            "type": "Role",
+            "id": "https://example.org/link/to/ontology#1026",
+            "labels": {
+              "en": "Head Engineer",
+              "nb": "Overingeniør"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

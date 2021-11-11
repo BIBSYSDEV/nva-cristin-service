@@ -15,11 +15,23 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-@JacocoGenerated // TODO: Will write tests later
 public class PersonQueryHandler extends CristinQueryHandler<Void, SearchResponse> {
 
+    private final transient CristinPersonApiClient apiClient;
+
+    @JacocoGenerated
     public PersonQueryHandler() {
-        super(Void.class, new Environment());
+        this(new Environment());
+    }
+
+    @JacocoGenerated
+    public PersonQueryHandler(Environment environment) {
+        this(new CristinPersonApiClient(), environment);
+    }
+
+    public PersonQueryHandler(CristinPersonApiClient apiClient, Environment environment) {
+        super(Void.class, environment);
+        this.apiClient = apiClient;
     }
 
     @Override
@@ -34,7 +46,7 @@ public class PersonQueryHandler extends CristinQueryHandler<Void, SearchResponse
 
         Map<String, String> requestQueryParams = buildParamMap(query, page, numberOfResults);
 
-        return new CristinPersonApiClient().generateQueryResponse(requestQueryParams);
+        return apiClient.generateQueryResponse(requestQueryParams);
     }
 
     @Override

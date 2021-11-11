@@ -2,8 +2,15 @@ package no.unit.nva.cristin.person.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.common.model.JsonPropertyNames.CONTEXT;
-import static no.unit.nva.cristin.person.Constants.PERSON_CONTEXT;
+import static no.unit.nva.cristin.common.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.common.model.JsonPropertyNames.TYPE_PROPERTY;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AFFILIATIONS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IDENTIFIERS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -18,13 +25,16 @@ import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonPropertyOrder({CONTEXT})
+@JsonPropertyOrder({CONTEXT, ID, TYPE_PROPERTY, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
 public class Person {
 
+    @JsonIgnore
+    public static final String TYPE_PERSON = "Person";
+    private static final String type = TYPE_PERSON;
+    private URI id;
     @JsonInclude(NON_NULL)
     @JsonProperty(CONTEXT)
-    private static String context = PERSON_CONTEXT;
-    private URI id;
+    private static String context;
     private List<TypedValue> identifiers;
     private List<TypedValue> names;
     private ContactDetails contactDetails;
@@ -62,12 +72,20 @@ public class Person {
         return context;
     }
 
+    public static void setContext(String context) {
+        Person.context = context;
+    }
+
     public List<TypedValue> getIdentifiers() {
-        return Objects.nonNull(identifiers) ? identifiers : Collections.emptyList();
+        return Objects.nonNull(identifiers) ? sortedListOfIdentifiers(identifiers) : Collections.emptyList();
     }
 
     public URI getId() {
         return id;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public void setIdentifiers(List<TypedValue> identifiers) {
@@ -75,7 +93,7 @@ public class Person {
     }
 
     public List<Affiliation> getAffiliations() {
-        return Objects.nonNull(affiliations) ? affiliations : Collections.emptyList();
+        return Objects.nonNull(affiliations) ? sortedListOfAffiliations(affiliations) : Collections.emptyList();
     }
 
     public ContactDetails getContactDetails() {
@@ -91,7 +109,7 @@ public class Person {
     }
 
     public List<TypedValue> getNames() {
-        return Objects.nonNull(names) ? names : Collections.emptyList();
+        return Objects.nonNull(names) ? sortedListOfIdentifiers(names) : Collections.emptyList();
     }
 
     public void setNames(List<TypedValue> names) {
@@ -122,6 +140,7 @@ public class Person {
         Person that = (Person) o;
         return Objects.equals(getContext(), that.getContext())
             && Objects.equals(getId(), that.getId())
+            // TODO: We dont need to sort here anymore as we do it in getters
             && sortedListOfIdentifiers(getIdentifiers()).equals(sortedListOfIdentifiers(that.getIdentifiers()))
             && sortedListOfIdentifiers(getNames()).equals(sortedListOfIdentifiers(that.getNames()))
             && Objects.equals(getContactDetails(), that.getContactDetails())
@@ -132,7 +151,9 @@ public class Person {
     @JacocoGenerated
     @Override
     public int hashCode() {
-        return Objects.hash(getContext(), getId(), sortedListOfIdentifiers(getIdentifiers()),
+        return Objects.hash(getContext(), getId(),
+            // TODO: We dont need to sort here anymore as we do it in getters
+            sortedListOfIdentifiers(getIdentifiers()),
             sortedListOfIdentifiers(getNames()), getContactDetails(), getImage(),
             sortedListOfAffiliations(getAffiliations()));
     }
