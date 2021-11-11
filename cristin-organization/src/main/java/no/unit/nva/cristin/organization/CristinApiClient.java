@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.organization;
 
 import no.unit.nva.cristin.common.model.SearchResponse;
-import no.unit.nva.cristin.model.nva.Organization;
+import no.unit.nva.cristin.model.Organization;
 import no.unit.nva.exception.HttpClientFailureException;
 import no.unit.nva.exception.NonExistingUnitError;
 import no.unit.nva.utils.Language;

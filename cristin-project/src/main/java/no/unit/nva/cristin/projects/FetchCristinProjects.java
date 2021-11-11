@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.common.util.UriUtils;
 import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -28,7 +29,7 @@ import nva.commons.core.JacocoGenerated;
 /**
  * Handler for requests to Lambda function.
  */
-public class FetchCristinProjects extends CristinHandler<Void, SearchResponse> {
+public class FetchCristinProjects extends CristinHandler<Void, SearchResponse<NvaProject>> {
 
     private static final char CHARACTER_DASH = '-';
     private static final char CHARACTER_COMMA = ',';
@@ -54,7 +55,7 @@ public class FetchCristinProjects extends CristinHandler<Void, SearchResponse> {
     }
 
     @Override
-    protected SearchResponse processInput(Void input, RequestInfo requestInfo, Context context)
+    protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
         validateThatSuppliedQueryParamsIsSupported(requestInfo);
@@ -99,7 +100,7 @@ public class FetchCristinProjects extends CristinHandler<Void, SearchResponse> {
             .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
     }
 
-    private SearchResponse getTransformedCristinProjectsUsingWrapperObject(String language, String query, String page,
+    private SearchResponse<NvaProject> getTransformedCristinProjectsUsingWrapperObject(String language, String query, String page,
                                                                            String numberOfResults)
         throws ApiGatewayException {
 

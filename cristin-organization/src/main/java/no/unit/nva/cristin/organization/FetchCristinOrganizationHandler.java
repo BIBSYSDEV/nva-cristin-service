@@ -2,7 +2,7 @@ package no.unit.nva.cristin.organization;
 
 
 import com.amazonaws.services.lambda.runtime.Context;
-import no.unit.nva.cristin.model.nva.Organization;
+import no.unit.nva.cristin.model.Organization;
 import no.unit.nva.utils.Language;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;

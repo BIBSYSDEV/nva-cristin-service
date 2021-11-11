@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.model.nva;
+package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -26,7 +26,6 @@ public class Organization {
     private static final String ORGANIZATION_TYPE = "Organization";
 
     private URI id;
-//    private String type;
     @JsonPropertyOrder(alphabetic = true)
     private Map<String, String> name;
     private String acronym;
@@ -75,14 +74,6 @@ public class Organization {
         this.id = id;
     }
 
-//    public String getType() {
-//        return type;
-//    }
-//
-//    public void setType(String type) {
-//        this.type = type;
-//    }
-
     public Map<String, String> getName() {
         return Utils.nonEmptyOrDefault(name);
     }
@@ -109,7 +100,6 @@ public class Organization {
         }
         Organization that = (Organization) o;
         return Objects.equals(getId(), that.getId())
-//                && Objects.equals(getType(), that.getType())
                 && Objects.equals(getName(), that.getName())
                 && Objects.equals(getAcronym(), that.getAcronym())
                 && Objects.equals(getPartOf(), that.getPartOf());
@@ -123,7 +113,6 @@ public class Organization {
     @Override
     public String toString() {
         return "NvaOrganization{" + "id=" + id
-//                + ", type='" + type + '\''
                 + ", name=" + name
                 + ", acronym='" + acronym + '\''
                 + ", partOf=" + partOf

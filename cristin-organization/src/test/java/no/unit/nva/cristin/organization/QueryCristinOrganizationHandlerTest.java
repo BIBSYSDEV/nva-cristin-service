@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
 import no.unit.nva.cristin.common.model.SearchResponse;
-import no.unit.nva.cristin.model.nva.Organization;
+import no.unit.nva.cristin.model.Organization;
 import no.unit.nva.exception.HttpClientFailureException;
 import no.unit.nva.exception.NonExistingUnitError;
 import no.unit.nva.testutils.HandlerRequestBuilder;

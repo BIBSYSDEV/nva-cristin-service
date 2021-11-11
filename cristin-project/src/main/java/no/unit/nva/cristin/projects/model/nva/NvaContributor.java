@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.projects.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import no.unit.nva.cristin.model.nva.Organization;
+import no.unit.nva.cristin.model.Organization;
 
 import java.util.Objects;
 

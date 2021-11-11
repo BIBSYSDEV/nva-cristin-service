@@ -145,7 +145,7 @@ public class SearchResponse<E> {
         return this;
     }
 
-    public SearchResponse withSize(int size) {
+    public SearchResponse<E> withSize(int size) {
         this.size = size;
         return this;
     }
@@ -159,7 +159,7 @@ public class SearchResponse<E> {
      * @return ProjectsWrapper object with some field values set using the supplied parameters
      * @throws BadRequestException if page requested is invalid
      */
-    public SearchResponse usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)
+    public SearchResponse<E> usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)
         throws BadRequestException {
 
         this.size = getSizeHeader(headers);

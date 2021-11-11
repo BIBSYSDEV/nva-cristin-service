@@ -1,9 +1,9 @@
 dependencies {
     implementation project(":cristin-commons")
-    testImplementation project(":cristin-commons")
-    testImplementation libs.karate.core
-    testImplementation libs.karate.junit5
     implementation libs.nva.logutils
     implementation libs.apache.commons
     implementation libs.httpcore
+    testImplementation project(":cristin-commons")
+    testImplementation libs.karate.core
+    testImplementation libs.karate.junit5
 }

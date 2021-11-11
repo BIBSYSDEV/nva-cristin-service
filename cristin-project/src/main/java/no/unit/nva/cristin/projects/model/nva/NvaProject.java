@@ -3,7 +3,7 @@ package no.unit.nva.cristin.projects.model.nva;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import no.unit.nva.cristin.model.nva.Organization;
+import no.unit.nva.cristin.model.Organization;
 import no.unit.nva.cristin.projects.ProjectStatus;
 import nva.commons.core.JacocoGenerated;
 

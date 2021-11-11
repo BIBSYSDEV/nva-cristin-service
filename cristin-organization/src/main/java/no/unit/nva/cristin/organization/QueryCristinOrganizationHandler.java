@@ -5,7 +5,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.common.util.UriUtils;
-import no.unit.nva.cristin.model.nva.Organization;
+import no.unit.nva.cristin.model.Organization;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;

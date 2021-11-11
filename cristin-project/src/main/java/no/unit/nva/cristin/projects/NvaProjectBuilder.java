@@ -14,7 +14,7 @@ import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
-import no.unit.nva.cristin.model.nva.Organization;
+import no.unit.nva.cristin.model.Organization;
 import no.unit.nva.cristin.projects.model.nva.NvaPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.utils.UriUtils;
