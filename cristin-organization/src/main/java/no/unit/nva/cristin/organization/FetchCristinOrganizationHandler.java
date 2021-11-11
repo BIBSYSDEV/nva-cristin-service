@@ -23,6 +23,7 @@ import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.projects.Constants.HTTPS;
 import static no.unit.nva.cristin.projects.Constants.IDENTIFIER;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
+import static no.unit.nva.cristin.projects.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
@@ -31,10 +32,10 @@ import static nva.commons.core.attempt.Try.attempt;
 public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Organization> {
 
     public static final String IDENTIFIER_PATTERN = "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$";
+    public static final Pattern PATTERN = Pattern.compile(IDENTIFIER_PATTERN);
     protected static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(LANGUAGE);
     private static final Set<String> VALID_LANGUAGE_CODES = Set.of("en", "nb", "nn");
-    private static final String ORGANIZATION_PATH = "organization";
     private final transient CristinApiClient cristinApiClient;
 
     @JacocoGenerated
@@ -85,13 +86,22 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
         if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
             throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP);
         }
+        if (!requestInfo.getPathParameters().containsKey(IDENTIFIER)) {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID);
+        }
     }
 
     private String getValidId(RequestInfo requestInfo) throws BadRequestException {
-        attempt(() -> Pattern.compile(IDENTIFIER_PATTERN).matcher(requestInfo.getPathParameter(IDENTIFIER)).find())
-                .orElseThrow(failure -> new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
+        final String identifier =  requestInfo.getPathParameter(IDENTIFIER);
+        if (matchesIdentifierPattern(identifier)) {
+            return identifier;
+        } else {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID);
+        }
+    }
 
-        return requestInfo.getPathParameter(IDENTIFIER);
+    private boolean matchesIdentifierPattern(String identifier) {
+        return PATTERN.matcher(identifier).matches();
     }
 
     private Organization getTransformedOrganizationFromCristin(String identifier, Language language)

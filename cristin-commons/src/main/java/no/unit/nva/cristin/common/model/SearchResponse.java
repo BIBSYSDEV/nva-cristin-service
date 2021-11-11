@@ -53,7 +53,7 @@ public class SearchResponse<E> {
     @JsonProperty
     private List<E> hits;
 
-    public SearchResponse() {
+    private SearchResponse() {
 
     }
 
@@ -130,20 +130,26 @@ public class SearchResponse<E> {
         this.hits = hits;
     }
 
-    public SearchResponse withContext(String context) {
+    public SearchResponse<E> withContext(String context) {
         this.context = context;
         return this;
     }
 
-    public SearchResponse withProcessingTime(Long processingTime) {
+    public SearchResponse<E> withProcessingTime(Long processingTime) {
         this.processingTime = processingTime;
         return this;
     }
 
-    public SearchResponse withHits(List<E> hits) {
+    public SearchResponse<E> withHits(List<E> hits) {
         this.hits = hits;
         return this;
     }
+
+    public SearchResponse withSize(int size) {
+        this.size = size;
+        return this;
+    }
+
 
     /**
      * Assigns value to some field values using supplied headers and query parameters.
@@ -207,4 +213,5 @@ public class SearchResponse<E> {
     private int getSizeHeader(HttpHeaders headers) {
         return (int) headers.firstValueAsLong(X_TOTAL_COUNT).orElse(0);
     }
+
 }

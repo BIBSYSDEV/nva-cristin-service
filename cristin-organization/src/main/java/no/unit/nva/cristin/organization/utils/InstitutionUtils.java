@@ -30,7 +30,7 @@ public final class InstitutionUtils {
         try {
             List<InstitutionDto> institutions = Arrays.asList(
                     JsonUtils.dtoObjectMapper.readValue(institutionsJson, InstitutionDto[].class));
-            return new SearchResponse<Organization>().withHits(institutions
+            return new SearchResponse<Organization>(null).withHits(institutions
                     .stream()
                     .map(InstitutionUtils::toInstitutionResponse)
                     .collect(Collectors.toList()));

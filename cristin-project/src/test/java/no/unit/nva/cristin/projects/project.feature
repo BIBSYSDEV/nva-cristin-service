@@ -9,12 +9,13 @@ Feature: API tests for Cristin Project retrieve and search
     Given url CRISTIN_BASE
 
 
-#  Scenario: GET organization returns list of search results
-#    Given  path '/test-cristin/project'
-#    When method GET
-#    Then status 200
-#    And match response.hits == '#array'
-#    And match response.total == '#number'
+  Scenario: GET organization returns list of empty search results
+    Given  path '/project'
+    And param query = illegalIdentifier
+    When method GET
+    Then status 200
+    And match response.hits == '#array'
+    And match response.size == 0
 
   Scenario: GET resources with query returns list of search results
     Given path '/project'
