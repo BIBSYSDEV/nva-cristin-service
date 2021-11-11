@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithId;
+import static no.unit.nva.utils.UriUtils.getNvaProjectUriWithId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +17,7 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.model.nva.Organization;
 import no.unit.nva.cristin.projects.model.nva.NvaPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
 
 public class NvaProjectBuilder {
@@ -64,7 +65,7 @@ public class NvaProjectBuilder {
      * @return a NvaProject converted from a CristinProject
      */
     public NvaProject build() {
-        nvaProject.setId(getNvaProjectUriWithId(cristinProject.getCristinProjectId()));
+        nvaProject.setId(getNvaProjectUriWithId(cristinProject.getCristinProjectId(), UriUtils.PROJECT));
         nvaProject.setType(PROJECT_TYPE);
         nvaProject.setIdentifiers(createCristinIdentifier());
         nvaProject.setTitle(extractMainTitle());

@@ -239,22 +239,22 @@ public class NvaProject {
 
     @Override
     public String toString() {
-        return "NvaProject{" +
-                "context='" + context + '\'' +
-                ", id=" + id +
-                ", type='" + type + '\'' +
-                ", identifiers=" + identifiers +
-                ", title='" + title + '\'' +
-                ", language=" + language +
-                ", alternativeTitles=" + alternativeTitles +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", funding=" + funding +
-                ", coordinatingInstitution=" + coordinatingInstitution +
-                ", contributors=" + contributors +
-                ", status=" + status +
-                ", academicSummary=" + academicSummary +
-                ", popularScientificSummary=" + popularScientificSummary +
-                '}';
+        return "NvaProject{"
+                + "context='" + context + '\''
+                + ", id=" + id
+                + ", type='" + type + '\''
+                + ", identifiers=" + identifiers
+                + ", title='" + title + '\''
+                + ", language=" + language
+                + ", alternativeTitles=" + alternativeTitles
+                + ", startDate=" + startDate
+                + ", endDate=" + endDate
+                + ", funding=" + funding
+                + ", coordinatingInstitution=" + coordinatingInstitution
+                + ", contributors=" + contributors
+                + ", status=" + status
+                + ", academicSummary=" + academicSummary
+                + ", popularScientificSummary=" + popularScientificSummary
+                + '}';
     }
 }

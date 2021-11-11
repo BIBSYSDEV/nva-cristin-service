@@ -1,3 +1,4 @@
 dependencies {
     implementation libs.nva.logutils
+    implementation libs.httpcore
 }

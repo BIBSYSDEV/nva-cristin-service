@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.utils;
 
 import static no.unit.nva.cristin.common.util.UriUtils.SLASH_DELIMITER;
 import static no.unit.nva.cristin.common.util.UriUtils.queryParameters;
@@ -10,22 +10,23 @@ import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.util.Map;
 
-public class ProjectUriUtils {
+public class UriUtils {
 
-    private static final String PROJECT = "project";
+    public static final String PROJECT = "project";
+    public static final String INSTITUTION = "institution";
 
-    public static URI getNvaProjectUriWithParams(Map<String, String> parameters) {
-        return attempt(() -> new URI(HTTPS, DOMAIN_NAME, getCommonPath(),
+    public static URI createUriFromParams(Map<String, String> parameters, String module) {
+        return attempt(() -> new URI(HTTPS, DOMAIN_NAME, getCommonPath(module),
             queryParameters(parameters), EMPTY_FRAGMENT)).orElseThrow();
     }
 
-    public static URI getNvaProjectUriWithId(String id) {
-        return attempt(() -> new URI(HTTPS, DOMAIN_NAME, getCommonPath() + id,
+    public static URI getNvaProjectUriWithId(String id, String module) {
+        return attempt(() -> new URI(HTTPS, DOMAIN_NAME, getCommonPath(module) + id,
             EMPTY_FRAGMENT)).orElseThrow();
     }
 
-    private static String getCommonPath() {
-        return SLASH_DELIMITER + BASE_PATH + SLASH_DELIMITER + PROJECT + SLASH_DELIMITER;
+    private static String getCommonPath(String module) {
+        return SLASH_DELIMITER + BASE_PATH + SLASH_DELIMITER + module + SLASH_DELIMITER;
     }
 
 

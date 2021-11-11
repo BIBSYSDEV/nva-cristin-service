@@ -1,7 +1,8 @@
-package no.unit.nva.cristin.organization.utils;
+package no.unit.nva.utils;
 
 
-import no.unit.nva.cristin.organization.exception.UnknownLanguageException;
+
+import no.unit.nva.exception.UnknownLanguageException;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

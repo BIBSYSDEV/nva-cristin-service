@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.organization.exception;
+package no.unit.nva.exception;
 
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import org.apache.http.HttpStatus;

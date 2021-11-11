@@ -3,7 +3,7 @@ package no.unit.nva.cristin.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.model.nva.Organization;
-import no.unit.nva.cristin.organization.utils.Language;
+import no.unit.nva.utils.Language;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -54,27 +54,28 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
     }
 
     protected static String getValidLanguage(RequestInfo requestInfo) throws BadRequestException {
-        return Optional.of(getQueryParam(requestInfo, LANGUAGE)
+        return Optional.of(getQueryParam(requestInfo)
                         .orElse(DEFAULT_LANGUAGE_CODE))
                 .filter(VALID_LANGUAGE_CODES::contains)
                 .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_LANGUAGE_INVALID));
     }
 
-    protected static Optional<String> getQueryParam(RequestInfo requestInfo, String queryParameter) {
-        return attempt(() -> requestInfo.getQueryParameter(queryParameter)).toOptional();
+    protected static Optional<String> getQueryParam(RequestInfo requestInfo) {
+        return attempt(() -> requestInfo.getQueryParameter(LANGUAGE)).toOptional();
     }
 
     @Override
     protected Organization processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
+        Organization result;
         validateThatSuppliedQueryParamsIsSupported(requestInfo);
-        String id = getValidId(requestInfo);
-        Language language = Language.getLanguage(getValidLanguage(requestInfo));
         try {
-            return getTransformedOrganizationFromCristin(id, language);
+            result = getTransformedOrganizationFromCristin(getValidId(requestInfo),
+                    Language.getLanguage(getValidLanguage(requestInfo)));
         } catch (InterruptedException e) {
             throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP);
         }
+        return result;
     }
 
     @Override
