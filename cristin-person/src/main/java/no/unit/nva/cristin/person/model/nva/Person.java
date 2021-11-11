@@ -140,22 +140,18 @@ public class Person {
         Person that = (Person) o;
         return Objects.equals(getContext(), that.getContext())
             && Objects.equals(getId(), that.getId())
-            // TODO: We dont need to sort here anymore as we do it in getters
-            && sortedListOfIdentifiers(getIdentifiers()).equals(sortedListOfIdentifiers(that.getIdentifiers()))
-            && sortedListOfIdentifiers(getNames()).equals(sortedListOfIdentifiers(that.getNames()))
+            && getIdentifiers().equals(that.getIdentifiers())
+            && getNames().equals(that.getNames())
             && Objects.equals(getContactDetails(), that.getContactDetails())
             && Objects.equals(getImage(), that.getImage())
-            && sortedListOfAffiliations(getAffiliations()).equals(sortedListOfAffiliations(that.getAffiliations()));
+            && getAffiliations().equals(that.getAffiliations());
     }
 
     @JacocoGenerated
     @Override
     public int hashCode() {
-        return Objects.hash(getContext(), getId(),
-            // TODO: We dont need to sort here anymore as we do it in getters
-            sortedListOfIdentifiers(getIdentifiers()),
-            sortedListOfIdentifiers(getNames()), getContactDetails(), getImage(),
-            sortedListOfAffiliations(getAffiliations()));
+        return Objects.hash(getContext(), getId(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
+            getAffiliations());
     }
 
     private List<TypedValue> sortedListOfIdentifiers(List<TypedValue> listToSort) {
