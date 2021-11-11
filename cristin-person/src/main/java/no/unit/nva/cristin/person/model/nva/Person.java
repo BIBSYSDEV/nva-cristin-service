@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static no.unit.nva.cristin.common.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.person.Constants.PERSON_CONTEXT;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -17,11 +18,11 @@ import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonPropertyOrder({"@context"})
+@JsonPropertyOrder({CONTEXT})
 public class Person {
 
     @JsonInclude(NON_NULL)
-    @JsonProperty("@context")
+    @JsonProperty(CONTEXT)
     private static String context = PERSON_CONTEXT;
     private URI id;
     private List<TypedValue> identifiers;

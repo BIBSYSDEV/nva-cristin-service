@@ -1,14 +1,14 @@
 package no.unit.nva.cristin.projects;
 
 import static java.util.Arrays.asList;
+import static no.unit.nva.cristin.common.model.Constants.LANGUAGE;
+import static no.unit.nva.cristin.common.model.Constants.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.common.model.Constants.PAGE;
+import static no.unit.nva.cristin.common.model.Constants.QUERY;
 import static no.unit.nva.cristin.common.util.UriUtils.queryParameters;
-import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
-import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.projects.Constants.PAGE;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
-import static no.unit.nva.cristin.projects.Constants.QUERY;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_GRANT_ID;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_TITLE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;

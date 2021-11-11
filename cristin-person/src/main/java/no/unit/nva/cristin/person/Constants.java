@@ -1,7 +1,9 @@
 package no.unit.nva.cristin.person;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonUtils;
 
 @JacocoGenerated
 public class Constants {
@@ -13,6 +15,8 @@ public class Constants {
     public static final String BASE_PATH = ENVIRONMENT.readEnv("BASE_PATH");
     public static final String DOMAIN_NAME = ENVIRONMENT.readEnvOpt("DOMAIN_NAME")
         .orElse("api.dev.nva.aws.unit.no");
+    public static final ObjectMapper OBJECT_MAPPER = JsonUtils.dtoObjectMapper;
 
     public static final String PERSON_CONTEXT = "https://example.org/person-context.json";
+    public static final String PERSON_PATH = "person";
 }

@@ -1,11 +1,11 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.Constants.DEFAULT_NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.projects.Constants.FIRST_PAGE;
-import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
-import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.projects.Constants.PAGE;
-import static no.unit.nva.cristin.projects.Constants.QUERY;
+import static no.unit.nva.cristin.common.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.common.model.Constants.FIRST_PAGE;
+import static no.unit.nva.cristin.common.model.Constants.LANGUAGE;
+import static no.unit.nva.cristin.common.model.Constants.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.common.model.Constants.PAGE;
+import static no.unit.nva.cristin.common.model.Constants.QUERY;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;

@@ -1,11 +1,11 @@
 package no.unit.nva.cristin.projects;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
-import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
-import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.common.model.Constants.LANGUAGE;
+import static no.unit.nva.cristin.common.model.Constants.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.common.model.Constants.PAGE;
+import static no.unit.nva.cristin.common.model.Constants.QUERY;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.projects.Constants.PAGE;
-import static no.unit.nva.cristin.projects.Constants.QUERY;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_GRANT_ID;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_TITLE;
 import static no.unit.nva.cristin.projects.Constants.REL_NEXT;

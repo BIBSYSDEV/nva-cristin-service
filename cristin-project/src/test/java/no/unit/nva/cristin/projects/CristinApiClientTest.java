@@ -1,25 +1,11 @@
 package no.unit.nva.cristin.projects;
 
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static no.unit.nva.cristin.projects.Constants.DEFAULT_NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.projects.Constants.FIRST_PAGE;
-import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
-import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.projects.Constants.PAGE;
-import static no.unit.nva.cristin.projects.Constants.QUERY;
+import static no.unit.nva.cristin.common.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.common.model.Constants.FIRST_PAGE;
+import static no.unit.nva.cristin.common.model.Constants.LANGUAGE;
+import static no.unit.nva.cristin.common.model.Constants.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.common.model.Constants.PAGE;
+import static no.unit.nva.cristin.common.model.Constants.QUERY;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_GRANT_ID;
 import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_TITLE;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.GRANT_ID_EXAMPLE;
@@ -36,6 +22,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import org.junit.jupiter.api.Test;
 
 public class CristinApiClientTest {
 

@@ -150,7 +150,7 @@ public class SearchResponse {
      *
      * @param headers     the headers from response
      * @param queryParams the query params from request
-     * @return ProjectsWrapper object with some field values set using the supplied parameters
+     * @return SearchResponse object with some field values set using the supplied parameters
      * @throws BadRequestException if page requested is invalid
      */
     public SearchResponse usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)

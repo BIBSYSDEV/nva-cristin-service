@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person.model.cristin;
 import static no.unit.nva.cristin.person.Constants.BASE_PATH;
 import static no.unit.nva.cristin.person.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.person.Constants.HTTPS;
+import static no.unit.nva.cristin.person.Constants.PERSON_PATH;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -25,8 +26,6 @@ import nva.commons.core.paths.UriWrapper;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPerson {
 
-    @JsonIgnore
-    public static final String PERSON_PATH = "person";
     @JsonIgnore
     public static final String CRISTIN_IDENTIFIER = "CristinIdentifier";
     @JsonIgnore
