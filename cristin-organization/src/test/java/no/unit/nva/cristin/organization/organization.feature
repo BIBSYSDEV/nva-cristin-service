@@ -17,7 +17,7 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.size == 0
 
   Scenario: GET returns 400 status Bad request when path parameter identifier is missing
-    Given path '/organization/ '
+    Given path '/organization/+'
     When method GET
     Then status 400
     And match response.title == 'Bad Request'
