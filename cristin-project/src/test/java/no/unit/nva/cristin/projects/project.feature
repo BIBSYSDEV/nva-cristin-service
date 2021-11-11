@@ -9,7 +9,7 @@ Feature: API tests for Cristin Project retrieve and search
     Given url CRISTIN_BASE
 
 
-  Scenario: GET organization returns list of empty search results
+  Scenario: GET project returns list of empty search results
     Given  path '/project'
     And param query = illegalIdentifier
     When method GET
