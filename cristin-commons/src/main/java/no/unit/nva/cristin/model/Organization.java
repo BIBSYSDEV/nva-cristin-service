@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import no.unit.nva.cristin.common.Utils;
-import no.unit.nva.cristin.common.model.cristin.CristinInstitution;
-import no.unit.nva.cristin.projects.Constants;
 
 import java.net.URI;
 import java.util.Map;
@@ -13,7 +11,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import static no.unit.nva.cristin.common.model.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.common.util.UriUtils.buildUri;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 

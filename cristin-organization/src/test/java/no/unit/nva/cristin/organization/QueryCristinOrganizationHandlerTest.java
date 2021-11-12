@@ -54,9 +54,8 @@ class QueryCristinOrganizationHandlerTest {
     private Context context;
 
 
-
     @BeforeEach
-    public void setUp() throws HttpClientFailureException, InterruptedException, NonExistingUnitError {
+    void setUp() throws HttpClientFailureException, InterruptedException, NonExistingUnitError {
 
         environment = mock(Environment.class);
         when(environment.readEnv(ALLOWED_ORIGIN_ENV)).thenReturn("*");
@@ -69,13 +68,11 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     private SearchResponse<Organization> emptySearchResponse() {
-        return  new SearchResponse<Organization>(randomId()).withHits(Collections.emptyList());
+        return new SearchResponse<Organization>(randomId()).withHits(Collections.emptyList());
     }
 
-
-
     @Test
-    public void returnsBadRequestResponseOnMissingQueryParam() throws IOException {
+    void shouldReturnBadRequestResponseOnMissingQueryParam() throws IOException {
         InputStream inputStream = generateHandlerRequestWithMissingQueryParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
         GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
@@ -85,7 +82,7 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    public void returnsEmptyResponseOnStrangeQuery() throws IOException {
+    void shouldReturnEmptyResponseOnStrangeQuery() throws IOException {
         InputStream inputStream = generateHandlerRequestWithStrangeQueryParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
@@ -95,8 +92,6 @@ class QueryCristinOrganizationHandlerTest {
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MediaType.JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
-
-
 
     private InputStream generateHandlerRequestWithMissingQueryParameter() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
@@ -110,7 +105,6 @@ class QueryCristinOrganizationHandlerTest {
                 .withQueryParameters(Map.of("query", "strangeQueryWithoutHits"))
                 .build();
     }
-
 
     private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
         return gatewayResponse.getBodyObject(Problem.class).getDetail();
@@ -126,5 +120,4 @@ class QueryCristinOrganizationHandlerTest {
         return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH)
                 .addChild(randomString()).getUri();
     }
-
 }
