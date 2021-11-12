@@ -4,27 +4,30 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.unit.nva.cristin.organization.exception.NonExistingUnitError;
+import no.unit.nva.exception.NonExistingUnitError;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static no.unit.nva.cristin.organization.FetchCristinOrganizationHandler.IDENTIFIER_PATTERN;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.ApiGatewayHandler.ALLOWED_ORIGIN_ENV;
 import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
@@ -42,17 +45,16 @@ import static org.mockito.Mockito.when;
 
 class FetchCristinOrganizationTest {
 
-    FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
-    private CristinApiClient cristinApiClientStub;
-    private Environment environment;
-    private ByteArrayOutputStream output;
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     public static final String IDENTIFIER = "identifier";
-    public static final String IDENTIFIER_VALUE = "0.0.0.0";
+    public static final String IDENTIFIER_VALUE = "1.0.0.0";
     public static final String ORGANIZATION_NOT_FOUND_MESSAGE = "Organization not found: ";
-    private Context context;
     private static final String IDENTIFIER_NULL_ERROR = "Identifier is not a valid Organization identifier: null";
-
+    FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
+    private CristinApiClient cristinApiClient;
+    private Environment environment;
+    private ByteArrayOutputStream output;
+    private Context context;
 
     @BeforeEach
     public void setUp() {
@@ -60,21 +62,34 @@ class FetchCristinOrganizationTest {
         environment = mock(Environment.class);
         when(environment.readEnv(ALLOWED_ORIGIN_ENV)).thenReturn("*");
         context = mock(Context.class);
-        cristinApiClientStub = new CristinApiClientStub();
+        cristinApiClient = new CristinApiClient();
         output = new ByteArrayOutputStream();
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClientStub, environment);
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, environment);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "1.0.0.0, true",
+            "1.0.0, false",
+            "1.0, false",
+            "1, false",
+            "John, false"
+    })    void identifierPatternMatcher(String identifier, boolean expected) {
+        final Pattern pattern = Pattern.compile(IDENTIFIER_PATTERN);
+        final boolean matches = pattern.matcher(identifier).matches();
+        final boolean valid  = matches == expected;
+        assertThat(identifier + " is " + valid, valid);
     }
 
     @Test
-    @DisplayName("handler Returns NotFound Response On Organization Missing")
     public void handlerReturnsNotFoundResponseOnPublicationMissing()
             throws IOException, ApiGatewayException, InterruptedException {
 
-        cristinApiClientStub = spy(cristinApiClientStub);
-            doThrow(new NonExistingUnitError("Organization not found: " + IDENTIFIER_VALUE))
-                    .when(cristinApiClientStub).getSingleUnit(any(), any());
+        cristinApiClient = spy(cristinApiClient);
+        doThrow(new NonExistingUnitError("Organization not found: " + IDENTIFIER_VALUE))
+                .when(cristinApiClient).getSingleUnit(any(), any());
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClientStub, environment);
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, environment);
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
         GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
 
@@ -88,7 +103,6 @@ class FetchCristinOrganizationTest {
     }
 
     @Test
-    @DisplayName("handler Returns BadRequest Response On Empty Input")
     public void handlerReturnsBadRequestResponseOnEmptyInput() throws IOException {
         InputStream inputStream = new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withBody(null)
@@ -103,7 +117,20 @@ class FetchCristinOrganizationTest {
     }
 
     @Test
-    @DisplayName("handler Returns BadRequest Response On Missing Path Param")
+    public void handlerReturnsBadRequestResponseOnIllegalIdentifierInPath() throws IOException {
+        InputStream inputStream = new HandlerRequestBuilder<InputStream>(restApiMapper)
+                .withBody(null)
+                .withHeaders(null)
+                .withPathParameters(Map.of("identifier", randomString()))
+                .build();
+        fetchCristinOrganizationHandler.handleRequest(inputStream, output, context);
+        GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
+        String actualDetail = gatewayResponse.getBodyObject(Problem.class).getDetail();
+        assertEquals(SC_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
+    }
+
+    @Test
     public void handlerReturnsBadRequestResponseOnMissingPathParam() throws IOException {
         InputStream inputStream = generateHandlerRequestWithMissingPathParameter();
         fetchCristinOrganizationHandler.handleRequest(inputStream, output, context);
@@ -114,10 +141,9 @@ class FetchCristinOrganizationTest {
     }
 
     @Test
-    @DisplayName("handler Returns InternalServerError Response On Unexpected Exception")
     public void handlerReturnsInternalServerErrorResponseOnUnexpectedException()
-            throws IOException, ApiGatewayException, InterruptedException {
-        CristinApiClient serviceThrowingException = spy(cristinApiClientStub);
+            throws IOException, InterruptedException {
+        CristinApiClient serviceThrowingException = spy(cristinApiClient);
         try {
             doThrow(new NullPointerException())
                     .when(serviceThrowingException)

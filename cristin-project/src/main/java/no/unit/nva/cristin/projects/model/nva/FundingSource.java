@@ -9,7 +9,7 @@ import nva.commons.core.JacocoGenerated;
 import java.util.Map;
 import java.util.Objects;
 
-import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class FundingSource {

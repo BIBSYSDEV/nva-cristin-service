@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithId;
+import static no.unit.nva.utils.UriUtils.getNvaProjectUriWithId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +14,10 @@ import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
-import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
+import no.unit.nva.cristin.model.Organization;
 import no.unit.nva.cristin.projects.model.nva.NvaPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
 
 public class NvaProjectBuilder {
@@ -54,7 +55,7 @@ public class NvaProjectBuilder {
         NvaContributor nvaContributor = new NvaContributor();
         nvaContributor.setType(cristinRolesToNva.get(role.getRoleCode()));
         nvaContributor.setIdentity(NvaPerson.fromCristinPerson(cristinPerson));
-        nvaContributor.setAffiliation(NvaOrganization.fromCristinInstitution(role.getInstitution()));
+        nvaContributor.setAffiliation(Organization.fromCristinInstitution(role.getInstitution()));
         return nvaContributor;
     }
 
@@ -64,7 +65,7 @@ public class NvaProjectBuilder {
      * @return a NvaProject converted from a CristinProject
      */
     public NvaProject build() {
-        nvaProject.setId(getNvaProjectUriWithId(cristinProject.getCristinProjectId()));
+        nvaProject.setId(getNvaProjectUriWithId(cristinProject.getCristinProjectId(), UriUtils.PROJECT));
         nvaProject.setType(PROJECT_TYPE);
         nvaProject.setIdentifiers(createCristinIdentifier());
         nvaProject.setTitle(extractMainTitle());
@@ -86,9 +87,9 @@ public class NvaProjectBuilder {
                 Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()));
     }
 
-    private NvaOrganization extractCoordinatingInstitution() {
+    private Organization extractCoordinatingInstitution() {
         return Optional.ofNullable(cristinProject.getCoordinatingInstitution())
-                .map(coordinatingInstitution -> NvaOrganization
+                .map(coordinatingInstitution -> Organization
                         .fromCristinInstitution(coordinatingInstitution.getInstitution()))
                 .orElse(null);
     }

@@ -13,6 +13,11 @@ jsoup = {strictly = '1.13.1'}
 aws-lambda-java-core = {strictly = '1.2.1'}
 google-guava = {strictly = '31.0.1-jre'}
 apacheHttpCore = { strictly = "4.4.14" }
+karate-core = {strictly = '1.1.0'}
+karate-apache = {strictly = '0.9.6'}
+karate-junit5 = {strictly = '1.1.0'}
+log4jApi = { strictly = '2.14.1' }
+slf4j = { strictly = '1.8.0-beta4' }
 
 
 [libraries]
@@ -28,6 +33,10 @@ hamcrest = { group = 'org.hamcrest', name = 'hamcrest', version.ref = 'hamcrest'
 nva-testutils = { group = 'com.github.bibsysdev', name = 'nva-testutils', version.ref = 'nva-testutils' }
 nva-logutils = { group = 'com.github.bibsysdev', name = 'logutils', version.ref = 'nva-commons' }
 zalando = { group = 'org.zalando', name = 'problem', version.ref = 'zalando' }
+karate-core = { group = 'com.intuit.karate', name = 'karate-core', version.ref = 'karate-core'}
+karate-apache = { group = 'com.intuit.karate', name = 'karate-apache', version.ref = 'karate-apache'}
+karate-junit5 = { group = 'com.intuit.karate', name = 'karate-junit5', version.ref = 'karate-junit5'}
+karate-parent = { group = 'com.intuit.karate', name =  'karate-parent', version.ref = 'karate-core'}
 
 #Regular
 
@@ -42,15 +51,17 @@ jackson-datatype-jsr310 = { group = 'com.fasterxml.jackson.datatype', name = 'ja
 
 apache-commons = { group = 'org.apache.commons', name = 'commons-lang3', version.ref = 'apache-commons' }
 javax-ws-rs = { group = 'javax.ws.rs', name = 'javax.ws.rs-api', version.ref = 'javax-ws-rs' }
-sl4j = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'sl4j' }
+# sl4j = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'sl4j' }
 jsoup = { group = 'org.jsoup', name = 'jsoup', version.ref = 'jsoup' }
 aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version.ref = 'aws-lambda-java-core' }
 google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'google-guava' }
 httpcore = { group = "org.apache.httpcomponents", name = "httpcore", version.ref = "apacheHttpCore" }
 
+log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4jApi' }
+slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
 testing = ['junit-jupiter-api', 'junit-jupiter-params', 'junit-jupiter-engine', 'mockito-core', 'hamcrest', 'nva-testutils', 'nva-logutils', 'zalando']
 jackson = ['jackson-core', 'jackson-databind', 'jackson-annotations', 'jackson-datatype-jdk8', 'jackson-datatype-jsr310']
-others = ['apache-commons', 'javax-ws-rs', 'sl4j', 'jsoup', 'aws-lambda-java-core', 'google-guava']
+others = ['apache-commons', 'javax-ws-rs', 'slf4j-api', 'log4j-api', 'jsoup', 'aws-lambda-java-core', 'google-guava']

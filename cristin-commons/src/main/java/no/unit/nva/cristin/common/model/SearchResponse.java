@@ -28,7 +28,7 @@ import nva.commons.core.JacocoGenerated;
     JsonPropertyNames.CONTEXT, JsonPropertyNames.ID, JsonPropertyNames.SIZE, JsonPropertyNames.SEARCH_STRING,
     JsonPropertyNames.PROCESSING_TIME, JsonPropertyNames.FIRST_RECORD, JsonPropertyNames.NEXT_RESULTS,
     JsonPropertyNames.PREVIOUS_RESULTS, JsonPropertyNames.HITS})
-public class SearchResponse {
+public class SearchResponse<E> {
 
     @JsonIgnore
     public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
@@ -51,9 +51,9 @@ public class SearchResponse {
     @JsonProperty
     private URI previousResults;
     @JsonProperty
-    private List<?> hits;
+    private List<E> hits;
 
-    public SearchResponse() {
+    private SearchResponse() {
 
     }
 
@@ -126,24 +126,30 @@ public class SearchResponse {
         return hits;
     }
 
-    public void setHits(List<?> hits) {
+    public void setHits(List<E> hits) {
         this.hits = hits;
     }
 
-    public SearchResponse withContext(String context) {
+    public SearchResponse<E> withContext(String context) {
         this.context = context;
         return this;
     }
 
-    public SearchResponse withProcessingTime(Long processingTime) {
+    public SearchResponse<E> withProcessingTime(Long processingTime) {
         this.processingTime = processingTime;
         return this;
     }
 
-    public SearchResponse withHits(List<?> hits) {
+    public SearchResponse<E> withHits(List<E> hits) {
         this.hits = hits;
         return this;
     }
+
+    public SearchResponse<E> withSize(int size) {
+        this.size = size;
+        return this;
+    }
+
 
     /**
      * Assigns value to some field values using supplied headers and query parameters.
@@ -153,7 +159,7 @@ public class SearchResponse {
      * @return ProjectsWrapper object with some field values set using the supplied parameters
      * @throws BadRequestException if page requested is invalid
      */
-    public SearchResponse usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)
+    public SearchResponse<E> usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)
         throws BadRequestException {
 
         this.size = getSizeHeader(headers);
@@ -207,4 +213,5 @@ public class SearchResponse {
     private int getSizeHeader(HttpHeaders headers) {
         return (int) headers.firstValueAsLong(X_TOTAL_COUNT).orElse(0);
     }
+
 }

@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import no.unit.nva.cristin.model.Organization;
 
 import java.util.Objects;
 
@@ -14,7 +15,7 @@ public class NvaContributor {
 
     private String type;
     private NvaPerson identity;
-    private NvaOrganization affiliation;
+    private Organization affiliation;
 
     public String getType() {
         return type;
@@ -32,11 +33,11 @@ public class NvaContributor {
         this.identity = identity;
     }
 
-    public NvaOrganization getAffiliation() {
+    public Organization getAffiliation() {
         return affiliation;
     }
 
-    public void setAffiliation(NvaOrganization affiliation) {
+    public void setAffiliation(Organization affiliation) {
         this.affiliation = affiliation;
     }
 

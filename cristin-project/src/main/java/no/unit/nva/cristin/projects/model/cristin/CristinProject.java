@@ -14,7 +14,7 @@ import java.util.Map;
 
 import static no.unit.nva.cristin.projects.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
-import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)

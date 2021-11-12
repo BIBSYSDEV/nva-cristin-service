@@ -1,8 +1,38 @@
 dependencies {
     implementation project(":cristin-commons")
-    implementation 'com.googlecode.jaxb-namespaceprefixmapper-interfaces:JAXBNamespacePrefixMapper:6.1.0'
+    implementation libs.junit.jupiter.api
+
+    testImplementation libs.karate.core
+    testImplementation libs.karate.junit5
 }
 
-repositories {
-    mavenCentral()
+sourceSets {
+    test {
+        resources {
+            srcDir file('src/test/java')
+        }
+    }
 }
+
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags('karateTest')
+    }
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
+}
+
+
+//tasks.register('karateTesting', Test) {
+//    useJUnitPlatform {
+//        includeEngines 'junit-jupiter'
+//        includeTags("karateTest")
+//    }
+//    testLogging {
+//        events 'skipped', 'passed', 'failed'
+//    }
+//}
+
