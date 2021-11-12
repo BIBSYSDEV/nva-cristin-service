@@ -55,7 +55,7 @@ public class NvaProjectBuilder {
         NvaContributor nvaContributor = new NvaContributor();
         nvaContributor.setType(cristinRolesToNva.get(role.getRoleCode()));
         nvaContributor.setIdentity(NvaPerson.fromCristinPerson(cristinPerson));
-        nvaContributor.setAffiliation(Organization.fromCristinInstitution(role.getInstitution()));
+        nvaContributor.setAffiliation(role.getInstitution().toOrganization());
         return nvaContributor;
     }
 
@@ -89,8 +89,7 @@ public class NvaProjectBuilder {
 
     private Organization extractCoordinatingInstitution() {
         return Optional.ofNullable(cristinProject.getCoordinatingInstitution())
-                .map(coordinatingInstitution -> Organization
-                        .fromCristinInstitution(coordinatingInstitution.getInstitution()))
+                .map(coordinatingInstitution -> coordinatingInstitution.getInstitution().toOrganization())
                 .orElse(null);
     }
 

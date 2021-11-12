@@ -41,22 +41,6 @@ public class Organization {
     public Organization() {
     }
 
-    /**
-     * Build a NvaOrganization datamodel from a CristinInstitution datamodel.
-     *
-     * @param cristinInstitution the model to convert from
-     * @return a NvaOrganization converted from a CristinInstitution
-     */
-    public static Organization fromCristinInstitution(CristinInstitution cristinInstitution) {
-        if (cristinInstitution == null) {
-            return null;
-        }
-
-        return new Builder()
-                .withId(buildUri(Constants.CRISTIN_API_BASE_URL, Constants.INSTITUTION_PATH,
-                        cristinInstitution.getCristinInstitutionId()))
-                .withName(cristinInstitution.getInstitutionName()).build();
-    }
 
     public String getAcronym() {
         return acronym;
