@@ -73,7 +73,6 @@ Resources:
             Path: /project/
             Method: get
             RequestParameters:
-              - method.request.querystring.language
               - method.request.querystring.query
               - method.request.querystring.page
               - method.request.querystring.results
@@ -92,8 +91,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /project/{id}
             Method: get
-            RequestParameters:
-              - method.request.querystring.language
 
   NvaCristinQueryOrganizationFunction:
     Type: AWS::Serverless::Function

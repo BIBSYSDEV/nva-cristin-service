@@ -45,7 +45,6 @@ class FetchCristinOrganizationTest {
     public static final String IDENTIFIER = "identifier";
     public static final String IDENTIFIER_VALUE = "1.0.0.0";
     public static final String ORGANIZATION_NOT_FOUND_MESSAGE = "Organization not found: ";
-    private static final String IDENTIFIER_NULL_ERROR = "Identifier is not a valid Organization identifier: null";
     FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinApiClient cristinApiClient;
     private Environment environment;
@@ -64,11 +63,11 @@ class FetchCristinOrganizationTest {
 
     @Test
     void shouldReturnsNotFoundResponseWhenUnitIsMissing()
-            throws IOException, ApiGatewayException, InterruptedException {
+            throws IOException, ApiGatewayException {
 
         cristinApiClient = spy(cristinApiClient);
         doThrow(new NonExistingUnitError("Organization not found: " + IDENTIFIER_VALUE))
-                .when(cristinApiClient).getSingleUnit(any(), any());
+                .when(cristinApiClient).getSingleUnit(any());
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, environment);
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
@@ -122,13 +121,12 @@ class FetchCristinOrganizationTest {
     }
 
     @Test
-    void shouldReturnInternalServerErrorResponseOnUnexpectedException()
-            throws IOException, InterruptedException {
+    void shouldReturnInternalServerErrorResponseOnUnexpectedException() throws IOException {
         CristinApiClient serviceThrowingException = spy(cristinApiClient);
         try {
             doThrow(new NullPointerException())
                     .when(serviceThrowingException)
-                    .getSingleUnit(any(), any());
+                    .getSingleUnit(any());
         } catch (ApiGatewayException e) {
             e.printStackTrace();
         }
