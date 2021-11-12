@@ -146,7 +146,7 @@ public class CristinApiClient {
                 .orElseThrow();
 
         HttpResponse<String> response = fetchGetResult(uri);
-        checkHttpStatusCode(getNvaProjectUriWithId(id, UriUtils.PROJECT).toString(), response.statusCode());
+        checkHttpStatusCode(getNvaProjectUriWithId(id).toString(), response.statusCode());
         return getDeserializedResponse(response, CristinProject.class);
     }
 

@@ -1,12 +1,6 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.utils.UriUtils.getNvaProjectUriWithId;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import no.unit.nva.cristin.model.Organization;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -14,11 +8,18 @@ import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
-import no.unit.nva.cristin.model.Organization;
 import no.unit.nva.cristin.projects.model.nva.NvaPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static no.unit.nva.utils.UriUtils.getNvaProjectUriWithId;
 
 public class NvaProjectBuilder {
 
@@ -65,7 +66,7 @@ public class NvaProjectBuilder {
      * @return a NvaProject converted from a CristinProject
      */
     public NvaProject build() {
-        nvaProject.setId(getNvaProjectUriWithId(cristinProject.getCristinProjectId(), UriUtils.PROJECT));
+        nvaProject.setId(getNvaProjectUriWithId(cristinProject.getCristinProjectId()));
         nvaProject.setType(PROJECT_TYPE);
         nvaProject.setIdentifiers(createCristinIdentifier());
         nvaProject.setTitle(extractMainTitle());
