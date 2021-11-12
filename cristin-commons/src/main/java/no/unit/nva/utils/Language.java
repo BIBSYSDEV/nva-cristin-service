@@ -41,4 +41,7 @@ public enum Language {
         return String.format(UNKNOWN_LANGUAGE_TEMPLATE, code, LANGUAGES_STRING);
     }
 
+    public String getCode() {
+        return this.code;
+    }
 }

@@ -3,10 +3,10 @@ package no.unit.nva.cristin.organization;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.model.Organization;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
-import no.unit.nva.cristin.organization.exception.HttpClientFailureException;
-import no.unit.nva.cristin.organization.exception.NonExistingUnitError;
 import no.unit.nva.cristin.organization.utils.InstitutionUtils;
-import no.unit.nva.cristin.organization.utils.Language;
+import no.unit.nva.exception.HttpClientFailureException;
+import no.unit.nva.exception.NonExistingUnitError;
+import no.unit.nva.utils.Language;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.attempt.Failure;
 import nva.commons.core.attempt.Try;
@@ -146,4 +146,5 @@ public class HttpExecutorImpl extends HttpExecutor {
     private String generateInstitutionsQueryUri(Language language) {
         return String.format(INSTITUTIONS_URI_TEMPLATE, language.getCode());
     }
+
 }

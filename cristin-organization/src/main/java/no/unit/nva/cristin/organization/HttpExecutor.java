@@ -2,10 +2,10 @@ package no.unit.nva.cristin.organization;
 
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.model.Organization;
-import no.unit.nva.cristin.organization.exception.FailedHttpRequestException;
-import no.unit.nva.cristin.organization.exception.HttpClientFailureException;
-import no.unit.nva.cristin.organization.exception.NonExistingUnitError;
-import no.unit.nva.cristin.organization.utils.Language;
+import no.unit.nva.exception.FailedHttpRequestException;
+import no.unit.nva.exception.HttpClientFailureException;
+import no.unit.nva.exception.NonExistingUnitError;
+import no.unit.nva.utils.Language;
 import org.apache.http.HttpStatus;
 
 import java.net.URI;

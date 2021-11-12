@@ -19,6 +19,13 @@ public class CristinApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
 
+    private final transient HttpExecutor httpExecutor;
+
+    public CristinApiClient() {
+        this.httpExecutor = new HttpExecutorImpl();
+    }
+
+
     /**
      * Get information for an Organization.
      *
@@ -29,9 +36,11 @@ public class CristinApiClient {
      * @throws HttpClientFailureException when Cristin server reports failure
      */
     public Organization getSingleUnit(URI uri, Language language)
-            throws NonExistingUnitError, HttpClientFailureException {
+            throws NonExistingUnitError, HttpClientFailureException, InterruptedException {
         logger.info("Fetching results for: " + uri.toString());
-        throw new NonExistingUnitError(uri.toString());
+        Organization result = httpExecutor.getSingleUnit(uri, language);
+        return result;
+
     }
 
     /**

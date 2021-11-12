@@ -100,9 +100,11 @@ public class FetchCristinProjects extends CristinHandler<Void, SearchResponse<Nv
             .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
     }
 
-    private SearchResponse<NvaProject> getTransformedCristinProjectsUsingWrapperObject(String language, String query, String page,
-                                                                           String numberOfResults)
-        throws ApiGatewayException {
+    private SearchResponse<NvaProject> getTransformedCristinProjectsUsingWrapperObject(String language,
+                                                                                       String query,
+                                                                                       String page,
+                                                                                       String numberOfResults)
+            throws ApiGatewayException {
 
         Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
         requestQueryParams.put(QUERY, query);
