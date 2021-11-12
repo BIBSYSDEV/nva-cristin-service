@@ -1,0 +1,53 @@
+{
+  "cristin_unit_id": "185.53.18.14",
+  "unit_name": {
+    "nb": "Avdeling for medisinsk biokjemi",
+    "en": "Department of Medical Biochemistry"
+  },
+  "institution": {
+    "cristin_institution_id": "185",
+    "url": "https://api.cristin.no/v2/institutions/185"
+  },
+  "parent_unit": {
+    "cristin_unit_id": "185.53.18.0",
+    "unit_name": {
+      "nb": "Klinikk for laboratoriemedisin",
+      "en": "Klinikk for laboratoriemedisin"
+    },
+    "url": "https://api.cristin.no/v2/units/185.53.18.0"
+  },
+  "parent_units": [
+    {
+      "cristin_unit_id": "185.90.0.0",
+      "unit_name": {
+        "nb": "Universitetet i Oslo",
+        "en": "University of Oslo"
+      },
+      "url": "https://api.cristin.no/v2/units/185.90.0.0"
+    },
+    {
+      "cristin_unit_id": "185.50.0.0",
+      "unit_name": {
+        "nb": "Det medisinske fakultet",
+        "en": "Faculty of Medicine"
+      },
+      "url": "https://api.cristin.no/v2/units/185.50.0.0"
+    },
+    {
+      "cristin_unit_id": "185.53.0.0",
+      "unit_name": {
+        "nb": "Institutt for klinisk medisin",
+        "en": "Institutt for klinisk medisin"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.0.0"
+    },
+    {
+      "cristin_unit_id": "185.53.18.0",
+      "unit_name": {
+        "nb": "Klinikk for laboratoriemedisin",
+        "en": "Klinikk for laboratoriemedisin"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.0"
+    }
+  ]
+}
