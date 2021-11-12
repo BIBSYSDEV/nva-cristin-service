@@ -217,9 +217,6 @@ components:
             telephone:
               type: string
               pattern: '\+?\d+'
-            email:
-              type: string
-              pattern: '.+[@].+[.]\w+'
         image:
           $ref: '#/components/schemas/Id'
         affiliations:
@@ -314,7 +311,6 @@ components:
                 value: 'Nordmann'
             contactDetails:
               telephone: '+4799885566'
-              email: 'kjell@epost.no'
             image: 'https://api.cristin.no/v2/persons/359084/picture'
             affiliations:
               - type: 'Affiliation'
@@ -379,7 +375,6 @@ components:
             value: 'Nordmann'
         contactDetails:
           telephone: '+4799885566'
-          email: 'kjell@epost.no'
         image: 'https://api.cristin.no/v2/persons/359084/picture'
         affiliations:
           - type: 'Affiliation'
