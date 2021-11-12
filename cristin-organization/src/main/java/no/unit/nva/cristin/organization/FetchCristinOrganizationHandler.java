@@ -18,12 +18,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static no.unit.nva.cristin.projects.Constants.BASE_PATH;
-import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
 import static no.unit.nva.cristin.projects.Constants.HTTPS;
 import static no.unit.nva.cristin.projects.Constants.IDENTIFIER;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
-import static no.unit.nva.cristin.projects.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
@@ -37,6 +35,8 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(LANGUAGE);
     private static final Set<String> VALID_LANGUAGE_CODES = Set.of("en", "nb", "nn");
     private final transient CristinApiClient cristinApiClient;
+    private static final String CRISTIN_API_UNITS_PATH = "/v2/units/";
+
 
     @JacocoGenerated
     public FetchCristinOrganizationHandler() {
@@ -107,12 +107,13 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
 
     private Organization getTransformedOrganizationFromCristin(String identifier, Language language)
             throws ApiGatewayException, InterruptedException {
-        return Optional.of(cristinApiClient.getSingleUnit(createOrganizationUri(identifier), language))
+        return Optional.of(cristinApiClient.getSingleUnit(createCristinUnitUri(identifier), language))
                 .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_LANGUAGE_INVALID));
     }
 
-    private URI createOrganizationUri(String identifier) {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH)
+    private URI createCristinUnitUri(String identifier) {
+        return new UriWrapper(HTTPS, CRISTIN_API_HOST).addChild(CRISTIN_API_UNITS_PATH)
                 .addChild(identifier).getUri();
     }
+
 }

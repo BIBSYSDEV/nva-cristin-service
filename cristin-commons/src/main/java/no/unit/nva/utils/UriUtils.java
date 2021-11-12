@@ -1,11 +1,14 @@
 package no.unit.nva.utils;
 
+import nva.commons.core.paths.UriWrapper;
+
 import static no.unit.nva.cristin.common.util.UriUtils.SLASH_DELIMITER;
 import static no.unit.nva.cristin.common.util.UriUtils.queryParameters;
 import static no.unit.nva.cristin.projects.Constants.BASE_PATH;
 import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.projects.Constants.EMPTY_FRAGMENT;
 import static no.unit.nva.cristin.projects.Constants.HTTPS;
+import static no.unit.nva.cristin.projects.Constants.ORGANIZATION_PATH;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.util.Map;
@@ -29,5 +32,9 @@ public class UriUtils {
         return SLASH_DELIMITER + BASE_PATH + SLASH_DELIMITER + module + SLASH_DELIMITER;
     }
 
+    public URI createOrganizationUri(String identifier) {
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH)
+                .addChild(identifier).getUri();
+    }
 
 }

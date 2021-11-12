@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.unit.nva.cristin.model.Organization;
 import no.unit.nva.exception.NonExistingUnitError;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -33,10 +34,12 @@ import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEP
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -160,6 +163,19 @@ class FetchCristinOrganizationTest {
         assertEquals(SC_INTERNAL_SERVER_ERROR, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(
                 MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS));
+    }
+
+    @Test
+    public void handlerReturnsOrganizationForValidInput() throws IOException {
+
+        String identifier = "185.53.18.14";
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, environment);
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(identifier), output, context);
+        GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(SC_OK, gatewayResponse.getStatusCode());
+        Organization actual = gatewayResponse.getBodyObject(Organization.class);
+        assertNotNull(actual);
     }
 
 
