@@ -11,14 +11,6 @@ public class FailedHttpRequestException extends ApiGatewayException {
         super(message);
     }
 
-    public FailedHttpRequestException(Exception exception) {
-        super(exception);
-    }
-
-    public FailedHttpRequestException(Exception exception, String message) {
-        super(exception, message);
-    }
-
     @Override
     protected Integer statusCode() {
         return ERROR_CODE;

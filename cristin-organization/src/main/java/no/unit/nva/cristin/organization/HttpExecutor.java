@@ -1,12 +1,11 @@
 package no.unit.nva.cristin.organization;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import no.unit.nva.cristin.common.model.SearchResponse;
+import no.unit.nva.cristin.model.Organization;
 import no.unit.nva.cristin.organization.exception.FailedHttpRequestException;
 import no.unit.nva.cristin.organization.exception.HttpClientFailureException;
-import no.unit.nva.cristin.organization.exception.InvalidUriException;
 import no.unit.nva.cristin.organization.exception.NonExistingUnitError;
 import no.unit.nva.cristin.organization.utils.Language;
-import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
 import org.apache.http.HttpStatus;
 
 import java.net.URI;
@@ -21,12 +20,9 @@ public abstract class HttpExecutor {
     public static int FIRST_SUCCESSFUL_CODE = HttpStatus.SC_OK;
     public static String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
 
-    public abstract InstitutionListResponse getInstitutions(Language language) throws HttpClientFailureException;
+    public abstract SearchResponse<Organization> getInstitutions(Language language) throws HttpClientFailureException;
 
-    public abstract JsonNode getNestedInstitution(URI uri, Language language)
-        throws HttpClientFailureException, InvalidUriException, FailedHttpRequestException;
-
-    public abstract NvaOrganization getSingleUnit(URI uri, Language language)
+    public abstract Organization getSingleUnit(URI uri, Language language)
         throws NonExistingUnitError, HttpClientFailureException, InterruptedException;
 
     protected HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response)

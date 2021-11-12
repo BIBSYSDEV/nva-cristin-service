@@ -7,7 +7,6 @@ import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.exception.HttpClientFailureException;
 import no.unit.nva.cristin.organization.exception.NonExistingUnitError;
 import no.unit.nva.cristin.organization.utils.Language;
-import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonUtils;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
@@ -23,17 +22,11 @@ import java.util.concurrent.ExecutionException;
 
 import static java.util.Objects.nonNull;
 
+@SuppressWarnings("PMD.ConstructorCallsOverridableMethod")    // TODO Fix external access
 public class SingleUnitHierarchyGenerator {
 
-    private final HttpClient httpClient;
-
-    private final Logger logger = LoggerFactory.getLogger(SingleUnitHierarchyGenerator.class);
-
-    @JacocoGenerated
-    public SingleUnitHierarchyGenerator(URI uri, Language language)
-        throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
-        this(uri, language, newHttpClient());
-    }
+    private final transient HttpClient httpClient;
+    private final transient  Logger logger = LoggerFactory.getLogger(SingleUnitHierarchyGenerator.class);
 
     /**
      * Parametrized constructor.
@@ -46,21 +39,16 @@ public class SingleUnitHierarchyGenerator {
      * @throws HttpClientFailureException when HttpClient receives an error.
      */
     public SingleUnitHierarchyGenerator(URI uri, Language language, HttpClient httpClient)
-        throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
+            throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
         this.httpClient = httpClient;
         fetchHierarchy(uri, language);
     }
 
-    @JacocoGenerated
-    private static HttpClient newHttpClient() {
-        return HttpClient.newHttpClient();
-    }
-
     private void fetchHierarchy(URI uri, Language language)
-        throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
+            throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
         SubSubUnitDto current = fetchAndUpdateModel(uri, language);
         URI parent = Optional.ofNullable(current.getParentUnit())
-            .map(InstitutionDto::getUri).orElse(null);
+                .map(InstitutionDto::getUri).orElse(null);
         while (nonNull(current.getParentUnit())) {
             current = fetchAndUpdateModel(parent, language);
             if (nonNull(current.getParentUnit())) {
@@ -70,13 +58,21 @@ public class SingleUnitHierarchyGenerator {
     }
 
     private SubSubUnitDto fetchAndUpdateModel(URI uri, Language language)
-        throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
-        SubSubUnitDto current = fetch(uri);
-        return current;
+            throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
+        return this.fetch(uri, language);
     }
 
-    public SubSubUnitDto fetch(URI uri)
-        throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
+    /**
+     * Fetches an OOrganization with given id.
+     * @param uri id of organization to fetch
+     * @param language in which languages information is wanted
+     * @return subunit for id
+     * @throws InterruptedException       when the client throws such exception.
+     * @throws NonExistingUnitError       when the URI does not correspond to an existing unit.
+     * @throws HttpClientFailureException when HttpClient receives an error.
+     */
+    public SubSubUnitDto fetch(URI uri, Language language)
+            throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
 
         HttpRequest httpRequest = createHttpRequest(uri);
         HttpResponse<String> response = sendRequest(httpRequest);
@@ -88,7 +84,7 @@ public class SingleUnitHierarchyGenerator {
     }
 
     private HttpResponse<String> sendRequest(HttpRequest httpRequest) throws InterruptedException,
-                                                                             HttpClientFailureException {
+            HttpClientFailureException {
         try {
             return httpClient.sendAsync(httpRequest, BodyHandlers.ofString()).get();
         } catch (ExecutionException e) {
@@ -111,9 +107,9 @@ public class SingleUnitHierarchyGenerator {
 
     private HttpRequest createHttpRequest(URI uri) {
         return HttpRequest.newBuilder()
-            .GET()
-            .uri(uri)
-            .build();
+                .GET()
+                .uri(uri)
+                .build();
     }
 
 }

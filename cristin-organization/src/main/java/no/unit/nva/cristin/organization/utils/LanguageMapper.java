@@ -12,11 +12,9 @@ public class LanguageMapper {
 
     private static final Logger logger = LoggerFactory.getLogger(LanguageMapper.class);
 
-    public LanguageMapper() {
-    }
-
     /**
-     * Returns a {@link Language} object for a valid language code. See valid language codes in {@link no.unit.nva.institution.proxy.utils.Language} class.
+     * Returns a {@link Language} object for a valid language code.
+     * See valid language codes in {@link Language} class.
      *
      * @param languageCode a valid language code.
      * @return a {@link Language} instance
