@@ -129,7 +129,26 @@ Resources:
             Path: /organization/{id}
             Method: get
 
-  NvaCristinProjectsFunctionBasePathMapping:
+  NvaCristinQueryPersonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.handler.PersonQueryHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Events:
+        NvaCristinQueryPersonEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/
+            Method: get
+            RequestParameters:
+              - method.request.querystring.query
+              - method.request.querystring.page
+              - method.request.querystring.results
+
+  NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
       BasePath: !Ref CustomDomainBasePath
