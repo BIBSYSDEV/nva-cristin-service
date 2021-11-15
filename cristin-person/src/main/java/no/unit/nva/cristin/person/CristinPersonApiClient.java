@@ -19,9 +19,11 @@ import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.core.JacocoGenerated;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 
+@JacocoGenerated
 public class CristinPersonApiClient {
 
     private static final String PERSON_QUERY_CONTEXT = "https://example.org/person-search-context.json";
