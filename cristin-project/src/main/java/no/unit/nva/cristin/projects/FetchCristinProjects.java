@@ -107,8 +107,8 @@ public class FetchCristinProjects extends CristinHandler<Void, SearchResponse<Nv
             throws ApiGatewayException {
 
         Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
-        requestQueryParams.put(QUERY, query);
         requestQueryParams.put(LANGUAGE, language);
+        requestQueryParams.put(QUERY, query);
         requestQueryParams.put(PAGE, page);
         requestQueryParams.put(NUMBER_OF_RESULTS, numberOfResults);
 

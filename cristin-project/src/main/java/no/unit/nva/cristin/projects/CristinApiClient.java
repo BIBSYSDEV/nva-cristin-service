@@ -12,6 +12,7 @@ import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.attempt.Failure;
 import nva.commons.core.attempt.Try;
+import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,9 @@ import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.common.util.UriUtils.queryParameters;
+import static no.unit.nva.cristin.projects.Constants.BASE_PATH;
+import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.projects.Constants.HTTPS;
 import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
 import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
@@ -49,7 +53,6 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_P
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
-import static no.unit.nva.utils.UriUtils.getNvaProjectUriWithId;
 import static no.unit.nva.utils.UriUtils.createUriFromParams;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
@@ -146,7 +149,8 @@ public class CristinApiClient {
                 .orElseThrow();
 
         HttpResponse<String> response = fetchGetResult(uri);
-        checkHttpStatusCode(getNvaProjectUriWithId(id).toString(), response.statusCode());
+        checkHttpStatusCode(new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(UriUtils.PROJECT)
+                .addChild(id).getUri().toString(), response.statusCode());
         return getDeserializedResponse(response, CristinProject.class);
     }
 

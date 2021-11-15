@@ -10,7 +10,9 @@ import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
+import nva.commons.core.paths.UriWrapper;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +21,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static no.unit.nva.utils.UriUtils.getNvaProjectUriWithId;
+import static no.unit.nva.cristin.projects.Constants.BASE_PATH;
+import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.projects.Constants.HTTPS;
 
 public class NvaProjectBuilder {
 
@@ -66,7 +70,8 @@ public class NvaProjectBuilder {
      * @return a NvaProject converted from a CristinProject
      */
     public NvaProject build() {
-        nvaProject.setId(getNvaProjectUriWithId(cristinProject.getCristinProjectId()));
+        nvaProject.setId(new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(UriUtils.PROJECT)
+                .addChild(cristinProject.getCristinProjectId()).getUri());
         nvaProject.setType(PROJECT_TYPE);
         nvaProject.setIdentifiers(createCristinIdentifier());
         nvaProject.setTitle(extractMainTitle());

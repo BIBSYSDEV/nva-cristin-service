@@ -1,11 +1,11 @@
 {
   "@context": "https://bibsysdev.github.io/src/project-search-context.json",
-  "id": "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=1&query=reindeer&results=5",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=1&results=5",
   "size": 135,
-  "searchString": "language=nb&page=1&query=reindeer&results=5",
+  "searchString": "query=reindeer&language=nb&page=1&results=5",
   "processingTime": 1000,
   "firstRecord": 1,
-  "nextResults": "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=2&query=reindeer&results=5",
+  "nextResults": "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=2&query=reindeer&results=5",
   "previousResults": null,
   "hits": [
     {
@@ -36,8 +36,8 @@
         }
       ],
       "coordinatingInstitution": {
-        "id": "https://api.cristin.no/v2/institutions/1234",
         "type": "Organization",
+        "id": "https://api.cristin.no/v2/institutions/1234",
         "name": {
           "en": "University"
         }
@@ -52,8 +52,8 @@
             "lastName": "Nordmann"
           },
           "affiliation": {
-            "id": "https://api.cristin.no/v2/institutions/1234",
             "type": "Organization",
+            "id": "https://api.cristin.no/v2/institutions/1234",
             "name": {
               "en": "University"
             }
@@ -94,8 +94,8 @@
         }
       ],
       "coordinatingInstitution": {
-        "id": "https://api.cristin.no/v2/institutions/1234",
         "type": "Organization",
+        "id": "https://api.cristin.no/v2/institutions/1234",
         "name": {
           "en": "University"
         }
@@ -110,8 +110,8 @@
             "lastName": "Nordmann"
           },
           "affiliation": {
-            "id": "https://api.cristin.no/v2/institutions/1234",
             "type": "Organization",
+            "id": "https://api.cristin.no/v2/institutions/1234",
             "name": {
               "en": "University"
             }
@@ -152,8 +152,8 @@
         }
       ],
       "coordinatingInstitution": {
-        "id": "https://api.cristin.no/v2/institutions/1234",
         "type": "Organization",
+        "id": "https://api.cristin.no/v2/institutions/1234",
         "name": {
           "en": "University"
         }
@@ -168,8 +168,8 @@
             "lastName": "Nordmann"
           },
           "affiliation": {
-            "id": "https://api.cristin.no/v2/institutions/1234",
             "type": "Organization",
+            "id": "https://api.cristin.no/v2/institutions/1234",
             "name": {
               "en": "University"
             }
@@ -210,8 +210,8 @@
         }
       ],
       "coordinatingInstitution": {
-        "id": "https://api.cristin.no/v2/institutions/1234",
         "type": "Organization",
+        "id": "https://api.cristin.no/v2/institutions/1234",
         "name": {
           "en": "University"
         }
@@ -226,8 +226,8 @@
             "lastName": "Nordmann"
           },
           "affiliation": {
-            "id": "https://api.cristin.no/v2/institutions/1234",
             "type": "Organization",
+            "id": "https://api.cristin.no/v2/institutions/1234",
             "name": {
               "en": "University"
             }
@@ -268,8 +268,8 @@
         }
       ],
       "coordinatingInstitution": {
-        "id": "https://api.cristin.no/v2/institutions/1234",
         "type": "Organization",
+        "id": "https://api.cristin.no/v2/institutions/1234",
         "name": {
           "en": "University"
         }
@@ -284,8 +284,8 @@
             "lastName": "Nordmann"
           },
           "affiliation": {
-            "id": "https://api.cristin.no/v2/institutions/1234",
             "type": "Organization",
+            "id": "https://api.cristin.no/v2/institutions/1234",
             "name": {
               "en": "University"
             }
