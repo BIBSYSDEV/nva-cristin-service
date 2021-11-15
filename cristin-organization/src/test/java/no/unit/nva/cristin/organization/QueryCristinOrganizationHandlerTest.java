@@ -2,7 +2,6 @@ package no.unit.nva.cristin.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
 import no.unit.nva.cristin.common.model.SearchResponse;
@@ -66,7 +65,7 @@ class QueryCristinOrganizationHandlerTest {
     void shouldReturnBadRequestResponseOnMissingQueryParam() throws IOException {
         InputStream inputStream = generateHandlerRequestWithMissingQueryParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
@@ -99,12 +98,6 @@ class QueryCristinOrganizationHandlerTest {
 
     private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
         return gatewayResponse.getBodyObject(Problem.class).getDetail();
-    }
-
-    private GatewayResponse<Problem> parseFailureResponse() throws JsonProcessingException {
-        JavaType responseWithProblemType = restApiMapper.getTypeFactory()
-                .constructParametricType(GatewayResponse.class, Problem.class);
-        return restApiMapper.readValue(output.toString(), responseWithProblemType);
     }
 
     private URI randomId() {
