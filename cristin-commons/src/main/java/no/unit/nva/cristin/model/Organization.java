@@ -1,5 +1,7 @@
 package no.unit.nva.cristin.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import no.unit.nva.cristin.common.Utils;
@@ -14,25 +16,33 @@ import static no.unit.nva.cristin.common.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 
-@SuppressWarnings({"unused", "PMD.BeanMembersShouldSerialize"})
+@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonPropertyOrder({ID, TYPE, NAME, "acronym", "partOf"})
 public class Organization implements JsonSerializable {
 
-    private URI id;
+    private final URI id;
     @JsonPropertyOrder(alphabetic = true)
-    private Map<String, String> name;
-    private String acronym;
-    private Set<Organization> partOf;
+    private final Map<String, String> name;
+    private final String acronym;
+    private final Set<Organization> partOf;
 
-    private Organization(Builder builder) {
-        setId(builder.id);
-        setName(builder.name);
-        setAcronym(builder.acronym);
-        setPartOf(builder.partOf);
+    @JsonCreator
+    public Organization(@JsonProperty("id") URI id,
+                        @JsonProperty("name") Map<String, String> name,
+                        @JsonProperty("acronym") String acronym,
+                        @JsonProperty("partOf") Set<Organization> partOf) {
+        this.id = id;
+        this.name = name;
+        this.acronym = acronym;
+        this.partOf = partOf;
     }
 
-    public Organization() {
+    private Organization(Builder builder) {
+        this.id = builder.id;
+        this.name = builder.name;
+        this.acronym = builder.acronym;
+        this.partOf = builder.partOf;
     }
 
 
@@ -40,32 +50,16 @@ public class Organization implements JsonSerializable {
         return acronym;
     }
 
-    public void setAcronym(String acronym) {
-        this.acronym = acronym;
-    }
-
     public URI getId() {
         return id;
-    }
-
-    public void setId(URI id) {
-        this.id = id;
     }
 
     public Map<String, String> getName() {
         return Utils.nonEmptyOrDefault(name);
     }
 
-    public void setName(Map<String, String> name) {
-        this.name = name;
-    }
-
     public Set<Organization> getPartOf() {
         return partOf;
-    }
-
-    public void setPartOf(Set<Organization> partOf) {
-        this.partOf = partOf;
     }
 
     @Override
@@ -90,7 +84,7 @@ public class Organization implements JsonSerializable {
 
     @Override
     public String toString() {
-     return toJsonString();
+        return toJsonString();
     }
 
     public static final class Builder {
