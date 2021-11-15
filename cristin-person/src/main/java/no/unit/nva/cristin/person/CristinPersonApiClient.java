@@ -54,7 +54,8 @@ public class CristinPersonApiClient {
 
     private CristinPerson fetchDummyResponse() {
         String body = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PERSON_JSON));
-        return attempt(() -> OBJECT_MAPPER.readValue(body, CristinPerson.class)).orElseThrow();
+        return attempt(() -> OBJECT_MAPPER.readValue(body, CristinPerson.class))
+            .orElseThrow(failure -> new RuntimeException("Error reading dummy Json"));
     }
 
     private URI getPersonUriWithParams(Map<String, String> requestQueryParams) {
