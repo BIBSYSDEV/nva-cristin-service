@@ -23,7 +23,7 @@ import nva.commons.core.JacocoGenerated;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 
-@JacocoGenerated
+@JacocoGenerated // TODO: Dummy response which will be changed to fetch from upstream later
 public class CristinPersonApiClient {
 
     private static final String PERSON_QUERY_CONTEXT = "https://example.org/person-search-context.json";

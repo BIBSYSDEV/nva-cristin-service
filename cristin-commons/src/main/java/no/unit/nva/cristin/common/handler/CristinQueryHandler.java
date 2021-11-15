@@ -18,7 +18,7 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-@JacocoGenerated // TODO: Will write tests later
+@JacocoGenerated // TODO: When FetchCristinProjects extends this we will get testing for free
 public abstract class CristinQueryHandler<I, O> extends ApiGatewayHandler<I, O> {
 
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH =
