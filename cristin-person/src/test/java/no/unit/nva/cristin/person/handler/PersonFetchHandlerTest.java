@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.handler;
 
 import static no.unit.nva.cristin.person.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.person.handler.PersonFetchHandler.ID;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import no.unit.nva.cristin.person.CristinPersonApiClient;
@@ -27,10 +29,13 @@ import org.junit.jupiter.api.Test;
 
 public class PersonFetchHandlerTest {
 
-    public static final String ILLEGAL_PATH_PARAM_VALUE = "String";
-    private static final String RANDOM_ID = "12345";
     private static final String NVA_API_GET_PERSON_RESPONSE_JSON =
         "nvaApiGetPersonResponse.json";
+    private static final Map<String, String> ILLEGAL_PATH_PARAM = Map.of(ID, "string");
+    private static final Map<String, String> ILLEGAL_QUERY_PARAMS = Map.of("somekey", "somevalue");
+    private static final Map<String, String> VALID_PATH_PARAM = Map.of(ID, "12345");
+    private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
+
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
@@ -46,7 +51,7 @@ public class PersonFetchHandlerTest {
 
     @Test
     void shouldReturnResponseWhenCallingEndpointWithNameParameter() throws IOException {
-        Person actual = sendQuery(null, pathParam()).getBodyObject(Person.class);
+        Person actual = sendQuery(EMPTY_MAP, VALID_PATH_PARAM).getBodyObject(Person.class);
         String expectedString = IoUtils.stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
         Person expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
 
@@ -55,7 +60,7 @@ public class PersonFetchHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenCallingEndpointWithAnyQueryParameters() throws IOException {
-        GatewayResponse<Person> gatewayResponse = sendQuery(illegalQueryParams(), pathParam());
+        GatewayResponse<Person> gatewayResponse = sendQuery(ILLEGAL_QUERY_PARAMS, VALID_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -65,7 +70,7 @@ public class PersonFetchHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenPathParamIsNotANumber() throws IOException {
-        GatewayResponse<Person> gatewayResponse = sendQuery(null, illegalPathParam());
+        GatewayResponse<Person> gatewayResponse = sendQuery(EMPTY_MAP, ILLEGAL_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -91,15 +96,4 @@ public class PersonFetchHandlerTest {
             .build();
     }
 
-    private Map<String, String> illegalQueryParams() {
-        return Map.of("somekey", "somevalue");
-    }
-
-    private Map<String, String> pathParam() {
-        return Map.of(PersonFetchHandler.ID, RANDOM_ID);
-    }
-
-    private Map<String, String> illegalPathParam() {
-        return Map.of(PersonFetchHandler.ID, ILLEGAL_PATH_PARAM_VALUE);
-    }
 }
