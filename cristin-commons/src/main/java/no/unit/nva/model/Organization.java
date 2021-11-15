@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.model;
+package no.unit.nva.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,14 +12,19 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static no.unit.nva.cristin.common.model.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.NAME;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ACRONYM;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PART_OF;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+
 
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonPropertyOrder({ID, TYPE, NAME, "acronym", "partOf"})
+@JsonPropertyOrder({ID, TYPE, NAME, ACRONYM, PART_OF})
 public class Organization implements JsonSerializable {
+
+
 
     private final URI id;
     @JsonPropertyOrder(alphabetic = true)

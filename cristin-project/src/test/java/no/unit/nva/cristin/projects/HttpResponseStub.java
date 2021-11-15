@@ -14,10 +14,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
-import static no.unit.nva.cristin.projects.Constants.LINK;
-import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
-import static no.unit.nva.cristin.projects.Constants.REL_PREV;
-import static no.unit.nva.cristin.projects.Constants.X_TOTAL_COUNT;
+import static no.unit.nva.cristin.model.Constants.LINK;
+import static no.unit.nva.cristin.model.Constants.REL_NEXT;
+import static no.unit.nva.cristin.model.Constants.REL_PREV;
+import static no.unit.nva.cristin.model.Constants.X_TOTAL_COUNT;
+
 
 @JacocoGenerated
 public class HttpResponseStub implements HttpResponse<String> {

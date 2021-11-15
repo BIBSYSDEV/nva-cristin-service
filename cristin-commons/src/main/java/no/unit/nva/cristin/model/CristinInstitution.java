@@ -1,14 +1,14 @@
-package no.unit.nva.cristin.common.model.cristin;
+package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Map;
 
-import no.unit.nva.cristin.model.Organization;
-import no.unit.nva.cristin.projects.Constants;
+import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
 
-import static no.unit.nva.cristin.common.util.UriUtils.buildUri;
+import static no.unit.nva.utils.UriUtils.buildUri;
+
 
 @SuppressWarnings("unused")
 @JacocoGenerated

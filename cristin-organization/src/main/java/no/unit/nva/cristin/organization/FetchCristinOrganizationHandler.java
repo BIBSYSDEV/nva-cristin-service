@@ -2,7 +2,7 @@ package no.unit.nva.cristin.organization;
 
 
 import com.amazonaws.services.lambda.runtime.Context;
-import no.unit.nva.cristin.model.Organization;
+import no.unit.nva.model.Organization;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -15,11 +15,11 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static no.unit.nva.cristin.projects.Constants.BASE_PATH;
-import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.projects.Constants.HTTPS;
-import static no.unit.nva.cristin.projects.Constants.IDENTIFIER;
-import static no.unit.nva.cristin.projects.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;

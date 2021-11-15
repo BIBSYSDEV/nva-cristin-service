@@ -1,25 +1,27 @@
-package no.unit.nva.cristin.common.model;
+package no.unit.nva.cristin.model;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
-import static no.unit.nva.cristin.common.model.Constants.LINK;
-import static no.unit.nva.cristin.common.model.Constants.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.common.model.Constants.PAGE;
-import static no.unit.nva.cristin.common.model.Constants.REL_NEXT;
-import static no.unit.nva.cristin.common.model.Constants.REL_PREV;
-import static no.unit.nva.cristin.common.model.Constants.X_TOTAL_COUNT;
-import static nva.commons.core.StringUtils.EMPTY_STRING;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import no.unit.nva.utils.UriUtils;
+import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.core.JacocoGenerated;
+
 import java.net.URI;
 import java.net.http.HttpHeaders;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import no.unit.nva.cristin.common.util.UriUtils;
-import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.core.JacocoGenerated;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
+import static com.google.common.net.HttpHeaders.LINK;
+import static no.unit.nva.cristin.model.Constants.REL_NEXT;
+import static no.unit.nva.cristin.model.Constants.REL_PREV;
+import static no.unit.nva.cristin.model.Constants.X_TOTAL_COUNT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 
 @SuppressWarnings("unused")
 @JacocoGenerated

@@ -1,13 +1,13 @@
 package no.unit.nva.cristin.projects.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import no.unit.nva.cristin.model.Organization;
+import no.unit.nva.model.Organization;
 
 import java.util.Objects;
 
-import static no.unit.nva.cristin.projects.JsonPropertyNames.AFFILIATION;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTITY;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.AFFILIATION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTITY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 
 @SuppressWarnings("unused")
 @JsonPropertyOrder({TYPE, IDENTITY, AFFILIATION})

@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.projects;
 
-import no.unit.nva.cristin.model.Organization;
+import no.unit.nva.model.Organization;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -21,9 +21,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static no.unit.nva.cristin.projects.Constants.BASE_PATH;
-import static no.unit.nva.cristin.projects.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.projects.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
 
 public class NvaProjectBuilder {
 

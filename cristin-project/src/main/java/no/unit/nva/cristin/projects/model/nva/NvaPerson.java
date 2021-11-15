@@ -1,12 +1,13 @@
 package no.unit.nva.cristin.projects.model.nva;
 
-import static no.unit.nva.cristin.common.util.UriUtils.buildUri;
-import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_BASE_URL;
-import static no.unit.nva.cristin.projects.Constants.PERSON_PATH;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.FIRST_NAME;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.LAST_NAME;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE_URL;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.utils.UriUtils.buildUri;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
