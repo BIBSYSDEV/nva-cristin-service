@@ -1,9 +1,9 @@
 package no.unit.nva.cristin.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import no.unit.nva.cristin.common.Utils;
+import nva.commons.core.JsonSerializable;
 
 import java.net.URI;
 import java.util.Map;
@@ -17,10 +17,7 @@ import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 @SuppressWarnings({"unused", "PMD.BeanMembersShouldSerialize"})
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonPropertyOrder({ID, TYPE, NAME, "acronym", "partOf"})
-public class Organization {
-
-    @JsonIgnore
-    private static final String ORGANIZATION_TYPE = "Organization";
+public class Organization implements JsonSerializable {
 
     private URI id;
     @JsonPropertyOrder(alphabetic = true)
@@ -93,11 +90,7 @@ public class Organization {
 
     @Override
     public String toString() {
-        return "NvaOrganization{" + "id=" + id
-                + ", name=" + name
-                + ", acronym='" + acronym + '\''
-                + ", partOf=" + partOf
-                + '}';
+     return toJsonString();
     }
 
     public static final class Builder {
