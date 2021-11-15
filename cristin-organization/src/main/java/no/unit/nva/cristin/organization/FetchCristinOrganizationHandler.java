@@ -7,7 +7,6 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
 
@@ -33,16 +32,11 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
 
     @JacocoGenerated
     public FetchCristinOrganizationHandler() {
-        this(new Environment());
+        this(new CristinApiClient());
     }
 
-    @JacocoGenerated
-    public FetchCristinOrganizationHandler(Environment environment) {
-        this(new CristinApiClient(), environment);
-    }
-
-    public FetchCristinOrganizationHandler(CristinApiClient cristinApiClient, Environment environment) {
-        super(Void.class, environment);
+    public FetchCristinOrganizationHandler(CristinApiClient cristinApiClient) {
+        super(Void.class);
         this.cristinApiClient = cristinApiClient;
     }
 

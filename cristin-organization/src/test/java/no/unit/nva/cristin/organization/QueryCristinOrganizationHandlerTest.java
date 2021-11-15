@@ -7,11 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.model.Organization;
-import no.unit.nva.exception.HttpClientFailureException;
-import no.unit.nva.exception.NonExistingUnitError;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
-import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.apache.http.entity.ContentType;
@@ -35,7 +32,6 @@ import static no.unit.nva.cristin.projects.Constants.HTTPS;
 import static no.unit.nva.cristin.projects.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
-import static nva.commons.apigateway.ApiGatewayHandler.ALLOWED_ORIGIN_ENV;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -49,22 +45,17 @@ class QueryCristinOrganizationHandlerTest {
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private CristinApiClient cristinApiClient;
-    private Environment environment;
     private ByteArrayOutputStream output;
     private Context context;
 
 
     @BeforeEach
-    void setUp() throws HttpClientFailureException, InterruptedException, NonExistingUnitError {
-
-        environment = mock(Environment.class);
-        when(environment.readEnv(ALLOWED_ORIGIN_ENV)).thenReturn("*");
+    void setUp() {
         context = mock(Context.class);
         cristinApiClient = mock(CristinApiClient.class);
         when(cristinApiClient.queryInstitutions(any())).thenReturn(emptySearchResponse());
-
         output = new ByteArrayOutputStream();
-        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, environment);
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient);
     }
 
     private SearchResponse<Organization> emptySearchResponse() {

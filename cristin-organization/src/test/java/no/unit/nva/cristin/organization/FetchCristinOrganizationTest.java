@@ -8,7 +8,6 @@ import no.unit.nva.exception.NonExistingUnitError;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +23,6 @@ import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
-import static nva.commons.apigateway.ApiGatewayHandler.ALLOWED_ORIGIN_ENV;
 import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -37,7 +35,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 class FetchCristinOrganizationTest {
 
@@ -47,18 +44,15 @@ class FetchCristinOrganizationTest {
     public static final String ORGANIZATION_NOT_FOUND_MESSAGE = "Organization not found: ";
     FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinApiClient cristinApiClient;
-    private Environment environment;
     private ByteArrayOutputStream output;
     private Context context;
 
     @BeforeEach
     void setUp() {
-        environment = mock(Environment.class);
-        when(environment.readEnv(ALLOWED_ORIGIN_ENV)).thenReturn("*");
         context = mock(Context.class);
         cristinApiClient = new CristinApiClient();
         output = new ByteArrayOutputStream();
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, environment);
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
     }
 
     @Test
@@ -69,7 +63,7 @@ class FetchCristinOrganizationTest {
         doThrow(new NonExistingUnitError("Organization not found: " + IDENTIFIER_VALUE))
                 .when(cristinApiClient).getSingleUnit(any());
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, environment);
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
         GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
 
@@ -131,7 +125,7 @@ class FetchCristinOrganizationTest {
             e.printStackTrace();
         }
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(serviceThrowingException, environment);
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(serviceThrowingException);
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
 
         GatewayResponse<Problem> gatewayResponse = parseFailureResponse();

@@ -10,7 +10,6 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
@@ -45,16 +44,11 @@ public class QueryCristinOrganizationHandler extends ApiGatewayHandler<Void, Sea
 
     @JacocoGenerated
     public QueryCristinOrganizationHandler() {
-        this(new Environment());
+        this(new CristinApiClient());
     }
 
-    @JacocoGenerated
-    public QueryCristinOrganizationHandler(Environment environment) {
-        this(new CristinApiClient(), environment);
-    }
-
-    public QueryCristinOrganizationHandler(CristinApiClient cristinApiClient, Environment environment) {
-        super(Void.class, environment);
+    public QueryCristinOrganizationHandler(CristinApiClient cristinApiClient) {
+        super(Void.class);
         this.cristinApiClient = cristinApiClient;
     }
 
