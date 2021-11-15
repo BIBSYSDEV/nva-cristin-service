@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.model.cristin;
 
 import static no.unit.nva.cristin.person.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.person.Constants.PERSON_CONTEXT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,6 +43,7 @@ public class CristinPersonTest {
         Person expectedNvaPerson = fromJson(nvaBody, Person.class);
 
         Person actualNvaPerson = cristinPerson.toPerson();
+        actualNvaPerson.setContext(PERSON_CONTEXT);
 
         assertThat(actualNvaPerson, equalTo(expectedNvaPerson));
     }

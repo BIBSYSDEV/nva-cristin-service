@@ -10,11 +10,9 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IDENTIFIERS
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,17 +22,14 @@ import java.util.stream.Collectors;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonPropertyOrder({CONTEXT, ID, TYPE_PROPERTY, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
 public class Person {
 
-    @JsonIgnore
-    public static final String TYPE_PERSON = "Person";
-    private static final String type = TYPE_PERSON;
-    private URI id;
+    private static final String type = "Person";
     @JsonInclude(NON_NULL)
     @JsonProperty(CONTEXT)
-    private static String context;
+    private String context;
+    private URI id;
     private List<TypedValue> identifiers;
     private List<TypedValue> names;
     private ContactDetails contactDetails;
@@ -72,8 +67,8 @@ public class Person {
         return context;
     }
 
-    public static void setContext(String context) {
-        Person.context = context;
+    public void setContext(String context) {
+        this.context = context;
     }
 
     public List<TypedValue> getIdentifiers() {
@@ -169,6 +164,11 @@ public class Person {
 
         public Builder() {
             person = new Person();
+        }
+
+        public Builder withContext(String context) {
+            person.setContext(context);
+            return this;
         }
 
         public Builder withId(URI id) {
