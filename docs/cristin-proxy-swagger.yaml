@@ -320,6 +320,51 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /person/{id}:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Find person by identifier
+      description: Returns a single person matching id parameter
+      operationId: GetPersonById
+      parameters:
+        - name: id
+          in: path
+          description: ID of person to return
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9]+$'
+          example: '359084'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Person'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonExample'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 
 components:
   responses:

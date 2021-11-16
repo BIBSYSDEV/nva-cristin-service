@@ -40,6 +40,7 @@ public class CristinPersonTest {
 
         String nvaBody = getBodyFromResource(NVA_API_GET_PERSON_JSON);
         Person expectedNvaPerson = fromJson(nvaBody, Person.class);
+        expectedNvaPerson.setContext(null);
 
         Person actualNvaPerson = cristinPerson.toPerson();
 

@@ -33,7 +33,7 @@ public class Person {
     private URI id;
     @JsonInclude(NON_NULL)
     @JsonProperty(CONTEXT)
-    private static String context;
+    private String context;
     @JsonProperty(IDENTIFIERS)
     private List<TypedValue> identifiers;
     @JsonProperty(NAMES)
@@ -76,8 +76,8 @@ public class Person {
         return context;
     }
 
-    public static void setContext(String context) {
-        Person.context = context;
+    public void setContext(String context) {
+        this.context = context;
     }
 
     public List<TypedValue> getIdentifiers() {
@@ -173,6 +173,11 @@ public class Person {
 
         public Builder() {
             person = new Person();
+        }
+
+        public Builder withContext(String context) {
+            person.setContext(context);
+            return this;
         }
 
         public Builder withId(URI id) {

@@ -45,6 +45,18 @@ public class CristinPersonApiClient {
             .withHits(getDummyHits());
     }
 
+    /**
+     * Creates a Person object based on what is fetched from Cristin upstream.
+     *
+     * @param id the identifier of the person to fetch
+     * @return Person object with person data from upstream
+     */
+    public Person generateGetResponse(String id) {
+        Person person = fetchDummyResponse().toPerson();
+        person.setContext(Constants.PERSON_CONTEXT);
+        return person;
+    }
+
     private HttpHeaders dummyHeaders() {
         return HttpHeaders.of(Map.of("x-total-count", Collections.singletonList("1")), (s, s2) -> true);
     }
