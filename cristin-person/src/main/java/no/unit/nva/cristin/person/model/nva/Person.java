@@ -10,7 +10,6 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IDENTIFIERS
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -28,17 +27,22 @@ import nva.commons.core.JacocoGenerated;
 @JsonPropertyOrder({CONTEXT, ID, TYPE_PROPERTY, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
 public class Person {
 
-    @JsonIgnore
-    public static final String TYPE_PERSON = "Person";
-    private static final String type = TYPE_PERSON;
+    @JsonProperty(TYPE_PROPERTY)
+    private static final String type = "Person";
+    @JsonProperty(ID)
     private URI id;
     @JsonInclude(NON_NULL)
     @JsonProperty(CONTEXT)
     private static String context;
+    @JsonProperty(IDENTIFIERS)
     private List<TypedValue> identifiers;
+    @JsonProperty(NAMES)
     private List<TypedValue> names;
+    @JsonProperty(CONTACT_DETAILS)
     private ContactDetails contactDetails;
+    @JsonProperty(IMAGE)
     private URI image;
+    @JsonProperty(AFFILIATIONS)
     private List<Affiliation> affiliations;
 
     public Person() {
