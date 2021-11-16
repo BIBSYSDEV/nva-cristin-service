@@ -1,5 +1,14 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+
+import java.net.URI;
+import java.util.Objects;
+
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE_URL;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
@@ -8,23 +17,23 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.utils.UriUtils.buildUri;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.net.URI;
-import java.util.Objects;
-import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
-
 @SuppressWarnings("unused")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonPropertyOrder({ID, TYPE, FIRST_NAME, LAST_NAME})
 public class NvaPerson {
 
-    @JsonIgnore
-    private static final String PERSON_TYPE = "Person";
-
     private URI id;
-    private String type;
     private String firstName;
     private String lastName;
+
+    @JsonCreator
+    public NvaPerson(@JsonProperty(ID) URI id,
+                     @JsonProperty(FIRST_NAME) String firstName,
+                     @JsonProperty(LAST_NAME) String lastName) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 
     public URI getId() {
         return id;
@@ -32,14 +41,6 @@ public class NvaPerson {
 
     public void setId(URI id) {
         this.id = id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getFirstName() {
@@ -59,22 +60,19 @@ public class NvaPerson {
     }
 
     /**
-     * Build a NvaPerson datamodel from a CristinPerson datamodel.
+     * Build a Person datamodel from a CristinPerson datamodel.
      *
      * @param cristinPerson the model to convert from
-     * @return a NvaPerson converted from a CristinPerson
+     * @return a Person converted from a CristinPerson
      */
     public static NvaPerson fromCristinPerson(CristinPerson cristinPerson) {
         if (cristinPerson == null) {
             return null;
         }
 
-        NvaPerson identity = new NvaPerson();
-        identity.setId(buildUri(CRISTIN_API_BASE_URL, PERSON_PATH, cristinPerson.getCristinPersonId()));
-        identity.setType(PERSON_TYPE);
-        identity.setFirstName(cristinPerson.getFirstName());
-        identity.setLastName(cristinPerson.getSurname());
-        return identity;
+        return new NvaPerson(buildUri(CRISTIN_API_BASE_URL, PERSON_PATH, cristinPerson.getCristinPersonId()),
+                cristinPerson.getFirstName(),
+                cristinPerson.getSurname());
     }
 
     @Override
@@ -87,13 +85,12 @@ public class NvaPerson {
         }
         NvaPerson nvaPerson = (NvaPerson) o;
         return getId().equals(nvaPerson.getId())
-                && getType().equals(nvaPerson.getType())
                 && Objects.equals(getFirstName(), nvaPerson.getFirstName())
                 && Objects.equals(getLastName(), nvaPerson.getLastName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getType(), getFirstName(), getLastName());
+        return Objects.hash(getId(), getFirstName(), getLastName());
     }
 }
