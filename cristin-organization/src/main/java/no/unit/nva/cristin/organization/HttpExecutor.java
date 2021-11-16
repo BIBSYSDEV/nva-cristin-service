@@ -1,23 +1,24 @@
 package no.unit.nva.cristin.organization;
 
-import no.unit.nva.cristin.common.model.SearchResponse;
-import no.unit.nva.cristin.model.Organization;
+import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.HttpClientFailureException;
 import no.unit.nva.exception.NonExistingUnitError;
-import no.unit.nva.utils.Language;
-import org.apache.http.HttpStatus;
+import no.unit.nva.language.Language;
+import no.unit.nva.model.Organization;
 
 import java.net.URI;
 import java.net.http.HttpResponse;
 
+import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Objects.isNull;
 
 public abstract class HttpExecutor {
 
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
-    public static int FIRST_NON_SUCCESSFUL_CODE = HttpStatus.SC_MULTIPLE_CHOICES;
-    public static int FIRST_SUCCESSFUL_CODE = HttpStatus.SC_OK;
+    public static int FIRST_NON_SUCCESSFUL_CODE = HTTP_MULT_CHOICE;
+    public static int FIRST_SUCCESSFUL_CODE = HTTP_OK;
     public static String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
 
     public abstract SearchResponse<Organization> getInstitutions(Language language) throws HttpClientFailureException;

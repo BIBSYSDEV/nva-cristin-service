@@ -1,8 +1,8 @@
 package no.unit.nva.cristin.organization.utils;
 
-import no.unit.nva.cristin.common.model.SearchResponse;
-import no.unit.nva.cristin.model.Organization;
+import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
+import no.unit.nva.model.Organization;
 import nva.commons.core.JsonUtils;
 
 import java.io.IOException;

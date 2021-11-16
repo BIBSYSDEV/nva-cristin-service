@@ -4,7 +4,9 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.exception.NonExistingUnitError;
+import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.MediaTypes;
@@ -24,8 +26,10 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.utils.UriUtils.buildUri;
 import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -57,7 +61,7 @@ class FetchCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnsNotFoundResponseWhenUnitIsMissing()
-            throws IOException, ApiGatewayException {
+            throws IOException, ApiGatewayException, InterruptedException {
 
         cristinApiClient = spy(cristinApiClient);
         doThrow(new NonExistingUnitError("Organization not found: " + IDENTIFIER_VALUE))
@@ -121,7 +125,7 @@ class FetchCristinOrganizationHandlerTest {
             doThrow(new NullPointerException())
                     .when(serviceThrowingException)
                     .getSingleUnit(any());
-        } catch (ApiGatewayException e) {
+        } catch (ApiGatewayException | InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -132,7 +136,21 @@ class FetchCristinOrganizationHandlerTest {
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(
+
                 MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS));
+    }
+
+//    @Test
+    void shouldReturnOrganizationForValidRequest() throws IOException {  // TODO This is an actual call to Cristin
+        final String organizationIdentifier = "185.14.0.17";
+        InputStream inputStream = generateHandlerRequest(organizationIdentifier);
+        fetchCristinOrganizationHandler.handleRequest(inputStream, output, context);
+        GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        Organization expected = new Organization.Builder()
+                .withId(buildUri(Constants.CRISTIN_API_BASE_URL, Constants.INSTITUTION_PATH, organizationIdentifier))
+                .withName(Map.of("en", "Oslo University Hospital")).build();
+        assertEquals(expected, gatewayResponse.getBodyObject(Organization.class));
     }
 
     private InputStream generateHandlerRequest(String organizationIdentifier) throws JsonProcessingException {

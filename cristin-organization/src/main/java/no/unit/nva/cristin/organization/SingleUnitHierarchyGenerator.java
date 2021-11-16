@@ -6,9 +6,8 @@ import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.exception.HttpClientFailureException;
 import no.unit.nva.exception.NonExistingUnitError;
-import no.unit.nva.utils.Language;
+import no.unit.nva.language.Language;
 import nva.commons.core.JsonUtils;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +19,8 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Objects.nonNull;
 
 @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")    // TODO Fix external access
@@ -93,7 +94,7 @@ public class SingleUnitHierarchyGenerator {
     }
 
     private boolean isSuccessful(int statusCode) {
-        return statusCode <= HttpStatus.SC_MULTIPLE_CHOICES && statusCode >= HttpStatus.SC_OK;
+        return statusCode <= HTTP_MULT_CHOICE && statusCode >= HTTP_OK;
     }
 
     private SubSubUnitDto toUnit(String json) {

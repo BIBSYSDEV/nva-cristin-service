@@ -1,6 +1,8 @@
 dependencies {
     implementation project(":cristin-commons")
     implementation libs.nva.logutils
+    implementation libs.nva.language
+
     testImplementation project(":cristin-commons")
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5

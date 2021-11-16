@@ -1,12 +1,12 @@
 package no.unit.nva.cristin.organization;
 
-import no.unit.nva.cristin.common.model.SearchResponse;
-import no.unit.nva.cristin.model.Organization;
+import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.utils.InstitutionUtils;
 import no.unit.nva.exception.HttpClientFailureException;
 import no.unit.nva.exception.NonExistingUnitError;
-import no.unit.nva.utils.Language;
+import no.unit.nva.language.Language;
+import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.attempt.Failure;
 import nva.commons.core.attempt.Try;
@@ -22,13 +22,14 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
-import static no.unit.nva.cristin.common.util.UriUtils.buildUri;
-import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_BASE_URL;
-import static no.unit.nva.cristin.projects.Constants.INSTITUTION_PATH;
+import static com.google.common.net.HttpHeaders.ACCEPT;
+import static com.google.common.net.HttpHeaders.USER_AGENT;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE_URL;
+import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
+import static no.unit.nva.utils.UriUtils.buildUri;
 import static nva.commons.core.attempt.Try.attempt;
-import static org.apache.http.HttpHeaders.ACCEPT;
-import static org.apache.http.HttpHeaders.USER_AGENT;
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+
 
 public class HttpExecutorImpl extends HttpExecutor {
 
@@ -91,7 +92,7 @@ public class HttpExecutorImpl extends HttpExecutor {
     private CompletableFuture<HttpResponse<String>> createAndSendHttpRequest(URI uri) {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .GET()
-                .header(ACCEPT, APPLICATION_JSON.getMimeType())
+                .header(ACCEPT, APPLICATION_JSON)
                 .header(USER_AGENT, NVA_INSTITUTIONS_LIST_CRAWLER)
                 .uri(uri)
                 .build();
@@ -144,7 +145,7 @@ public class HttpExecutorImpl extends HttpExecutor {
     }
 
     private String generateInstitutionsQueryUri(Language language) {
-        return String.format(INSTITUTIONS_URI_TEMPLATE, language.getCode());
+        return String.format(INSTITUTIONS_URI_TEMPLATE, language.getLexvoUri());
     }
 
 }

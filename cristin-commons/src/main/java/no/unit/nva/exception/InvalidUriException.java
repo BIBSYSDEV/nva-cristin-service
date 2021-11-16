@@ -1,7 +1,8 @@
 package no.unit.nva.exception;
 
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import org.apache.http.HttpStatus;
+
+import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 
 public class InvalidUriException extends ApiGatewayException {
 
@@ -17,6 +18,6 @@ public class InvalidUriException extends ApiGatewayException {
 
     @Override
     protected Integer statusCode() {
-        return HttpStatus.SC_BAD_REQUEST;
+        return HTTP_BAD_GATEWAY;
     }
 }
