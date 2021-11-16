@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,18 +23,26 @@ import java.util.stream.Collectors;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonPropertyOrder({CONTEXT, ID, TYPE_PROPERTY, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
 public class Person {
 
+    @JsonProperty(TYPE_PROPERTY)
     private static final String type = "Person";
+    @JsonProperty(ID)
+    private URI id;
     @JsonInclude(NON_NULL)
     @JsonProperty(CONTEXT)
     private String context;
-    private URI id;
+    @JsonProperty(IDENTIFIERS)
     private List<TypedValue> identifiers;
+    @JsonProperty(NAMES)
     private List<TypedValue> names;
+    @JsonProperty(CONTACT_DETAILS)
     private ContactDetails contactDetails;
+    @JsonProperty(IMAGE)
     private URI image;
+    @JsonProperty(AFFILIATIONS)
     private List<Affiliation> affiliations;
 
     public Person() {

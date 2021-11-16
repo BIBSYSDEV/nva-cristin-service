@@ -1,6 +1,6 @@
 [versions]
 junit = {strictly = '5.8.1'}
-nva-commons = {strictly = '1.16.9'}
+nva-commons = {strictly = '1.16.12'}
 jackson = {strictly = '2.12.1'}
 mockito = {strictly = '3.11.2'}
 hamcrest = {strictly = '2.2'}
@@ -8,7 +8,6 @@ nva-testutils = {strictly = '0.1.27'}
 zalando = {strictly = '0.25.0'}
 apache-commons = {strictly = '3.12.0'}
 javax-ws-rs = {strictly = '2.1.1'}
-#sl4j = {strictly = '1.7.31'}
 jsoup = {strictly = '1.13.1'}
 aws-lambda-java-core = {strictly = '1.2.1'}
 google-guava = {strictly = '31.0.1-jre'}
@@ -42,7 +41,6 @@ jackson-datatype-jsr310 = { group = 'com.fasterxml.jackson.datatype', name = 'ja
 
 apache-commons = { group = 'org.apache.commons', name = 'commons-lang3', version.ref = 'apache-commons' }
 javax-ws-rs = { group = 'javax.ws.rs', name = 'javax.ws.rs-api', version.ref = 'javax-ws-rs' }
-#sl4j = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'sl4j' }
 jsoup = { group = 'org.jsoup', name = 'jsoup', version.ref = 'jsoup' }
 aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version.ref = 'aws-lambda-java-core' }
 google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'google-guava' }
