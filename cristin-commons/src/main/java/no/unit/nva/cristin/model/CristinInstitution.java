@@ -43,11 +43,6 @@ public class CristinInstitution {
         this.url = url;
     }
 
-    /**
-     * Build a Organization datamodel from a CristinInstitution datamodel.
-     *
-     * @return a Organization converted from a CristinInstitution
-     */
     public Organization toOrganization() {
 
         return new Organization.Builder()

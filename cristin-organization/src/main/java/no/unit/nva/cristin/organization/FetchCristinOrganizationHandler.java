@@ -26,7 +26,7 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_
 
 public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Organization> {
 
-    public static final String IDENTIFIER_PATTERN = "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$";
+    public static final String IDENTIFIER_PATTERN = "^(?:[0-9]{1,5}\\.){3}[0-9]{1,3}$";
     public static final Pattern PATTERN = Pattern.compile(IDENTIFIER_PATTERN);
     private final transient CristinApiClient cristinApiClient;
 

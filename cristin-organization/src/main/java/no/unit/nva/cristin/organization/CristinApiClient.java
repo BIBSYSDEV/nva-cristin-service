@@ -2,9 +2,8 @@ package no.unit.nva.cristin.organization;
 
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.Organization;
-import no.unit.nva.exception.HttpClientFailureException;
-import no.unit.nva.exception.NonExistingUnitError;
 import no.unit.nva.utils.UriUtils;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,13 +22,12 @@ public class CristinApiClient {
      *
      * @param uri      the Cristin unit URI
      * @return an {@link Organization} containing the information
-     * @throws NonExistingUnitError       when the URI does not correspond to an existing unit.
-     * @throws HttpClientFailureException when Cristin server reports failure
+     * @throws NotFoundException       when the URI does not correspond to an existing unit.
      */
     public Organization getSingleUnit(URI uri)
-            throws NonExistingUnitError, HttpClientFailureException {
+            throws NotFoundException {
         logger.info("Fetching results for: " + uri.toString());
-        throw new NonExistingUnitError(uri.toString());
+        throw new NotFoundException(uri.toString());
     }
 
     /**

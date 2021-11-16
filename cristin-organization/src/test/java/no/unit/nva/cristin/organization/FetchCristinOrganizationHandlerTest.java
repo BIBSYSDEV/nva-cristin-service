@@ -4,11 +4,11 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.unit.nva.exception.NonExistingUnitError;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JsonUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ class FetchCristinOrganizationHandlerTest {
             throws IOException, ApiGatewayException {
 
         cristinApiClient = spy(cristinApiClient);
-        doThrow(new NonExistingUnitError("Organization not found: " + IDENTIFIER_VALUE))
+        doThrow(new NotFoundException("Organization not found: " + IDENTIFIER_VALUE))
                 .when(cristinApiClient).getSingleUnit(any());
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
