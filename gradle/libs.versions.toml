@@ -1,6 +1,6 @@
 [versions]
 junit = {strictly = '5.8.1'}
-nva-commons = {strictly = '1.16.8'}
+nva-commons = {strictly = '1.16.9'}
 jackson = {strictly = '2.12.1'}
 mockito = {strictly = '3.11.2'}
 hamcrest = {strictly = '2.2'}
@@ -12,7 +12,6 @@ sl4j = {strictly = '1.7.31'}
 jsoup = {strictly = '1.13.1'}
 aws-lambda-java-core = {strictly = '1.2.1'}
 google-guava = {strictly = '31.0.1-jre'}
-apacheHttpCore = { strictly = "4.4.14" }
 karate-core = {strictly = '1.1.0'}
 karate-apache = {strictly = '0.9.6'}
 karate-junit5 = {strictly = '1.1.0'}
@@ -49,13 +48,11 @@ jackson-annotations = { group = 'com.fasterxml.jackson.core', name = 'jackson-an
 jackson-datatype-jdk8 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jdk8', version.ref = 'jackson' }
 jackson-datatype-jsr310 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jsr310', version.ref = 'jackson' }
 
-apache-commons = { group = 'org.apache.commons', name = 'commons-lang3', version.ref = 'apache-commons' }
+# apache-commons = { group = 'org.apache.commons', name = 'commons-lang3', version.ref = 'apache-commons' }
 javax-ws-rs = { group = 'javax.ws.rs', name = 'javax.ws.rs-api', version.ref = 'javax-ws-rs' }
-# sl4j = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'sl4j' }
 jsoup = { group = 'org.jsoup', name = 'jsoup', version.ref = 'jsoup' }
 aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version.ref = 'aws-lambda-java-core' }
 google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'google-guava' }
-httpcore = { group = "org.apache.httpcomponents", name = "httpcore", version.ref = "apacheHttpCore" }
 
 log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4jApi' }
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
@@ -64,4 +61,4 @@ slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
 testing = ['junit-jupiter-api', 'junit-jupiter-params', 'junit-jupiter-engine', 'mockito-core', 'hamcrest', 'nva-testutils', 'nva-logutils', 'zalando']
 jackson = ['jackson-core', 'jackson-databind', 'jackson-annotations', 'jackson-datatype-jdk8', 'jackson-datatype-jsr310']
-others = ['apache-commons', 'javax-ws-rs', 'slf4j-api', 'log4j-api', 'jsoup', 'aws-lambda-java-core', 'google-guava']
+others = ['javax-ws-rs', 'slf4j-api', 'log4j-api', 'jsoup', 'aws-lambda-java-core', 'google-guava']

@@ -40,7 +40,7 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid path parameter for identifier, needs to be a number....'
+    And match response.detail == 'Invalid path parameter for identifier, needs to be a number'
 
   Scenario: GET returns status Not found when requesting unknown project identifier
     Given path '/project/' + nonExistingProjectId

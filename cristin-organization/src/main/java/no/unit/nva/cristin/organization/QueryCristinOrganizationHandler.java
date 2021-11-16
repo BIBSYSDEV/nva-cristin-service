@@ -3,14 +3,13 @@ package no.unit.nva.cristin.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.Utils;
-import no.unit.nva.cristin.common.model.SearchResponse;
-import no.unit.nva.cristin.common.util.UriUtils;
-import no.unit.nva.cristin.model.Organization;
+import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.model.Organization;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
@@ -19,12 +18,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static no.unit.nva.cristin.projects.Constants.DEFAULT_NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.projects.Constants.FIRST_PAGE;
-import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
-import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.projects.Constants.PAGE;
-import static no.unit.nva.cristin.projects.Constants.QUERY;
+import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
@@ -45,16 +44,11 @@ public class QueryCristinOrganizationHandler extends ApiGatewayHandler<Void, Sea
 
     @JacocoGenerated
     public QueryCristinOrganizationHandler() {
-        this(new Environment());
+        this(new CristinApiClient());
     }
 
-    @JacocoGenerated
-    public QueryCristinOrganizationHandler(Environment environment) {
-        this(new CristinApiClient(), environment);
-    }
-
-    public QueryCristinOrganizationHandler(CristinApiClient cristinApiClient, Environment environment) {
-        super(Void.class, environment);
+    public QueryCristinOrganizationHandler(CristinApiClient cristinApiClient) {
+        super(Void.class);
         this.cristinApiClient = cristinApiClient;
     }
 

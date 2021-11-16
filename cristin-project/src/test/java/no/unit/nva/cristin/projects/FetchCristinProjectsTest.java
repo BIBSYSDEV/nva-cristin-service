@@ -1,14 +1,50 @@
 package no.unit.nva.cristin.projects;
 
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.MediaType;
+import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.zalando.problem.Problem;
+
+import javax.ws.rs.core.HttpHeaders;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpResponse;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
+
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
-import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
-import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.projects.Constants.PAGE;
-import static no.unit.nva.cristin.projects.Constants.QUERY;
-import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_GRANT_ID;
-import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_TITLE;
-import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.QueryType;
+import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
+import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
+import static no.unit.nva.cristin.model.Constants.REL_NEXT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
@@ -33,40 +69,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.MediaType;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
-import javax.ws.rs.core.HttpHeaders;
-import no.unit.nva.cristin.common.model.SearchResponse;
-import no.unit.nva.cristin.projects.Constants.QueryType;
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.Environment;
-import nva.commons.core.ioutils.IoUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.zalando.problem.Problem;
 
 public class FetchCristinProjectsTest {
 
@@ -79,9 +81,9 @@ public class FetchCristinProjectsTest {
     private static final String SECOND_PAGE = "2";
     private static final String TEN_RESULTS = "10";
     private static final String URI_WITH_PAGE_NUMBER_VALUE_OF_TWO =
-        "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=2&query=reindeer&results=5";
+        "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=2&results=5";
     private static final String URI_WITH_TEN_NUMBER_OF_RESULTS =
-        "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=1&query=reindeer&results=10";
+        "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=1&results=10";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
@@ -91,7 +93,7 @@ public class FetchCristinProjectsTest {
     public static final String GRANT_ID_EXAMPLE = "1234567";
     public static final String WHITESPACE = " ";
     public static final String URI_WITH_ESCAPED_WHITESPACE =
-        "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=1&query=reindeer+reindeer&results=5";
+        "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer+reindeer&language=nb&page=1&results=5";
     public static final String INVALID_QUERY_PARAM_KEY = "invalid";
     public static final String INVALID_QUERY_PARAM_VALUE = "value";
 
@@ -571,7 +573,7 @@ public class FetchCristinProjectsTest {
     }
 
     private static String exampleUriFromPageAndResults(String page, String results) {
-        String url = "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=%s&query=reindeer&results=%s";
+        String url = "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=%s&query=reindeer&results=%s";
         return String.format(url, page, results);
     }
 
@@ -590,8 +592,10 @@ public class FetchCristinProjectsTest {
 
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(
-            QUERY, RANDOM_TITLE,
-            LANGUAGE, LANGUAGE_NB));
+                QUERY,
+                RANDOM_TITLE,
+                LANGUAGE,
+                LANGUAGE_NB));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
     }

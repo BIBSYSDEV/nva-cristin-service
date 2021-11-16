@@ -3,9 +3,10 @@ package no.unit.nva.cristin.projects.model.nva;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import no.unit.nva.cristin.model.Organization;
+import no.unit.nva.model.Organization;
 import no.unit.nva.cristin.projects.ProjectStatus;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonSerializable;
 
 import java.net.URI;
 import java.time.Instant;
@@ -15,27 +16,27 @@ import java.util.Objects;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.ALTERNATIVE_TITLES;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTEXT;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.CONTRIBUTORS;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.COORDINATING_INSTITUTION;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.END_DATE;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.FUNDING;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTIFIERS;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.START_DATE;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.STATUS;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.TITLE;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIERS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_POPULAR_SCIENTIFIC_SUMMARY;
 
 @JsonInclude(ALWAYS)
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
         FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS, NVA_ACADEMIC_SUMMARY, NVA_POPULAR_SCIENTIFIC_SUMMARY})
-public class NvaProject {
+public class NvaProject implements JsonSerializable {
 
     public static final String NVA_ACADEMIC_SUMMARY = "academicSummary";
     public static final String NVA_POPULAR_SCIENTIFIC_SUMMARY = "popularScientificSummary";
@@ -239,22 +240,6 @@ public class NvaProject {
 
     @Override
     public String toString() {
-        return "NvaProject{"
-                + "context='" + context + '\''
-                + ", id=" + id
-                + ", type='" + type + '\''
-                + ", identifiers=" + identifiers
-                + ", title='" + title + '\''
-                + ", language=" + language
-                + ", alternativeTitles=" + alternativeTitles
-                + ", startDate=" + startDate
-                + ", endDate=" + endDate
-                + ", funding=" + funding
-                + ", coordinatingInstitution=" + coordinatingInstitution
-                + ", contributors=" + contributors
-                + ", status=" + status
-                + ", academicSummary=" + academicSummary
-                + ", popularScientificSummary=" + popularScientificSummary
-                + '}';
+        return toJsonString();
     }
 }

@@ -32,9 +32,10 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Map.of;
-import static no.unit.nva.cristin.projects.Constants.ID;
-import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
-import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
@@ -45,7 +46,6 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ER
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_KEY;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_VALUE;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;

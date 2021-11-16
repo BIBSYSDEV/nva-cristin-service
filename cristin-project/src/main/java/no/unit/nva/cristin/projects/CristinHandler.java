@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
+import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
 import static nva.commons.core.attempt.Try.attempt;
 import com.google.common.net.MediaType;
@@ -23,7 +24,7 @@ public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
 
     @Override
     protected List<MediaType> listSupportedMediaTypes() {
-        return Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+        return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
     protected static String getValidLanguage(RequestInfo requestInfo) throws BadRequestException {

@@ -1,12 +1,12 @@
 package no.unit.nva.exception;
 
-
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import org.apache.http.HttpStatus;
+
+import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 
 public class HttpClientFailureException extends ApiGatewayException {
 
-    public static final int ERROR_CODE = HttpStatus.SC_BAD_GATEWAY;
+    public static final int ERROR_CODE = HTTP_BAD_GATEWAY;
 
     public HttpClientFailureException(String message) {
         super(message);
