@@ -8,7 +8,7 @@ import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
-import no.unit.nva.cristin.projects.model.nva.NvaPerson;
+import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
@@ -59,7 +59,7 @@ public class NvaProjectBuilder {
                                                                               CristinRole role) {
         NvaContributor nvaContributor = new NvaContributor();
         nvaContributor.setType(cristinRolesToNva.get(role.getRoleCode()));
-        nvaContributor.setIdentity(NvaPerson.fromCristinPerson(cristinPerson));
+        nvaContributor.setIdentity(Person.fromCristinPerson(cristinPerson));
         nvaContributor.setAffiliation(role.getInstitution().toOrganization());
         return nvaContributor;
     }

@@ -20,16 +20,16 @@ import static no.unit.nva.utils.UriUtils.buildUri;
 @SuppressWarnings("unused")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonPropertyOrder({ID, TYPE, FIRST_NAME, LAST_NAME})
-public class NvaPerson {
+public class Person {
 
     private URI id;
     private String firstName;
     private String lastName;
 
     @JsonCreator
-    public NvaPerson(@JsonProperty(ID) URI id,
-                     @JsonProperty(FIRST_NAME) String firstName,
-                     @JsonProperty(LAST_NAME) String lastName) {
+    public Person(@JsonProperty(ID) URI id,
+                  @JsonProperty(FIRST_NAME) String firstName,
+                  @JsonProperty(LAST_NAME) String lastName) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -65,12 +65,12 @@ public class NvaPerson {
      * @param cristinPerson the model to convert from
      * @return a Person converted from a CristinPerson
      */
-    public static NvaPerson fromCristinPerson(CristinPerson cristinPerson) {
+    public static Person fromCristinPerson(CristinPerson cristinPerson) {
         if (cristinPerson == null) {
             return null;
         }
 
-        return new NvaPerson(buildUri(CRISTIN_API_BASE_URL, PERSON_PATH, cristinPerson.getCristinPersonId()),
+        return new Person(buildUri(CRISTIN_API_BASE_URL, PERSON_PATH, cristinPerson.getCristinPersonId()),
                 cristinPerson.getFirstName(),
                 cristinPerson.getSurname());
     }
@@ -80,10 +80,10 @@ public class NvaPerson {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof NvaPerson)) {
+        if (!(o instanceof Person)) {
             return false;
         }
-        NvaPerson nvaPerson = (NvaPerson) o;
+        Person nvaPerson = (Person) o;
         return getId().equals(nvaPerson.getId())
                 && Objects.equals(getFirstName(), nvaPerson.getFirstName())
                 && Objects.equals(getLastName(), nvaPerson.getLastName());

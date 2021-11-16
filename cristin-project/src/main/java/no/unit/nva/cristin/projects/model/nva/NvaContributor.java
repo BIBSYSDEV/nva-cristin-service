@@ -14,7 +14,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 public class NvaContributor {
 
     private String type;
-    private NvaPerson identity;
+    private Person identity;
     private Organization affiliation;
 
     public String getType() {
@@ -25,11 +25,11 @@ public class NvaContributor {
         this.type = type;
     }
 
-    public NvaPerson getIdentity() {
+    public Person getIdentity() {
         return identity;
     }
 
-    public void setIdentity(NvaPerson identity) {
+    public void setIdentity(Person identity) {
         this.identity = identity;
     }
 
