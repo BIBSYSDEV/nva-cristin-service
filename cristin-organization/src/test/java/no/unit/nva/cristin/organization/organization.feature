@@ -22,7 +22,7 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid path parameter for identifier, needs to be a number'
+    And match response.detail == 'Invalid path parameter for identifier, needs to be four numbers separated by dots'
 
   Scenario: GET returns 400 status Bad request when requesting illegal organization identifier
     Given path '/organization/' + illegalIdentifier
@@ -30,7 +30,7 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid path parameter for identifier, needs to be a number'
+    And match response.detail == 'Invalid path parameter for identifier, needs to be four numbers separated by dots'
 
   Scenario: GET returns 400 status Bad request when requesting without any query parameter
     Given path '/organization/'

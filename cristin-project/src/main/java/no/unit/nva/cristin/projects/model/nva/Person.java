@@ -5,17 +5,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.util.Objects;
 
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE_URL;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
-import static no.unit.nva.utils.UriUtils.buildUri;
 
 @SuppressWarnings("unused")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
@@ -70,7 +71,9 @@ public class Person {
             return null;
         }
 
-        return new Person(buildUri(CRISTIN_API_BASE_URL, PERSON_PATH, cristinPerson.getCristinPersonId()),
+        final URI id = new UriWrapper(HTTPS, CRISTIN_API_BASE).addChild(PERSON_PATH)
+                .addChild(cristinPerson.getCristinPersonId()).getUri();
+        return new Person(id,
                 cristinPerson.getFirstName(),
                 cristinPerson.getSurname());
     }

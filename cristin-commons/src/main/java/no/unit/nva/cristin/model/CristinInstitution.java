@@ -2,12 +2,16 @@ package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.util.Map;
-
 import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.paths.UriWrapper;
 
-import static no.unit.nva.utils.UriUtils.buildUri;
+import java.net.URI;
+import java.util.Map;
+
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
 
 
 @SuppressWarnings("unused")
@@ -43,16 +47,12 @@ public class CristinInstitution {
         this.url = url;
     }
 
-    /**
-     * Build a Organization datamodel from a CristinInstitution datamodel.
-     *
-     * @return a Organization converted from a CristinInstitution
-     */
     public Organization toOrganization() {
 
+        final URI id = new UriWrapper(HTTPS, CRISTIN_API_BASE).addChild(INSTITUTION_PATH)
+                .addChild(getCristinInstitutionId()).getUri();
         return new Organization.Builder()
-                .withId(buildUri(Constants.CRISTIN_API_BASE_URL, Constants.INSTITUTION_PATH,
-                        getCristinInstitutionId()))
+                .withId(id)
                 .withName(getInstitutionName()).build();
     }
 

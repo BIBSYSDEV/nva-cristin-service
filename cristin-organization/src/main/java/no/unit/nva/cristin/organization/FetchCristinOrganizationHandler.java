@@ -15,19 +15,18 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_HOST;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
 
 public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Organization> {
 
-    public static final String IDENTIFIER_PATTERN = "^(?:[0-9]{1,4}\\.){3}[0-9]{1,3}$";
+    public static final String IDENTIFIER_PATTERN = "^(?:[0-9]{1,5}\\.){3}[0-9]{1,3}$";
     public static final Pattern PATTERN = Pattern.compile(IDENTIFIER_PATTERN);
-    private static final String VERSION2 = "v2";
-    private static final String UNITS_PATH = "units";
     private final transient CristinApiClient cristinApiClient;
 
     @JacocoGenerated
@@ -48,7 +47,7 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
         try {
             result = getTransformedOrganizationFromCristin(getValidId(requestInfo));
         } catch (InterruptedException e) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP);
+            throw new BadRequestException(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE);
         }
         return result;
     }
@@ -60,7 +59,7 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
 
     private void validateThatSuppliedParamsIsSupported(RequestInfo requestInfo) throws BadRequestException {
         if (!requestInfo.getPathParameters().containsKey(IDENTIFIER)) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID);
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
         }
     }
 
@@ -69,7 +68,7 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
         if (matchesIdentifierPattern(identifier)) {
             return identifier;
         } else {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID);
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
         }
     }
 
@@ -79,12 +78,15 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
 
     private Organization getTransformedOrganizationFromCristin(String identifier)
             throws ApiGatewayException, InterruptedException {
-        return Optional.of(cristinApiClient.getSingleUnit(createCristinOrganizationUri(identifier)))
-                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_LANGUAGE_INVALID));
+        return Optional.of(cristinApiClient.getSingleUnit(createOrganizationUri(identifier)))
+                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE));
     }
 
-    public static URI createCristinOrganizationUri(String identifier) {
-        return new UriWrapper(HTTPS, CRISTIN_API_HOST).addChild(VERSION2).addChild(UNITS_PATH)
-                .addChild(identifier).addQueryParameter("lang","en,nb,nn").getUri();
+    private URI createOrganizationUri(String identifier) {
+        return new UriWrapper(HTTPS,
+                DOMAIN_NAME).addChild(BASE_PATH)
+                .addChild(ORGANIZATION_PATH)
+                .addChild(identifier)
+                .getUri();
     }
 }

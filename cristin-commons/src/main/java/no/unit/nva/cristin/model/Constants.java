@@ -23,7 +23,8 @@ public class Constants {
             "https://bibsysdev.github.io/src/project-context.json";
     public static final String CRISTIN_API_HOST = ENVIRONMENT.readEnvOpt("CRISTIN_API_HOST")
             .orElse("api.cristin.no");
-    public static final String CRISTIN_API_BASE_URL = "https://" + CRISTIN_API_HOST + "/v2";
+    public static final String CRISTIN_API_BASE = CRISTIN_API_HOST + "/v2";
+
     public static final String HTTPS = "https";
     public static final String INSTITUTION_PATH = "institutions";
     public static final String PERSON_PATH = "persons";
