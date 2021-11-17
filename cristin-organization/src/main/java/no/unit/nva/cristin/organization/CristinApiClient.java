@@ -4,6 +4,7 @@ import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +12,10 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
-import static no.unit.nva.utils.UriUtils.createUriFromParams;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+
 
 public class CristinApiClient {
 
@@ -35,7 +39,12 @@ public class CristinApiClient {
      * @param requestQueryParams Map containing verified query parameters
      */
     public SearchResponse<Organization> queryInstitutions(Map<String, String> requestQueryParams) {
-        return new SearchResponse<Organization>(createUriFromParams(requestQueryParams, UriUtils.INSTITUTION))
+        URI id = new UriWrapper(HTTPS,
+                DOMAIN_NAME).addChild(BASE_PATH)
+                .addChild(UriUtils.INSTITUTION)
+                .addQueryParameters(requestQueryParams)
+                .getUri();
+        return new SearchResponse<Organization>(id)
                 .withProcessingTime(0L)
                 .withSize(0)
                 .withHits(Collections.emptyList());

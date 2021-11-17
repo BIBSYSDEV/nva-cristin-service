@@ -52,7 +52,6 @@ import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_P
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
 import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
-import static no.unit.nva.utils.UriUtils.createUriFromParams;
 import static no.unit.nva.utils.UriUtils.queryParameters;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
@@ -116,7 +115,12 @@ public class CristinApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        return new SearchResponse<NvaProject>(createUriFromParams(requestQueryParams, UriUtils.PROJECT))
+        URI id = new UriWrapper(HTTPS,
+                DOMAIN_NAME).addChild(BASE_PATH)
+                .addChild(UriUtils.PROJECT)
+                .addQueryParameters(requestQueryParams)
+                .getUri();
+        return new SearchResponse<NvaProject>(id)
             .withContext(PROJECT_SEARCH_CONTEXT_URL)
             .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
             .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
@@ -137,7 +141,12 @@ public class CristinApiClient {
                 .orElseThrow();
 
         HttpResponse<String> response = fetchQueryResults(uri);
-        checkHttpStatusCode(createUriFromParams(parameters, UriUtils.PROJECT).toString(), response.statusCode());
+        URI id = new UriWrapper(HTTPS,
+                DOMAIN_NAME).addChild(BASE_PATH)
+                .addChild(UriUtils.PROJECT)
+                .addQueryParameters(parameters)
+                .getUri();
+        checkHttpStatusCode(id.toString(), response.statusCode());
         return response;
     }
 
