@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person;
 import static no.unit.nva.cristin.common.model.Constants.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.common.model.Constants.PAGE;
 import static no.unit.nva.cristin.common.model.Constants.QUERY;
+import static no.unit.nva.cristin.common.model.Constants.X_TOTAL_COUNT;
 import static no.unit.nva.cristin.person.Constants.BASE_PATH;
 import static no.unit.nva.cristin.person.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.person.Constants.HTTPS;
@@ -15,6 +16,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiPredicate;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -29,6 +31,7 @@ public class CristinPersonApiClient {
     private static final String PERSON_QUERY_CONTEXT = "https://example.org/person-search-context.json";
     private static final String CRISTIN_GET_PERSON_JSON =
         "cristinGetPersonResponse.json";
+    private static final List<String> SIZE_OF_ONE_IN_X_TOTAL_COUNT = Collections.singletonList("1");
 
     /**
      * Creates a SearchResponse based on fetch from Cristin upstream.
@@ -41,7 +44,7 @@ public class CristinPersonApiClient {
         return new SearchResponse(getPersonUriWithParams(requestQueryParams))
             .withContext(PERSON_QUERY_CONTEXT)
             .withProcessingTime(1000L)
-            .usingHeadersAndQueryParams(dummyHeaders(), requestQueryParams)
+            .usingHeadersAndQueryParams(headersWithTotalCount(), requestQueryParams)
             .withHits(getDummyHits());
     }
 
@@ -57,8 +60,12 @@ public class CristinPersonApiClient {
         return person;
     }
 
-    private HttpHeaders dummyHeaders() {
-        return HttpHeaders.of(Map.of("x-total-count", Collections.singletonList("1")), (s, s2) -> true);
+    private HttpHeaders headersWithTotalCount() {
+        return HttpHeaders.of(Map.of(X_TOTAL_COUNT, SIZE_OF_ONE_IN_X_TOTAL_COUNT), dummyFilter());
+    }
+
+    private BiPredicate<String, String> dummyFilter() {
+        return (s, s2) -> true;
     }
 
     private List<Person> getDummyHits() {
