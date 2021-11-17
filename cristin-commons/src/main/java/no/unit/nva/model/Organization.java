@@ -25,18 +25,21 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 public class Organization implements JsonSerializable {
 
 
-
+    @JsonProperty(ID)
     private final URI id;
     @JsonPropertyOrder(alphabetic = true)
+    @JsonProperty(NAME)
     private final Map<String, String> name;
+    @JsonProperty(ACRONYM)
     private final String acronym;
+    @JsonProperty(PART_OF)
     private final Set<Organization> partOf;
 
     @JsonCreator
-    public Organization(@JsonProperty("id") URI id,
-                        @JsonProperty("name") Map<String, String> name,
-                        @JsonProperty("acronym") String acronym,
-                        @JsonProperty("partOf") Set<Organization> partOf) {
+    public Organization(@JsonProperty(ID) URI id,
+                        @JsonProperty(NAME) Map<String, String> name,
+                        @JsonProperty(ACRONYM) String acronym,
+                        @JsonProperty(PART_OF) Set<Organization> partOf) {
         this.id = id;
         this.name = name;
         this.acronym = acronym;
