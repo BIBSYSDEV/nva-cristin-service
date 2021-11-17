@@ -20,22 +20,24 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 public class CristinApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
+    private static final String NOT_FOUND_MESSAGE_TEMPLATE = "The URI \"%s\" cannot be dereferenced";
 
     /**
      * Get information for an Organization.
      *
-     * @param uri      the Cristin unit URI
+     * @param uri the Cristin unit URI
      * @return an {@link Organization} containing the information
-     * @throws NotFoundException       when the URI does not correspond to an existing unit.
+     * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
     public Organization getSingleUnit(URI uri)
             throws NotFoundException {
         logger.info("Fetching results for: " + uri.toString());
-        throw new NotFoundException(uri.toString());
+        throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri.toString()));
     }
 
     /**
      * Fetch Organizations matching given query criteria.
+     *
      * @param requestQueryParams Map containing verified query parameters
      */
     public SearchResponse<Organization> queryInstitutions(Map<String, String> requestQueryParams) {
