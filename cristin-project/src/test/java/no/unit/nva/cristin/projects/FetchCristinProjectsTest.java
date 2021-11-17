@@ -115,7 +115,8 @@ public class FetchCristinProjectsTest {
     @ArgumentsSource(TestPairProvider.class)
     void handlerReturnsExpectedBodyWhenRequestInputIsValid(String expected) throws IOException {
         String actual = sendDefaultQuery().getBody();
-        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
+        assertEquals(OBJECT_MAPPER.readValue(expected,GatewayResponse.class),
+                OBJECT_MAPPER.readValue(actual, GatewayResponse.class));
     }
 
     @Test
@@ -573,7 +574,7 @@ public class FetchCristinProjectsTest {
     }
 
     private static String exampleUriFromPageAndResults(String page, String results) {
-        String url = "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=%s&query=reindeer&results=%s";
+        String url = "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=%s&results=%s";
         return String.format(url, page, results);
     }
 

@@ -5,7 +5,7 @@
   "searchString": "query=reindeer&language=nb&page=1&results=5",
   "processingTime": 1000,
   "firstRecord": 1,
-  "nextResults": "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=2&query=reindeer&results=5",
+  "nextResults": "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=2&results=5",
   "previousResults": null,
   "hits": [
     {

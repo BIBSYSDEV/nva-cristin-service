@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.net.http.HttpHeaders;
@@ -22,6 +22,8 @@ import static no.unit.nva.cristin.model.Constants.X_TOTAL_COUNT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static nva.commons.core.attempt.Try.attempt;
+import static nva.commons.core.paths.UriWrapper.EMPTY_FRAGMENT;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
@@ -37,6 +39,7 @@ public class SearchResponse<E> {
         "Page requested is out of scope. Query contains %s results";
     @JsonIgnore
     public static final int FIRST_RECORD_ZERO_WHEN_NO_HITS = 0;
+    private static final String EMPTY_QUERY = null;
 
     @JsonProperty("@context")
     private String context;
@@ -202,8 +205,12 @@ public class SearchResponse<E> {
     private URI generateIdUriWithPageFromParams(int newPage, Map<String, String> queryParams) {
         Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
         newParams.put(PAGE, String.valueOf(newPage));
-        return UriUtils.getUriFromOtherUriUsingNewParams(id, newParams);
+        var newUri = attempt(() ->new URI(id.getScheme(),id.getHost(),id.getPath(),EMPTY_QUERY,EMPTY_FRAGMENT))
+                .map(UriWrapper::new)
+                .orElseThrow();
+        return newUri.addQueryParameters(newParams).getUri();
     }
+
 
     private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {
         int page = Integer.parseInt(queryParams.get(PAGE));
