@@ -41,12 +41,12 @@ public class CristinApiClient {
      * @param requestQueryParams Map containing verified query parameters
      */
     public SearchResponse<Organization> queryInstitutions(Map<String, String> requestQueryParams) {
-        URI id = new UriWrapper(HTTPS,
-                DOMAIN_NAME).addChild(BASE_PATH)
-                .addChild(UriUtils.INSTITUTION)
-                .addQueryParameters(requestQueryParams)
-                .getUri();
-        return new SearchResponse<Organization>(id)
+        return new SearchResponse<Organization>(
+                new UriWrapper(HTTPS, DOMAIN_NAME)
+                        .addChild(BASE_PATH)
+                        .addChild(UriUtils.INSTITUTION)
+                        .addQueryParameters(requestQueryParams)
+                        .getUri())
                 .withProcessingTime(0L)
                 .withSize(0)
                 .withHits(Collections.emptyList());
