@@ -25,6 +25,7 @@ import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -87,7 +88,7 @@ class FetchCristinOrganizationHandlerTest {
         GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
         String actualDetail = gatewayResponse.getBodyObject(Problem.class).getDetail();
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
+        assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS));
     }
 
     @Test
@@ -101,7 +102,7 @@ class FetchCristinOrganizationHandlerTest {
         GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
         String actualDetail = gatewayResponse.getBodyObject(Problem.class).getDetail();
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
+        assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS));
     }
 
     @Test
@@ -111,7 +112,7 @@ class FetchCristinOrganizationHandlerTest {
         GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
+        assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS));
     }
 
     @Test

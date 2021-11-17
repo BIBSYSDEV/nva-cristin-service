@@ -15,13 +15,13 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 
 public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Organization> {
 
@@ -59,7 +59,7 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
 
     private void validateThatSuppliedParamsIsSupported(RequestInfo requestInfo) throws BadRequestException {
         if (!requestInfo.getPathParameters().containsKey(IDENTIFIER)) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID);
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
         }
     }
 
@@ -68,7 +68,7 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
         if (matchesIdentifierPattern(identifier)) {
             return identifier;
         } else {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID);
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
         }
     }
 
