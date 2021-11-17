@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.common;
 
 import nva.commons.core.JacocoGenerated;
 
@@ -18,7 +18,7 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_SERVER_ERROR =
         "Internal server error. Contact application administrator.";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID =
-        "Invalid path parameter for identifier, needs to be a number";
+        "Invalid path parameter for identifier, needs to be four numbers separated by dots";
     public static final String ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS =
         "Parameter 'query' is missing or invalid. "
             + "May only contain alphanumeric characters, dash, comma, period and whitespace";

@@ -20,9 +20,8 @@ import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 
 public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Organization> {
 
@@ -48,7 +47,7 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
         try {
             result = getTransformedOrganizationFromCristin(getValidId(requestInfo));
         } catch (InterruptedException e) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP);
+            throw new BadRequestException(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE);
         }
         return result;
     }
@@ -80,7 +79,7 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
     private Organization getTransformedOrganizationFromCristin(String identifier)
             throws ApiGatewayException, InterruptedException {
         return Optional.of(cristinApiClient.getSingleUnit(createOrganizationUri(identifier)))
-                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_LANGUAGE_INVALID));
+                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE));
     }
 
     private URI createOrganizationUri(String identifier) {
