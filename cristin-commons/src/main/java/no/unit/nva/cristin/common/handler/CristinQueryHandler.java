@@ -11,6 +11,7 @@ import com.google.common.net.MediaType;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import no.unit.nva.cristin.common.util.UriUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -28,9 +29,7 @@ public abstract class CristinQueryHandler<I, O> extends ApiGatewayHandler<I, O> 
     public static final String ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS =
         "Parameter 'query' is missing or invalid. "
             + "May only contain alphanumeric characters, dash, comma, period and whitespace";
-    private static final char CHARACTER_DASH = '-';
-    private static final char CHARACTER_COMMA = ',';
-    private static final char CHARACTER_PERIOD = '.';
+
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS);
 
     public CristinQueryHandler(Class<I> iclass, Environment environment) {
@@ -83,20 +82,8 @@ public abstract class CristinQueryHandler<I, O> extends ApiGatewayHandler<I, O> 
     }
 
     private boolean isValidQuery(String str) {
-        char[] charArray = str.toCharArray();
-        for (char c : charArray) {
-            if (!isValidCharacter(c)) {
-                return false;
-            }
-        }
-        return true;
+        Pattern pattern = Pattern.compile("[\\w\\s\\-,.]+"); // Words, whitespaces, dash, comma, period
+        return pattern.matcher(str).matches();
     }
 
-    private boolean isValidCharacter(char c) {
-        return Character.isWhitespace(c)
-            || Character.isLetterOrDigit(c)
-            || c == CHARACTER_DASH
-            || c == CHARACTER_COMMA
-            || c == CHARACTER_PERIOD;
-    }
 }

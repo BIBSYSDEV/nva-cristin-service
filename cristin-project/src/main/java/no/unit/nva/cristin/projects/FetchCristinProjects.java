@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.common.util.UriUtils;
 import nva.commons.apigateway.RequestInfo;
@@ -29,9 +30,6 @@ import nva.commons.core.JacocoGenerated;
  */
 public class FetchCristinProjects extends CristinHandler<Void, SearchResponse> {
 
-    private static final char CHARACTER_DASH = '-';
-    private static final char CHARACTER_COMMA = ',';
-    private static final char CHARACTER_PERIOD = '.';
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
 
     private final transient CristinApiClient cristinApiClient;
@@ -112,21 +110,8 @@ public class FetchCristinProjects extends CristinHandler<Void, SearchResponse> {
     }
 
     private boolean isValidQuery(String str) {
-        char[] charArray = str.toCharArray();
-        for (char c : charArray) {
-            if (!isValidCharacter(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isValidCharacter(char c) {
-        return Character.isWhitespace(c)
-            || Character.isLetterOrDigit(c)
-            || c == CHARACTER_DASH
-            || c == CHARACTER_COMMA
-            || c == CHARACTER_PERIOD;
+        Pattern pattern = Pattern.compile("[\\w\\s\\-,.]+"); // Words, whitespaces, dash, comma, period
+        return pattern.matcher(str).matches();
     }
 
 }
