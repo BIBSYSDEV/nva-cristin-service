@@ -8,11 +8,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
 import no.unit.nva.cristin.person.model.nva.ContactDetails;
@@ -147,12 +148,12 @@ public class CristinPerson {
     }
 
     /**
-     * Transforms identifiers from Cristin into a List.
+     * Transforms identifiers from Cristin into a Set.
      *
-     * @return List of transformed identifiers
+     * @return Set of transformed identifiers
      */
-    private List<TypedValue> extractIdentifiers() {
-        List<TypedValue> identifiers = new ArrayList<>();
+    private Set<TypedValue> extractIdentifiers() {
+        Set<TypedValue> identifiers = new HashSet<>();
 
         identifiers.add(new TypedValue(CRISTIN_IDENTIFIER, getCristinPersonId()));
         getOrcid().flatMap(CristinOrcid::getId).ifPresent(id -> identifiers.add(new TypedValue(ORCID, id)));
@@ -161,12 +162,12 @@ public class CristinPerson {
     }
 
     /**
-     * Transforms names from a Cristin person into a List.
+     * Transforms names from a Cristin person into a Set.
      *
-     * @return List of transformed names
+     * @return Set of transformed names
      */
-    private List<TypedValue> extractNames() {
-        List<TypedValue> names = new ArrayList<>();
+    private Set<TypedValue> extractNames() {
+        Set<TypedValue> names = new HashSet<>();
 
         names.add(new TypedValue(FIRST_NAME, getFirstName()));
         names.add(new TypedValue(LAST_NAME, getSurname()));
@@ -180,8 +181,8 @@ public class CristinPerson {
         return getPictureUrl().map(UriWrapper::new).map(UriWrapper::getUri).orElse(null);
     }
 
-    private List<Affiliation> extractAffiliations() {
+    private Set<Affiliation> extractAffiliations() {
         return getAffiliations().stream().map(CristinAffiliation::toAffiliation).collect(
-            Collectors.toList());
+            Collectors.toSet());
     }
 }

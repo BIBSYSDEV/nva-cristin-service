@@ -113,7 +113,7 @@ public class CristinApiClient {
             .withContext(PROJECT_SEARCH_CONTEXT_URL)
             .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
             .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
-            .withHits(nvaProjects);
+            .withHits(Set.of(nvaProjects));
     }
 
     protected static <T> T fromJson(String body, Class<T> classOfT) throws IOException {

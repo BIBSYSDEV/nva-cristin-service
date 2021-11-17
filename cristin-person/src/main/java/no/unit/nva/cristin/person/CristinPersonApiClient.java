@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -68,9 +69,9 @@ public class CristinPersonApiClient {
         return (s, s2) -> true;
     }
 
-    private List<Person> getDummyHits() {
+    private Set<Person> getDummyHits() {
         CristinPerson cristinPerson = fetchDummyResponse();
-        return List.of(cristinPerson.toPerson());
+        return Set.of(cristinPerson.toPerson());
     }
 
     private CristinPerson fetchDummyResponse() {

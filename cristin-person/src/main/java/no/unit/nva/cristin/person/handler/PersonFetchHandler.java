@@ -39,7 +39,7 @@ public class PersonFetchHandler extends ApiGatewayHandler<Void, Person> {
 
     @Override
     protected Person processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        validateNoUnsupportedQueryParamSent(requestInfo);
+        validateQueryParameters(requestInfo);
 
         String id = getValidId(requestInfo);
 
@@ -51,7 +51,7 @@ public class PersonFetchHandler extends ApiGatewayHandler<Void, Person> {
         return HttpURLConnection.HTTP_OK;
     }
 
-    private void validateNoUnsupportedQueryParamSent(RequestInfo requestInfo) throws BadRequestException {
+    private void validateQueryParameters(RequestInfo requestInfo) throws BadRequestException {
         if (!requestInfo.getQueryParameters().keySet().isEmpty()) {
             throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP);
         }
