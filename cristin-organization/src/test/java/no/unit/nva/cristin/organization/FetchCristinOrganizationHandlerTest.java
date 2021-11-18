@@ -4,12 +4,14 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JsonUtils;
+import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
@@ -17,6 +19,7 @@ import org.zalando.problem.Problem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Map;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
@@ -24,8 +27,13 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -135,6 +143,54 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(actualDetail, containsString(
                 MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS));
     }
+
+    @Test
+    void shouldReturnTopLevelOrganizationWithName()
+            throws IOException, ApiGatewayException, InterruptedException {
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
+        final String identifier = "20202.0.0.0";
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(identifier), output, context);
+        GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getHeaders(), hasKey(CONTENT_TYPE));
+        assertThat(gatewayResponse.getHeaders(), hasKey(ACCESS_CONTROL_ALLOW_ORIGIN));
+
+        URI expectedId = new UriWrapper(HTTPS,
+                DOMAIN_NAME).addChild(BASE_PATH)
+                .addChild(ORGANIZATION_PATH)
+                .addChild(identifier)
+                .getUri();
+        Organization actualOrganization = gatewayResponse.getBodyObject(Organization.class);
+        assertEquals(actualOrganization.getId(), expectedId);
+        assertThat(actualOrganization.getName().get("en"), containsString("Unit"));
+    }
+
+    @Test
+    void shouldReturnOrganizationHierarchy()
+            throws IOException, ApiGatewayException, InterruptedException {
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
+        final String identifier = "185.53.18.14";
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(identifier), output, context);
+        GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getHeaders(), hasKey(CONTENT_TYPE));
+        assertThat(gatewayResponse.getHeaders(), hasKey(ACCESS_CONTROL_ALLOW_ORIGIN));
+
+        URI expectedId = new UriWrapper(HTTPS,
+                DOMAIN_NAME).addChild(BASE_PATH)
+                .addChild(ORGANIZATION_PATH)
+                .addChild(identifier)
+                .getUri();
+        Organization actualOrganization = gatewayResponse.getBodyObject(Organization.class);
+        assertEquals(actualOrganization.getId(), expectedId);
+        assertThat(actualOrganization.getName().get("en"), containsString("Department of Medical Biochemistry"));
+    }
+
+
 
     private InputStream generateHandlerRequest(String organizationIdentifier) throws JsonProcessingException {
         Map<String, String> headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type());
