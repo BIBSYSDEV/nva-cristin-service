@@ -1,4 +1,4 @@
 dependencies {
     implementation libs.nva.logutils
-    implementation libs.nva.language
+    implementation libs.google.guava
 }

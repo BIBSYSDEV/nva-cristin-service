@@ -1,15 +1,14 @@
 [versions]
 junit = {strictly = '5.8.1'}
 nva-commons = {strictly = '1.16.16'}
-jackson = {strictly = '2.12.1'}
-mockito = {strictly = '3.11.2'}
+jackson = {strictly = '2.12.5'}
+mockito = {strictly = '4.0.0'}
 hamcrest = {strictly = '2.2'}
-nva-testutils = {strictly = '1.16.12'}
-zalando = {strictly = '0.25.0'}
-apache-commons = {strictly = '3.12.0'}
+nva-testutils = {strictly = '1.16.16'}
+zalando = {strictly = '0.26.0'}
 javax-ws-rs = {strictly = '2.1.1'}
 sl4j = {strictly = '1.7.31'}
-jsoup = {strictly = '1.13.1'}
+jsoup = {strictly = '1.14.3'}
 aws-lambda-java-core = {strictly = '1.2.1'}
 google-guava = {strictly = '31.0.1-jre'}
 karate-core = {strictly = '1.1.0'}
@@ -49,7 +48,6 @@ jackson-annotations = { group = 'com.fasterxml.jackson.core', name = 'jackson-an
 jackson-datatype-jdk8 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jdk8', version.ref = 'jackson' }
 jackson-datatype-jsr310 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jsr310', version.ref = 'jackson' }
 
-# apache-commons = { group = 'org.apache.commons', name = 'commons-lang3', version.ref = 'apache-commons' }
 javax-ws-rs = { group = 'javax.ws.rs', name = 'javax.ws.rs-api', version.ref = 'javax-ws-rs' }
 jsoup = { group = 'org.jsoup', name = 'jsoup', version.ref = 'jsoup' }
 aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version.ref = 'aws-lambda-java-core' }
