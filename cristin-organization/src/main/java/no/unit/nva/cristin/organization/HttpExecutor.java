@@ -2,10 +2,8 @@ package no.unit.nva.cristin.organization;
 
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.exception.FailedHttpRequestException;
-import no.unit.nva.exception.HttpClientFailureException;
-import no.unit.nva.exception.NonExistingUnitError;
-import no.unit.nva.language.Language;
 import no.unit.nva.model.Organization;
+import nva.commons.apigateway.exceptions.NotFoundException;
 
 import java.net.URI;
 import java.net.http.HttpResponse;
@@ -21,10 +19,10 @@ public abstract class HttpExecutor {
     public static int FIRST_SUCCESSFUL_CODE = HTTP_OK;
     public static String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
 
-    public abstract SearchResponse<Organization> getInstitutions(Language language) throws HttpClientFailureException;
+    public abstract SearchResponse<Organization> getInstitutions() throws FailedHttpRequestException;
 
-    public abstract Organization getSingleUnit(URI uri, Language language)
-        throws NonExistingUnitError, HttpClientFailureException, InterruptedException;
+    public abstract Organization getSingleUnit(URI uri)
+            throws NotFoundException, FailedHttpRequestException, InterruptedException;
 
     protected HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response)
         throws FailedHttpRequestException {

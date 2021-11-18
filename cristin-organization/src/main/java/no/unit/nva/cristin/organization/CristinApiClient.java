@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.organization;
 
 import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.NotFoundException;
@@ -20,7 +21,7 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 public class CristinApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
-    private static final String NOT_FOUND_MESSAGE_TEMPLATE = "The URI \"%s\" cannot be dereferenced";
+    private final transient HttpExecutor httpExecutor = new HttpExecutorImpl();
 
     /**
      * Get information for an Organization.
@@ -30,9 +31,10 @@ public class CristinApiClient {
      * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
     public Organization getSingleUnit(URI uri)
-            throws NotFoundException {
+            throws NotFoundException, InterruptedException, FailedHttpRequestException {
         logger.info("Fetching results for: " + uri.toString());
-        throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri.toString()));
+        Organization result = httpExecutor.getSingleUnit(uri);
+        return result;
     }
 
     /**

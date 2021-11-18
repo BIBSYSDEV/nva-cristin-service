@@ -11,7 +11,6 @@ import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -78,15 +77,12 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
 
     private Organization getTransformedOrganizationFromCristin(String identifier)
             throws ApiGatewayException, InterruptedException {
-        return Optional.of(cristinApiClient.getSingleUnit(createOrganizationUri(identifier)))
+        return Optional.of(cristinApiClient.getSingleUnit(new UriWrapper(HTTPS,
+                        DOMAIN_NAME).addChild(BASE_PATH)
+                        .addChild(ORGANIZATION_PATH)
+                        .addChild(identifier)
+                        .getUri()))
                 .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE));
     }
 
-    private URI createOrganizationUri(String identifier) {
-        return new UriWrapper(HTTPS,
-                DOMAIN_NAME).addChild(BASE_PATH)
-                .addChild(ORGANIZATION_PATH)
-                .addChild(identifier)
-                .getUri();
-    }
 }

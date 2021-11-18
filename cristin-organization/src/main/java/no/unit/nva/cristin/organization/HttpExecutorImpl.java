@@ -3,13 +3,13 @@ package no.unit.nva.cristin.organization;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.utils.InstitutionUtils;
-import no.unit.nva.exception.HttpClientFailureException;
-import no.unit.nva.exception.NonExistingUnitError;
-import no.unit.nva.language.Language;
+import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.attempt.Failure;
 import nva.commons.core.attempt.Try;
+import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +25,10 @@ import java.util.concurrent.CompletableFuture;
 import static com.google.common.net.HttpHeaders.ACCEPT;
 import static com.google.common.net.HttpHeaders.USER_AGENT;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE_URL;
-import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
-import static no.unit.nva.utils.UriUtils.buildUri;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static nva.commons.core.attempt.Try.attempt;
 
 
@@ -60,9 +61,9 @@ public class HttpExecutorImpl extends HttpExecutor {
     }
 
     @Override
-    public SearchResponse<Organization> getInstitutions(Language language) throws HttpClientFailureException {
+    public SearchResponse<Organization> getInstitutions() throws FailedHttpRequestException {
 
-        return attempt(() -> URI.create(generateInstitutionsQueryUri(language)))
+        return attempt(() -> URI.create(generateInstitutionsQueryUri()))
                 .flatMap(this::sendRequestMultipleTimes)
                 .map(this::throwExceptionIfNotSuccessful)
                 .map(HttpResponse::body)
@@ -121,31 +122,34 @@ public class HttpExecutorImpl extends HttpExecutor {
     }
 
     @Override
-    public Organization getSingleUnit(URI uri, Language language)
-            throws InterruptedException, NonExistingUnitError, HttpClientFailureException {
+    public Organization getSingleUnit(URI uri)
+            throws InterruptedException, NotFoundException, FailedHttpRequestException {
         SingleUnitHierarchyGenerator singleUnitHierarchyGenerator =
-                new SingleUnitHierarchyGenerator(uri, language, httpClient);
-        SubSubUnitDto subSubUnitDto = singleUnitHierarchyGenerator.fetch(uri, language);
+                new SingleUnitHierarchyGenerator(uri, httpClient);
+        SubSubUnitDto subSubUnitDto = singleUnitHierarchyGenerator.fetch(uri);
         return toNvaOrganization(subSubUnitDto);
     }
 
     private Organization toNvaOrganization(SubSubUnitDto subSubUnitDto) {
         return new Organization.Builder()
-                .withId(buildUri(CRISTIN_API_BASE_URL, INSTITUTION_PATH,
-                subSubUnitDto.getId()))
+                .withId(new UriWrapper(HTTPS,
+                        DOMAIN_NAME).addChild(BASE_PATH)
+                        .addChild(ORGANIZATION_PATH)
+                        .addChild(subSubUnitDto.getId())
+                        .getUri())
                 .withName(subSubUnitDto.getUnitName()).build();
     }
 
-    private <T> HttpClientFailureException handleError(Failure<T> failure) {
-        return new HttpClientFailureException(failure.getException(), failure.getException().getMessage());
+    private <T> FailedHttpRequestException handleError(Failure<T> failure) {
+        return new FailedHttpRequestException(failure.getException(), failure.getException().getMessage());
     }
 
     private SearchResponse<Organization> toInstitutionListResponse(String institutionDto) throws IOException {
         return InstitutionUtils.toInstitutionListResponse(institutionDto);
     }
 
-    private String generateInstitutionsQueryUri(Language language) {
-        return String.format(INSTITUTIONS_URI_TEMPLATE, language.getLexvoUri());
+    private String generateInstitutionsQueryUri() {
+        return INSTITUTIONS_URI_TEMPLATE; // String.format(INSTITUTIONS_URI_TEMPLATE, language.getLexvoUri());
     }
 
 }
