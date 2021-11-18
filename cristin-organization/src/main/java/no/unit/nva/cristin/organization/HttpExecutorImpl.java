@@ -124,8 +124,7 @@ public class HttpExecutorImpl extends HttpExecutor {
     @Override
     public Organization getSingleUnit(URI uri)
             throws InterruptedException, NotFoundException, FailedHttpRequestException {
-        SingleUnitHierarchyGenerator singleUnitHierarchyGenerator =
-                new SingleUnitHierarchyGenerator(uri, httpClient);
+        SingleUnitHierarchyGenerator singleUnitHierarchyGenerator = new SingleUnitHierarchyGenerator(uri, httpClient);
         SubSubUnitDto subSubUnitDto = singleUnitHierarchyGenerator.fetch(uri);
         return toNvaOrganization(subSubUnitDto);
     }

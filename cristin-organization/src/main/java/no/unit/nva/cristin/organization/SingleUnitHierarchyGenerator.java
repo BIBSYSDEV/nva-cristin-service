@@ -69,7 +69,7 @@ public class SingleUnitHierarchyGenerator {
      */
     public SubSubUnitDto fetch(URI uri)
             throws InterruptedException, NotFoundException, FailedHttpRequestException {
-
+        logger.info("Fetching " + uri.toString());
         HttpRequest httpRequest = createHttpRequest(uri);
         HttpResponse<String> response = sendRequest(httpRequest);
         if (isSuccessful(response.statusCode())) {
