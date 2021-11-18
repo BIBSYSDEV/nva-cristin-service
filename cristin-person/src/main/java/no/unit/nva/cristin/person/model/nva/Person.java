@@ -15,15 +15,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Set;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonSerializable;
 
 @JacocoGenerated
 @JsonPropertyOrder({CONTEXT, ID, TYPE_PROPERTY, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
-public class Person {
+public class Person implements JsonSerializable {
 
     @JsonProperty(TYPE_PROPERTY)
     private static final String type = "Person";
@@ -33,15 +32,15 @@ public class Person {
     @JsonProperty(CONTEXT)
     private String context;
     @JsonProperty(IDENTIFIERS)
-    private List<TypedValue> identifiers;
+    private Set<TypedValue> identifiers;
     @JsonProperty(NAMES)
-    private List<TypedValue> names;
+    private Set<TypedValue> names;
     @JsonProperty(CONTACT_DETAILS)
     private ContactDetails contactDetails;
     @JsonProperty(IMAGE)
     private URI image;
     @JsonProperty(AFFILIATIONS)
-    private List<Affiliation> affiliations;
+    private Set<Affiliation> affiliations;
 
     public Person() {
 
@@ -58,10 +57,10 @@ public class Person {
      * @param affiliations   This person's organization affiliations.
      */
     @JsonCreator
-    public Person(@JsonProperty("id") URI id, @JsonProperty("identifiers") List<TypedValue> identifiers,
-                  @JsonProperty("names") List<TypedValue> names,
+    public Person(@JsonProperty("id") URI id, @JsonProperty("identifiers") Set<TypedValue> identifiers,
+                  @JsonProperty("names") Set<TypedValue> names,
                   @JsonProperty("contactDetails") ContactDetails contactDetails, @JsonProperty("image") URI image,
-                  @JsonProperty("affiliations") List<Affiliation> affiliations) {
+                  @JsonProperty("affiliations") Set<Affiliation> affiliations) {
         this.id = id;
         this.identifiers = identifiers;
         this.names = names;
@@ -78,8 +77,8 @@ public class Person {
         this.context = context;
     }
 
-    public List<TypedValue> getIdentifiers() {
-        return Objects.nonNull(identifiers) ? sortedListOfIdentifiers(identifiers) : Collections.emptyList();
+    public Set<TypedValue> getIdentifiers() {
+        return Objects.nonNull(identifiers) ? identifiers : Collections.emptySet();
     }
 
     public URI getId() {
@@ -90,12 +89,12 @@ public class Person {
         return type;
     }
 
-    public void setIdentifiers(List<TypedValue> identifiers) {
+    public void setIdentifiers(Set<TypedValue> identifiers) {
         this.identifiers = identifiers;
     }
 
-    public List<Affiliation> getAffiliations() {
-        return Objects.nonNull(affiliations) ? sortedListOfAffiliations(affiliations) : Collections.emptyList();
+    public Set<Affiliation> getAffiliations() {
+        return Objects.nonNull(affiliations) ? affiliations : Collections.emptySet();
     }
 
     public ContactDetails getContactDetails() {
@@ -110,12 +109,12 @@ public class Person {
         this.id = id;
     }
 
-    public List<TypedValue> getNames() {
-        return Objects.nonNull(names) ? sortedListOfIdentifiers(names) : Collections.emptyList();
+    public void setAffiliations(Set<Affiliation> affiliations) {
+        this.affiliations = affiliations;
     }
 
-    public void setNames(List<TypedValue> names) {
-        this.names = names;
+    public Set<TypedValue> getNames() {
+        return Objects.nonNull(names) ? names : Collections.emptySet();
     }
 
     public void setContactDetails(ContactDetails contactDetails) {
@@ -126,8 +125,8 @@ public class Person {
         this.image = image;
     }
 
-    public void setAffiliations(List<Affiliation> affiliations) {
-        this.affiliations = affiliations;
+    public void setNames(Set<TypedValue> names) {
+        this.names = names;
     }
 
     @JacocoGenerated
@@ -149,19 +148,16 @@ public class Person {
             && getAffiliations().equals(that.getAffiliations());
     }
 
+    @Override
+    public String toString() {
+        return toJsonString();
+    }
+
     @JacocoGenerated
     @Override
     public int hashCode() {
         return Objects.hash(getContext(), getId(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
             getAffiliations());
-    }
-
-    private List<TypedValue> sortedListOfIdentifiers(List<TypedValue> listToSort) {
-        return listToSort.stream().sorted(Comparator.comparing(TypedValue::getType)).collect(Collectors.toList());
-    }
-
-    private List<Affiliation> sortedListOfAffiliations(List<Affiliation> listToSort) {
-        return listToSort.stream().sorted(Comparator.comparing(Affiliation::hashCode)).collect(Collectors.toList());
     }
 
     @JacocoGenerated
@@ -183,12 +179,12 @@ public class Person {
             return this;
         }
 
-        public Builder withIdentifiers(List<TypedValue> identifiers) {
+        public Builder withIdentifiers(Set<TypedValue> identifiers) {
             person.setIdentifiers(identifiers);
             return this;
         }
 
-        public Builder withNames(List<TypedValue> names) {
+        public Builder withNames(Set<TypedValue> names) {
             person.setNames(names);
             return this;
         }
@@ -203,7 +199,7 @@ public class Person {
             return this;
         }
 
-        public Builder withAffiliations(List<Affiliation> affiliations) {
+        public Builder withAffiliations(Set<Affiliation> affiliations) {
             person.setAffiliations(affiliations);
             return this;
         }

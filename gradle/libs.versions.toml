@@ -1,10 +1,10 @@
 [versions]
 junit = {strictly = '5.8.1'}
-nva-commons = {strictly = '1.16.12'}
+nva-commons = {strictly = '1.16.16'}
 jackson = {strictly = '2.12.1'}
 mockito = {strictly = '3.11.2'}
 hamcrest = {strictly = '2.2'}
-nva-testutils = {strictly = '0.1.27'}
+nva-testutils = {strictly = '1.16.12'}
 zalando = {strictly = '0.25.0'}
 apache-commons = {strictly = '3.12.0'}
 javax-ws-rs = {strictly = '2.1.1'}
@@ -24,7 +24,7 @@ junit-jupiter-engine = { group = 'org.junit.jupiter', name = 'junit-jupiter-engi
 
 mockito-core = { group = 'org.mockito', name = 'mockito-core', version.ref = 'mockito' }
 hamcrest = { group = 'org.hamcrest', name = 'hamcrest', version.ref = 'hamcrest' }
-nva-testutils = { group = 'com.github.bibsysdev', name = 'nva-testutils', version.ref = 'nva-testutils' }
+nva-testutils = { group = 'com.github.bibsysdev', name = 'nvatestutils', version.ref = 'nva-testutils' }
 nva-logutils = { group = 'com.github.bibsysdev', name = 'logutils', version.ref = 'nva-commons' }
 zalando = { group = 'org.zalando', name = 'problem', version.ref = 'zalando' }
 

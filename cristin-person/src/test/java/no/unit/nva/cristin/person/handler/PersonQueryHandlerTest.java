@@ -6,13 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.person.CristinPersonApiClient;
+import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
@@ -41,10 +44,17 @@ public class PersonQueryHandlerTest {
 
     @Test
     void shouldReturnResponseWhenCallingEndpointWithNameParameter() throws IOException {
-        String actual = sendDefaultQuery().getBody();
-        String expected = IoUtils.stringFromResources(Path.of(NVA_API_QUERY_PERSON_JSON));
+        SearchResponse actual = sendDefaultQuery().getBodyObject(SearchResponse.class);
+        String expectedString = IoUtils.stringFromResources(Path.of(NVA_API_QUERY_PERSON_JSON));
+        SearchResponse expected = OBJECT_MAPPER.readValue(expectedString, SearchResponse.class);
 
-        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
+        // Type casting problems when using generic types. Needed to convert. Was somehow converting to LinkedHashMap
+        List<Person> expectedPersons = OBJECT_MAPPER.convertValue(expected.getHits(), new TypeReference<>() {});
+        List<Person> actualPersons = OBJECT_MAPPER.convertValue(actual.getHits(), new TypeReference<>() {});
+        expected.setHits(expectedPersons);
+        actual.setHits(actualPersons);
+
+        assertEquals(expected, actual);
     }
 
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
