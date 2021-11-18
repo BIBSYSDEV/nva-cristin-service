@@ -15,9 +15,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.net.http.HttpHeaders;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.cristin.common.util.UriUtils;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -54,7 +54,7 @@ public class SearchResponse implements JsonSerializable {
     @JsonProperty
     private URI previousResults;
     @JsonProperty
-    private Set<?> hits;
+    private List<?> hits;
 
     public SearchResponse() {
 
@@ -125,11 +125,11 @@ public class SearchResponse implements JsonSerializable {
         this.previousResults = previousResults;
     }
 
-    public Set<?> getHits() {
-        return Objects.nonNull(hits) ? hits : Collections.emptySet();
+    public List<?> getHits() {
+        return Objects.nonNull(hits) ? hits : Collections.emptyList();
     }
 
-    public void setHits(Set<?> hits) {
+    public void setHits(List<?> hits) {
         this.hits = hits;
     }
 
@@ -143,7 +143,7 @@ public class SearchResponse implements JsonSerializable {
         return this;
     }
 
-    public SearchResponse withHits(Set<?> hits) {
+    public SearchResponse withHits(List<?> hits) {
         this.hits = hits;
         return this;
     }

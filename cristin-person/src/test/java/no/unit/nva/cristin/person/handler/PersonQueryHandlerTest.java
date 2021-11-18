@@ -11,8 +11,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import no.unit.nva.cristin.common.model.SearchResponse;
 import no.unit.nva.cristin.person.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -49,8 +49,8 @@ public class PersonQueryHandlerTest {
         SearchResponse expected = OBJECT_MAPPER.readValue(expectedString, SearchResponse.class);
 
         // Type casting problems when using generic types. Needed to convert. Was somehow converting to LinkedHashMap
-        Set<Person> expectedPersons = OBJECT_MAPPER.convertValue(expected.getHits(), new TypeReference<>() {});
-        Set<Person> actualPersons = OBJECT_MAPPER.convertValue(actual.getHits(), new TypeReference<>() {});
+        List<Person> expectedPersons = OBJECT_MAPPER.convertValue(expected.getHits(), new TypeReference<>() {});
+        List<Person> actualPersons = OBJECT_MAPPER.convertValue(actual.getHits(), new TypeReference<>() {});
         expected.setHits(expectedPersons);
         actual.setHits(actualPersons);
 
