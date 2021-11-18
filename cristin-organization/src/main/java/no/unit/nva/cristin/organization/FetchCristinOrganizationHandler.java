@@ -16,10 +16,9 @@ import java.util.regex.Pattern;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
-import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 
 public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Organization> {
@@ -78,8 +77,8 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
     private Organization getTransformedOrganizationFromCristin(String identifier)
             throws ApiGatewayException, InterruptedException {
         return Optional.of(cristinApiClient.getSingleUnit(new UriWrapper(HTTPS,
-                        DOMAIN_NAME).addChild(BASE_PATH)
-                        .addChild(ORGANIZATION_PATH)
+                        CRISTIN_API_BASE)
+                        .addChild(UNITS_PATH)
                         .addChild(identifier)
                         .getUri()))
                 .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE));

@@ -37,6 +37,9 @@ public class Constants {
     public static final List<MediaType> DEFAULT_RESPONSE_MEDIA_TYPES = List.of(MediaType.JSON_UTF_8,
             MediaTypes.APPLICATION_JSON_LD);
     public static final String ORGANIZATION_PATH = "organization";
+    public static final String UNITS_PATH = "units";
+
+
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,
