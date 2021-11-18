@@ -126,10 +126,10 @@ public class HttpExecutorImpl extends HttpExecutor {
             throws InterruptedException, NotFoundException, FailedHttpRequestException {
         SingleUnitHierarchyGenerator singleUnitHierarchyGenerator = new SingleUnitHierarchyGenerator(uri, httpClient);
         SubSubUnitDto subSubUnitDto = singleUnitHierarchyGenerator.fetch(uri);
-        return toNvaOrganization(subSubUnitDto);
+        return toOrganization(subSubUnitDto);
     }
 
-    private Organization toNvaOrganization(SubSubUnitDto subSubUnitDto) {
+    private Organization toOrganization(SubSubUnitDto subSubUnitDto) {
         return new Organization.Builder()
                 .withId(new UriWrapper(HTTPS,
                         DOMAIN_NAME).addChild(BASE_PATH)
