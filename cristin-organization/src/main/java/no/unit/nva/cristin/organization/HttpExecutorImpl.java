@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static com.google.common.net.HttpHeaders.ACCEPT;
 import static com.google.common.net.HttpHeaders.USER_AGENT;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static no.unit.nva.cristin.model.Constants.APPLICATION_JSON;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -42,6 +42,8 @@ public class HttpExecutorImpl extends HttpExecutor {
     public static final int WAITING_TIME = 500; //500 milliseconds
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
     private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
+
+
     private final transient HttpClient httpClient;
 
     /**

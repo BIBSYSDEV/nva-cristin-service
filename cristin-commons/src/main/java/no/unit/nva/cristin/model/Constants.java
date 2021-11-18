@@ -8,6 +8,8 @@ import nva.commons.core.JsonUtils;
 
 import java.util.List;
 
+import static com.google.common.net.MediaType.JSON_UTF_8;
+
 public class Constants {
 
     public static final String X_TOTAL_COUNT = "x-total-count";
@@ -34,11 +36,12 @@ public class Constants {
     public static final String FIRST_PAGE = "1";
     public static final String DEFAULT_NUMBER_OF_RESULTS = "5";
 
-    public static final List<MediaType> DEFAULT_RESPONSE_MEDIA_TYPES = List.of(MediaType.JSON_UTF_8,
+    public static final List<MediaType> DEFAULT_RESPONSE_MEDIA_TYPES = List.of(JSON_UTF_8,
             MediaTypes.APPLICATION_JSON_LD);
+
     public static final String ORGANIZATION_PATH = "organization";
     public static final String UNITS_PATH = "units";
-
+    public static final String APPLICATION_JSON = JSON_UTF_8.toString();
 
 
     public enum QueryType {
