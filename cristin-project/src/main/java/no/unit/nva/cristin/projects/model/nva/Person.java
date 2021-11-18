@@ -23,9 +23,9 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 @JsonPropertyOrder({ID, TYPE, FIRST_NAME, LAST_NAME})
 public class Person {
 
-    private URI id;
-    private String firstName;
-    private String lastName;
+    private final URI id;
+    private final String firstName;
+    private final String lastName;
 
     @JsonCreator
     public Person(@JsonProperty(ID) URI id,
@@ -33,30 +33,6 @@ public class Person {
                   @JsonProperty(LAST_NAME) String lastName) {
         this.id = id;
         this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    public URI getId() {
-        return id;
-    }
-
-    public void setId(URI id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
@@ -76,6 +52,18 @@ public class Person {
         return new Person(id,
                 cristinPerson.getFirstName(),
                 cristinPerson.getSurname());
+    }
+
+    public URI getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     @Override
