@@ -6,4 +6,7 @@ dependencies {
     testImplementation project(":cristin-commons")
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
+    implementation libs.google.guava
+    implementation libs.aws.lambda.java.core
+
 }
