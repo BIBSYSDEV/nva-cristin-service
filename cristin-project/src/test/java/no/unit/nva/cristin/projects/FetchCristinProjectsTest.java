@@ -115,8 +115,9 @@ public class FetchCristinProjectsTest {
     @ArgumentsSource(TestPairProvider.class)
     void handlerReturnsExpectedBodyWhenRequestInputIsValid(String expected) throws IOException {
         String actual = sendDefaultQuery().getBody();
-        assertEquals(OBJECT_MAPPER.readValue(expected,GatewayResponse.class),
-                OBJECT_MAPPER.readValue(actual, GatewayResponse.class));
+        final SearchResponse expectedSearchResponse = OBJECT_MAPPER.readValue(expected, SearchResponse.class);
+        final SearchResponse actualSearchResponse = OBJECT_MAPPER.readValue(actual, SearchResponse.class);
+        assertEquals(expectedSearchResponse, actualSearchResponse);
     }
 
     @Test

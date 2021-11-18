@@ -6,12 +6,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonSerializable;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.net.http.HttpHeaders;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
@@ -32,7 +34,7 @@ import static nva.commons.core.paths.UriWrapper.EMPTY_FRAGMENT;
     JsonPropertyNames.CONTEXT, JsonPropertyNames.ID, JsonPropertyNames.SIZE, JsonPropertyNames.SEARCH_STRING,
     JsonPropertyNames.PROCESSING_TIME, JsonPropertyNames.FIRST_RECORD, JsonPropertyNames.NEXT_RESULTS,
     JsonPropertyNames.PREVIOUS_RESULTS, JsonPropertyNames.HITS})
-public class SearchResponse<E> {
+public class SearchResponse<E> implements JsonSerializable {
 
     @JsonIgnore
     public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
@@ -205,7 +207,7 @@ public class SearchResponse<E> {
     private URI generateIdUriWithPageFromParams(int newPage, Map<String, String> queryParams) {
         Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
         newParams.put(PAGE, String.valueOf(newPage));
-        var newUri = attempt(() ->new URI(id.getScheme(),id.getHost(),id.getPath(),EMPTY_QUERY,EMPTY_FRAGMENT))
+        var newUri = attempt(() -> new URI(id.getScheme(),id.getHost(),id.getPath(),EMPTY_QUERY,EMPTY_FRAGMENT))
                 .map(UriWrapper::new)
                 .orElseThrow();
         return newUri.addQueryParameters(newParams).getUri();
@@ -223,4 +225,39 @@ public class SearchResponse<E> {
         return (int) headers.firstValueAsLong(X_TOTAL_COUNT).orElse(0);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SearchResponse)) {
+            return false;
+        }
+        SearchResponse<?> that = (SearchResponse<?>) o;
+        return Objects.equals(getContext(), that.getContext())
+                && Objects.equals(getId(), that.getId())
+                && Objects.equals(getSize(), that.getSize())
+                && Objects.equals(getProcessingTime(), that.getProcessingTime())
+                && Objects.equals(getFirstRecord(), that.getFirstRecord())
+                && Objects.equals(getNextResults(), that.getNextResults())
+                && Objects.equals(getPreviousResults(), that.getPreviousResults())
+                && Objects.equals(getHits(), that.getHits());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getContext(),
+                getId(),
+                getSize(),
+                getProcessingTime(),
+                getFirstRecord(),
+                getNextResults(),
+                getPreviousResults(),
+                getHits());
+    }
+
+    @Override
+    public String toString() {
+        return toJsonString();
+    }
 }
