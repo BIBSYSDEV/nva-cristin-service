@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.common.handler.CristinQueryHandler.WORD_WHITESPACE_DASH_COMMA_PERIOD;
 import static no.unit.nva.cristin.common.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.common.model.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.common.model.Constants.LANGUAGE;
@@ -110,7 +111,7 @@ public class FetchCristinProjects extends CristinHandler<Void, SearchResponse> {
     }
 
     private boolean isValidQuery(String str) {
-        Pattern pattern = Pattern.compile("[\\w\\s\\-,.]+"); // Words, whitespaces, dash, comma, period
+        Pattern pattern = Pattern.compile(WORD_WHITESPACE_DASH_COMMA_PERIOD);
         return pattern.matcher(str).matches();
     }
 
