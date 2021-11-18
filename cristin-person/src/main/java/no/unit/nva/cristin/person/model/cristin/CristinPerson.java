@@ -147,32 +147,22 @@ public class CristinPerson {
             .addChild(getCristinPersonId()).getUri();
     }
 
-    /**
-     * Transforms identifiers from Cristin into a Set.
-     *
-     * @return Set of transformed identifiers
-     */
     private Set<TypedValue> extractIdentifiers() {
         Set<TypedValue> identifiers = new HashSet<>();
 
         identifiers.add(new TypedValue(CRISTIN_IDENTIFIER, getCristinPersonId()));
-        getOrcid().flatMap(CristinOrcid::getId).ifPresent(id -> identifiers.add(new TypedValue(ORCID, id)));
+        getOrcid().flatMap(CristinOrcid::getId).ifPresent(orcid -> identifiers.add(new TypedValue(ORCID, orcid)));
 
         return identifiers;
     }
 
-    /**
-     * Transforms names from a Cristin person into a Set.
-     *
-     * @return Set of transformed names
-     */
     private Set<TypedValue> extractNames() {
         Set<TypedValue> names = new HashSet<>();
 
         names.add(new TypedValue(FIRST_NAME, getFirstName()));
         names.add(new TypedValue(LAST_NAME, getSurname()));
-        getFirstNamePreferred().ifPresent(id -> names.add(new TypedValue(PREFERRED_FIRST_NAME, id)));
-        getSurnamePreferred().ifPresent(id -> names.add(new TypedValue(PREFERRED_LAST_NAME, id)));
+        getFirstNamePreferred().ifPresent(name -> names.add(new TypedValue(PREFERRED_FIRST_NAME, name)));
+        getSurnamePreferred().ifPresent(name -> names.add(new TypedValue(PREFERRED_LAST_NAME, name)));
 
         return names;
     }
