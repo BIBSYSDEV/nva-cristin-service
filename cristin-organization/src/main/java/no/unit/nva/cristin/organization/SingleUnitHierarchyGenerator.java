@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 
 @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")    // TODO Fix external access
 public class SingleUnitHierarchyGenerator {
@@ -75,7 +76,7 @@ public class SingleUnitHierarchyGenerator {
         if (isSuccessful(response.statusCode())) {
             return toUnit(response.body());
         } else {
-            throw new NotFoundException(uri.toString());
+            throw new NotFoundException( String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
         }
     }
 
