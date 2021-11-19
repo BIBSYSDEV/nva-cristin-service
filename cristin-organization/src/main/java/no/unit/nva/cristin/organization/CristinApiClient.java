@@ -33,7 +33,7 @@ public class CristinApiClient {
     public Organization getSingleUnit(URI uri)
             throws NotFoundException, InterruptedException, FailedHttpRequestException {
         logger.info("Fetching results for: " + uri.toString());
-        return httpExecutor.getSingleUnit(uri);
+        return httpExecutor.getNestedInstitution(uri);
     }
 
     /**

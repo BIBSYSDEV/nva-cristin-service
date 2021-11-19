@@ -39,4 +39,7 @@ public abstract class HttpExecutor {
     private String errorMessage(HttpResponse<String> response) {
         return String.format(ERROR_MESSAGE_FORMAT, response.statusCode(), response.body());
     }
+
+    public abstract Organization getNestedInstitution(URI uri)
+            throws NotFoundException, FailedHttpRequestException, InterruptedException;
 }

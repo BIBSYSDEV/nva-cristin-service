@@ -43,7 +43,8 @@ public class Constants {
     public static final String UNITS_PATH = "units";
     public static final String APPLICATION_JSON = JSON_UTF_8.toString();
     public static final String NOT_FOUND_MESSAGE_TEMPLATE = "The URI \"%s\" cannot be dereferenced";
-
+    public static final String QUERY_PARAMETER_LANGUAGE = "lang";
+    public static final String ALL_QUERY_PARAMETER_LANGUAGES = "en,nb,nn";
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,
