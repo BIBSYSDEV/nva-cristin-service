@@ -27,14 +27,14 @@ import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 public class SingleUnitHierarchyGenerator {
 
     private final transient HttpClient httpClient;
-    private final transient  Logger logger = LoggerFactory.getLogger(SingleUnitHierarchyGenerator.class);
+    private final transient Logger logger = LoggerFactory.getLogger(SingleUnitHierarchyGenerator.class);
 
     /**
      * Parametrized constructor.
      *
      * @param uri        the URI of the Crstin Unit
      * @param httpClient an {@link HttpClient}
-     * @throws InterruptedException       when the client throws such exception.
+     * @throws InterruptedException when the client throws such exception.
      */
     public SingleUnitHierarchyGenerator(URI uri, HttpClient httpClient)
             throws InterruptedException, NotFoundException, FailedHttpRequestException {
@@ -62,21 +62,21 @@ public class SingleUnitHierarchyGenerator {
 
     /**
      * Fetches an OOrganization with given id.
+     *
      * @param uri id of organization to fetch
      * @return subunit for id
      * @throws InterruptedException       when the client throws such exception.
-     * @throws NotFoundException       when the URI does not correspond to an existing unit.
+     * @throws NotFoundException          when the URI does not correspond to an existing unit.
      * @throws FailedHttpRequestException when HttpClient receives an error.
      */
-    public SubSubUnitDto fetch(URI uri)
-            throws InterruptedException, NotFoundException, FailedHttpRequestException {
+    public SubSubUnitDto fetch(URI uri) throws InterruptedException, NotFoundException, FailedHttpRequestException {
         logger.info("Fetching " + uri.toString());
         HttpRequest httpRequest = createHttpRequest(uri);
         HttpResponse<String> response = sendRequest(httpRequest);
         if (isSuccessful(response.statusCode())) {
             return toUnit(response.body());
         } else {
-            throw new NotFoundException( String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
+            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
         }
     }
 

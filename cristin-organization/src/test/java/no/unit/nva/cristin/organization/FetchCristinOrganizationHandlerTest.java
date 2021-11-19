@@ -33,6 +33,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAT
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS;
@@ -50,7 +51,7 @@ class FetchCristinOrganizationHandlerTest {
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     public static final String IDENTIFIER = "identifier";
     public static final String IDENTIFIER_VALUE = "1.0.0.0";
-    public static final String ORGANIZATION_NOT_FOUND_MESSAGE = "Organization not found: ";
+    public static final String ORGANIZATION_NOT_FOUND_MESSAGE = "cannot be dereferenced";
     FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinApiClient cristinApiClient;
     private ByteArrayOutputStream output;
@@ -69,7 +70,7 @@ class FetchCristinOrganizationHandlerTest {
             throws IOException, ApiGatewayException, InterruptedException {
 
         cristinApiClient = spy(cristinApiClient);
-        doThrow(new NotFoundException("Organization not found: " + IDENTIFIER_VALUE))
+        doThrow(new NotFoundException(NOT_FOUND_MESSAGE_TEMPLATE + IDENTIFIER_VALUE))
                 .when(cristinApiClient).getSingleUnit(any());
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);

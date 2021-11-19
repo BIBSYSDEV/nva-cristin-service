@@ -7,17 +7,23 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 
@@ -37,13 +43,22 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
         this.cristinApiClient = cristinApiClient;
     }
 
+    @SuppressWarnings("PMD.AvoidThrowingNewInstanceOfSameException")
     @Override
     protected Organization processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
         Organization result;
         validateThatSuppliedParamsIsSupported(requestInfo);
+        final String identifier = getValidId(requestInfo);
         try {
-            result = getTransformedOrganizationFromCristin(getValidId(requestInfo));
+            result = getTransformedOrganizationFromCristin(identifier);
+        } catch (NotFoundException e) {
+            URI uri = new UriWrapper(HTTPS, DOMAIN_NAME)
+                    .addChild(BASE_PATH)
+                    .addChild(ORGANIZATION_PATH)
+                    .addChild(identifier)
+                    .getUri();
+            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
         } catch (InterruptedException e) {
             throw new BadRequestException(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE);
         }
@@ -62,7 +77,7 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
     }
 
     private String getValidId(RequestInfo requestInfo) throws BadRequestException {
-        final String identifier =  requestInfo.getPathParameter(IDENTIFIER);
+        final String identifier = requestInfo.getPathParameter(IDENTIFIER);
         if (matchesIdentifierPattern(identifier)) {
             return identifier;
         } else {

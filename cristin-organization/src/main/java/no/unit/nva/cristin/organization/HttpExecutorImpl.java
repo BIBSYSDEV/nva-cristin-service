@@ -148,7 +148,7 @@ public class HttpExecutorImpl extends HttpExecutor {
     }
 
     private String generateInstitutionsQueryUri() {
-        return INSTITUTIONS_URI_TEMPLATE; // String.format(INSTITUTIONS_URI_TEMPLATE, language.getLexvoUri());
+        return INSTITUTIONS_URI_TEMPLATE;
     }
 
 }
