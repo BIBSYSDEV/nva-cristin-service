@@ -13,7 +13,7 @@ dependencies {
     testImplementation libs.bundles.testing
     implementation libs.bundles.nvaCommons
     implementation libs.bundles.jackson
-    implementation libs.bundles.others
+    implementation libs.slf4j.api
 }
 
 sourceCompatibility = JavaVersion.VERSION_11  // source-code version and must be <= targetCompatibility
@@ -70,7 +70,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'METHOD'
                 value = 'COVEREDRATIO'
-                minimum = 0.95
+                minimum = 0.7
             }
         }
 
@@ -78,7 +78,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'CLASS'
                 value = 'COVEREDRATIO'
-                minimum = 0.95
+                minimum = 0.7
             }
         }
     }

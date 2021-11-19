@@ -1,0 +1,4 @@
+dependencies {
+    implementation libs.nva.logutils
+    implementation libs.google.guava
+}

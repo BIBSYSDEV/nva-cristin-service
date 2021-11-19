@@ -1,0 +1,33 @@
+name: Karate API tests
+
+on: [ push, pull_request ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - uses: aws-actions/setup-sam@v1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: arn:aws:iam::884807050265:role/nva-dev-github-actions-role
+          aws-region: eu-west-1
+      - run: sam build
+      # Prevent prompts and failure when the stack is unchanged
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+      # Run karate tests on deployed api
+      - name: Run Karate tests erikbos/karate-action@main
+        uses: erikbos/karate-action@main
+        with:
+          url: https://api.dev.nva.aws.unit.no/karate-cristin/
+          tests: |
+            cristin-organization/src/test/java/no/unit/nva/cristin/organization/organization.feature
+            cristin-project/src/test/java/no/unit/nva/cristin/projects/project.feature
+

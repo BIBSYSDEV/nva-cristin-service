@@ -1,9 +1,10 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.common.util.UriUtils.queryParameters;
-import static no.unit.nva.cristin.projects.Constants.CRISTIN_API_HOST;
-import static no.unit.nva.cristin.projects.Constants.EMPTY_FRAGMENT;
-import static no.unit.nva.cristin.projects.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_HOST;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.utils.UriUtils.queryParameters;
+import static nva.commons.core.paths.UriWrapper.EMPTY_FRAGMENT;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;

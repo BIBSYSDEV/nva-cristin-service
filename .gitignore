@@ -286,4 +286,5 @@ gradle-app.setting
 # AWS Build folder
 .aws-sam
 
-/samconfig.toml
+/cristin-project/target/
+/cristin-organization/target/

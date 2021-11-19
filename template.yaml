@@ -73,7 +73,6 @@ Resources:
             Path: /project/
             Method: get
             RequestParameters:
-              - method.request.querystring.language
               - method.request.querystring.query
               - method.request.querystring.page
               - method.request.querystring.results
@@ -92,14 +91,12 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /project/{id}
             Method: get
-            RequestParameters:
-              - method.request.querystring.language
 
   NvaCristinQueryOrganizationFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-organization
-      Handler: no.unit.nva.cristin.organization.QueryCristinOrganization::handleRequest
+      Handler: no.unit.nva.cristin.organization.QueryCristinOrganizationHandler::handleRequest
       Runtime: java11
       MemorySize: 512
       Events:
@@ -114,11 +111,11 @@ Resources:
               - method.request.querystring.page
               - method.request.querystring.results
 
-  NvaCristinGetOrganizationFunction:
+  NvaCristinFetchOrganizationFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: cristin-project
-      Handler: no.unit.nva.cristin.organization.FetchCristinOrganization::handleRequest
+      CodeUri: cristin-organization
+      Handler: no.unit.nva.cristin.organization.FetchCristinOrganizationHandler::handleRequest
       Runtime: java11
       MemorySize: 512
       Events:

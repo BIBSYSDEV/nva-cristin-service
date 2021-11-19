@@ -1,26 +1,20 @@
 package no.unit.nva.cristin.projects;
 
-import static java.util.Arrays.asList;
-import static no.unit.nva.cristin.common.util.UriUtils.queryParameters;
-import static no.unit.nva.cristin.projects.Constants.LANGUAGE;
-import static no.unit.nva.cristin.projects.Constants.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.projects.Constants.PAGE;
-import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
-import static no.unit.nva.cristin.projects.Constants.PROJECT_SEARCH_CONTEXT_URL;
-import static no.unit.nva.cristin.projects.Constants.QUERY;
-import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_GRANT_ID;
-import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_TITLE;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
-import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithId;
-import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithParams;
-import static nva.commons.core.StringUtils.EMPTY_STRING;
-import static nva.commons.core.attempt.Try.attempt;
+import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.utils.UriUtils;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadGatewayException;
+import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.attempt.Failure;
+import nva.commons.core.attempt.Try;
+import nva.commons.core.paths.UriWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -37,18 +31,30 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import no.unit.nva.cristin.common.model.SearchResponse;
-import no.unit.nva.cristin.projects.Constants.QueryType;
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.BadGatewayException;
-import nva.commons.apigateway.exceptions.NotFoundException;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.attempt.Failure;
-import nva.commons.core.attempt.Try;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static java.util.Arrays.asList;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
+import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
+import static no.unit.nva.cristin.model.Constants.QueryType;
+import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
+import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
+import static no.unit.nva.utils.UriUtils.queryParameters;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class CristinApiClient {
 
@@ -92,9 +98,9 @@ public class CristinApiClient {
      *
      * @param requestQueryParams Request parameters from client containing title and language
      * @return a ProjectsWrapper filled with transformed Cristin Projects and metadata
-     * @throws ApiGatewayException if some error happen we should return this to client
+     * @throws ApiGatewayException if some errors happen we should return this to client
      */
-    public SearchResponse queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
+    public SearchResponse<NvaProject> queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
         Map<String, String> requestQueryParams) throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
@@ -109,7 +115,12 @@ public class CristinApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        return new SearchResponse(getNvaProjectUriWithParams(requestQueryParams))
+        URI id = new UriWrapper(HTTPS,
+                DOMAIN_NAME).addChild(BASE_PATH)
+                .addChild(UriUtils.PROJECT)
+                .addQueryParameters(requestQueryParams)
+                .getUri();
+        return new SearchResponse<NvaProject>(id)
             .withContext(PROJECT_SEARCH_CONTEXT_URL)
             .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
             .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
@@ -121,29 +132,34 @@ public class CristinApiClient {
     }
 
     protected HttpResponse<String> queryProjects(Map<String, String> parameters, QueryType queryType)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         URI uri = attempt(() -> generateQueryProjectsUrl(parameters, queryType))
-            .toOptional(failure ->
-                logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters), failure.getException()))
-            .orElseThrow();
+                .toOptional(failure ->
+                        logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED,
+                                queryParameters(parameters), failure.getException()))
+                .orElseThrow();
 
         HttpResponse<String> response = fetchQueryResults(uri);
-
-        checkHttpStatusCode(getNvaProjectUriWithParams(parameters).toString(), response.statusCode());
-
+        URI id = new UriWrapper(HTTPS,
+                DOMAIN_NAME).addChild(BASE_PATH)
+                .addChild(UriUtils.PROJECT)
+                .addQueryParameters(parameters)
+                .getUri();
+        checkHttpStatusCode(id.toString(), response.statusCode());
         return response;
     }
 
     protected CristinProject getProject(String id, String language) throws ApiGatewayException {
         URI uri = attempt(() -> generateGetProjectUri(id, language))
-            .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
-            .orElseThrow();
+                .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
+                        id,
+                        failure.getException()))
+                .orElseThrow();
 
         HttpResponse<String> response = fetchGetResult(uri);
-
-        checkHttpStatusCode(getNvaProjectUriWithId(id).toString(), response.statusCode());
-
+        checkHttpStatusCode(new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(UriUtils.PROJECT)
+                .addChild(id).getUri().toString(), response.statusCode());
         return getDeserializedResponse(response, CristinProject.class);
     }
 

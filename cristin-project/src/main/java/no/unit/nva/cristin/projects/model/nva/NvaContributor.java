@@ -1,20 +1,21 @@
 package no.unit.nva.cristin.projects.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import no.unit.nva.model.Organization;
 
 import java.util.Objects;
 
-import static no.unit.nva.cristin.projects.JsonPropertyNames.AFFILIATION;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.IDENTITY;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.AFFILIATION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTITY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 
 @SuppressWarnings("unused")
 @JsonPropertyOrder({TYPE, IDENTITY, AFFILIATION})
 public class NvaContributor {
 
     private String type;
-    private NvaPerson identity;
-    private NvaOrganization affiliation;
+    private Person identity;
+    private Organization affiliation;
 
     public String getType() {
         return type;
@@ -24,19 +25,19 @@ public class NvaContributor {
         this.type = type;
     }
 
-    public NvaPerson getIdentity() {
+    public Person getIdentity() {
         return identity;
     }
 
-    public void setIdentity(NvaPerson identity) {
+    public void setIdentity(Person identity) {
         this.identity = identity;
     }
 
-    public NvaOrganization getAffiliation() {
+    public Organization getAffiliation() {
         return affiliation;
     }
 
-    public void setAffiliation(NvaOrganization affiliation) {
+    public void setAffiliation(Organization affiliation) {
         this.affiliation = affiliation;
     }
 
