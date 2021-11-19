@@ -1,9 +1,9 @@
 package no.unit.nva.cristin.person.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static no.unit.nva.cristin.common.model.JsonPropertyNames.CONTEXT;
-import static no.unit.nva.cristin.common.model.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.common.model.JsonPropertyNames.TYPE_PROPERTY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AFFILIATIONS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IDENTIFIERS;
@@ -21,10 +21,10 @@ import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonSerializable;
 
 @JacocoGenerated
-@JsonPropertyOrder({CONTEXT, ID, TYPE_PROPERTY, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
+@JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
 public class Person implements JsonSerializable {
 
-    @JsonProperty(TYPE_PROPERTY)
+    @JsonProperty(TYPE)
     private static final String type = "Person";
     @JsonProperty(ID)
     private URI id;

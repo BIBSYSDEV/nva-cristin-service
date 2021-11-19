@@ -1,5 +1,8 @@
 package no.unit.nva.cristin.person.handler;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
@@ -13,12 +16,6 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 public class PersonFetchHandler extends ApiGatewayHandler<Void, Person> {
-
-    public static final String ID = "id";
-    public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID =
-        "Invalid path parameter for id, needs to be a number";
-    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP =
-        "This endpoint does not support query params";
 
     private final transient CristinPersonApiClient apiClient;
 

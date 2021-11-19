@@ -1,17 +1,15 @@
 package no.unit.nva.cristin.model;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import no.unit.nva.model.Organization;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.paths.UriWrapper;
-
-import java.net.URI;
-import java.util.Map;
-
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.net.URI;
+import java.util.Map;
+import no.unit.nva.model.Organization;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.paths.UriWrapper;
 
 
 @SuppressWarnings("unused")
@@ -47,14 +45,18 @@ public class CristinInstitution {
         this.url = url;
     }
 
+    /**
+     * Creates an Organization model based on this CristinInstitution model.
+     *
+     * @return Organization model
+     */
     public Organization toOrganization() {
 
         final URI id = new UriWrapper(HTTPS, CRISTIN_API_BASE).addChild(INSTITUTION_PATH)
-                .addChild(getCristinInstitutionId()).getUri();
+            .addChild(getCristinInstitutionId()).getUri();
         return new Organization.Builder()
-                .withId(id)
-                .withName(getInstitutionName()).build();
+            .withId(id)
+            .withName(getInstitutionName()).build();
     }
-
 }
 

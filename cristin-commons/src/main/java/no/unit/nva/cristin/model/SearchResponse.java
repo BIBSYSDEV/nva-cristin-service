@@ -1,21 +1,5 @@
 package no.unit.nva.cristin.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
-import nva.commons.core.paths.UriWrapper;
-
-import java.net.URI;
-import java.net.http.HttpHeaders;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.google.common.net.HttpHeaders.LINK;
 import static no.unit.nva.cristin.model.Constants.REL_NEXT;
@@ -26,6 +10,20 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.paths.UriWrapper.EMPTY_FRAGMENT;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.net.URI;
+import java.net.http.HttpHeaders;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonSerializable;
+import nva.commons.core.paths.UriWrapper;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
@@ -157,13 +155,12 @@ public class SearchResponse<E> implements JsonSerializable {
         return this;
     }
 
-
     /**
      * Assigns value to some field values using supplied headers and query parameters.
      *
      * @param headers     the headers from response
      * @param queryParams the query params from request
-     * @return ProjectsWrapper object with some field values set using the supplied parameters
+     * @return SearchResponse object with some field values set using the supplied parameters
      * @throws BadRequestException if page requested is invalid
      */
     public SearchResponse<E> usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)

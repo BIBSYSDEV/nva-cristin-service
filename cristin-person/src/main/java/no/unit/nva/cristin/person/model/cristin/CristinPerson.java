@@ -1,9 +1,9 @@
 package no.unit.nva.cristin.person.model.cristin;
 
-import static no.unit.nva.cristin.person.Constants.BASE_PATH;
-import static no.unit.nva.cristin.person.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.person.Constants.HTTPS;
-import static no.unit.nva.cristin.person.Constants.PERSON_PATH;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -143,7 +143,7 @@ public class CristinPerson {
     }
 
     private URI extractIdUri() {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH)
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH_NVA)
             .addChild(getCristinPersonId()).getUri();
     }
 

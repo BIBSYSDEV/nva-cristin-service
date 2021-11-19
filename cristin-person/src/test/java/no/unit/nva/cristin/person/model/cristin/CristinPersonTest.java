@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.person.model.cristin;
 
-import static no.unit.nva.cristin.person.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;

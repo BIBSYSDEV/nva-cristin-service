@@ -1,21 +1,22 @@
 package no.unit.nva.cristin.person.handler;
 
-import static no.unit.nva.cristin.common.model.Constants.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.common.model.Constants.PAGE;
-import static no.unit.nva.cristin.common.model.Constants.QUERY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
-import no.unit.nva.cristin.common.model.SearchResponse;
+import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.CristinPersonApiClient;
+import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class PersonQueryHandler extends CristinQueryHandler<Void, SearchResponse> {
+public class PersonQueryHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
     private final transient CristinPersonApiClient apiClient;
 
@@ -35,7 +36,7 @@ public class PersonQueryHandler extends CristinQueryHandler<Void, SearchResponse
     }
 
     @Override
-    protected SearchResponse processInput(Void input, RequestInfo requestInfo, Context context)
+    protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
         validateQueryParamKeys(requestInfo);
@@ -50,7 +51,7 @@ public class PersonQueryHandler extends CristinQueryHandler<Void, SearchResponse
     }
 
     @Override
-    protected Integer getSuccessStatusCode(Void input, SearchResponse output) {
+    protected Integer getSuccessStatusCode(Void input, SearchResponse<Person> output) {
         return HttpURLConnection.HTTP_OK;
     }
 

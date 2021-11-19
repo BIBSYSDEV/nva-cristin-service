@@ -1,7 +1,9 @@
 package no.unit.nva.cristin.person.handler;
 
-import static no.unit.nva.cristin.person.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.person.handler.PersonFetchHandler.ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -10,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.HttpHeaders;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +20,6 @@ import java.net.HttpURLConnection;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
-import javax.ws.rs.core.HttpHeaders;
 import no.unit.nva.cristin.person.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -65,7 +67,7 @@ public class PersonFetchHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-            containsString(PersonFetchHandler.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP));
+            containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP));
     }
 
     @Test
@@ -75,7 +77,7 @@ public class PersonFetchHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-            containsString(PersonFetchHandler.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
+            containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
     }
 
     private GatewayResponse<Person> sendQuery(Map<String, String> queryParams, Map<String, String> pathParam)

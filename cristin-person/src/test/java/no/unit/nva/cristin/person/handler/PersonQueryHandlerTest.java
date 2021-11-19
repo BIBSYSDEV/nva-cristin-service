@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.handler;
 
-import static no.unit.nva.cristin.common.model.Constants.QUERY;
-import static no.unit.nva.cristin.person.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import no.unit.nva.cristin.common.model.SearchResponse;
+import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -44,9 +44,10 @@ public class PersonQueryHandlerTest {
 
     @Test
     void shouldReturnResponseWhenCallingEndpointWithNameParameter() throws IOException {
-        SearchResponse actual = sendDefaultQuery().getBodyObject(SearchResponse.class);
+        SearchResponse<Person> actual = sendDefaultQuery().getBodyObject(SearchResponse.class);
         String expectedString = IoUtils.stringFromResources(Path.of(NVA_API_QUERY_PERSON_JSON));
-        SearchResponse expected = OBJECT_MAPPER.readValue(expectedString, SearchResponse.class);
+        SearchResponse<Person> expected = OBJECT_MAPPER.readValue(expectedString, SearchResponse.class);
+        ;
 
         // Type casting problems when using generic types. Needed to convert. Was somehow converting to LinkedHashMap
         List<Person> expectedPersons = OBJECT_MAPPER.convertValue(expected.getHits(), new TypeReference<>() {});
