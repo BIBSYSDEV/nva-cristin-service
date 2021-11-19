@@ -1,28 +1,31 @@
-package no.unit.nva.cristin.common.model;
+package no.unit.nva.cristin.model;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
-import static no.unit.nva.cristin.common.model.Constants.LINK;
-import static no.unit.nva.cristin.common.model.Constants.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.common.model.Constants.PAGE;
-import static no.unit.nva.cristin.common.model.Constants.REL_NEXT;
-import static no.unit.nva.cristin.common.model.Constants.REL_PREV;
-import static no.unit.nva.cristin.common.model.Constants.X_TOTAL_COUNT;
-import static nva.commons.core.StringUtils.EMPTY_STRING;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonSerializable;
+import nva.commons.core.paths.UriWrapper;
+
 import java.net.URI;
 import java.net.http.HttpHeaders;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import no.unit.nva.cristin.common.util.UriUtils;
-import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
+import static com.google.common.net.HttpHeaders.LINK;
+import static no.unit.nva.cristin.model.Constants.REL_NEXT;
+import static no.unit.nva.cristin.model.Constants.REL_PREV;
+import static no.unit.nva.cristin.model.Constants.X_TOTAL_COUNT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static nva.commons.core.attempt.Try.attempt;
+import static nva.commons.core.paths.UriWrapper.EMPTY_FRAGMENT;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
@@ -31,13 +34,14 @@ import nva.commons.core.JsonSerializable;
     JsonPropertyNames.CONTEXT, JsonPropertyNames.ID, JsonPropertyNames.SIZE, JsonPropertyNames.SEARCH_STRING,
     JsonPropertyNames.PROCESSING_TIME, JsonPropertyNames.FIRST_RECORD, JsonPropertyNames.NEXT_RESULTS,
     JsonPropertyNames.PREVIOUS_RESULTS, JsonPropertyNames.HITS})
-public class SearchResponse implements JsonSerializable {
+public class SearchResponse<E> implements JsonSerializable {
 
     @JsonIgnore
     public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
         "Page requested is out of scope. Query contains %s results";
     @JsonIgnore
     public static final int FIRST_RECORD_ZERO_WHEN_NO_HITS = 0;
+    private static final String EMPTY_QUERY = null;
 
     @JsonProperty("@context")
     private String context;
@@ -54,9 +58,9 @@ public class SearchResponse implements JsonSerializable {
     @JsonProperty
     private URI previousResults;
     @JsonProperty
-    private List<?> hits;
+    private List<E> hits;
 
-    public SearchResponse() {
+    private SearchResponse() {
 
     }
 
@@ -126,37 +130,43 @@ public class SearchResponse implements JsonSerializable {
     }
 
     public List<?> getHits() {
-        return Objects.nonNull(hits) ? hits : Collections.emptyList();
+        return hits;
     }
 
-    public void setHits(List<?> hits) {
+    public void setHits(List<E> hits) {
         this.hits = hits;
     }
 
-    public SearchResponse withContext(String context) {
+    public SearchResponse<E> withContext(String context) {
         this.context = context;
         return this;
     }
 
-    public SearchResponse withProcessingTime(Long processingTime) {
+    public SearchResponse<E> withProcessingTime(Long processingTime) {
         this.processingTime = processingTime;
         return this;
     }
 
-    public SearchResponse withHits(List<?> hits) {
+    public SearchResponse<E> withHits(List<E> hits) {
         this.hits = hits;
         return this;
     }
+
+    public SearchResponse<E> withSize(int size) {
+        this.size = size;
+        return this;
+    }
+
 
     /**
      * Assigns value to some field values using supplied headers and query parameters.
      *
      * @param headers     the headers from response
      * @param queryParams the query params from request
-     * @return SearchResponse object with some field values set using the supplied parameters
+     * @return ProjectsWrapper object with some field values set using the supplied parameters
      * @throws BadRequestException if page requested is invalid
      */
-    public SearchResponse usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)
+    public SearchResponse<E> usingHeadersAndQueryParams(HttpHeaders headers, Map<String, String> queryParams)
         throws BadRequestException {
 
         this.size = getSizeHeader(headers);
@@ -197,8 +207,12 @@ public class SearchResponse implements JsonSerializable {
     private URI generateIdUriWithPageFromParams(int newPage, Map<String, String> queryParams) {
         Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
         newParams.put(PAGE, String.valueOf(newPage));
-        return UriUtils.getUriFromOtherUriUsingNewParams(id, newParams);
+        var newUri = attempt(() -> new URI(id.getScheme(),id.getHost(),id.getPath(),EMPTY_QUERY,EMPTY_FRAGMENT))
+                .map(UriWrapper::new)
+                .orElseThrow();
+        return newUri.addQueryParameters(newParams).getUri();
     }
+
 
     private Integer indexOfFirstEntryInPageCalculatedFromParams(Map<String, String> queryParams) {
         int page = Integer.parseInt(queryParams.get(PAGE));
@@ -211,7 +225,6 @@ public class SearchResponse implements JsonSerializable {
         return (int) headers.firstValueAsLong(X_TOTAL_COUNT).orElse(0);
     }
 
-    @JacocoGenerated
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -220,23 +233,27 @@ public class SearchResponse implements JsonSerializable {
         if (!(o instanceof SearchResponse)) {
             return false;
         }
-        SearchResponse that = (SearchResponse) o;
+        SearchResponse<?> that = (SearchResponse<?>) o;
         return Objects.equals(getContext(), that.getContext())
-            && Objects.equals(getId(), that.getId())
-            && Objects.equals(getSize(), that.getSize())
-            && Objects.equals(getSearchString(), that.getSearchString())
-            && Objects.equals(getProcessingTime(), that.getProcessingTime())
-            && Objects.equals(getFirstRecord(), that.getFirstRecord())
-            && Objects.equals(getNextResults(), that.getNextResults())
-            && Objects.equals(getPreviousResults(), that.getPreviousResults())
-            && getHits().equals(that.getHits());
+                && Objects.equals(getId(), that.getId())
+                && Objects.equals(getSize(), that.getSize())
+                && Objects.equals(getProcessingTime(), that.getProcessingTime())
+                && Objects.equals(getFirstRecord(), that.getFirstRecord())
+                && Objects.equals(getNextResults(), that.getNextResults())
+                && Objects.equals(getPreviousResults(), that.getPreviousResults())
+                && Objects.equals(getHits(), that.getHits());
     }
 
-    @JacocoGenerated
     @Override
     public int hashCode() {
-        return Objects.hash(getContext(), getId(), getSize(), getSearchString(), getProcessingTime(), getFirstRecord(),
-            getNextResults(), getPreviousResults(), getHits());
+        return Objects.hash(getContext(),
+                getId(),
+                getSize(),
+                getProcessingTime(),
+                getFirstRecord(),
+                getNextResults(),
+                getPreviousResults(),
+                getHits());
     }
 
     @Override

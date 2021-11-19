@@ -1,3 +1,28 @@
 dependencies {
     implementation project(":cristin-commons")
+    implementation libs.junit.jupiter.api
+
+    testImplementation libs.karate.core
+    testImplementation libs.karate.junit5
+    implementation libs.google.guava
+    implementation libs.aws.lambda.java.core
+}
+
+sourceSets {
+    test {
+        resources {
+            srcDir file('src/test/java')
+        }
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags('karateTest')
+    }
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
 }

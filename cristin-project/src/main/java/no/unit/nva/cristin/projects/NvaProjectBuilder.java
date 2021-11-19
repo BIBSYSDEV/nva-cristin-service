@@ -1,12 +1,6 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.ProjectUriUtils.getNvaProjectUriWithId;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import no.unit.nva.model.Organization;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -14,10 +8,22 @@ import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
-import no.unit.nva.cristin.projects.model.nva.NvaOrganization;
-import no.unit.nva.cristin.projects.model.nva.NvaPerson;
+import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
+import nva.commons.core.paths.UriWrapper;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
 
 public class NvaProjectBuilder {
 
@@ -53,8 +59,8 @@ public class NvaProjectBuilder {
                                                                               CristinRole role) {
         NvaContributor nvaContributor = new NvaContributor();
         nvaContributor.setType(cristinRolesToNva.get(role.getRoleCode()));
-        nvaContributor.setIdentity(NvaPerson.fromCristinPerson(cristinPerson));
-        nvaContributor.setAffiliation(NvaOrganization.fromCristinInstitution(role.getInstitution()));
+        nvaContributor.setIdentity(Person.fromCristinPerson(cristinPerson));
+        nvaContributor.setAffiliation(role.getInstitution().toOrganization());
         return nvaContributor;
     }
 
@@ -64,7 +70,8 @@ public class NvaProjectBuilder {
      * @return a NvaProject converted from a CristinProject
      */
     public NvaProject build() {
-        nvaProject.setId(getNvaProjectUriWithId(cristinProject.getCristinProjectId()));
+        nvaProject.setId(new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(UriUtils.PROJECT)
+                .addChild(cristinProject.getCristinProjectId()).getUri());
         nvaProject.setType(PROJECT_TYPE);
         nvaProject.setIdentifiers(createCristinIdentifier());
         nvaProject.setTitle(extractMainTitle());
@@ -86,10 +93,9 @@ public class NvaProjectBuilder {
                 Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()));
     }
 
-    private NvaOrganization extractCoordinatingInstitution() {
+    private Organization extractCoordinatingInstitution() {
         return Optional.ofNullable(cristinProject.getCoordinatingInstitution())
-                .map(coordinatingInstitution -> NvaOrganization
-                        .fromCristinInstitution(coordinatingInstitution.getInstitution()))
+                .map(coordinatingInstitution -> coordinatingInstitution.getInstitution().toOrganization())
                 .orElse(null);
     }
 

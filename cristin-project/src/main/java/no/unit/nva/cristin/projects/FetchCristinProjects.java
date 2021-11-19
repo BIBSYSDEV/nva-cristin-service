@@ -1,24 +1,26 @@
 package no.unit.nva.cristin.projects;
 
 import static no.unit.nva.cristin.common.handler.CristinQueryHandler.QUERY_PATTERN;
-import static no.unit.nva.cristin.common.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.common.model.Constants.FIRST_PAGE;
-import static no.unit.nva.cristin.common.model.Constants.LANGUAGE;
-import static no.unit.nva.cristin.common.model.Constants.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.common.model.Constants.PAGE;
-import static no.unit.nva.cristin.common.model.Constants.QUERY;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import no.unit.nva.cristin.common.model.SearchResponse;
-import no.unit.nva.cristin.common.util.UriUtils;
+import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -28,7 +30,7 @@ import nva.commons.core.JacocoGenerated;
 /**
  * Handler for requests to Lambda function.
  */
-public class FetchCristinProjects extends CristinHandler<Void, SearchResponse> {
+public class FetchCristinProjects extends CristinHandler<Void, SearchResponse<NvaProject>> {
 
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
 
@@ -51,7 +53,7 @@ public class FetchCristinProjects extends CristinHandler<Void, SearchResponse> {
     }
 
     @Override
-    protected SearchResponse processInput(Void input, RequestInfo requestInfo, Context context)
+    protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
         validateThatSuppliedQueryParamsIsSupported(requestInfo);
@@ -96,13 +98,15 @@ public class FetchCristinProjects extends CristinHandler<Void, SearchResponse> {
             .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
     }
 
-    private SearchResponse getTransformedCristinProjectsUsingWrapperObject(String language, String query, String page,
-                                                                           String numberOfResults)
-        throws ApiGatewayException {
+    private SearchResponse<NvaProject> getTransformedCristinProjectsUsingWrapperObject(String language,
+                                                                                       String query,
+                                                                                       String page,
+                                                                                       String numberOfResults)
+            throws ApiGatewayException {
 
         Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
-        requestQueryParams.put(QUERY, query);
         requestQueryParams.put(LANGUAGE, language);
+        requestQueryParams.put(QUERY, query);
         requestQueryParams.put(PAGE, page);
         requestQueryParams.put(NUMBER_OF_RESULTS, numberOfResults);
 

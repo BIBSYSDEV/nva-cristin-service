@@ -1,57 +1,10 @@
 package no.unit.nva.cristin.projects;
 
-import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
-import static no.unit.nva.cristin.common.model.Constants.LANGUAGE;
-import static no.unit.nva.cristin.common.model.Constants.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.common.model.Constants.PAGE;
-import static no.unit.nva.cristin.common.model.Constants.QUERY;
-import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_GRANT_ID;
-import static no.unit.nva.cristin.projects.Constants.QueryType.QUERY_USING_TITLE;
-import static no.unit.nva.cristin.projects.Constants.REL_NEXT;
-import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
-import static no.unit.nva.cristin.projects.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
-import static no.unit.nva.cristin.projects.HttpResponseStub.LINK_EXAMPLE_VALUE;
-import static no.unit.nva.cristin.projects.HttpResponseStub.TOTAL_COUNT_EXAMPLE_VALUE;
-import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
-import static nva.commons.core.StringUtils.EMPTY_STRING;
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
-import javax.ws.rs.core.HttpHeaders;
-import no.unit.nva.cristin.common.model.SearchResponse;
-import no.unit.nva.cristin.projects.Constants.QueryType;
+import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -68,20 +21,69 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.zalando.problem.Problem;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpResponse;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
+
+import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.QueryType;
+import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
+import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
+import static no.unit.nva.cristin.model.Constants.REL_NEXT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
+import static no.unit.nva.cristin.projects.HttpResponseStub.LINK_EXAMPLE_VALUE;
+import static no.unit.nva.cristin.projects.HttpResponseStub.TOTAL_COUNT_EXAMPLE_VALUE;
+import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+
 public class FetchCristinProjectsTest {
 
     public static final String LANGUAGE_NB = "nb";
     private static final String INVALID_LANGUAGE = "ru";
     public static final String RANDOM_TITLE = "reindeer";
-    private static final String TITLE_ILLEGAL_CHARACTERS = "<script>Health</script>";
+    private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
     private static final String INVALID_JSON = "This is not valid JSON!";
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String SECOND_PAGE = "2";
     private static final String TEN_RESULTS = "10";
     private static final String URI_WITH_PAGE_NUMBER_VALUE_OF_TWO =
-        "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=2&query=reindeer&results=5";
+        "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=2&results=5";
     private static final String URI_WITH_TEN_NUMBER_OF_RESULTS =
-        "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=1&query=reindeer&results=10";
+        "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=1&results=10";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
@@ -91,9 +93,11 @@ public class FetchCristinProjectsTest {
     public static final String GRANT_ID_EXAMPLE = "1234567";
     public static final String WHITESPACE = " ";
     public static final String URI_WITH_ESCAPED_WHITESPACE =
-        "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=1&query=reindeer+reindeer&results=5";
+        "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer+reindeer&language=nb&page=1&results=5";
     public static final String INVALID_QUERY_PARAM_KEY = "invalid";
     public static final String INVALID_QUERY_PARAM_VALUE = "value";
+    public static final String PROBLEM_JSON = APPLICATION_PROBLEM_JSON.toString();
+    public static final String MEDIATYPE_JSON_UTF8 = MediaType.JSON_UTF_8.toString();
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -113,7 +117,9 @@ public class FetchCristinProjectsTest {
     @ArgumentsSource(TestPairProvider.class)
     void handlerReturnsExpectedBodyWhenRequestInputIsValid(String expected) throws IOException {
         String actual = sendDefaultQuery().getBody();
-        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
+        final SearchResponse expectedSearchResponse = OBJECT_MAPPER.readValue(expected, SearchResponse.class);
+        final SearchResponse actualSearchResponse = OBJECT_MAPPER.readValue(actual, SearchResponse.class);
+        assertEquals(expectedSearchResponse, actualSearchResponse);
     }
 
     @Test
@@ -131,7 +137,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
@@ -156,7 +162,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
@@ -165,15 +171,15 @@ public class FetchCristinProjectsTest {
         InputStream input = requestWithQueryParameters(Map.of(QUERY, RANDOM_TITLE));
 
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(MediaType.JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @Test
     void handlerReceivesAllowOriginHeaderValueFromEnvironmentAndPutsItOnResponse() throws Exception {
-        GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
+        var gatewayResponse = sendDefaultQuery();
         assertEquals(ALLOW_ALL_ORIGIN, gatewayResponse.getHeaders().get(ACCESS_CONTROL_ALLOW_ORIGIN));
     }
 
@@ -185,7 +191,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
@@ -197,7 +203,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
@@ -211,7 +217,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_LANGUAGE_INVALID));
     }
 
@@ -242,7 +248,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
@@ -256,7 +262,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
     }
 
@@ -271,7 +277,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
@@ -457,7 +463,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(MediaType.JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @Test
@@ -478,7 +484,7 @@ public class FetchCristinProjectsTest {
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(MediaType.JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @Test
@@ -501,7 +507,7 @@ public class FetchCristinProjectsTest {
         SearchResponse actual = gatewayResponse.getBodyObject(SearchResponse.class);
         assertEquals(5, actual.getHits().size());
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(MediaType.JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @Test
@@ -528,7 +534,7 @@ public class FetchCristinProjectsTest {
         Problem body = gatewayResponse.getBodyObject(Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(body.getDetail(), containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH));
     }
 
@@ -571,7 +577,7 @@ public class FetchCristinProjectsTest {
     }
 
     private static String exampleUriFromPageAndResults(String page, String results) {
-        String url = "https://api.dev.nva.aws.unit.no/cristin/project/?language=nb&page=%s&query=reindeer&results=%s";
+        String url = "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=%s&results=%s";
         return String.format(url, page, results);
     }
 
@@ -590,8 +596,10 @@ public class FetchCristinProjectsTest {
 
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(
-            QUERY, RANDOM_TITLE,
-            LANGUAGE, LANGUAGE_NB));
+                QUERY,
+                RANDOM_TITLE,
+                LANGUAGE,
+                LANGUAGE_NB));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
     }

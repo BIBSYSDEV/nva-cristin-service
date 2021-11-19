@@ -217,7 +217,7 @@ paths:
     get:
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinGetOrganizationFunction.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchOrganizationFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:

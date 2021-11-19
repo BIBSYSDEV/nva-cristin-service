@@ -1,10 +1,12 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.projects.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.projects.Constants.PROJECT_LOOKUP_CONTEXT_URL;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static nva.commons.core.attempt.Try.attempt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.nio.file.Path;
+
+import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.core.ioutils.IoUtils;

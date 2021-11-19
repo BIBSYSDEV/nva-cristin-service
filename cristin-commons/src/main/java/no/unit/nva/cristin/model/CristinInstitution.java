@@ -1,9 +1,18 @@
-package no.unit.nva.cristin.projects.model.cristin;
+package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.util.Map;
+import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.paths.UriWrapper;
+
+import java.net.URI;
+import java.util.Map;
+
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
+
 
 @SuppressWarnings("unused")
 @JacocoGenerated
@@ -37,5 +46,15 @@ public class CristinInstitution {
     public void setUrl(String url) {
         this.url = url;
     }
+
+    public Organization toOrganization() {
+
+        final URI id = new UriWrapper(HTTPS, CRISTIN_API_BASE).addChild(INSTITUTION_PATH)
+                .addChild(getCristinInstitutionId()).getUri();
+        return new Organization.Builder()
+                .withId(id)
+                .withName(getInstitutionName()).build();
+    }
+
 }
 

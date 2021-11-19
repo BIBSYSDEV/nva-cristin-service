@@ -12,9 +12,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-import static no.unit.nva.cristin.projects.JsonPropertyNames.ACADEMIC_SUMMARY;
-import static no.unit.nva.cristin.projects.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
-import static no.unit.nva.cristin.projects.Utils.nonEmptyOrDefault;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)

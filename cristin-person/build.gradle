@@ -1,6 +1,7 @@
 dependencies {
     implementation project(":cristin-commons")
-
+    implementation libs.google.guava
+    implementation libs.aws.lambda.java.core
     implementation libs.nva.logutils
     implementation libs.nva.commons.apigateway
 }
