@@ -33,6 +33,7 @@ public abstract class CristinQueryHandler<I, O> extends ApiGatewayHandler<I, O> 
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS);
 
     public static final String WORD_WHITESPACE_DASH_COMMA_PERIOD = "[\\w\\s\\-,.]+";
+    public static final Pattern QUERY_PATTERN = Pattern.compile(WORD_WHITESPACE_DASH_COMMA_PERIOD);
 
     public CristinQueryHandler(Class<I> iclass, Environment environment) {
         super(iclass, environment);
@@ -84,8 +85,7 @@ public abstract class CristinQueryHandler<I, O> extends ApiGatewayHandler<I, O> 
     }
 
     private boolean isValidQuery(String str) {
-        Pattern pattern = Pattern.compile(WORD_WHITESPACE_DASH_COMMA_PERIOD);
-        return pattern.matcher(str).matches();
+        return QUERY_PATTERN.matcher(str).matches();
     }
 
 }
