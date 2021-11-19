@@ -56,6 +56,5 @@ Feature: API tests for Cristin Organization retrieve and search
     When method GET
     Then status 200
     And match response.hits == '#array'
-    And match response.total == '#number'
+    And match response.size == '#number'
     And match response.hits == '#[0]' // hits array length == 0
-    And match response.firstRecord == 0
