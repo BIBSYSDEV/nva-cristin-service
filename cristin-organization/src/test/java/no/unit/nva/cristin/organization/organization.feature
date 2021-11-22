@@ -47,7 +47,7 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'The URI "https://api.dev.nva.aws.unit.no/karate-cristin/organization/0.1.2.3" cannot be dereferenced'
+    And match response.detail == 'The URI "https://api.dev.nva.aws.unit.no/' + BASE_PATH + '/organization/0.1.2.3" cannot be dereferenced'
 
 #  Scenario: GET organization with query and result returns list of search results limited to results with position
 #    Given path '/organization'
