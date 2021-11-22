@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import no.unit.nva.cristin.common.handler.CristinHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;

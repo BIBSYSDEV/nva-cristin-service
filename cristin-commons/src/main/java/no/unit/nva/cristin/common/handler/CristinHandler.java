@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.common.handler;
 
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
@@ -15,7 +15,7 @@ import nva.commons.core.Environment;
 
 public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
 
-    protected static final String DEFAULT_LANGUAGE_CODE = "nb";
+    public static final String DEFAULT_LANGUAGE_CODE = "nb";
     private static final Set<String> VALID_LANGUAGE_CODES = Set.of("en", "nb", "nn");
 
     public CristinHandler(Class<I> iclass, Environment environment) {
