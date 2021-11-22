@@ -146,7 +146,7 @@ class FetchCristinOrganizationHandlerTest {
     }
 
 //    @Test
-    void shouldReturnTopLevelOrganizationWithName()
+    void shouldReturnTopLevelOrganizationWithName() // TODO This is integration test, remove in final approch
             throws IOException, ApiGatewayException, InterruptedException {
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
@@ -169,7 +169,7 @@ class FetchCristinOrganizationHandlerTest {
     }
 
 //    @Test
-    void shouldReturnOrganizationHierarchy()
+    void shouldReturnOrganizationHierarchy() // TODO This is integration test, remove in final approch
             throws IOException, ApiGatewayException, InterruptedException {
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
@@ -189,8 +189,32 @@ class FetchCristinOrganizationHandlerTest {
         Organization actualOrganization = gatewayResponse.getBodyObject(Organization.class);
         assertEquals(actualOrganization.getId(), expectedId);
         assertThat(actualOrganization.getName().get("en"), containsString("Department of Medical Biochemistry"));
+        System.out.println(actualOrganization);
     }
 
+//    @Test
+    void shouldReturnOrganizationHierarchy2() // TODO This is integration test, remove in final approch
+            throws IOException, ApiGatewayException, InterruptedException {
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
+        final String identifier = "185.53.18.0";
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(identifier), output, context);
+        GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getHeaders(), hasKey(CONTENT_TYPE));
+        assertThat(gatewayResponse.getHeaders(), hasKey(ACCESS_CONTROL_ALLOW_ORIGIN));
+
+        URI expectedId = new UriWrapper(HTTPS,
+                DOMAIN_NAME).addChild(BASE_PATH)
+                .addChild(ORGANIZATION_PATH)
+                .addChild(identifier)
+                .getUri();
+        Organization actualOrganization = gatewayResponse.getBodyObject(Organization.class);
+        assertEquals(actualOrganization.getId(), expectedId);
+        assertThat(actualOrganization.getName().get("en"), containsString("Klinikk for laboratoriemedisin"));
+        System.out.println(actualOrganization);
+    }
 
 
     private InputStream generateHandlerRequest(String organizationIdentifier) throws JsonProcessingException {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
+import no.unit.nva.cristin.organization.dto.SubUnitDto;
 import no.unit.nva.cristin.organization.utils.InstitutionUtils;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
@@ -24,10 +25,14 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static com.google.common.net.HttpHeaders.ACCEPT;
 import static com.google.common.net.HttpHeaders.USER_AGENT;
@@ -36,12 +41,9 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.ALL_QUERY_PARAMETER_LANGUAGES;
 import static no.unit.nva.cristin.model.Constants.APPLICATION_JSON;
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
-import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.attempt.Try.attempt;
 
 
@@ -57,6 +59,8 @@ public class HttpExecutorImpl extends HttpExecutor {
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
     private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
     private final transient HttpClient httpClient;
+
+    private final transient Map<URI, Organization> organizationMap = new ConcurrentHashMap<>();
 
     /**
      * Default constructor.
@@ -74,7 +78,7 @@ public class HttpExecutorImpl extends HttpExecutor {
         this.httpClient = client;
     }
 
-    public static URI getUriWithLanguage(URI uri) {
+    public static URI addLanguage(URI uri) {
         return new UriWrapper(uri).addQueryParameter(QUERY_PARAMETER_LANGUAGE, ALL_QUERY_PARAMETER_LANGUAGES).getUri();
     }
 
@@ -150,14 +154,31 @@ public class HttpExecutorImpl extends HttpExecutor {
     private Organization toOrganization(SubSubUnitDto subSubUnitDto) {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
         final Set<Organization> partOf = isNull(parent) ? Collections.emptySet() : Set.of(toOrganization(wrapFetching(parent)));
-        return new Organization.Builder()
-                .withId(new UriWrapper(HTTPS,
-                        DOMAIN_NAME).addChild(BASE_PATH)
-                        .addChild(ORGANIZATION_PATH)
-                        .addChild(subSubUnitDto.getId())
-                        .getUri())
+        final URI id = getNvaApiId(subSubUnitDto.getId());
+
+        final Organization organization = new Organization.Builder()
+                .withId(id)
                 .withPartOf(partOf)
+                .withSubUnits(getSubUnits(subSubUnitDto.getSubUnits()))
                 .withName(subSubUnitDto.getUnitName()).build();
+        organizationMap.put(id, organization);
+        return organization;
+    }
+
+    private Set<Organization> getSubUnits(List<SubUnitDto> subUnits) {
+        if (isNull(subUnits)) {
+            return Collections.emptySet();
+        }
+        return subUnits.stream()
+                .map(this::toFlatOrganization)
+                .collect(Collectors.toSet());
+    }
+
+    private Organization toFlatOrganization(SubUnitDto subUnitDto) {
+        return new Organization.Builder()
+                .withId(getNvaApiId(subUnitDto.getId()))
+                .withName(subUnitDto.getName())
+                .build();
     }
 
     private <T> FailedHttpRequestException handleError(Failure<T> failure) {
@@ -175,18 +196,7 @@ public class HttpExecutorImpl extends HttpExecutor {
     @Override
     public Organization getNestedInstitution(URI uri)
             throws NotFoundException, FailedHttpRequestException, InterruptedException {
-        SubSubUnitDto currentUnit = fetch(getUriWithLanguage(uri));
-
-//        List<SubSubUnitDto> list = currentUnit.getParentUnits().stream()
-//                .map(this::getUnitUri)
-//                .filter(Objects::nonNull)
-//                .map(this::wrapFetching)
-//                .filter(Objects::nonNull)
-//                .collect(Collectors.toList());
-//        System.out.println(list);
-
-        Organization currentOrganization = toOrganization(currentUnit);
-        return currentOrganization;
+        return toOrganization(fetch(uri));
     }
 
     private SubSubUnitDto wrapFetching(URI uri) {
@@ -199,27 +209,14 @@ public class HttpExecutorImpl extends HttpExecutor {
 
     private SubSubUnitDto fetch(URI uri) throws InterruptedException, NotFoundException, FailedHttpRequestException {
         logger.info("Fetching " + uri.toString());
-        HttpRequest httpRequest = createHttpRequest(uri);
+        HttpRequest httpRequest = createHttpRequest(addLanguage(uri));
         HttpResponse<String> response = sendRequest(httpRequest);
         if (isSuccessful(response.statusCode())) {
-            return toUnit(response.body());
+            return toSubSubUnitDto(response.body());
         } else {
             throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
         }
     }
-
-//    private SubSubUnitDto fetchWithRetry(URI subunitUri) throws FailedHttpRequestException {
-//
-//        SubSubUnitDto subsubUnitDto = Try.of(getUriWithLanguage(subunitUri))
-//                .flatMap(this::sendRequestMultipleTimes)
-//                .map(this::throwExceptionIfNotSuccessful)
-//                .map(HttpResponse::body)
-//                .map(this::toUnit)
-//                .orElseThrow(this::handleError);
-//
-//        subsubUnitDto.setSourceUri(subunitUri);
-//        return subsubUnitDto;
-//    }
 
     private HttpRequest createHttpRequest(URI uri) {
         return HttpRequest.newBuilder()
@@ -241,7 +238,7 @@ public class HttpExecutorImpl extends HttpExecutor {
         return statusCode <= HTTP_MULT_CHOICE && statusCode >= HTTP_OK;
     }
 
-    private SubSubUnitDto toUnit(String json) {
+    private SubSubUnitDto toSubSubUnitDto(String json) {
         try {
             return JsonUtils.dtoObjectMapper.readValue(json, SubSubUnitDto.class);
         } catch (JsonProcessingException e) {

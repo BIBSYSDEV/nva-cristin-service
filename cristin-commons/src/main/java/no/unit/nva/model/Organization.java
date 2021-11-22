@@ -16,12 +16,13 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ACRONYM;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PART_OF;
+import static no.unit.nva.cristin.model.JsonPropertyNames.SUBUNITS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 
 
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonPropertyOrder({ID, TYPE, NAME, ACRONYM, PART_OF})
+@JsonPropertyOrder({ID, TYPE, NAME, ACRONYM, PART_OF, SUBUNITS})
 public class Organization implements JsonSerializable {
 
 
@@ -34,16 +35,20 @@ public class Organization implements JsonSerializable {
     private final String acronym;
     @JsonProperty(PART_OF)
     private final Set<Organization> partOf;
+    @JsonProperty(SUBUNITS)
+    private final Set<Organization> subUnits;
 
     @JsonCreator
     public Organization(@JsonProperty(ID) URI id,
                         @JsonProperty(NAME) Map<String, String> name,
                         @JsonProperty(ACRONYM) String acronym,
-                        @JsonProperty(PART_OF) Set<Organization> partOf) {
+                        @JsonProperty(PART_OF) Set<Organization> partOf,
+                        @JsonProperty(SUBUNITS) Set<Organization> subUnits) {
         this.id = id;
         this.name = name;
         this.acronym = acronym;
         this.partOf = partOf;
+        this.subUnits = subUnits;
     }
 
     private Organization(Builder builder) {
@@ -51,6 +56,7 @@ public class Organization implements JsonSerializable {
         this.name = builder.name;
         this.acronym = builder.acronym;
         this.partOf = builder.partOf;
+        this.subUnits = builder.subUnits;
     }
 
 
@@ -101,6 +107,7 @@ public class Organization implements JsonSerializable {
         private Map<String, String> name;
         private String acronym;
         private Set<Organization> partOf;
+        private Set<Organization> subUnits;
 
         public Builder withId(URI id) {
             this.id = id;
@@ -119,6 +126,11 @@ public class Organization implements JsonSerializable {
 
         public Builder withPartOf(Set<Organization> partOf) {
             this.partOf = partOf;
+            return this;
+        }
+
+        public Builder withSubUnits(Set<Organization> subUnits) {
+            this.subUnits = subUnits;
             return this;
         }
 
