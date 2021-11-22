@@ -2,8 +2,9 @@ Feature: API tests for Cristin Organization retrieve and search
 
   Background:
     * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
+    * def BASE_PATH = 'np3392-karate-cristin'
     * def testOrganizationNameSearchTerm = 'univers'
-    * def CRISTIN_BASE = SERVER_URL + '/np3392-karate-cristin'
+    * def CRISTIN_BASE = SERVER_URL + '/' + BASE_PATH
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingOrganizationId = '0.1.2.3'
     Given url CRISTIN_BASE
