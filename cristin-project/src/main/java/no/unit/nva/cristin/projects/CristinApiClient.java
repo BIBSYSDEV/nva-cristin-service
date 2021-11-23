@@ -1,22 +1,19 @@
 package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
-import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.attempt.Failure;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -36,7 +33,6 @@ import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.model.Constants.QueryType;
@@ -46,21 +42,16 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
 import static no.unit.nva.utils.UriUtils.queryParameters;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 
-public class CristinApiClient {
+public class CristinApiClient extends ApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
-
-    private static final int FIRST_NON_SUCCESS_CODE = 300;
 
     private final transient HttpClient client;
 
@@ -69,6 +60,7 @@ public class CristinApiClient {
     }
 
     public CristinApiClient(HttpClient client) {
+        super();
         this.client = client;
     }
 
@@ -125,10 +117,6 @@ public class CristinApiClient {
             .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
             .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
             .withHits(nvaProjects);
-    }
-
-    protected static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
-        return OBJECT_MAPPER.readValue(body, classOfT);
     }
 
     protected HttpResponse<String> queryProjects(Map<String, String> parameters, QueryType queryType)
@@ -265,10 +253,6 @@ public class CristinApiClient {
         return CristinQuery.fromIdAndLanguage(id, language);
     }
 
-    protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
-        return endRequestTime - startRequestTime;
-    }
-
     protected HttpResponse<String> fetchGetResult(URI uri) {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
@@ -292,49 +276,6 @@ public class CristinApiClient {
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
-    private <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
-        throws BadGatewayException {
-
-        return attempt(() -> fromJson(response.body(), classOfT))
-            .orElseThrow(failure -> logAndThrowDeserializationError(response, failure));
-    }
-
-    private <T> BadGatewayException logAndThrowDeserializationError(HttpResponse<String> response, Failure<T> failure) {
-        logError(ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(), failure.getException());
-        return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-    }
-
-    private void checkHttpStatusCode(String uri, int statusCode)
-        throws NotFoundException, BadGatewayException {
-
-        if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
-            throw new NotFoundException(uri);
-        } else if (remoteServerHasInternalProblems(statusCode)) {
-            logBackendFetchFail(uri, statusCode);
-            throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
-        } else if (errorIsUnknown(statusCode)) {
-            logBackendFetchFail(uri, statusCode);
-            throw new RuntimeException();
-        }
-    }
-
-    private boolean errorIsUnknown(int statusCode) {
-        return responseIsFailure(statusCode)
-            && !remoteServerHasInternalProblems(statusCode);
-    }
-
-    private boolean responseIsFailure(int statusCode) {
-        return statusCode >= FIRST_NON_SUCCESS_CODE;
-    }
-
-    private boolean remoteServerHasInternalProblems(int statusCode) {
-        return statusCode >= HttpURLConnection.HTTP_INTERNAL_ERROR;
-    }
-
-    private void logBackendFetchFail(String uri, int statusCode) {
-        logger.error(String.format(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE, statusCode, uri));
-    }
-
     private List<NvaProject> mapValidCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
         return cristinProjects.stream()
             .filter(CristinProject::hasValidContent)
@@ -342,7 +283,4 @@ public class CristinApiClient {
             .collect(Collectors.toList());
     }
 
-    private void logError(String message, String data, Exception failure) {
-        logger.error(String.format(message, data, failure.getMessage()));
-    }
 }

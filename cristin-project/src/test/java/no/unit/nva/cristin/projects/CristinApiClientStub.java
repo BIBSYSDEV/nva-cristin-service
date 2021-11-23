@@ -22,7 +22,7 @@ public class CristinApiClientStub extends CristinApiClient {
     }
 
     @Override
-    protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
+    public long calculateProcessingTime(long startRequestTime, long endRequestTime) {
         return 1000;
     }
 
