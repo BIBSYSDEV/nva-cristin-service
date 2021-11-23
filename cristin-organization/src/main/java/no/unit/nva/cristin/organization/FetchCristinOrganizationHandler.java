@@ -26,10 +26,11 @@ import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 
 public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Organization> {
 
-    public static final String IDENTIFIER_PATTERN = "^(?:[0-9]{1,5}\\.){3}[0-9]{1,3}$";
+    public static final String IDENTIFIER_PATTERN = "^(?:[0-9]+\\.){3}[0-9]{1,3}$";
     public static final Pattern PATTERN = Pattern.compile(IDENTIFIER_PATTERN);
     private final transient CristinApiClient cristinApiClient;
 
@@ -62,6 +63,7 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
         } catch (InterruptedException e) {
             throw new BadRequestException(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE);
         }
+        result.setContext(ORGANIZATION_CONTEXT);
         return result;
     }
 

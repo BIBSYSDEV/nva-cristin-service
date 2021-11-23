@@ -3,16 +3,11 @@ package no.unit.nva.cristin.organization.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import static no.unit.nva.utils.UriUtils.getNvaApiId;
 
 public class SubSubUnitDto {
 
@@ -120,20 +115,4 @@ public class SubSubUnitDto {
         this.sourceUri = sourceUri;
     }
 
-
-    public Organization toOrganization() {
-        final URI id = getNvaApiId(getId());
-
-        final Organization organization = new Organization.Builder()
-                .withId(id)
-                .withSubUnits(makeSubUnits())
-                .withName(getUnitName())
-                .build();
-        return organization;
-    }
-
-
-    private Set<Organization> makeSubUnits() {
-        return Collections.emptySet();
-    }
 }

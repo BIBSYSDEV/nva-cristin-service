@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import no.unit.nva.cristin.common.Utils;
 import nva.commons.core.JsonSerializable;
+import nva.commons.core.JsonUtils;
 
 import java.net.URI;
 import java.util.Map;
@@ -13,18 +13,20 @@ import java.util.Objects;
 import java.util.Set;
 
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACRONYM;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.HAS_PART;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PART_OF;
-import static no.unit.nva.cristin.model.JsonPropertyNames.SUBUNITS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 
 
-@SuppressWarnings("PMD.BeanMembersShouldSerialize")
+@SuppressWarnings({"PMD.BeanMembersShouldSerialize", "PMD.LinguisticNaming"})
+@JsonPropertyOrder({CONTEXT, ID, TYPE, NAME, ACRONYM, PART_OF, HAS_PART})
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonPropertyOrder({ID, TYPE, NAME, ACRONYM, PART_OF, SUBUNITS})
 public class Organization implements JsonSerializable {
 
+    public static final String ORGANIZATION_CONTEXT = "https://api.dev.nva.aws.unit.no/cristin/organization";
 
     @JsonProperty(ID)
     private final URI id;
@@ -35,20 +37,22 @@ public class Organization implements JsonSerializable {
     private final String acronym;
     @JsonProperty(PART_OF)
     private final Set<Organization> partOf;
-    @JsonProperty(SUBUNITS)
-    private final Set<Organization> subUnits;
+    @JsonProperty(HAS_PART)
+    private final Set<Organization> hasPart;
+    @JsonProperty(CONTEXT)
+    private String context;
 
     @JsonCreator
     public Organization(@JsonProperty(ID) URI id,
                         @JsonProperty(NAME) Map<String, String> name,
                         @JsonProperty(ACRONYM) String acronym,
                         @JsonProperty(PART_OF) Set<Organization> partOf,
-                        @JsonProperty(SUBUNITS) Set<Organization> subUnits) {
+                        @JsonProperty(HAS_PART) Set<Organization> hasPart) {
         this.id = id;
         this.name = name;
         this.acronym = acronym;
         this.partOf = partOf;
-        this.subUnits = subUnits;
+        this.hasPart = hasPart;
     }
 
     private Organization(Builder builder) {
@@ -56,24 +60,35 @@ public class Organization implements JsonSerializable {
         this.name = builder.name;
         this.acronym = builder.acronym;
         this.partOf = builder.partOf;
-        this.subUnits = builder.subUnits;
+        this.hasPart = builder.hasPart;
     }
 
-
-    public String getAcronym() {
-        return acronym;
+    public void setContext(String context) {
+        this.context = context;
     }
 
     public URI getId() {
         return id;
     }
 
+    public String getContext() {
+        return context;
+    }
+
     public Map<String, String> getName() {
-        return Utils.nonEmptyOrDefault(name);
+        return name;
+    }
+
+    public String getAcronym() {
+        return acronym;
     }
 
     public Set<Organization> getPartOf() {
         return partOf;
+    }
+
+    public Set<Organization> getHasPart() {
+        return hasPart;
     }
 
     @Override
@@ -88,17 +103,32 @@ public class Organization implements JsonSerializable {
         return Objects.equals(getId(), that.getId())
                 && Objects.equals(getName(), that.getName())
                 && Objects.equals(getAcronym(), that.getAcronym())
-                && Objects.equals(getPartOf(), that.getPartOf());
+                && Objects.equals(getPartOf(), that.getPartOf())
+                && Objects.equals(getHasPart(), that.getHasPart());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getAcronym(), getPartOf());
+        return Objects.hash(getId(), getName(), getAcronym(), getPartOf(), getHasPart());
     }
 
     @Override
     public String toString() {
         return toJsonString();
+    }
+
+    /**
+     * JsonString.
+     *
+     * @return JsonString
+     */
+    @Override
+    public String toJsonString() {
+        try {
+            return JsonUtils.singleLineObjectMapper.writeValueAsString(this);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static final class Builder {
@@ -107,7 +137,7 @@ public class Organization implements JsonSerializable {
         private Map<String, String> name;
         private String acronym;
         private Set<Organization> partOf;
-        private Set<Organization> subUnits;
+        private Set<Organization> hasPart;
 
         public Builder withId(URI id) {
             this.id = id;
@@ -129,8 +159,8 @@ public class Organization implements JsonSerializable {
             return this;
         }
 
-        public Builder withSubUnits(Set<Organization> subUnits) {
-            this.subUnits = subUnits;
+        public Builder withHasPart(Set<Organization> hasPart) {
+            this.hasPart = hasPart;
             return this;
         }
 
@@ -140,3 +170,5 @@ public class Organization implements JsonSerializable {
     }
 
 }
+
+

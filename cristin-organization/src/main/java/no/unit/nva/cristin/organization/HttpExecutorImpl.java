@@ -1,66 +1,41 @@
 package no.unit.nva.cristin.organization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.dto.SubUnitDto;
-import no.unit.nva.cristin.organization.utils.InstitutionUtils;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonUtils;
-import nva.commons.core.attempt.Failure;
-import nva.commons.core.attempt.Try;
-import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import static com.google.common.net.HttpHeaders.ACCEPT;
-import static com.google.common.net.HttpHeaders.USER_AGENT;
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Objects.isNull;
-import static no.unit.nva.cristin.model.Constants.ALL_QUERY_PARAMETER_LANGUAGES;
-import static no.unit.nva.cristin.model.Constants.APPLICATION_JSON;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
-import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
+import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
-import static nva.commons.core.attempt.Try.attempt;
 
 
 public class HttpExecutorImpl extends HttpExecutor {
 
-    public static final String PARSE_ERROR = "Failed to parse: ";
-    public static final String NVA_INSTITUTIONS_LIST_CRAWLER = "NVA Institutions List Crawler";
-    public static final String INSTITUTIONS_URI_TEMPLATE =
-            "https://api.cristin.no/v2/institutions?country=NO" + "&per_page=1000&lang=%s&cristin_institution=true";
-    public static final int FIRST_EFFORT = 0;
-    public static final int MAX_EFFORTS = 2;
-    public static final int WAITING_TIME = 500; //500 milliseconds
-    public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
     private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
     private final transient HttpClient httpClient;
-
-    private final transient Map<URI, Organization> organizationMap = new ConcurrentHashMap<>();
 
     /**
      * Default constructor.
@@ -78,125 +53,52 @@ public class HttpExecutorImpl extends HttpExecutor {
         this.httpClient = client;
     }
 
-    public static URI addLanguage(URI uri) {
-        return new UriWrapper(uri).addQueryParameter(QUERY_PARAMETER_LANGUAGE, ALL_QUERY_PARAMETER_LANGUAGES).getUri();
-    }
 
-    @Override
-    public SearchResponse<Organization> getInstitutions() throws FailedHttpRequestException {
-
-        return attempt(() -> URI.create(generateInstitutionsQueryUri()))
-                .flatMap(this::sendRequestMultipleTimes)
-                .map(this::throwExceptionIfNotSuccessful)
-                .map(HttpResponse::body)
-                .map(this::toInstitutionListResponse)
-                .orElseThrow(this::handleError);
-    }
-
-    private Try<HttpResponse<String>> sendRequestMultipleTimes(URI uri) {
-        Try<HttpResponse<String>> lastEffort = null;
-        for (int effortCount = FIRST_EFFORT; shouldKeepTrying(effortCount, lastEffort); effortCount++) {
-            waitBeforeRetrying(effortCount);
-            lastEffort = attemptFetch(uri, effortCount);
-        }
-        return lastEffort;
-    }
-
-    private Try<HttpResponse<String>> attemptFetch(URI uri, int effortCount) {
-        Try<HttpResponse<String>> newEffort = attempt(() -> createAndSendHttpRequest(uri).get());
-        if (newEffort.isFailure()) {
-            logger.warn(String.format("Failed HttpRequest on attempt %d of 3: ", effortCount + 1)
-                    + newEffort.getException().getMessage(), newEffort.getException()
-            );
-        }
-        return newEffort;
-    }
-
-    private CompletableFuture<HttpResponse<String>> createAndSendHttpRequest(URI uri) {
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .GET()
-                .header(ACCEPT, APPLICATION_JSON)
-                .header(USER_AGENT, NVA_INSTITUTIONS_LIST_CRAWLER)
-                .uri(uri)
-                .build();
-        return httpClient.sendAsync(httpRequest, BodyHandlers.ofString());
-    }
-
-    private int waitBeforeRetrying(int effortCount) {
-        if (effortCount > FIRST_EFFORT) {
-            try {
-                Thread.sleep(WAITING_TIME);
-            } catch (InterruptedException e) {
-                logger.error(LOG_INTERRUPTION);
-                throw new RuntimeException(e);
-            }
-        }
-        return effortCount;
-    }
-
-    @SuppressWarnings("PMD.UselessParentheses") // keep the parenthesis for clarity
-    private boolean shouldKeepTrying(int effortCount, Try<HttpResponse<String>> lastEffort) {
-        return lastEffort == null || (lastEffort.isFailure() && shouldTryMoreTimes(effortCount));
-    }
-
-    private boolean shouldTryMoreTimes(int effortCount) {
-        return effortCount < MAX_EFFORTS;
-    }
-
-    @Override
-    public Organization getSingleUnit(URI uri)
-            throws InterruptedException, NotFoundException, FailedHttpRequestException {
-
-        SubSubUnitDto subSubUnitDto = fetch(uri);
-        return toOrganization(subSubUnitDto);
-    }
-
-    private Organization toOrganization(SubSubUnitDto subSubUnitDto) {
+      private Organization toOrganization(SubSubUnitDto subSubUnitDto) {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
-        final Set<Organization> partOf = isNull(parent) ? Collections.emptySet() : Set.of(toOrganization(wrapFetching(parent)));
+        final Set<Organization> partOf = isNull(parent) ? null : Set.of(toOrganization(wrapFetching(parent)));
         final URI id = getNvaApiId(subSubUnitDto.getId());
-
         final Organization organization = new Organization.Builder()
                 .withId(id)
                 .withPartOf(partOf)
-                .withSubUnits(getSubUnits(subSubUnitDto.getSubUnits()))
+                .withHasPart(getSubUnits(subSubUnitDto))
                 .withName(subSubUnitDto.getUnitName()).build();
-        organizationMap.put(id, organization);
         return organization;
     }
 
-    private Set<Organization> getSubUnits(List<SubUnitDto> subUnits) {
-        if (isNull(subUnits)) {
-            return Collections.emptySet();
+    private Set<Organization> getSubUnits(SubSubUnitDto subSubUnitDto) {
+        List<SubUnitDto> subUnits = subSubUnitDto.getSubUnits();
+        if (!isNull(subUnits)) {
+            final URI parent = getNvaApiId(subSubUnitDto.getId());
+            return subUnits.stream()
+                    .map((SubUnitDto subUnitDto) -> toFlatOrganization(subUnitDto, parent))
+                    .collect(Collectors.toSet());
+        } else {
+            return null;
         }
-        return subUnits.stream()
-                .map(this::toFlatOrganization)
-                .collect(Collectors.toSet());
     }
 
-    private Organization toFlatOrganization(SubUnitDto subUnitDto) {
+    private Organization toFlatOrganization(SubUnitDto subUnitDto, URI parent) {
         return new Organization.Builder()
                 .withId(getNvaApiId(subUnitDto.getId()))
+                .withPartOf(Set.of(new Organization.Builder().withId(parent).build()))
                 .withName(subUnitDto.getName())
                 .build();
-    }
-
-    private <T> FailedHttpRequestException handleError(Failure<T> failure) {
-        return new FailedHttpRequestException(failure.getException(), failure.getException().getMessage());
-    }
-
-    private SearchResponse<Organization> toInstitutionListResponse(String institutionDto) throws IOException {
-        return InstitutionUtils.toInstitutionListResponse(institutionDto);
-    }
-
-    private String generateInstitutionsQueryUri() {
-        return INSTITUTIONS_URI_TEMPLATE;
     }
 
     @Override
     public Organization getNestedInstitution(URI uri)
             throws NotFoundException, FailedHttpRequestException, InterruptedException {
-        return toOrganization(fetch(uri));
+        SubSubUnitDto subSubUnitDto = fetch(uri);
+        URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
+        final Set<Organization> partOf = isNull(parent) ? null : Set.of(toOrganization(wrapFetching(parent)));
+        final URI id = getNvaApiId(subSubUnitDto.getId());
+        final Organization organization = new Organization.Builder()
+                .withId(id)
+                .withPartOf(partOf)
+                .withHasPart(getSubUnits(subSubUnitDto))
+                .withName(subSubUnitDto.getUnitName()).build();
+        return organization;
     }
 
     private SubSubUnitDto wrapFetching(URI uri) {
@@ -208,7 +110,6 @@ public class HttpExecutorImpl extends HttpExecutor {
     }
 
     private SubSubUnitDto fetch(URI uri) throws InterruptedException, NotFoundException, FailedHttpRequestException {
-        logger.info("Fetching " + uri.toString());
         HttpRequest httpRequest = createHttpRequest(addLanguage(uri));
         HttpResponse<String> response = sendRequest(httpRequest);
         if (isSuccessful(response.statusCode())) {
@@ -246,5 +147,4 @@ public class HttpExecutorImpl extends HttpExecutor {
         }
         return null;
     }
-
 }

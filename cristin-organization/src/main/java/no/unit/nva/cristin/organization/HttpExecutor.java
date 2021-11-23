@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.organization;
 
-import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import nva.commons.apigateway.exceptions.NotFoundException;
@@ -18,11 +17,6 @@ public abstract class HttpExecutor {
     public static int FIRST_NON_SUCCESSFUL_CODE = HTTP_MULT_CHOICE;
     public static int FIRST_SUCCESSFUL_CODE = HTTP_OK;
     public static String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
-
-    public abstract SearchResponse<Organization> getInstitutions() throws FailedHttpRequestException;
-
-    public abstract Organization getSingleUnit(URI uri)
-            throws NotFoundException, FailedHttpRequestException, InterruptedException;
 
     protected HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response)
         throws FailedHttpRequestException {
