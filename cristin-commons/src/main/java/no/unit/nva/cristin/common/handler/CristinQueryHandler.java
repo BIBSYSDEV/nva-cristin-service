@@ -38,17 +38,19 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     protected String getValidPage(RequestInfo requestInfo) throws BadRequestException {
-        return Optional.of(getQueryParam(requestInfo, PAGE)
-                .orElse(FIRST_PAGE))
-            .filter(Utils::isPositiveInteger)
-            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_PAGE_VALUE_INVALID));
+        String page = getQueryParam(requestInfo, PAGE).orElse(FIRST_PAGE);
+        if (Utils.isPositiveInteger(page)) {
+            return page;
+        }
+        throw new BadRequestException(ERROR_MESSAGE_PAGE_VALUE_INVALID);
     }
 
     protected String getValidNumberOfResults(RequestInfo requestInfo) throws BadRequestException {
-        return Optional.of(getQueryParam(requestInfo, NUMBER_OF_RESULTS)
-                .orElse(DEFAULT_NUMBER_OF_RESULTS))
-            .filter(Utils::isPositiveInteger)
-            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
+        String results = getQueryParam(requestInfo, NUMBER_OF_RESULTS).orElse(DEFAULT_NUMBER_OF_RESULTS);
+        if (Utils.isPositiveInteger(results)) {
+            return results;
+        }
+        throw new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID);
     }
 
     protected String getValidQuery(RequestInfo requestInfo) throws BadRequestException {

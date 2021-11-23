@@ -2,7 +2,8 @@ Feature: API tests for Cristin Project retrieve and search
 
   Background:
     * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
-    * def CRISTIN_BASE = SERVER_URL + '/karate-cristin'
+    * def BASE_PATH = 'np3392-karate-cristin'
+    * def CRISTIN_BASE = SERVER_URL + '/' + BASE_PATH
     * def testProjectNameSearchTerm = 'univers'
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingProjectId = '0'
@@ -48,4 +49,4 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'https://api.dev.nva.aws.unit.no/karate-cristin/project/0'
+    And match response.detail == 'https://api.dev.nva.aws.unit.no/' + BASE_PATH + '/project/0'
