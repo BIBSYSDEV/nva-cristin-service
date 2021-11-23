@@ -93,7 +93,7 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
 
     private Organization getTransformedOrganizationFromCristin(String identifier)
             throws ApiGatewayException, InterruptedException {
-        return Optional.of(cristinApiClient.getSingleUnit(new UriWrapper(HTTPS,
+        return Optional.of(cristinApiClient.getOrganization(new UriWrapper(HTTPS,
                         CRISTIN_API_BASE)
                         .addChild(UNITS_PATH)
                         .addChild(identifier)

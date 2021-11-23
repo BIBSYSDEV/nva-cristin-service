@@ -28,7 +28,6 @@ import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
@@ -71,7 +70,7 @@ class FetchCristinOrganizationHandlerTest {
 
         cristinApiClient = spy(cristinApiClient);
         doThrow(new NotFoundException(NOT_FOUND_MESSAGE_TEMPLATE + IDENTIFIER_VALUE))
-                .when(cristinApiClient).getSingleUnit(any());
+                .when(cristinApiClient).getOrganization(any());
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
@@ -130,7 +129,7 @@ class FetchCristinOrganizationHandlerTest {
         try {
             doThrow(new NullPointerException())
                     .when(serviceThrowingException)
-                    .getSingleUnit(any());
+                    .getOrganization(any());
         } catch (ApiGatewayException | InterruptedException e) {
             e.printStackTrace();
         }

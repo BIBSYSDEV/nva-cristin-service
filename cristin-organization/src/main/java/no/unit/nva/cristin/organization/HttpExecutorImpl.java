@@ -32,7 +32,7 @@ import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 
 
-public class HttpExecutorImpl extends HttpExecutor {
+public class HttpExecutorImpl implements HttpExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
     private final transient HttpClient httpClient;
@@ -53,13 +53,15 @@ public class HttpExecutorImpl extends HttpExecutor {
         this.httpClient = client;
     }
 
+    private Organization toOrganization(SubSubUnitDto subSubUnitDto) {
+        return getOrganization(subSubUnitDto);
+    }
 
-      private Organization toOrganization(SubSubUnitDto subSubUnitDto) {
+    private Organization getOrganization(SubSubUnitDto subSubUnitDto) {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
         final Set<Organization> partOf = isNull(parent) ? null : Set.of(toOrganization(wrapFetching(parent)));
-        final URI id = getNvaApiId(subSubUnitDto.getId());
         final Organization organization = new Organization.Builder()
-                .withId(id)
+                .withId(getNvaApiId(subSubUnitDto.getId()))
                 .withPartOf(partOf)
                 .withHasPart(getSubUnits(subSubUnitDto))
                 .withName(subSubUnitDto.getUnitName()).build();
@@ -87,18 +89,9 @@ public class HttpExecutorImpl extends HttpExecutor {
     }
 
     @Override
-    public Organization getNestedInstitution(URI uri)
+    public Organization getOrganization(URI uri)
             throws NotFoundException, FailedHttpRequestException, InterruptedException {
-        SubSubUnitDto subSubUnitDto = fetch(uri);
-        URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
-        final Set<Organization> partOf = isNull(parent) ? null : Set.of(toOrganization(wrapFetching(parent)));
-        final URI id = getNvaApiId(subSubUnitDto.getId());
-        final Organization organization = new Organization.Builder()
-                .withId(id)
-                .withPartOf(partOf)
-                .withHasPart(getSubUnits(subSubUnitDto))
-                .withName(subSubUnitDto.getUnitName()).build();
-        return organization;
+        return getOrganization(fetch(uri));
     }
 
     private SubSubUnitDto wrapFetching(URI uri) {

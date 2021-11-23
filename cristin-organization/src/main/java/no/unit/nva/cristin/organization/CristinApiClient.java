@@ -6,8 +6,6 @@ import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.paths.UriWrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Collections;
@@ -20,7 +18,6 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 
 public class CristinApiClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
     private final transient HttpExecutor httpExecutor = new HttpExecutorImpl();
 
     /**
@@ -30,10 +27,9 @@ public class CristinApiClient {
      * @return an {@link Organization} containing the information
      * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
-    public Organization getSingleUnit(URI uri)
+    public Organization getOrganization(URI uri)
             throws NotFoundException, InterruptedException, FailedHttpRequestException {
-        logger.info("Fetching results for: " + uri.toString());
-        return httpExecutor.getNestedInstitution(uri);
+        return httpExecutor.getOrganization(uri);
     }
 
     /**
