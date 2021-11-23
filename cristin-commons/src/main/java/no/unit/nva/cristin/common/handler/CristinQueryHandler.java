@@ -16,9 +16,7 @@ import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
-import nva.commons.core.JacocoGenerated;
 
-@JacocoGenerated // TODO: When FetchCristinProjects extends this we will get testing for free
 public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
 
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS);
