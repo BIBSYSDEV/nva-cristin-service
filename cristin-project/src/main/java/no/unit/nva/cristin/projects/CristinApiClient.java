@@ -5,12 +5,10 @@ import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.attempt.Try;
-import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +28,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.model.Constants.QueryType;
@@ -45,8 +40,10 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
+import static no.unit.nva.utils.UriUtils.PROJECT;
+import static no.unit.nva.utils.UriUtils.createIdUri;
+import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.queryParameters;
-import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class CristinApiClient extends ApiClient {
@@ -107,11 +104,8 @@ public class CristinApiClient extends ApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        URI id = new UriWrapper(HTTPS,
-                DOMAIN_NAME).addChild(BASE_PATH)
-                .addChild(UriUtils.PROJECT)
-                .addQueryParameters(requestQueryParams)
-                .getUri();
+        URI id = createIdUriFromParams(requestQueryParams, PROJECT);
+
         return new SearchResponse<NvaProject>(id)
             .withContext(PROJECT_SEARCH_CONTEXT_URL)
             .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
@@ -129,11 +123,7 @@ public class CristinApiClient extends ApiClient {
                 .orElseThrow();
 
         HttpResponse<String> response = fetchQueryResults(uri);
-        URI id = new UriWrapper(HTTPS,
-                DOMAIN_NAME).addChild(BASE_PATH)
-                .addChild(UriUtils.PROJECT)
-                .addQueryParameters(parameters)
-                .getUri();
+        URI id = createIdUriFromParams(parameters, PROJECT);
         checkHttpStatusCode(id.toString(), response.statusCode());
         return response;
     }
@@ -146,8 +136,8 @@ public class CristinApiClient extends ApiClient {
                 .orElseThrow();
 
         HttpResponse<String> response = fetchGetResult(uri);
-        checkHttpStatusCode(new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(UriUtils.PROJECT)
-                .addChild(id).getUri().toString(), response.statusCode());
+        checkHttpStatusCode(createIdUri(id, PROJECT).toString(), response.statusCode());
+
         return getDeserializedResponse(response, CristinProject.class);
     }
 
@@ -211,19 +201,6 @@ public class CristinApiClient extends ApiClient {
             .map(Try::orElseThrow)
             .filter(this::isSuccessfulRequest)
             .collect(Collectors.toList());
-    }
-
-    protected boolean isSuccessfulRequest(HttpResponse<String> response) {
-        try {
-            checkHttpStatusCode(nullableUriToString(response.uri()), response.statusCode());
-            return true;
-        } catch (Exception ex) {
-            return false;
-        }
-    }
-
-    private String nullableUriToString(URI uri) throws URISyntaxException {
-        return Optional.ofNullable(uri).orElse(new URI(EMPTY_STRING)).toString();
     }
 
     private List<URI> extractCristinUrisFromProjects(String language, List<CristinProject> projectsFromQuery) {

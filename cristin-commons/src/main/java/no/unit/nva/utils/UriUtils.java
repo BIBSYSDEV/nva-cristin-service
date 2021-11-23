@@ -1,9 +1,13 @@
 package no.unit.nva.utils;
 
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import nva.commons.core.paths.UriWrapper;
 
 public class UriUtils {
 
@@ -37,5 +41,14 @@ public class UriUtils {
                 .sorted(Map.Entry.comparingByKey())
                 .map(entry -> String.format(PARAMETER_KEY_VALUE_PAIR_TEMPLATE, entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining(PARAMETER_DELIMITER));
+    }
+
+    public static URI createIdUri(String id, String type) {
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(type).addChild(id).getUri();
+    }
+
+    public static URI createIdUriFromParams(Map<String, String> requestQueryParams, String type) {
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(type)
+            .addQueryParameters(requestQueryParams).getUri();
     }
 }

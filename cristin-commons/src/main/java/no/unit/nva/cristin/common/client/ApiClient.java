@@ -4,10 +4,13 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAI
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.http.HttpResponse;
+import java.util.Optional;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
@@ -42,6 +45,16 @@ public class ApiClient {
 
     protected void logError(String message, String data, Exception failure) {
         logger.error(String.format(message, data, failure.getMessage()));
+    }
+
+    protected boolean isSuccessfulRequest(HttpResponse<String> response) {
+        try {
+            URI uri = Optional.ofNullable(response.uri()).orElse(new URI(EMPTY_STRING));
+            checkHttpStatusCode(uri.toString(), response.statusCode());
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     protected void checkHttpStatusCode(String uri, int statusCode)
