@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import nva.commons.core.JsonSerializable;
-import nva.commons.core.JsonUtils;
 
 import java.net.URI;
 import java.util.Map;
@@ -115,20 +114,6 @@ public class Organization implements JsonSerializable {
     @Override
     public String toString() {
         return toJsonString();
-    }
-
-    /**
-     * JsonString.
-     *
-     * @return JsonString
-     */
-    @Override
-    public String toJsonString() {
-        try {
-            return JsonUtils.singleLineObjectMapper.writeValueAsString(this);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static final class Builder {
