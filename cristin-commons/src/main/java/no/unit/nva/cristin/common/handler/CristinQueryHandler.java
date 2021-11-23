@@ -9,7 +9,6 @@ import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import no.unit.nva.cristin.common.Utils;
