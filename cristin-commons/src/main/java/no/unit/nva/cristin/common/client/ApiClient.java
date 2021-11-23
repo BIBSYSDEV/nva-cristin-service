@@ -49,29 +49,30 @@ public class ApiClient {
 
     protected boolean isSuccessfulRequest(HttpResponse<String> response) {
         try {
-            URI uri = Optional.ofNullable(response.uri()).orElse(new URI(EMPTY_STRING));
-            checkHttpStatusCode(uri.toString(), response.statusCode());
+            checkHttpStatusCode(response.uri(), response.statusCode());
             return true;
         } catch (Exception ex) {
             return false;
         }
     }
 
-    protected void checkHttpStatusCode(String uri, int statusCode)
+    protected void checkHttpStatusCode(URI uri, int statusCode)
         throws NotFoundException, BadGatewayException {
 
+        String uriAsString = Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
+
         if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
-            throw new NotFoundException(uri);
+            throw new NotFoundException(uriAsString);
         } else if (remoteServerHasInternalProblems(statusCode)) {
-            logBackendFetchFail(uri, statusCode);
+            logBackendFetchFail(uriAsString, statusCode);
             throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         } else if (errorIsUnknown(statusCode)) {
-            logBackendFetchFail(uri, statusCode);
+            logBackendFetchFail(uriAsString, statusCode);
             throw new RuntimeException();
         }
     }
 
-    protected boolean errorIsUnknown(int statusCode) {
+    private boolean errorIsUnknown(int statusCode) {
         return responseIsFailure(statusCode)
             && !remoteServerHasInternalProblems(statusCode);
     }

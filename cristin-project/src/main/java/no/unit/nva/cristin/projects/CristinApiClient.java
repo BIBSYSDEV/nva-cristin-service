@@ -124,7 +124,7 @@ public class CristinApiClient extends ApiClient {
 
         HttpResponse<String> response = fetchQueryResults(uri);
         URI id = createIdUriFromParams(parameters, PROJECT);
-        checkHttpStatusCode(id.toString(), response.statusCode());
+        checkHttpStatusCode(id, response.statusCode());
         return response;
     }
 
@@ -136,7 +136,7 @@ public class CristinApiClient extends ApiClient {
                 .orElseThrow();
 
         HttpResponse<String> response = fetchGetResult(uri);
-        checkHttpStatusCode(createIdUri(id, PROJECT).toString(), response.statusCode());
+        checkHttpStatusCode(createIdUri(id, PROJECT), response.statusCode());
 
         return getDeserializedResponse(response, CristinProject.class);
     }
