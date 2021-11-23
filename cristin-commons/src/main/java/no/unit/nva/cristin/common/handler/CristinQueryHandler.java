@@ -60,10 +60,11 @@ public abstract class CristinQueryHandler<I, O> extends ApiGatewayHandler<I, O> 
     }
 
     protected String getValidNumberOfResults(RequestInfo requestInfo) throws BadRequestException {
-        return Optional.of(getQueryParam(requestInfo, NUMBER_OF_RESULTS)
-                .orElse(DEFAULT_NUMBER_OF_RESULTS))
-            .filter(Utils::isPositiveInteger)
-            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID));
+        String results = getQueryParam(requestInfo, NUMBER_OF_RESULTS).orElse(DEFAULT_NUMBER_OF_RESULTS);
+        if (Utils.isPositiveInteger(results)) {
+            return results;
+        }
+        throw new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID);
     }
 
     protected String getValidQuery(RequestInfo requestInfo) throws BadRequestException {
