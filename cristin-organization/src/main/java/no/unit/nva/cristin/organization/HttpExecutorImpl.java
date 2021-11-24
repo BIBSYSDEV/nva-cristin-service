@@ -29,7 +29,7 @@ import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.attempt.Try.attempt;
 
 
-public class HttpExecutorImpl implements HttpExecutor {
+public class HttpExecutorImpl {
 
     private final transient HttpClient httpClient;
 
@@ -49,17 +49,16 @@ public class HttpExecutorImpl implements HttpExecutor {
         this.httpClient = client;
     }
 
-    private Organization getOrganization(SubSubUnitDto subSubUnitDto) {
+    private Organization fromSubSubunit(SubSubUnitDto subSubUnitDto) {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
         final Set<Organization> partOf = isNull(parent)
                 ? null
-                : Set.of(getOrganization(attempt(() -> fetch(parent)).orElseThrow()));
-        final Organization organization = new Organization.Builder()
+                : Set.of(fromSubSubunit(attempt(() -> fetch(parent)).orElseThrow()));
+        return new Organization.Builder()
                 .withId(getNvaApiId(subSubUnitDto.getId()))
                 .withPartOf(partOf)
                 .withHasPart(getSubUnits(subSubUnitDto))
                 .withName(subSubUnitDto.getUnitName()).build();
-        return organization;
     }
 
     private Set<Organization> getSubUnits(SubSubUnitDto subSubUnitDto) {
@@ -82,13 +81,12 @@ public class HttpExecutorImpl implements HttpExecutor {
                 .build();
     }
 
-    @Override
     public Organization getOrganization(URI uri)
             throws NotFoundException, FailedHttpRequestException, InterruptedException {
-        return getOrganization(fetch(uri));
+        return fromSubSubunit(fetch(uri));
     }
 
-    private SubSubUnitDto fetch(URI uri) throws InterruptedException, NotFoundException, FailedHttpRequestException {
+    protected SubSubUnitDto fetch(URI uri) throws InterruptedException, NotFoundException, FailedHttpRequestException {
         HttpRequest httpRequest = createHttpRequest(addLanguage(uri));
         HttpResponse<String> response = sendRequest(httpRequest);
         if (isSuccessful(response.statusCode())) {

@@ -18,7 +18,15 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 
 public class CristinApiClient {
 
-    private final transient HttpExecutor httpExecutor = new HttpExecutorImpl();
+    private final transient HttpExecutorImpl httpExecutor;
+
+    public CristinApiClient() {
+        this(new HttpExecutorImpl());
+    }
+
+    public CristinApiClient(HttpExecutorImpl httpExecutor) {
+        this.httpExecutor = httpExecutor;
+    }
 
     /**
      * Get information for an Organization.
