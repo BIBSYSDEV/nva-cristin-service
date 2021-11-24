@@ -3,13 +3,20 @@ package no.unit.nva.cristin.organization.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
 public class SubSubUnitDto {
+
+    private static final Logger logger = LoggerFactory.getLogger(SubSubUnitDto.class);
+
 
     private String id;
     private Map<String, String> unitName;
@@ -114,5 +121,16 @@ public class SubSubUnitDto {
     public void setSourceUri(URI sourceUri) {
         this.sourceUri = sourceUri;
     }
+
+    public static SubSubUnitDto fromJson(String json) {
+        try {
+            return JsonUtils.dtoObjectMapper.readValue(json, SubSubUnitDto.class);
+        } catch (JsonProcessingException e) {
+            logger.error("Error processing JSON string: " + json, e);
+        }
+        return null;
+    }
+
+
 
 }

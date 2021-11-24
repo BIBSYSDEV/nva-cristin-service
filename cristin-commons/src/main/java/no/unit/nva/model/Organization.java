@@ -25,6 +25,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Organization implements JsonSerializable {
 
+    public static final String ORGANIZATION_IDENTIFIER_PATTERN = "^(?:[0-9]+\\.){3}[0-9]{1,3}$";
     public static final String ORGANIZATION_CONTEXT = "https://api.dev.nva.aws.unit.no/cristin/organization";
 
     @JsonProperty(ID)

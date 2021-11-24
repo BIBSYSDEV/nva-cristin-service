@@ -27,11 +27,12 @@ import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
+import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 
 public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Organization> {
 
-    public static final String IDENTIFIER_PATTERN = "^(?:[0-9]+\\.){3}[0-9]{1,3}$";
-    public static final Pattern PATTERN = Pattern.compile(IDENTIFIER_PATTERN);
+
+    public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
     private final transient CristinApiClient cristinApiClient;
 
     @JacocoGenerated

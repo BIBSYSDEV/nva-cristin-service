@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.organization;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.dto.SubUnitDto;
@@ -8,9 +7,6 @@ import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -30,11 +26,11 @@ import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import static nva.commons.core.attempt.Try.attempt;
 
 
 public class HttpExecutorImpl implements HttpExecutor {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
     private final transient HttpClient httpClient;
 
     /**
@@ -53,13 +49,11 @@ public class HttpExecutorImpl implements HttpExecutor {
         this.httpClient = client;
     }
 
-    private Organization toOrganization(SubSubUnitDto subSubUnitDto) {
-        return getOrganization(subSubUnitDto);
-    }
-
     private Organization getOrganization(SubSubUnitDto subSubUnitDto) {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
-        final Set<Organization> partOf = isNull(parent) ? null : Set.of(toOrganization(wrapFetching(parent)));
+        final Set<Organization> partOf = isNull(parent)
+                ? null
+                : Set.of(getOrganization(attempt(() -> fetch(parent)).orElseThrow()));
         final Organization organization = new Organization.Builder()
                 .withId(getNvaApiId(subSubUnitDto.getId()))
                 .withPartOf(partOf)
@@ -73,14 +67,14 @@ public class HttpExecutorImpl implements HttpExecutor {
         if (!isNull(subUnits)) {
             final URI parent = getNvaApiId(subSubUnitDto.getId());
             return subUnits.stream()
-                    .map((SubUnitDto subUnitDto) -> toFlatOrganization(subUnitDto, parent))
+                    .map((SubUnitDto subUnitDto) -> asOrganizationReference(subUnitDto, parent))
                     .collect(Collectors.toSet());
         } else {
             return null;
         }
     }
 
-    private Organization toFlatOrganization(SubUnitDto subUnitDto, URI parent) {
+    private Organization asOrganizationReference(SubUnitDto subUnitDto, URI parent) {
         return new Organization.Builder()
                 .withId(getNvaApiId(subUnitDto.getId()))
                 .withPartOf(Set.of(new Organization.Builder().withId(parent).build()))
@@ -94,19 +88,11 @@ public class HttpExecutorImpl implements HttpExecutor {
         return getOrganization(fetch(uri));
     }
 
-    private SubSubUnitDto wrapFetching(URI uri) {
-        try {
-            return fetch(uri);
-        } catch (FailedHttpRequestException | InterruptedException | NotFoundException e) {
-            return null;
-        }
-    }
-
     private SubSubUnitDto fetch(URI uri) throws InterruptedException, NotFoundException, FailedHttpRequestException {
         HttpRequest httpRequest = createHttpRequest(addLanguage(uri));
         HttpResponse<String> response = sendRequest(httpRequest);
         if (isSuccessful(response.statusCode())) {
-            return toSubSubUnitDto(response.body());
+            return SubSubUnitDto.fromJson(response.body());
         } else {
             throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
         }
@@ -132,12 +118,4 @@ public class HttpExecutorImpl implements HttpExecutor {
         return statusCode <= HTTP_MULT_CHOICE && statusCode >= HTTP_OK;
     }
 
-    private SubSubUnitDto toSubSubUnitDto(String json) {
-        try {
-            return JsonUtils.dtoObjectMapper.readValue(json, SubSubUnitDto.class);
-        } catch (JsonProcessingException e) {
-            logger.error("Error processing JSON string: " + json, e);
-        }
-        return null;
-    }
 }
