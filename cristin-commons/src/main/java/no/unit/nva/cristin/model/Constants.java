@@ -2,14 +2,11 @@ package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
-import java.util.List;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 
 import java.util.List;
-
-import static com.google.common.net.MediaType.JSON_UTF_8;
 
 public class Constants {
 

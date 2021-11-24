@@ -42,6 +42,7 @@ public class Organization implements JsonSerializable {
     @JsonProperty(CONTEXT)
     private String context;
 
+    @SuppressWarnings("missingjavadocmethod")
     @JsonCreator
     public Organization(@JsonProperty(ID) URI id,
                         @JsonProperty(NAME) Map<String, String> name,
