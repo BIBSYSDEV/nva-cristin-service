@@ -8,5 +8,5 @@ s3_prefix = "np3359-karate-cristin-service"
 region = "eu-west-1"
 confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "CustomDomain=\"api.dev.nva.aws.unit.no\" CustomDomainBasePath=\"np3359-cristin\" CristinApiHost=\"api.cristin.no\""
+parameter_overrides = "CustomDomain=\"api.dev.nva.aws.unit.no\" CustomDomainBasePath=\"cristin-np3359\" CristinApiHost=\"api.cristin.no\""
 image_repositories = []
