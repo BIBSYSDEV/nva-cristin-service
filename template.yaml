@@ -7,7 +7,7 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 20
+    Timeout: 40
     Architectures:
       - arm64
     Environment:
@@ -126,7 +126,41 @@ Resources:
             Path: /organization/{id}
             Method: get
 
-  NvaCristinProjectsFunctionBasePathMapping:
+  NvaCristinQueryPersonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.handler.PersonQueryHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Events:
+        NvaCristinQueryPersonEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/
+            Method: get
+            RequestParameters:
+              - method.request.querystring.query
+              - method.request.querystring.page
+              - method.request.querystring.results
+
+  NvaCristinFetchPersonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.handler.PersonFetchHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Events:
+        NvaCristinFetchPersonEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}
+            Method: get
+
+  NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
       BasePath: !Ref CustomDomainBasePath
