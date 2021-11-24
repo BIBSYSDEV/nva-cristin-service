@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import static no.unit.nva.cristin.common.handler.CristinQueryHandler.QUERY_PATTERN;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
@@ -31,9 +32,6 @@ import nva.commons.core.JacocoGenerated;
  */
 public class FetchCristinProjects extends CristinHandler<Void, SearchResponse<NvaProject>> {
 
-    private static final char CHARACTER_DASH = '-';
-    private static final char CHARACTER_COMMA = ',';
-    private static final char CHARACTER_PERIOD = '.';
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
 
     private final transient CristinApiClient cristinApiClient;
@@ -116,21 +114,7 @@ public class FetchCristinProjects extends CristinHandler<Void, SearchResponse<Nv
     }
 
     private boolean isValidQuery(String str) {
-        char[] charArray = str.toCharArray();
-        for (char c : charArray) {
-            if (!isValidCharacter(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isValidCharacter(char c) {
-        return Character.isWhitespace(c)
-            || Character.isLetterOrDigit(c)
-            || c == CHARACTER_DASH
-            || c == CHARACTER_COMMA
-            || c == CHARACTER_PERIOD;
+        return QUERY_PATTERN.matcher(str).matches();
     }
 
 }

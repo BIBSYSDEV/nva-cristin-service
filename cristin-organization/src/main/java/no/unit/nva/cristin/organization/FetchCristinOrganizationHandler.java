@@ -67,9 +67,8 @@ public class FetchCristinOrganizationHandler extends ApiGatewayHandler<Void, Org
         final String identifier =  requestInfo.getPathParameter(IDENTIFIER);
         if (matchesIdentifierPattern(identifier)) {
             return identifier;
-        } else {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
         }
+        throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
     }
 
     private boolean matchesIdentifierPattern(String identifier) {

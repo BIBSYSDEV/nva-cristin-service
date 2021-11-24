@@ -1,0 +1,47 @@
+{
+  "cristin_person_id": "359084",
+  "orcid": {
+    "id": "1234-1234-1234-1234"
+  },
+  "first_name": "Kjell Ola",
+  "surname": "Nordmann",
+  "first_name_preferred": "Ola",
+  "surname_preferred": "Nordmann",
+  "tel": "+4799885566",
+  "identified_cristin_person": true,
+  "cristin_profile_url": "https://app.cristin.no/persons/show.jsf?id=359084",
+  "picture_url": "https://api.cristin.no/v2/persons/359084/picture",
+  "affiliations": [
+    {
+      "institution": {
+        "cristin_institution_id": "185",
+        "url": "https://api.cristin.no/v2/institutions/185"
+      },
+      "unit": {
+        "cristin_unit_id": "185.11.0.0",
+        "url": "https://api.cristin.no/v2/units/185.11.0.0"
+      },
+      "active": true,
+      "position": {
+        "en": "Researcher",
+        "nb": "Forsker",
+        "nn": "Forskar"
+      }
+    },
+    {
+      "institution": {
+        "cristin_institution_id": "185",
+        "url": "https://api.cristin.no/v2/institutions/185"
+      },
+      "unit": {
+        "cristin_unit_id": "185.90.0.0",
+        "url": "https://api.cristin.no/v2/units/185.90.0.0"
+      },
+      "active": true,
+      "position": {
+        "en": "Head Engineer",
+        "nb": "Overingeniør"
+      }
+    }
+  ]
+}

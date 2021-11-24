@@ -1,17 +1,19 @@
 package no.unit.nva.cristin.person.model.cristin;
 
-import static no.unit.nva.cristin.person.Constants.BASE_PATH;
-import static no.unit.nva.cristin.person.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.person.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
 import no.unit.nva.cristin.person.model.nva.ContactDetails;
@@ -25,8 +27,6 @@ import nva.commons.core.paths.UriWrapper;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPerson {
 
-    @JsonIgnore
-    public static final String PERSON_PATH = "person";
     @JsonIgnore
     public static final String CRISTIN_IDENTIFIER = "CristinIdentifier";
     @JsonIgnore
@@ -143,36 +143,26 @@ public class CristinPerson {
     }
 
     private URI extractIdUri() {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH)
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH_NVA)
             .addChild(getCristinPersonId()).getUri();
     }
 
-    /**
-     * Transforms identifiers from Cristin into a List.
-     *
-     * @return List of transformed identifiers
-     */
-    private List<TypedValue> extractIdentifiers() {
-        List<TypedValue> identifiers = new ArrayList<>();
+    private Set<TypedValue> extractIdentifiers() {
+        Set<TypedValue> identifiers = new HashSet<>();
 
         identifiers.add(new TypedValue(CRISTIN_IDENTIFIER, getCristinPersonId()));
-        getOrcid().flatMap(CristinOrcid::getId).ifPresent(id -> identifiers.add(new TypedValue(ORCID, id)));
+        getOrcid().flatMap(CristinOrcid::getId).ifPresent(orcid -> identifiers.add(new TypedValue(ORCID, orcid)));
 
         return identifiers;
     }
 
-    /**
-     * Transforms names from a Cristin person into a List.
-     *
-     * @return List of transformed names
-     */
-    private List<TypedValue> extractNames() {
-        List<TypedValue> names = new ArrayList<>();
+    private Set<TypedValue> extractNames() {
+        Set<TypedValue> names = new HashSet<>();
 
         names.add(new TypedValue(FIRST_NAME, getFirstName()));
         names.add(new TypedValue(LAST_NAME, getSurname()));
-        getFirstNamePreferred().ifPresent(id -> names.add(new TypedValue(PREFERRED_FIRST_NAME, id)));
-        getSurnamePreferred().ifPresent(id -> names.add(new TypedValue(PREFERRED_LAST_NAME, id)));
+        getFirstNamePreferred().ifPresent(name -> names.add(new TypedValue(PREFERRED_FIRST_NAME, name)));
+        getSurnamePreferred().ifPresent(name -> names.add(new TypedValue(PREFERRED_LAST_NAME, name)));
 
         return names;
     }
@@ -181,8 +171,8 @@ public class CristinPerson {
         return getPictureUrl().map(UriWrapper::new).map(UriWrapper::getUri).orElse(null);
     }
 
-    private List<Affiliation> extractAffiliations() {
+    private Set<Affiliation> extractAffiliations() {
         return getAffiliations().stream().map(CristinAffiliation::toAffiliation).collect(
-            Collectors.toList());
+            Collectors.toSet());
     }
 }
