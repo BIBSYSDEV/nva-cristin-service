@@ -109,10 +109,9 @@ public class CristinApiClient extends ApiClient {
             throws ApiGatewayException {
 
         URI uri = attempt(() -> generateQueryProjectsUrl(parameters, queryType))
-                .toOptional(failure ->
-                        logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED,
-                                queryParameters(parameters), failure.getException()))
-                .orElseThrow();
+            .toOptional(failure -> logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters),
+                failure.getException()))
+            .orElseThrow();
 
         HttpResponse<String> response = fetchQueryResults(uri);
         URI id = createIdUriFromParams(parameters, PROJECT);
@@ -122,10 +121,8 @@ public class CristinApiClient extends ApiClient {
 
     protected CristinProject getProject(String id, String language) throws ApiGatewayException {
         URI uri = attempt(() -> generateGetProjectUri(id, language))
-                .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
-                        id,
-                        failure.getException()))
-                .orElseThrow();
+            .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
+            .orElseThrow();
 
         HttpResponse<String> response = fetchGetResult(uri);
         checkHttpStatusCode(createIdUri(id, PROJECT), response.statusCode());
@@ -133,8 +130,7 @@ public class CristinApiClient extends ApiClient {
         return getDeserializedResponse(response, CristinProject.class);
     }
 
-    protected List<CristinProject> getEnrichedProjectsUsingQueryResponse(HttpResponse<String> response,
-                                                                         String language)
+    protected List<CristinProject> getEnrichedProjectsUsingQueryResponse(HttpResponse<String> response, String language)
         throws ApiGatewayException {
 
         List<CristinProject> projectsFromQuery = asList(getDeserializedResponse(response, CristinProject[].class));
@@ -148,10 +144,8 @@ public class CristinApiClient extends ApiClient {
             : combineResultsWithQueryInCaseEnrichmentFails(projectsFromQuery, enrichedCristinProjects);
     }
 
-    protected List<CristinProject> combineResultsWithQueryInCaseEnrichmentFails(
-        List<CristinProject> projectsFromQuery,
-        List<CristinProject> enrichedProjects) {
-
+    protected List<CristinProject> combineResultsWithQueryInCaseEnrichmentFails(List<CristinProject> projectsFromQuery,
+                                                                                List<CristinProject> enrichedProjects) {
         Set<String> enrichedProjectIds = enrichedProjects.stream()
             .map(CristinProject::getCristinProjectId)
             .collect(Collectors.toSet());
