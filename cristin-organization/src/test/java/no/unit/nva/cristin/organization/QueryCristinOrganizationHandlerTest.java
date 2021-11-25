@@ -111,7 +111,7 @@ class QueryCristinOrganizationHandlerTest {
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         SearchResponse<Organization> actual = gatewayResponse.getBodyObject(SearchResponse.class);
-        assertEquals(0, actual.getHits().size());
+        assertEquals(5, actual.getHits().size());
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }

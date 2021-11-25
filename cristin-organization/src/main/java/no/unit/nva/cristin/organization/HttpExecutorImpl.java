@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.organization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
@@ -112,16 +113,17 @@ public class HttpExecutorImpl {
         HttpResponse<String> response = sendRequest(httpRequest);
         if (isSuccessful(response.statusCode())) {
             try {
-                final Optional<String> value = response.headers().firstValue("X-Total-Count");
-                System.out.println("totalCount="+ value);
-                List<SubUnitDto> units = JsonUtils.dtoObjectMapper.readValue(response.body(), List.class);
+
+                final String body = response.body();
+                List<SubUnitDto> units = JsonUtils.dtoObjectMapper.readValue(body,  new TypeReference<List<SubUnitDto>>(){});
                 final SearchResponse<Organization> searchResponse = new SearchResponse<>(uri);
                 List<Organization> organizations = units.stream()
                         .map(SubUnitDto::getUri)
                         .map(this::wrapGetOrganization)
-//                        .filter(Objects::nonNull)
                         .collect(Collectors.toList());
                 searchResponse.setHits(organizations);
+                final String count = response.headers().firstValue("X-Total-Count").orElse(""+organizations.size());
+                searchResponse.setSize(Integer.parseInt(count));
                 return searchResponse;
             } catch (JsonProcessingException e) {
                 throw new FailedHttpRequestException(e.getMessage());
