@@ -9,11 +9,20 @@ import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.JacocoGenerated;
 import nva.commons.core.attempt.Failure;
+import nva.commons.core.attempt.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +31,29 @@ public class ApiClient {
     private static final Logger logger = LoggerFactory.getLogger(ApiClient.class);
 
     private static final int FIRST_NON_SUCCESS_CODE = 300;
+
+    private final transient HttpClient client;
+
+    public ApiClient(HttpClient client) {
+        this.client = client;
+    }
+
+    @JacocoGenerated
+    public CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
+        return client.sendAsync(
+            HttpRequest.newBuilder(uri).GET().build(),
+            BodyHandlers.ofString(StandardCharsets.UTF_8));
+    }
+
+    public HttpResponse<String> fetchGetResult(URI uri) {
+        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+    }
+
+    public HttpResponse<String> fetchQueryResults(URI uri) {
+        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+    }
 
     public static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
         return OBJECT_MAPPER.readValue(body, classOfT);
@@ -47,7 +79,24 @@ public class ApiClient {
         logger.error(String.format(message, data, failure.getMessage()));
     }
 
-    protected boolean isSuccessfulRequest(HttpResponse<String> response) {
+    public List<HttpResponse<String>> fetchQueryResultsOneByOne(List<URI> uris) {
+        List<CompletableFuture<HttpResponse<String>>> responsesContainer =
+            uris.stream().map(this::fetchGetResultAsync).collect(Collectors.toList());
+
+        return collectSuccessfulResponsesOrThrowException(responsesContainer);
+    }
+
+    private List<HttpResponse<String>> collectSuccessfulResponsesOrThrowException(
+        List<CompletableFuture<HttpResponse<String>>> responsesContainer) {
+
+        return responsesContainer.stream()
+            .map(attempt(CompletableFuture::get))
+            .map(Try::orElseThrow)
+            .filter(this::isSuccessfulRequest)
+            .collect(Collectors.toList());
+    }
+
+    private boolean isSuccessfulRequest(HttpResponse<String> response) {
         try {
             checkHttpStatusCode(response.uri(), response.statusCode());
             return true;
