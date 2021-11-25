@@ -42,6 +42,7 @@ import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -186,11 +187,7 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(gatewayResponse.getHeaders(), hasKey(CONTENT_TYPE));
         assertThat(gatewayResponse.getHeaders(), hasKey(ACCESS_CONTROL_ALLOW_ORIGIN));
 
-        URI expectedId = new UriWrapper(HTTPS,
-                DOMAIN_NAME).addChild(BASE_PATH)
-                .addChild(ORGANIZATION_PATH)
-                .addChild(identifier)
-                .getUri();
+        URI expectedId = getNvaApiId(identifier, ORGANIZATION_PATH);
         Organization actualOrganization = gatewayResponse.getBodyObject(Organization.class);
         assertEquals(actualOrganization.getId(), expectedId);
         assertThat(actualOrganization.getName().get("en"), containsString("Department of Medical Biochemistry"));

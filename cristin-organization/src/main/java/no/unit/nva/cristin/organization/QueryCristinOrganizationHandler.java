@@ -26,12 +26,7 @@ import static nva.commons.core.attempt.Try.attempt;
 @SuppressWarnings("unused")
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
 
-    protected static final String DEFAULT_LANGUAGE_CODE = "nb";
-    private static final char CHARACTER_DASH = '-';
-    private static final char CHARACTER_COMMA = ',';
-    private static final char CHARACTER_PERIOD = '.';
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS);
-    private static final Set<String> VALID_LANGUAGE_CODES = Set.of("en", "nb", "nn");
     private final transient CristinApiClient cristinApiClient;
 
     @JacocoGenerated
@@ -72,5 +67,4 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
             throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP);
         }
     }
-
 }
