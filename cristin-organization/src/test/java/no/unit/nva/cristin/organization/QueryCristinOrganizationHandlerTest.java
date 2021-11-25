@@ -58,7 +58,7 @@ class QueryCristinOrganizationHandlerTest {
     void setUp() throws NotFoundException, FailedHttpRequestException, InterruptedException {
         context = mock(Context.class);
         cristinApiClient = mock(CristinApiClient.class);
-        when(cristinApiClient.queryInstitutions(any())).thenReturn(emptySearchResponse());
+        when(cristinApiClient.queryOrganizations(any())).thenReturn(emptySearchResponse());
         output = new ByteArrayOutputStream();
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
     }

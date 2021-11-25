@@ -1,5 +1,7 @@
 package no.unit.nva.cristin.organization;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.dto.SubUnitDto;
@@ -7,6 +9,7 @@ import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonUtils;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -91,6 +94,38 @@ public class HttpExecutorImpl {
         HttpResponse<String> response = sendRequest(httpRequest);
         if (isSuccessful(response.statusCode())) {
             return SubSubUnitDto.fromJson(response.body());
+        } else {
+            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
+        }
+    }
+
+    private Organization wrapGetOrganization(URI uri) {
+        try {
+            return getOrganization(uri);
+        } catch (InterruptedException | NotFoundException | FailedHttpRequestException e) {
+            return  null;
+        }
+    }
+
+    protected SearchResponse<Organization> query(URI uri) throws InterruptedException, NotFoundException, FailedHttpRequestException {
+        HttpRequest httpRequest = createHttpRequest(addLanguage(uri));
+        HttpResponse<String> response = sendRequest(httpRequest);
+        if (isSuccessful(response.statusCode())) {
+            try {
+                final Optional<String> value = response.headers().firstValue("X-Total-Count");
+                System.out.println("totalCount="+ value);
+                List<SubUnitDto> units = JsonUtils.dtoObjectMapper.readValue(response.body(), List.class);
+                final SearchResponse<Organization> searchResponse = new SearchResponse<>(uri);
+                List<Organization> organizations = units.stream()
+                        .map(SubUnitDto::getUri)
+                        .map(this::wrapGetOrganization)
+//                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
+                searchResponse.setHits(organizations);
+                return searchResponse;
+            } catch (JsonProcessingException e) {
+                throw new FailedHttpRequestException(e.getMessage());
+            }
         } else {
             throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
         }
