@@ -11,6 +11,7 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.MediaTypes;
+import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +58,7 @@ class QueryCristinOrganizationHandlerTest {
         cristinApiClient = mock(CristinApiClient.class);
         when(cristinApiClient.queryInstitutions(any())).thenReturn(emptySearchResponse());
         output = new ByteArrayOutputStream();
-        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient);
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
     }
 
     private SearchResponse<Organization> emptySearchResponse() {
@@ -83,23 +84,6 @@ class QueryCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnEmptyResponseOnStrangeQuery() throws IOException {
-        InputStream inputStream = generateHandlerRequestWithStrangeQueryParameter();
-        queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
-
-        SearchResponse<Organization> actual = gatewayResponse.getBodyObject(SearchResponse.class);
-        assertEquals(0, actual.getHits().size());
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-    }
-
-//    @Test
-    void shouldReturnResponseOnQuery() throws IOException { // TODO Integration test...
-
-        cristinApiClient = new CristinApiClient();
-        output = new ByteArrayOutputStream();
-        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient);
-
         InputStream inputStream = generateHandlerRequestWithStrangeQueryParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);

@@ -11,6 +11,7 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
@@ -67,7 +68,7 @@ class FetchCristinOrganizationHandlerTest {
         context = mock(Context.class);
         cristinApiClient = new CristinApiClient();
         output = new ByteArrayOutputStream();
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
     }
 
     @Test
@@ -78,7 +79,7 @@ class FetchCristinOrganizationHandlerTest {
         doThrow(new NotFoundException(NOT_FOUND_MESSAGE_TEMPLATE + IDENTIFIER_VALUE))
                 .when(cristinApiClient).getOrganization(any());
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
         GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
 
@@ -140,7 +141,8 @@ class FetchCristinOrganizationHandlerTest {
             e.printStackTrace();
         }
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(serviceThrowingException);
+        fetchCristinOrganizationHandler =
+                new FetchCristinOrganizationHandler(serviceThrowingException, new Environment());
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
 
         GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
@@ -158,7 +160,7 @@ class FetchCristinOrganizationHandlerTest {
         when(httpClient.sendAsync(any(), any())).thenThrow(new RuntimeException("This should Not happen!"));
         HttpExecutorImpl httpExecutor = new HttpExecutorImpl(httpClient);
         output = new ByteArrayOutputStream();
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
 
         HttpExecutorImpl mySpy = spy(httpExecutor);
         final URI level1 = URI.create("https://api.cristin.no/v2/units/185.90.0.0");
@@ -173,7 +175,7 @@ class FetchCristinOrganizationHandlerTest {
         doReturn(getSubSubUnit("unit_18_53_18_14.json")).when(mySpy).fetch(level4);
         cristinApiClient = new CristinApiClient(mySpy);
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient);
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
         final String identifier = "185.53.18.14";
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(identifier), output, context);
         GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output);

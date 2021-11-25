@@ -123,12 +123,13 @@ public class SubSubUnitDto {
     }
 
     public static SubSubUnitDto fromJson(String json) {
+        SubSubUnitDto result = null;
         try {
-            return JsonUtils.dtoObjectMapper.readValue(json, SubSubUnitDto.class);
+            result = JsonUtils.dtoObjectMapper.readValue(json, SubSubUnitDto.class);
         } catch (JsonProcessingException e) {
             logger.error("Error processing JSON string: " + json, e);
         }
-        return null;
+        return result;
     }
 
 
