@@ -2,7 +2,7 @@ Feature: API tests for Cristin Project retrieve and search
 
   Background:
     * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
-    * def BASE_PATH = 'np3392-karate-cristin'
+    * def BASE_PATH = 'np3445-karate-cristin'
     * def CRISTIN_BASE = SERVER_URL + '/' + BASE_PATH
     * def testProjectNameSearchTerm = 'univers'
     * def illegalIdentifier = 'illegalIdentifier'
