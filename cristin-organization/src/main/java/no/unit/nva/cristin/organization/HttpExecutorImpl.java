@@ -24,6 +24,7 @@ import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.attempt.Try.attempt;
@@ -45,7 +46,6 @@ public class HttpExecutorImpl {
     }
 
     public HttpExecutorImpl(HttpClient client) {
-        super();
         this.httpClient = client;
     }
 
@@ -55,7 +55,7 @@ public class HttpExecutorImpl {
                 ? null
                 : Set.of(fromSubSubunit(attempt(() -> fetch(parent)).orElseThrow()));
         return new Organization.Builder()
-                .withId(getNvaApiId(subSubUnitDto.getId()))
+                .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                 .withPartOf(partOf)
                 .withHasPart(getSubUnits(subSubUnitDto))
                 .withName(subSubUnitDto.getUnitName()).build();
@@ -64,7 +64,7 @@ public class HttpExecutorImpl {
     private Set<Organization> getSubUnits(SubSubUnitDto subSubUnitDto) {
         List<SubUnitDto> subUnits = subSubUnitDto.getSubUnits();
         if (!isNull(subUnits)) {
-            final URI parent = getNvaApiId(subSubUnitDto.getId());
+            final URI parent = getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH);
             return subUnits.stream()
                     .map((SubUnitDto subUnitDto) -> asOrganizationReference(subUnitDto, parent))
                     .collect(Collectors.toSet());
@@ -75,7 +75,7 @@ public class HttpExecutorImpl {
 
     private Organization asOrganizationReference(SubUnitDto subUnitDto, URI parent) {
         return new Organization.Builder()
-                .withId(getNvaApiId(subUnitDto.getId()))
+                .withId(getNvaApiId(subUnitDto.getId(), ORGANIZATION_PATH))
                 .withPartOf(Set.of(new Organization.Builder().withId(parent).build()))
                 .withName(subUnitDto.getName())
                 .build();
@@ -115,5 +115,6 @@ public class HttpExecutorImpl {
     private boolean isSuccessful(int statusCode) {
         return statusCode <= HTTP_MULT_CHOICE && statusCode >= HTTP_OK;
     }
+
 
 }

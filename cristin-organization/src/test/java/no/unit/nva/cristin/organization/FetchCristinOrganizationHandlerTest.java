@@ -39,7 +39,10 @@ import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.utils.UriUtils.getCristinUri;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -163,15 +166,15 @@ class FetchCristinOrganizationHandlerTest {
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
 
         HttpExecutorImpl mySpy = spy(httpExecutor);
-        final URI level1 = URI.create("https://api.cristin.no/v2/units/185.90.0.0");
+        final URI level1 = getCristinUri("185.90.0.0", UNITS_PATH);
         doReturn(getSubSubUnit("unit_18_90_0_0.json")).when(mySpy).fetch(level1);
-        final URI level2a = URI.create("https://api.cristin.no/v2/units/185.53.0.0");
+        final URI level2a = getCristinUri("185.53.0.0", UNITS_PATH);
         doReturn(getSubSubUnit("unit_18_53_0_0.json")).when(mySpy).fetch(level2a);
-        final URI level2b = URI.create("https://api.cristin.no/v2/units/185.50.0.0");
+        final URI level2b = getCristinUri("185.50.0.0", UNITS_PATH);
         doReturn(getSubSubUnit("unit_18_50_0_0.json")).when(mySpy).fetch(level2b);
-        final URI level3 = URI.create("https://api.cristin.no/v2/units/185.53.18.0");
+        final URI level3 = getCristinUri("185.53.18.0", UNITS_PATH);
         doReturn(getSubSubUnit("unit_18_53_18_0.json")).when(mySpy).fetch(level3);
-        final URI level4 = URI.create("https://api.cristin.no/v2/units/185.53.18.14");
+        final URI level4 = getCristinUri("185.53.18.14", UNITS_PATH);
         doReturn(getSubSubUnit("unit_18_53_18_14.json")).when(mySpy).fetch(level4);
         cristinApiClient = new CristinApiClient(mySpy);
 
@@ -184,11 +187,7 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(gatewayResponse.getHeaders(), hasKey(CONTENT_TYPE));
         assertThat(gatewayResponse.getHeaders(), hasKey(ACCESS_CONTROL_ALLOW_ORIGIN));
 
-        URI expectedId = new UriWrapper(HTTPS,
-                DOMAIN_NAME).addChild(BASE_PATH)
-                .addChild(ORGANIZATION_PATH)
-                .addChild(identifier)
-                .getUri();
+        URI expectedId = getNvaApiId(identifier, ORGANIZATION_PATH);
         Organization actualOrganization = gatewayResponse.getBodyObject(Organization.class);
         assertEquals(actualOrganization.getId(), expectedId);
         assertThat(actualOrganization.getName().get("en"), containsString("Department of Medical Biochemistry"));
