@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
@@ -60,11 +59,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         requestQueryParams.put(PAGE, getValidPage(requestInfo));
         requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
 
-        try {
-            return queryOrganizationsFromCristin(requestQueryParams);
-        } catch (InterruptedException e) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP);
-        }
+        return cristinApiClient.queryInstitutions(requestQueryParams);
     }
 
     @Override
@@ -78,10 +73,4 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         }
     }
 
-    private SearchResponse<Organization> queryOrganizationsFromCristin(Map<String, String> requestQueryParams)
-            throws ApiGatewayException, InterruptedException {
-
-        return Optional.of(cristinApiClient.queryInstitutions(requestQueryParams))
-                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_LANGUAGE_INVALID));
-    }
 }
