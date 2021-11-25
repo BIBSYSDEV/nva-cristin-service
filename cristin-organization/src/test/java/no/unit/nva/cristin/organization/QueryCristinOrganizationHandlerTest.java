@@ -11,6 +11,7 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.MediaTypes;
+import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,10 +55,11 @@ class QueryCristinOrganizationHandlerTest {
     @BeforeEach
     void setUp() {
         context = mock(Context.class);
+        Environment environment = new Environment();
         cristinApiClient = mock(CristinApiClient.class);
         when(cristinApiClient.queryInstitutions(any())).thenReturn(emptySearchResponse());
         output = new ByteArrayOutputStream();
-        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient);
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, environment);
     }
 
     private SearchResponse<Organization> emptySearchResponse() {
@@ -98,7 +100,7 @@ class QueryCristinOrganizationHandlerTest {
 
         cristinApiClient = new CristinApiClient();
         output = new ByteArrayOutputStream();
-        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient);
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
 
         InputStream inputStream = generateHandlerRequestWithStrangeQueryParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
