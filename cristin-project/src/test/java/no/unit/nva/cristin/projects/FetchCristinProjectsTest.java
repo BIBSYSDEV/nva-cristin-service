@@ -1,10 +1,58 @@
 package no.unit.nva.cristin.projects;
 
+import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
+import static no.unit.nva.cristin.common.client.HttpResponseFaker.LINK_EXAMPLE_VALUE;
+import static no.unit.nva.cristin.common.client.HttpResponseFaker.TOTAL_COUNT_EXAMPLE_VALUE;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.QueryType;
+import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
+import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
+import static no.unit.nva.cristin.model.Constants.REL_NEXT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
+import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpResponse;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.common.client.HttpResponseFaker;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -21,55 +69,6 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.zalando.problem.Problem;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
-
-import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.model.Constants.QueryType;
-import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
-import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
-import static no.unit.nva.cristin.model.Constants.REL_NEXT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
-import static no.unit.nva.cristin.projects.HttpResponseStub.LINK_EXAMPLE_VALUE;
-import static no.unit.nva.cristin.projects.HttpResponseStub.TOTAL_COUNT_EXAMPLE_VALUE;
-import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
-import static nva.commons.core.StringUtils.EMPTY_STRING;
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 
 public class FetchCristinProjectsTest {
 
@@ -146,7 +145,7 @@ public class FetchCristinProjectsTest {
     void handlerReturnsNonEnrichedBodyWhenEnrichingFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
         HttpResponse<String> response =
-                new HttpResponseStub(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
+            new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(CompletableFuture.completedFuture(response)).when(cristinApiClientStub).fetchGetResultAsync(any());
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
@@ -257,7 +256,7 @@ public class FetchCristinProjectsTest {
     void handlerThrowsBadGatewayExceptionWhenThereIsThrownIoExceptionWhenReadingFromJson() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(EMPTY_STRING))
+        doReturn(new HttpResponseFaker(EMPTY_STRING))
             .when(cristinApiClientStub).fetchQueryResults(any(URI.class));
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
         GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
@@ -450,8 +449,8 @@ public class FetchCristinProjectsTest {
     void handlerReturnsMatchingProjectsFromGrantIdSearchWhenSuppliedWithOnlyNumber() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(
-                getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
+        doReturn(new HttpResponseFaker(
+            getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
         doThrow(RuntimeException.class)
@@ -474,8 +473,8 @@ public class FetchCristinProjectsTest {
         doThrow(RuntimeException.class)
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
-        doReturn(new HttpResponseStub(
-                getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
+        doReturn(new HttpResponseFaker(
+            getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
 
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
@@ -492,11 +491,11 @@ public class FetchCristinProjectsTest {
     void handlerReturnsProjectsFromTitleSearchWhenGrantIdSearchReturnsZeroResults() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(EMPTY_LIST_STRING))
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
-        doReturn(new HttpResponseStub(
-                getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
+        doReturn(new HttpResponseFaker(
+            getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
 
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
@@ -541,7 +540,7 @@ public class FetchCristinProjectsTest {
 
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(new HttpResponseStub(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
             generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
             .when(cristinApiClientStub).queryProjects(any(), any());
         doReturn(Collections.emptyList()).when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
@@ -584,7 +583,7 @@ public class FetchCristinProjectsTest {
 
     private void modifyQueryResponseToClient(String body, java.net.http.HttpHeaders headers) {
         cristinApiClientStub = spy(cristinApiClientStub);
-        HttpResponse<String> response = new HttpResponseStub(body);
+        HttpResponse<String> response = new HttpResponseFaker(body);
         response = spy(response);
         doReturn(headers).when(response).headers();
         doReturn(response).when(cristinApiClientStub).fetchQueryResults(any(URI.class));
@@ -592,7 +591,7 @@ public class FetchCristinProjectsTest {
     }
 
     private java.net.http.HttpHeaders generateHeaders(String totalCount, String link) {
-        return java.net.http.HttpHeaders.of(HttpResponseStub.headerMap(totalCount, link), HttpResponseStub.filter());
+        return java.net.http.HttpHeaders.of(HttpResponseFaker.headerMap(totalCount, link), HttpResponseFaker.filter());
     }
 
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {

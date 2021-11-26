@@ -1,11 +1,11 @@
 package no.unit.nva.cristin.projects;
 
-import nva.commons.core.ioutils.IoUtils;
-
 import java.net.URI;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
+import no.unit.nva.cristin.common.client.HttpResponseFaker;
+import nva.commons.core.ioutils.IoUtils;
 
 public class CristinApiClientStub extends CristinApiClient {
 
@@ -42,11 +42,11 @@ public class CristinApiClientStub extends CristinApiClient {
     }
 
     private HttpResponse<String> mockGetResponse() {
-        return new HttpResponseStub(responseBody);
+        return new HttpResponseFaker(responseBody);
     }
 
     private HttpResponse<String> mockQueryResponse() {
         String body = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE));
-        return new HttpResponseStub(body);
+        return new HttpResponseFaker(body);
     }
 }

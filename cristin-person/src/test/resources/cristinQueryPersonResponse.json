@@ -1,0 +1,14 @@
+[
+  {
+    "first_name": "Kjell Ola",
+    "surname": "Nordmann",
+    "url": "https://api.cristin.no/v2/persons/359084",
+    "cristin_person_id": "359084"
+  },
+  {
+    "first_name": "Kjell",
+    "surname": "Elvis",
+    "url": "https://api.cristin.no/v2/persons/567856",
+    "cristin_person_id": "567856"
+  }
+]

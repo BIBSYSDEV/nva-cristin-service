@@ -14,14 +14,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.CristinPersonApiClient;
+import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class PersonQueryHandlerTest {
@@ -37,13 +36,12 @@ public class PersonQueryHandlerTest {
 
     @BeforeEach
     void setUp() {
-        CristinPersonApiClient apiClient = new CristinPersonApiClient();
+        CristinPersonApiClientStub apiClient = new CristinPersonApiClientStub();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new PersonQueryHandler(apiClient, environment);
     }
 
-    @Disabled
     @Test
     void shouldReturnResponseWhenCallingEndpointWithNameParameter() throws IOException {
         SearchResponse<Person> actual = sendDefaultQuery().getBodyObject(SearchResponse.class);

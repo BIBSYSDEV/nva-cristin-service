@@ -20,7 +20,7 @@ import java.net.HttpURLConnection;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
-import no.unit.nva.cristin.person.CristinPersonApiClient;
+import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;

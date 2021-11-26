@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.person;
+package no.unit.nva.cristin.person.client;
 
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_HOST;
 import static no.unit.nva.cristin.model.Constants.HTTPS;

@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.person;
+package no.unit.nva.cristin.person.client;
 
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
