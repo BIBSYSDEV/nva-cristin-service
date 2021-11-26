@@ -73,8 +73,10 @@ public class CristinApiClient {
                 CRISTIN_PER_PAGE_PARAM, requestQueryParams.get(NUMBER_OF_RESULTS));
     }
 
-    private SearchResponse<Organization> updateSearchResponseMetadata(SearchResponse<Organization> searchResponse,
-                                                        Map<String, String> requestQueryParams, long timeUsed) {
+    private SearchResponse<Organization> updateSearchResponseMetadata(
+            SearchResponse<Organization> searchResponse,
+            Map<String, String> requestQueryParams,
+            long timeUsed) {
         final URI baseUri = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH).getUri();
         searchResponse.setId(new UriWrapper(baseUri).addQueryParameters(requestQueryParams).getUri());
         searchResponse.setFirstRecord(calculateFirstRecord(requestQueryParams));
@@ -106,7 +108,9 @@ public class CristinApiClient {
     }
 
     private Integer calculateFirstRecord(Map<String, String> requestQueryParams) {
-        return Integer.parseInt(requestQueryParams.get(PAGE));
+        final int page = Integer.parseInt(requestQueryParams.get(PAGE));
+        final int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
+        return (page - 1) * pageSize + 1;
     }
 
 }
