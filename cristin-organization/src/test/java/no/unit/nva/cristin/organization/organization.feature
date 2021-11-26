@@ -2,9 +2,8 @@ Feature: API tests for Cristin Organization retrieve and search
 
   Background:
     * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
-    * def BASE_PATH = 'np3445-karate-cristin'
     * def testOrganizationNameSearchTerm = 'univers'
-    * def CRISTIN_BASE = SERVER_URL + '/' + BASE_PATH
+    * def CRISTIN_BASE = SERVER_URL + '/cristin-np3359'
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingOrganizationId = '0.1.2.3'
     Given url CRISTIN_BASE
@@ -47,16 +46,15 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'The URI "https://api.dev.nva.aws.unit.no/' + BASE_PATH + '/organization/0.1.2.3" cannot be dereferenced'
+    And match response.detail == 'The URI "' + CRISTIN_BASE + '/organization/0.1.2.3" cannot be dereferenced'
 
-#  Scenario: GET organization with query and result returns list of search results limited to results with position
-#    Given path '/organization'
-#    And param query = testOrganizationNameSearchTerm
-#    And param results = '2'
-#    And param page = '4'
-#    When method GET
-#    Then status 200
-#    And match response.hits == '#array'
-#    And match response.total == '#number'
-#    And match response.hits == '#[0]' // hits array length == 0
-#    And match response.firstRecord == 0
+  Scenario: GET organization with query and result returns list of search results limited to results with position
+    Given path '/organization'
+    And param query = testOrganizationNameSearchTerm
+    And param results = '2'
+    And param page = '4'
+    When method GET
+    Then status 200
+    And match response.hits == '#array'
+    And match response.size == '#number'
+    And match response.hits == '#[0]' // hits array length == 0
