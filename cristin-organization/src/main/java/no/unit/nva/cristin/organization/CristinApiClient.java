@@ -7,7 +7,6 @@ import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -61,9 +60,10 @@ public class CristinApiClient {
                 .addQueryParameters(cristinRequestQueryParams)
                 .getUri();
 
+        long start = System.currentTimeMillis();
         SearchResponse<Organization> searchResponse = httpExecutor.query(queryUri);
 
-        return updateSearchResponseMetadata(searchResponse,requestQueryParams);
+        return updateSearchResponseMetadata(searchResponse,requestQueryParams, System.currentTimeMillis() - start);
     }
 
     private Map<String, String> translateToCristinApi(Map<String, String> requestQueryParams) {
@@ -74,37 +74,35 @@ public class CristinApiClient {
     }
 
     private SearchResponse updateSearchResponseMetadata(SearchResponse searchResponse,
-                                                        Map<String, String> requestQueryParams) {
+                                                        Map<String, String> requestQueryParams, long timeUsed) {
         final URI baseUri = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH).getUri();
         searchResponse.setId(new UriWrapper(baseUri).addQueryParameters(requestQueryParams).getUri());
         searchResponse.setFirstRecord(calculateFirstRecord(requestQueryParams));
-        searchResponse.setNextResults(
-                new UriWrapper(baseUri).addQueryParameters(nextResult(requestQueryParams, requestQueryParams.size()))
-                        .getUri());
-        searchResponse.setPreviousResults(
-                new UriWrapper(baseUri).addQueryParameters(previousResult(requestQueryParams)).getUri());
+        searchResponse.setNextResults(nextResult(baseUri, requestQueryParams, searchResponse.getSize()));
+        searchResponse.setPreviousResults(previousResult(baseUri, requestQueryParams, searchResponse.getSize()));
+        searchResponse.setProcessingTime(timeUsed);
         return searchResponse;
     }
 
-    private Map<String, String> previousResult(Map<String, String> requestQueryParams) {
+    private URI previousResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
         int firstPage = Integer.parseInt(requestQueryParams.get(PAGE)) - 1;
-        if (firstPage > 0) {
+        if (firstPage > 0 && totalSize > 0) {
             Map<String, String> nextMap = new ConcurrentHashMap<>(requestQueryParams);
             nextMap.put(PAGE, Integer.toString(firstPage));
-            return  nextMap;
+            return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
         }
-        return Collections.emptyMap();
+        return null;
     }
 
-    private Map<String, String> nextResult(Map<String, String> requestQueryParams, int totalSize) {
+    private URI nextResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
         int nextPage = Integer.parseInt(requestQueryParams.get(PAGE)) + 1;
         int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
         if (nextPage * pageSize < totalSize) {
             Map<String, String> nextMap = new ConcurrentHashMap<>(requestQueryParams);
             nextMap.put(PAGE, Integer.toString(nextPage));
-            return  nextMap;
+            return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
         }
-        return Collections.emptyMap();
+        return null;
     }
 
     private Integer calculateFirstRecord(Map<String, String> requestQueryParams) {
