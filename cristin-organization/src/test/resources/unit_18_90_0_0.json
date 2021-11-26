@@ -1,0 +1,264 @@
+{
+  "cristin_unit_id": "185.90.0.0",
+  "unit_name": {
+    "en": "University of Oslo"
+  },
+  "institution": {
+    "cristin_institution_id": "185",
+    "url": "https://api.cristin.no/v2/institutions/185"
+  },
+  "subunits": [
+    {
+      "cristin_unit_id": "185.11.0.0",
+      "unit_name": {
+        "en": "Faculty of Theology"
+      },
+      "url": "https://api.cristin.no/v2/units/185.11.0.0"
+    },
+    {
+      "cristin_unit_id": "185.12.0.0",
+      "unit_name": {
+        "en": "Faculty of Law"
+      },
+      "url": "https://api.cristin.no/v2/units/185.12.0.0"
+    },
+    {
+      "cristin_unit_id": "185.14.0.0",
+      "unit_name": {
+        "en": "Faculty of Humanities"
+      },
+      "url": "https://api.cristin.no/v2/units/185.14.0.0"
+    },
+    {
+      "cristin_unit_id": "185.15.0.0",
+      "unit_name": {
+        "en": "Faculty of Mathematics and Natural Sciences"
+      },
+      "url": "https://api.cristin.no/v2/units/185.15.0.0"
+    },
+    {
+      "cristin_unit_id": "185.16.0.0",
+      "unit_name": {
+        "en": "Faculty of Dentistry"
+      },
+      "url": "https://api.cristin.no/v2/units/185.16.0.0"
+    },
+    {
+      "cristin_unit_id": "185.17.0.0",
+      "unit_name": {
+        "en": "Faculty of Social Sciences"
+      },
+      "url": "https://api.cristin.no/v2/units/185.17.0.0"
+    },
+    {
+      "cristin_unit_id": "185.18.0.0",
+      "unit_name": {
+        "en": "Faculty of Educational Sciences"
+      },
+      "url": "https://api.cristin.no/v2/units/185.18.0.0"
+    },
+    {
+      "cristin_unit_id": "185.27.0.0",
+      "unit_name": {
+        "en": "Museum of Cultural History"
+      },
+      "url": "https://api.cristin.no/v2/units/185.27.0.0"
+    },
+    {
+      "cristin_unit_id": "185.28.0.0",
+      "unit_name": {
+        "en": "Natural History Museum"
+      },
+      "url": "https://api.cristin.no/v2/units/185.28.0.0"
+    },
+    {
+      "cristin_unit_id": "185.36.0.0",
+      "unit_name": {
+        "en": "UiO: Management and Support Units"
+      },
+      "url": "https://api.cristin.no/v2/units/185.36.0.0"
+    },
+    {
+      "cristin_unit_id": "185.50.0.0",
+      "unit_name": {
+        "en": "Faculty of Medicine"
+      },
+      "url": "https://api.cristin.no/v2/units/185.50.0.0"
+    },
+    {
+      "cristin_unit_id": "185.29.1.0",
+      "unit_name": {
+        "en": "Senter for utvikling og miljø"
+      },
+      "url": "https://api.cristin.no/v2/units/185.29.1.0"
+    },
+    {
+      "cristin_unit_id": "185.29.3.0",
+      "unit_name": {
+        "en": "Seminar for Philosophy of Science"
+      },
+      "url": "https://api.cristin.no/v2/units/185.29.3.0"
+    },
+    {
+      "cristin_unit_id": "185.29.4.0",
+      "unit_name": {
+        "en": "UiO:Energy"
+      },
+      "url": "https://api.cristin.no/v2/units/185.29.4.0"
+    },
+    {
+      "cristin_unit_id": "185.29.7.0",
+      "unit_name": {
+        "en": "The International Summer School"
+      },
+      "url": "https://api.cristin.no/v2/units/185.29.7.0"
+    },
+    {
+      "cristin_unit_id": "185.29.12.0",
+      "unit_name": {
+        "en": "Centre for Gender Research"
+      },
+      "url": "https://api.cristin.no/v2/units/185.29.12.0"
+    },
+    {
+      "cristin_unit_id": "185.29.14.0",
+      "unit_name": {
+        "en": "Uniforum"
+      },
+      "url": "https://api.cristin.no/v2/units/185.29.14.0"
+    },
+    {
+      "cristin_unit_id": "185.29.15.0",
+      "unit_name": {
+        "en": "Apollon"
+      },
+      "url": "https://api.cristin.no/v2/units/185.29.15.0"
+    },
+    {
+      "cristin_unit_id": "185.29.20.0",
+      "unit_name": {
+        "en": "UiO:Life Science"
+      },
+      "url": "https://api.cristin.no/v2/units/185.29.20.0"
+    },
+    {
+      "cristin_unit_id": "185.29.23.0",
+      "unit_name": {
+        "en": "UiO:Life Science"
+      },
+      "url": "https://api.cristin.no/v2/units/185.29.23.0"
+    },
+    {
+      "cristin_unit_id": "185.34.1.0",
+      "unit_name": {
+        "en": "University Library Joint"
+      },
+      "url": "https://api.cristin.no/v2/units/185.34.1.0"
+    },
+    {
+      "cristin_unit_id": "185.34.1.10",
+      "unit_name": {
+        "en": "Library Director's Staff"
+      },
+      "url": "https://api.cristin.no/v2/units/185.34.1.10"
+    },
+    {
+      "cristin_unit_id": "185.34.1.20",
+      "unit_name": {
+        "en": "University Library Digital Services"
+      },
+      "url": "https://api.cristin.no/v2/units/185.34.1.20"
+    },
+    {
+      "cristin_unit_id": "185.34.12.0",
+      "unit_name": {
+        "en": "Law Library"
+      },
+      "url": "https://api.cristin.no/v2/units/185.34.12.0"
+    },
+    {
+      "cristin_unit_id": "185.34.13.0",
+      "unit_name": {
+        "en": "Medical Library"
+      },
+      "url": "https://api.cristin.no/v2/units/185.34.13.0"
+    },
+    {
+      "cristin_unit_id": "185.34.15.0",
+      "unit_name": {
+        "en": "Bibliotek for medisin og realfag"
+      },
+      "url": "https://api.cristin.no/v2/units/185.34.15.0"
+    },
+    {
+      "cristin_unit_id": "185.34.20.0",
+      "unit_name": {
+        "en": "HumSam-biblioteket"
+      },
+      "url": "https://api.cristin.no/v2/units/185.34.20.0"
+    },
+    {
+      "cristin_unit_id": "185.39.1.0",
+      "unit_name": {
+        "en": "Student Chaplain Office"
+      },
+      "url": "https://api.cristin.no/v2/units/185.39.1.0"
+    },
+    {
+      "cristin_unit_id": "185.39.2.0",
+      "unit_name": {
+        "en": "Trade unions"
+      },
+      "url": "https://api.cristin.no/v2/units/185.39.2.0"
+    },
+    {
+      "cristin_unit_id": "185.39.3.0",
+      "unit_name": {
+        "en": "Senior Safety representatives"
+      },
+      "url": "https://api.cristin.no/v2/units/185.39.3.0"
+    },
+    {
+      "cristin_unit_id": "185.39.4.0",
+      "unit_name": {
+        "en": "Data protection officer"
+      },
+      "url": "https://api.cristin.no/v2/units/185.39.4.0"
+    },
+    {
+      "cristin_unit_id": "185.39.7.0",
+      "unit_name": {
+        "en": "Universitetets barnehage"
+      },
+      "url": "https://api.cristin.no/v2/units/185.39.7.0"
+    },
+    {
+      "cristin_unit_id": "185.39.9.10",
+      "unit_name": {
+        "en": "CICERO Senter for klimaforskning"
+      },
+      "url": "https://api.cristin.no/v2/units/185.39.9.10"
+    },
+    {
+      "cristin_unit_id": "185.39.12.0",
+      "unit_name": {
+        "en": "Current Research Information System In Norway"
+      },
+      "url": "https://api.cristin.no/v2/units/185.39.12.0"
+    },
+    {
+      "cristin_unit_id": "185.39.50.0",
+      "unit_name": {
+        "en": "CERES - National Centre for Systems and Services for Research and Studies"
+      },
+      "url": "https://api.cristin.no/v2/units/185.39.50.0"
+    },
+    {
+      "cristin_unit_id": "185.39.59.0",
+      "unit_name": {
+        "en": "Kunnskapsdepartementets tjenesteorgan"
+      },
+      "url": "https://api.cristin.no/v2/units/185.39.59.0"
+    }
+  ]
+}

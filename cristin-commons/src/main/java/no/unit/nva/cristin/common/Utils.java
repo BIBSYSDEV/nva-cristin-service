@@ -3,6 +3,7 @@ package no.unit.nva.cristin.common;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.Objects.nonNull;
 
@@ -30,4 +31,9 @@ public class Utils {
     public static <E> List<E> nonEmptyOrDefault(List<E> list) {
         return nonNull(list) ? list : Collections.emptyList();
     }
+
+    public static <E> Set<E> nonEmptyOrDefault(Set<E> set) {
+        return nonNull(set) ? set : Collections.emptySet();
+    }
+
 }
