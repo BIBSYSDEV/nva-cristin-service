@@ -1,15 +1,12 @@
 package no.unit.nva.cristin.organization;
 
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.organization.dto.SubUnitDto;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.Map;
 
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
@@ -55,7 +52,7 @@ public class CristinApiClient {
      * @param requestQueryParams Map containing verified query parameters
      */
     public SearchResponse<Organization> queryOrganizations(Map<String, String> requestQueryParams)
-            throws NotFoundException, FailedHttpRequestException, InterruptedException {
+            throws NotFoundException, FailedHttpRequestException {
         Map<String, String> cristinRequestQueryParams = translateToCristinApi(requestQueryParams);
         URI queryUri = new UriWrapper(HTTPS, CRISTIN_API_BASE)
                 .addChild(UNITS_PATH)

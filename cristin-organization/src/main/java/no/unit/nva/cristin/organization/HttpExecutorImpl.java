@@ -2,6 +2,7 @@ package no.unit.nva.cristin.organization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
@@ -21,7 +22,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
@@ -36,6 +36,7 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public class HttpExecutorImpl {
 
+    public static final ObjectMapper OBJECTMAPPER = JsonUtils.dtoObjectMapper;
     private final transient HttpClient httpClient;
 
     /**
@@ -85,12 +86,11 @@ public class HttpExecutorImpl {
                 .build();
     }
 
-    public Organization getOrganization(URI uri)
-            throws NotFoundException, FailedHttpRequestException, InterruptedException {
+    public Organization getOrganization(URI uri) throws NotFoundException {
         return fromSubSubunit(fetch(uri));
     }
 
-    protected SubSubUnitDto fetch(URI uri) throws InterruptedException, NotFoundException, FailedHttpRequestException {
+    protected SubSubUnitDto fetch(URI uri) throws NotFoundException {
         HttpRequest httpRequest = createHttpRequest(addLanguage(uri));
         HttpResponse<String> response = sendRequest(httpRequest);
         if (isSuccessful(response.statusCode())) {
@@ -100,37 +100,30 @@ public class HttpExecutorImpl {
         }
     }
 
-    private Organization wrapGetOrganization(URI uri) {
-        try {
-            return getOrganization(uri);
-        } catch (InterruptedException | NotFoundException | FailedHttpRequestException e) {
-            return  null;
-        }
-    }
-
-    protected SearchResponse<Organization> query(URI uri) throws InterruptedException, NotFoundException, FailedHttpRequestException {
+    protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
         HttpRequest httpRequest = createHttpRequest(addLanguage(uri));
         HttpResponse<String> response = sendRequest(httpRequest);
         if (isSuccessful(response.statusCode())) {
             try {
-
-                final String body = response.body();
-                List<SubUnitDto> units = JsonUtils.dtoObjectMapper.readValue(body,  new TypeReference<List<SubUnitDto>>(){});
-                final SearchResponse<Organization> searchResponse = new SearchResponse<>(uri);
-                List<Organization> organizations = units.stream()
-                        .map(SubUnitDto::getUri)
-                        .map(this::wrapGetOrganization)
-                        .collect(Collectors.toList());
-                searchResponse.setHits(organizations);
-                final String count = response.headers().firstValue("X-Total-Count").orElse(""+organizations.size());
-                searchResponse.setSize(Integer.parseInt(count));
-                return searchResponse;
+                List<Organization> organizations = getOrganizations(response);
+                final int count =  response.headers().firstValue("X-Total-Count").isPresent()
+                        ? Integer.parseInt(response.headers().firstValue("X-Total-Count").get())
+                        : organizations.size();
+                return new SearchResponse<Organization>(uri).withHits(organizations).withSize(count);
             } catch (JsonProcessingException e) {
                 throw new FailedHttpRequestException(e.getMessage());
             }
         } else {
             throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
         }
+    }
+
+    private List<Organization> getOrganizations(HttpResponse<String> response) throws JsonProcessingException {
+        List<SubUnitDto> units = OBJECTMAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>(){});
+        return units.stream()
+                .map(SubUnitDto::getUri)
+                .map(uri -> attempt(() -> getOrganization(uri)).orElseThrow())
+                .collect(Collectors.toList());
     }
 
     private HttpRequest createHttpRequest(URI uri) {
@@ -140,13 +133,8 @@ public class HttpExecutorImpl {
                 .build();
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest httpRequest) throws InterruptedException,
-            FailedHttpRequestException {
-        try {
-            return httpClient.sendAsync(httpRequest, BodyHandlers.ofString()).get();
-        } catch (ExecutionException e) {
-            throw new FailedHttpRequestException(e);
-        }
+    private HttpResponse<String> sendRequest(HttpRequest httpRequest) {
+        return  attempt(() -> httpClient.sendAsync(httpRequest, BodyHandlers.ofString()).get()).orElseThrow();
     }
 
     private boolean isSuccessful(int statusCode) {
