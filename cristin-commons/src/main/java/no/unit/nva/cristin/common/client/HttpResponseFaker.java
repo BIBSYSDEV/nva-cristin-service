@@ -1,9 +1,8 @@
 package no.unit.nva.cristin.common.client;
 
-import static no.unit.nva.cristin.model.Constants.LINK;
-import static no.unit.nva.cristin.model.Constants.REL_NEXT;
-import static no.unit.nva.cristin.model.Constants.REL_PREV;
-import static no.unit.nva.cristin.model.Constants.X_TOTAL_COUNT;
+import nva.commons.core.JacocoGenerated;
+
+import javax.net.ssl.SSLSession;
 import java.net.URI;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpHeaders;
@@ -14,8 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
-import javax.net.ssl.SSLSession;
-import nva.commons.core.JacocoGenerated;
+
+import static no.unit.nva.cristin.model.Constants.LINK;
+import static no.unit.nva.cristin.model.Constants.REL_NEXT;
+import static no.unit.nva.cristin.model.Constants.REL_PREV;
+import static no.unit.nva.cristin.model.Constants.X_TOTAL_COUNT;
 
 @JacocoGenerated
 public class HttpResponseFaker implements HttpResponse<String> {

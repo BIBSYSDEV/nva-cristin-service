@@ -24,11 +24,9 @@ import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.JacocoGenerated;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
 
-@JacocoGenerated // TODO: Dummy response which will be changed to fetch from upstream later
 public class CristinPersonApiClient extends ApiClient {
 
     private static final String CRISTIN_GET_PERSON_JSON =
