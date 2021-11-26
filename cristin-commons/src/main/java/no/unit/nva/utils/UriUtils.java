@@ -69,11 +69,6 @@ public class UriUtils {
         return new UriWrapper(uri).addQueryParameter(QUERY_PARAMETER_LANGUAGE, ALL_QUERY_PARAMETER_LANGUAGES).getUri();
     }
 
-
-    public static URI createIdUri(String id, String type) {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(type).addChild(id).getUri();
-    }
-
     public static URI createIdUriFromParams(Map<String, String> requestQueryParams, String type) {
         return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(type)
             .addQueryParameters(requestQueryParams).getUri();

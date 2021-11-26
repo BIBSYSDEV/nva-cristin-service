@@ -5,6 +5,7 @@ import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.attempt.Try;
@@ -36,7 +37,6 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PRO
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
 import static no.unit.nva.utils.UriUtils.PROJECT;
-import static no.unit.nva.utils.UriUtils.createIdUri;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
@@ -125,7 +125,7 @@ public class CristinApiClient extends ApiClient {
             .orElseThrow();
 
         HttpResponse<String> response = fetchGetResult(uri);
-        checkHttpStatusCode(createIdUri(id, PROJECT), response.statusCode());
+        checkHttpStatusCode(UriUtils.getNvaApiId(id, PROJECT), response.statusCode());
 
         return getDeserializedResponse(response, CristinProject.class);
     }
