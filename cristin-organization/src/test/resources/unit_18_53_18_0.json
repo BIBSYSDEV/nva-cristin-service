@@ -1,0 +1,133 @@
+{
+  "cristin_unit_id": "185.53.18.0",
+  "unit_name": {
+    "en": "Klinikk for laboratoriemedisin"
+  },
+  "institution": {
+    "cristin_institution_id": "185",
+    "url": "https://api.cristin.no/v2/institutions/185"
+  },
+  "parent_unit": {
+    "cristin_unit_id": "185.53.0.0",
+    "unit_name": {
+      "en": "Institutt for klinisk medisin"
+    },
+    "url": "https://api.cristin.no/v2/units/185.53.0.0"
+  },
+  "parent_units": [
+    {
+      "cristin_unit_id": "185.90.0.0",
+      "unit_name": {
+        "en": "University of Oslo"
+      },
+      "url": "https://api.cristin.no/v2/units/185.90.0.0"
+    },
+    {
+      "cristin_unit_id": "185.50.0.0",
+      "unit_name": {
+        "en": "Faculty of Medicine"
+      },
+      "url": "https://api.cristin.no/v2/units/185.50.0.0"
+    },
+    {
+      "cristin_unit_id": "185.53.0.0",
+      "unit_name": {
+        "en": "Institutt for klinisk medisin"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.0.0"
+    }
+  ],
+  "subunits": [
+    {
+      "cristin_unit_id": "185.53.18.1",
+      "unit_name": {
+        "en": "Forskningsleder"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.1"
+    },
+    {
+      "cristin_unit_id": "185.53.18.10",
+      "unit_name": {
+        "en": "Department of Medical Genetics"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.10"
+    },
+    {
+      "cristin_unit_id": "185.53.18.11",
+      "unit_name": {
+        "en": "Department of Microbiology"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.11"
+    },
+    {
+      "cristin_unit_id": "185.53.18.12",
+      "unit_name": {
+        "en": "Department of Immunology"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.12"
+    },
+    {
+      "cristin_unit_id": "185.53.18.13",
+      "unit_name": {
+        "en": "Department of Pathology"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.13"
+    },
+    {
+      "cristin_unit_id": "185.53.18.14",
+      "unit_name": {
+        "en": "Department of Medical Biochemistry"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.14"
+    },
+    {
+      "cristin_unit_id": "185.53.18.15",
+      "unit_name": {
+        "en": "Department of Pharmacology"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.15"
+    },
+    {
+      "cristin_unit_id": "185.53.18.18",
+      "unit_name": {
+        "en": "Department of Forensic Medicine"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.18"
+    },
+    {
+      "cristin_unit_id": "185.53.18.71",
+      "unit_name": {
+        "en": "K.G.Jebsen Inflammation Research Centre - part UiO"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.71"
+    },
+    {
+      "cristin_unit_id": "185.53.18.72",
+      "unit_name": {
+        "en": "K.G. Jebsen Influenza Vaccine Research Centre-part UiO"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.72"
+    },
+    {
+      "cristin_unit_id": "185.53.18.73",
+      "unit_name": {
+        "en": "K.G. Jebsen Coeliac Disease Research Centre"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.73"
+    },
+    {
+      "cristin_unit_id": "185.53.18.74",
+      "unit_name": {
+        "en": "World Leading - Human Immunology"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.74"
+    },
+    {
+      "cristin_unit_id": "185.53.18.75",
+      "unit_name": {
+        "en": "K.G. Jebsen Centre for B-Cell Malignancies"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.18.75"
+    }
+  ]
+}

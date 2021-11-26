@@ -1,12 +1,11 @@
 package no.unit.nva.cristin.organization;
 
 import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.paths.UriWrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.Collections;
@@ -19,8 +18,15 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 
 public class CristinApiClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
-    private static final String NOT_FOUND_MESSAGE_TEMPLATE = "The URI \"%s\" cannot be dereferenced";
+    private final transient HttpExecutorImpl httpExecutor;
+
+    public CristinApiClient() {
+        this(new HttpExecutorImpl());
+    }
+
+    public CristinApiClient(HttpExecutorImpl httpExecutor) {
+        this.httpExecutor = httpExecutor;
+    }
 
     /**
      * Get information for an Organization.
@@ -29,10 +35,9 @@ public class CristinApiClient {
      * @return an {@link Organization} containing the information
      * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
-    public Organization getSingleUnit(URI uri)
-            throws NotFoundException {
-        logger.info("Fetching results for: " + uri.toString());
-        throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri.toString()));
+    public Organization getOrganization(URI uri)
+            throws NotFoundException, InterruptedException, FailedHttpRequestException {
+        return httpExecutor.getOrganization(uri);
     }
 
     /**
