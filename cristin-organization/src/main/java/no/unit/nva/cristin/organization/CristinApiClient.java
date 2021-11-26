@@ -73,7 +73,7 @@ public class CristinApiClient {
                 CRISTIN_PER_PAGE_PARAM, requestQueryParams.get(NUMBER_OF_RESULTS));
     }
 
-    private SearchResponse updateSearchResponseMetadata(SearchResponse searchResponse,
+    private SearchResponse<Organization> updateSearchResponseMetadata(SearchResponse<Organization> searchResponse,
                                                         Map<String, String> requestQueryParams, long timeUsed) {
         final URI baseUri = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH).getUri();
         searchResponse.setId(new UriWrapper(baseUri).addQueryParameters(requestQueryParams).getUri());
