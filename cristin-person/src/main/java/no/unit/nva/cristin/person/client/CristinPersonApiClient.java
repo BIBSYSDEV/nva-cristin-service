@@ -93,7 +93,7 @@ public class CristinPersonApiClient extends ApiClient {
         return result;
     }
 
-    protected HttpResponse<String> queryPersons(Map<String, String> parameters) throws ApiGatewayException {
+    public HttpResponse<String> queryPersons(Map<String, String> parameters) throws ApiGatewayException {
         URI uri = generateQueryPersonsUrl(parameters);
         HttpResponse<String> response = fetchQueryResults(uri);
         URI id = createIdUriFromParams(parameters, PERSON_PATH_NVA);
