@@ -48,10 +48,11 @@ public class PersonQueryHandlerTest {
     private static final String RANDOM_NAME = "John Smith";
     private static final String NVA_API_QUERY_PERSON_JSON =
         "nvaApiQueryPersonResponse.json";
-    public static final String PROBLEM_JSON = APPLICATION_PROBLEM_JSON.toString();
-    public static final String ZERO_VALUE = "0";
+    private static final String PROBLEM_JSON = APPLICATION_PROBLEM_JSON.toString();
+    private static final String ZERO_VALUE = "0";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String EMPTY_LIST_STRING = "[]";
+
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
     private Context context;
@@ -103,7 +104,7 @@ public class PersonQueryHandlerTest {
         handler = new PersonQueryHandler(apiClient, environment);
         SearchResponse searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
 
-        // Query response has size of 2, and will return that even if trying to enrich those 2 throw exception
+        // Query response has size of 2, and will return that even if trying to enrich those 2 returns empty
         assertThat(2, equalTo(searchResponse.getHits().size()));
     }
 
