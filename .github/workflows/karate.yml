@@ -30,4 +30,5 @@ jobs:
           tests: |
             cristin-organization/src/test/java/no/unit/nva/cristin/organization/organization.feature
             cristin-project/src/test/java/no/unit/nva/cristin/projects/project.feature
-
+      # Delete stack after running tests
+      - run: sam delete --no-prompts
