@@ -62,8 +62,8 @@ public class CristinApiClient {
 
         long start = System.currentTimeMillis();
         SearchResponse<Organization> searchResponse = httpExecutor.query(queryUri);
-
-        return updateSearchResponseMetadata(searchResponse,requestQueryParams, System.currentTimeMillis() - start);
+        final long totalProcessingTime = System.currentTimeMillis() - start;
+        return updateSearchResponseMetadata(searchResponse,requestQueryParams, totalProcessingTime);
     }
 
     private Map<String, String> translateToCristinApi(Map<String, String> requestQueryParams) {
@@ -77,13 +77,22 @@ public class CristinApiClient {
             SearchResponse<Organization> searchResponse,
             Map<String, String> requestQueryParams,
             long timeUsed) {
-        final URI baseUri = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH).getUri();
-        searchResponse.setId(new UriWrapper(baseUri).addQueryParameters(requestQueryParams).getUri());
+        searchResponse.setId(getNvaQueryId(requestQueryParams));
         searchResponse.setFirstRecord(calculateFirstRecord(requestQueryParams));
-        searchResponse.setNextResults(nextResult(baseUri, requestQueryParams, searchResponse.getSize()));
-        searchResponse.setPreviousResults(previousResult(baseUri, requestQueryParams, searchResponse.getSize()));
+        searchResponse.setNextResults(nextResult(getNvaApiBaseUri(), requestQueryParams, searchResponse.getSize()));
+        searchResponse.setPreviousResults(previousResult(getNvaApiBaseUri(),
+                requestQueryParams,
+                searchResponse.getSize()));
         searchResponse.setProcessingTime(timeUsed);
         return searchResponse;
+    }
+
+    private URI getNvaQueryId(Map<String, String> requestQueryParams) {
+        return new UriWrapper(getNvaApiBaseUri()).addQueryParameters(requestQueryParams).getUri();
+    }
+
+    private URI getNvaApiBaseUri() {
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH).getUri();
     }
 
     private URI previousResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
@@ -97,11 +106,11 @@ public class CristinApiClient {
     }
 
     private URI nextResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
-        int nextPage = Integer.parseInt(requestQueryParams.get(PAGE)) + 1;
+        int currentPage = Integer.parseInt(requestQueryParams.get(PAGE));
         int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
-        if (nextPage * pageSize < totalSize) {
+        if (currentPage * pageSize < totalSize) {
             Map<String, String> nextMap = new ConcurrentHashMap<>(requestQueryParams);
-            nextMap.put(PAGE, Integer.toString(nextPage));
+            nextMap.put(PAGE, Integer.toString(currentPage++));
             return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
         }
         return null;

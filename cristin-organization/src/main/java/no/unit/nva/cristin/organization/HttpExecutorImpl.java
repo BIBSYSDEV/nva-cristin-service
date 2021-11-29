@@ -2,7 +2,6 @@ package no.unit.nva.cristin.organization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
@@ -11,7 +10,6 @@ import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonUtils;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -28,6 +26,7 @@ import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
@@ -36,7 +35,6 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public class HttpExecutorImpl {
 
-    public static final ObjectMapper OBJECTMAPPER = JsonUtils.dtoObjectMapper;
     private final transient HttpClient httpClient;
 
     /**
@@ -119,7 +117,7 @@ public class HttpExecutorImpl {
     }
 
     private List<Organization> getOrganizations(HttpResponse<String> response) throws JsonProcessingException {
-        List<SubUnitDto> units = OBJECTMAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>(){});
+        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>(){});
         return units.stream()
                 .map(SubUnitDto::getUri)
                 .map(uri -> attempt(() -> getOrganization(uri)).orElseThrow())
