@@ -110,7 +110,7 @@ public class CristinApiClient {
         int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
         if (currentPage * pageSize < totalSize) {
             Map<String, String> nextMap = new ConcurrentHashMap<>(requestQueryParams);
-            nextMap.put(PAGE, Integer.toString(currentPage++));
+            nextMap.put(PAGE, Integer.toString(currentPage + 1));
             return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
         }
         return null;
