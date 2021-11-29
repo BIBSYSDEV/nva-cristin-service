@@ -6,10 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.MediaTypes;
+import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +29,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static com.google.common.net.MediaType.JSON_UTF_8;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
@@ -32,6 +37,7 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,16 +55,23 @@ class QueryCristinOrganizationHandlerTest {
 
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws NotFoundException, FailedHttpRequestException, InterruptedException {
         context = mock(Context.class);
         cristinApiClient = mock(CristinApiClient.class);
         when(cristinApiClient.queryInstitutions(any())).thenReturn(emptySearchResponse());
         output = new ByteArrayOutputStream();
-        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient);
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
     }
 
     private SearchResponse<Organization> emptySearchResponse() {
-        return new SearchResponse<Organization>(randomId()).withHits(Collections.emptyList());
+        return new SearchResponse<Organization>(
+                new UriWrapper(HTTPS, DOMAIN_NAME)
+                        .addChild(BASE_PATH)
+                        .addChild(UriUtils.INSTITUTION)
+                        .getUri())
+                .withProcessingTime(0L)
+                .withSize(0)
+                .withHits(Collections.emptyList());
     }
 
     @Test
@@ -80,18 +93,39 @@ class QueryCristinOrganizationHandlerTest {
         SearchResponse<Organization> actual = gatewayResponse.getBodyObject(SearchResponse.class);
         assertEquals(0, actual.getHits().size());
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(MediaType.JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
+
+    @Test
+    void shouldReturnResponseOnQuery() throws IOException { // TODO Integration test...
+
+        cristinApiClient = new CristinApiClient();
+        output = new ByteArrayOutputStream();
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
+
+        InputStream inputStream = new HandlerRequestBuilder<InputStream>(restApiMapper)
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withQueryParameters(Map.of("query", "klinisk"))
+                .build();
+        queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        SearchResponse<Organization> actual = gatewayResponse.getBodyObject(SearchResponse.class);
+        assertEquals(0, actual.getHits().size());
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
 
     private InputStream generateHandlerRequestWithMissingQueryParameter() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
                 .build();
     }
 
     private InputStream generateHandlerRequestWithStrangeQueryParameter() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
                 .withQueryParameters(Map.of("query", "strangeQueryWithoutHits"))
                 .build();
     }

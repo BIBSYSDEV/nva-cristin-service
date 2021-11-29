@@ -1,13 +1,19 @@
 package no.unit.nva.utils;
 
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
+import nva.commons.core.paths.UriWrapper;
+
 import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import nva.commons.core.paths.UriWrapper;
+
+import static no.unit.nva.cristin.model.Constants.ALL_QUERY_PARAMETER_LANGUAGES;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
+
 
 public class UriUtils {
 
@@ -43,8 +49,24 @@ public class UriUtils {
                 .collect(Collectors.joining(PARAMETER_DELIMITER));
     }
 
-    public static URI createIdUri(String id, String type) {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(type).addChild(id).getUri();
+
+    public static URI getNvaApiId(String identifier, String path) {
+        return new UriWrapper(HTTPS,
+                DOMAIN_NAME).addChild(BASE_PATH)
+                .addChild(path)
+                .addChild(identifier)
+                .getUri();
+    }
+
+    public static URI getCristinUri(String identifier, String path) {
+        return new UriWrapper(HTTPS, CRISTIN_API_BASE)
+                .addChild(path)
+                .addChild(identifier)
+                .getUri();
+    }
+
+    public static URI addLanguage(URI uri) {
+        return new UriWrapper(uri).addQueryParameter(QUERY_PARAMETER_LANGUAGE, ALL_QUERY_PARAMETER_LANGUAGES).getUri();
     }
 
     public static URI createIdUriFromParams(Map<String, String> requestQueryParams, String type) {

@@ -1,0 +1,84 @@
+{
+  "cristin_unit_id": "185.50.0.0",
+  "unit_name": {
+    "en": "Faculty of Medicine"
+  },
+  "institution": {
+    "cristin_institution_id": "185",
+    "url": "https://api.cristin.no/v2/institutions/185"
+  },
+  "parent_unit": {
+    "cristin_unit_id": "185.90.0.0",
+    "unit_name": {
+      "en": "University of Oslo"
+    },
+    "url": "https://api.cristin.no/v2/units/185.90.0.0"
+  },
+  "parent_units": [
+    {
+      "cristin_unit_id": "185.90.0.0",
+      "unit_name": {
+        "en": "University of Oslo"
+      },
+      "url": "https://api.cristin.no/v2/units/185.90.0.0"
+    }
+  ],
+  "subunits": [
+    {
+      "cristin_unit_id": "185.50.1.0",
+      "unit_name": {
+        "en": "Management Section"
+      },
+      "url": "https://api.cristin.no/v2/units/185.50.1.0"
+    },
+    {
+      "cristin_unit_id": "185.50.8.0",
+      "unit_name": {
+        "en": "Ahus IKT - research services"
+      },
+      "url": "https://api.cristin.no/v2/units/185.50.8.0"
+    },
+    {
+      "cristin_unit_id": "185.50.9.0",
+      "unit_name": {
+        "en": "OUS IKT - research services"
+      },
+      "url": "https://api.cristin.no/v2/units/185.50.9.0"
+    },
+    {
+      "cristin_unit_id": "185.51.0.0",
+      "unit_name": {
+        "en": "Institute of Basic Medical Sciences"
+      },
+      "url": "https://api.cristin.no/v2/units/185.51.0.0"
+    },
+    {
+      "cristin_unit_id": "185.52.0.0",
+      "unit_name": {
+        "en": "Institute of Health and Society"
+      },
+      "url": "https://api.cristin.no/v2/units/185.52.0.0"
+    },
+    {
+      "cristin_unit_id": "185.53.0.0",
+      "unit_name": {
+        "en": "Institutt for klinisk medisin"
+      },
+      "url": "https://api.cristin.no/v2/units/185.53.0.0"
+    },
+    {
+      "cristin_unit_id": "185.56.0.0",
+      "unit_name": {
+        "en": "Biotechnology Centre of Oslo"
+      },
+      "url": "https://api.cristin.no/v2/units/185.56.0.0"
+    },
+    {
+      "cristin_unit_id": "185.57.0.0",
+      "unit_name": {
+        "en": "Centre for Molecular Medicine Norway"
+      },
+      "url": "https://api.cristin.no/v2/units/185.57.0.0"
+    }
+  ]
+}
