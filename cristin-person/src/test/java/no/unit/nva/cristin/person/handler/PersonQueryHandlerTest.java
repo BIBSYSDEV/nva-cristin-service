@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.handler;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.common.client.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -83,9 +84,9 @@ public class PersonQueryHandlerTest {
     }
 
     @Test
-    void shouldThrowCorrectErrorResponseToClientWhenBackendFetchFails() throws IOException {
+    void shouldHideInternalExceptionFromClientWhenUnknownErrorOccur() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
-        doThrow(new RuntimeException()).when(apiClient).fetchQueryResults(any());
+        doThrow(new RuntimeException()).when(apiClient).getEnrichedPersonsUsingQueryResponse(any());
         handler = new PersonQueryHandler(apiClient, environment);
 
         GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
@@ -93,6 +94,20 @@ public class PersonQueryHandlerTest {
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
+    }
+
+    @Test
+    void shouldReturnBadGatewayToClientWhenBackendFetchFails() throws IOException {
+        apiClient = spy(apiClient);
+        HttpResponse<String> response = new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
+        doReturn(response).when(apiClient).fetchQueryResults(any());
+        handler = new PersonQueryHandler(apiClient, environment);
+
+        GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
+
+        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
     }
 
     @Test

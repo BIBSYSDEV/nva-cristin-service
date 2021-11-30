@@ -64,7 +64,7 @@ public class CristinPersonApiClient extends ApiClient {
             .withHits(persons);
     }
 
-    protected List<CristinPerson> getEnrichedPersonsUsingQueryResponse(HttpResponse<String> response)
+    public List<CristinPerson> getEnrichedPersonsUsingQueryResponse(HttpResponse<String> response)
         throws ApiGatewayException {
 
         List<CristinPerson> personsFromQuery = asList(getDeserializedResponse(response, CristinPerson[].class));
