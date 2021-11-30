@@ -131,7 +131,7 @@ public class HttpExecutorImpl {
                 .build();
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest httpRequest) {
+     protected HttpResponse<String> sendRequest(HttpRequest httpRequest) {
         return  attempt(() -> httpClient.sendAsync(httpRequest, BodyHandlers.ofString()).get()).orElseThrow();
     }
 

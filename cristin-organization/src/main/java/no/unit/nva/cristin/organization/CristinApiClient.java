@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
@@ -19,6 +18,8 @@ import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
+import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 
 
 public class CristinApiClient {
@@ -54,12 +55,8 @@ public class CristinApiClient {
      */
     public SearchResponse<Organization> queryOrganizations(Map<String, String> requestQueryParams)
             throws NotFoundException, FailedHttpRequestException {
-        Map<String, String> cristinRequestQueryParams = translateToCristinApi(requestQueryParams);
-        URI queryUri = new UriWrapper(HTTPS, CRISTIN_API_BASE)
-                .addChild(UNITS_PATH)
-                .addQueryParameters(cristinRequestQueryParams)
-                .getUri();
 
+        URI queryUri = createCristinQueryUri(translateToCristinApi(requestQueryParams), UNITS_PATH);
         long start = System.currentTimeMillis();
         SearchResponse<Organization> searchResponse = httpExecutor.query(queryUri);
         final long totalProcessingTime = System.currentTimeMillis() - start;
@@ -77,7 +74,7 @@ public class CristinApiClient {
             SearchResponse<Organization> searchResponse,
             Map<String, String> requestQueryParams,
             long timeUsed) {
-        searchResponse.setId(getNvaQueryId(requestQueryParams));
+        searchResponse.setId(createIdUriFromParams(requestQueryParams, ORGANIZATION_PATH));
         searchResponse.setFirstRecord(calculateFirstRecord(requestQueryParams));
         searchResponse.setNextResults(nextResult(getNvaApiBaseUri(), requestQueryParams, searchResponse.getSize()));
         searchResponse.setPreviousResults(previousResult(getNvaApiBaseUri(),
@@ -85,10 +82,6 @@ public class CristinApiClient {
                 searchResponse.getSize()));
         searchResponse.setProcessingTime(timeUsed);
         return searchResponse;
-    }
-
-    private URI getNvaQueryId(Map<String, String> requestQueryParams) {
-        return new UriWrapper(getNvaApiBaseUri()).addQueryParameters(requestQueryParams).getUri();
     }
 
     private URI getNvaApiBaseUri() {
