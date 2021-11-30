@@ -3,7 +3,8 @@ name: Karate API tests
 on: [push]
 env:
   STACK_NAME: karate-cristin-np3471
-deploy:
+jobs:
+  build_and_deploy:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
