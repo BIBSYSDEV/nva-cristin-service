@@ -16,6 +16,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
+@SuppressWarnings("unused")
 public class PersonQueryHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
     private final transient CristinPersonApiClient apiClient;

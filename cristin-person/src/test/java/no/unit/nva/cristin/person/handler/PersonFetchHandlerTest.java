@@ -52,7 +52,7 @@ public class PersonFetchHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseWhenCallingEndpointWithNameParameter() throws IOException {
+    void shouldReturnResponseWhenCallingEndpointWithValidIdentifier() throws IOException {
         Person actual = sendQuery(EMPTY_MAP, VALID_PATH_PARAM).getBodyObject(Person.class);
         String expectedString = IoUtils.stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
         Person expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
