@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
+import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -223,7 +224,7 @@ public class FetchCristinProjectsTest {
 
     @Test
     void readerThrowsIoExceptionWhenReadingInvalidJson() {
-        Executable action = () -> CristinApiClient.fromJson(INVALID_JSON, CristinProject.class);
+        Executable action = () -> ApiClient.fromJson(INVALID_JSON, CristinProject.class);
         assertThrows(IOException.class, action);
     }
 

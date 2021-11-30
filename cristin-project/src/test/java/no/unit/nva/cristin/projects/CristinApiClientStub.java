@@ -22,22 +22,22 @@ public class CristinApiClientStub extends CristinApiClient {
     }
 
     @Override
-    protected long calculateProcessingTime(long startRequestTime, long endRequestTime) {
+    public long calculateProcessingTime(long startRequestTime, long endRequestTime) {
         return 1000;
     }
 
     @Override
-    protected HttpResponse<String> fetchGetResult(URI uri) {
+    public HttpResponse<String> fetchGetResult(URI uri) {
         return mockGetResponse();
     }
 
     @Override
-    protected CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
+    public CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
         return CompletableFuture.completedFuture(mockGetResponse());
     }
 
     @Override
-    protected HttpResponse<String> fetchQueryResults(URI uri) {
+    public HttpResponse<String> fetchQueryResults(URI uri) {
         return mockQueryResponse();
     }
 

@@ -31,5 +31,4 @@ jobs:
             cristin-organization/src/test/java/no/unit/nva/cristin/organization/organization.feature
             cristin-project/src/test/java/no/unit/nva/cristin/projects/project.feature
       # Delete stack after running tests
-      - name: Delete stack after running Karate tests
-        run: sam delete --no-prompts
+      - run: sam delete --no-prompts
