@@ -1,7 +1,9 @@
 package no.unit.nva.cristin.person.handler;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -9,7 +11,11 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
@@ -17,9 +23,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
+import no.unit.nva.cristin.common.client.HttpResponseFaker;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -38,6 +46,7 @@ public class PersonFetchHandlerTest {
     private static final Map<String, String> ILLEGAL_QUERY_PARAMS = Map.of("somekey", "somevalue");
     private static final Map<String, String> VALID_PATH_PARAM = Map.of(ID, "12345");
     private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
+    private static final String EMPTY_STRING = "";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -80,6 +89,46 @@ public class PersonFetchHandlerTest {
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
             containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
+    }
+
+    @Test
+    void shouldReturnNotFoundToClientWhenCristinFetchReturnsNotFound() throws Exception {
+        apiClient = spy(apiClient);
+        doReturn(new HttpResponseFaker(EMPTY_STRING, 404))
+            .when(apiClient).fetchGetResult(any(URI.class));
+
+        handler = new PersonFetchHandler(apiClient, environment);
+        GatewayResponse<Person> gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
+
+        assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldReturnBadGatewayWhenStatusCodeFromBackendSignalsError() throws Exception {
+        apiClient = spy(apiClient);
+        doReturn(new HttpResponseFaker(EMPTY_STRING, 500))
+            .when(apiClient).fetchGetResult(any(URI.class));
+
+        handler = new PersonFetchHandler(apiClient, environment);
+        GatewayResponse<Person> gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(gatewayResponse.getBody(),
+            containsString(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
+    }
+
+    @Test
+    void shouldHideInternalExceptionFromClientWhenBackendFail() throws Exception {
+        apiClient = spy(apiClient);
+
+        doThrow(RuntimeException.class).when(apiClient).generateGetResponse(any());
+        handler = new PersonFetchHandler(apiClient, environment);
+        GatewayResponse<Person> gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
+
+        assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
     private GatewayResponse<Person> sendQuery(Map<String, String> queryParams, Map<String, String> pathParam)

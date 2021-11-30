@@ -30,8 +30,6 @@ import nva.commons.core.attempt.Try;
 
 public class CristinPersonApiClient extends ApiClient {
 
-    //private static final String CRISTIN_GET_PERSON_JSON = "cristinGetPersonResponse.json";
-
     public CristinPersonApiClient() {
         this(HttpClient.newHttpClient());
     }
