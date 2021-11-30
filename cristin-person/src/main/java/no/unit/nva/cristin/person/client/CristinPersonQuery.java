@@ -18,7 +18,8 @@ public class CristinPersonQuery {
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_DEFAULT_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
-    private static final String CRISTIN_API_PERSONS_PATH = "/v2/persons/";
+    private static final String CRISTIN_API_VERSION_PATH = "v2";
+    private static final String CRISTIN_API_PERSONS_PATH = "persons";
 
     private final transient Map<String, String> cristinQueryParameters;
 
@@ -67,6 +68,7 @@ public class CristinPersonQuery {
      */
     public URI toURI() {
         URI uri = new UriWrapper(HTTPS, CRISTIN_API_HOST)
+            .addChild(CRISTIN_API_VERSION_PATH)
             .addChild(CRISTIN_API_PERSONS_PATH)
             .addQueryParameters(cristinQueryParameters)
             .getUri();
