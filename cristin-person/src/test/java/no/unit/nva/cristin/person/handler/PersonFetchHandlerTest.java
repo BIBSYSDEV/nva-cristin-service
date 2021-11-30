@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.handler;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
+import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -38,6 +39,7 @@ public class PersonFetchHandlerTest {
     private static final Map<String, String> VALID_PATH_PARAM = Map.of(ID, "12345");
     private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
 
+    private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
@@ -45,7 +47,7 @@ public class PersonFetchHandlerTest {
 
     @BeforeEach
     void setUp() {
-        CristinPersonApiClient apiClient = new CristinPersonApiClient();
+        apiClient = new CristinPersonApiClientStub();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new PersonFetchHandler(apiClient, environment);
@@ -67,7 +69,7 @@ public class PersonFetchHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-            containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP));
+            containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP));
     }
 
     @Test
