@@ -7,10 +7,10 @@ Feature: API tests for Cristin Organization retrieve and search
 
   Scenario: Print environment
 #    Then print 'url is : ', url
-    * print 'SERVER_URL is : ', SERVER_URL
+#    * print 'SERVER_URL is : ', SERVER_URL
     * print 'karate.properties[java.home]=', karate.properties['java.home']
 #    * print myVarName
-    * def baseUrl = karate.properties['url']
-    * print baseUrl
+    * def environmentBaseUrl = karate.properties['baseUrl']
+    * print environmentBaseUrl
     * print url
 
