@@ -1,0 +1,368 @@
+{
+  "type": "Organization",
+  "@context": "https://api.dev.nva.aws.unit.no/cristin/organization",
+  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.20.0",
+  "name": {
+    "en": "Department of Medical Biochemistry",
+    "nb": "Avdeling for medisinsk biokjemi"
+  },
+  "partOf": [
+    {
+      "type": "Organization",
+      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.0.0",
+      "name": {
+        "en": "Division of Diagnostics and Intervention",
+        "nb": "Klinikk for laboratoriemedisin"
+      },
+      "partOf": [
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0",
+          "name": {
+            "en": "Oslo University Hospital",
+            "nb": "Oslo universitetssykehus HF"
+          },
+          "hasPart": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.27.0.0",
+              "name": {
+                "en": "Division of Cancer Medicine",
+                "nb": "Kreftklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.29.0.0",
+              "name": {
+                "en": "Division of Prehospital Service",
+                "nb": "Prehospital klinikk"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.24.0.0",
+              "name": {
+                "en": "Division of Paediatric and Adolescent Medicine",
+                "nb": "Barne- og ungdomsklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.30.0.0",
+              "name": {
+                "en": "Div of Technology and Innovation",
+                "nb": "Teknologi- og innovasjonsklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.28.0.0",
+              "name": {
+                "en": "Division of Radiology and Nuclear Medicine",
+                "nb": "Klinikk for radiologi og nukleærmedisin"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.26.0.0",
+              "name": {
+                "en": "Division of Surgery, Inflammatory Medicine and Transplantation",
+                "nb": "Klinikk for kirurgi, inflammasjonsmedisin og transplantasjon"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.2.0.0",
+              "name": {
+                "en": "Division of Medicine",
+                "nb": "Medisinsk klinikk"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.6.0.0",
+              "name": {
+                "en": "Division of Cardiovascular and Pulmonary Diseases",
+                "nb": "Hjerte-, lunge- og karklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.10.0.0",
+              "name": {
+                "en": "Oslo Hospital Services",
+                "nb": "Oslo Sykehusservice"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.23.0.0",
+              "name": {
+                "en": "Division of Orthopaedic Surgery",
+                "nb": "Klinikk for ortopedi"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.11.0.0",
+              "name": {
+                "en": "CEO Executive Staff",
+                "nb": "Direktørens stab"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.25.0.0",
+              "name": {
+                "en": "Division of Gynaecology and Obstetrics",
+                "nb": "Kvinneklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.1.0.0",
+              "name": {
+                "en": "Division of Mental Health and Addiction ",
+                "nb": "Klinikk psykisk helse og avhengighet"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.0.0",
+              "name": {
+                "en": "Division of Diagnostics and Intervention",
+                "nb": "Klinikk for laboratoriemedisin"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.21.0.0",
+              "name": {
+                "en": "Division of Head, Neck and Reconstructive Surgery",
+                "nb": "Klinikk for hode, hals og rekonstruktiv kirurgi"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.8.0.0",
+              "name": {
+                "en": "Division of Emergencies and Critical Care",
+                "nb": "Akuttklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.22.0.0",
+              "name": {
+                "en": "Division of Clinical Neuroscience",
+                "nb": "Nevroklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.0.0.0"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hasPart": [
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.25.0",
+          "name": {
+            "en": "Department of Medical Genetics",
+            "nb": "Avdeling for medisinsk genetikk"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.0.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.30.0",
+          "name": {
+            "en": "Department of Microbiology",
+            "nb": "Avdeling for mikrobiologi"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.0.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.40.0",
+          "name": {
+            "nb": "Avdeling for rettsmedisinske fag"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.0.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.10.0",
+          "name": {
+            "en": "Department of Immunology",
+            "nb": "Avdeling for immunologi og transfusjonmedisin"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.0.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.20.0",
+          "name": {
+            "en": "Department of Medical Biochemistry",
+            "nb": "Avdeling for medisinsk biokjemi"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.0.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.5.0",
+          "name": {
+            "en": "Department of Pharmacology",
+            "nb": "Avdeling for farmakologi"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.0.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.35.0",
+          "name": {
+            "en": "Department of Pathology",
+            "nb": "Avdeling for patologi"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/2012.9.0.0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -27,7 +27,6 @@ import static no.unit.nva.utils.UriUtils.getNvaApiId;
 
 public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, Organization> {
 
-
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
     private final transient CristinApiClient cristinApiClient;
 

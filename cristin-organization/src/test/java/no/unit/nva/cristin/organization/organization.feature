@@ -3,7 +3,7 @@ Feature: API tests for Cristin Organization retrieve and search
   Background:
     * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
     * def testOrganizationNameSearchTerm = 'univers'
-    * def CRISTIN_BASE = SERVER_URL + '/np3460-karate-cristin'
+    * def CRISTIN_BASE = SERVER_URL + '/cristin-karate-np3360'
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingOrganizationId = '0.1.2.3'
     Given url CRISTIN_BASE
@@ -57,4 +57,4 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 200
     And match response.hits == '#array'
     And match response.size == '#number'
-    And match response.hits == '#[0]' // hits array length == 0
+    And match response.hits == '#[2]' // hits array length == 0
