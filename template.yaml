@@ -14,7 +14,7 @@ Globals:
       Variables:
         ALLOWED_ORIGIN: '*'
         CRISTIN_API_HOST: !Ref CristinApiHost
-        DOMAIN_NAME: !Ref CustomDomain
+        DOMAIN_NAME: !Ref ApiDomain
         BASE_PATH: !Ref CustomDomainBasePath
   Api:
     Cors:
