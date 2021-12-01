@@ -4,17 +4,16 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
-import com.google.common.net.MediaType;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.MediaTypes;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
+import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,34 +24,45 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static com.google.common.net.MediaType.JSON_UTF_8;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static java.net.HttpURLConnection.HTTP_OK;
+import static java.util.Collections.emptyList;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 class QueryCristinOrganizationHandlerTest {
 
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
+    private static final String CRISTIN_QUERY_RESPONSE = "cristin_query_response_sample.json";
     QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private CristinApiClient cristinApiClient;
     private ByteArrayOutputStream output;
     private Context context;
-
 
     @BeforeEach
     void setUp() throws NotFoundException, FailedHttpRequestException, InterruptedException {
@@ -71,7 +81,7 @@ class QueryCristinOrganizationHandlerTest {
                         .getUri())
                 .withProcessingTime(0L)
                 .withSize(0)
-                .withHits(Collections.emptyList());
+                .withHits(emptyList());
     }
 
     @Test
@@ -97,25 +107,48 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseOnQuery() throws IOException { // TODO Integration test...
+    void shouldReturnResponseOnQuery() throws IOException, NotFoundException, FailedHttpRequestException {
 
-        cristinApiClient = new CristinApiClient();
+        HttpClient httpClient = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.ALWAYS)
+                .connectTimeout(Duration.ofSeconds(30))
+                .build();
+
+        HttpExecutorImpl httpExecutor = new HttpExecutorImpl(httpClient);
+        output = new ByteArrayOutputStream();
+
+        HttpExecutorImpl mySpy = spy(httpExecutor);
+        final URI first = getCristinUri("185.53.18.14", UNITS_PATH);
+        doReturn(getOrganization("org_18_53_18_14.json")).when(mySpy).getOrganization(first);
+        final URI second = getCristinUri("2012.9.20.0", UNITS_PATH);
+        doReturn(getOrganization("org_2012_9_20_0.json")).when(mySpy).getOrganization(second);
+        HttpResponse<String> mockHttpResponse = mock(HttpResponse.class);
+        when(mockHttpResponse.statusCode()).thenReturn(HTTP_OK);
+        when(mockHttpResponse.body()).thenReturn(IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE)));
+        when(mockHttpResponse.headers())
+                .thenReturn(java.net.http.HttpHeaders.of(Collections.emptyMap(), (s1,s2) -> true));
+        doReturn(mockHttpResponse).when(mySpy).sendRequest(any());
+
+        cristinApiClient = new CristinApiClient(mySpy);
         output = new ByteArrayOutputStream();
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
 
         InputStream inputStream = new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withQueryParameters(Map.of("query", "klinisk"))
+                .withQueryParameters(Map.of("query", "Department of Medical Biochemistry"))
                 .build();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         SearchResponse<Organization> actual = gatewayResponse.getBodyObject(SearchResponse.class);
-        assertEquals(5, actual.getHits().size());
+        assertEquals(2, actual.getHits().size());
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
+    private Organization getOrganization(String subUnitFile) throws JsonProcessingException {
+        return  OBJECT_MAPPER.readValue(IoUtils.stringFromResources(Path.of(subUnitFile)), Organization.class);
+    }
 
     private InputStream generateHandlerRequestWithMissingQueryParameter() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)

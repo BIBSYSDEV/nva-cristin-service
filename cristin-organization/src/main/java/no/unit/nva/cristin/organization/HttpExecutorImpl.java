@@ -99,15 +99,13 @@ public class HttpExecutorImpl {
     }
 
     protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
-        HttpRequest httpRequest = createHttpRequest(addLanguage(uri));
-        HttpResponse<String> response = sendRequest(httpRequest);
+        HttpResponse<String> response = sendRequest(createHttpRequest(addLanguage(uri)));
         if (isSuccessful(response.statusCode())) {
             try {
                 List<Organization> organizations = getOrganizations(response);
-                final int count =  response.headers().firstValue("X-Total-Count").isPresent()
-                        ? Integer.parseInt(response.headers().firstValue("X-Total-Count").get())
-                        : organizations.size();
-                return new SearchResponse<Organization>(uri).withHits(organizations).withSize(count);
+                return new SearchResponse<Organization>(uri)
+                        .withHits(organizations)
+                        .withSize(getCount(response, organizations));
             } catch (JsonProcessingException e) {
                 throw new FailedHttpRequestException(e.getMessage());
             }
@@ -116,8 +114,16 @@ public class HttpExecutorImpl {
         }
     }
 
+    private int getCount(HttpResponse<String> response, List<Organization> organizations) {
+        final int count = response.headers().firstValue("X-Total-Count").isPresent()
+                ? Integer.parseInt(response.headers().firstValue("X-Total-Count").get())
+                : organizations.size();
+        return count;
+    }
+
     private List<Organization> getOrganizations(HttpResponse<String> response) throws JsonProcessingException {
-        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>(){});
+        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>() {
+        });
         return units.stream()
                 .map(SubUnitDto::getUri)
                 .map(uri -> attempt(() -> getOrganization(uri)).orElseThrow())
@@ -131,8 +137,8 @@ public class HttpExecutorImpl {
                 .build();
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest httpRequest) {
-        return  attempt(() -> httpClient.sendAsync(httpRequest, BodyHandlers.ofString()).get()).orElseThrow();
+    protected HttpResponse<String> sendRequest(HttpRequest httpRequest) {
+        return attempt(() -> httpClient.sendAsync(httpRequest, BodyHandlers.ofString()).get()).orElseThrow();
     }
 
     private boolean isSuccessful(int statusCode) {

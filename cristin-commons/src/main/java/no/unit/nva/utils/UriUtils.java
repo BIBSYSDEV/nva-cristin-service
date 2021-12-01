@@ -73,4 +73,13 @@ public class UriUtils {
         return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(type)
             .addQueryParameters(requestQueryParams).getUri();
     }
+
+
+    public static URI createCristinQueryUri(Map<String, String> cristinRequestQueryParams, String path) {
+        URI queryUri = new UriWrapper(HTTPS, CRISTIN_API_BASE)
+                .addChild(path)
+                .addQueryParameters(cristinRequestQueryParams)
+                .getUri();
+        return queryUri;
+    }
 }
