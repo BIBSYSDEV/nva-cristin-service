@@ -7,14 +7,17 @@ Feature: API tests for Cristin Organization retrieve and search
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingOrganizationId = '0.1.2.3'
 #    Given url CRISTIN_BASE
-    Given url url
-    * baseUrl java.lang.System.getenv('backendUrl')
+    Given url baseUrl
+#  *  url baseUrl
+
+  Scenario: Print environment
+    Then print 'baseUrl is : ',baseUrl
+    Then print 'url is : ',url
 
   Scenario: GET organization returns list of search results
     Given  path '/organization'
     And param query = illegalIdentifier
     When method GET
-    Then print 'baseUrl is : ',baseUrl
     Then status 200
     And match response.hits == '#array'
     And match response.size == 0
