@@ -2,8 +2,8 @@ name: Karate API tests
 
 on: [push]
 env:
-  STACK_NAME: karate-cristin-np3471
-  BASE_PATH: cristin-karate-np3471
+  STACK_NAME: "karate-cristin-np3471"
+  BASE_PATH: "cristin-karate-np3471"
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
