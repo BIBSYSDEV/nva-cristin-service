@@ -12,5 +12,5 @@ Feature: API tests for Cristin Organization retrieve and search
 #    * print myVarName
     * def environmentBaseUrl = karate.properties['baseUrl']
     * print environmentBaseUrl
-    * print url
+#    * print url
 
