@@ -21,7 +21,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
 
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS);
 
-    public static final String WORD_WHITESPACE_DASH_COMMA_PERIOD = "[\\w\\s\\-,.]+";
+    public static final String WORD_WHITESPACE_DASH_COMMA_PERIOD = "[\\w\\s\\-,.æøå]+";
     public static final Pattern QUERY_PATTERN = Pattern.compile(WORD_WHITESPACE_DASH_COMMA_PERIOD);
 
     public CristinQueryHandler(Class<I> iclass, Environment environment) {

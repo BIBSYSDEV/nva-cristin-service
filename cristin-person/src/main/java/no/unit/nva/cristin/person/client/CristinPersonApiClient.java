@@ -13,6 +13,7 @@ import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,10 @@ import nva.commons.core.attempt.Try;
 public class CristinPersonApiClient extends ApiClient {
 
     public CristinPersonApiClient() {
-        this(HttpClient.newHttpClient());
+        this(HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.ALWAYS)
+            .connectTimeout(Duration.ofSeconds(30))
+            .build());
     }
 
     public CristinPersonApiClient(HttpClient client) {
