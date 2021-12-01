@@ -14,7 +14,7 @@ Globals:
       Variables:
         ALLOWED_ORIGIN: '*'
         CRISTIN_API_HOST: !Ref CristinApiHost
-        DOMAIN_NAME: !Ref CustomDomain
+        DOMAIN_NAME: !Ref ApiDomain
         BASE_PATH: !Ref CustomDomainBasePath
   Api:
     Cors:
@@ -23,10 +23,10 @@ Globals:
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Parameters:
-  CustomDomain:
-    Type: String
-    Description: Custom API to connect this lambda to
-    Default: 'api.dev.nva.aws.unit.no'
+  ApiDomain:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /NVA/ApiDomain
+    Description: Domain-name for the backend
   CustomDomainBasePath:
     Type: String
     Description: Base path mapping in CustomDomain
@@ -164,7 +164,7 @@ Resources:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
       BasePath: !Ref CustomDomainBasePath
-      DomainName: !Ref CustomDomain
+      DomainName: !Ref ApiDomain
       RestApiId: !Ref NvaCristinProxyApi
       Stage: !Ref NvaCristinProxyApi.Stage
 
