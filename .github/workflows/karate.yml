@@ -3,7 +3,8 @@ name: Karate API tests
 on: [ push ]
 env:
   STACK_NAME: "karate-cristin-np3471"
-  BASE_PATH: cristin-${GITHUB_REF_NAME}
+  BASE_PATH: "cristin-karate-tests"
+  ANOTHER_BASE_PATH: "cristin-karate-tests-${GITHUB_REF_NAME}"
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -22,7 +23,7 @@ jobs:
           role-to-assume: arn:aws:iam::884807050265:role/nva-dev-github-actions-role
           aws-region: eu-west-1
       - name: Build and deploy
-        run: echo building ${GITHUB_REPOSITORY} ${GITHUB_REF_NAME} ${STACK_NAME} ${BASE_PATH}
+        run: echo building ${GITHUB_REPOSITORY} ${GITHUB_REF_NAME} ${STACK_NAME} ${BASE_PATH} ${ANOTHER_BASE_PATH}
       - run: sam build
       # Prevent prompts and failure when the stack is unchanged
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${STACK_NAME} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=api.dev.nva.aws.unit.no ParameterKey=CustomDomainBasePath,ParameterValue=${BASE_PATH} ParameterKey=CristinApiHost,ParameterValue=api.cristin.no
