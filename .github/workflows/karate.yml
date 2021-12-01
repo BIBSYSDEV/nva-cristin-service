@@ -32,8 +32,7 @@ jobs:
       - name: Run Karate tests erikbos/karate-action@main
         uses: erikbos/karate-action@main
         with:
-          url: https://api.dev.nva.aws.unit.no/${BASE_PATH}/
-          backendUrl: https://api.dev.nva.aws.unit.no/no-real-path/
+          url: https://api.dev.nva.aws.unit.no/no-real-path/
           tests: |
             cristin-organization/src/test/java/no/unit/nva/cristin/organization/environment.feature
 #            cristin-organization/src/test/java/no/unit/nva/cristin/organization/organization.feature
