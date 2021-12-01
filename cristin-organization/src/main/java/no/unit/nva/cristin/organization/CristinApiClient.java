@@ -60,7 +60,7 @@ public class CristinApiClient {
         long start = System.currentTimeMillis();
         SearchResponse<Organization> searchResponse = httpExecutor.query(queryUri);
         final long totalProcessingTime = System.currentTimeMillis() - start;
-        return updateSearchResponseMetadata(searchResponse,requestQueryParams, totalProcessingTime);
+        return updateSearchResponseMetadata(searchResponse, requestQueryParams, totalProcessingTime);
     }
 
     private Map<String, String> translateToCristinApi(Map<String, String> requestQueryParams) {
@@ -75,7 +75,9 @@ public class CristinApiClient {
             Map<String, String> requestQueryParams,
             long timeUsed) {
         searchResponse.setId(createIdUriFromParams(requestQueryParams, ORGANIZATION_PATH));
-        searchResponse.setFirstRecord(calculateFirstRecord(requestQueryParams));
+        if (searchResponse.getSize() > 0) {
+            searchResponse.setFirstRecord(calculateFirstRecord(requestQueryParams));
+        }
         searchResponse.setNextResults(nextResult(getNvaApiBaseUri(), requestQueryParams, searchResponse.getSize()));
         searchResponse.setPreviousResults(previousResult(getNvaApiBaseUri(),
                 requestQueryParams,
