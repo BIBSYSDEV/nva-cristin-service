@@ -25,7 +25,7 @@ jobs:
         run: echo building ${GITHUB_REPOSITORY} ${GITHUB_REF_NAME} ${STACK_NAME} ${BASE_PATH}
       - run: sam build
       # Prevent prompts and failure when the stack is unchanged
-      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${STACK_NAME} --parameter-overrides "CustomDomain=\"api.dev.nva.aws.unit.no\" CustomDomainBasePath=\"${BASE_PATH}\" CristinApiHost=\"api.cristin.no\""
+       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${STACK_NAME} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=api.dev.nva.aws.unit.no ParameterKey=CustomDomainBasePath,ParameterValue=${BASE_PATH} ParameterKey=CristinApiHost,ParameterValue=api.cristin.no
       # Run karate tests on deployed api
       - name: Run Karate tests erikbos/karate-action@main
         uses: erikbos/karate-action@main
