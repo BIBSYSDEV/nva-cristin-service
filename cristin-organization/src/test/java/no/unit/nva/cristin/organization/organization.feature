@@ -1,18 +1,12 @@
 Feature: API tests for Cristin Organization retrieve and search
 
   Background:
-#    * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
+    * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
     * def testOrganizationNameSearchTerm = 'univers'
-#    * def CRISTIN_BASE = SERVER_URL + '/cristin-karate-np3360'
+    * def CRISTIN_BASE = SERVER_URL + '/cristin-karate-tests'
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingOrganizationId = '0.1.2.3'
-#    Given url CRISTIN_BASE
-    Given url baseUrl
-#  *  url baseUrl
-
-  Scenario: Print environment
-    Then print 'baseUrl is : ',baseUrl
-    Then print 'url is : ',url
+    Given url CRISTIN_BASE
 
   Scenario: GET organization returns list of search results
     Given  path '/organization'

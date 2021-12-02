@@ -1,15 +1,26 @@
 Feature: API tests for Cristin Organization retrieve and search
 
   Background:
-    * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
-    * def CRISTIN_BASE = SERVER_URL + '/cristin-karate-np3360'
-#    Given url CRISTIN_BASE
-    * url url
-  Scenario: Print environment
-#    Then print 'url is : ', url
-#    * print 'SERVER_URL is : ', SERVER_URL
-#    * print myVarName
-    * def environmentBaseUrl = karate.properties['baseUrl']
-    * print environmentBaseUrl
-    * print url
+    * def CRISTIN_BASE = baseUrl + 'cristin-karate-tests'
+    * def illegalIdentifier = 'illegalIdentifier'
+    Given url CRISTIN_BASE
 
+
+  Scenario: Print environment
+    * print 'baseUrl=', baseUrl
+    * print 'CRISTIN_BASE=', CRISTIN_BASE
+#    * print 'url=', url
+
+  Scenario: GET organization returns list of search results
+    Given path '/organization'
+    And param query = illegalIdentifier
+    When method GET
+    Then status 200
+    And match response.hits == '#array'
+    And match response.size == 0
+
+  Scenario: GET organization returns list of search results
+    Given path '/organization/185.53.18.14'
+    When method GET
+    Then status 200
+    * print response
