@@ -1,0 +1,24 @@
+[
+  {
+    "cristin_unit_id": "185.53.18.14",
+    "unit_name": {
+      "en": "Department of Medical Biochemistry"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin.no/v2/units/185.53.18.14",
+    "acronym": "KLM-MBK"
+  },
+  {
+    "cristin_unit_id": "2012.9.20.0",
+    "unit_name": {
+      "en": "Department of Medical Biochemistry"
+    },
+    "institution": {
+      "acronym": "OUS"
+    },
+    "url": "https://api.cristin.no/v2/units/2012.9.20.0",
+    "acronym": "MBK"
+  }
+]

@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.projects;
 
-import no.unit.nva.cristin.common.client.HttpResponseFaker;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import org.junit.jupiter.api.Test;
 

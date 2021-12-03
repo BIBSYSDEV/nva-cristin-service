@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.common.client;
+package no.unit.nva.cristin.testing;
 
 import nva.commons.core.JacocoGenerated;
 
