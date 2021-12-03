@@ -1,0 +1,1163 @@
+{
+  "type": "Organization",
+  "@context": "https://api.dev.nva.aws.unit.no/cristin/organization",
+  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.14",
+  "name": {
+    "en": "Department of Medical Biochemistry",
+    "nb": "Avdeling for medisinsk biokjemi"
+  },
+  "partOf": [
+    {
+      "type": "Organization",
+      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0",
+      "name": {
+        "en": "Klinikk for laboratoriemedisin",
+        "nb": "Klinikk for laboratoriemedisin"
+      },
+      "partOf": [
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0",
+          "name": {
+            "en": "Institutt for klinisk medisin",
+            "nb": "Institutt for klinisk medisin"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.0.0",
+              "name": {
+                "en": "Faculty of Medicine",
+                "nb": "Det medisinske fakultet"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0",
+                  "name": {
+                    "en": "University of Oslo",
+                    "nb": "Universitetet i Oslo"
+                  },
+                  "hasPart": [
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.29.14.0",
+                      "name": {
+                        "en": "Uniforum",
+                        "nb": "Uniforum"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.18.0.0",
+                      "name": {
+                        "en": "Faculty of Educational Sciences",
+                        "nb": "Det utdanningsvitenskapelige fakultet"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.39.59.0",
+                      "name": {
+                        "en": "Kunnskapsdepartementets tjenesteorgan",
+                        "nb": "Kunnskapsdepartementets tjenesteorgan"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.34.1.10",
+                      "name": {
+                        "en": "Library Director's Staff",
+                        "nb": "Bibliotekdirektørens stab"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.39.7.0",
+                      "name": {
+                        "en": "Universitetets barnehage",
+                        "nb": "Universitetets barnehage"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.12.0.0",
+                      "name": {
+                        "en": "Faculty of Law",
+                        "nb": "Det juridiske fakultet"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.34.15.0",
+                      "name": {
+                        "en": "Bibliotek for medisin og realfag",
+                        "nb": "Bibliotek for medisin og realfag"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.29.1.0",
+                      "name": {
+                        "en": "Senter for utvikling og miljø",
+                        "nb": "Senter for utvikling og miljø"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.14.0.0",
+                      "name": {
+                        "en": "Faculty of Humanities",
+                        "nb": "Det humanistiske fakultet"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.15.0.0",
+                      "name": {
+                        "en": "Faculty of Mathematics and Natural Sciences",
+                        "nb": "Det matematisk-naturvitenskapelige fakultet"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.29.12.0",
+                      "name": {
+                        "en": "Centre for Gender Research",
+                        "nb": "Senter for tverrfaglig kjønnsforskning"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.39.4.0",
+                      "name": {
+                        "en": "Data protection officer",
+                        "nb": "Personvernombud"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.39.50.0",
+                      "name": {
+                        "en": "CERES - National Centre for Systems and Services for Research and Studies",
+                        "nb": "CERES - Nasjonalt senter for felles systemer og tjenester for forskning og studier"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.29.4.0",
+                      "name": {
+                        "en": "UiO:Energy",
+                        "nb": "UiO:Energi"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.16.0.0",
+                      "name": {
+                        "en": "Faculty of Dentistry",
+                        "nb": "Det odontologiske fakultet"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.28.0.0",
+                      "name": {
+                        "en": "Natural History Museum",
+                        "nb": "Naturhistorisk museum"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.36.0.0",
+                      "name": {
+                        "en": "UiO: Management and Support Units",
+                        "nb": "UiO:Ledelsen og støtteenheter"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.39.9.10",
+                      "name": {
+                        "en": "CICERO Senter for klimaforskning",
+                        "nb": "CICERO Senter for klimaforskning"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.17.0.0",
+                      "name": {
+                        "en": "Faculty of Social Sciences",
+                        "nb": "Det samfunnsvitenskapelige fakultet"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.29.23.0",
+                      "name": {
+                        "en": "UiO:Life Science",
+                        "nb": "UiO:Livsvitenskap"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.34.13.0",
+                      "name": {
+                        "en": "Medical Library",
+                        "nb": "Medisinsk bibliotek"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.11.0.0",
+                      "name": {
+                        "en": "Faculty of Theology",
+                        "nb": "Det teologiske fakultet"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.39.3.0",
+                      "name": {
+                        "en": "Senior Safety representatives",
+                        "nb": "Hovedverneombud ved UiO"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.39.12.0",
+                      "name": {
+                        "en": "Current Research Information System In Norway",
+                        "nb": "Current Research Information System In Norway"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.39.2.0",
+                      "name": {
+                        "en": "Trade unions",
+                        "nb": "Hovedtillitsvalgte ved UiO"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.29.3.0",
+                      "name": {
+                        "en": "Seminar for Philosophy of Science",
+                        "nb": "Seminaret for vitenskapsteori"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.34.1.20",
+                      "name": {
+                        "en": "University Library Digital Services",
+                        "nb": "Universitetsbiblioteket digitale tjenester"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.34.1.0",
+                      "name": {
+                        "en": "University Library Joint",
+                        "nb": "Universitetsbiblioteket felles"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.29.7.0",
+                      "name": {
+                        "en": "The International Summer School",
+                        "nb": "Den internasjonale sommerskole"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.29.15.0",
+                      "name": {
+                        "en": "Apollon",
+                        "nb": "Apollon"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.27.0.0",
+                      "name": {
+                        "en": "Museum of Cultural History",
+                        "nb": "Kulturhistorisk museum"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.39.1.0",
+                      "name": {
+                        "en": "Student Chaplain Office",
+                        "nb": "Studentprestens kontor"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.29.20.0",
+                      "name": {
+                        "en": "UiO:Life Science",
+                        "nb": "UiO:Livsvitenskap"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.34.12.0",
+                      "name": {
+                        "en": "Law Library",
+                        "nb": "Juridisk bibliotek"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.0.0",
+                      "name": {
+                        "en": "Faculty of Medicine",
+                        "nb": "Det medisinske fakultet"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.34.20.0",
+                      "name": {
+                        "en": "HumSam-biblioteket",
+                        "nb": "HumSam-biblioteket"
+                      },
+                      "partOf": [
+                        {
+                          "type": "Organization",
+                          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.90.0.0"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "hasPart": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.57.0.0",
+                  "name": {
+                    "en": "Centre for Molecular Medicine Norway",
+                    "nb": "Norsk Senter for Molekylærmedisin"
+                  },
+                  "partOf": [
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.0.0"
+                    }
+                  ]
+                },
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.1.0",
+                  "name": {
+                    "en": "Management Section",
+                    "nb": "Seksjon for ledelse"
+                  },
+                  "partOf": [
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.0.0"
+                    }
+                  ]
+                },
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.52.0.0",
+                  "name": {
+                    "en": "Institute of Health and Society",
+                    "nb": "Institutt for helse og samfunn"
+                  },
+                  "partOf": [
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.0.0"
+                    }
+                  ]
+                },
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.56.0.0",
+                  "name": {
+                    "en": "Biotechnology Centre of Oslo",
+                    "nb": "Bioteknologisenteret i Oslo"
+                  },
+                  "partOf": [
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.0.0"
+                    }
+                  ]
+                },
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.8.0",
+                  "name": {
+                    "en": "Ahus IKT - research services",
+                    "nb": "Ahus IKT - tjenester for forskning"
+                  },
+                  "partOf": [
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.0.0"
+                    }
+                  ]
+                },
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.9.0",
+                  "name": {
+                    "en": "OUS IKT - research services",
+                    "nb": "OUS IKT - tjenester for forskning"
+                  },
+                  "partOf": [
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.0.0"
+                    }
+                  ]
+                },
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.51.0.0",
+                  "name": {
+                    "en": "Institute of Basic Medical Sciences",
+                    "nb": "Institutt for medisinske basalfag"
+                  },
+                  "partOf": [
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.0.0"
+                    }
+                  ]
+                },
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0",
+                  "name": {
+                    "en": "Institutt for klinisk medisin",
+                    "nb": "Institutt for klinisk medisin"
+                  },
+                  "partOf": [
+                    {
+                      "type": "Organization",
+                      "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.50.0.0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "hasPart": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.1.0",
+              "name": {
+                "en": "Administrasjonen klinisk medisin",
+                "nb": "Administrasjonen ved institutt for klinisk medisin"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.2.12",
+              "name": {
+                "en": "Norwegian Centre for Mental Disorders Research - Centre of Excellence",
+                "nb": "Norsk senter for mental helseforskning - Senter for Fremragende Forskning"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.63.0",
+              "name": {
+                "en": "Klinikk for radiologi og nukleærmedisin",
+                "nb": "Klinikk for radiologi og nukleærmedisin"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.20.0",
+              "name": {
+                "en": "Oslo Hospital Services",
+                "nb": "Oslo sykehusservice"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.48.0",
+              "name": {
+                "en": "Kirurgi, inflammasjon og transplantasjon",
+                "nb": "Klinikk for kirurgi, inflammasjonsmedisin og transplantasjon"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.2.16",
+              "name": {
+                "en": "Division of Technology and Innovation",
+                "nb": "Teknologi- og innovasjonsklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.11.0",
+              "name": {
+                "en": "Medicine Clinic",
+                "nb": "Medisinsk klinikk"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.43.0",
+              "name": {
+                "en": "Hode, hals og rekonstruktiv kirurgi",
+                "nb": "Klinikk for hode, hals og rekonstruktiv kirurgi"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.61.0",
+              "name": {
+                "en": "Division of Prehospital Services",
+                "nb": "Prehospital klinikk"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.10.0",
+              "name": {
+                "en": "Division of Mental Health and Addiction",
+                "nb": "Klinikk psykisk helse og avhengighet"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.49.0",
+              "name": {
+                "en": "Kreftklinikken",
+                "nb": "Kreftklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.45.0",
+              "name": {
+                "en": "Kvinneklinikken",
+                "nb": "Kvinneklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.15.0",
+              "name": {
+                "en": "Clinic for Cardiovascular and Pulmonary Diseases",
+                "nb": "Hjerte-, lunge- og karklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0",
+              "name": {
+                "en": "Klinikk for laboratoriemedisin",
+                "nb": "Klinikk for laboratoriemedisin"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.42.0",
+              "name": {
+                "en": "Nevroklinikken",
+                "nb": "Nevroklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.46.0",
+              "name": {
+                "en": "Barne- og ungdomsklinikken",
+                "nb": "Barne- og ungdomsklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.80.0",
+              "name": {
+                "en": "Administration Campus Ahus",
+                "nb": "Administrasjonen Campus Ahus"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.2.10",
+              "name": {
+                "en": "Centre for Cancer Biomedicine",
+                "nb": "Senter for kreftbiomedisin"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.2.11",
+              "name": {
+                "en": "Centre for Immune Regulation",
+                "nb": "Senter for immunregulering"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.44.0",
+              "name": {
+                "en": "Division of Orthopaedic Surgery",
+                "nb": "Ortopedisk klinikk"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.2.15",
+              "name": {
+                "en": "Centre for Cancer Cell Reprogramming",
+                "nb": "Senter for kreftcelle-reprogrammering"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            },
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.60.0",
+              "name": {
+                "en": "Akuttklinikken",
+                "nb": "Akuttklinikken"
+              },
+              "partOf": [
+                {
+                  "type": "Organization",
+                  "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.0.0"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hasPart": [
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.73",
+          "name": {
+            "en": "K.G. Jebsen Coeliac Disease Research Centre",
+            "nb": "K.G. Jebsen senter for cøliakiforskning"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.11",
+          "name": {
+            "en": "Department of Microbiology",
+            "nb": "Avdeling for mikrobiologi"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.12",
+          "name": {
+            "en": "Department of Immunology",
+            "nb": "Avdeling for immunologi og transfusjonsmedisin"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.1",
+          "name": {
+            "en": "Forskningsleder",
+            "nb": "Forskningsleder"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.10",
+          "name": {
+            "en": "Department of Medical Genetics",
+            "nb": "Avdeling for medisinsk genetikk"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.18",
+          "name": {
+            "en": "Department of Forensic Medicine",
+            "nb": "Avdeling for rettsmedisinske fag"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.75",
+          "name": {
+            "en": "K.G. Jebsen Centre for B-Cell Malignancies",
+            "nb": "K.G. Jebsen senter for B-cellekreft - del UiO"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.14",
+          "name": {
+            "en": "Department of Medical Biochemistry",
+            "nb": "Avdeling for medisinsk biokjemi"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.13",
+          "name": {
+            "en": "Department of Pathology",
+            "nb": "Avdeling for patologi"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.71",
+          "name": {
+            "en": "K.G.Jebsen Inflammation Research Centre - part UiO",
+            "nb": "K.G. Jebsen Senter for betennelsesforskning - part UiO"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.15",
+          "name": {
+            "en": "Department of Pharmacology",
+            "nb": "Avdeling for farmakologi"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.74",
+          "name": {
+            "en": "World Leading - Human Immunology",
+            "nb": "Verdensledende miljø &#8211; Human Immunology"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        },
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.72",
+          "name": {
+            "en": "K.G. Jebsen Influenza Vaccine Research Centre-part UiO",
+            "nb": "K.G. Jebsen Senter for influensavaksine-part UiO"
+          },
+          "partOf": [
+            {
+              "type": "Organization",
+              "id": "https://api.dev.nva.aws.unit.no/cristin-karate-np3360/organization/185.53.18.0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

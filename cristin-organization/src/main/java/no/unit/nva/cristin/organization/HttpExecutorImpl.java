@@ -1,5 +1,8 @@
 package no.unit.nva.cristin.organization;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.dto.SubUnitDto;
@@ -17,13 +20,13 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
@@ -81,12 +84,11 @@ public class HttpExecutorImpl {
                 .build();
     }
 
-    public Organization getOrganization(URI uri)
-            throws NotFoundException, FailedHttpRequestException, InterruptedException {
+    public Organization getOrganization(URI uri) throws NotFoundException {
         return fromSubSubunit(fetch(uri));
     }
 
-    protected SubSubUnitDto fetch(URI uri) throws InterruptedException, NotFoundException, FailedHttpRequestException {
+    protected SubSubUnitDto fetch(URI uri) throws NotFoundException {
         HttpRequest httpRequest = createHttpRequest(addLanguage(uri));
         HttpResponse<String> response = sendRequest(httpRequest);
         if (isSuccessful(response.statusCode())) {
@@ -96,6 +98,38 @@ public class HttpExecutorImpl {
         }
     }
 
+    protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
+        HttpResponse<String> response = sendRequest(createHttpRequest(addLanguage(uri)));
+        if (isSuccessful(response.statusCode())) {
+            try {
+                List<Organization> organizations = getOrganizations(response);
+                return new SearchResponse<Organization>(uri)
+                        .withHits(organizations)
+                        .withSize(getCount(response, organizations));
+            } catch (JsonProcessingException e) {
+                throw new FailedHttpRequestException(e.getMessage());
+            }
+        } else {
+            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
+        }
+    }
+
+    private int getCount(HttpResponse<String> response, List<Organization> organizations) {
+        final int count = response.headers().firstValue("X-Total-Count").isPresent()
+                ? Integer.parseInt(response.headers().firstValue("X-Total-Count").get())
+                : organizations.size();
+        return count;
+    }
+
+    private List<Organization> getOrganizations(HttpResponse<String> response) throws JsonProcessingException {
+        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>() {
+        });
+        return units.stream()
+                .map(SubUnitDto::getUri)
+                .map(uri -> attempt(() -> getOrganization(uri)).orElseThrow())
+                .collect(Collectors.toList());
+    }
+
     private HttpRequest createHttpRequest(URI uri) {
         return HttpRequest.newBuilder()
                 .GET()
@@ -103,13 +137,8 @@ public class HttpExecutorImpl {
                 .build();
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest httpRequest) throws InterruptedException,
-            FailedHttpRequestException {
-        try {
-            return httpClient.sendAsync(httpRequest, BodyHandlers.ofString()).get();
-        } catch (ExecutionException e) {
-            throw new FailedHttpRequestException(e);
-        }
+    protected HttpResponse<String> sendRequest(HttpRequest httpRequest) {
+        return attempt(() -> httpClient.sendAsync(httpRequest, BodyHandlers.ofString()).get()).orElseThrow();
     }
 
     private boolean isSuccessful(int statusCode) {
