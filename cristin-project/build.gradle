@@ -6,6 +6,8 @@ dependencies {
     testImplementation libs.karate.junit5
     implementation libs.google.guava
     implementation libs.aws.lambda.java.core
+
+    testImplementation project(":cristin-testing")
 }
 
 sourceSets {

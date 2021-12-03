@@ -4,7 +4,7 @@ import java.net.URI;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
-import no.unit.nva.cristin.common.client.HttpResponseFaker;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
 import nva.commons.core.ioutils.IoUtils;
 
 public class CristinPersonApiClientStub extends CristinPersonApiClient {

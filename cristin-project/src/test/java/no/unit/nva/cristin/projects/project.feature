@@ -2,6 +2,7 @@ Feature: API tests for Cristin Project retrieve and search
 
   Background:
     * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
+    # BASE_PATH must match CustomDomainBasePath in samconfig.toml
     * def BASE_PATH = 'np2749-karate-cristin'
     * def CRISTIN_BASE = SERVER_URL + '/' + BASE_PATH
     * def testProjectNameSearchTerm = 'univers'
