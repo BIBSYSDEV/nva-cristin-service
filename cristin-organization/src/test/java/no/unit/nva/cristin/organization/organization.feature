@@ -4,7 +4,7 @@ Feature: API tests for Cristin Organization retrieve and search
     * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
     * def testOrganizationNameSearchTerm = 'univers'
     # CRISTIN_BASE base path must match CustomDomainBasePath in samconfig.toml
-    * def CRISTIN_BASE = SERVER_URL + '/np2749-karate-cristin'
+    * def CRISTIN_BASE = SERVER_URL + '/np2820-karate-cristin'
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingOrganizationId = '0.1.2.3'
     Given url CRISTIN_BASE
