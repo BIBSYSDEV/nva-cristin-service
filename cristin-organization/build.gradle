@@ -11,85 +11,34 @@ dependencies {
     testImplementation libs.karate.apache
     testImplementation libs.karate.parent
 }
-//
-//configurations {
-//    karateTestImplementation.extendsFrom testImplementation
-//    karateTestRuntime.extendsFrom testRuntime
-//}
-//
-//
-////tasks.named('test') {
-////    useJUnitPlatform {
-////        excludeTags('xkarateTest')
-////    }
-////    failFast = true
-////    testLogging {
-////        events 'skipped', 'passed', 'failed'
-////    }
-////    finalizedBy jacocoTestReport
-////}
-//
-//sourceSets {
-//    karateTest {
-//        resources {
-//            srcDir file("src/test/java")
-////            exclude "**/*.java"
-//        }
-//    }
-//}
-//
-//task karateTest(type: Test) {
-//    doFirst {
-//        print "Start running karate tests"
-//    }
-//    useJUnitPlatform {
-////        include '**/*.java'
-////        excludeTags('karateTest')
-//    }
-//    environment "ALLOWED_ORIGIN", "*"
-//    environment "CRISTIN_API_HOST", "api.cristin.no"
-//    environment "BASE_PATH", "cristin"
-//    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
-//
-//    systemProperty "karate.options", System.properties.getProperty("karate.options")
-//    systemProperty "karate.env", System.properties.getProperty("karate.env")
-//    outputs.upToDateWhen { false }
-//
-//    options {
-//        systemProperties(System.getProperties())
-//    }
-//
-//    testLogging {
-//        events 'skipped', 'passed', 'failed'
-//    }
-//    finalizedBy jacocoTestReport
-//
-//
-//    doLast {
-//        print "done running karate tests"
-//    }
-//}
-//
-//task karateTestExecute(type: JavaExec) {
-//    classpath = sourceSets.test.runtimeClasspath
-//    executable = "com.intuit.karate.cli.Main"
-//}
 
-
-
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags('karateTest')
+        excludeTags('NotKarateTest')
+    }
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
+}
 
 
 sourceSets {
     karateTest {
         resources {
             srcDir file('src/test/java')
-            exclude '**/*.java'
+            exclude '**/*Test.java'
         }
     }
 }
 
-task karateTest(type: Test)  {
-    useJUnitPlatform()
+task karateTest(type: Test) {
+    useJUnitPlatform {
+        includeTags('karateTest')
+        excludeTags('NotKarateTest')
+    }
 
     environment "ALLOWED_ORIGIN", "*"
     environment "CRISTIN_API_HOST", "api.cristin.no"
@@ -99,14 +48,4 @@ task karateTest(type: Test)  {
     systemProperty "karate.options", System.properties.getProperty("karate.options")
     systemProperty "karate.env", System.properties.getProperty("karate.env")
     outputs.upToDateWhen { false }
-}
-
-repositories {
-    mavenCentral()
-    // mavenLocal()
-}
-
-task karateDebug(type: JavaExec) {
-    classpath = sourceSets.test.runtimeClasspath
-    main = 'com.intuit.karate.cli.Main'
 }
