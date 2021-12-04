@@ -24,12 +24,14 @@ jobs:
           aws-region: eu-west-1
       - name: Echo environment
         run: echo building ${GITHUB_REPOSITORY} ${GITHUB_REF_NAME} ${STACK_NAME} ${BASE_PATH} ${ANOTHER_BASE_PATH}
-      - name: Build and deploy
-      - run: sam build
-#       Prevent prompts and failure when the stack is unchanged
+      - name: Build
+        run: sam build
+      #       Prevent prompts and failure when the stack is unchanged
+      - name: Deploy
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${STACK_NAME} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=api.dev.nva.aws.unit.no ParameterKey=CustomDomainBasePath,ParameterValue=${BASE_PATH} ParameterKey=CristinApiHost,ParameterValue=api.cristin.no
 #       Run karate tests on deployed api
       - name: Run karate tests with Gradle
         run: ./gradlew karateTest -x test
 #      Delete stack after running tests
-      - run: sam delete --no-prompts --stack-name ${STACK_NAME}
+      - name: Delete stack after running tests
+        run: sam delete --no-prompts --stack-name ${STACK_NAME}
