@@ -31,5 +31,5 @@ jobs:
 #       Run karate tests on deployed api
       - name: Run karate tests with Gradle
         run: ./gradlew karateTest -x test
-      Delete stack after running tests
+#      Delete stack after running tests
       - run: sam delete --no-prompts --stack-name ${STACK_NAME}
