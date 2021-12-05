@@ -8,14 +8,6 @@ dependencies {
     implementation libs.aws.lambda.java.core
 }
 
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-        }
-    }
-}
-
 tasks.named('test') {
     useJUnitPlatform {
         excludeTags('karateTest')
@@ -25,4 +17,29 @@ tasks.named('test') {
         events 'skipped', 'passed', 'failed'
     }
     finalizedBy jacocoTestReport
+}
+
+
+sourceSets {
+    karateTest {
+        resources {
+            srcDir file('src/test/java')
+            exclude '**/*Test.java'
+        }
+    }
+}
+
+task karateTest(type: Test) {
+    useJUnitPlatform {
+        includeTags('karateTest')
+    }
+
+    environment "ALLOWED_ORIGIN", "*"
+    environment "CRISTIN_API_HOST", "api.cristin.no"
+    environment "BASE_PATH", "cristin"
+    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
+
+    systemProperty "karate.options", System.properties.getProperty("karate.options")
+    systemProperty "karate.env", System.properties.getProperty("karate.env")
+    outputs.upToDateWhen { false }
 }

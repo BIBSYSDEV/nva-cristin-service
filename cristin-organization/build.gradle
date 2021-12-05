@@ -15,7 +15,6 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform {
         excludeTags('karateTest')
-        excludeTags('NotKarateTest')
     }
     failFast = true
     testLogging {
@@ -37,7 +36,6 @@ sourceSets {
 task karateTest(type: Test) {
     useJUnitPlatform {
         includeTags('karateTest')
-        excludeTags('NotKarateTest')
     }
 
     environment "ALLOWED_ORIGIN", "*"
