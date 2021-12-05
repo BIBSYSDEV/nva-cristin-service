@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 @Tag("karateTest")
 class EnvironmentDumpKarateTestRunner {
 
+    @Tag("karateTest")
     @Test
-    Karate testEnvironment() {
-        return Karate.run("environment").relativeTo(getClass()).outputCucumberJson(true);
+    void testEnvironment() {
+        Karate.run("environment").relativeTo(getClass()).outputCucumberJson(true);
+        System.out.println("KarateTests run");
     }
 }
