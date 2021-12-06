@@ -23,15 +23,15 @@ jobs:
           role-to-assume: arn:aws:iam::884807050265:role/nva-dev-github-actions-role
           aws-region: eu-west-1
       - name: Echo environment
-        run: echo building ${GITHUB_REPOSITORY} ${GITHUB_REF_NAME} $STACK_NAME $BASE_PATH
+        run: echo building ${GITHUB_REPOSITORY} ${GITHUB_REF_NAME} ${STACK_NAME} ${BASE_PATH}
       - name: Build
         run: sam build
       #       Prevent prompts and failure when the stack is unchanged
       - name: Deploy
-        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name $STACK_NAME --parameter-overrides ParameterKey=CustomDomain,ParameterValue=$DOMAIN_NAME ParameterKey=CustomDomainBasePath,ParameterValue=$BASE_PATH ParameterKey=CristinApiHost,ParameterValue=api.cristin.no
+        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${STACK_NAME} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${BASE_PATH} ParameterKey=CristinApiHost,ParameterValue=api.cristin.no
 #       Run karate tests on deployed api
       - name: Run karate tests with Gradle
         run: ./gradlew karateTest -x test
 #      Delete stack after running tests
       - name: Delete stack after running tests
-        run: sam delete --no-prompts --region eu-west-1 --stack-name $STACK_NAME
+        run: sam delete --no-prompts --region eu-west-1 --stack-name ${STACK_NAME}
