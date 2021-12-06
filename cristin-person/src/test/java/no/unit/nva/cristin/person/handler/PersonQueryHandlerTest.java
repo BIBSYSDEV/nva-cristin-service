@@ -17,6 +17,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -41,6 +42,7 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
+import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,6 +55,8 @@ public class PersonQueryHandlerTest {
     private static final String ZERO_VALUE = "0";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String EMPTY_LIST_STRING = "[]";
+    private static final String EXPECTED_CRISTIN_URI_WITH_PARAMS =
+        "https://api.cristin.no/v2/persons?per_page=5&name=John+Smith&page=1&lang=en,nb,nn";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -139,6 +143,14 @@ public class PersonQueryHandlerTest {
         SearchResponse<Person> searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
 
         assertThat(0, equalTo(searchResponse.getHits().size()));
+    }
+
+    @Test
+    void shouldProduceCorrectCristinUriFromParams() throws IOException {
+        apiClient = spy(apiClient);
+        handler = new PersonQueryHandler(apiClient, environment);
+        sendDefaultQuery();
+        verify(apiClient).fetchQueryResults(new UriWrapper(EXPECTED_CRISTIN_URI_WITH_PARAMS).getUri());
     }
 
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {

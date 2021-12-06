@@ -16,6 +16,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
@@ -35,6 +36,7 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
+import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +49,8 @@ public class PersonFetchHandlerTest {
     private static final Map<String, String> VALID_PATH_PARAM = Map.of(ID, "12345");
     private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
     private static final String EMPTY_STRING = "";
+    private static final String EXPECTED_CRISTIN_URI_WITH_IDENTIFIER =
+        "https://api.cristin.no/v2/persons/12345?lang=en,nb,nn";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -129,6 +133,14 @@ public class PersonFetchHandlerTest {
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
+    }
+
+    @Test
+    void shouldProduceCorrectCristinUriFromIdentifier() throws IOException {
+        apiClient = spy(apiClient);
+        handler = new PersonFetchHandler(apiClient, environment);
+        sendQuery(null, VALID_PATH_PARAM);
+        verify(apiClient).fetchGetResult(new UriWrapper(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER).getUri());
     }
 
     private GatewayResponse<Person> sendQuery(Map<String, String> queryParams, Map<String, String> pathParam)

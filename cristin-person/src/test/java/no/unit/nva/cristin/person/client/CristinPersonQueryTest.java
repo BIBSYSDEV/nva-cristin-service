@@ -15,7 +15,7 @@ public class CristinPersonQueryTest {
         "https://api.cristin.no/v2/persons/1234?lang=en,nb,nn";
     private static final String EXPECTED_CRISTIN_URI_WITH_PARAMS =
         "https://api.cristin.no/v2/persons?per_page=5&name=John&page=2&lang=en,nb,nn";
-    private static Map<String, String> EXAMPLE_PARAMS =
+    private static final Map<String, String> EXAMPLE_PARAMS =
         Map.of(QUERY, "John", PAGE, "2", NUMBER_OF_RESULTS, "5");
 
     @Test
