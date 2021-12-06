@@ -77,7 +77,7 @@ public class FetchCristinProjectsTest {
     public static final String LANGUAGE_NB = "nb";
     private static final String INVALID_LANGUAGE = "ru";
     public static final String RANDOM_TITLE = "reindeer";
-    private static final String TITLE_ILLEGAL_CHARACTERS = "abc123- ,-?";
+    private static final String TITLE_ILLEGAL_CHARACTERS = "<script>Hallo</script>";
     private static final String INVALID_JSON = "This is not valid JSON!";
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String SECOND_PAGE = "2";
