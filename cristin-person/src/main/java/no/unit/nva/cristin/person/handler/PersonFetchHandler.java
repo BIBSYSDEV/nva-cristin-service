@@ -6,7 +6,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
-import no.unit.nva.cristin.person.CristinPersonApiClient;
+import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;

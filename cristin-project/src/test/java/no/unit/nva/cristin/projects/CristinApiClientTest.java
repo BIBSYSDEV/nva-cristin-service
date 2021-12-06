@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import org.junit.jupiter.api.Test;
 
@@ -111,7 +112,7 @@ public class CristinApiClientTest {
     void returnsDummyFetchGetResultForCodeCoverage() throws IOException, InterruptedException {
         HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> httpResponse =
-                new HttpResponseStub(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
+            new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(httpResponse);
         final CristinApiClient cristinApiClient = new CristinApiClient(mockHttpClient);
         HttpResponse<String> result = cristinApiClient.fetchGetResult(LOCALHOST_URI);
@@ -131,7 +132,7 @@ public class CristinApiClientTest {
     void returnsDummyFetchQueryResultsForCodeCoverage() throws IOException, InterruptedException {
         HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> httpResponse =
-                new HttpResponseStub(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
+            new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(httpResponse);
         final CristinApiClient cristinApiClient = new CristinApiClient(mockHttpClient);
         HttpResponse<String> result = cristinApiClient.fetchQueryResults(LOCALHOST_URI);

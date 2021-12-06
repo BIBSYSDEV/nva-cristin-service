@@ -2,11 +2,11 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "karate-cristin-service"
+stack_name = "np2749-karate-cristin-service"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-plnc75nq3gkx"
-s3_prefix = "karate-cristin-service-np3360"
+s3_prefix = "np2749-karate-cristin-service"
 region = "eu-west-1"
 confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "CustomDomain=\"api.dev.nva.aws.unit.no\" CustomDomainBasePath=\"cristin-karate\" CristinApiHost=\"api.cristin.no\""
+parameter_overrides = "ApiDomain=\"/NVA/ApiDomain\" CustomDomainBasePath=\"np2749-karate-cristin\" CristinApiHost=\"api.cristin.no\""
 image_repositories = []
