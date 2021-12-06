@@ -3,7 +3,7 @@ name: Karate API tests
 on: [ push ]
 env:
   STACK_NAME: $GITHUB_REF_NAME
-  BASE_PATH: ${{GITHUB_REF_NAME}}
+  BASE_PATH: $GITHUB_REF_NAME
   DOMAIN_NAME:  "api.dev.nva.aws.unit.no"
 jobs:
   build_and_deploy:
