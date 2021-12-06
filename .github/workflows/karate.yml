@@ -23,8 +23,6 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::884807050265:role/nva-dev-github-actions-role
           aws-region: eu-west-1
-      - name: Echo environment
-        run: echo building with stackName=${{env.STACK_NAME}} base_path=${{env.BASE_PATH}}
       - name: Build
         run: sam build
       #       Prevent prompts and failure when the stack is unchanged
