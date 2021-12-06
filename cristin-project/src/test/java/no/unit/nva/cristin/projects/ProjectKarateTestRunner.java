@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 class ProjectKarateTestRunner {
 
     @Test
-    Karate testProject() {
-        return Karate.run("project").relativeTo(getClass()).outputCucumberJson(true);
-
+    void projectKarateTest() {
+        Karate.run("project").relativeTo(getClass()).outputCucumberJson(true);
     }
 }
