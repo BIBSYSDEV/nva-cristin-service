@@ -40,7 +40,7 @@ import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class PersonFetchHandlerTest {
+public class FetchCristinPersonHandlerTest {
 
     private static final String NVA_API_GET_PERSON_RESPONSE_JSON =
         "nvaApiGetPersonResponse.json";
@@ -56,14 +56,14 @@ public class PersonFetchHandlerTest {
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
-    private PersonFetchHandler handler;
+    private FetchCristinPersonHandler handler;
 
     @BeforeEach
     void setUp() {
         apiClient = new CristinPersonApiClientStub();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        handler = new PersonFetchHandler(apiClient, environment);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class PersonFetchHandlerTest {
         doReturn(new HttpResponseFaker(EMPTY_STRING, 404))
             .when(apiClient).fetchGetResult(any(URI.class));
 
-        handler = new PersonFetchHandler(apiClient, environment);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
         GatewayResponse<Person> gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
@@ -113,7 +113,7 @@ public class PersonFetchHandlerTest {
         doReturn(new HttpResponseFaker(EMPTY_STRING, 500))
             .when(apiClient).fetchGetResult(any(URI.class));
 
-        handler = new PersonFetchHandler(apiClient, environment);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
         GatewayResponse<Person> gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
@@ -127,7 +127,7 @@ public class PersonFetchHandlerTest {
         apiClient = spy(apiClient);
 
         doThrow(RuntimeException.class).when(apiClient).generateGetResponse(any());
-        handler = new PersonFetchHandler(apiClient, environment);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
         GatewayResponse<Person> gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
@@ -138,7 +138,7 @@ public class PersonFetchHandlerTest {
     @Test
     void shouldProduceCorrectCristinUriFromIdentifier() throws IOException {
         apiClient = spy(apiClient);
-        handler = new PersonFetchHandler(apiClient, environment);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
         sendQuery(null, VALID_PATH_PARAM);
         verify(apiClient).fetchGetResult(new UriWrapper(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER).getUri());
     }

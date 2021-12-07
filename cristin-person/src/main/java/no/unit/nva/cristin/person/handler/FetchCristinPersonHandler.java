@@ -16,21 +16,21 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
-public class PersonFetchHandler extends ApiGatewayHandler<Void, Person> {
+public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
 
     private final transient CristinPersonApiClient apiClient;
 
     @JacocoGenerated
-    public PersonFetchHandler() {
+    public FetchCristinPersonHandler() {
         this(new Environment());
     }
 
     @JacocoGenerated
-    public PersonFetchHandler(Environment environment) {
+    public FetchCristinPersonHandler(Environment environment) {
         this(new CristinPersonApiClient(), environment);
     }
 
-    public PersonFetchHandler(CristinPersonApiClient apiClient, Environment environment) {
+    public FetchCristinPersonHandler(CristinPersonApiClient apiClient, Environment environment) {
         super(Void.class, environment);
         this.apiClient = apiClient;
     }
