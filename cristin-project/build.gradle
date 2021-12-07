@@ -11,20 +11,25 @@ dependencies {
 }
 
 sourceSets {
-    test {
+    karateTest {
         resources {
             srcDir file('src/test/java')
+            exclude '**/*Test.java'
         }
     }
 }
 
-tasks.named('test') {
+task karateTest(type: Test) {
     useJUnitPlatform {
-        excludeTags('karateTest')
+        includeTags('karateTest')
     }
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    finalizedBy jacocoTestReport
+
+    environment "ALLOWED_ORIGIN", "*"
+    environment "CRISTIN_API_HOST", "api.cristin.no"
+    environment "BASE_PATH", "cristin"
+    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
+
+    systemProperty "karate.options", System.properties.getProperty("karate.options")
+    systemProperty "karate.env", System.properties.getProperty("karate.env")
+    outputs.upToDateWhen { false }
 }

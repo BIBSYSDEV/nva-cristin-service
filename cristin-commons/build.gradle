@@ -4,3 +4,15 @@ dependencies {
     implementation libs.aws.lambda.java.core
 
 }
+
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags('karateTest')
+    }
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
+}
+
