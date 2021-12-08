@@ -8,8 +8,6 @@ import static no.unit.nva.cristin.model.Constants.X_TOTAL_COUNT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
-import static nva.commons.core.attempt.Try.attempt;
-import static nva.commons.core.paths.UriWrapper.EMPTY_FRAGMENT;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -204,9 +202,8 @@ public class SearchResponse<E> implements JsonSerializable {
     private URI generateIdUriWithPageFromParams(int newPage, Map<String, String> queryParams) {
         Map<String, String> newParams = new ConcurrentHashMap<>(queryParams);
         newParams.put(PAGE, String.valueOf(newPage));
-        var newUri = attempt(() -> new URI(id.getScheme(),id.getHost(),id.getPath(),EMPTY_QUERY,EMPTY_FRAGMENT))
-                .map(UriWrapper::new)
-                .orElseThrow();
+        UriWrapper newUri = new UriWrapper(id.getScheme(), id.getHost()).addChild(id.getPath());
+
         return newUri.addQueryParameters(newParams).getUri();
     }
 

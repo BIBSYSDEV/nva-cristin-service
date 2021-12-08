@@ -16,21 +16,22 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class PersonQueryHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
+@SuppressWarnings("unused")
+public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
     private final transient CristinPersonApiClient apiClient;
 
     @JacocoGenerated
-    public PersonQueryHandler() {
+    public QueryCristinPersonHandler() {
         this(new Environment());
     }
 
     @JacocoGenerated
-    public PersonQueryHandler(Environment environment) {
+    public QueryCristinPersonHandler(Environment environment) {
         this(new CristinPersonApiClient(), environment);
     }
 
-    public PersonQueryHandler(CristinPersonApiClient apiClient, Environment environment) {
+    public QueryCristinPersonHandler(CristinPersonApiClient apiClient, Environment environment) {
         super(Void.class, environment);
         this.apiClient = apiClient;
     }

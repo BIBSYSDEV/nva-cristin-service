@@ -2,6 +2,8 @@ package no.unit.nva.cristin.person.client;
 
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_HOST;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.utils.UriUtils.addLanguage;
+import static no.unit.nva.utils.UriUtils.getCristinUri;
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,14 +13,13 @@ import nva.commons.core.paths.UriWrapper;
 @JacocoGenerated
 public class CristinPersonQuery {
 
-    private static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
-    private static final String CRISTIN_QUERY_PARAMETER_DEFAULT_LANGUAGES = "nb,nn,en";
     private static final String CRISTIN_QUERY_PARAMETER_NAME_KEY = "name";
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_DEFAULT_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
-    private static final String CRISTIN_API_PERSONS_PATH = "/v2/persons/";
+    private static final String CRISTIN_API_VERSION_PATH = "v2";
+    private static final String CRISTIN_API_PERSONS_PATH = "persons";
 
     private final transient Map<String, String> cristinQueryParameters;
 
@@ -33,9 +34,6 @@ public class CristinPersonQuery {
         cristinQueryParameters.put(
             CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY,
             CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE);
-        cristinQueryParameters.put(
-            CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY,
-            CRISTIN_QUERY_PARAMETER_DEFAULT_LANGUAGES);
     }
 
     /**
@@ -45,9 +43,7 @@ public class CristinPersonQuery {
      * @return an URI to Cristin person with identifier
      */
     public static URI fromId(String identifier) {
-        return new UriWrapper(HTTPS, CRISTIN_API_HOST).addChild(CRISTIN_API_PERSONS_PATH).addChild(identifier)
-            .addQueryParameter(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, CRISTIN_QUERY_PARAMETER_DEFAULT_LANGUAGES)
-            .getUri();
+        return addLanguage(getCristinUri(identifier, CRISTIN_API_PERSONS_PATH));
     }
 
     public CristinPersonQuery withName(String name) {
@@ -71,9 +67,12 @@ public class CristinPersonQuery {
      * @return an URI to Cristin Persons with parameters
      */
     public URI toURI() {
-        return new UriWrapper(HTTPS, CRISTIN_API_HOST)
+        URI uri = new UriWrapper(HTTPS, CRISTIN_API_HOST)
+            .addChild(CRISTIN_API_VERSION_PATH)
             .addChild(CRISTIN_API_PERSONS_PATH)
             .addQueryParameters(cristinQueryParameters)
             .getUri();
+
+        return addLanguage(uri);
     }
 }

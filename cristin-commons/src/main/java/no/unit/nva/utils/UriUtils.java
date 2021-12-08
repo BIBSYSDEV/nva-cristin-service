@@ -19,6 +19,7 @@ public class UriUtils {
 
     public static final String PROJECT = "project";
     public static final String INSTITUTION = "institution";
+    public static final String PERSON = "person";
     public static final String WHITESPACE_REGEX = "\\s+";
     public static final String WHITESPACE_REPLACEMENT = "+";
     private static final String PARAMETER_KEY_VALUE_PAIR_TEMPLATE = "%s=%s";
