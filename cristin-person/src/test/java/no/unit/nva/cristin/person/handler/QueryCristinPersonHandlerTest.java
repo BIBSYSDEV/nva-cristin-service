@@ -17,6 +17,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -41,10 +42,11 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
+import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class PersonQueryHandlerTest {
+public class QueryCristinPersonHandlerTest {
 
     private static final String RANDOM_NAME = "John Smith";
     private static final String NVA_API_QUERY_PERSON_JSON =
@@ -53,19 +55,21 @@ public class PersonQueryHandlerTest {
     private static final String ZERO_VALUE = "0";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String EMPTY_LIST_STRING = "[]";
+    private static final String EXPECTED_CRISTIN_URI_WITH_PARAMS =
+        "https://api.cristin.no/v2/persons?per_page=5&name=John+Smith&page=1&lang=en,nb,nn";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
-    private PersonQueryHandler handler;
+    private QueryCristinPersonHandler handler;
 
     @BeforeEach
     void setUp() {
         apiClient = new CristinPersonApiClientStub();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        handler = new PersonQueryHandler(apiClient, environment);
+        handler = new QueryCristinPersonHandler(apiClient, environment);
     }
 
     @Test
@@ -87,7 +91,7 @@ public class PersonQueryHandlerTest {
     void shouldHideInternalExceptionFromClientWhenUnknownErrorOccur() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
         doThrow(new RuntimeException()).when(apiClient).getEnrichedPersonsUsingQueryResponse(any());
-        handler = new PersonQueryHandler(apiClient, environment);
+        handler = new QueryCristinPersonHandler(apiClient, environment);
 
         GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
 
@@ -101,7 +105,7 @@ public class PersonQueryHandlerTest {
         apiClient = spy(apiClient);
         HttpResponse<String> response = new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(response).when(apiClient).fetchQueryResults(any());
-        handler = new PersonQueryHandler(apiClient, environment);
+        handler = new QueryCristinPersonHandler(apiClient, environment);
 
         GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
 
@@ -116,7 +120,7 @@ public class PersonQueryHandlerTest {
         HttpResponse<String> response =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(CompletableFuture.completedFuture(response)).when(apiClient).fetchGetResultAsync(any());
-        handler = new PersonQueryHandler(apiClient, environment);
+        handler = new QueryCristinPersonHandler(apiClient, environment);
         SearchResponse searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
 
         // Query response has size of 2, and will return that even if trying to enrich those 2 returns empty
@@ -135,10 +139,18 @@ public class PersonQueryHandlerTest {
         doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
             generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(apiClient).queryPersons(any());
         doReturn(Collections.emptyList()).when(apiClient).fetchQueryResultsOneByOne(any());
-        handler = new PersonQueryHandler(apiClient, environment);
+        handler = new QueryCristinPersonHandler(apiClient, environment);
         SearchResponse<Person> searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
 
         assertThat(0, equalTo(searchResponse.getHits().size()));
+    }
+
+    @Test
+    void shouldProduceCorrectCristinUriFromParams() throws IOException {
+        apiClient = spy(apiClient);
+        handler = new QueryCristinPersonHandler(apiClient, environment);
+        sendDefaultQuery();
+        verify(apiClient).fetchQueryResults(new UriWrapper(EXPECTED_CRISTIN_URI_WITH_PARAMS).getUri());
     }
 
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {

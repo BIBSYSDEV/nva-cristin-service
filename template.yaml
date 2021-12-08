@@ -130,7 +130,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.PersonQueryHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.handler.QueryCristinPersonHandler::handleRequest
       Runtime: java11
       MemorySize: 512
       Events:
@@ -149,7 +149,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.PersonFetchHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.handler.FetchCristinPersonHandler::handleRequest
       Runtime: java11
       MemorySize: 512
       Events:
