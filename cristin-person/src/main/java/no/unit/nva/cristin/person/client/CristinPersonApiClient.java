@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.client;
 
 import static java.util.Arrays.asList;
+import static no.unit.nva.cristin.common.Utils.isOrcid;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PERSON_QUERY_CONTEXT;
@@ -148,10 +149,14 @@ public class CristinPersonApiClient extends ApiClient {
     }
 
     private CristinPerson getCristinPerson(String identifier) throws NotFoundException, BadGatewayException {
-        URI uri = CristinPersonQuery.fromId(identifier);
+        URI uri = getCorrectUriForIdentifier(identifier);
         HttpResponse<String> response = fetchGetResult(uri);
         checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode());
 
         return getDeserializedResponse(response, CristinPerson.class);
+    }
+
+    private URI getCorrectUriForIdentifier(String identifier) {
+        return isOrcid(identifier) ? CristinPersonQuery.fromOrcid(identifier) : CristinPersonQuery.fromId(identifier);
     }
 }

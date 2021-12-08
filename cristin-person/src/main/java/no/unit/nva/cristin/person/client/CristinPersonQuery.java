@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.client;
 
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_HOST;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_TEST_API_BASE;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
@@ -44,6 +45,23 @@ public class CristinPersonQuery {
      */
     public static URI fromId(String identifier) {
         return addLanguage(getCristinUri(identifier, CRISTIN_API_PERSONS_PATH));
+    }
+
+    /**
+     * Creates a URI to Cristin person with ORCID identifier.
+     *
+     * @param orcid Cristin person ORCID identifier to lookup in Cristin
+     * @return an URI to Cristin person with ORCID identifier
+     */
+    public static URI fromOrcid(String orcid) {
+        String identifier = String.format("ORCID:%s", orcid);
+
+        URI uri = new UriWrapper(HTTPS, CRISTIN_TEST_API_BASE)
+            .addChild(CRISTIN_API_PERSONS_PATH)
+            .addChild(identifier)
+            .getUri();
+
+        return addLanguage(uri);
     }
 
     public CristinPersonQuery withName(String name) {

@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.person.handler;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -56,9 +56,13 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
 
     private String getValidId(RequestInfo requestInfo) throws BadRequestException {
         String identifier = requestInfo.getPathParameter(ID);
-        if (!Utils.isPositiveInteger(identifier)) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID);
+        if (isValidIdentifier(identifier)) {
+            return identifier;
         }
-        return identifier;
+        throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID);
+    }
+
+    private boolean isValidIdentifier(String identifier) {
+        return Utils.isPositiveInteger(identifier) || Utils.isOrcid(identifier);
     }
 }
