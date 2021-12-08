@@ -5,16 +5,14 @@ dependencies {
     implementation libs.google.guava
     implementation libs.aws.lambda.java.core
 
-    testImplementation project(":cristin-commons")
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
-    testImplementation libs.karate.apache
-    testImplementation libs.karate.parent
 }
+
 
 tasks.named('test') {
     useJUnitPlatform {
-        excludeTags('karateTest')
+        excludeTags 'karateTest'
     }
     failFast = true
     testLogging {
@@ -22,7 +20,6 @@ tasks.named('test') {
     }
     finalizedBy jacocoTestReport
 }
-
 
 sourceSets {
     test {

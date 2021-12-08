@@ -9,9 +9,6 @@ Feature: API tests for Cristin Organization retrieve and search
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     Given url CRISTIN_BASE
 
-  Scenario: Forcing failure
-    * karate.fail('Forcing failure in tests')
-
   Scenario: GET organization returns list of search results
     Given  path '/organization'
     And param query = illegalIdentifier
