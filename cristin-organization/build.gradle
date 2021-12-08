@@ -12,11 +12,22 @@ dependencies {
     testImplementation libs.karate.parent
 }
 
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags('karateTest')
+    }
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
+}
+
 sourceSets {
     karateTest {
         resources {
             srcDir file('src/test/java')
-            exclude '**/*Test.java'
+//            exclude '**/*.java'
         }
     }
 }
@@ -34,4 +45,8 @@ task karateTest(type: Test) {
     systemProperty "karate.options", System.properties.getProperty("karate.options")
     systemProperty "karate.env", System.properties.getProperty("karate.env")
     outputs.upToDateWhen { false }
+
+//    options {
+//        systemProperties(System.getProperties())
+//    }
 }
