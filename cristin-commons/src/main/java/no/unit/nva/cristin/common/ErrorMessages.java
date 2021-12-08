@@ -39,4 +39,6 @@ public class ErrorMessages {
         "Invalid query param supplied. Valid ones are 'query', 'page', 'results' and 'language'";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP =
         "Invalid query param supplied. Valid one are 'language'";
+    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP =
+        "This endpoint does not support query parameters";
 }

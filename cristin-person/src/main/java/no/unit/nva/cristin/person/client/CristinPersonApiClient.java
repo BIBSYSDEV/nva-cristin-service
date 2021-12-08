@@ -1,19 +1,19 @@
 package no.unit.nva.cristin.person.client;
 
 import static java.util.Arrays.asList;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PERSON_QUERY_CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.utils.UriUtils.PERSON;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,17 +23,19 @@ import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadGatewayException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Try;
-import nva.commons.core.ioutils.IoUtils;
 
 public class CristinPersonApiClient extends ApiClient {
 
-    private static final String CRISTIN_GET_PERSON_JSON =
-        "cristinGetPersonResponse.json";
-
     public CristinPersonApiClient() {
-        this(HttpClient.newHttpClient());
+        this(HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.ALWAYS)
+            .connectTimeout(Duration.ofSeconds(30))
+            .build());
     }
 
     public CristinPersonApiClient(HttpClient client) {
@@ -136,19 +138,20 @@ public class CristinPersonApiClient extends ApiClient {
     /**
      * Creates a Person object based on what is fetched from Cristin upstream.
      *
-     * @param id the identifier of the person to fetch
+     * @param identifier the identifier of the person to fetch
      * @return Person object with person data from upstream
      */
-    public Person generateGetResponse(String id) {
-        Person person = fetchDummyResponse().toPerson();
+    public Person generateGetResponse(String identifier) throws NotFoundException, BadGatewayException {
+        Person person = getCristinPerson(identifier).toPerson();
         person.setContext(PERSON_CONTEXT);
         return person;
     }
 
-    private CristinPerson fetchDummyResponse() {
-        String body = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PERSON_JSON));
-        return attempt(() -> OBJECT_MAPPER.readValue(body, CristinPerson.class))
-            .orElseThrow(failure -> new RuntimeException("Error reading dummy Json"));
-    }
+    private CristinPerson getCristinPerson(String identifier) throws NotFoundException, BadGatewayException {
+        URI uri = CristinPersonQuery.fromId(identifier);
+        HttpResponse<String> response = fetchGetResult(uri);
+        checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode());
 
+        return getDeserializedResponse(response, CristinPerson.class);
+    }
 }
