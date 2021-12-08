@@ -10,7 +10,7 @@ public class OrganizationKarateTestRunner {
     @Karate.Test
     @Tag("karateTest")
     Karate runOrganizationKarateTest() {
-        return Karate.run().relativeTo(getClass()).outputCucumberJson(true);
+        return Karate.run().relativeTo(getClass());
     }
 
 }
