@@ -19,6 +19,8 @@ public class ErrorMessages {
         "Internal server error. Contact application administrator.";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID =
         "Invalid path parameter for identifier, needs to be a number";
+    public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID =
+        "Invalid path parameter for identifier, needs to be a number or an ORCID";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS =
         "Invalid path parameter for identifier,"
             + " needs to be organization identifier matching pattern /(?:\\d+.){3}\\d+/, e.g. (100.0.0.0)";

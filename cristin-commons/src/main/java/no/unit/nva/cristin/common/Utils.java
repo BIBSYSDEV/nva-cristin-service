@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import no.unit.nva.cristin.model.Constants;
 
 import static java.util.Objects.nonNull;
 
@@ -36,4 +37,7 @@ public class Utils {
         return nonNull(set) ? set : Collections.emptySet();
     }
 
+    public static boolean isOrcid(String identifier) {
+        return Constants.ORCID_PATTERN.matcher(identifier).matches();
+    }
 }

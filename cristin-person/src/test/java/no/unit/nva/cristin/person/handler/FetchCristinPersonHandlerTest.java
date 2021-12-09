@@ -1,9 +1,10 @@
 package no.unit.nva.cristin.person.handler;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_TEST_API_BASE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -51,6 +52,9 @@ public class FetchCristinPersonHandlerTest {
     private static final String EMPTY_STRING = "";
     private static final String EXPECTED_CRISTIN_URI_WITH_IDENTIFIER =
         "https://api.cristin.no/v2/persons/12345?lang=en,nb,nn";
+    private static final Map<String, String> VALID_ORCID_PATH_PARAM = Map.of(ID, "1234-1234-1234-1234");
+    private static final String EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER =
+        String.format("https://%s/persons/ORCID:1234-1234-1234-1234?lang=en,nb,nn", CRISTIN_TEST_API_BASE);
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -86,13 +90,13 @@ public class FetchCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenPathParamIsNotANumber() throws IOException {
+    void shouldThrowBadRequestWhenPathParamIsNotANumberOrOrcid() throws IOException {
         GatewayResponse<Person> gatewayResponse = sendQuery(EMPTY_MAP, ILLEGAL_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-            containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
+            containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID));
     }
 
     @Test
@@ -141,6 +145,23 @@ public class FetchCristinPersonHandlerTest {
         handler = new FetchCristinPersonHandler(apiClient, environment);
         sendQuery(null, VALID_PATH_PARAM);
         verify(apiClient).fetchGetResult(new UriWrapper(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER).getUri());
+    }
+
+    @Test
+    void shouldReturnResponseWhenCallingEndpointWithValidOrcidIdentifier() throws IOException {
+        Person actual = sendQuery(EMPTY_MAP, VALID_ORCID_PATH_PARAM).getBodyObject(Person.class);
+        String expectedString = IoUtils.stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
+        Person expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
+
+        assertThat(actual, equalTo(expected));
+    }
+
+    @Test
+    void shouldProduceCorrectCristinUriFromOrcidIdentifier() throws IOException {
+        apiClient = spy(apiClient);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        sendQuery(null, VALID_ORCID_PATH_PARAM);
+        verify(apiClient).fetchGetResult(new UriWrapper(EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER).getUri());
     }
 
     private GatewayResponse<Person> sendQuery(Map<String, String> queryParams, Map<String, String> pathParam)
