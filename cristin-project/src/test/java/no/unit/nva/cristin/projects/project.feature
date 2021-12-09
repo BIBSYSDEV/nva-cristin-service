@@ -9,8 +9,6 @@ Feature: API tests for Cristin Project retrieve and search
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     Given url CRISTIN_BASE
 
-
-
   Scenario: GET project returns list of empty search results
     Given  path '/project'
     And param query = illegalIdentifier
