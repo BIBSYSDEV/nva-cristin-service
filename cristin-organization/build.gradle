@@ -5,18 +5,27 @@ dependencies {
     implementation libs.google.guava
     implementation libs.aws.lambda.java.core
 
-    testImplementation project(":cristin-commons")
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
-    testImplementation libs.karate.apache
-    testImplementation libs.karate.parent
+}
+
+
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags 'karateTest'
+    }
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
 }
 
 sourceSets {
-    karateTest {
+    test {
         resources {
             srcDir file('src/test/java')
-            exclude '**/*Test.java'
+            exclude '**/*.java'
         }
     }
 }
@@ -28,7 +37,7 @@ task karateTest(type: Test) {
 
     environment "ALLOWED_ORIGIN", "*"
     environment "CRISTIN_API_HOST", "api.cristin.no"
-    environment "BASE_PATH", "cristin"
+    environment "BASE_PATH", "cristin-karate-exclude"
     environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
 
     systemProperty "karate.options", System.properties.getProperty("karate.options")

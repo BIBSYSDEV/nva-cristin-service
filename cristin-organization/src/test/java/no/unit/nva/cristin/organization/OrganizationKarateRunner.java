@@ -1,13 +1,14 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.organization;
 
 import com.intuit.karate.junit5.Karate;
 import org.junit.jupiter.api.Tag;
 
 @Tag("karateTest")
-class ProjectKarateTestRunner {
+public class OrganizationKarateRunner {
 
     @Karate.Test
-    Karate runAllProjectKarateTests() {
+    Karate runKarateFeatures() {
         return Karate.run().relativeTo(getClass());
     }
+
 }

@@ -9,8 +9,6 @@ Feature: API tests for Cristin Project retrieve and search
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     Given url CRISTIN_BASE
 
-
-
   Scenario: GET project returns list of empty search results
     Given  path '/project'
     And param query = illegalIdentifier
@@ -50,4 +48,4 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'https://api.dev.nva.aws.unit.no/' + BASE_PATH + '/project/0'
+    And match response.detail == 'https://api.dev.nva.aws.unit.no/' + basePath + '/project/0'
