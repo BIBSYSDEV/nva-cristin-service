@@ -6,4 +6,5 @@ dependencies {
     implementation libs.nva.commons.apigateway
 
     testImplementation project(":cristin-commons")
+    testImplementation project(":cristin-testing")
 }

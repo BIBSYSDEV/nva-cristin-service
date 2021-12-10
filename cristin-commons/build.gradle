@@ -2,5 +2,5 @@ dependencies {
     implementation libs.nva.logutils
     implementation libs.google.guava
     implementation libs.aws.lambda.java.core
-
 }
+

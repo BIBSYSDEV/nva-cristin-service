@@ -9,8 +9,8 @@ import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
@@ -20,9 +20,7 @@ import nva.commons.core.Environment;
 public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
 
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS);
-
-    public static final String WORD_WHITESPACE_DASH_COMMA_PERIOD = "[\\w\\s\\-,.]+";
-    public static final Pattern QUERY_PATTERN = Pattern.compile(WORD_WHITESPACE_DASH_COMMA_PERIOD);
+    private static final List<Character> VALID_SPECIAL_CHARS = List.of('-', ',', '.');
 
     public CristinQueryHandler(Class<I> iclass, Environment environment) {
         super(iclass, environment);
@@ -58,7 +56,15 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     private boolean isValidQuery(String str) {
-        return QUERY_PATTERN.matcher(str).matches();
+        for (Character c : str.toCharArray()) {
+            if (isUnsupportedCharacter(c)) {
+                return false;
+            }
+        }
+        return true;
     }
 
+    private boolean isUnsupportedCharacter(Character c) {
+        return !Character.isLetterOrDigit(c) && !Character.isWhitespace(c) && !VALID_SPECIAL_CHARS.contains(c);
+    }
 }

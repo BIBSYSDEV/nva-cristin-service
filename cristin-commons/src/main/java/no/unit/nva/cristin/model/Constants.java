@@ -2,6 +2,7 @@ package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
+import java.util.regex.Pattern;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
@@ -18,12 +19,15 @@ public class Constants {
     public static final ObjectMapper OBJECT_MAPPER = JsonUtils.dtoObjectMapper;
     public static final Environment ENVIRONMENT = new Environment();
     public static final String PROJECT_SEARCH_CONTEXT_URL =
-            "https://bibsysdev.github.io/src/project-search-context.json";
+        "https://bibsysdev.github.io/src/project-search-context.json";
     public static final String PROJECT_LOOKUP_CONTEXT_URL =
-            "https://bibsysdev.github.io/src/project-context.json";
+        "https://bibsysdev.github.io/src/project-context.json";
     public static final String CRISTIN_API_HOST = ENVIRONMENT.readEnvOpt("CRISTIN_API_HOST")
-            .orElse("api.cristin.no");
+        .orElse("api.cristin.no");
     public static final String CRISTIN_API_BASE = CRISTIN_API_HOST + "/v2";
+    // TODO: Find better way to use Cristin test instance
+    public static final String CRISTIN_TEST_API_HOST = "api.cristin-test.uio.no";
+    public static final String CRISTIN_TEST_API_BASE = CRISTIN_TEST_API_HOST + "/v2";
 
     public static final String HTTPS = "https";
     public static final String INSTITUTION_PATH = "institutions";
@@ -44,6 +48,7 @@ public class Constants {
     public static final String NOT_FOUND_MESSAGE_TEMPLATE = "The URI \"%s\" cannot be dereferenced";
     public static final String QUERY_PARAMETER_LANGUAGE = "lang";
     public static final String ALL_QUERY_PARAMETER_LANGUAGES = "en,nb,nn";
+    public static final Pattern ORCID_PATTERN = Pattern.compile("[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9|Xx]");
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,

@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import java.time.Duration;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
@@ -46,7 +47,10 @@ public class CristinApiClient extends ApiClient {
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
 
     public CristinApiClient() {
-        this(HttpClient.newHttpClient());
+        this(HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.ALWAYS)
+            .connectTimeout(Duration.ofSeconds(30))
+            .build());
     }
 
     public CristinApiClient(HttpClient client) {

@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.testing;
 
 import nva.commons.core.JacocoGenerated;
 
@@ -19,54 +19,54 @@ import static no.unit.nva.cristin.model.Constants.REL_NEXT;
 import static no.unit.nva.cristin.model.Constants.REL_PREV;
 import static no.unit.nva.cristin.model.Constants.X_TOTAL_COUNT;
 
-
 @JacocoGenerated
-public class HttpResponseStub implements HttpResponse<String> {
+public class HttpResponseFaker implements HttpResponse<String> {
 
     public static final String TOTAL_COUNT_EXAMPLE_VALUE = "135";
     public static final String LINK_EXAMPLE_VALUE = String.join(";", REL_PREV, REL_NEXT);
-    private final String body;
-    private final int statusCode;
-    private final HttpHeaders headers;
+    private final transient String bodyString;
+    private final transient int status;
+    private final transient HttpHeaders httpHeaders;
 
-    public HttpResponseStub(String body) {
-        this(body, 200);
+    public HttpResponseFaker(String bodyString) {
+        this(bodyString, 200);
     }
 
-    public HttpResponseStub(String body, int statusCode) {
-        this(body, statusCode, defaultHeaders());
+    public HttpResponseFaker(String bodyString, int status) {
+        this(bodyString, status, defaultHeaders());
     }
 
     /**
      * Main constructor for a stub of HttpResponse.
      *
-     * @param body       Body content of HttpResponse
-     * @param statusCode Http status code of HttpResponse
-     * @param headers    HttpHeaders used in the HttpResponse
+     * @param bodyString  Body content of HttpResponse
+     * @param status      Http status code of HttpResponse
+     * @param httpHeaders HttpHeaders used in the HttpResponse
      */
-    public HttpResponseStub(String body, int statusCode, HttpHeaders headers) {
-        this.body = body;
-        this.statusCode = statusCode;
-        this.headers = headers;
+    public HttpResponseFaker(String bodyString, int status, HttpHeaders httpHeaders) {
+        this.bodyString = bodyString;
+        this.status = status;
+        this.httpHeaders = httpHeaders;
     }
 
-    protected static Map<String, List<String>> headerMap(String totalCount, String link) {
+    public static Map<String, List<String>> headerMap(String totalCount, String link) {
         return Map.of(
-                X_TOTAL_COUNT, Collections.singletonList(totalCount),
-                LINK, Collections.singletonList(link));
+            X_TOTAL_COUNT, Collections.singletonList(totalCount),
+            LINK, Collections.singletonList(link));
     }
 
-    protected static BiPredicate<String, String> filter() {
+    public static BiPredicate<String, String> filter() {
         return (s, s2) -> true;
-    }
-
-    protected static HttpHeaders defaultHeaders() {
-        return HttpHeaders.of(headerMap(TOTAL_COUNT_EXAMPLE_VALUE, LINK_EXAMPLE_VALUE), filter());
     }
 
     @Override
     public int statusCode() {
-        return statusCode;
+        return status;
+    }
+
+    @Override
+    public HttpHeaders headers() {
+        return httpHeaders;
     }
 
     @Override
@@ -80,13 +80,12 @@ public class HttpResponseStub implements HttpResponse<String> {
     }
 
     @Override
-    public HttpHeaders headers() {
-        return headers;
+    public String body() {
+        return bodyString;
     }
 
-    @Override
-    public String body() {
-        return body;
+    private static HttpHeaders defaultHeaders() {
+        return HttpHeaders.of(headerMap(TOTAL_COUNT_EXAMPLE_VALUE, LINK_EXAMPLE_VALUE), filter());
     }
 
     @Override

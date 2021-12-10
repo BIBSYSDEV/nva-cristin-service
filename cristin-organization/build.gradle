@@ -2,11 +2,45 @@ dependencies {
     implementation project(":cristin-commons")
     implementation libs.nva.logutils
     implementation libs.nva.commons.apigateway
-
-    testImplementation project(":cristin-commons")
-    testImplementation libs.karate.core
-    testImplementation libs.karate.junit5
     implementation libs.google.guava
     implementation libs.aws.lambda.java.core
 
+    testImplementation libs.karate.core
+    testImplementation libs.karate.junit5
+}
+
+
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags 'karateTest'
+    }
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
+}
+
+sourceSets {
+    test {
+        resources {
+            srcDir file('src/test/java')
+            exclude '**/*.java'
+        }
+    }
+}
+
+task karateTest(type: Test) {
+    useJUnitPlatform {
+        includeTags('karateTest')
+    }
+
+    environment "ALLOWED_ORIGIN", "*"
+    environment "CRISTIN_API_HOST", "api.cristin.no"
+    environment "BASE_PATH", "cristin-main"
+    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
+
+    systemProperty "karate.options", System.properties.getProperty("karate.options")
+    systemProperty "karate.env", System.properties.getProperty("karate.env")
+    outputs.upToDateWhen { false }
 }

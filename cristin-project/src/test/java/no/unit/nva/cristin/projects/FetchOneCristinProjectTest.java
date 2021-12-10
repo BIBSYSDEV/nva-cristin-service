@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
+
+import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -32,18 +34,18 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Map.of;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
-import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE;
+import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_KEY;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_VALUE;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -93,7 +95,7 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerReturnsNotFoundStatusWhenIdIsNotFound() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(new HttpResponseStub(getBodyFromResource(CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON), 404))
+        doReturn(new HttpResponseFaker(getBodyFromResource(CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON), 404))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
@@ -105,7 +107,7 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerReturnsBadGatewayWhenStatusCodeFromBackendSignalsError() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(new HttpResponseStub(null, 500))
+        doReturn(new HttpResponseFaker(null, 500))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
@@ -163,7 +165,7 @@ public class FetchOneCristinProjectTest {
 
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(getBodyFromResource(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON)))
+        doReturn(new HttpResponseFaker(getBodyFromResource(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON)))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
@@ -177,7 +179,7 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerThrowsBadGatewayExceptionWhenBackendReturnsInvalidProjectData() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(new HttpResponseStub(JSON_WITH_MISSING_REQUIRED_DATA))
+        doReturn(new HttpResponseFaker(JSON_WITH_MISSING_REQUIRED_DATA))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
@@ -198,7 +200,7 @@ public class FetchOneCristinProjectTest {
     void handlerThrowsBadGatewayExceptionWhenThereIsThrownExceptionWhenReadingFromJson() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(EMPTY_STRING))
+        doReturn(new HttpResponseFaker(EMPTY_STRING))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
@@ -226,7 +228,7 @@ public class FetchOneCristinProjectTest {
     void handlerThrowsInternalErrorWhenHttpStatusCodeIsSomeUnexpectedValue() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doReturn(new HttpResponseStub(EMPTY_STRING, 418))
+        doReturn(new HttpResponseFaker(EMPTY_STRING, 418))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);

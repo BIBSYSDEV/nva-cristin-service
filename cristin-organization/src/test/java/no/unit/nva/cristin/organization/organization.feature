@@ -1,11 +1,12 @@
 Feature: API tests for Cristin Organization retrieve and search
 
   Background:
-    * def SERVER_URL = 'https://api.dev.nva.aws.unit.no'
     * def testOrganizationNameSearchTerm = 'univers'
-    * def CRISTIN_BASE = SERVER_URL + '/cristin-karate'
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingOrganizationId = '0.1.2.3'
+    * def domainName = java.lang.System.getenv('DOMAIN_NAME')
+    * def basePath = java.lang.System.getenv('BASE_PATH')
+    * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     Given url CRISTIN_BASE
 
   Scenario: GET organization returns list of search results
