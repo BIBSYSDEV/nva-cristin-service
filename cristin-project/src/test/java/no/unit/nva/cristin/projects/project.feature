@@ -1,15 +1,14 @@
 Feature: API tests for Cristin Project retrieve and search
 
   Background:
-    * def testProjectNameSearchTerm = 'univers'
+    * def domainName = java.lang.System.getenv('DOMAIN_NAME')
+    * def basePath = java.lang.System.getenv('BASE_PATH')
+    * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingProjectId = '0'
     * def validIdentifier = '304134'
     * def projectIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/project\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
-    * def domainName = java.lang.System.getenv('DOMAIN_NAME')
-    * def basePath = java.lang.System.getenv('BASE_PATH')
-    * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     Given url CRISTIN_BASE
 
   Scenario: Fetch and receive CORS preflight response
@@ -54,7 +53,7 @@ Feature: API tests for Cristin Project retrieve and search
       | 'application/ld+json' |
       | 'application/json'    |
 
-  Scenario Outline: Request with unsupported Accept header returns Unsupported Media Type
+  Scenario Outline: Fetch with unsupported Accept header returns Unsupported Media Type
     * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }
     Given path '/project/' + validIdentifier
     When method GET
@@ -72,32 +71,7 @@ Feature: API tests for Cristin Project retrieve and search
       | 'application/xml'         |
       | 'application/rdf+xml'     |
 
-  Scenario: GET project returns list of empty search results
-    Given  path '/project'
-    And param query = illegalIdentifier
-    When method GET
-    Then status 200
-    And match response.hits == '#array'
-    And match response.size == 0
-
-  Scenario: GET resources with query returns list of search results
-    Given path '/project'
-    And param query = testProjectNameSearchTerm
-    When method GET
-    Then status 200
-    And match response.firstRecord == 1
-
-  Scenario: GET resources with query and result returns list of search results limited to results with position
-    Given path '/project'
-    And param query = testProjectNameSearchTerm
-    And param results = '2'
-    And param page = '4'
-    When method GET
-    Then status 200
-    And match response.hits == '#[2]' // hits array length == 2
-    And match response.firstRecord == 7
-
-  Scenario: GET returns status Bad request when requesting illegal project identifier
+  Scenario: Fetch returns status Bad request when requesting illegal project identifier
     Given path '/project/' + illegalIdentifier
     When method GET
     Then status 400
@@ -105,7 +79,16 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.status == 400
     And match response.detail == 'Invalid path parameter for identifier, needs to be a number'
 
-  Scenario: GET returns status Not found when requesting unknown project identifier
+  Scenario: Fetch returns status Bad request when sending illegal query parameter
+    Given path '/project/' + validIdentifier
+    And param invalidParam = 'someValue'
+    When method GET
+    Then status 400
+    And match response.title == 'Bad Request'
+    And match response.status == 400
+    And match response.detail == "Invalid query param supplied. Valid one are 'language'"
+
+  Scenario: Fetch returns status Not found when requesting unknown project identifier
     Given path '/project/' + nonExistingProjectId
     When method GET
     Then status 404

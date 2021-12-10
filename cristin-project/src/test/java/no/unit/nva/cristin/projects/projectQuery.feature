@@ -68,7 +68,7 @@ Feature: API tests for Cristin projects query
     And match response.size == '#present'
     And match response.hits == '#present'
 
-  Scenario Outline: Request with unsupported Accept header returns Unsupported Media Type
+  Scenario Outline: Query with unsupported Accept header returns Unsupported Media Type
     * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }
     Given path '/project/'
     And param query = queryString
