@@ -10,6 +10,7 @@ Feature: API tests for Cristin Project retrieve and search
     * def projectIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/project\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
     Given url CRISTIN_BASE
+    * print 'Current base url: ' + CRISTIN_BASE
 
   Scenario: Fetch and receive CORS preflight response
     * configure headers =
