@@ -52,11 +52,22 @@ public class HttpExecutorImpl {
         this.httpClient = client;
     }
 
+    private Organization getParentOrganization(SubSubUnitDto subSubUnitDto) {
+        URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
+        final Set<Organization> partOf = isNull(parent)
+                ? null
+                : Set.of(getParentOrganization(attempt(() -> fetch(parent)).orElseThrow()));
+        return new Organization.Builder()
+                .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
+                .withPartOf(partOf)
+                .withName(subSubUnitDto.getUnitName()).build();
+    }
+
     private Organization fromSubSubunit(SubSubUnitDto subSubUnitDto) {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
         final Set<Organization> partOf = isNull(parent)
                 ? null
-                : Set.of(fromSubSubunit(attempt(() -> fetch(parent)).orElseThrow()));
+                : Set.of(getParentOrganization(attempt(() -> fetch(parent)).orElseThrow()));
         return new Organization.Builder()
                 .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                 .withPartOf(partOf)
@@ -67,21 +78,27 @@ public class HttpExecutorImpl {
     private Set<Organization> getSubUnits(SubSubUnitDto subSubUnitDto) {
         List<SubUnitDto> subUnits = subSubUnitDto.getSubUnits();
         if (!isNull(subUnits)) {
-            final URI parent = getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH);
             return subUnits.stream()
-                    .map((SubUnitDto subUnitDto) -> asOrganizationReference(subUnitDto, parent))
+                    .map((SubUnitDto subUnitDto) -> getSubUnitDto(subUnitDto.getUri()))
                     .collect(Collectors.toSet());
         } else {
             return null;
         }
     }
 
-    private Organization asOrganizationReference(SubUnitDto subUnitDto, URI parent) {
+    private Organization getSubUnitDto(URI cristinUri)  {
+        return attempt(() ->  getSubOrganization(cristinUri)).orElseThrow();
+    }
+
+    public Organization getSubOrganization(URI uri) throws NotFoundException {
+        return getHasParts(fetch(uri));
+    }
+
+    private Organization getHasParts(SubSubUnitDto subSubUnitDto) {
         return new Organization.Builder()
-                .withId(getNvaApiId(subUnitDto.getId(), ORGANIZATION_PATH))
-                .withPartOf(Set.of(new Organization.Builder().withId(parent).build()))
-                .withName(subUnitDto.getName())
-                .build();
+                .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
+                .withHasPart(getSubUnits(subSubUnitDto))
+                .withName(subSubUnitDto.getUnitName()).build();
     }
 
     public Organization getOrganization(URI uri) throws NotFoundException {
@@ -144,6 +161,5 @@ public class HttpExecutorImpl {
     private boolean isSuccessful(int statusCode) {
         return statusCode <= HTTP_MULT_CHOICE && statusCode >= HTTP_OK;
     }
-
 
 }
