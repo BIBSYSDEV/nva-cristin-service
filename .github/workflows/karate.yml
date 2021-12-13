@@ -1,6 +1,6 @@
 name: Karate API tests
 
-on: [ pull_request ]
+on: [ push ]
 env:
   STACK_NAME: cristin-$GITHUB_REF_NAME
   BASE_PATH: cristin-$GITHUB_REF_NAME
