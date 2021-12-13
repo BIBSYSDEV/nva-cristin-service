@@ -32,5 +32,5 @@ jobs:
       - name: Run karate tests with Gradle
         run: ./gradlew karateTest -x test
       # Delete stack after running tests
-      - name: Delete stack after running tests
-        run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}
+#      - name: Delete stack after running tests
+#        run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}
