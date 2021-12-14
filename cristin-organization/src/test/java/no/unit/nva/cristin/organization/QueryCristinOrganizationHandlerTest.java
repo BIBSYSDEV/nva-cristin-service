@@ -108,7 +108,7 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseOnQuery() throws IOException, NotFoundException, FailedHttpRequestException {
+    void shouldReturnResponseOnQuery() throws IOException, NotFoundException, FailedHttpRequestException, HttpClientFailureException {
 
         HttpClient httpClient = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)

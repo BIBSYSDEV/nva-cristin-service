@@ -168,15 +168,15 @@ class FetchCristinOrganizationHandlerTest {
 
         HttpExecutorImpl mySpy = spy(httpExecutor);
         final URI level1 = getCristinUri("185.90.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_90_0_0.json")).when(mySpy).fetch(level1);
+        doReturn(getSubSubUnit("unit_18_90_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level1);
         final URI level2a = getCristinUri("185.53.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_0_0.json")).when(mySpy).fetch(level2a);
+        doReturn(getSubSubUnit("unit_18_53_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2a);
         final URI level2b = getCristinUri("185.50.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_50_0_0.json")).when(mySpy).fetch(level2b);
+        doReturn(getSubSubUnit("unit_18_50_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2b);
         final URI level3 = getCristinUri("185.53.18.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_18_0.json")).when(mySpy).fetch(level3);
+        doReturn(getSubSubUnit("unit_18_53_18_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level3);
         final URI level4 = getCristinUri("185.53.18.14", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_18_14.json")).when(mySpy).fetch(level4);
+        doReturn(getSubSubUnit("unit_18_53_18_14.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level4);
         cristinApiClient = new CristinApiClient(mySpy);
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());

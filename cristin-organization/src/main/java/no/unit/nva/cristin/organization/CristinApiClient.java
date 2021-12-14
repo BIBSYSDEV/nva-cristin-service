@@ -44,7 +44,7 @@ public class CristinApiClient {
      * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
     public Organization getOrganization(URI uri)
-            throws NotFoundException, InterruptedException, FailedHttpRequestException {
+            throws NotFoundException, InterruptedException, FailedHttpRequestException, HttpClientFailureException {
         return httpExecutor.getOrganization(uri);
     }
 

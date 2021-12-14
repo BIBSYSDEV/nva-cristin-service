@@ -3,4 +3,3 @@ dependencies {
     implementation libs.google.guava
     implementation libs.aws.lambda.java.core
 }
-
