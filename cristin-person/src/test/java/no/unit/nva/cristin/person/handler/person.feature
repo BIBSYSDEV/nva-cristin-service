@@ -53,7 +53,8 @@ Feature: API tests for Cristin Person fetch
 
     Examples:
       | CONTENT_TYPE       |
-      #| 'application/ld+json' | Must implement later
+      # TODO: Implement ld json
+      #| 'application/ld+json' |
       | 'application/json' |
 
   Scenario Outline: Fetch with unsupported Accept header returns Unsupported Media Type
