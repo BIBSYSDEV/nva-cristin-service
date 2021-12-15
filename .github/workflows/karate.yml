@@ -3,7 +3,7 @@ name: Karate API tests
 on: [ push ]
 env:
   STACK_NAME: cristin-$GITHUB_REF_NAME
-  BASE_PATH: cristin-$GITHUB_REF_NAME
+  SERVICE_BASE_PATH: cristin-$GITHUB_REF_NAME
   DOMAIN_NAME:  "api.dev.nva.aws.unit.no"
   CRISTIN_API: "api.cristin.no"
 jobs:
@@ -27,10 +27,10 @@ jobs:
 #        run: sam build
       # Prevent prompts and failure when the stack is unchanged
 #      - name: Deploy
-#        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${{env.STACK_NAME}} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${{env.BASE_PATH}} ParameterKey=CristinApiHost,ParameterValue=${CRISTIN_API}
+#        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${{env.STACK_NAME}} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${{env.SERVICE_BASE_PATH}} ParameterKey=CristinApiHost,ParameterValue=${CRISTIN_API}
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
-        run: ./gradlew karateTest -x test -DBASE_PATH=${{env.BASE_PATH}}  --info
+        run: ./gradlew karateTest -x test -DBASE_PATH="cristin-$GITHUB_REF_NAME" --info
 
       # Delete stack after running tests
 #      - name: Delete stack after running tests
