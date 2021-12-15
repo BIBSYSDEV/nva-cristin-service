@@ -29,12 +29,8 @@ jobs:
 #      - name: Deploy
 #        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${{env.STACK_NAME}} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${{env.BASE_PATH}} ParameterKey=CristinApiHost,ParameterValue=${CRISTIN_API}
       # Run karate tests on deployed api
-      - name: set environment for the rest
-        run: B_PATH=${{env.BASE_PATH}} >> $GITHUB_ENV
-      - name: echo env
-        run: env
       - name: Run karate tests with Gradle
-        run: ./gradlew karateTest -x test --info
+        run: ./gradlew karateTest -x test -DBASE_PATH==${{env.BASE_PATH}}  --info
 
       # Delete stack after running tests
 #      - name: Delete stack after running tests
