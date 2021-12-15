@@ -246,7 +246,7 @@ public class HttpExecutorImpl {
                 && response.statusCode() < FIRST_NON_SUCCESSFUL_CODE) {
             return response;
         } else if (response.statusCode() == HTTP_NOT_FOUND) {
-            throw new NotFoundException(errorMessage(response));
+            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, response.body()));
         } else {
             throw new FailedHttpRequestException(errorMessage(response));
         }
