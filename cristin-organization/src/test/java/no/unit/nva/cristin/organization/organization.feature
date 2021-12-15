@@ -41,13 +41,13 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.status == 400
     And match response.detail == 'Parameter \'query\' is missing or invalid. May only contain alphanumeric characters, dash, comma, period and whitespace'
 
-  Scenario: GET returns 404 status Not found when requesting unknown organization identifier
-    Given path '/organization/' + nonExistingOrganizationId
-    When method GET
-    Then status 404
-    And match response.title == 'Not Found'
-    And match response.status == 404
-    And match response.detail == 'The URI "' + CRISTIN_BASE + '/organization/0.1.2.3" cannot be dereferenced'
+#  Scenario: GET returns 404 status Not found when requesting unknown organization identifier
+#    Given path '/organization/' + nonExistingOrganizationId
+#    When method GET
+#    Then status 404
+#    And match response.title == 'Not Found'
+#    And match response.status == 404
+#    And match response.detail == 'The URI "' + CRISTIN_BASE + '/organization/0.1.2.3" cannot be dereferenced'
 
   Scenario: GET organization with query and result returns list of search results limited to results with position
     Given path '/organization'
