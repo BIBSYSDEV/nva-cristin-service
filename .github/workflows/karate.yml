@@ -33,8 +33,7 @@ jobs:
         run: env
         env:
           BASE_PATH: ${{env.BASE_PATH}}
-          SVENN_BASE: cristin-$GITHUB_REF_NAME
-          SVENN_BASE2: '${{env.BASE_PATH}}'
+          SVENN_BASE: cristin-${{GITHUB_REF_NAME}}
       - name: Run karate tests with Gradle
         run: ./gradlew karateTest -x test --info
         env:
