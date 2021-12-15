@@ -116,4 +116,6 @@ Feature: API tests for Cristin Person fetch
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingOrcid
+    * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingOrcid
+    * def errorMessage = "The requested resource ' + uri + ' was not found"
+    And match response.detail == errorMessage
