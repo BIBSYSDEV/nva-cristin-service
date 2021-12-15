@@ -1,11 +1,11 @@
-Feature: API tests for Cristin projects query
+Feature: API tests for Cristin persons query
 
   Background:
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
-    * def queryString = 'covid'
-    * def projectIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/project\/[0-9]+'
+    * def queryString = 'John'
+    * def personIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/person\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
@@ -22,7 +22,7 @@ Feature: API tests for Cristin projects query
       'Access-Control-Request-Method': 'GET'
     }
   """
-    Given path '/project/'
+    Given path '/person/'
     And param query = queryString
     When method OPTIONS
     Then status 200
@@ -40,7 +40,7 @@ Feature: API tests for Cristin projects query
 
   Scenario Outline: Query returns valid data and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
-    Given path '/project/'
+    Given path '/person/'
     And param query = queryString
     When method GET
     Then status 200
@@ -49,9 +49,8 @@ Feature: API tests for Cristin projects query
     And match response.id == '#present'
     And match response.size == '#present'
     And match response.hits == '#present'
-    And match response.hits[0].type == 'Project'
-    And match response.hits[0].id == '#regex ' + projectIdRegex
-    And match response.hits[0].title == '#present'
+    And match response.hits[0].type == 'Person'
+    And match response.hits[0].id == '#regex ' + personIdRegex
 
     Examples:
       | CONTENT_TYPE          |
@@ -59,8 +58,8 @@ Feature: API tests for Cristin projects query
       | 'application/json'    |
 
   Scenario: Query accepts special characters and whitespace
-    Given path '/project/'
-    And param query = 'Kåre G'
+    Given path '/person/'
+    And param query = 'John Smith'
     When method GET
     Then status 200
     And match response == '#object'
@@ -71,7 +70,7 @@ Feature: API tests for Cristin projects query
 
   Scenario Outline: Query with unsupported Accept header returns Unsupported Media Type
     * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }
-    Given path '/project/'
+    Given path '/person/'
     And param query = queryString
     When method GET
     Then status 415
@@ -89,7 +88,7 @@ Feature: API tests for Cristin projects query
       | 'application/rdf+xml'     |
 
   Scenario: Query with bad parameter returns Bad Request
-    Given path '/project/'
+    Given path '/person/'
     And param notValidParam = 'someValue'
     When method GET
     Then status 400
@@ -97,11 +96,12 @@ Feature: API tests for Cristin projects query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
+    # TODO: Change detail to exclude language
     And match response.detail == "Invalid query param supplied. Valid ones are 'query', 'page', 'results' and 'language'"
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
-    Given path '/project/'
+    Given path '/person/'
     And param query = queryString
     And param <VALID_PARAM> = <INVALID_PARAM_VALUE>
     When method GET
@@ -121,7 +121,7 @@ Feature: API tests for Cristin projects query
       | 'results'   | 'hello'             |
 
   Scenario: Query with missing query parameter returns Bad Request
-    Given path '/project/'
+    Given path '/person/'
     And method GET
     Then status 400
     * def contentType = responseHeaders['Content-Type'][0]
@@ -132,26 +132,15 @@ Feature: API tests for Cristin projects query
     And match response.requestId == '#notnull'
 
   Scenario: Query returns correct pagination values and URIs
-    Given path '/project/'
+    Given path '/person/'
     And param query = queryString
-    And param results = '5'
+    And param results = '3'
     And param page = '2'
     When method GET
     Then status 200
-    * def nextResultsPath = CRISTIN_BASE + '/project?query=' + queryString + '&language=nb&page=3&results=5'
-    * def previousResultsPath = CRISTIN_BASE + '/project?query=' + queryString + '&language=nb&page=1&results=5'
+    * def nextResultsPath = CRISTIN_BASE + '/person?query=' + queryString + '&page=3&results=3'
+    * def previousResultsPath = CRISTIN_BASE + '/person?query=' + queryString + '&page=1&results=3'
     And match response.nextResults == nextResultsPath
     And match response.previousResults == previousResultsPath
-    And match response.firstRecord == 6
-    And match response.hits == '#[5]'
-
-  Scenario: Query with grant id returns correct project
-    Given path '/project/'
-    * def grantId = '226139'
-    And param query = grantId
-    When method GET
-    Then status 200
-    And match response.hits == '#[1]'
-    * def matchingProject = '432742'
-    And match response.hits[0].id contains matchingProject
-    And match response.hits[0].title == '#present'
+    And match response.firstRecord == 4
+    And match response.hits == '#[3]'
