@@ -8,6 +8,7 @@ import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.dto.SubUnitDto;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.attempt.Failure;
@@ -28,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
@@ -40,8 +42,6 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public class HttpExecutorImpl {
 
-    public static final String NVA_INSTITUTIONS_LIST_CRAWLER = "NVA Institutions List Crawler";
-
     private final transient HttpClient httpClient;
     private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
     public static final int FIRST_EFFORT = 0;
@@ -53,10 +53,6 @@ public class HttpExecutorImpl {
     public static int FIRST_SUCCESSFUL_CODE = HTTP_OK;
     public static String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
 
-    private static int fetchCounter;
-    public static int getFetchCounter() {
-        return fetchCounter;
-    }
 
     /**
      * Default constructor.
@@ -77,7 +73,8 @@ public class HttpExecutorImpl {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
         final Set<Organization> partOf = isNull(parent)
                 ? null
-                : Set.of(getParentOrganization(attempt(() -> getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
+                : Set.of(getParentOrganization(attempt(() ->
+                getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
         return new Organization.Builder()
                 .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                 .withPartOf(partOf)
@@ -88,7 +85,8 @@ public class HttpExecutorImpl {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
         final Set<Organization> partOf = isNull(parent)
                 ? null
-                : Set.of(getParentOrganization(attempt(() -> getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
+                : Set.of(getParentOrganization(attempt(() ->
+                getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
         return new Organization.Builder()
                 .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                 .withPartOf(partOf)
@@ -112,7 +110,7 @@ public class HttpExecutorImpl {
         return attempt(() ->  getSubOrganization(cristinUri)).orElseThrow();
     }
 
-    public Organization getSubOrganization(URI uri) throws HttpClientFailureException {
+    public Organization getSubOrganization(URI uri) throws FailedHttpRequestException {
         return getHasParts(getSubSubUnitDtoWithMultipleEfforts(uri));
     }
 
@@ -123,22 +121,9 @@ public class HttpExecutorImpl {
                 .withName(subSubUnitDto.getUnitName()).build();
     }
 
-    public Organization getOrganization(URI uri) throws HttpClientFailureException {
+    public Organization getOrganization(URI uri) throws FailedHttpRequestException {
         return fromSubSubunit(getSubSubUnitDtoWithMultipleEfforts(uri));
     }
-
-//    protected SubSubUnitDto fetch(URI uri) throws NotFoundException {
-////        System.out.println("fetch -> " + uri.toString());
-//        fetchCounter++;
-//        HttpRequest httpRequest = createHttpRequest(addLanguage(uri));
-//        HttpResponse<String> response = sendRequest(httpRequest);
-//        if (isSuccessful(response.statusCode())) {
-//            return SubSubUnitDto.fromJson(response.body());
-//        } else {
-//            System.out.println("fetch !isSuccessful response.statusCode()=" +response.statusCode() + ", uri=" + uri.toString());
-//            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
-//        }
-//    }
 
     protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
         HttpResponse<String> response = sendRequest(createHttpRequest(addLanguage(uri)));
@@ -165,7 +150,6 @@ public class HttpExecutorImpl {
 
     private List<Organization> getOrganizations(HttpResponse<String> response) throws JsonProcessingException {
         List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>() {});
-        System.out.println("getOrganizations units.size()=" + units.size());
         return units.stream()
                 .map(SubUnitDto::getUri)
                 .map(uri -> attempt(() -> getOrganization(uri)).orElseThrow())
@@ -187,10 +171,10 @@ public class HttpExecutorImpl {
         return statusCode <= HTTP_MULT_CHOICE && statusCode >= HTTP_OK;
     }
 
-    private <T> HttpClientFailureException handleError(Failure<T> failure) {
-        return new HttpClientFailureException(failure.getException(), failure.getException().getMessage());
+    private <T> FailedHttpRequestException handleError(Failure<T> failure) {
+        final ApiGatewayException failureException = (ApiGatewayException) failure.getException();
+        return new FailedHttpRequestException(failureException, failureException.getStatusCode());
     }
-
 
     private Try<HttpResponse<String>> sendRequestMultipleTimes(URI uri) {
         Try<HttpResponse<String>> lastEffort = null;
@@ -204,7 +188,7 @@ public class HttpExecutorImpl {
     private Try<HttpResponse<String>> attemptFetch(URI uri, int effortCount) {
         Try<HttpResponse<String>> newEffort = attempt(() -> createAndSendHttpRequest(uri).get());
         if (newEffort.isFailure()) {
-            logger.trace(String.format("Failed HttpRequest on attempt %d of 3: ", effortCount + 1)
+            logger.warn(String.format("Failed HttpRequest on attempt %d of 3: ", effortCount + 1)
                     + newEffort.getException().getMessage(), newEffort.getException()
             );
         }
@@ -227,6 +211,7 @@ public class HttpExecutorImpl {
     private boolean shouldKeepTrying(int effortCount, Try<HttpResponse<String>> lastEffort) {
         return lastEffort == null || (lastEffort.isFailure() && shouldTryMoreTimes(effortCount));
     }
+
     private int waitBeforeRetrying(int effortCount) {
         if (effortCount > FIRST_EFFORT) {
             try {
@@ -238,31 +223,35 @@ public class HttpExecutorImpl {
         }
         return effortCount;
     }
+
     public SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri)
-            throws HttpClientFailureException {
-        fetchCounter++;
+            throws FailedHttpRequestException {
 
         SubSubUnitDto subsubUnitDto = Try.of(subunitUri)
                 .flatMap(this::sendRequestMultipleTimes)
                 .map(this::throwExceptionIfNotSuccessful)
                 .map(HttpResponse::body)
-                .map( SubSubUnitDto::fromJson)
+                .map(SubSubUnitDto::fromJson)
                 .orElseThrow(this::handleError);
 
         subsubUnitDto.setSourceUri(subunitUri);
         return subsubUnitDto;
     }
+
     protected HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response)
-            throws FailedHttpRequestException {
+            throws FailedHttpRequestException, NotFoundException {
         if (isNull(response)) {
             throw new FailedHttpRequestException(NULL_HTTP_RESPONSE_ERROR_MESSAGE);
         } else if (response.statusCode() >= FIRST_SUCCESSFUL_CODE
                 && response.statusCode() < FIRST_NON_SUCCESSFUL_CODE) {
             return response;
+        } else if (response.statusCode() == HTTP_NOT_FOUND) {
+            throw new NotFoundException(errorMessage(response));
         } else {
             throw new FailedHttpRequestException(errorMessage(response));
         }
     }
+
     private String errorMessage(HttpResponse<String> response) {
         return String.format(ERROR_MESSAGE_FORMAT, response.statusCode(), response.body());
     }

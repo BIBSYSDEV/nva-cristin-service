@@ -16,7 +16,6 @@ import nva.commons.core.JsonUtils;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
 
@@ -108,7 +107,7 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseOnQuery() throws IOException, NotFoundException, FailedHttpRequestException, HttpClientFailureException {
+    void shouldReturnResponseOnQuery() throws IOException, FailedHttpRequestException {
 
         HttpClient httpClient = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)

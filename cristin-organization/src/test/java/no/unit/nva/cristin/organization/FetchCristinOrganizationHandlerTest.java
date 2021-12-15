@@ -25,8 +25,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
@@ -157,8 +160,7 @@ class FetchCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnOrganizationHierarchy() throws IOException, ApiGatewayException, InterruptedException {
-
+    void shouldReturnOrganizationHierarchy() throws IOException, ApiGatewayException {
 
         HttpClient httpClient = mock(HttpClient.class);
         when(httpClient.sendAsync(any(), any())).thenThrow(new RuntimeException("This should Not happen!"));
@@ -194,6 +196,28 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(actualOrganization.getName().get("en"), containsString("Department of Medical Biochemistry"));
         System.out.println(actualOrganization);
     }
+
+
+    @Test
+    void shouldReturnHttp404NotFoundWhenNonExistingIdentifier() throws Exception {
+        HttpClient httpClient = mock(HttpClient.class);
+        HttpResponse<Object> httpResponse = mock(HttpResponse.class);
+        CompletableFuture<HttpResponse<Object>> notFoundResponse = mock(CompletableFuture.class);
+        when(httpResponse.statusCode()).thenReturn(HTTP_NOT_FOUND);
+        when(notFoundResponse.get()).thenReturn(httpResponse);
+        when(httpClient.sendAsync(any(), any())).thenReturn(notFoundResponse);
+        HttpExecutorImpl httpExecutor = new HttpExecutorImpl(httpClient);
+        CristinApiClient cristinApiClient = new CristinApiClient(httpExecutor);
+        output = new ByteArrayOutputStream();
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+
+
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
+
+        GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
+        assertEquals(HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
+    }
+
 
     private Object getSubSubUnit(String subUnitFile) {
         return SubSubUnitDto.fromJson(IoUtils.stringFromResources(Path.of(subUnitFile)));
