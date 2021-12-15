@@ -30,7 +30,7 @@ jobs:
 #        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${{env.STACK_NAME}} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${{env.SERVICE_BASE_PATH}} ParameterKey=CristinApiHost,ParameterValue=${CRISTIN_API}
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
-        run: ./gradlew karateTest -x test -DBASE_PATH="cristin-$GITHUB_REF_NAME" --info
+        run: BASE_PATH=$("cristin-$GITHUB_REF_NAME") ./gradlew karateTest -x test --info
 
       # Delete stack after running tests
 #      - name: Delete stack after running tests
