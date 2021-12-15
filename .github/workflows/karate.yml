@@ -3,7 +3,7 @@ name: Karate API tests
 on: [ push ]
 env:
   STACK_NAME: cristin-$GITHUB_REF_NAME
-  BASE_PATH: cristin-$GITHUB_REF_NAME
+  BASE_PATH: 'cristin-np-3491-more-org-haspart-data'
   DOMAIN_NAME:  "api.dev.nva.aws.unit.no"
   CRISTIN_API: "api.cristin.no"
 jobs:
