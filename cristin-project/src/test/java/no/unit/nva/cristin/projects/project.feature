@@ -95,4 +95,5 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'https://api.dev.nva.aws.unit.no/' + basePath + '/project/0'
+    * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/project/0'
+    And match response.detail == "The requested resource '" + uri + "' was not found"

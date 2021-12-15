@@ -99,7 +99,8 @@ Feature: API tests for Cristin Person fetch
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingPersonId
+    * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingPersonId
+    And match response.detail == "The requested resource '" + uri + "' was not found"
 
   Scenario: Fetch with ORCID returns valid data
     Given path '/person/' + validOrcid
@@ -117,5 +118,4 @@ Feature: API tests for Cristin Person fetch
     And match response.title == 'Not Found'
     And match response.status == 404
     * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingOrcid
-    * def errorMessage = "The requested resource ' + uri + ' was not found"
-    And match response.detail == errorMessage
+    And match response.detail == "The requested resource '" + uri + "' was not found"
