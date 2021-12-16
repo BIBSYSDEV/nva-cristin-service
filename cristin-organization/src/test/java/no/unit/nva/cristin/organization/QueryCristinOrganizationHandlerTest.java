@@ -55,6 +55,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import nva.commons.core.attempt.Try;
 
 class QueryCristinOrganizationHandlerTest {
 
@@ -128,7 +129,7 @@ class QueryCristinOrganizationHandlerTest {
         when(mockHttpResponse.body()).thenReturn(IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE)));
         when(mockHttpResponse.headers())
                 .thenReturn(java.net.http.HttpHeaders.of(Collections.emptyMap(), (s1,s2) -> true));
-        doReturn(mockHttpResponse).when(mySpy).sendRequest(any());
+        doReturn(getaTry(mockHttpResponse)).when(mySpy).sendRequestMultipleTimes(any());
 
         cristinApiClient = new CristinApiClient(mySpy);
         output = new ByteArrayOutputStream();
@@ -145,6 +146,10 @@ class QueryCristinOrganizationHandlerTest {
         assertEquals(2, actual.getHits().size());
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    private Try<HttpResponse<String>> getaTry(HttpResponse<String> mockHttpResponse) {
+        return Try.of(mockHttpResponse);
     }
 
     private Organization getOrganization(String subUnitFile) throws JsonProcessingException {

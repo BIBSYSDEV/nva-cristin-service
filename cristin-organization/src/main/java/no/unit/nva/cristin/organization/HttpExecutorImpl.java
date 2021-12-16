@@ -42,16 +42,16 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public class HttpExecutorImpl {
 
-    private final transient HttpClient httpClient;
-    private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
     public static final int FIRST_EFFORT = 0;
     public static final int MAX_EFFORTS = 2;
     public static final int WAITING_TIME = 500; //500 milliseconds
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
+    private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
     public static int FIRST_NON_SUCCESSFUL_CODE = HTTP_MULT_CHOICE;
     public static int FIRST_SUCCESSFUL_CODE = HTTP_OK;
     public static String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
+    private final transient HttpClient httpClient;
 
 
     /**
@@ -73,9 +73,8 @@ public class HttpExecutorImpl {
         return fromSubSubunit(getSubSubUnitDtoWithMultipleEfforts(uri));
     }
 
-
     protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
-        HttpResponse<String> response = sendRequest(createHttpRequest(addLanguage(uri)));
+        HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(uri)).get();
         if (isSuccessful(response.statusCode())) {
             try {
                 List<Organization> organizations = getOrganizations(response);
@@ -96,7 +95,7 @@ public class HttpExecutorImpl {
         final Set<Organization> partOf = isNull(parent)
                 ? null
                 : Set.of(getParentOrganization(attempt(() ->
-                    getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
+                getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
         return new Organization.Builder()
                 .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                 .withPartOf(partOf)
@@ -108,7 +107,7 @@ public class HttpExecutorImpl {
         final Set<Organization> partOf = isNull(parent)
                 ? null
                 : Set.of(getParentOrganization(attempt(() ->
-                    getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
+                getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
         return new Organization.Builder()
                 .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                 .withPartOf(partOf)
@@ -128,8 +127,8 @@ public class HttpExecutorImpl {
         }
     }
 
-    private Organization getSubUnitDto(URI cristinUri)  {
-        return attempt(() ->  getSubOrganization(cristinUri)).orElseThrow();
+    private Organization getSubUnitDto(URI cristinUri) {
+        return attempt(() -> getSubOrganization(cristinUri)).orElseThrow();
     }
 
     private Organization getSubOrganization(URI uri) throws ApiGatewayException {
@@ -151,22 +150,13 @@ public class HttpExecutorImpl {
     }
 
     private List<Organization> getOrganizations(HttpResponse<String> response) throws JsonProcessingException {
-        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>() {});
+        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>() {
+        });
         return units.stream()
+                .parallel()
                 .map(SubUnitDto::getUri)
                 .map(uri -> attempt(() -> getOrganization(uri)).orElseThrow())
                 .collect(Collectors.toList());
-    }
-
-    private HttpRequest createHttpRequest(URI uri) {
-        return HttpRequest.newBuilder()
-                .GET()
-                .uri(uri)
-                .build();
-    }
-
-    protected HttpResponse<String> sendRequest(HttpRequest httpRequest) {
-        return attempt(() -> httpClient.sendAsync(httpRequest, BodyHandlers.ofString()).get()).orElseThrow();
     }
 
     private boolean isSuccessful(int statusCode) {
@@ -181,7 +171,7 @@ public class HttpExecutorImpl {
         return new FailedHttpRequestException(failureException, failureException.getStatusCode());
     }
 
-    private Try<HttpResponse<String>> sendRequestMultipleTimes(URI uri) {
+    protected Try<HttpResponse<String>> sendRequestMultipleTimes(URI uri) {
         Try<HttpResponse<String>> lastEffort = null;
         for (int effortCount = FIRST_EFFORT; shouldKeepTrying(effortCount, lastEffort); effortCount++) {
             waitBeforeRetrying(effortCount);
@@ -229,7 +219,7 @@ public class HttpExecutorImpl {
         return effortCount;
     }
 
-     protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri)
+    protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri)
             throws ApiGatewayException {
 
         SubSubUnitDto subsubUnitDto = Try.of(subunitUri)
