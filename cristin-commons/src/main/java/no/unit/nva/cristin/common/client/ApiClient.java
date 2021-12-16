@@ -52,6 +52,17 @@ public class ApiClient {
 
     public HttpResponse<String> fetchGetResult(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+        return getSuccessfulResponseOrThrowException(httpRequest);
+    }
+
+    public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
+        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+        return getSuccessfulResponseOrThrowException(httpRequest);
+    }
+
+    private HttpResponse<String> getSuccessfulResponseOrThrowException(HttpRequest httpRequest)
+        throws GatewayTimeoutException, FailedHttpRequestException {
+
         try {
             return client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8));
         } catch (HttpTimeoutException timeoutException) {
@@ -59,11 +70,6 @@ public class ApiClient {
         } catch (IOException | InterruptedException otherException) {
             throw new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
-    }
-
-    public HttpResponse<String> fetchQueryResults(URI uri) {
-        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
-        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
     public static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
@@ -74,7 +80,7 @@ public class ApiClient {
         return endRequestTime - startRequestTime;
     }
 
-    protected  <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
+    protected <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
         throws BadGatewayException {
 
         return attempt(() -> fromJson(response.body(), classOfT))

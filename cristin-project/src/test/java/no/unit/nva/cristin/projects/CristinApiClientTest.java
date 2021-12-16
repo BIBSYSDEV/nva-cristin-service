@@ -130,7 +130,7 @@ public class CristinApiClientTest {
     }
 
     @Test
-    void returnsDummyFetchQueryResultsForCodeCoverage() throws IOException, InterruptedException {
+    void returnsDummyFetchQueryResultsForCodeCoverage() throws IOException, InterruptedException, ApiGatewayException {
         HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> httpResponse =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);

@@ -314,7 +314,7 @@ public class FetchCristinProjectsTest {
     void handlerReturnsProjectWrapperWithFirstRecordWhenInputIsIncludesCurrentPageAndNumberOfResults(int expected,
                                                                                                      String perPage,
                                                                                                      String currentPage)
-        throws IOException {
+        throws IOException, ApiGatewayException {
 
         modifyQueryResponseToClient(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE),
@@ -583,7 +583,9 @@ public class FetchCristinProjectsTest {
         return String.format(url, page, results);
     }
 
-    private void modifyQueryResponseToClient(String body, java.net.http.HttpHeaders headers) {
+    private void modifyQueryResponseToClient(String body, java.net.http.HttpHeaders headers)
+        throws ApiGatewayException {
+
         cristinApiClientStub = spy(cristinApiClientStub);
         HttpResponse<String> response = new HttpResponseFaker(body);
         response = spy(response);
