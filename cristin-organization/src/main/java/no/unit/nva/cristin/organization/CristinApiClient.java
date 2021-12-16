@@ -19,6 +19,7 @@ import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 
@@ -75,6 +76,7 @@ public class CristinApiClient {
             SearchResponse<Organization> searchResponse,
             Map<String, String> requestQueryParams,
             long timeUsed) {
+        searchResponse.setContext(ORGANIZATION_CONTEXT);
         searchResponse.setId(createIdUriFromParams(requestQueryParams, ORGANIZATION_PATH));
         if (searchResponse.getSize() > 0) {
             searchResponse.setFirstRecord(calculateFirstRecord(requestQueryParams));

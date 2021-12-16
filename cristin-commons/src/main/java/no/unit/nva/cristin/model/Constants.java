@@ -45,7 +45,7 @@ public class Constants {
     public static final String PERSON_PATH_NVA = "person";
     public static final String PERSON_QUERY_CONTEXT = "https://example.org/person-search-context.json";
     public static final String UNITS_PATH = "units";
-    public static final String NOT_FOUND_MESSAGE_TEMPLATE = "The URI \"%s\" cannot be dereferenced";
+    public static final String NOT_FOUND_MESSAGE_TEMPLATE = "The URI '%s' cannot be dereferenced";
     public static final String QUERY_PARAMETER_LANGUAGE = "lang";
     public static final String ALL_QUERY_PARAMETER_LANGUAGES = "en,nb,nn";
     public static final Pattern ORCID_PATTERN = Pattern.compile("[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9|Xx]");
