@@ -48,9 +48,9 @@ public class HttpExecutorImpl {
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
     private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
-    public static int FIRST_NON_SUCCESSFUL_CODE = HTTP_MULT_CHOICE;
-    public static int FIRST_SUCCESSFUL_CODE = HTTP_OK;
-    public static String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
+    public static final int FIRST_NON_SUCCESSFUL_CODE = HTTP_MULT_CHOICE;
+    public static final int FIRST_SUCCESSFUL_CODE = HTTP_OK;
+    public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
     private final transient HttpClient httpClient;
 
 
