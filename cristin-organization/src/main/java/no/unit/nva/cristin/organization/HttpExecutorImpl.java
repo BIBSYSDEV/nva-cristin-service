@@ -69,6 +69,10 @@ public class HttpExecutorImpl {
         this.httpClient = client;
     }
 
+    public Organization getOrganization(URI uri) throws FailedHttpRequestException {
+        return fromSubSubunit(getSubSubUnitDtoWithMultipleEfforts(uri));
+    }
+
     private Organization getParentOrganization(SubSubUnitDto subSubUnitDto) {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
         final Set<Organization> partOf = isNull(parent)
@@ -110,7 +114,7 @@ public class HttpExecutorImpl {
         return attempt(() ->  getSubOrganization(cristinUri)).orElseThrow();
     }
 
-    public Organization getSubOrganization(URI uri) throws FailedHttpRequestException {
+    private Organization getSubOrganization(URI uri) throws FailedHttpRequestException {
         return getHasParts(getSubSubUnitDtoWithMultipleEfforts(uri));
     }
 
@@ -121,9 +125,6 @@ public class HttpExecutorImpl {
                 .withName(subSubUnitDto.getUnitName()).build();
     }
 
-    public Organization getOrganization(URI uri) throws FailedHttpRequestException {
-        return fromSubSubunit(getSubSubUnitDtoWithMultipleEfforts(uri));
-    }
 
     protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
         HttpResponse<String> response = sendRequest(createHttpRequest(addLanguage(uri)));
