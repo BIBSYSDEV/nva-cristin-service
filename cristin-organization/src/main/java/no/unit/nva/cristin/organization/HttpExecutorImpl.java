@@ -229,7 +229,7 @@ public class HttpExecutorImpl {
         return effortCount;
     }
 
-    public SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri)
+     protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri)
             throws ApiGatewayException {
 
         SubSubUnitDto subsubUnitDto = Try.of(subunitUri)
