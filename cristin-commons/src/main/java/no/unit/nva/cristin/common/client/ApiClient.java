@@ -2,6 +2,7 @@ package no.unit.nva.cristin.common.client;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
@@ -111,7 +112,8 @@ public class ApiClient {
         String uriAsString = Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
 
         if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
-            throw new NotFoundException(uriAsString);
+            String msg = String.format(ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, uriAsString);
+            throw new NotFoundException(msg);
         } else if (remoteServerHasInternalProblems(statusCode)) {
             logBackendFetchFail(uriAsString, statusCode);
             throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
