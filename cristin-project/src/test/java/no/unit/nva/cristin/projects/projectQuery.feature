@@ -15,11 +15,12 @@ Feature: API tests for Cristin projects query
   """
     {
       'Origin': 'http://localhost:3000',
-      'Accept': '*/*',
+      'Accept': 'application/ld+json',
       'Referer': 'Not sure what the value should be yet',
       'Connection': 'keep-alive',
       'Accept-Encoding': 'gzip, deflate, br',
-      'Access-Control-Request-Method': 'GET'
+      'Access-Control-Request-Method': 'GET',
+      'Access-Control-Request-Headers': 'Content-Type, Authorization'
     }
   """
     Given path '/project/'

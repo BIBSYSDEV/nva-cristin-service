@@ -8,7 +8,7 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
         "Error fetching cristin project with id: %s . Exception Message: %s";
     public static final String ERROR_MESSAGE_BACKEND_FETCH_FAILED =
-        "Your request cannot be processed at this time due to an upstream error";
+        "The request failed because of a problem with the upstream server";
     public static final String ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
         "Project matching id %s does not have valid data";
     public static final String ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED =
@@ -43,4 +43,6 @@ public class ErrorMessages {
         "Invalid query param supplied. Valid one are 'language'";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP =
         "This endpoint does not support query parameters";
+    public static final String ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI =
+        "The requested resource '%s' was not found";
 }

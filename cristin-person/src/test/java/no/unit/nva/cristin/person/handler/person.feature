@@ -19,11 +19,12 @@ Feature: API tests for Cristin Person fetch
   """
     {
       'Origin': 'http://localhost:3000',
-      'Accept': '*/*',
+      'Accept': 'application/ld+json',
       'Referer': 'Not sure what the value should be yet',
       'Connection': 'keep-alive',
       'Accept-Encoding': 'gzip, deflate, br',
-      'Access-Control-Request-Method': 'GET'
+      'Access-Control-Request-Method': 'GET',
+      'Access-Control-Request-Headers': 'Content-Type, Authorization'
     }
   """
     Given path '/person/1234'
@@ -99,7 +100,8 @@ Feature: API tests for Cristin Person fetch
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingPersonId
+    * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingPersonId
+    And match response.detail == "The requested resource '" + uri + "' was not found"
 
   Scenario: Fetch with ORCID returns valid data
     Given path '/person/' + validOrcid
@@ -116,4 +118,5 @@ Feature: API tests for Cristin Person fetch
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingOrcid
+    * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingOrcid
+    And match response.detail == "The requested resource '" + uri + "' was not found"
