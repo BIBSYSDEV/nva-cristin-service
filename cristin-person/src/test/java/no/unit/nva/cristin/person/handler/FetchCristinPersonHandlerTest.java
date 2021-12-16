@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERRO
 import static no.unit.nva.cristin.model.Constants.CRISTIN_TEST_API_BASE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.exception.GatewayTimeoutException.ERROR_MESSAGE_GATEWAY_TIMEOUT;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
@@ -26,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpConnectTimeoutException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
@@ -35,6 +39,7 @@ import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
@@ -140,7 +145,7 @@ public class FetchCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldProduceCorrectCristinUriFromIdentifier() throws IOException {
+    void shouldProduceCorrectCristinUriFromIdentifier() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
         handler = new FetchCristinPersonHandler(apiClient, environment);
         sendQuery(null, VALID_PATH_PARAM);
@@ -157,11 +162,24 @@ public class FetchCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldProduceCorrectCristinUriFromOrcidIdentifier() throws IOException {
+    void shouldProduceCorrectCristinUriFromOrcidIdentifier() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
         handler = new FetchCristinPersonHandler(apiClient, environment);
         sendQuery(null, VALID_ORCID_PATH_PARAM);
         verify(apiClient).fetchGetResult(new UriWrapper(EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER).getUri());
+    }
+
+    @Test
+    void shouldReturnGatewayTimeoutWhenFetchFromUpstreamServerTimesOut() throws Exception {
+        HttpClient clientMock = mock(HttpClient.class);
+        when(clientMock.<String>send(any(), any())).thenThrow(new HttpConnectTimeoutException(EMPTY_STRING));
+        CristinPersonApiClient apiClient = new CristinPersonApiClient(clientMock);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        GatewayResponse<Person> gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
+
+        assertEquals(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_GATEWAY_TIMEOUT));
     }
 
     private GatewayResponse<Person> sendQuery(Map<String, String> queryParams, Map<String, String> pathParam)

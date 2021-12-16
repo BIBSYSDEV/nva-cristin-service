@@ -26,8 +26,6 @@ import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.BadGatewayException;
-import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Try;
 
 public class CristinPersonApiClient extends ApiClient {
@@ -142,13 +140,13 @@ public class CristinPersonApiClient extends ApiClient {
      * @param identifier the identifier of the person to fetch
      * @return Person object with person data from upstream
      */
-    public Person generateGetResponse(String identifier) throws NotFoundException, BadGatewayException {
+    public Person generateGetResponse(String identifier) throws ApiGatewayException {
         Person person = getCristinPerson(identifier).toPerson();
         person.setContext(PERSON_CONTEXT);
         return person;
     }
 
-    private CristinPerson getCristinPerson(String identifier) throws NotFoundException, BadGatewayException {
+    private CristinPerson getCristinPerson(String identifier) throws ApiGatewayException {
         URI uri = getCorrectUriForIdentifier(identifier);
         HttpResponse<String> response = fetchGetResult(uri);
         checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode());

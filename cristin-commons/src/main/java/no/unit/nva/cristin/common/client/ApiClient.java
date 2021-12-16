@@ -14,11 +14,15 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import no.unit.nva.exception.FailedHttpRequestException;
+import no.unit.nva.exception.GatewayTimeoutException;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
@@ -46,9 +50,15 @@ public class ApiClient {
             BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
-    public HttpResponse<String> fetchGetResult(URI uri) {
+    public HttpResponse<String> fetchGetResult(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
-        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+        try {
+            return client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8));
+        } catch (HttpTimeoutException timeoutException) {
+            throw new GatewayTimeoutException();
+        } catch (IOException | InterruptedException otherException) {
+            throw new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        }
     }
 
     public HttpResponse<String> fetchQueryResults(URI uri) {
