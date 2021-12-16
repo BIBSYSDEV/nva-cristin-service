@@ -3,6 +3,7 @@ package no.unit.nva.cristin.organization;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.paths.UriWrapper;
 
@@ -44,7 +45,7 @@ public class CristinApiClient {
      * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
     public Organization getOrganization(URI uri)
-            throws NotFoundException, InterruptedException, FailedHttpRequestException {
+            throws ApiGatewayException, InterruptedException {
         return httpExecutor.getOrganization(uri);
     }
 

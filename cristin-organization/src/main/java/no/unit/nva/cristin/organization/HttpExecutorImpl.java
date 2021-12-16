@@ -69,16 +69,34 @@ public class HttpExecutorImpl {
         this.httpClient = client;
     }
 
-    public Organization getOrganization(URI uri) throws FailedHttpRequestException {
+    public Organization getOrganization(URI uri) throws ApiGatewayException {
         return fromSubSubunit(getSubSubUnitDtoWithMultipleEfforts(uri));
     }
+
+
+    protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
+        HttpResponse<String> response = sendRequest(createHttpRequest(addLanguage(uri)));
+        if (isSuccessful(response.statusCode())) {
+            try {
+                List<Organization> organizations = getOrganizations(response);
+                return new SearchResponse<Organization>(uri)
+                        .withHits(organizations)
+                        .withSize(getCount(response, organizations));
+            } catch (JsonProcessingException e) {
+                throw new FailedHttpRequestException(e.getMessage());
+            }
+        } else {
+            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
+        }
+    }
+
 
     private Organization getParentOrganization(SubSubUnitDto subSubUnitDto) {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
         final Set<Organization> partOf = isNull(parent)
                 ? null
                 : Set.of(getParentOrganization(attempt(() ->
-                getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
+                    getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
         return new Organization.Builder()
                 .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                 .withPartOf(partOf)
@@ -90,7 +108,7 @@ public class HttpExecutorImpl {
         final Set<Organization> partOf = isNull(parent)
                 ? null
                 : Set.of(getParentOrganization(attempt(() ->
-                getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
+                    getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
         return new Organization.Builder()
                 .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                 .withPartOf(partOf)
@@ -114,7 +132,7 @@ public class HttpExecutorImpl {
         return attempt(() ->  getSubOrganization(cristinUri)).orElseThrow();
     }
 
-    private Organization getSubOrganization(URI uri) throws FailedHttpRequestException {
+    private Organization getSubOrganization(URI uri) throws ApiGatewayException {
         return getHasParts(getSubSubUnitDtoWithMultipleEfforts(uri));
     }
 
@@ -123,23 +141,6 @@ public class HttpExecutorImpl {
                 .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                 .withHasPart(getSubUnits(subSubUnitDto))
                 .withName(subSubUnitDto.getUnitName()).build();
-    }
-
-
-    protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
-        HttpResponse<String> response = sendRequest(createHttpRequest(addLanguage(uri)));
-        if (isSuccessful(response.statusCode())) {
-            try {
-                List<Organization> organizations = getOrganizations(response);
-                return new SearchResponse<Organization>(uri)
-                        .withHits(organizations)
-                        .withSize(getCount(response, organizations));
-            } catch (JsonProcessingException e) {
-                throw new FailedHttpRequestException(e.getMessage());
-            }
-        } else {
-            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
-        }
     }
 
     private int getCount(HttpResponse<String> response, List<Organization> organizations) {
@@ -172,8 +173,11 @@ public class HttpExecutorImpl {
         return statusCode <= HTTP_MULT_CHOICE && statusCode >= HTTP_OK;
     }
 
-    private <T> FailedHttpRequestException handleError(Failure<T> failure) {
+    private <T> ApiGatewayException handleError(Failure<T> failure) {
         final ApiGatewayException failureException = (ApiGatewayException) failure.getException();
+        if (failureException instanceof NotFoundException) {
+            return failureException;
+        }
         return new FailedHttpRequestException(failureException, failureException.getStatusCode());
     }
 
@@ -226,11 +230,11 @@ public class HttpExecutorImpl {
     }
 
     public SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri)
-            throws FailedHttpRequestException {
+            throws ApiGatewayException {
 
         SubSubUnitDto subsubUnitDto = Try.of(subunitUri)
                 .flatMap(this::sendRequestMultipleTimes)
-                .map(this::throwExceptionIfNotSuccessful)
+                .map((HttpResponse<String> response) -> throwExceptionIfNotSuccessful(response, subunitUri))
                 .map(HttpResponse::body)
                 .map(SubSubUnitDto::fromJson)
                 .orElseThrow(this::handleError);
@@ -239,7 +243,7 @@ public class HttpExecutorImpl {
         return subsubUnitDto;
     }
 
-    protected HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response)
+    protected HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response, URI requestedUri)
             throws FailedHttpRequestException, NotFoundException {
         if (isNull(response)) {
             throw new FailedHttpRequestException(NULL_HTTP_RESPONSE_ERROR_MESSAGE);
@@ -247,7 +251,7 @@ public class HttpExecutorImpl {
                 && response.statusCode() < FIRST_NON_SUCCESSFUL_CODE) {
             return response;
         } else if (response.statusCode() == HTTP_NOT_FOUND) {
-            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, response.body()));
+            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, requestedUri));
         } else {
             throw new FailedHttpRequestException(errorMessage(response));
         }

@@ -11,6 +11,7 @@ import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.regex.Pattern;
 
@@ -24,6 +25,7 @@ import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import static nva.commons.core.exceptions.ExceptionUtils.stackTraceInSingleLine;
 
 public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, Organization> {
 
@@ -77,4 +79,6 @@ public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, O
         }
         throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
     }
+
+
 }

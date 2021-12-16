@@ -204,13 +204,13 @@ class FetchCristinOrganizationHandlerTest {
         HttpResponse<Object> httpResponse = mock(HttpResponse.class);
         CompletableFuture<HttpResponse<Object>> notFoundResponse = mock(CompletableFuture.class);
         when(httpResponse.statusCode()).thenReturn(HTTP_NOT_FOUND);
+        when(httpResponse.body()).thenReturn("https://example.org/someidentifier");
         when(notFoundResponse.get()).thenReturn(httpResponse);
         when(httpClient.sendAsync(any(), any())).thenReturn(notFoundResponse);
         HttpExecutorImpl httpExecutor = new HttpExecutorImpl(httpClient);
         CristinApiClient cristinApiClient = new CristinApiClient(httpExecutor);
         output = new ByteArrayOutputStream();
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
-
 
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
 
