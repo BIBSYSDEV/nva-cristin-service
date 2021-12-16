@@ -22,6 +22,7 @@ public class FailedHttpRequestException extends ApiGatewayException {
     public FailedHttpRequestException(Exception e, Integer statusCode) {
         super(e, statusCode);
     }
+
     @Override
     protected Integer statusCode() {
         return HTTP_BAD_GATEWAY;

@@ -58,7 +58,6 @@ public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, O
         }
     }
 
-
     @Override
     protected Integer getSuccessStatusCode(Void input, Organization output) {
         return HttpURLConnection.HTTP_OK;
@@ -77,6 +76,5 @@ public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, O
         }
         throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
     }
-
 
 }

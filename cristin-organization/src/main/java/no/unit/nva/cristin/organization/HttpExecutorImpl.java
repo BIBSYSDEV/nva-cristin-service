@@ -143,15 +143,13 @@ public class HttpExecutorImpl {
     }
 
     private int getCount(HttpResponse<String> response, List<Organization> organizations) {
-        final int count = response.headers().firstValue("X-Total-Count").isPresent()
+        return response.headers().firstValue("X-Total-Count").isPresent()
                 ? Integer.parseInt(response.headers().firstValue("X-Total-Count").get())
                 : organizations.size();
-        return count;
     }
 
     private List<Organization> getOrganizations(HttpResponse<String> response) throws JsonProcessingException {
-        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>() {
-        });
+        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() { });
         return units.stream()
                 .parallel()
                 .map(SubUnitDto::getUri)

@@ -35,7 +35,6 @@ tasks.named('test') {
 
 test {
     environment "ALLOWED_ORIGIN", "*"
-//    environment "CRISTIN_API_HOST", "api.cristin-test.uio.no"
     environment "CRISTIN_API_HOST", "api.cristin.no"
     environment "BASE_PATH", "cristin"
     environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
@@ -83,5 +82,4 @@ jacocoTestCoverageVerification {
             }
         }
     }
-
 }
