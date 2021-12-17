@@ -1,5 +1,5 @@
 [versions]
-junit = {strictly = '5.8.1'}
+junit = {strictly = '5.8.2'}
 nva-commons = {strictly = '1.16.26'}
 jackson = {strictly = '2.13.0'}
 mockito = {strictly = '4.1.0'}
