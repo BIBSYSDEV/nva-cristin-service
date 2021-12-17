@@ -47,10 +47,8 @@ public class HttpExecutorImpl {
     public static final int WAITING_TIME = 500; //500 milliseconds
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
-    private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
-    public static final int FIRST_NON_SUCCESSFUL_CODE = HTTP_MULT_CHOICE;
-    public static final int FIRST_SUCCESSFUL_CODE = HTTP_OK;
     public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
+    private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
     private final transient HttpClient httpClient;
 
 
@@ -84,8 +82,10 @@ public class HttpExecutorImpl {
             } catch (JsonProcessingException e) {
                 throw new FailedHttpRequestException(e.getMessage());
             }
-        } else {
+        } else if (response.statusCode() == HTTP_NOT_FOUND) {
             throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
+        } else {
+            throw new FailedHttpRequestException(errorMessage(response));
         }
     }
 
@@ -149,7 +149,8 @@ public class HttpExecutorImpl {
     }
 
     private List<Organization> getOrganizations(HttpResponse<String> response) throws JsonProcessingException {
-        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() { });
+        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() {
+        });
         return units.stream()
                 .parallel()
                 .map(SubUnitDto::getUri)
@@ -235,8 +236,7 @@ public class HttpExecutorImpl {
             throws FailedHttpRequestException, NotFoundException {
         if (isNull(response)) {
             throw new FailedHttpRequestException(NULL_HTTP_RESPONSE_ERROR_MESSAGE);
-        } else if (response.statusCode() >= FIRST_SUCCESSFUL_CODE
-                && response.statusCode() < FIRST_NON_SUCCESSFUL_CODE) {
+        } else if (isSuccessful(response.statusCode())) {
             return response;
         } else if (response.statusCode() == HTTP_NOT_FOUND) {
             throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, requestedUri));
