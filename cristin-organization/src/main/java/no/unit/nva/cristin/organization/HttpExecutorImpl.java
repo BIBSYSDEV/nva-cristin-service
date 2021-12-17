@@ -49,6 +49,8 @@ public class HttpExecutorImpl {
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
     public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
     private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
+    public static final String PROBLEM_PARSING_JSON_URL_TEMPLATE
+            = "Problem parsing remote response, requested url is '%s'";
     private final transient HttpClient httpClient;
 
 
@@ -80,7 +82,8 @@ public class HttpExecutorImpl {
                         .withHits(organizations)
                         .withSize(getCount(response, organizations));
             } catch (JsonProcessingException e) {
-                throw new FailedHttpRequestException(e.getMessage());
+                logger.error(String.format(PROBLEM_PARSING_JSON_URL_TEMPLATE, uri),e);
+                throw new FailedHttpRequestException(String.format(PROBLEM_PARSING_JSON_URL_TEMPLATE, uri));
             }
         } else if (response.statusCode() == HTTP_NOT_FOUND) {
             throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
