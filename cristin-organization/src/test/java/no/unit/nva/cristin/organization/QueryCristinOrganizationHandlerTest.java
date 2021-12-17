@@ -129,7 +129,7 @@ class QueryCristinOrganizationHandlerTest {
         when(mockHttpResponse.body()).thenReturn(IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE)));
         when(mockHttpResponse.headers())
                 .thenReturn(java.net.http.HttpHeaders.of(Collections.emptyMap(), (s1,s2) -> true));
-        doReturn(getaTry(mockHttpResponse)).when(mySpy).sendRequestMultipleTimes(any());
+        doReturn(getTry(mockHttpResponse)).when(mySpy).sendRequestMultipleTimes(any());
 
         cristinApiClient = new CristinApiClient(mySpy);
         output = new ByteArrayOutputStream();
@@ -148,7 +148,7 @@ class QueryCristinOrganizationHandlerTest {
         assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
-    private Try<HttpResponse<String>> getaTry(HttpResponse<String> mockHttpResponse) {
+    private Try<HttpResponse<String>> getTry(HttpResponse<String> mockHttpResponse) {
         return Try.of(mockHttpResponse);
     }
 
@@ -173,8 +173,4 @@ class QueryCristinOrganizationHandlerTest {
         return gatewayResponse.getBodyObject(Problem.class).getDetail();
     }
 
-    private URI randomId() {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH)
-                .addChild(randomString()).getUri();
-    }
 }
