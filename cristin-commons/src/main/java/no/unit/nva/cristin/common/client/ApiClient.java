@@ -108,7 +108,7 @@ public class ApiClient {
 
         return responsesContainer.stream()
             .map(attempt(CompletableFuture::get))
-            .map(Try::orElseThrow)
+            .map(Try::get)
             .filter(this::isSuccessfulRequest)
             .collect(Collectors.toList());
     }
