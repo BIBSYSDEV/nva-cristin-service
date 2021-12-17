@@ -28,14 +28,14 @@ import static no.unit.nva.utils.UriUtils.getNvaApiId;
 public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, Organization> {
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
-    private final transient CristinApiClient cristinApiClient;
+    private final transient CristinOrganizationApiClient cristinApiClient;
 
     @JacocoGenerated
     public FetchCristinOrganizationHandler() {
-        this(new CristinApiClient(), new Environment());
+        this(new CristinOrganizationApiClient(), new Environment());
     }
 
-    public FetchCristinOrganizationHandler(CristinApiClient cristinApiClient, Environment environment) {
+    public FetchCristinOrganizationHandler(CristinOrganizationApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }
