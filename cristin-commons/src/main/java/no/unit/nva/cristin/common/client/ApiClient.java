@@ -33,6 +33,11 @@ public class ApiClient {
 
     private static final int FIRST_NON_SUCCESS_CODE = 300;
 
+    public static final int FIRST_EFFORT = 0;
+    public static final int MAX_EFFORTS = 2;
+    public static final int WAITING_TIME = 500; //500 milliseconds
+    public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
+
     private final transient HttpClient client;
 
     public ApiClient(HttpClient client) {
@@ -139,4 +144,46 @@ public class ApiClient {
     private boolean remoteServerHasInternalProblems(int statusCode) {
         return statusCode >= HttpURLConnection.HTTP_INTERNAL_ERROR;
     }
+
+    public Try<HttpResponse<String>> sendRequestMultipleTimes(URI uri) {
+        Try<HttpResponse<String>> lastEffort = null;
+        for (int effortCount = FIRST_EFFORT; shouldKeepTrying(effortCount, lastEffort); effortCount++) {
+            waitBeforeRetrying(effortCount);
+            lastEffort = attemptFetch(uri, effortCount);
+        }
+        return lastEffort;
+    }
+
+    private Try<HttpResponse<String>> attemptFetch(URI uri, int effortCount) {
+        Try<HttpResponse<String>> newEffort = attempt(() -> fetchGetResultAsync(uri).get());
+        if (newEffort.isFailure()) {
+            logger.warn(String.format("Failed HttpRequest on attempt %d of 3: ", effortCount + 1)
+                    + newEffort.getException().getMessage(), newEffort.getException()
+            );
+        }
+        return newEffort;
+    }
+
+    private boolean shouldTryMoreTimes(int effortCount) {
+        return effortCount < MAX_EFFORTS;
+    }
+
+    @SuppressWarnings("PMD.UselessParentheses") // keep the parenthesis for clarity
+    private boolean shouldKeepTrying(int effortCount, Try<HttpResponse<String>> lastEffort) {
+        return lastEffort == null || (lastEffort.isFailure() && shouldTryMoreTimes(effortCount));
+    }
+
+    private int waitBeforeRetrying(int effortCount) {
+        if (effortCount > FIRST_EFFORT) {
+            try {
+                Thread.sleep(WAITING_TIME);
+            } catch (InterruptedException e) {
+                logger.error(LOG_INTERRUPTION);
+                throw new RuntimeException(e);
+            }
+        }
+        return effortCount;
+    }
+
+
 }
