@@ -273,14 +273,6 @@ public static final int FIRST_EFFORT = 0;
         return newEffort;
     }
 
-//    private CompletableFuture<HttpResponse<String>> createAndSendHttpRequest(URI uri) {
-//        HttpRequest httpRequest = HttpRequest.newBuilder()
-//                .GET()
-//                .uri(uri)
-//                .build();
-//        return sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
-//    }
-
     private boolean shouldTryMoreTimes(int effortCount) {
         return effortCount < MAX_EFFORTS;
     }
@@ -316,7 +308,7 @@ public static final int FIRST_EFFORT = 0;
         return subsubUnitDto;
     }
 
-    protected HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response, URI requestedUri)
+    private HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response, URI requestedUri)
             throws FailedHttpRequestException, NotFoundException {
         if (isNull(response)) {
             throw new FailedHttpRequestException(NULL_HTTP_RESPONSE_ERROR_MESSAGE);
@@ -332,6 +324,5 @@ public static final int FIRST_EFFORT = 0;
     private String errorMessage(HttpResponse<String> response) {
         return String.format(ERROR_MESSAGE_FORMAT, response.statusCode(), response.body());
     }
-
 
 }
