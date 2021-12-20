@@ -2,75 +2,140 @@ package no.unit.nva.cristin.organization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.dto.SubUnitDto;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
-import nva.commons.core.JacocoGenerated;
 import nva.commons.core.attempt.Failure;
 import nva.commons.core.attempt.Try;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
-import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.addLanguage;
+import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
+import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
+import static no.unit.nva.utils.UriUtils.getNvaApiBaseUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.attempt.Try.attempt;
 
+//@SuppressWarnings("PMD.GodClass")
+public class CristinOrganizationApiClient extends ApiClient {
 
-public class HttpExecutorImpl {
-
-    public static final int FIRST_EFFORT = 0;
-    public static final int MAX_EFFORTS = 2;
-    public static final int WAITING_TIME = 500; //500 milliseconds
-    public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
+    public static final String CRISTIN_PER_PAGE_PARAM = "per_page";
+    private static final String CRISTIN_QUERY_NAME_PARAM = "name";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
     public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
-    private static final Logger logger = LoggerFactory.getLogger(HttpExecutorImpl.class);
-    public static final String PROBLEM_PARSING_JSON_URL_TEMPLATE
-            = "Problem parsing remote response, requested url is '%s'";
-    private final transient HttpClient httpClient;
-
 
     /**
-     * Default constructor.
+     * Create a CristinOrganizationApiClient with default HTTPClient.
      */
-    @JacocoGenerated
-    public HttpExecutorImpl() {
+    public CristinOrganizationApiClient() {
         this(HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
                 .connectTimeout(Duration.ofSeconds(30))
                 .build());
     }
 
-    public HttpExecutorImpl(HttpClient client) {
-        this.httpClient = client;
+    public CristinOrganizationApiClient(HttpClient client) {
+        super(client);
     }
 
-    public Organization getOrganization(URI uri) throws ApiGatewayException {
+    /**
+     * Get information for an Organization.
+     *
+     * @param uri the Cristin unit URI
+     * @return an {@link Organization} containing the information
+     * @throws NotFoundException when the URI does not correspond to an existing unit.
+     */
+    public Organization getOrganization(URI uri)
+            throws ApiGatewayException, InterruptedException {
         return fromSubSubunit(getSubSubUnitDtoWithMultipleEfforts(uri));
+    }
+
+    /**
+     * Fetch Organizations matching given query criteria.
+     *
+     * @param requestQueryParams Map containing verified query parameters
+     */
+    public SearchResponse<Organization> queryOrganizations(Map<String, String> requestQueryParams)
+            throws NotFoundException, FailedHttpRequestException {
+
+        URI queryUri = createCristinQueryUri(translateToCristinApi(requestQueryParams), UNITS_PATH);
+        final long start = System.currentTimeMillis();
+        SearchResponse<Organization> searchResponse = query(queryUri);
+        final long totalProcessingTime = System.currentTimeMillis() - start;
+        return updateSearchResponseMetadata(searchResponse, requestQueryParams, totalProcessingTime);
+    }
+
+    private Map<String, String> translateToCristinApi(Map<String, String> requestQueryParams) {
+        return Map.of(
+                CRISTIN_QUERY_NAME_PARAM, requestQueryParams.get(QUERY),
+                PAGE, requestQueryParams.get(PAGE),
+                CRISTIN_PER_PAGE_PARAM, requestQueryParams.get(NUMBER_OF_RESULTS));
+    }
+
+    private SearchResponse<Organization> updateSearchResponseMetadata(
+            SearchResponse<Organization> searchResponse,
+            Map<String, String> requestQueryParams,
+            long timeUsed) {
+        searchResponse.setContext(ORGANIZATION_CONTEXT);
+        searchResponse.setId(createIdUriFromParams(requestQueryParams, ORGANIZATION_PATH));
+        if (searchResponse.getSize() > 0) {
+            searchResponse.setFirstRecord(calculateFirstRecord(requestQueryParams));
+        }
+        searchResponse.setNextResults(nextResult(getNvaApiBaseUri(), requestQueryParams, searchResponse.getSize()));
+        searchResponse.setPreviousResults(previousResult(getNvaApiBaseUri(),
+                requestQueryParams,
+                searchResponse.getSize()));
+        searchResponse.setProcessingTime(timeUsed);
+        return searchResponse;
+    }
+
+    private URI previousResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
+        int firstPage = Integer.parseInt(requestQueryParams.get(PAGE)) - 1;
+        if (firstPage > 0 && totalSize > 0) {
+            Map<String, String> nextMap = new ConcurrentHashMap<>(requestQueryParams);
+            nextMap.put(PAGE, Integer.toString(firstPage));
+            return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
+        }
+        return null;
+    }
+
+    private URI nextResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
+        int currentPage = Integer.parseInt(requestQueryParams.get(PAGE));
+        int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
+        if (currentPage * pageSize < totalSize) {
+            Map<String, String> nextMap = new ConcurrentHashMap<>(requestQueryParams);
+            nextMap.put(PAGE, Integer.toString(currentPage + 1));
+            return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
+        }
+        return null;
     }
 
     protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
@@ -82,8 +147,7 @@ public class HttpExecutorImpl {
                         .withHits(organizations)
                         .withSize(getCount(response, organizations));
             } catch (JsonProcessingException e) {
-                logger.error(String.format(PROBLEM_PARSING_JSON_URL_TEMPLATE, uri),e);
-                throw new FailedHttpRequestException(String.format(PROBLEM_PARSING_JSON_URL_TEMPLATE, uri));
+                throw new FailedHttpRequestException(e.getMessage());
             }
         } else if (response.statusCode() == HTTP_NOT_FOUND) {
             throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
@@ -91,7 +155,6 @@ public class HttpExecutorImpl {
             throw new FailedHttpRequestException(errorMessage(response));
         }
     }
-
 
     private Organization getParentOrganization(SubSubUnitDto subSubUnitDto) {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);
@@ -145,14 +208,9 @@ public class HttpExecutorImpl {
                 .withName(subSubUnitDto.getUnitName()).build();
     }
 
-    private int getCount(HttpResponse<String> response, List<Organization> organizations) {
-        return response.headers().firstValue("X-Total-Count").isPresent()
-                ? Integer.parseInt(response.headers().firstValue("X-Total-Count").get())
-                : organizations.size();
-    }
-
     private List<Organization> getOrganizations(HttpResponse<String> response) throws JsonProcessingException {
-        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() { });
+        List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() {
+        });
         return units.stream()
                 .parallel()
                 .map(SubUnitDto::getUri)
@@ -160,70 +218,12 @@ public class HttpExecutorImpl {
                 .collect(Collectors.toList());
     }
 
-    private boolean isSuccessful(int statusCode) {
-        return statusCode <= HTTP_MULT_CHOICE && statusCode >= HTTP_OK;
-    }
-
-    private <T> ApiGatewayException handleError(Failure<T> failure) {
-        final ApiGatewayException failureException = (ApiGatewayException) failure.getException();
-        if (failureException instanceof NotFoundException) {
-            return failureException;
-        }
-        return new FailedHttpRequestException(failureException, failureException.getStatusCode());
-    }
-
-    protected Try<HttpResponse<String>> sendRequestMultipleTimes(URI uri) {
-        Try<HttpResponse<String>> lastEffort = null;
-        for (int effortCount = FIRST_EFFORT; shouldKeepTrying(effortCount, lastEffort); effortCount++) {
-            waitBeforeRetrying(effortCount);
-            lastEffort = attemptFetch(uri, effortCount);
-        }
-        return lastEffort;
-    }
-
-    private Try<HttpResponse<String>> attemptFetch(URI uri, int effortCount) {
-        Try<HttpResponse<String>> newEffort = attempt(() -> createAndSendHttpRequest(uri).get());
-        if (newEffort.isFailure()) {
-            logger.warn(String.format("Failed HttpRequest on attempt %d of 3: ", effortCount + 1)
-                    + newEffort.getException().getMessage(), newEffort.getException()
-            );
-        }
-        return newEffort;
-    }
-
-    private CompletableFuture<HttpResponse<String>> createAndSendHttpRequest(URI uri) {
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .GET()
-                .uri(addLanguage(uri))
-                .build();
-        return httpClient.sendAsync(httpRequest, BodyHandlers.ofString());
-    }
-
-    private boolean shouldTryMoreTimes(int effortCount) {
-        return effortCount < MAX_EFFORTS;
-    }
-
-    @SuppressWarnings("PMD.UselessParentheses") // keep the parenthesis for clarity
-    private boolean shouldKeepTrying(int effortCount, Try<HttpResponse<String>> lastEffort) {
-        return lastEffort == null || (lastEffort.isFailure() && shouldTryMoreTimes(effortCount));
-    }
-
-    private int waitBeforeRetrying(int effortCount) {
-        if (effortCount > FIRST_EFFORT) {
-            try {
-                Thread.sleep(WAITING_TIME);
-            } catch (InterruptedException e) {
-                logger.error(LOG_INTERRUPTION);
-                throw new RuntimeException(e);
-            }
-        }
-        return effortCount;
-    }
 
     protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri)
             throws ApiGatewayException {
 
         SubSubUnitDto subsubUnitDto = Try.of(subunitUri)
+                .map(UriUtils::addLanguage)
                 .flatMap(this::sendRequestMultipleTimes)
                 .map((HttpResponse<String> response) -> throwExceptionIfNotSuccessful(response, subunitUri))
                 .map(HttpResponse::body)
@@ -234,7 +234,15 @@ public class HttpExecutorImpl {
         return subsubUnitDto;
     }
 
-    protected HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response, URI requestedUri)
+    private <T> ApiGatewayException handleError(Failure<T> failure) {
+        final ApiGatewayException failureException = (ApiGatewayException) failure.getException();
+        if (failureException instanceof NotFoundException) {
+            return failureException;
+        }
+        return new FailedHttpRequestException(failureException, failureException.getStatusCode());
+    }
+
+    private HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response, URI requestedUri)
             throws FailedHttpRequestException, NotFoundException {
         if (isNull(response)) {
             throw new FailedHttpRequestException(NULL_HTTP_RESPONSE_ERROR_MESSAGE);
@@ -250,5 +258,5 @@ public class HttpExecutorImpl {
     private String errorMessage(HttpResponse<String> response) {
         return String.format(ERROR_MESSAGE_FORMAT, response.statusCode(), response.body());
     }
-}
 
+}
