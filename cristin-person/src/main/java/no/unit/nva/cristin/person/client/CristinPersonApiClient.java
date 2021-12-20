@@ -71,7 +71,7 @@ public class CristinPersonApiClient extends ApiClient {
     }
 
     /**
-     * Crate a list of CristinPersons from Cristin response.
+     * Create a list of CristinPersons from Cristin response.
      * @param response from Cristin API
      * @return List of valid CristinPersons from Response
      * @throws ApiGatewayException when transformation from response fails
