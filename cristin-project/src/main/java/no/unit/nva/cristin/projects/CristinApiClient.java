@@ -46,6 +46,9 @@ public class CristinApiClient extends ApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinApiClient.class);
 
+    /**
+     * Create a generic cristin API client with default HTTP client.
+     */
     public CristinApiClient() {
         this(HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)
