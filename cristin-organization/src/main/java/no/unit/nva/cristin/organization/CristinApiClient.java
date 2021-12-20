@@ -3,6 +3,7 @@ package no.unit.nva.cristin.organization;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.paths.UriWrapper;
 
@@ -18,6 +19,7 @@ import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 
@@ -44,7 +46,7 @@ public class CristinApiClient {
      * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
     public Organization getOrganization(URI uri)
-            throws NotFoundException, InterruptedException, FailedHttpRequestException {
+            throws ApiGatewayException, InterruptedException {
         return httpExecutor.getOrganization(uri);
     }
 
@@ -74,6 +76,7 @@ public class CristinApiClient {
             SearchResponse<Organization> searchResponse,
             Map<String, String> requestQueryParams,
             long timeUsed) {
+        searchResponse.setContext(ORGANIZATION_CONTEXT);
         searchResponse.setId(createIdUriFromParams(requestQueryParams, ORGANIZATION_PATH));
         if (searchResponse.getSize() > 0) {
             searchResponse.setFirstRecord(calculateFirstRecord(requestQueryParams));

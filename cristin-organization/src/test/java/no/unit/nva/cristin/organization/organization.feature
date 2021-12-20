@@ -47,7 +47,7 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'The URI "' + CRISTIN_BASE + '/organization/0.1.2.3" cannot be dereferenced'
+    And match response.detail == 'The resource \'' + CRISTIN_BASE + '/organization/0.1.2.3\' cannot be dereferenced'
 
   Scenario: GET organization with query and result returns list of search results limited to results with position
     Given path '/organization'

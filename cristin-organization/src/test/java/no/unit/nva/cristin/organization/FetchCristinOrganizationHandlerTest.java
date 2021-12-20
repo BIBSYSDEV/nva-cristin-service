@@ -25,8 +25,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
@@ -157,8 +160,7 @@ class FetchCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnOrganizationHierarchy() throws IOException, ApiGatewayException, InterruptedException {
-
+    void shouldReturnOrganizationHierarchy() throws IOException, ApiGatewayException {
 
         HttpClient httpClient = mock(HttpClient.class);
         when(httpClient.sendAsync(any(), any())).thenThrow(new RuntimeException("This should Not happen!"));
@@ -168,15 +170,15 @@ class FetchCristinOrganizationHandlerTest {
 
         HttpExecutorImpl mySpy = spy(httpExecutor);
         final URI level1 = getCristinUri("185.90.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_90_0_0.json")).when(mySpy).fetch(level1);
+        doReturn(getSubSubUnit("unit_18_90_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level1);
         final URI level2a = getCristinUri("185.53.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_0_0.json")).when(mySpy).fetch(level2a);
+        doReturn(getSubSubUnit("unit_18_53_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2a);
         final URI level2b = getCristinUri("185.50.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_50_0_0.json")).when(mySpy).fetch(level2b);
+        doReturn(getSubSubUnit("unit_18_50_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2b);
         final URI level3 = getCristinUri("185.53.18.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_18_0.json")).when(mySpy).fetch(level3);
+        doReturn(getSubSubUnit("unit_18_53_18_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level3);
         final URI level4 = getCristinUri("185.53.18.14", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_18_14.json")).when(mySpy).fetch(level4);
+        doReturn(getSubSubUnit("unit_18_53_18_14.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level4);
         cristinApiClient = new CristinApiClient(mySpy);
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
@@ -194,6 +196,28 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(actualOrganization.getName().get("en"), containsString("Department of Medical Biochemistry"));
         System.out.println(actualOrganization);
     }
+
+
+    @Test
+    void shouldReturnHttp404NotFoundWhenNonExistingIdentifier() throws Exception {
+        HttpClient httpClient = mock(HttpClient.class);
+        HttpResponse<Object> httpResponse = mock(HttpResponse.class);
+        CompletableFuture<HttpResponse<Object>> notFoundResponse = mock(CompletableFuture.class);
+        when(httpResponse.statusCode()).thenReturn(HTTP_NOT_FOUND);
+        when(httpResponse.body()).thenReturn("https://example.org/someidentifier");
+        when(notFoundResponse.get()).thenReturn(httpResponse);
+        when(httpClient.sendAsync(any(), any())).thenReturn(notFoundResponse);
+        HttpExecutorImpl httpExecutor = new HttpExecutorImpl(httpClient);
+        CristinApiClient cristinApiClient = new CristinApiClient(httpExecutor);
+        output = new ByteArrayOutputStream();
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
+
+        GatewayResponse<Problem> gatewayResponse = parseFailureResponse();
+        assertEquals(HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
+    }
+
 
     private Object getSubSubUnit(String subUnitFile) {
         return SubSubUnitDto.fromJson(IoUtils.stringFromResources(Path.of(subUnitFile)));
