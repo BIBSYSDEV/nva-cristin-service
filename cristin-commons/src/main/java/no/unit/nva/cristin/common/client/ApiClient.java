@@ -1,10 +1,14 @@
 package no.unit.nva.cristin.common.client;
 
+import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import java.io.IOException;
@@ -16,9 +20,12 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import no.unit.nva.model.Organization;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.JacocoGenerated;
@@ -185,5 +192,20 @@ public class ApiClient {
         return effortCount;
     }
 
+    public Integer calculateFirstRecord(Map<String, String> requestQueryParams) {
+        final int page = Integer.parseInt(requestQueryParams.get(PAGE));
+        final int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
+        return (page - 1) * pageSize + 1;
+    }
+
+    public int getCount(HttpResponse<String> response, List<Organization> organizations) {
+        return response.headers().firstValue("X-Total-Count").isPresent()
+                ? Integer.parseInt(response.headers().firstValue("X-Total-Count").get())
+                : organizations.size();
+    }
+
+    public boolean isSuccessful(int statusCode) {
+        return statusCode <= HTTP_MULT_CHOICE && statusCode >= HTTP_OK;
+    }
 
 }

@@ -12,6 +12,7 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
 
 
@@ -83,4 +84,9 @@ public class UriUtils {
                 .getUri();
         return queryUri;
     }
+
+    public static  URI getNvaApiBaseUri() {
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH).getUri();
+    }
+
 }

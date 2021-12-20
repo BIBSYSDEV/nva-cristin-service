@@ -26,13 +26,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
-import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Objects.isNull;
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
@@ -44,10 +39,11 @@ import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
+import static no.unit.nva.utils.UriUtils.getNvaApiBaseUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.attempt.Try.attempt;
 
-@SuppressWarnings("PMD.GodClass")
+//@SuppressWarnings("PMD.GodClass")
 public class CristinOrganizationApiClient extends ApiClient {
 
     public static final String CRISTIN_PER_PAGE_PARAM = "per_page";
@@ -117,9 +113,6 @@ public class CristinOrganizationApiClient extends ApiClient {
         return searchResponse;
     }
 
-    private URI getNvaApiBaseUri() {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH).getUri();
-    }
 
     private URI previousResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
         int firstPage = Integer.parseInt(requestQueryParams.get(PAGE)) - 1;
@@ -140,12 +133,6 @@ public class CristinOrganizationApiClient extends ApiClient {
             return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
         }
         return null;
-    }
-
-    private Integer calculateFirstRecord(Map<String, String> requestQueryParams) {
-        final int page = Integer.parseInt(requestQueryParams.get(PAGE));
-        final int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
-        return (page - 1) * pageSize + 1;
     }
 
     protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
@@ -218,12 +205,6 @@ public class CristinOrganizationApiClient extends ApiClient {
                 .withName(subSubUnitDto.getUnitName()).build();
     }
 
-    private int getCount(HttpResponse<String> response, List<Organization> organizations) {
-        return response.headers().firstValue("X-Total-Count").isPresent()
-                ? Integer.parseInt(response.headers().firstValue("X-Total-Count").get())
-                : organizations.size();
-    }
-
     private List<Organization> getOrganizations(HttpResponse<String> response) throws JsonProcessingException {
         List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() {
         });
@@ -234,9 +215,6 @@ public class CristinOrganizationApiClient extends ApiClient {
                 .collect(Collectors.toList());
     }
 
-    private boolean isSuccessful(int statusCode) {
-        return statusCode <= HTTP_MULT_CHOICE && statusCode >= HTTP_OK;
-    }
 
     private <T> ApiGatewayException handleError(Failure<T> failure) {
         final ApiGatewayException failureException = (ApiGatewayException) failure.getException();
@@ -245,7 +223,6 @@ public class CristinOrganizationApiClient extends ApiClient {
         }
         return new FailedHttpRequestException(failureException, failureException.getStatusCode());
     }
-
 
     protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri)
             throws ApiGatewayException {
