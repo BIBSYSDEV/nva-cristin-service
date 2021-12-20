@@ -32,6 +32,9 @@ import nva.commons.core.attempt.Try;
 
 public class CristinPersonApiClient extends ApiClient {
 
+    /**
+     * Create CristinPersonApiClient with default HTTP client.
+     */
     public CristinPersonApiClient() {
         this(HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)
@@ -67,6 +70,12 @@ public class CristinPersonApiClient extends ApiClient {
             .withHits(persons);
     }
 
+    /**
+     * Crate a list of CristinPersons from Cristin response.
+     * @param response from Cristin API
+     * @return List of valid CristinPersons from Response
+     * @throws ApiGatewayException when transformation from response fails
+     */
     public List<CristinPerson> getEnrichedPersonsUsingQueryResponse(HttpResponse<String> response)
         throws ApiGatewayException {
 
@@ -96,6 +105,12 @@ public class CristinPersonApiClient extends ApiClient {
         return result;
     }
 
+    /**
+     * Perform a query for Persons matching criteria in parameters.
+     * @param parameters containing search criteria for Cristin Person API
+     * @return HttpResponse containing CristinPersons matching search criteria in parameters
+     * @throws ApiGatewayException request fails or contains errors
+     */
     public HttpResponse<String> queryPersons(Map<String, String> parameters) throws ApiGatewayException {
         URI uri = generateQueryPersonsUrl(parameters);
         HttpResponse<String> response = fetchQueryResults(uri);

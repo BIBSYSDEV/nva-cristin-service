@@ -1,12 +1,12 @@
 package no.unit.nva.cristin.common.client;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static nva.commons.core.StringUtils.EMPTY_STRING;
-import static nva.commons.core.attempt.Try.attempt;
+import nva.commons.apigateway.exceptions.BadGatewayException;
+import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.attempt.Failure;
+import nva.commons.core.attempt.Try;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -19,13 +19,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import nva.commons.apigateway.exceptions.BadGatewayException;
-import nva.commons.apigateway.exceptions.NotFoundException;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.attempt.Failure;
-import nva.commons.core.attempt.Try;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class ApiClient {
 
@@ -39,7 +40,11 @@ public class ApiClient {
         this.client = client;
     }
 
-    @JacocoGenerated
+    /**
+     * Build and perform GET request for given URI.
+     * @param uri to fetch from
+     * @return response containing data from requested URI or error
+     */
     public CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
         return client.sendAsync(
             HttpRequest.newBuilder(uri).GET().build(),
@@ -80,6 +85,11 @@ public class ApiClient {
         logger.error(String.format(message, data, failure.getMessage()));
     }
 
+    /**
+     * Get results for a list of URIs.
+     * @param uris list containing URIs
+     * @return responses for given URIs
+     */
     public List<HttpResponse<String>> fetchQueryResultsOneByOne(List<URI> uris) {
         List<CompletableFuture<HttpResponse<String>>> responsesContainer =
             uris.stream().map(this::fetchGetResultAsync).collect(Collectors.toList());
