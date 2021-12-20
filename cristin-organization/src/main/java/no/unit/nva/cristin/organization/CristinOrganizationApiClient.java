@@ -83,7 +83,7 @@ public class CristinOrganizationApiClient extends ApiClient {
             throws NotFoundException, FailedHttpRequestException {
 
         URI queryUri = createCristinQueryUri(translateToCristinApi(requestQueryParams), UNITS_PATH);
-        long start = System.currentTimeMillis();
+        final long start = System.currentTimeMillis();
         SearchResponse<Organization> searchResponse = query(queryUri);
         final long totalProcessingTime = System.currentTimeMillis() - start;
         return updateSearchResponseMetadata(searchResponse, requestQueryParams, totalProcessingTime);
@@ -112,7 +112,6 @@ public class CristinOrganizationApiClient extends ApiClient {
         searchResponse.setProcessingTime(timeUsed);
         return searchResponse;
     }
-
 
     private URI previousResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
         int firstPage = Integer.parseInt(requestQueryParams.get(PAGE)) - 1;
@@ -216,14 +215,6 @@ public class CristinOrganizationApiClient extends ApiClient {
     }
 
 
-    private <T> ApiGatewayException handleError(Failure<T> failure) {
-        final ApiGatewayException failureException = (ApiGatewayException) failure.getException();
-        if (failureException instanceof NotFoundException) {
-            return failureException;
-        }
-        return new FailedHttpRequestException(failureException, failureException.getStatusCode());
-    }
-
     protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri)
             throws ApiGatewayException {
 
@@ -236,6 +227,14 @@ public class CristinOrganizationApiClient extends ApiClient {
 
         subsubUnitDto.setSourceUri(subunitUri);
         return subsubUnitDto;
+    }
+
+    private <T> ApiGatewayException handleError(Failure<T> failure) {
+        final ApiGatewayException failureException = (ApiGatewayException) failure.getException();
+        if (failureException instanceof NotFoundException) {
+            return failureException;
+        }
+        return new FailedHttpRequestException(failureException, failureException.getStatusCode());
     }
 
     private HttpResponse<String> throwExceptionIfNotSuccessful(HttpResponse<String> response, URI requestedUri)
