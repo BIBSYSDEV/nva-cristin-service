@@ -42,7 +42,7 @@ public class Person implements JsonSerializable {
     @JsonProperty(AFFILIATIONS)
     private Set<Affiliation> affiliations;
 
-    public Person() {
+    private Person() {
 
     }
 

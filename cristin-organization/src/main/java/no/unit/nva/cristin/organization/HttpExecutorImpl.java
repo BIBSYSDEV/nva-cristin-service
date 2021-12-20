@@ -194,7 +194,7 @@ public class HttpExecutorImpl {
     private CompletableFuture<HttpResponse<String>> createAndSendHttpRequest(URI uri) {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .GET()
-                .uri(uri)
+                .uri(addLanguage(uri))
                 .build();
         return httpClient.sendAsync(httpRequest, BodyHandlers.ofString());
     }
