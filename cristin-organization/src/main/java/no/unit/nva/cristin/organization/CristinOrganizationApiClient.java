@@ -44,7 +44,6 @@ import static no.unit.nva.utils.UriUtils.getNvaApiBaseUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.attempt.Try.attempt;
 
-//@SuppressWarnings("PMD.GodClass")
 public class CristinOrganizationApiClient extends ApiClient {
 
     public static final String CRISTIN_PER_PAGE_PARAM = "per_page";
@@ -219,8 +218,7 @@ public class CristinOrganizationApiClient extends ApiClient {
     }
 
 
-    protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri)
-            throws ApiGatewayException {
+    protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri) throws ApiGatewayException {
 
         SubSubUnitDto subsubUnitDto = Try.of(subunitUri)
                 .map(UriUtils::addLanguage)
