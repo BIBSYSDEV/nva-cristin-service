@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import static no.unit.nva.cristin.model.Constants.ALL_QUERY_PARAMETER_LANGUAGES;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
@@ -61,7 +61,7 @@ public class UriUtils {
     }
 
     public static URI getCristinUri(String identifier, String path) {
-        return new UriWrapper(HTTPS, CRISTIN_API_BASE)
+        return new UriWrapper(CRISTIN_API_URL)
                 .addChild(path)
                 .addChild(identifier)
                 .getUri();
@@ -78,7 +78,7 @@ public class UriUtils {
 
 
     public static URI createCristinQueryUri(Map<String, String> cristinRequestQueryParams, String path) {
-        URI queryUri = new UriWrapper(HTTPS, CRISTIN_API_BASE)
+        URI queryUri = new UriWrapper(CRISTIN_API_URL)
                 .addChild(path)
                 .addQueryParameters(cristinRequestQueryParams)
                 .getUri();

@@ -35,7 +35,7 @@ tasks.named('test') {
 
 test {
     environment "ALLOWED_ORIGIN", "*"
-    environment "CRISTIN_API_HOST", "api.cristin.no"
+    environment "CRISTIN_API_URL", "https://api.cristin.no/v2"
     environment "BASE_PATH", "cristin"
     environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
 }

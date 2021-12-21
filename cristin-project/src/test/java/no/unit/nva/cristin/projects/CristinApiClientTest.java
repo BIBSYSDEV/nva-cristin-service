@@ -41,9 +41,9 @@ import static org.mockito.Mockito.when;
 public class CristinApiClientTest {
 
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
-        "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&title=reindeer";
+        "https://api.cristin.no/v2/projects?per_page=5&page=1&lang=nb&title=reindeer";
     private static final String CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI =
-        "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&project_code=1234567";
+        "https://api.cristin.no/v2/projects?per_page=5&project_code=1234567&page=1&lang=nb";
     public static final String EXAMPLE_TITLE = "Example Title";
     private static final URI LOCALHOST_URI = URI.create("http://localhost/cristin");
     private final Set<String> ids = Set.of("123", "456", "789");
