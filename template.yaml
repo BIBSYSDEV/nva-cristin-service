@@ -34,7 +34,7 @@ Parameters:
   CristinApiUrl:
     Type: String
     Description: Url for Cristin API
-    Default: https://api.cristin.no/v2
+    Default: https://api.cristin-test.uio.no/v2
     AllowedValues:
       - https://api.cristin-test.uio.no/v2
       - https://api.cristin.no/v2
