@@ -49,6 +49,12 @@ public class HttpResponseFaker implements HttpResponse<String> {
         this.httpHeaders = httpHeaders;
     }
 
+    /**
+     * Create map of headers.
+     * @param totalCount count header
+     * @param link link header
+     * @return map of headers
+     */
     public static Map<String, List<String>> headerMap(String totalCount, String link) {
         return Map.of(
             X_TOTAL_COUNT, Collections.singletonList(totalCount),

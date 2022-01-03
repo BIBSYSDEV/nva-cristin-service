@@ -40,8 +40,8 @@ import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
-import static no.unit.nva.utils.UriUtils.getNvaApiBaseUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class CristinOrganizationApiClient extends ApiClient {
@@ -105,36 +105,35 @@ public class CristinOrganizationApiClient extends ApiClient {
             long timeUsed) {
         searchResponse.setContext(ORGANIZATION_CONTEXT);
         searchResponse.setId(createIdUriFromParams(requestQueryParams, ORGANIZATION_PATH));
-        if (searchResponse.getSize() > 0) {
+        if (searchResponse.isNotEmpty()) {
             searchResponse.setFirstRecord(calculateFirstRecord(requestQueryParams));
         }
-        searchResponse.setNextResults(nextResult(getNvaApiBaseUri(), requestQueryParams, searchResponse.getSize()));
-        searchResponse.setPreviousResults(previousResult(getNvaApiBaseUri(),
+        searchResponse.setNextResults(nextResult(getNvaApiUri(ORGANIZATION_PATH),
+                requestQueryParams,
+                searchResponse.getSize()));
+        searchResponse.setPreviousResults(previousResult(getNvaApiUri(ORGANIZATION_PATH),
                 requestQueryParams,
                 searchResponse.getSize()));
         searchResponse.setProcessingTime(timeUsed);
         return searchResponse;
     }
 
+
     private URI previousResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
         int firstPage = Integer.parseInt(requestQueryParams.get(PAGE)) - 1;
-        if (firstPage > 0 && totalSize > 0) {
-            Map<String, String> nextMap = new ConcurrentHashMap<>(requestQueryParams);
-            nextMap.put(PAGE, Integer.toString(firstPage));
-            return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
-        }
-        return null;
+        return firstPage > 0 && totalSize > 0 ? getUri(requestQueryParams, firstPage, baseUri) : null;
     }
 
     private URI nextResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
         int currentPage = Integer.parseInt(requestQueryParams.get(PAGE));
         int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
-        if (currentPage * pageSize < totalSize) {
-            Map<String, String> nextMap = new ConcurrentHashMap<>(requestQueryParams);
-            nextMap.put(PAGE, Integer.toString(currentPage + 1));
-            return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
-        }
-        return null;
+        return currentPage * pageSize < totalSize ? getUri(requestQueryParams, currentPage + 1, baseUri) : null;
+    }
+
+    private URI getUri(Map<String, String> requestQueryParams, int firstPage, URI baseUri) {
+        Map<String, String> nextMap = new ConcurrentHashMap<>(requestQueryParams);
+        nextMap.put(PAGE, Integer.toString(firstPage));
+        return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
     }
 
     protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
