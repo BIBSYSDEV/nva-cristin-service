@@ -12,9 +12,9 @@ public class CristinQueryTest {
     private static final String FROM_PAGE = "2";
     private static final String ID = "1234";
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
-        "https://api.cristin.no/v2/projects?per_page=10&page=2&title=reindeer&lang=nb";
+        "https://api.cristin-test.uio.no/v2/projects?per_page=10&page=2&title=reindeer&lang=nb";
     private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI =
-        "https://api.cristin.no/v2/projects/1234?lang=nb";
+        "https://api.cristin-test.uio.no/v2/projects/1234?lang=nb";
 
     @Test
     void buildReturnsUriWithCustomParameterValuesWhenCustomParameterValuesAreSupplied() throws Exception {
