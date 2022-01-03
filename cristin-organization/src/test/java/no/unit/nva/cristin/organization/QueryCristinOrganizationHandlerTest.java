@@ -10,13 +10,13 @@ import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
 
@@ -55,6 +55,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import nva.commons.core.attempt.Try;
 
 class QueryCristinOrganizationHandlerTest {
 
@@ -108,7 +109,7 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseOnQuery() throws IOException, NotFoundException, FailedHttpRequestException {
+    void shouldReturnResponseOnQuery() throws IOException, ApiGatewayException {
 
         HttpClient httpClient = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
@@ -128,7 +129,7 @@ class QueryCristinOrganizationHandlerTest {
         when(mockHttpResponse.body()).thenReturn(IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE)));
         when(mockHttpResponse.headers())
                 .thenReturn(java.net.http.HttpHeaders.of(Collections.emptyMap(), (s1,s2) -> true));
-        doReturn(mockHttpResponse).when(mySpy).sendRequest(any());
+        doReturn(getTry(mockHttpResponse)).when(mySpy).sendRequestMultipleTimes(any());
 
         cristinApiClient = new CristinApiClient(mySpy);
         output = new ByteArrayOutputStream();
@@ -145,6 +146,10 @@ class QueryCristinOrganizationHandlerTest {
         assertEquals(2, actual.getHits().size());
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    private Try<HttpResponse<String>> getTry(HttpResponse<String> mockHttpResponse) {
+        return Try.of(mockHttpResponse);
     }
 
     private Organization getOrganization(String subUnitFile) throws JsonProcessingException {
@@ -168,8 +173,4 @@ class QueryCristinOrganizationHandlerTest {
         return gatewayResponse.getBodyObject(Problem.class).getDetail();
     }
 
-    private URI randomId() {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH)
-                .addChild(randomString()).getUri();
-    }
 }
