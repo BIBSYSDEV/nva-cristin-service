@@ -29,17 +29,3 @@ sourceSets {
         }
     }
 }
-
-task karateTest(type: Test) {
-    useJUnitPlatform {
-        includeTags('karateTest')
-    }
-
-    environment "ALLOWED_ORIGIN", "*"
-    environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
-    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
-
-    systemProperty "karate.options", System.properties.getProperty("karate.options")
-    systemProperty "karate.env", System.properties.getProperty("karate.env")
-    outputs.upToDateWhen { false }
-}
