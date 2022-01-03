@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.common.client;
 
 import no.unit.nva.model.Organization;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
@@ -63,12 +64,12 @@ public class ApiClient {
     }
 
     public HttpResponse<String> fetchGetResult(URI uri) {
-        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
     public HttpResponse<String> fetchQueryResults(URI uri) {
-        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 

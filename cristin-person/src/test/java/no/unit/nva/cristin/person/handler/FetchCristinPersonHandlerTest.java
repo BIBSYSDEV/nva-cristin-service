@@ -51,7 +51,7 @@ public class FetchCristinPersonHandlerTest {
     private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
     private static final String EMPTY_STRING = "";
     private static final String EXPECTED_CRISTIN_URI_WITH_IDENTIFIER =
-        "https://api.cristin.no/v2/persons/12345?lang=en,nb,nn";
+        "https://api.cristin-test.uio.no/v2/persons/12345?lang=en,nb,nn";
     private static final Map<String, String> VALID_ORCID_PATH_PARAM = Map.of(ID, "1234-1234-1234-1234");
     private static final String EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER =
         String.format("%s/persons/ORCID:1234-1234-1234-1234?lang=en,nb,nn", CRISTIN_API_URL);
