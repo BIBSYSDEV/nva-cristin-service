@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.common.client;
 
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
@@ -16,15 +17,20 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -33,6 +39,11 @@ public class ApiClient {
     private static final Logger logger = LoggerFactory.getLogger(ApiClient.class);
 
     private static final int FIRST_NON_SUCCESS_CODE = 300;
+
+    public static final int FIRST_EFFORT = 0;
+    public static final int MAX_EFFORTS = 2;
+    public static final int WAITING_TIME = 500; //500 milliseconds
+    public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
 
     private final transient HttpClient client;
 
@@ -52,12 +63,12 @@ public class ApiClient {
     }
 
     public HttpResponse<String> fetchGetResult(URI uri) {
-        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
     public HttpResponse<String> fetchQueryResults(URI uri) {
-        HttpRequest httpRequest = HttpRequest.newBuilder(uri).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
@@ -149,4 +160,77 @@ public class ApiClient {
     private boolean remoteServerHasInternalProblems(int statusCode) {
         return statusCode >= HttpURLConnection.HTTP_INTERNAL_ERROR;
     }
+
+    /**
+     * Send a request multiple times before failure.
+     * @param uri location of wanted resource
+     * @return Response with operation status and relevant content
+     */
+    public Try<HttpResponse<String>> sendRequestMultipleTimes(URI uri) {
+        Try<HttpResponse<String>> lastEffort = null;
+        for (int effortCount = FIRST_EFFORT; shouldKeepTrying(effortCount, lastEffort); effortCount++) {
+            waitBeforeRetrying(effortCount);
+            lastEffort = attemptFetch(uri, effortCount);
+        }
+        return lastEffort;
+    }
+
+    private Try<HttpResponse<String>> attemptFetch(URI uri, int effortCount) {
+        Try<HttpResponse<String>> newEffort = attempt(() -> fetchGetResultAsync(uri).get());
+        if (newEffort.isFailure()) {
+            logger.warn(String.format("Failed HttpRequest on attempt %d of 3: ", effortCount + 1)
+                    + newEffort.getException().getMessage(), newEffort.getException()
+            );
+        }
+        return newEffort;
+    }
+
+    private boolean shouldTryMoreTimes(int effortCount) {
+        return effortCount < MAX_EFFORTS;
+    }
+
+    @SuppressWarnings("PMD.UselessParentheses") // keep the parenthesis for clarity
+    private boolean shouldKeepTrying(int effortCount, Try<HttpResponse<String>> lastEffort) {
+        return lastEffort == null || (lastEffort.isFailure() && shouldTryMoreTimes(effortCount));
+    }
+
+    private int waitBeforeRetrying(int effortCount) {
+        if (effortCount > FIRST_EFFORT) {
+            try {
+                Thread.sleep(WAITING_TIME);
+            } catch (InterruptedException e) {
+                logger.error(LOG_INTERRUPTION);
+                throw new RuntimeException(e);
+            }
+        }
+        return effortCount;
+    }
+
+    /**
+     * calculate value of firstRecord from requestParameters.
+     * @param requestQueryParams parameters limiting this request
+     * @return index of first record in resultSet
+     */
+    public Integer calculateFirstRecord(Map<String, String> requestQueryParams) {
+        final int page = Integer.parseInt(requestQueryParams.get(PAGE));
+        final int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
+        return (page - 1) * pageSize + 1;
+    }
+
+    /**
+     * report total number of results for this query.
+     * @param response containing result for given parameters
+     * @param items matching given criteria
+     * @return total number of hits for this query
+     */
+    public int getCount(HttpResponse<String> response, List<?> items) {
+        return response.headers().firstValue("X-Total-Count").isPresent()
+                ? Integer.parseInt(response.headers().firstValue("X-Total-Count").get())
+                : items.size();
+    }
+
+    public boolean isSuccessful(int statusCode) {
+        return statusCode <= HTTP_MULT_CHOICE && statusCode >= HTTP_OK;
+    }
+
 }

@@ -22,14 +22,9 @@ public class Constants {
         "https://bibsysdev.github.io/src/project-search-context.json";
     public static final String PROJECT_LOOKUP_CONTEXT_URL =
         "https://bibsysdev.github.io/src/project-context.json";
-    public static final String CRISTIN_API_HOST = ENVIRONMENT.readEnvOpt("CRISTIN_API_HOST")
-        .orElse("api.cristin.no");
-    public static final String CRISTIN_API_BASE = CRISTIN_API_HOST + "/v2";
-    // TODO: Find better way to use Cristin test instance
-    public static final String CRISTIN_TEST_API_HOST = "api.cristin-test.uio.no";
-    public static final String CRISTIN_TEST_API_BASE = CRISTIN_TEST_API_HOST + "/v2";
-
     public static final String HTTPS = "https";
+    public static final String CRISTIN_API_URL = ENVIRONMENT.readEnv("CRISTIN_API_URL");
+
     public static final String INSTITUTION_PATH = "institutions";
     public static final String PERSON_PATH = "persons";
     public static final String BASE_PATH = ENVIRONMENT.readEnv("BASE_PATH");

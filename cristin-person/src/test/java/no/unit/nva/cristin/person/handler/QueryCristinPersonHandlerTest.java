@@ -56,7 +56,7 @@ public class QueryCristinPersonHandlerTest {
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String EXPECTED_CRISTIN_URI_WITH_PARAMS =
-        "https://api.cristin.no/v2/persons?per_page=5&name=John+Smith&page=1&lang=en,nb,nn";
+        "https://api.cristin-test.uio.no/v2/persons?per_page=5&name=John+Smith&page=1&lang=en,nb,nn";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();

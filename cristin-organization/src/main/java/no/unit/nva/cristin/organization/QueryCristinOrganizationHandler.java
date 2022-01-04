@@ -20,14 +20,14 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
 
-    private final transient CristinApiClient cristinApiClient;
+    private final transient CristinOrganizationApiClient cristinApiClient;
 
     @JacocoGenerated
     public QueryCristinOrganizationHandler() {
-        this(new CristinApiClient(), new Environment());
+        this(new CristinOrganizationApiClient(), new Environment());
     }
 
-    public QueryCristinOrganizationHandler(CristinApiClient apiClient, Environment environment) {
+    public QueryCristinOrganizationHandler(CristinOrganizationApiClient apiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = apiClient;
     }

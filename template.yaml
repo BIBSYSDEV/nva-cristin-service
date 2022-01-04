@@ -13,7 +13,7 @@ Globals:
     Environment:
       Variables:
         ALLOWED_ORIGIN: '*'
-        CRISTIN_API_HOST: !Ref CristinApiHost
+        CRISTIN_API_URL: !Ref CristinApiUrl
         DOMAIN_NAME: !Ref ApiDomain
         BASE_PATH: !Ref CustomDomainBasePath
   Api:
@@ -31,11 +31,13 @@ Parameters:
     Type: String
     Description: Base path mapping in CustomDomain
     Default: 'cristin'
-  CristinApiHost:
+  CristinApiUrl:
     Type: String
-    Description: Hostname for Cristin API
-    Default: 'api.cristin.no'
-
+    Description: Url for Cristin API
+    Default: https://api.cristin-test.uio.no/v2
+    AllowedValues:
+      - https://api.cristin-test.uio.no/v2
+      - https://api.cristin.no/v2
 Resources:
 
   ApiAccessLogGroup:
