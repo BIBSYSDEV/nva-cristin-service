@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.common.client;
 
+import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.utils.UriUtils;
@@ -28,7 +29,6 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.unit.nva.cristin.common.ErrorMessages.*;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
@@ -99,7 +99,7 @@ public class ApiClient {
         } catch (HttpTimeoutException timeoutException) {
             throw new GatewayTimeoutException();
         } catch (IOException | InterruptedException otherException) {
-            throw new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+            throw new FailedHttpRequestException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
     }
 
@@ -119,8 +119,8 @@ public class ApiClient {
     }
 
     private <T> BadGatewayException logAndThrowDeserializationError(HttpResponse<String> response, Failure<T> failure) {
-        logError(ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(), failure.getException());
-        return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        logError(ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(), failure.getException());
+        return new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
     }
 
     protected void logError(String message, String data, Exception failure) {
@@ -164,11 +164,11 @@ public class ApiClient {
         String uriAsString = Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
 
         if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
-            String msg = String.format(ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, uriAsString);
+            String msg = String.format(ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, uriAsString);
             throw new NotFoundException(msg);
         } else if (remoteServerHasInternalProblems(statusCode)) {
             logBackendFetchFail(uriAsString, statusCode);
-            throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+            throw new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         } else if (errorIsUnknown(statusCode)) {
             logBackendFetchFail(uriAsString, statusCode);
             throw new RuntimeException();
@@ -181,7 +181,7 @@ public class ApiClient {
     }
 
     private void logBackendFetchFail(String uri, int statusCode) {
-        logger.error(String.format(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE, statusCode, uri));
+        logger.error(String.format(ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE, statusCode, uri));
     }
 
     private boolean responseIsFailure(int statusCode) {
