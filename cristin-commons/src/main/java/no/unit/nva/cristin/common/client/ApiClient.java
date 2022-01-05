@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.common.client;
 
-import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
@@ -173,6 +172,11 @@ public class ApiClient {
         return statusCode >= HttpURLConnection.HTTP_INTERNAL_ERROR;
     }
 
+    /**
+     * Send a request multiple times before failure.
+     * @param uri location of wanted resource
+     * @return Response with operation status and relevant content
+     */
     public Try<HttpResponse<String>> sendRequestMultipleTimes(URI uri) {
         Try<HttpResponse<String>> lastEffort = null;
         for (int effortCount = FIRST_EFFORT; shouldKeepTrying(effortCount, lastEffort); effortCount++) {
@@ -213,16 +217,27 @@ public class ApiClient {
         return effortCount;
     }
 
+    /**
+     * calculate value of firstRecord from requestParameters.
+     * @param requestQueryParams parameters limiting this request
+     * @return index of first record in resultSet
+     */
     public Integer calculateFirstRecord(Map<String, String> requestQueryParams) {
         final int page = Integer.parseInt(requestQueryParams.get(PAGE));
         final int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
         return (page - 1) * pageSize + 1;
     }
 
-    public int getCount(HttpResponse<String> response, List<Organization> organizations) {
+    /**
+     * report total number of results for this query.
+     * @param response containing result for given parameters
+     * @param items matching given criteria
+     * @return total number of hits for this query
+     */
+    public int getCount(HttpResponse<String> response, List<?> items) {
         return response.headers().firstValue("X-Total-Count").isPresent()
                 ? Integer.parseInt(response.headers().firstValue("X-Total-Count").get())
-                : organizations.size();
+                : items.size();
     }
 
     public boolean isSuccessful(int statusCode) {

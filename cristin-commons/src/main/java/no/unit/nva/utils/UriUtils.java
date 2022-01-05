@@ -12,7 +12,6 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
-import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
 
 
@@ -52,6 +51,12 @@ public class UriUtils {
     }
 
 
+    /**
+     * Create URI identifying NVA resource from path and identifier.
+     * @param identifier of element
+     * @param path section of NVA API
+     * @return valid URI for a NVA resource
+     */
     public static URI getNvaApiId(String identifier, String path) {
         return new UriWrapper(HTTPS,
                 DOMAIN_NAME).addChild(BASE_PATH)
@@ -60,6 +65,12 @@ public class UriUtils {
                 .getUri();
     }
 
+    /**
+     * Create URI identifying a cristin resource from path and identifier.
+     * @param identifier cristin identifier of resource
+     * @param path section of cristin api
+     * @return valid URI for a cristin resource
+     */
     public static URI getCristinUri(String identifier, String path) {
         return new UriWrapper(CRISTIN_API_URL)
                 .addChild(path)
@@ -77,16 +88,21 @@ public class UriUtils {
     }
 
 
+    /**
+     * Create a valid query URI for cristin.
+     * @param cristinRequestQueryParams limitations for request
+     * @param path section of cristin API
+     * @return valid URI for query against cristin
+     */
     public static URI createCristinQueryUri(Map<String, String> cristinRequestQueryParams, String path) {
-        URI queryUri = new UriWrapper(CRISTIN_API_URL)
+        return new UriWrapper(CRISTIN_API_URL)
                 .addChild(path)
                 .addQueryParameters(cristinRequestQueryParams)
                 .getUri();
-        return queryUri;
     }
 
-    public static  URI getNvaApiBaseUri() {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(ORGANIZATION_PATH).getUri();
+    public static  URI getNvaApiUri(String path) {
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(path).getUri();
     }
 
 }
