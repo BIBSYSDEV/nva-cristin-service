@@ -59,6 +59,26 @@ Resources:
         DefaultAuthorizer: NONE
       EndpointConfiguration: Regional
 
+  CristinAuthenticatedClientRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [lambda.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      Policies:
+        - PolicyName: readSecret
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:cristinBasicAuth*'
+
 
   NvaCristinProjectsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -93,6 +113,22 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /project/{id}
             Method: get
+
+  NvaCristinCreateProjectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-project
+      Handler: no.unit.nva.cristin.projects.CreateProjectHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Role: !GetAtt CristinAuthenticatedClientRole.Arn
+      Events:
+        NvaCristinOneProjectEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /project
+            Method: post
 
   NvaCristinQueryOrganizationFunction:
     Type: AWS::Serverless::Function
