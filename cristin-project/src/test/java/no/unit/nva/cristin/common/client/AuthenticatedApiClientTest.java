@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.common.client;
 
-import no.unit.nva.utils.CristinAuthenticator;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;

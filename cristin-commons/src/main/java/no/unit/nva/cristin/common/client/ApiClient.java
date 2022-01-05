@@ -36,30 +36,32 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public class ApiClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApiClient.class);
-
-    private static final int FIRST_NON_SUCCESS_CODE = 300;
-
     public static final int FIRST_EFFORT = 0;
     public static final int MAX_EFFORTS = 2;
     public static final int WAITING_TIME = 500; //500 milliseconds
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
-
+    private static final Logger logger = LoggerFactory.getLogger(ApiClient.class);
+    private static final int FIRST_NON_SUCCESS_CODE = 300;
     private final transient HttpClient client;
 
     public ApiClient(HttpClient client) {
         this.client = client;
     }
 
+    public static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
+        return OBJECT_MAPPER.readValue(body, classOfT);
+    }
+
     /**
      * Build and perform GET request for given URI.
+     *
      * @param uri to fetch from
      * @return response containing data from requested URI or error
      */
     public CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
         return client.sendAsync(
-            HttpRequest.newBuilder(uri).GET().build(),
-            BodyHandlers.ofString(StandardCharsets.UTF_8));
+                HttpRequest.newBuilder(uri).GET().build(),
+                BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
     public HttpResponse<String> fetchGetResult(URI uri) {
@@ -72,7 +74,7 @@ public class ApiClient {
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
-    public  HttpResponse<String>  fetchPostResult(URI uri, String body) {
+    public HttpResponse<String> fetchPostResult(URI uri, String body) {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(uri)
                 .header("Content-Type", "application/json")
@@ -81,7 +83,7 @@ public class ApiClient {
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
-    public  CompletableFuture<HttpResponse<String>>  fetchPostResultAsync(URI uri, String body) {
+    public CompletableFuture<HttpResponse<String>> fetchPostResultAsync(URI uri, String body) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
                 .header("Content-Type", "application/json")
@@ -90,19 +92,15 @@ public class ApiClient {
         return client.sendAsync(request, BodyHandlers.ofString());
     }
 
-    public static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
-        return OBJECT_MAPPER.readValue(body, classOfT);
-    }
-
     public long calculateProcessingTime(long startRequestTime, long endRequestTime) {
         return endRequestTime - startRequestTime;
     }
 
-    protected  <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
-        throws BadGatewayException {
+    protected <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
+            throws BadGatewayException {
 
         return attempt(() -> fromJson(response.body(), classOfT))
-            .orElseThrow(failure -> logAndThrowDeserializationError(response, failure));
+                .orElseThrow(failure -> logAndThrowDeserializationError(response, failure));
     }
 
     private <T> BadGatewayException logAndThrowDeserializationError(HttpResponse<String> response, Failure<T> failure) {
@@ -116,24 +114,25 @@ public class ApiClient {
 
     /**
      * Get results for a list of URIs.
+     *
      * @param uris list containing URIs
      * @return responses for given URIs
      */
     public List<HttpResponse<String>> fetchQueryResultsOneByOne(List<URI> uris) {
         List<CompletableFuture<HttpResponse<String>>> responsesContainer =
-            uris.stream().map(this::fetchGetResultAsync).collect(Collectors.toList());
+                uris.stream().map(this::fetchGetResultAsync).collect(Collectors.toList());
 
         return collectSuccessfulResponsesOrThrowException(responsesContainer);
     }
 
     private List<HttpResponse<String>> collectSuccessfulResponsesOrThrowException(
-        List<CompletableFuture<HttpResponse<String>>> responsesContainer) {
+            List<CompletableFuture<HttpResponse<String>>> responsesContainer) {
 
         return responsesContainer.stream()
-            .map(attempt(CompletableFuture::get))
-            .map(Try::orElseThrow)
-            .filter(this::isSuccessfulRequest)
-            .collect(Collectors.toList());
+                .map(attempt(CompletableFuture::get))
+                .map(Try::orElseThrow)
+                .filter(this::isSuccessfulRequest)
+                .collect(Collectors.toList());
     }
 
     private boolean isSuccessfulRequest(HttpResponse<String> response) {
@@ -146,7 +145,7 @@ public class ApiClient {
     }
 
     protected void checkHttpStatusCode(URI uri, int statusCode)
-        throws NotFoundException, BadGatewayException {
+            throws NotFoundException, BadGatewayException {
 
         String uriAsString = Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
 
@@ -164,7 +163,7 @@ public class ApiClient {
 
     private boolean errorIsUnknown(int statusCode) {
         return responseIsFailure(statusCode)
-            && !remoteServerHasInternalProblems(statusCode);
+                && !remoteServerHasInternalProblems(statusCode);
     }
 
     private void logBackendFetchFail(String uri, int statusCode) {
@@ -181,6 +180,7 @@ public class ApiClient {
 
     /**
      * Send a request multiple times before failure.
+     *
      * @param uri location of wanted resource
      * @return Response with operation status and relevant content
      */
@@ -226,6 +226,7 @@ public class ApiClient {
 
     /**
      * calculate value of firstRecord from requestParameters.
+     *
      * @param requestQueryParams parameters limiting this request
      * @return index of first record in resultSet
      */
@@ -237,8 +238,9 @@ public class ApiClient {
 
     /**
      * report total number of results for this query.
+     *
      * @param response containing result for given parameters
-     * @param items matching given criteria
+     * @param items    matching given criteria
      * @return total number of hits for this query
      */
     public int getCount(HttpResponse<String> response, List<?> items) {

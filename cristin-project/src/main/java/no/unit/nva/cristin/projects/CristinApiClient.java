@@ -129,8 +129,8 @@ public class CristinApiClient extends ApiClient {
 
     protected CristinProject getProject(String id, String language) throws ApiGatewayException {
         URI uri = attempt(() -> generateGetProjectUri(id, language))
-                .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
-                .orElseThrow();
+            .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
+            .orElseThrow();
 
         HttpResponse<String> response = fetchGetResult(uri);
         checkHttpStatusCode(UriUtils.getNvaApiId(id, PROJECT), response.statusCode());

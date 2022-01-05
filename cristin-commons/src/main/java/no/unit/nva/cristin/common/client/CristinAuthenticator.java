@@ -1,4 +1,4 @@
-package no.unit.nva.utils;
+package no.unit.nva.cristin.common.client;
 
 import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
 import nva.commons.secrets.SecretsReader;
@@ -17,7 +17,8 @@ public class CristinAuthenticator {
     private static final String USERNAME_KEY = "username";
 
     public static Authenticator getBasicAuthenticator() {
-        final SecretsReader secretsReader = new SecretsReader(AWSSecretsManagerClientBuilder.standard().withRegion("eu-west-1").build());
+        final SecretsReader secretsReader =
+                new SecretsReader(AWSSecretsManagerClientBuilder.standard().withRegion("eu-west-1").build());
 
         String userName = attempt(() -> secretsReader.fetchSecret(SECRET_NAME, USERNAME_KEY)).orElseThrow();
         String passWord = attempt(() -> secretsReader.fetchSecret(SECRET_NAME, PASSWORD_KEY)).orElseThrow();
