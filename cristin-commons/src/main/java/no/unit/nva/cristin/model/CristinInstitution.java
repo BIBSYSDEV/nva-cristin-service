@@ -1,7 +1,6 @@
 package no.unit.nva.cristin.model;
 
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -52,7 +51,7 @@ public class CristinInstitution {
      */
     public Organization toOrganization() {
 
-        final URI id = new UriWrapper(HTTPS, CRISTIN_API_BASE).addChild(INSTITUTION_PATH)
+        final URI id = new UriWrapper(CRISTIN_API_URL).addChild(INSTITUTION_PATH)
             .addChild(getCristinInstitutionId()).getUri();
         return new Organization.Builder()
             .withId(id)

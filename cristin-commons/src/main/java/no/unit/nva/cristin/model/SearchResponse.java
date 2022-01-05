@@ -1,5 +1,21 @@
 package no.unit.nva.cristin.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonSerializable;
+import nva.commons.core.paths.UriWrapper;
+
+import java.net.URI;
+import java.net.http.HttpHeaders;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.google.common.net.HttpHeaders.LINK;
 import static no.unit.nva.cristin.model.Constants.REL_NEXT;
@@ -8,20 +24,6 @@ import static no.unit.nva.cristin.model.Constants.X_TOTAL_COUNT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.net.URI;
-import java.net.http.HttpHeaders;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
-import nva.commons.core.paths.UriWrapper;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
@@ -254,4 +256,10 @@ public class SearchResponse<E> implements JsonSerializable {
     public String toString() {
         return toJsonString();
     }
+
+    @JsonIgnore
+    public boolean isNotEmpty() {
+        return !hits.isEmpty();
+    }
+
 }

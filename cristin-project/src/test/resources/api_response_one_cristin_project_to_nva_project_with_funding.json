@@ -27,7 +27,7 @@
     }
   ],
   "coordinatingInstitution": {
-    "id": "https://api.cristin.no/v2/institutions/1234",
+    "id": "https://api.cristin-test.uio.no/v2/institutions/1234",
     "type": "Organization",
     "name": {
       "en": "University"
@@ -37,13 +37,13 @@
     {
       "type": "ProjectManager",
       "identity": {
-        "id": "https://api.cristin.no/v2/persons/123456",
+        "id": "https://api.cristin-test.uio.no/v2/persons/123456",
         "type": "Person",
         "firstName": "Ola",
         "lastName": "Nordmann"
       },
       "affiliation": {
-        "id": "https://api.cristin.no/v2/institutions/1234",
+        "id": "https://api.cristin-test.uio.no/v2/institutions/1234",
         "type": "Organization",
         "name": {
           "en": "University"

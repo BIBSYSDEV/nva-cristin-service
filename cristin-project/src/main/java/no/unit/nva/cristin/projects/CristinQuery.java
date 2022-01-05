@@ -1,14 +1,13 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_HOST;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
-import static no.unit.nva.utils.UriUtils.queryParameters;
-import static nva.commons.core.paths.UriWrapper.EMPTY_FRAGMENT;
+import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 
 public class CristinQuery {
 
@@ -19,7 +18,8 @@ public class CristinQuery {
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_DEFAULT_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
-    private static final String CRISTIN_API_PROJECTS_PATH = "/v2/projects/";
+    private static final String CRISTIN_API_PROJECTS_PATH = "projects";
+
 
     private final transient Map<String, String> cristinQueryParameters;
 
@@ -45,12 +45,11 @@ public class CristinQuery {
      * @throws URISyntaxException if URI is invalid
      */
     public static URI fromIdAndLanguage(String id, String language) throws URISyntaxException {
-        return new URI(
-            HTTPS,
-            CRISTIN_API_HOST,
-            CRISTIN_API_PROJECTS_PATH + id,
-            queryParameters(Map.of(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language)),
-            EMPTY_FRAGMENT);
+        return new UriWrapper(CRISTIN_API_URL)
+                .addChild(CRISTIN_API_PROJECTS_PATH)
+                .addChild(id)
+                .addQueryParameters(Map.of(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language))
+                .getUri();
     }
 
     public CristinQuery withGrantId(String grantId) {
@@ -85,11 +84,10 @@ public class CristinQuery {
      * @throws URISyntaxException if URI is invalid
      */
     public URI toURI() throws URISyntaxException {
-        return new URI(
-            HTTPS,
-            CRISTIN_API_HOST,
-            CRISTIN_API_PROJECTS_PATH,
-            queryParameters(cristinQueryParameters),
-            EMPTY_FRAGMENT);
+        return new UriWrapper(CRISTIN_API_URL)
+                .addChild(CRISTIN_API_PROJECTS_PATH)
+                .addQueryParameters(cristinQueryParameters)
+                .getUri();
+
     }
 }

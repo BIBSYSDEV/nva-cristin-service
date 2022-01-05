@@ -5,7 +5,7 @@ env:
   STACK_NAME: cristin-$GITHUB_REF_NAME
   BASE_PATH: cristin-$GITHUB_REF_NAME
   DOMAIN_NAME:  "api.dev.nva.aws.unit.no"
-  CRISTIN_API: "api.cristin.no"
+  CRISTIN_API_URL: "https://api.cristin-test.uio.no/v2"
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -27,7 +27,7 @@ jobs:
         run: sam build
       # Prevent prompts and failure when the stack is unchanged
       - name: Deploy
-        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${{env.STACK_NAME}} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${{env.BASE_PATH}} ParameterKey=CristinApiHost,ParameterValue=${CRISTIN_API}
+        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${{env.STACK_NAME}} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${{env.BASE_PATH}} ParameterKey=CristinApiUrl,ParameterValue=${CRISTIN_API_URL}
       # Take a break waiting for API to deploy
       - name: Sleep for 30 seconds
         run: sleep 30s

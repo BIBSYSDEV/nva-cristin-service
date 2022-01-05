@@ -4,7 +4,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FET
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
-import static no.unit.nva.cristin.model.Constants.CRISTIN_TEST_API_BASE;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.exception.GatewayTimeoutException.ERROR_MESSAGE_GATEWAY_TIMEOUT;
@@ -56,10 +56,10 @@ public class FetchCristinPersonHandlerTest {
     private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
     private static final String EMPTY_STRING = "";
     private static final String EXPECTED_CRISTIN_URI_WITH_IDENTIFIER =
-        "https://api.cristin.no/v2/persons/12345?lang=en,nb,nn";
+        "https://api.cristin-test.uio.no/v2/persons/12345?lang=en,nb,nn";
     private static final Map<String, String> VALID_ORCID_PATH_PARAM = Map.of(ID, "1234-1234-1234-1234");
     private static final String EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER =
-        String.format("https://%s/persons/ORCID:1234-1234-1234-1234?lang=en,nb,nn", CRISTIN_TEST_API_BASE);
+        String.format("%s/persons/ORCID:1234-1234-1234-1234?lang=en,nb,nn", CRISTIN_API_URL);
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
