@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.common.client;
 
 import no.unit.nva.utils.UriUtils;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
@@ -15,6 +16,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,8 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
+import no.unit.nva.exception.FailedHttpRequestException;
+import no.unit.nva.exception.GatewayTimeoutException;
 
 public class ApiClient {
 
@@ -62,14 +66,26 @@ public class ApiClient {
             BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
-    public HttpResponse<String> fetchGetResult(URI uri) {
+    public HttpResponse<String> fetchGetResult(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
-        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+        return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
-    public HttpResponse<String> fetchQueryResults(URI uri) {
+    public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
-        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+        return getSuccessfulResponseOrThrowException(httpRequest);
+    }
+
+    private HttpResponse<String> getSuccessfulResponseOrThrowException(HttpRequest httpRequest)
+        throws GatewayTimeoutException, FailedHttpRequestException {
+
+        try {
+            return client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8));
+        } catch (HttpTimeoutException timeoutException) {
+            throw new GatewayTimeoutException();
+        } catch (IOException | InterruptedException otherException) {
+            throw new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        }
     }
 
     public static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
@@ -80,7 +96,7 @@ public class ApiClient {
         return endRequestTime - startRequestTime;
     }
 
-    protected  <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
+    protected <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
         throws BadGatewayException {
 
         return attempt(() -> fromJson(response.body(), classOfT))
@@ -105,15 +121,15 @@ public class ApiClient {
         List<CompletableFuture<HttpResponse<String>>> responsesContainer =
             uris.stream().map(this::fetchGetResultAsync).collect(Collectors.toList());
 
-        return collectSuccessfulResponsesOrThrowException(responsesContainer);
+        return collectSuccessfulResponses(responsesContainer);
     }
 
-    private List<HttpResponse<String>> collectSuccessfulResponsesOrThrowException(
+    private List<HttpResponse<String>> collectSuccessfulResponses(
         List<CompletableFuture<HttpResponse<String>>> responsesContainer) {
 
         return responsesContainer.stream()
             .map(attempt(CompletableFuture::get))
-            .map(Try::orElseThrow)
+            .map(Try::get)
             .filter(this::isSuccessfulRequest)
             .collect(Collectors.toList());
     }
