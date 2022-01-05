@@ -2,6 +2,9 @@ package no.unit.nva.cristin.person.client;
 
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.common.Utils.isOrcid;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PERSON_QUERY_CONTEXT;
@@ -18,6 +21,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.common.client.ApiClient;
@@ -29,8 +33,13 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Try;
+import nva.commons.core.paths.UriWrapper;
 
 public class CristinPersonApiClient extends ApiClient {
+
+    public static final String IDENTITY_NUMBER_PATH = "identityNumber";
+    public static final String ERROR_MESSAGE_NO_MATCH_FOUND_FOR_SUPPLIED_PAYLOAD = "No match found for supplied "
+        + "payload";
 
     /**
      * Create CristinPersonApiClient with default HTTP client.
@@ -173,5 +182,53 @@ public class CristinPersonApiClient extends ApiClient {
 
     private URI getCorrectUriForIdentifier(String identifier) {
         return isOrcid(identifier) ? CristinPersonQuery.fromOrcid(identifier) : CristinPersonQuery.fromId(identifier);
+    }
+
+    // TODO: Add authentication when client authentication is in place
+    public Person getPersonFromNationalIdentityNumber(String identifier) throws ApiGatewayException {
+        // Upstream uses a query for national id even though it only returns 1 hit
+        List<CristinPerson> cristinPersons = queryUpstreamUsingIdentityNumber(identifier);
+        throwNotFoundIfNoMatches(cristinPersons);
+        CristinPerson enrichedCristinPerson = enrichFirstMatchFromQueryResponse(cristinPersons);
+        Person person = enrichedCristinPerson.toPerson();
+        person.setContext(PERSON_CONTEXT);
+
+        return person;
+    }
+
+    private List<CristinPerson> queryUpstreamUsingIdentityNumber(String identifier)
+        throws NotFoundException, BadGatewayException {
+
+        URI queryUri = CristinPersonQuery.fromNationalIdentityNumber(identifier);
+        HttpResponse<String> queryResponse = fetchQueryResults(queryUri);
+        checkHttpStatusCode(idUriForIdentityNumber(), queryResponse.statusCode());
+
+        return asList(getDeserializedResponse(queryResponse, CristinPerson[].class));
+    }
+
+    private void throwNotFoundIfNoMatches(List<CristinPerson> cristinPersons) throws NotFoundException {
+        if (Objects.isNull(cristinPersons) || cristinPersons.isEmpty()) {
+            throw new NotFoundException(ERROR_MESSAGE_NO_MATCH_FOUND_FOR_SUPPLIED_PAYLOAD);
+        }
+    }
+
+    private CristinPerson enrichFirstMatchFromQueryResponse(List<CristinPerson> cristinPersons)
+        throws NotFoundException, BadGatewayException {
+
+        URI fetchUri = extractFirstUriFromListOfCristinPersons(cristinPersons);
+        HttpResponse<String> fetchResponse = fetchGetResult(fetchUri);
+        checkHttpStatusCode(idUriForIdentityNumber(), fetchResponse.statusCode());
+
+        return getDeserializedResponse(fetchResponse, CristinPerson.class);
+    }
+
+    private URI extractFirstUriFromListOfCristinPersons(List<CristinPerson> cristinPersons) {
+        return cristinPersons.stream().findFirst()
+            .map(CristinPerson::getCristinPersonId)
+            .map(CristinPersonQuery::fromId).orElseThrow();
+    }
+
+    private URI idUriForIdentityNumber() {
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(IDENTITY_NUMBER_PATH).getUri();
     }
 }

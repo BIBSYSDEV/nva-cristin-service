@@ -21,6 +21,7 @@ public class CristinPersonQuery {
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
     private static final String CRISTIN_API_VERSION_PATH = "v2";
     private static final String CRISTIN_API_PERSONS_PATH = "persons";
+    public static final String NIN_PARAM_KEY = "national_id";
 
     private final transient Map<String, String> cristinQueryParameters;
 
@@ -59,6 +60,15 @@ public class CristinPersonQuery {
         URI uri = new UriWrapper(HTTPS, CRISTIN_TEST_API_BASE)
             .addChild(CRISTIN_API_PERSONS_PATH)
             .addChild(identifier)
+            .getUri();
+
+        return addLanguage(uri);
+    }
+
+    public static URI fromNationalIdentityNumber(String identifier) {
+        URI uri = new UriWrapper(HTTPS, CRISTIN_TEST_API_BASE)
+            .addChild(CRISTIN_API_PERSONS_PATH)
+            .addQueryParameter(NIN_PARAM_KEY, identifier)
             .getUri();
 
         return addLanguage(uri);
