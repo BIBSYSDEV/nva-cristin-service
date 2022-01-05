@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.common.client;
 
 import no.unit.nva.utils.UriUtils;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
@@ -36,7 +37,6 @@ import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
 
 public class ApiClient {
 
@@ -66,14 +66,14 @@ public class ApiClient {
             BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
-    public HttpResponse<String> fetchGetResult(URI uri) {
+    public HttpResponse<String> fetchGetResult(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
-        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+        return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
-    public HttpResponse<String> fetchQueryResults(URI uri) {
+    public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
-        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+        return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
     private HttpResponse<String> getSuccessfulResponseOrThrowException(HttpRequest httpRequest)
@@ -121,10 +121,10 @@ public class ApiClient {
         List<CompletableFuture<HttpResponse<String>>> responsesContainer =
             uris.stream().map(this::fetchGetResultAsync).collect(Collectors.toList());
 
-        return collectSuccessfulResponsesOrThrowException(responsesContainer);
+        return collectSuccessfulResponses(responsesContainer);
     }
 
-    private List<HttpResponse<String>> collectSuccessfulResponsesOrThrowException(
+    private List<HttpResponse<String>> collectSuccessfulResponses(
         List<CompletableFuture<HttpResponse<String>>> responsesContainer) {
 
         return responsesContainer.stream()
