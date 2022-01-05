@@ -72,7 +72,16 @@ public class ApiClient {
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
     }
 
-    public  CompletableFuture<HttpResponse<String>>  fetchPostResult(URI uri, String body) {
+    public  HttpResponse<String>  fetchPostResult(URI uri, String body) {
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+    }
+
+    public  CompletableFuture<HttpResponse<String>>  fetchPostResultAsync(URI uri, String body) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
                 .header("Content-Type", "application/json")
@@ -80,8 +89,6 @@ public class ApiClient {
                 .build();
         return client.sendAsync(request, BodyHandlers.ofString());
     }
-
-
 
     public static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
         return OBJECT_MAPPER.readValue(body, classOfT);
