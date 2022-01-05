@@ -1,5 +1,7 @@
 package no.unit.nva.cristin.common.client;
 
+import no.unit.nva.exception.FailedHttpRequestException;
+import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
@@ -26,17 +28,12 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
+import static no.unit.nva.cristin.common.ErrorMessages.*;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
-import no.unit.nva.exception.FailedHttpRequestException;
-import no.unit.nva.exception.GatewayTimeoutException;
 
 public class ApiClient {
 
@@ -74,6 +71,24 @@ public class ApiClient {
     public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
         return getSuccessfulResponseOrThrowException(httpRequest);
+    }
+
+    public HttpResponse<String> fetchPostResult(URI uri, String body) {
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+    }
+
+    public CompletableFuture<HttpResponse<String>> fetchPostResultAsync(URI uri, String body) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+        return client.sendAsync(request, BodyHandlers.ofString());
     }
 
     private HttpResponse<String> getSuccessfulResponseOrThrowException(HttpRequest httpRequest)
