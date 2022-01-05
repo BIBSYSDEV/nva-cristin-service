@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -109,7 +110,7 @@ public class CristinApiClientTest {
     }
 
     @Test
-    void returnsDummyFetchGetResultForCodeCoverage() throws IOException, InterruptedException {
+    void returnsDummyFetchGetResultForCodeCoverage() throws IOException, InterruptedException, ApiGatewayException {
         HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> httpResponse =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
@@ -129,7 +130,7 @@ public class CristinApiClientTest {
     }
 
     @Test
-    void returnsDummyFetchQueryResultsForCodeCoverage() throws IOException, InterruptedException {
+    void returnsDummyFetchQueryResultsForCodeCoverage() throws IOException, InterruptedException, ApiGatewayException {
         HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> httpResponse =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);

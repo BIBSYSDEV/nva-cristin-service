@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.common.client;
 
 import no.unit.nva.utils.UriUtils;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
@@ -15,6 +16,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -33,63 +35,61 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
+import no.unit.nva.exception.FailedHttpRequestException;
+import no.unit.nva.exception.GatewayTimeoutException;
 
 public class ApiClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(ApiClient.class);
+
+    private static final int FIRST_NON_SUCCESS_CODE = 300;
 
     public static final int FIRST_EFFORT = 0;
     public static final int MAX_EFFORTS = 2;
     public static final int WAITING_TIME = 500; //500 milliseconds
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
-    private static final Logger logger = LoggerFactory.getLogger(ApiClient.class);
-    private static final int FIRST_NON_SUCCESS_CODE = 300;
+
     private final transient HttpClient client;
 
     public ApiClient(HttpClient client) {
         this.client = client;
     }
 
-    public static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
-        return OBJECT_MAPPER.readValue(body, classOfT);
-    }
-
     /**
      * Build and perform GET request for given URI.
-     *
      * @param uri to fetch from
      * @return response containing data from requested URI or error
      */
     public CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
         return client.sendAsync(
-                HttpRequest.newBuilder(uri).GET().build(),
-                BodyHandlers.ofString(StandardCharsets.UTF_8));
+            HttpRequest.newBuilder(uri).GET().build(),
+            BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
-    public HttpResponse<String> fetchGetResult(URI uri) {
+    public HttpResponse<String> fetchGetResult(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
-        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+        return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
-    public HttpResponse<String> fetchQueryResults(URI uri) {
+    public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
-        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+        return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
-    public HttpResponse<String> fetchPostResult(URI uri, String body) {
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(uri)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
-        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+    private HttpResponse<String> getSuccessfulResponseOrThrowException(HttpRequest httpRequest)
+        throws GatewayTimeoutException, FailedHttpRequestException {
+
+        try {
+            return client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8));
+        } catch (HttpTimeoutException timeoutException) {
+            throw new GatewayTimeoutException();
+        } catch (IOException | InterruptedException otherException) {
+            throw new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        }
     }
 
-    public CompletableFuture<HttpResponse<String>> fetchPostResultAsync(URI uri, String body) {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
-        return client.sendAsync(request, BodyHandlers.ofString());
+    public static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
+        return OBJECT_MAPPER.readValue(body, classOfT);
     }
 
     public long calculateProcessingTime(long startRequestTime, long endRequestTime) {
@@ -97,10 +97,10 @@ public class ApiClient {
     }
 
     protected <T> T getDeserializedResponse(HttpResponse<String> response, Class<T> classOfT)
-            throws BadGatewayException {
+        throws BadGatewayException {
 
         return attempt(() -> fromJson(response.body(), classOfT))
-                .orElseThrow(failure -> logAndThrowDeserializationError(response, failure));
+            .orElseThrow(failure -> logAndThrowDeserializationError(response, failure));
     }
 
     private <T> BadGatewayException logAndThrowDeserializationError(HttpResponse<String> response, Failure<T> failure) {
@@ -114,25 +114,24 @@ public class ApiClient {
 
     /**
      * Get results for a list of URIs.
-     *
      * @param uris list containing URIs
      * @return responses for given URIs
      */
     public List<HttpResponse<String>> fetchQueryResultsOneByOne(List<URI> uris) {
         List<CompletableFuture<HttpResponse<String>>> responsesContainer =
-                uris.stream().map(this::fetchGetResultAsync).collect(Collectors.toList());
+            uris.stream().map(this::fetchGetResultAsync).collect(Collectors.toList());
 
-        return collectSuccessfulResponsesOrThrowException(responsesContainer);
+        return collectSuccessfulResponses(responsesContainer);
     }
 
-    private List<HttpResponse<String>> collectSuccessfulResponsesOrThrowException(
-            List<CompletableFuture<HttpResponse<String>>> responsesContainer) {
+    private List<HttpResponse<String>> collectSuccessfulResponses(
+        List<CompletableFuture<HttpResponse<String>>> responsesContainer) {
 
         return responsesContainer.stream()
-                .map(attempt(CompletableFuture::get))
-                .map(Try::orElseThrow)
-                .filter(this::isSuccessfulRequest)
-                .collect(Collectors.toList());
+            .map(attempt(CompletableFuture::get))
+            .map(Try::get)
+            .filter(this::isSuccessfulRequest)
+            .collect(Collectors.toList());
     }
 
     private boolean isSuccessfulRequest(HttpResponse<String> response) {
@@ -145,7 +144,7 @@ public class ApiClient {
     }
 
     protected void checkHttpStatusCode(URI uri, int statusCode)
-            throws NotFoundException, BadGatewayException {
+        throws NotFoundException, BadGatewayException {
 
         String uriAsString = Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
 
@@ -163,7 +162,7 @@ public class ApiClient {
 
     private boolean errorIsUnknown(int statusCode) {
         return responseIsFailure(statusCode)
-                && !remoteServerHasInternalProblems(statusCode);
+            && !remoteServerHasInternalProblems(statusCode);
     }
 
     private void logBackendFetchFail(String uri, int statusCode) {
@@ -180,7 +179,6 @@ public class ApiClient {
 
     /**
      * Send a request multiple times before failure.
-     *
      * @param uri location of wanted resource
      * @return Response with operation status and relevant content
      */
@@ -226,7 +224,6 @@ public class ApiClient {
 
     /**
      * calculate value of firstRecord from requestParameters.
-     *
      * @param requestQueryParams parameters limiting this request
      * @return index of first record in resultSet
      */
@@ -238,9 +235,8 @@ public class ApiClient {
 
     /**
      * report total number of results for this query.
-     *
      * @param response containing result for given parameters
-     * @param items    matching given criteria
+     * @param items matching given criteria
      * @return total number of hits for this query
      */
     public int getCount(HttpResponse<String> response, List<?> items) {
