@@ -42,9 +42,7 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
-import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -62,14 +60,14 @@ class QueryCristinOrganizationHandlerTest {
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     private static final String CRISTIN_QUERY_RESPONSE = "cristin_query_response_sample.json";
     QueryCristinOrganizationHandler queryCristinOrganizationHandler;
-    private CristinApiClient cristinApiClient;
+    private CristinOrganizationApiClient cristinApiClient;
     private ByteArrayOutputStream output;
     private Context context;
 
     @BeforeEach
     void setUp() throws NotFoundException, FailedHttpRequestException, InterruptedException {
         context = mock(Context.class);
-        cristinApiClient = mock(CristinApiClient.class);
+        cristinApiClient = mock(CristinOrganizationApiClient.class);
         when(cristinApiClient.queryOrganizations(any())).thenReturn(emptySearchResponse());
         output = new ByteArrayOutputStream();
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
@@ -109,17 +107,17 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseOnQuery() throws IOException, ApiGatewayException {
+    void shouldReturnResponseOnQuery() throws IOException, ApiGatewayException, InterruptedException {
 
         HttpClient httpClient = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
                 .connectTimeout(Duration.ofSeconds(30))
                 .build();
 
-        HttpExecutorImpl httpExecutor = new HttpExecutorImpl(httpClient);
         output = new ByteArrayOutputStream();
+        CristinOrganizationApiClient cristinApiClient = new CristinOrganizationApiClient(httpClient);
+        CristinOrganizationApiClient mySpy = spy(cristinApiClient);
 
-        HttpExecutorImpl mySpy = spy(httpExecutor);
         final URI first = getCristinUri("185.53.18.14", UNITS_PATH);
         doReturn(getOrganization("org_18_53_18_14.json")).when(mySpy).getOrganization(first);
         final URI second = getCristinUri("2012.9.20.0", UNITS_PATH);
@@ -131,7 +129,7 @@ class QueryCristinOrganizationHandlerTest {
                 .thenReturn(java.net.http.HttpHeaders.of(Collections.emptyMap(), (s1,s2) -> true));
         doReturn(getTry(mockHttpResponse)).when(mySpy).sendRequestMultipleTimes(any());
 
-        cristinApiClient = new CristinApiClient(mySpy);
+
         output = new ByteArrayOutputStream();
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
 

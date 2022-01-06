@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -41,9 +42,9 @@ import static org.mockito.Mockito.when;
 public class CristinApiClientTest {
 
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
-        "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&title=reindeer";
+        "https://api.cristin-test.uio.no/v2/projects?per_page=5&page=1&lang=nb&title=reindeer";
     private static final String CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI =
-        "https://api.cristin.no/v2/projects/?lang=nb&page=1&per_page=5&project_code=1234567";
+        "https://api.cristin-test.uio.no/v2/projects?per_page=5&project_code=1234567&page=1&lang=nb";
     public static final String EXAMPLE_TITLE = "Example Title";
     private static final URI LOCALHOST_URI = URI.create("http://localhost/cristin");
     private final Set<String> ids = Set.of("123", "456", "789");
@@ -109,7 +110,7 @@ public class CristinApiClientTest {
     }
 
     @Test
-    void returnsDummyFetchGetResultForCodeCoverage() throws IOException, InterruptedException {
+    void returnsDummyFetchGetResultForCodeCoverage() throws IOException, InterruptedException, ApiGatewayException {
         HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> httpResponse =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
@@ -129,7 +130,7 @@ public class CristinApiClientTest {
     }
 
     @Test
-    void returnsDummyFetchQueryResultsForCodeCoverage() throws IOException, InterruptedException {
+    void returnsDummyFetchQueryResultsForCodeCoverage() throws IOException, InterruptedException, ApiGatewayException {
         HttpClient mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> httpResponse =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);

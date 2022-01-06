@@ -6,6 +6,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERRO
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.exception.GatewayTimeoutException.ERROR_MESSAGE_GATEWAY_TIMEOUT;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -26,6 +28,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
+import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -56,7 +60,7 @@ public class QueryCristinPersonHandlerTest {
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String EXPECTED_CRISTIN_URI_WITH_PARAMS =
-        "https://api.cristin.no/v2/persons?per_page=5&name=John+Smith&page=1&lang=en,nb,nn";
+        "https://api.cristin-test.uio.no/v2/persons?per_page=5&name=John+Smith&page=1&lang=en,nb,nn";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -101,7 +105,7 @@ public class QueryCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnBadGatewayToClientWhenBackendFetchFails() throws IOException {
+    void shouldReturnBadGatewayToClientWhenBackendFetchFails() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
         HttpResponse<String> response = new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(response).when(apiClient).fetchQueryResults(any());
@@ -146,11 +150,24 @@ public class QueryCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldProduceCorrectCristinUriFromParams() throws IOException {
+    void shouldProduceCorrectCristinUriFromParams() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
         handler = new QueryCristinPersonHandler(apiClient, environment);
         sendDefaultQuery();
         verify(apiClient).fetchQueryResults(new UriWrapper(EXPECTED_CRISTIN_URI_WITH_PARAMS).getUri());
+    }
+
+    @Test
+    void shouldReturnGatewayTimeoutWhenQueryToUpstreamServerTimesOut() throws Exception {
+        HttpClient clientMock = mock(HttpClient.class);
+        when(clientMock.<String>send(any(), any())).thenThrow(new HttpConnectTimeoutException(EMPTY_STRING));
+        CristinPersonApiClient apiClient = new CristinPersonApiClient(clientMock);
+        handler = new QueryCristinPersonHandler(apiClient, environment);
+        GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
+
+        assertEquals(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_GATEWAY_TIMEOUT));
     }
 
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {

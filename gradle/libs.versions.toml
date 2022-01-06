@@ -1,5 +1,5 @@
 [versions]
-junit = {strictly = '5.8.1'}
+junit = {strictly = '5.8.2'}
 nva-commons = {strictly = '1.16.30'}
 jackson = {strictly = '2.13.0'}
 mockito = {strictly = '4.1.0'}
@@ -15,6 +15,7 @@ karate-junit5 = {strictly = '1.1.0'}
 log4jApi = { strictly = '2.17.0' }
 slf4j = { strictly = '1.8.0-beta4' }
 nva-language = { strictly = '1.0' }
+awsSdk = { strictly = '1.12.129' }
 
 [libraries]
 
@@ -39,6 +40,7 @@ karate-parent = { group = 'com.intuit.karate', name =  'karate-parent', version.
 nva-commons-core = { group = 'com.github.bibsysdev', name = 'core', version.ref = 'nva-commons' }
 nva-commons-apigateway = { group = 'com.github.bibsysdev', name = 'apigateway', version.ref = 'nva-commons' }
 nva-language = { group = 'com.github.bibsysdev', name = 'nva-language', version.ref = 'nva-language' }
+nva-secrets = { group = "com.github.bibsysdev", name = "secrets", version.ref = "nva-commons" }
 
 jackson-core = { group = 'com.fasterxml.jackson.core', name = 'jackson-core', version.ref = 'jackson' }
 jackson-databind = { group = 'com.fasterxml.jackson.core', name = 'jackson-databind', version.ref = 'jackson' }
@@ -50,6 +52,9 @@ javax-ws-rs = { group = 'javax.ws.rs', name = 'javax.ws.rs-api', version.ref = '
 jsoup = { group = 'org.jsoup', name = 'jsoup', version.ref = 'jsoup' }
 aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version.ref = 'aws-lambda-java-core' }
 google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'google-guava' }
+
+aws-sdk-core = { group = 'com.amazonaws', name = 'aws-java-sdk-core', version.ref = 'awsSdk' }
+aws-sdk-secrets = { group = 'com.amazonaws', name = 'aws-java-sdk-secretsmanager', version.ref = 'awsSdk' }
 
 log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4jApi' }
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }

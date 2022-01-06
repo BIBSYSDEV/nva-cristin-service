@@ -1,15 +1,15 @@
 package no.unit.nva.cristin.person.client;
 
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_HOST;
-import static no.unit.nva.cristin.model.Constants.CRISTIN_TEST_API_BASE;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
-import static no.unit.nva.utils.UriUtils.addLanguage;
-import static no.unit.nva.utils.UriUtils.getCristinUri;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.paths.UriWrapper;
+
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.paths.UriWrapper;
+
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.utils.UriUtils.addLanguage;
+import static no.unit.nva.utils.UriUtils.getCristinUri;
 
 @JacocoGenerated
 public class CristinPersonQuery {
@@ -19,7 +19,6 @@ public class CristinPersonQuery {
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_DEFAULT_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
-    private static final String CRISTIN_API_VERSION_PATH = "v2";
     private static final String CRISTIN_API_PERSONS_PATH = "persons";
     public static final String NIN_PARAM_KEY = "national_id";
 
@@ -57,7 +56,7 @@ public class CristinPersonQuery {
     public static URI fromOrcid(String orcid) {
         String identifier = String.format("ORCID:%s", orcid);
 
-        URI uri = new UriWrapper(HTTPS, CRISTIN_TEST_API_BASE)
+        URI uri = new UriWrapper(CRISTIN_API_URL)
             .addChild(CRISTIN_API_PERSONS_PATH)
             .addChild(identifier)
             .getUri();
@@ -95,8 +94,7 @@ public class CristinPersonQuery {
      * @return an URI to Cristin Persons with parameters
      */
     public URI toURI() {
-        URI uri = new UriWrapper(HTTPS, CRISTIN_API_HOST)
-            .addChild(CRISTIN_API_VERSION_PATH)
+        URI uri = new UriWrapper(CRISTIN_API_URL)
             .addChild(CRISTIN_API_PERSONS_PATH)
             .addQueryParameters(cristinQueryParameters)
             .getUri();

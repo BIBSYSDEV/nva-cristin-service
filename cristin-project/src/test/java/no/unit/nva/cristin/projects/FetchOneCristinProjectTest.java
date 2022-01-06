@@ -73,7 +73,7 @@ public class FetchOneCristinProjectTest {
     private static final String DEFAULT_ID = "9999";
     private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
     private static final String ENGLISH_LANGUAGE = "en";
-    private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI = "https://api.cristin.no/v2/projects/9999?lang=en";
+    private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI = "https://api.cristin-test.uio.no/v2/projects/9999?lang=en";
     private static final String DEFAULT_ACCEPT_HEADER = "*/*";
     public static final String FIELD_STATUS = "status";
     public static final String NOT_LEGAL_STATUS = "not_legal_status";

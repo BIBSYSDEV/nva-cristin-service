@@ -1,0 +1,66 @@
+{
+  "title": {
+    "nb": "NVA projects test"
+  },
+  "coordinating_institution": {
+    "institution": {
+      "cristin_institution_id": "224"
+    }
+  },
+  "institutions_responsible_for_research": [
+    {
+      "institution": {
+        "cristin_institution_id": "224"
+      }
+    },
+    {
+      "unit": {
+        "cristin_unit_id": "224.20.0.0"
+      }
+    },
+    {
+      "institution": {
+        "cristin_institution_id": "9200"
+      }
+    }
+  ],
+  "main_language": "nb",
+  "start_date": "2015-10-21T12:00:00.000Z",
+  "end_date": "2015-12-23T12:00:00.000Z",
+  "participants": [
+    {
+      "cristin_person_id": "515114",
+      "roles": [
+        {
+          "role_code": "PRO_PARTICIPANT",
+          "institution": {
+            "cristin_institution_id": "224"
+          }
+        },
+        {
+          "role_code": "PRO_MANAGER",
+          "institution": {
+            "cristin_institution_id": "224"
+          }
+        }
+      ]
+    },
+    {
+      "cristin_person_id": "738",
+      "roles": [
+        {
+          "role_code": "PRO_PARTICIPANT",
+          "unit": {
+            "cristin_unit_id": "20202.0.0.0"
+          }
+        }
+      ]
+    }
+  ],
+  "popular_scientific_summary": {
+    "nb": "Detaljer om pop. vit. sammendrag."
+  },
+  "method": {
+    "nb": "Eksempel på tekst med flere avsnitt. Formatert med enkel Html."
+  }
+}

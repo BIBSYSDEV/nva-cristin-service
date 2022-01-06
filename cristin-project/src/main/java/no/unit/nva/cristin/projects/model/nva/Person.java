@@ -10,8 +10,7 @@ import nva.commons.core.paths.UriWrapper;
 import java.net.URI;
 import java.util.Objects;
 
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_BASE;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
@@ -27,6 +26,9 @@ public class Person {
     private final String firstName;
     private final String lastName;
 
+    /**
+     * Create a valid NVA Person.
+     */
     @JsonCreator
     public Person(@JsonProperty(ID) URI id,
                   @JsonProperty(FIRST_NAME) String firstName,
@@ -47,7 +49,7 @@ public class Person {
             return null;
         }
 
-        final URI id = new UriWrapper(HTTPS, CRISTIN_API_BASE).addChild(PERSON_PATH)
+        final URI id = new UriWrapper(CRISTIN_API_URL).addChild(PERSON_PATH)
                 .addChild(cristinPerson.getCristinPersonId()).getUri();
         return new Person(id,
                 cristinPerson.getFirstName(),

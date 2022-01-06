@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import java.time.Duration;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
@@ -17,6 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +25,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
 import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.model.Constants.QueryType;
@@ -34,9 +37,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.queryParameters;
@@ -51,10 +51,11 @@ public class CristinApiClient extends ApiClient {
      */
     public CristinApiClient() {
         this(HttpClient.newBuilder()
-            .followRedirects(HttpClient.Redirect.ALWAYS)
-            .connectTimeout(Duration.ofSeconds(30))
-            .build());
+                .followRedirects(HttpClient.Redirect.ALWAYS)
+                .connectTimeout(Duration.ofSeconds(30))
+                .build());
     }
+
 
     public CristinApiClient(HttpClient client) {
         super(client);
@@ -70,14 +71,14 @@ public class CristinApiClient extends ApiClient {
      * @throws ApiGatewayException when there is a problem that can be returned to client
      */
     public NvaProject queryOneCristinProjectUsingIdIntoNvaProject(String id, String language)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         return Optional.of(getProject(id, language))
-            .filter(CristinProject::hasValidContent)
-            .map(NvaProjectBuilder::new)
-            .map(builder -> builder.withContext(PROJECT_LOOKUP_CONTEXT_URL))
-            .map(NvaProjectBuilder::build)
-            .orElseThrow(() -> projectHasNotValidContent(id));
+                .filter(CristinProject::hasValidContent)
+                .map(NvaProjectBuilder::new)
+                .map(builder -> builder.withContext(PROJECT_LOOKUP_CONTEXT_URL))
+                .map(NvaProjectBuilder::build)
+                .orElseThrow(() -> projectHasNotValidContent(id));
     }
 
     /**
@@ -89,13 +90,13 @@ public class CristinApiClient extends ApiClient {
      * @throws ApiGatewayException if some errors happen we should return this to client
      */
     public SearchResponse<NvaProject> queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
-        Map<String, String> requestQueryParams) throws ApiGatewayException {
+            Map<String, String> requestQueryParams) throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
         QueryType queryType = getQueryTypeBasedOnParams(requestQueryParams);
         HttpResponse<String> response = queryProjects(requestQueryParams, queryType);
         List<CristinProject> cristinProjects =
-            getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
+                getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
         if (cristinProjects.isEmpty() && queryType == QUERY_USING_GRANT_ID) {
             response = queryProjects(requestQueryParams, QUERY_USING_TITLE);
             cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
@@ -106,19 +107,19 @@ public class CristinApiClient extends ApiClient {
         URI id = createIdUriFromParams(requestQueryParams, PROJECT);
 
         return new SearchResponse<NvaProject>(id)
-            .withContext(PROJECT_SEARCH_CONTEXT_URL)
-            .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
-            .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
-            .withHits(nvaProjects);
+                .withContext(PROJECT_SEARCH_CONTEXT_URL)
+                .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
+                .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
+                .withHits(nvaProjects);
     }
 
     protected HttpResponse<String> queryProjects(Map<String, String> parameters, QueryType queryType)
             throws ApiGatewayException {
 
         URI uri = attempt(() -> generateQueryProjectsUrl(parameters, queryType))
-            .toOptional(failure -> logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters),
-                failure.getException()))
-            .orElseThrow();
+                .toOptional(failure -> logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters),
+                        failure.getException()))
+                .orElseThrow();
 
         HttpResponse<String> response = fetchQueryResults(uri);
         URI id = createIdUriFromParams(parameters, PROJECT);
@@ -138,7 +139,7 @@ public class CristinApiClient extends ApiClient {
     }
 
     protected List<CristinProject> getEnrichedProjectsUsingQueryResponse(HttpResponse<String> response, String language)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         List<CristinProject> projectsFromQuery = asList(getDeserializedResponse(response, CristinProject[].class));
         List<URI> cristinUris = extractCristinUrisFromProjects(language, projectsFromQuery);
@@ -147,19 +148,19 @@ public class CristinApiClient extends ApiClient {
         List<CristinProject> enrichedCristinProjects = mapValidResponsesToCristinProjects(individualResponses);
 
         return allProjectsWereEnriched(projectsFromQuery, enrichedCristinProjects)
-            ? enrichedCristinProjects
-            : combineResultsWithQueryInCaseEnrichmentFails(projectsFromQuery, enrichedCristinProjects);
+                ? enrichedCristinProjects
+                : combineResultsWithQueryInCaseEnrichmentFails(projectsFromQuery, enrichedCristinProjects);
     }
 
     protected List<CristinProject> combineResultsWithQueryInCaseEnrichmentFails(List<CristinProject> projectsFromQuery,
                                                                                 List<CristinProject> enrichedProjects) {
         Set<String> enrichedProjectIds = enrichedProjects.stream()
-            .map(CristinProject::getCristinProjectId)
-            .collect(Collectors.toSet());
+                .map(CristinProject::getCristinProjectId)
+                .collect(Collectors.toSet());
 
         List<CristinProject> missingProjects = projectsFromQuery.stream()
-            .filter(queryProject -> !enrichedProjectIds.contains(queryProject.getCristinProjectId()))
-            .collect(Collectors.toList());
+                .filter(queryProject -> !enrichedProjectIds.contains(queryProject.getCristinProjectId()))
+                .collect(Collectors.toList());
 
         ArrayList<CristinProject> result = new ArrayList<>();
         result.addAll(enrichedProjects);
@@ -174,9 +175,9 @@ public class CristinApiClient extends ApiClient {
 
     private List<URI> extractCristinUrisFromProjects(String language, List<CristinProject> projectsFromQuery) {
         return projectsFromQuery.stream()
-            .map(attempt(project -> generateGetProjectUri(project.getCristinProjectId(), language)))
-            .map(Try::orElseThrow)
-            .collect(Collectors.toList());
+                .map(attempt(project -> generateGetProjectUri(project.getCristinProjectId(), language)))
+                .map(Try::orElseThrow)
+                .collect(Collectors.toList());
     }
 
     private QueryType getQueryTypeBasedOnParams(Map<String, String> requestQueryParams) {
@@ -184,15 +185,15 @@ public class CristinApiClient extends ApiClient {
     }
 
     protected URI generateQueryProjectsUrl(Map<String, String> parameters, QueryType queryType)
-        throws URISyntaxException {
+            throws URISyntaxException {
 
         CristinQuery query = new CristinQuery()
-            .withLanguage(parameters.get(LANGUAGE))
-            .withFromPage(parameters.get(PAGE))
-            .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
+                .withLanguage(parameters.get(LANGUAGE))
+                .withFromPage(parameters.get(PAGE))
+                .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
 
         return queryType == QUERY_USING_GRANT_ID ? query.withGrantId(parameters.get(QUERY)).toURI() :
-            query.withTitle(parameters.get(QUERY)).toURI();
+                query.withTitle(parameters.get(QUERY)).toURI();
     }
 
     protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {
@@ -201,10 +202,10 @@ public class CristinApiClient extends ApiClient {
 
     private List<CristinProject> mapValidResponsesToCristinProjects(List<HttpResponse<String>> responses) {
         return responses.stream()
-            .map(attempt(response -> getDeserializedResponse(response, CristinProject.class)))
-            .map(Try::orElseThrow)
-            .filter(CristinProject::hasValidContent)
-            .collect(Collectors.toList());
+                .map(attempt(response -> getDeserializedResponse(response, CristinProject.class)))
+                .map(Try::orElseThrow)
+                .filter(CristinProject::hasValidContent)
+                .collect(Collectors.toList());
     }
 
     private BadGatewayException projectHasNotValidContent(String id) {
@@ -214,9 +215,9 @@ public class CristinApiClient extends ApiClient {
 
     private List<NvaProject> mapValidCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
         return cristinProjects.stream()
-            .filter(CristinProject::hasValidContent)
-            .map(CristinProject::toNvaProject)
-            .collect(Collectors.toList());
+                .filter(CristinProject::hasValidContent)
+                .map(CristinProject::toNvaProject)
+                .collect(Collectors.toList());
     }
 
 }

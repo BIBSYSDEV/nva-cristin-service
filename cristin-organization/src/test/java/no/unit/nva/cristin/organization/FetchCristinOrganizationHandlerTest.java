@@ -14,9 +14,7 @@ import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 import nva.commons.core.ioutils.IoUtils;
-import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
 
@@ -29,7 +27,6 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
@@ -38,9 +35,6 @@ import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
@@ -66,14 +60,14 @@ class FetchCristinOrganizationHandlerTest {
     public static final String IDENTIFIER_VALUE = "1.0.0.0";
     public static final String ORGANIZATION_NOT_FOUND_MESSAGE = "cannot be dereferenced";
     FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
-    private CristinApiClient cristinApiClient;
+    private CristinOrganizationApiClient cristinApiClient;
     private ByteArrayOutputStream output;
     private Context context;
 
     @BeforeEach
     void setUp() {
         context = mock(Context.class);
-        cristinApiClient = new CristinApiClient();
+        cristinApiClient = new CristinOrganizationApiClient();
         output = new ByteArrayOutputStream();
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
     }
@@ -139,7 +133,7 @@ class FetchCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnInternalServerErrorResponseOnUnexpectedException() throws IOException {
-        CristinApiClient serviceThrowingException = spy(cristinApiClient);
+        CristinOrganizationApiClient serviceThrowingException = spy(cristinApiClient);
         try {
             doThrow(new NullPointerException())
                     .when(serviceThrowingException)
@@ -164,11 +158,10 @@ class FetchCristinOrganizationHandlerTest {
 
         HttpClient httpClient = mock(HttpClient.class);
         when(httpClient.sendAsync(any(), any())).thenThrow(new RuntimeException("This should Not happen!"));
-        HttpExecutorImpl httpExecutor = new HttpExecutorImpl(httpClient);
         output = new ByteArrayOutputStream();
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
 
-        HttpExecutorImpl mySpy = spy(httpExecutor);
+        CristinOrganizationApiClient mySpy = spy(cristinApiClient);
         final URI level1 = getCristinUri("185.90.0.0", UNITS_PATH);
         doReturn(getSubSubUnit("unit_18_90_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level1);
         final URI level2a = getCristinUri("185.53.0.0", UNITS_PATH);
@@ -179,7 +172,6 @@ class FetchCristinOrganizationHandlerTest {
         doReturn(getSubSubUnit("unit_18_53_18_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level3);
         final URI level4 = getCristinUri("185.53.18.14", UNITS_PATH);
         doReturn(getSubSubUnit("unit_18_53_18_14.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level4);
-        cristinApiClient = new CristinApiClient(mySpy);
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
         final String identifier = "185.53.18.14";
@@ -207,8 +199,7 @@ class FetchCristinOrganizationHandlerTest {
         when(httpResponse.body()).thenReturn("https://example.org/someidentifier");
         when(notFoundResponse.get()).thenReturn(httpResponse);
         when(httpClient.sendAsync(any(), any())).thenReturn(notFoundResponse);
-        HttpExecutorImpl httpExecutor = new HttpExecutorImpl(httpClient);
-        CristinApiClient cristinApiClient = new CristinApiClient(httpExecutor);
+        CristinOrganizationApiClient cristinApiClient = new CristinOrganizationApiClient(httpClient);
         output = new ByteArrayOutputStream();
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
 
