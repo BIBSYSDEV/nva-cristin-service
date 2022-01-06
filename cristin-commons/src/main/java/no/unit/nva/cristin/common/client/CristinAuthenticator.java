@@ -10,6 +10,9 @@ import java.time.Duration;
 
 import static nva.commons.core.attempt.Try.attempt;
 
+/**
+ * Creates an Authenticator to create a HttpClient with authentication for usage in ApiClient requests to Cristin API.
+ */
 public class CristinAuthenticator {
 
     private static final String SECRET_NAME = "CristinClientBasicAuth";

@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.common.client;
 
+import com.google.common.net.MediaType;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
@@ -34,6 +35,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 
 public class ApiClient {
 
@@ -45,6 +47,7 @@ public class ApiClient {
     public static final int MAX_EFFORTS = 2;
     public static final int WAITING_TIME = 500; //500 milliseconds
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
+    public static final String APPLICATION_JSON = MediaType.JSON_UTF_8.toString();
 
     private final transient HttpClient client;
 
@@ -76,7 +79,7 @@ public class ApiClient {
     public HttpResponse<String> fetchPostResult(URI uri, String body) {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(uri)
-                .header("Content-Type", "application/json")
+                .header(CONTENT_TYPE, APPLICATION_JSON)
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
         return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
@@ -85,7 +88,7 @@ public class ApiClient {
     public CompletableFuture<HttpResponse<String>> fetchPostResultAsync(URI uri, String body) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
-                .header("Content-Type", "application/json")
+                .header(CONTENT_TYPE, APPLICATION_JSON)
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
         return client.sendAsync(request, BodyHandlers.ofString());
