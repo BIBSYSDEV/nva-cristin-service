@@ -1,5 +1,9 @@
 package no.unit.nva.cristin.common.client;
 
+import com.google.common.net.MediaType;
+import no.unit.nva.cristin.common.ErrorMessages;
+import no.unit.nva.exception.FailedHttpRequestException;
+import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
@@ -26,17 +30,12 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
-import no.unit.nva.exception.FailedHttpRequestException;
-import no.unit.nva.exception.GatewayTimeoutException;
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 
 public class ApiClient {
 
@@ -48,6 +47,7 @@ public class ApiClient {
     public static final int MAX_EFFORTS = 2;
     public static final int WAITING_TIME = 500; //500 milliseconds
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
+    public static final String APPLICATION_JSON = MediaType.JSON_UTF_8.toString();
 
     private final transient HttpClient client;
 
@@ -76,6 +76,24 @@ public class ApiClient {
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
+    public HttpResponse<String> fetchPostResult(URI uri, String body) {
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(uri)
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+        return attempt(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).orElseThrow();
+    }
+
+    public CompletableFuture<HttpResponse<String>> fetchPostResultAsync(URI uri, String body) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+        return client.sendAsync(request, BodyHandlers.ofString());
+    }
+
     private HttpResponse<String> getSuccessfulResponseOrThrowException(HttpRequest httpRequest)
         throws GatewayTimeoutException, FailedHttpRequestException {
 
@@ -84,7 +102,7 @@ public class ApiClient {
         } catch (HttpTimeoutException timeoutException) {
             throw new GatewayTimeoutException();
         } catch (IOException | InterruptedException otherException) {
-            throw new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+            throw new FailedHttpRequestException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
     }
 
@@ -104,8 +122,8 @@ public class ApiClient {
     }
 
     private <T> BadGatewayException logAndThrowDeserializationError(HttpResponse<String> response, Failure<T> failure) {
-        logError(ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(), failure.getException());
-        return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        logError(ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(), failure.getException());
+        return new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
     }
 
     protected void logError(String message, String data, Exception failure) {
@@ -149,11 +167,11 @@ public class ApiClient {
         String uriAsString = Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
 
         if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
-            String msg = String.format(ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, uriAsString);
+            String msg = String.format(ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, uriAsString);
             throw new NotFoundException(msg);
         } else if (remoteServerHasInternalProblems(statusCode)) {
             logBackendFetchFail(uriAsString, statusCode);
-            throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+            throw new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         } else if (errorIsUnknown(statusCode)) {
             logBackendFetchFail(uriAsString, statusCode);
             throw new RuntimeException();
@@ -166,7 +184,7 @@ public class ApiClient {
     }
 
     private void logBackendFetchFail(String uri, int statusCode) {
-        logger.error(String.format(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE, statusCode, uri));
+        logger.error(String.format(ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE, statusCode, uri));
     }
 
     private boolean responseIsFailure(int statusCode) {
