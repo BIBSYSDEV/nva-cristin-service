@@ -30,6 +30,7 @@ import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.paths.UriWrapper;
 
@@ -194,9 +195,7 @@ public class CristinPersonApiClient extends ApiClient {
         return person;
     }
 
-    private List<CristinPerson> queryUpstreamUsingIdentityNumber(String identifier)
-        throws NotFoundException, BadGatewayException {
-
+    private List<CristinPerson> queryUpstreamUsingIdentityNumber(String identifier) throws ApiGatewayException {
         URI queryUri = CristinPersonQuery.fromNationalIdentityNumber(identifier);
         HttpResponse<String> queryResponse = fetchQueryResults(queryUri);
         checkHttpStatusCode(idUriForIdentityNumber(), queryResponse.statusCode());
@@ -211,7 +210,7 @@ public class CristinPersonApiClient extends ApiClient {
     }
 
     private CristinPerson enrichFirstMatchFromQueryResponse(List<CristinPerson> cristinPersons)
-        throws NotFoundException, BadGatewayException {
+        throws ApiGatewayException {
 
         URI fetchUri = extractFirstUriFromListOfCristinPersons(cristinPersons);
         HttpResponse<String> fetchResponse = fetchGetResult(fetchUri);

@@ -65,7 +65,7 @@ public class CristinPersonQuery {
     }
 
     public static URI fromNationalIdentityNumber(String identifier) {
-        URI uri = new UriWrapper(HTTPS, CRISTIN_TEST_API_BASE)
+        URI uri = new UriWrapper(CRISTIN_API_URL)
             .addChild(CRISTIN_API_PERSONS_PATH)
             .addQueryParameter(NIN_PARAM_KEY, identifier)
             .getUri();

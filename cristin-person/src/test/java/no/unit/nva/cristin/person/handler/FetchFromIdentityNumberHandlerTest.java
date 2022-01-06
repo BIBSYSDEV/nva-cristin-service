@@ -21,6 +21,7 @@ import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
@@ -35,7 +36,8 @@ public class FetchFromIdentityNumberHandlerTest {
     private static final String DEFAULT_IDENTITY_NUMBER = "12345612345";
     private static final String VALID_CRISTIN_NATIONAL_ID_URI = "https://api.cristin-test.uio"
         + ".no/v2/persons?national_id=12345612345&lang=en,nb,nn";
-    private static final String URI_FIRST_HIT_FROM_CRISTIN = "https://api.cristin.no/v2/persons/359084?lang=en,nb,nn";
+    private static final String URI_FIRST_HIT_FROM_CRISTIN = "https://api.cristin-test.uio"
+        + ".no/v2/persons/359084?lang=en,nb,nn";
     private final Environment environment = new Environment();
     private CristinPersonApiClient apiClient;
     private Context context;
@@ -60,7 +62,7 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     @Test
-    void shouldProduceCorrectCristinUriFromNationalIdentifier() throws IOException {
+    void shouldProduceCorrectCristinUriFromNationalIdentifier() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
         handler = new FetchFromIdentityNumberHandler(apiClient, environment);
         sendQuery(defaultBody(), EMPTY_MAP);
