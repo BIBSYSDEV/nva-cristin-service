@@ -89,8 +89,8 @@ public class CristinOrganizationApiClient extends ApiClient {
             throws NotFoundException, FailedHttpRequestException {
 
         URI queryUri = createCristinQueryUri(translateToCristinApi(requestQueryParams), UNITS_PATH);
-        SearchResponse<Organization> searchResponse = query(queryUri);
         final long start = System.currentTimeMillis();
+        SearchResponse<Organization> searchResponse = query(queryUri);
         final long totalProcessingTime = System.currentTimeMillis() - start;
         return updateSearchResponseMetadata(searchResponse, requestQueryParams, totalProcessingTime);
     }
