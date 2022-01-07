@@ -9,10 +9,7 @@ import nva.commons.core.Environment;
 import java.util.List;
 import java.util.Set;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.common.ErrorMessages.*;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.model.Constants.FULL;
@@ -61,10 +58,13 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     protected String getValidDepth(RequestInfo requestInfo) throws BadRequestException {
-        isValidDepth(requestInfo);
-        return requestInfo.getQueryParameters().containsKey(DEPTH)
-                ? requestInfo.getQueryParameter(DEPTH)
-                : TOP;
+        if (isValidDepth(requestInfo)) {
+            return requestInfo.getQueryParameters().containsKey(DEPTH)
+                    ? requestInfo.getQueryParameter(DEPTH)
+                    : TOP;
+        } else {
+            throw new BadRequestException(ERROR_MESSAGE_DEPTH_INVALID);
+        }
     }
 
     private boolean isValidQuery(String str) {
@@ -77,7 +77,9 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     private boolean isValidDepth(RequestInfo requestInfo) throws BadRequestException {
-        return !requestInfo.getQueryParameters().containsKey(DEPTH) || Set.of(TOP, FULL).contains(requestInfo.getQueryParameter(DEPTH));
+        return !requestInfo.getQueryParameters().containsKey(DEPTH)
+                || (requestInfo.getQueryParameters().containsKey(DEPTH)
+                    && Set.of(TOP, FULL).contains(requestInfo.getQueryParameter(DEPTH)));
     }
 
 
