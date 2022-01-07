@@ -13,9 +13,7 @@ import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.*;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
@@ -39,6 +37,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         validateQueryParamKeys(requestInfo);
         Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
         requestQueryParams.put(QUERY, getValidQuery(requestInfo));
+        requestQueryParams.put(DEPTH, getValidDepth(requestInfo));
         requestQueryParams.put(PAGE, getValidPage(requestInfo));
         requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
         return attempt(() -> cristinApiClient.queryOrganizations(requestQueryParams)).orElseThrow();

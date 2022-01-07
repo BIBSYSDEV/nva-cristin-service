@@ -1,21 +1,18 @@
 package no.unit.nva.cristin.common.handler;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
-import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import java.util.List;
-import java.util.Set;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
+
+import java.util.List;
+import java.util.Set;
+
+import static java.util.Objects.isNull;
+import static no.unit.nva.cristin.common.ErrorMessages.*;
+import static no.unit.nva.cristin.model.Constants.*;
+import static no.unit.nva.cristin.model.JsonPropertyNames.*;
 
 public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
 
@@ -55,6 +52,12 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
             .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
+    protected String getValidDepth(RequestInfo requestInfo) throws BadRequestException {
+        return getQueryParam(requestInfo, QUERY)
+                .filter(this::isValidDepth)
+                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_DEPTH_INVALID));
+    }
+
     private boolean isValidQuery(String str) {
         for (Character c : str.toCharArray()) {
             if (isUnsupportedCharacter(c)) {
@@ -63,6 +66,11 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
         }
         return true;
     }
+
+    private boolean isValidDepth(String str) {
+        return isNull(str) || Set.of(TOP, FULL).contains(str);
+    }
+
 
     private boolean isUnsupportedCharacter(Character c) {
         return !Character.isLetterOrDigit(c) && !Character.isWhitespace(c) && !VALID_SPECIAL_CHARS.contains(c);
