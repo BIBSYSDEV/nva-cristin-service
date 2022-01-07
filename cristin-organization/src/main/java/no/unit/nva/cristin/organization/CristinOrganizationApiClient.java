@@ -32,19 +32,16 @@ import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.*;
 import static no.unit.nva.cristin.model.JsonPropertyNames.*;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
-import static no.unit.nva.utils.UriUtils.addLanguage;
-import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
-import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
-import static no.unit.nva.utils.UriUtils.getNvaApiId;
-import static no.unit.nva.utils.UriUtils.getNvaApiUri;
+import static no.unit.nva.utils.UriUtils.*;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class CristinOrganizationApiClient extends ApiClient {
 
+    public static final String CRISTIN_LEVELS_PARAM = "levels";
     public static final String CRISTIN_PER_PAGE_PARAM = "per_page";
-    private static final String CRISTIN_QUERY_NAME_PARAM = "name";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
     public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
+    private static final String CRISTIN_QUERY_NAME_PARAM = "name";
 
     /**
      * Create a CristinOrganizationApiClient with default HTTPClient.
@@ -81,23 +78,22 @@ public class CristinOrganizationApiClient extends ApiClient {
             throws NotFoundException, FailedHttpRequestException {
 
         URI queryUri = createCristinQueryUri(translateToCristinApi(requestQueryParams), UNITS_PATH);
+        SearchResponse<Organization> searchResponse = query(queryUri);
         final long start = System.currentTimeMillis();
-        SearchResponse<Organization> searchResponse = isFullLevelHierarchyQuery(requestQueryParams)
-                ? queryFullHierarchy(queryUri)
-                : queryTopLevel(queryUri);
         final long totalProcessingTime = System.currentTimeMillis() - start;
         return updateSearchResponseMetadata(searchResponse, requestQueryParams, totalProcessingTime);
     }
 
-    private boolean isFullLevelHierarchyQuery(Map<String, String> requestQueryParams) {
-        return requestQueryParams.getOrDefault(DEPTH,TOP).equals(TOP);
-    }
-
     private Map<String, String> translateToCristinApi(Map<String, String> requestQueryParams) {
         return Map.of(
+                CRISTIN_LEVELS_PARAM, toCristinLevel(requestQueryParams.get(DEPTH)),
                 CRISTIN_QUERY_NAME_PARAM, requestQueryParams.get(QUERY),
                 PAGE, requestQueryParams.get(PAGE),
                 CRISTIN_PER_PAGE_PARAM, requestQueryParams.get(NUMBER_OF_RESULTS));
+    }
+
+    private String toCristinLevel(String depth) {
+        return TOP.equals(depth) || isNull(depth) ? "1" : "32";
     }
 
     private SearchResponse<Organization> updateSearchResponseMetadata(
@@ -137,7 +133,7 @@ public class CristinOrganizationApiClient extends ApiClient {
         return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
     }
 
-    protected SearchResponse<Organization> queryFullHierarchy(URI uri) throws NotFoundException, FailedHttpRequestException {
+    protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
         HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(uri)).get();
         if (isSuccessful(response.statusCode())) {
             try {
@@ -154,25 +150,6 @@ public class CristinOrganizationApiClient extends ApiClient {
             throw new FailedHttpRequestException(errorMessage(response));
         }
     }
-
-    protected SearchResponse<Organization> queryTopLevel(URI uri) throws NotFoundException, FailedHttpRequestException {
-        HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(uri)).get();
-        if (isSuccessful(response.statusCode())) {
-            try {
-                List<Organization> organizations = getOrganizations(response);
-                return new SearchResponse<Organization>(uri)
-                        .withHits(organizations)
-                        .withSize(getCount(response, organizations));
-            } catch (JsonProcessingException e) {
-                throw new FailedHttpRequestException(e.getMessage());
-            }
-        } else if (response.statusCode() == HTTP_NOT_FOUND) {
-            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, uri));
-        } else {
-            throw new FailedHttpRequestException(errorMessage(response));
-        }
-    }
-
 
     private Organization getParentOrganization(SubSubUnitDto subSubUnitDto) {
         URI parent = Optional.ofNullable(subSubUnitDto.getParentUnit()).map(InstitutionDto::getUri).orElse(null);

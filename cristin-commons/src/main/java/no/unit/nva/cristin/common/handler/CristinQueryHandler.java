@@ -9,14 +9,22 @@ import nva.commons.core.Environment;
 import java.util.List;
 import java.util.Set;
 
-import static java.util.Objects.isNull;
-import static no.unit.nva.cristin.common.ErrorMessages.*;
-import static no.unit.nva.cristin.model.Constants.*;
-import static no.unit.nva.cristin.model.JsonPropertyNames.*;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
+import static no.unit.nva.cristin.model.Constants.FULL;
+import static no.unit.nva.cristin.model.Constants.TOP;
+import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 
 public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
 
-    private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS);
+    private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH);
     private static final List<Character> VALID_SPECIAL_CHARS = List.of('-', ',', '.');
 
     public CristinQueryHandler(Class<I> iclass, Environment environment) {
@@ -53,9 +61,10 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     protected String getValidDepth(RequestInfo requestInfo) throws BadRequestException {
-        return getQueryParam(requestInfo, QUERY)
-                .filter(this::isValidDepth)
-                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_DEPTH_INVALID));
+        isValidDepth(requestInfo);
+        return requestInfo.getQueryParameters().containsKey(DEPTH)
+                ? requestInfo.getQueryParameter(DEPTH)
+                : TOP;
     }
 
     private boolean isValidQuery(String str) {
@@ -67,8 +76,8 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
         return true;
     }
 
-    private boolean isValidDepth(String str) {
-        return isNull(str) || Set.of(TOP, FULL).contains(str);
+    private boolean isValidDepth(RequestInfo requestInfo) throws BadRequestException {
+        return !requestInfo.getQueryParameters().containsKey(DEPTH) || Set.of(TOP, FULL).contains(requestInfo.getQueryParameter(DEPTH));
     }
 
 

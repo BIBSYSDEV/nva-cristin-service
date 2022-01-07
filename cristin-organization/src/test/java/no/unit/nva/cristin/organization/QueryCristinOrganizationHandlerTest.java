@@ -14,6 +14,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
+import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +54,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import nva.commons.core.attempt.Try;
 
 class QueryCristinOrganizationHandlerTest {
 
@@ -135,7 +135,7 @@ class QueryCristinOrganizationHandlerTest {
 
         InputStream inputStream = new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withQueryParameters(Map.of("query", "Department of Medical Biochemistry"))
+                .withQueryParameters(Map.of("query", "Department of Medical Biochemistry","depth","full"))
                 .build();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
@@ -164,6 +164,13 @@ class QueryCristinOrganizationHandlerTest {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
                 .withQueryParameters(Map.of("query", "strangeQueryWithoutHits"))
+                .build();
+    }
+
+    private InputStream generateHandlerRequestWithQueryParameter() throws JsonProcessingException {
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withQueryParameters(Map.of("query", "Fysikk"))
                 .build();
     }
 
