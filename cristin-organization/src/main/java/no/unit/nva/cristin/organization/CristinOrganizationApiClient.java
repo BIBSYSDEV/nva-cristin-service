@@ -29,10 +29,21 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.util.Objects.isNull;
-import static no.unit.nva.cristin.model.Constants.*;
-import static no.unit.nva.cristin.model.JsonPropertyNames.*;
+import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.TOP;
+import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
-import static no.unit.nva.utils.UriUtils.*;
+import static no.unit.nva.utils.UriUtils.addLanguage;
+import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
+import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class CristinOrganizationApiClient extends ApiClient {

@@ -13,7 +13,10 @@ import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static no.unit.nva.cristin.model.JsonPropertyNames.*;
+import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
