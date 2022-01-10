@@ -14,6 +14,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
+import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,12 +38,14 @@ import static com.google.common.net.MediaType.JSON_UTF_8;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Collections.emptyList;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_DEPTH_INVALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -53,7 +56,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import nva.commons.core.attempt.Try;
 
 class QueryCristinOrganizationHandlerTest {
 
@@ -135,7 +137,7 @@ class QueryCristinOrganizationHandlerTest {
 
         InputStream inputStream = new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withQueryParameters(Map.of("query", "Department of Medical Biochemistry"))
+                .withQueryParameters(Map.of("query", "Department of Medical Biochemistry","depth","full"))
                 .build();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
@@ -144,6 +146,16 @@ class QueryCristinOrganizationHandlerTest {
         assertEquals(2, actual.getHits().size());
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void shouldReturnBadRequestOnIllegalDepth() throws IOException {
+        InputStream inputStream = generateHandlerRequestWithIllegalDepthParameter();
+        queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        String actualDetail = getProblemDetail(gatewayResponse);
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(actualDetail, containsString(ERROR_MESSAGE_DEPTH_INVALID));
     }
 
     private Try<HttpResponse<String>> getTry(HttpResponse<String> mockHttpResponse) {
@@ -164,6 +176,13 @@ class QueryCristinOrganizationHandlerTest {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
                 .withQueryParameters(Map.of("query", "strangeQueryWithoutHits"))
+                .build();
+    }
+
+    private InputStream generateHandlerRequestWithIllegalDepthParameter() throws JsonProcessingException {
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withQueryParameters(Map.of("query", "Fysikk",DEPTH, "feil"))
                 .build();
     }
 
