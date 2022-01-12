@@ -374,11 +374,112 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /person/nin:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinAuthorizedQueryPersonFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Query person by national identity number
+      description: Returns a single person matching nin query parameter, without national identity number in result
+      operationId: GetPersonByNIN
+      parameters:
+        - name: nin
+          in: query
+          description: national identity number of person to return
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9]{11}$'
+          example: '31129912345'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Person'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+
+  /person/nin/{nin}:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinAuthorizedGetPersonFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Get person by national identity number
+      description: Returns a single person matching nin path parameter, including national identity number
+      operationId: GetPersonByNIN
+      parameters:
+        - name: nin
+          in: path
+          description: national identity number of person to return
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9]{11}$'
+          example: '31129912345'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Person'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 
 components:
   responses:
     400:
       description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    401:
+      description: Unauthorized
       content:
         application/problem+json:
           schema:
