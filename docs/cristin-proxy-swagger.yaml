@@ -330,11 +330,12 @@ paths:
         502:
           $ref: '#/components/responses/502'
     post:
-      #x-amazon-apigateway-integration:
-      #uri:
-      #Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinQueryPersonFunction.Arn}/invocations
-      #httpMethod: POST
-      #type: "AWS_PROXY"
+      # TODO: Add authentication information
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinCreatePersonFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
       tags:
         - Person
       summary: Create one person
@@ -799,6 +800,7 @@ components:
       properties:
         identifiers:
           type: array
+          required: true
           description: Identifiers for this person
           items:
             type: object
@@ -813,6 +815,7 @@ components:
                 description: Value of identifier
         names:
           type: array
+          required: true
           description: Names for this person
           items:
             type: object
