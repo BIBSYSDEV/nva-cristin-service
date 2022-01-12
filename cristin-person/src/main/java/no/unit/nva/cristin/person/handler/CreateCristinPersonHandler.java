@@ -75,6 +75,6 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     }
 
     private Predicate<TypedValue> isNationalIdentityNumber() {
-        return typedValue -> typedValue.getType().equals(NATIONAL_IDENTITY_NUMBER);
+        return typedValue -> NATIONAL_IDENTITY_NUMBER.equals(typedValue.getType());
     }
 }
