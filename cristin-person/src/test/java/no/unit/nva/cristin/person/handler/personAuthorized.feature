@@ -13,7 +13,8 @@ Feature: API tests for Cristin Person fetch
 
   Scenario Outline: Fetch returns valid data and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
-    Given path '/person/nin/' + samplePersonId
+    Given path '/person/nin'
+    And param nin = samplePersonId
     When method GET
     Then status 200
     And match response == '#object'
@@ -29,8 +30,8 @@ Feature: API tests for Cristin Person fetch
 
   Scenario Outline: Fetch with unsupported Accept header returns Unsupported Media Type
     * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }
-    Given path '/person/nin' + samplePersonId
-    When method GET
+    Given path '/person/nin'
+    And param nin = samplePersonId
     Then status 415
     * def contentType = responseHeaders['Content-Type'][0]
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
@@ -52,7 +53,7 @@ Feature: API tests for Cristin Person fetch
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid path parameter for identifier, needs to be a number or an ORCID'
+    And match response.detail == 'Invalid query parameter for national identifier, must be a number with 11 digits'
 
 
   Scenario: Fetch returns status Bad request when sending illegal query parameter
@@ -62,7 +63,7 @@ Feature: API tests for Cristin Person fetch
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'This endpoint does not support query parameters'
+    And match response.detail == 'Missing from query parameters: nin'
 
   Scenario: Fetch returns status Not found when requesting unknown project identifier
     Given path '/person/nin'

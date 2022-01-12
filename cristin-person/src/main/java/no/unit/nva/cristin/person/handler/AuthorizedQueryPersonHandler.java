@@ -17,7 +17,7 @@ import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClie
 public class AuthorizedQueryPersonHandler extends ApiGatewayHandler<Void, Person> {
 
     public static final String ERROR_MESSAGE_INVALID_PARAMETER_FOR_PERSON_ID =
-            "Invalid query parameter for national identifier, needs to be a number with 11 digits ";
+            "Invalid query parameter for national identifier, must be a number with 11 digits";
     public static final int NATIONAL_IDENTIFIER_LENGTH = 11;
     private static final String NationalIdentifierNumber = "nin";
 
