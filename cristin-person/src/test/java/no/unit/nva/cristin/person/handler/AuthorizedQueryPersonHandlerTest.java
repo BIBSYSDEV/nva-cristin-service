@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 public class AuthorizedQueryPersonHandlerTest {
 
     private static final String NIN = "nin";
-    private static final String SAMPLE_NIN = "28089533134";
+    private static final String SAMPLE_NIN = "01010101006";
     private static final String ALPHA_NOT_NIN = "ABCDEFGHIJK";
     private static final String ILLEGAL_PARAMETER_NAME = "non_nin";
     public static final String MISSING_FROM_QUERY_PARAMETERS_NIN = "Missing from query parameters: nin";

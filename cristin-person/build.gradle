@@ -4,6 +4,8 @@ dependencies {
     implementation libs.aws.lambda.java.core
     implementation libs.nva.logutils
     implementation libs.nva.commons.apigateway
+    implementation libs.bekkopen.nocommons
+
 
     testImplementation project(":cristin-commons")
     testImplementation project(":cristin-testing")

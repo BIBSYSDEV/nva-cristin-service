@@ -2,6 +2,7 @@ package no.unit.nva.cristin.person.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
+import no.bekk.bekkopen.person.FodselsnummerValidator;
 import no.unit.nva.cristin.person.client.AuthorizedCristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -22,8 +23,7 @@ import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 public class AuthorizedQueryPersonHandler extends ApiGatewayHandler<Void, Person> {
 
     public static final String ERROR_MESSAGE_INVALID_PARAMETER_FOR_PERSON_ID =
-            "Invalid query parameter for national identifier, must be a number with 11 digits";
-    public static final int NATIONAL_IDENTIFIER_LENGTH = 11;
+            "Invalid value for national identification number";
     private static final String NationalIdentifierNumber = "nin";
 
     @JacocoGenerated
@@ -76,15 +76,7 @@ public class AuthorizedQueryPersonHandler extends ApiGatewayHandler<Void, Person
         throw new BadRequestException(ERROR_MESSAGE_INVALID_PARAMETER_FOR_PERSON_ID);
     }
 
-    private static boolean isPositiveLong(String str) {
-        try {
-            return Long.parseLong(str) > 0;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     private boolean isValidIdentifier(String identifier) {
-        return isPositiveLong(identifier) && identifier.length() == NATIONAL_IDENTIFIER_LENGTH;
+        return FodselsnummerValidator.isValid(identifier);
     }
 }

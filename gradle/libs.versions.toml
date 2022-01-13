@@ -16,7 +16,7 @@ log4jApi = { strictly = '2.17.0' }
 slf4j = { strictly = '1.8.0-beta4' }
 nva-language = { strictly = '1.0' }
 awsSdk = { strictly = '1.12.129' }
-
+bekkopen-nocommons = { strictly = '0.12.0' }
 [libraries]
 
 #Test
@@ -58,6 +58,8 @@ aws-sdk-secrets = { group = 'com.amazonaws', name = 'aws-java-sdk-secretsmanager
 
 log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4jApi' }
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
+
+bekkopen-nocommons = { group = 'no.bekk.bekkopen', name =  'nocommons', version.ref =  'bekkopen-nocommons' }
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
