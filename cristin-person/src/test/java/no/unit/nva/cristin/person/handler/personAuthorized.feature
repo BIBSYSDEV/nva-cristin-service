@@ -5,7 +5,7 @@ Feature: API tests for Cristin Person fetch
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     * def illegalIdentifier = 'illegalIdentifier'
-    * def samplePersonId = '00127925178'
+    * def samplePersonId = '01010101006'
     * def nonExistingPersonId = '99999999999'
     * def personIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/person\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
