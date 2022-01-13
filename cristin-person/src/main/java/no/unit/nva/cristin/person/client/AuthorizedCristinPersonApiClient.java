@@ -30,23 +30,23 @@ public class AuthorizedCristinPersonApiClient extends CristinPersonApiClient {
      * Fetch CristinPerson by national identification number (nationalIdentifier).
      * Request against Cristin API must be authenticated
      *
-     * @param nationalIdentifier valid national identification number - 11 digits
+     * @param nationalIdentificationNumber valid national identification number - 11 digits
      * @return CristinPerson without national identification number
      * @throws ApiGatewayException when upstream problems
      */
     @Override
-    public CristinPerson getCristinPerson(String nationalIdentifier) throws ApiGatewayException {
-        URI uri = fromNationalIdentifier(nationalIdentifier);
+    public CristinPerson getCristinPerson(String nationalIdentificationNumber) throws ApiGatewayException {
+        URI uri = fromNationalIdentificationNumber(nationalIdentificationNumber);
         HttpResponse<String> response = fetchQueryResults(uri);
-        checkHttpStatusCode(UriUtils.getNvaApiId(nationalIdentifier, PERSON), response.statusCode());
+        checkHttpStatusCode(UriUtils.getNvaApiId(nationalIdentificationNumber, PERSON), response.statusCode());
         List<CristinPerson> personsFromQuery = asList(getDeserializedResponse(response, CristinPerson[].class));
         if (personsFromQuery.isEmpty()) {
-            throw new NotFoundException(String.format(ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, nationalIdentifier));
+            throw new NotFoundException(String.format(ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, nationalIdentificationNumber));
         }
         return super.getCristinPerson(personsFromQuery.get(0).getCristinPersonId());
     }
 
-    private URI fromNationalIdentifier(String nationalIdentifier) {
+    private URI fromNationalIdentificationNumber(String nationalIdentifier) {
         return new UriWrapper(CRISTIN_API_URL)
                 .addChild(CRISTIN_API_PERSONS_PATH)
                 .addQueryParameter(NATIONAL_ID, nationalIdentifier)
