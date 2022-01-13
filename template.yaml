@@ -192,20 +192,6 @@ Resources:
             Path: /person/{id}
             Method: get
 
-  NvaCristinAuthorizedGetPersonFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.AuthorizedGetPersonHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
-      Events:
-        NvaCristinFetchPersonEvent:
-          Type: Api
-          Properties:
-            RestApiId: !Ref NvaCristinProxyApi
-            Path: /person/nin/{nin}
-            Method: get
   NvaCristinAuthorizedQueryPersonFunction:
     Type: AWS::Serverless::Function
     Properties:
