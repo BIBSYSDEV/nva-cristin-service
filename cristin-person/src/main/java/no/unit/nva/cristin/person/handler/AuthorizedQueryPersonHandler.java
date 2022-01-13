@@ -15,7 +15,7 @@ import nva.commons.core.JacocoGenerated;
 import java.net.HttpURLConnection;
 import java.util.List;
 
-import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
@@ -40,7 +40,7 @@ public class AuthorizedQueryPersonHandler extends ApiGatewayHandler<Void, Person
     protected Person processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         String identifier = getValidId(requestInfo);
         Person person = getAuthorizedCristinPersonApiClient().getCristinPerson(identifier).toPerson();
-        if (!isNull(person)) {
+        if (nonNull(person)) {
             person.setContext(PERSON_CONTEXT);
         }
         return person;
