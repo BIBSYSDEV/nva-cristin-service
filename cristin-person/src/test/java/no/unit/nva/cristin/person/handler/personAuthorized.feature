@@ -5,8 +5,9 @@ Feature: API tests for Cristin Person fetch
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     * def illegalIdentifier = 'illegalIdentifier'
-    * def samplePersonId = '01010101006'
-    * def nonExistingPersonId = '99999999999'
+    * def samplePersonId = '07117631634'
+#    * def samplePersonId = '01010101006'
+    * def nonExistingPersonId = '11077941012'
     * def personIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/person\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
     Given url CRISTIN_BASE
@@ -55,7 +56,7 @@ Feature: API tests for Cristin Person fetch
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid query parameter for national identifier, must be a number with 11 digits'
+    And match response.detail == 'Invalid value for national identification number'
 
 
   Scenario: Fetch returns status Bad request when sending illegal query parameter
