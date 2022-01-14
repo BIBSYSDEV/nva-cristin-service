@@ -1,0 +1,79 @@
+package no.unit.nva.cristin.person.handler;
+
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
+import com.amazonaws.services.lambda.runtime.Context;
+import java.net.HttpURLConnection;
+import java.util.Objects;
+import java.util.regex.Pattern;
+import no.unit.nva.cristin.person.client.CristinPersonApiClient;
+import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.TypedValue;
+import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
+
+@JacocoGenerated
+@SuppressWarnings("unused")
+public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
+
+    public static final String NIN_TYPE = "NIN";
+    public static final String NIN_PATTERN = "[0-9]{11}";
+    public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Invalid payload in body";
+
+    private final transient CristinPersonApiClient apiClient;
+
+    @JacocoGenerated
+    public FetchFromIdentityNumberHandler() {
+        this(new Environment());
+    }
+
+    @JacocoGenerated
+    public FetchFromIdentityNumberHandler(Environment environment) {
+        this(new CristinPersonApiClient(), environment);
+    }
+
+    public FetchFromIdentityNumberHandler(CristinPersonApiClient apiClient, Environment environment) {
+        super(TypedValue.class, environment);
+        this.apiClient = apiClient;
+    }
+
+    @Override
+    protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
+        throws ApiGatewayException {
+
+        validateQueryParameters(requestInfo);
+        validateInput(input);
+
+        return apiClient.getPersonFromNationalIdentityNumber(input.getValue());
+    }
+
+    @Override
+    protected Integer getSuccessStatusCode(TypedValue input, Person output) {
+        return HttpURLConnection.HTTP_OK;
+    }
+
+    private void validateQueryParameters(RequestInfo requestInfo) throws BadRequestException {
+        if (!requestInfo.getQueryParameters().keySet().isEmpty()) {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP);
+        }
+    }
+
+    private void validateInput(TypedValue input) throws BadRequestException {
+        if (Objects.nonNull(input)
+            && NIN_TYPE.equals(input.getType())
+            && Objects.nonNull(input.getValue())
+            && isValidNin(input.getValue())) {
+
+            return;
+        }
+        throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
+    }
+
+    private boolean isValidNin(String str) {
+        Pattern pattern = Pattern.compile(NIN_PATTERN);
+        return pattern.matcher(str).matches();
+    }
+}

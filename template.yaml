@@ -192,6 +192,21 @@ Resources:
             Path: /person/{id}
             Method: get
 
+  NvaCristinFetchPersonUsingNinFunction: # TODO: Update OpenAPI
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Events:
+        NvaCristinFetchPersonUsingNinEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/identityNumber/
+            Method: post
+
   NvaCristinAuthorizedQueryPersonFunction:
     Type: AWS::Serverless::Function
     Properties:
