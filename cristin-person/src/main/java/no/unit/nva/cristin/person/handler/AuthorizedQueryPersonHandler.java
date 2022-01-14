@@ -39,7 +39,7 @@ public class AuthorizedQueryPersonHandler extends ApiGatewayHandler<Void, Person
     @Override
     protected Person processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         String identifier = getValidId(requestInfo);
-        Person person = getAuthorizedCristinPersonApiClient().getCristinPerson(identifier).toPerson();
+        Person person = getAuthorizedCristinPersonApiClient().getPersonFromNationalIdentityNumber(identifier);
         if (nonNull(person)) {
             person.setContext(PERSON_CONTEXT);
         }

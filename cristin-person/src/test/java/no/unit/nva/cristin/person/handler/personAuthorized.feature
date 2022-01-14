@@ -15,9 +15,9 @@ Feature: API tests for Cristin Person fetch
 
   Scenario Outline: Fetch returns valid data and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
-    Given path '/person/nin'
-    And param nin = samplePersonId
-    When method GET
+    Given path '/person/identityNumber'
+    And request { type : NationalIdentificationNumber, value : '07117631634' }
+    When method POST
     Then status 200
     And match response == '#object'
     And match response['@context'] == '#present'
@@ -32,15 +32,15 @@ Feature: API tests for Cristin Person fetch
 
   Scenario Outline: Query with unsupported Accept header returns Unsupported Media Type
     * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }
-    Given path '/person/nin'
-    And param nin = samplePersonId
-    When method GET
+    Given path '/person/identityNumber'
+    And request { type : NationalIdentificationNumber, value : '07117631634' }
+    When method POST
     Then status 415
     * def contentType = responseHeaders['Content-Type'][0]
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Unsupported Media Type'
     And match response.status == 415
-    And match response.detail == <UNACCEPTABLE_CONTENT_TYPE> + ' contains no supported Accept header values. Supported values are: application/json; charset=utf-8, application/ld+json'
+    And match response.detail == <UNACCEPTABLE_CONTENT_TYPE> + ' contains no supported Accept header values. Supported values are: application/json; charset=utf-8'
     And match response.requestId == '#notnull'
 
     Examples:
@@ -50,29 +50,29 @@ Feature: API tests for Cristin Person fetch
       | 'application/rdf+xml'     |
 
   Scenario: Fetch returns status Bad request when requesting illegal person identifier
-    Given path '/person/nin'
-    And param nin = illegalIdentifier
-    When method GET
+    Given path '/person/identityNumber'
+    And request { type : NationalIdentificationNumber, value : 'abcdefghij' }
+    When method POST
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid value for national identification number'
+    And match response.detail == 'Invalid payload in body'
 
 
   Scenario: Fetch returns status Bad request when sending illegal query parameter
-    Given path '/person/nin'
-    And param invalidParam = 'someValue'
-    When method GET
+    Given path '/person/identityNumber'
+    And request { type : SwedishIdentificationNumber, value : 'medelsvenson' }
+    When method POST
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Missing from query parameters: nin'
+    And match response.detail == 'Invalid payload in body'
 
   Scenario: Fetch returns status Not found when requesting unknown person identifier
-    Given path '/person/nin'
-    And param nin = nonExistingPersonId
-    When method GET
+    Given path '/person/identityNumber'
+    And request { type : NationalIdentificationNumber, value : '11077941012' }
+    When method POST
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == "The requested resource '" + nonExistingPersonId + "' was not found"
+    And match response.detail == "No match found for supplied payload"

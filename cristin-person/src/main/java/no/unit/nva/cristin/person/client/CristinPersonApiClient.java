@@ -205,13 +205,13 @@ public class CristinPersonApiClient extends ApiClient {
         return asList(getDeserializedResponse(queryResponse, CristinPerson[].class));
     }
 
-    private void throwNotFoundIfNoMatches(List<CristinPerson> cristinPersons) throws NotFoundException {
+    protected void throwNotFoundIfNoMatches(List<CristinPerson> cristinPersons) throws NotFoundException {
         if (Objects.isNull(cristinPersons) || cristinPersons.isEmpty()) {
             throw new NotFoundException(ERROR_MESSAGE_NO_MATCH_FOUND_FOR_SUPPLIED_PAYLOAD);
         }
     }
 
-    private CristinPerson enrichFirstMatchFromQueryResponse(List<CristinPerson> cristinPersons)
+    protected CristinPerson enrichFirstMatchFromQueryResponse(List<CristinPerson> cristinPersons)
         throws ApiGatewayException {
 
         URI fetchUri = extractFirstUriFromListOfCristinPersons(cristinPersons);
