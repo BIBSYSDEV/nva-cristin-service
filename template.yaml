@@ -199,6 +199,7 @@ Resources:
       Handler: no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler::handleRequest
       Runtime: java11
       MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinFetchPersonUsingNinEvent:
           Type: Api
@@ -207,23 +208,23 @@ Resources:
             Path: /person/identityNumber/
             Method: post
 
-  NvaCristinAuthorizedQueryPersonFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.AuthorizedQueryPersonHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
-      Role: !GetAtt ReadCristinAuthenticationRole.Arn
-      Events:
-        NvaCristinFetchPersonEvent:
-          Type: Api
-          Properties:
-            RestApiId: !Ref NvaCristinProxyApi
-            Path: /person/nin/
-            Method: get
-            RequestParameters:
-              - method.request.querystring.nin
+#  NvaCristinAuthorizedQueryPersonFunction:
+#    Type: AWS::Serverless::Function
+#    Properties:
+#      CodeUri: cristin-person
+#      Handler: no.unit.nva.cristin.person.handler.AuthorizedQueryPersonHandler::handleRequest
+#      Runtime: java11
+#      MemorySize: 512
+#      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+#      Events:
+#        NvaCristinFetchPersonEvent:
+#          Type: Api
+#          Properties:
+#            RestApiId: !Ref NvaCristinProxyApi
+#            Path: /person/nin/
+#            Method: get
+#            RequestParameters:
+#              - method.request.querystring.nin
 
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping

@@ -1,10 +1,7 @@
 package no.unit.nva.cristin.person.handler;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
 import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
-import java.util.Objects;
-import java.util.regex.Pattern;
+import no.bekk.bekkopen.person.FodselsnummerValidator;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
@@ -15,13 +12,20 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
+import java.net.HttpURLConnection;
+import java.util.Objects;
+
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
+import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
+
 @JacocoGenerated
 @SuppressWarnings("unused")
 public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
 
     public static final String NIN_TYPE = "NIN";
-    public static final String NIN_PATTERN = "[0-9]{11}";
     public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Invalid payload in body";
+    private static final String READ_NATIONAL_IDENTIFICATION_NUMBER = "READ_NATIONAL_IDENTIFICATION_NUMBER";  // Replace with real AccessRight
+    private static final String ERROR_MESSAGE_NOT_AUTHORIZED = "Not authorized to use National Identification Number";
 
     private final transient CristinPersonApiClient apiClient;
 
@@ -32,7 +36,7 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
 
     @JacocoGenerated
     public FetchFromIdentityNumberHandler(Environment environment) {
-        this(new CristinPersonApiClient(), environment);
+        this(new CristinPersonApiClient(getHttpClient()), environment);
     }
 
     public FetchFromIdentityNumberHandler(CristinPersonApiClient apiClient, Environment environment) {
@@ -44,10 +48,24 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
+        validateAccess(requestInfo);
+
         validateQueryParameters(requestInfo);
         validateInput(input);
 
         return apiClient.getPersonFromNationalIdentityNumber(input.getValue());
+    }
+
+    private void validateAccess(RequestInfo requestInfo) throws BadRequestException {
+        if (!requesterHasAccessToReadNationalIdentificationNumber(requestInfo)) {
+            throw new BadRequestException(ERROR_MESSAGE_NOT_AUTHORIZED);
+
+        }
+    }
+
+    private boolean requesterHasAccessToReadNationalIdentificationNumber(RequestInfo requestInfo) {
+        return true;
+//        return requestInfo.getAccessRights().contains(READ_NATIONAL_IDENTIFICATION_NUMBER);
     }
 
     @Override
@@ -65,15 +83,15 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
         if (Objects.nonNull(input)
             && NIN_TYPE.equals(input.getType())
             && Objects.nonNull(input.getValue())
-            && isValidNin(input.getValue())) {
+            && isValidNationalIdentificationNumber(input.getValue())) {
 
             return;
         }
         throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
     }
 
-    private boolean isValidNin(String str) {
-        Pattern pattern = Pattern.compile(NIN_PATTERN);
-        return pattern.matcher(str).matches();
+    private boolean isValidNationalIdentificationNumber(String nationalIdentificationNumber) {
+        return FodselsnummerValidator.isValid(nationalIdentificationNumber);
     }
+
 }

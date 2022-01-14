@@ -1,5 +1,26 @@
 package no.unit.nva.cristin.person.client;
 
+import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.person.model.cristin.CristinPerson;
+import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.utils.UriUtils;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.attempt.Try;
+import nva.commons.core.paths.UriWrapper;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.common.Utils.isOrcid;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
@@ -14,22 +35,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.utils.UriUtils.PERSON;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static nva.commons.core.attempt.Try.attempt;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import no.unit.nva.cristin.common.client.ApiClient;
-import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.model.cristin.CristinPerson;
-import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.utils.UriUtils;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.attempt.Try;
 
 public class CristinPersonApiClient extends ApiClient {
 
@@ -168,7 +173,7 @@ public class CristinPersonApiClient extends ApiClient {
         return person;
     }
 
-    private CristinPerson getCristinPerson(String identifier) throws ApiGatewayException {
+    protected CristinPerson getCristinPerson(String identifier) throws ApiGatewayException {
         URI uri = getCorrectUriForIdentifier(identifier);
         HttpResponse<String> response = fetchGetResult(uri);
         checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode());

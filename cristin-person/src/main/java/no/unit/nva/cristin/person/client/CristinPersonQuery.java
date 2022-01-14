@@ -19,7 +19,7 @@ public class CristinPersonQuery {
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_DEFAULT_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
-    private static final String CRISTIN_API_PERSONS_PATH = "persons";
+    public static final String CRISTIN_API_PERSONS_PATH = "persons";
     public static final String NIN_PARAM_KEY = "national_id";
 
     private final transient Map<String, String> cristinQueryParameters;
