@@ -65,7 +65,7 @@ public class AuthorizedQueryPersonHandlerTest {
     }
 
     @Test
-    void shouldReturn500BadRequestWhenCallingEndpointWithIllegalNationalIdentifierParameter() throws IOException {
+    void shouldReturn400BadRequestWhenCallingEndpointWithIllegalNationalIdentifierParameter() throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(NIN, ALPHA_NOT_NIN));
         handler.handleRequest(input, output, context);
         GatewayResponse<Person> gatewayResponse = GatewayResponse.fromOutputStream(output);

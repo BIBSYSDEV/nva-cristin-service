@@ -24,7 +24,7 @@ public class AuthorizedQueryPersonHandler extends ApiGatewayHandler<Void, Person
 
     public static final String ERROR_MESSAGE_INVALID_PARAMETER_FOR_PERSON_ID =
             "Invalid value for national identification number";
-    private static final String NationalIdentifierNumber = "nin";
+    private static final String NationalIdentificationNumber = "NationalIdentificationNumber";
 
     @JacocoGenerated
     public AuthorizedQueryPersonHandler() {
@@ -69,7 +69,7 @@ public class AuthorizedQueryPersonHandler extends ApiGatewayHandler<Void, Person
     }
 
     private String getValidId(RequestInfo requestInfo) throws BadRequestException {
-        String nin = requestInfo.getQueryParameter(NationalIdentifierNumber);
+        String nin = requestInfo.getQueryParameter(NationalIdentificationNumber);
         if (isValidIdentifier(nin)) {
             return nin;
         }
