@@ -54,7 +54,7 @@ public class FetchFromIdentityNumberHandlerTest {
         "nvaApiGetPersonResponse.json";
     private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
     private static final String VALID_CRISTIN_NATIONAL_ID_URI = "https://api.cristin-test.uio"
-        + ".no/v2/persons?national_id=07117631634&lang=en,nb,nn";
+        + ".no/v2/persons?national_id=07117631634"; // &lang=en,nb,nn"; No need for language in first fetch
     private static final String URI_FIRST_HIT_FROM_CRISTIN = "https://api.cristin-test.uio"
         + ".no/v2/persons/359084?lang=en,nb,nn";
     public static final Map<String, String> SOME_QUERY_PARAM = Map.of("SomeQueryParam", "SomeValue");
@@ -77,7 +77,7 @@ public class FetchFromIdentityNumberHandlerTest {
         handler = new FetchFromIdentityNumberHandler(apiClient, environment);
     }
 
-//    @Test
+    @Test
     void shouldReturnPersonWhenMockedHttpResponseContainsCristinPerson() throws Exception {
         Person actual = sendQuery(defaultBody(), EMPTY_MAP).getBodyObject(Person.class);
         String expectedString = IoUtils.stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
@@ -87,14 +87,14 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     @Test
-    void typedValueTest() throws IOException, ApiGatewayException {
+    void typedValueTest() throws IOException {
         TypedValue nin = new TypedValue("national", "2342442");
         String s = JsonUtils.dtoObjectMapper.writeValueAsString(nin);
         System.out.println(s);
         assertNotNull(s);
     }
 
-//    @Test
+    @Test
     void shouldProduceCorrectCristinUriFromNationalIdentifier() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
         handler = new FetchFromIdentityNumberHandler(apiClient, environment);
@@ -104,7 +104,7 @@ public class FetchFromIdentityNumberHandlerTest {
         verify(apiClient).fetchGetResult(new UriWrapper(URI_FIRST_HIT_FROM_CRISTIN).getUri());
     }
 
-//    @Test
+    @Test
     void shouldReturnServerErrorWhenBackendAuthenticationNotSentToUpstreamOrNotValid() throws Exception {
         HttpClient clientMock = mock(HttpClient.class);
         when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_STRING, 401));
@@ -152,7 +152,7 @@ public class FetchFromIdentityNumberHandlerTest {
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 
-//    @Test
+    @Test
     void shouldReturnNotFoundWhenNoMatch() throws ApiGatewayException, IOException {
         apiClient = spy(apiClient);
         doReturn(new HttpResponseFaker(EMPTY_ARRAY, 200)).when(apiClient).fetchQueryResults(any(URI.class));

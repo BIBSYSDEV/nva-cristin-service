@@ -65,6 +65,8 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     }
 
     private void validateAccess(RequestInfo requestInfo) throws BadRequestException {
+        logger.info("requestInfo.getAccessRights()={}", requestInfo.getAccessRights());
+        logger.info("requestInfo.getRequestContext()={}", requestInfo.getRequestContext());
         if (!requesterHasAccessToReadNationalIdentificationNumber(requestInfo)) {
             throw new BadRequestException(ERROR_MESSAGE_NOT_AUTHORIZED);
 
