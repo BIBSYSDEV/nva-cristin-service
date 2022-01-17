@@ -10,8 +10,10 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +26,11 @@ import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClie
 @JacocoGenerated
 @SuppressWarnings("unused")
 public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
-    private static final Logger logger = LoggerFactory.getLogger(FetchFromIdentityNumberHandler.class);
-
     public static final String NIN_TYPE = "NationalIdentificationNumber";
     public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Invalid payload in body";
-    private static final String READ_NATIONAL_IDENTIFICATION_NUMBER = "READ_NATIONAL_IDENTIFICATION_NUMBER";  // Replace with real AccessRight
+    private static final Logger logger = LoggerFactory.getLogger(FetchFromIdentityNumberHandler.class);
+    // Replace with real AccessRight:
+    public static final String READ_NATIONAL_IDENTIFICATION_NUMBER = "READ_NATIONAL_IDENTIFICATION_NUMBER";
     private static final String ERROR_MESSAGE_NOT_AUTHORIZED = "Not authorized to use National Identification Number";
 
     private final transient AuthorizedCristinPersonApiClient apiClient;
@@ -51,31 +53,30 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     @SuppressWarnings("PMD.EmptyCatchBlock")
     @Override
     protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         validateAccess(requestInfo);
-
         validateQueryParameters(requestInfo);
-        try {
-            validateInput(input);
-        } catch (JsonProcessingException e) {
-        }
+        validateInput(input);
 
         return apiClient.getPersonFromNationalIdentityNumber(input.getValue());
     }
 
-    private void validateAccess(RequestInfo requestInfo) throws BadRequestException {
+    private void validateAccess(RequestInfo requestInfo) throws ForbiddenException {
+        try {
+            logger.info("requestInfo={}", JsonUtils.singleLineObjectMapper.writeValueAsString(requestInfo));
+        } catch (JsonProcessingException e) {
+            logger.info("error", e);
+        }
         logger.info("requestInfo.getAccessRights()={}", requestInfo.getAccessRights());
         logger.info("requestInfo.getRequestContext()={}", requestInfo.getRequestContext());
         if (!requesterHasAccessToReadNationalIdentificationNumber(requestInfo)) {
-            throw new BadRequestException(ERROR_MESSAGE_NOT_AUTHORIZED);
-
+            throw new ForbiddenException();
         }
     }
 
     private boolean requesterHasAccessToReadNationalIdentificationNumber(RequestInfo requestInfo) {
-        return true;
-//        return requestInfo.getAccessRights().contains(READ_NATIONAL_IDENTIFICATION_NUMBER);
+        return requestInfo.getAccessRights().contains(READ_NATIONAL_IDENTIFICATION_NUMBER);
     }
 
     @Override
@@ -89,11 +90,11 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
         }
     }
 
-    private void validateInput(TypedValue input) throws BadRequestException, JsonProcessingException {
+    private void validateInput(TypedValue input) throws BadRequestException {
         if (Objects.nonNull(input)
-            && NIN_TYPE.equals(input.getType())
-            && Objects.nonNull(input.getValue())
-            && isValidNationalIdentificationNumber(input.getValue())) {
+                && NIN_TYPE.equals(input.getType())
+                && Objects.nonNull(input.getValue())
+                && isValidNationalIdentificationNumber(input.getValue())) {
 
             return;
         }
@@ -101,7 +102,9 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     }
 
     private boolean isValidNationalIdentificationNumber(String nationalIdentificationNumber) {
-        logger.info("isValidNationalIdentificationNumber({})", nationalIdentificationNumber);
+        logger.debug("isValidNationalIdentificationNumber({}) = {}",
+                nationalIdentificationNumber,
+                FodselsnummerValidator.isValid(nationalIdentificationNumber));
         return FodselsnummerValidator.isValid(nationalIdentificationNumber);
     }
 

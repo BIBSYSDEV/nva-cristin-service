@@ -23,6 +23,10 @@ Globals:
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Parameters:
+  CognitoAuthorizerArn:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Reference to Cognito UserPool for the stage
+    Default: CognitoAuthorizerArn
   ApiDomain:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /NVA/ApiDomain
@@ -38,8 +42,8 @@ Parameters:
     AllowedValues:
       - https://api.cristin-test.uio.no/v2
       - https://api.cristin.no/v2
-Resources:
 
+Resources:
   ApiAccessLogGroup:
     Type: AWS::Logs::LogGroup
 
@@ -207,24 +211,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/identityNumber/
             Method: post
-
-#  NvaCristinAuthorizedQueryPersonFunction:
-#    Type: AWS::Serverless::Function
-#    Properties:
-#      CodeUri: cristin-person
-#      Handler: no.unit.nva.cristin.person.handler.AuthorizedQueryPersonHandler::handleRequest
-#      Runtime: java11
-#      MemorySize: 512
-#      Role: !GetAtt ReadCristinAuthenticationRole.Arn
-#      Events:
-#        NvaCristinFetchPersonEvent:
-#          Type: Api
-#          Properties:
-#            RestApiId: !Ref NvaCristinProxyApi
-#            Path: /person/nin/
-#            Method: get
-#            RequestParameters:
-#              - method.request.querystring.nin
 
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping

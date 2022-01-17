@@ -185,10 +185,15 @@ public class CristinPersonApiClient extends ApiClient {
         return isOrcid(identifier) ? CristinPersonQuery.fromOrcid(identifier) : CristinPersonQuery.fromId(identifier);
     }
 
-    // TODO: Add authentication when client authentication is in place
-    public Person getPersonFromNationalIdentityNumber(String identifier) throws ApiGatewayException {
+    /**
+     * Perform a query for Person matching National Identification Number in request body.
+     * @param nationalIdentificationNumber National Identification Number uniquely identifying person
+     * @return Person object with person data from upstream
+     * @throws ApiGatewayException when request fails at some point
+     */
+    public Person getPersonFromNationalIdentityNumber(String nationalIdentificationNumber) throws ApiGatewayException {
         // Upstream uses a query for national id even though it only returns 1 hit
-        List<CristinPerson> cristinPersons = queryUpstreamUsingIdentityNumber(identifier);
+        List<CristinPerson> cristinPersons = queryUpstreamUsingIdentityNumber(nationalIdentificationNumber);
         throwNotFoundIfNoMatches(cristinPersons);
         CristinPerson enrichedCristinPerson = enrichFirstMatchFromQueryResponse(cristinPersons);
         Person person = enrichedCristinPerson.toPerson();

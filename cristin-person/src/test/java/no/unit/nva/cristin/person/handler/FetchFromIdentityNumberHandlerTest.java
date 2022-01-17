@@ -33,6 +33,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERRO
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.NIN_TYPE;
+import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.READ_NATIONAL_IDENTIFICATION_NUMBER;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -72,6 +73,7 @@ public class FetchFromIdentityNumberHandlerTest {
     @BeforeEach
     void setUp() {
         apiClient = new AuthorizedCristinPersonApiClientStub();
+
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new FetchFromIdentityNumberHandler(apiClient, environment);
@@ -174,6 +176,7 @@ public class FetchFromIdentityNumberHandlerTest {
         throws JsonProcessingException {
 
         return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
+            .withAccessRight(READ_NATIONAL_IDENTIFICATION_NUMBER)
             .withBody(body)
             .withQueryParameters(queryParams)
             .build();
@@ -191,6 +194,7 @@ public class FetchFromIdentityNumberHandlerTest {
 
     private InputStream requestWithInvalidPayload() throws JsonProcessingException {
         return new HandlerRequestBuilder<Map<String, String>>(OBJECT_MAPPER)
+            .withAccessRight(READ_NATIONAL_IDENTIFICATION_NUMBER)
             .withBody(INVALID_PAYLOAD)
             .build();
     }

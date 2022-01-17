@@ -64,6 +64,12 @@ public class CristinPersonQuery {
         return addLanguage(uri);
     }
 
+    /**
+     * Creates a URI to Cristin person with National Identification Number.
+     *
+     * @param identifier Cristin person National Identification Number to lookup in Cristin
+     * @return an URI to Cristin person with National Identification Number identifier
+     */
     public static URI fromNationalIdentityNumber(String identifier) {
         URI uri = new UriWrapper(CRISTIN_API_URL)
             .addChild(CRISTIN_API_PERSONS_PATH)

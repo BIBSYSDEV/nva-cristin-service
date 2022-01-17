@@ -386,6 +386,8 @@ paths:
       summary: Query person by national identity number
       description: Returns a single person matching nin query parameter
       operationId: GetPersonByNIN
+      security:
+        - CognitoUserPool: [ ]
       requestBody:
         required: true
         content:
@@ -1086,3 +1088,14 @@ components:
               labels:
                 en: 'Head Engineer'
                 nb: 'Overingeniør'
+  securitySchemes:
+    CognitoUserPool:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: cognito_user_pools
+      x-amazon-apigateway-authorizer:
+        type: cognito_user_pools
+        providerARNs:
+          - Ref:
+              CognitoAuthorizerArn
