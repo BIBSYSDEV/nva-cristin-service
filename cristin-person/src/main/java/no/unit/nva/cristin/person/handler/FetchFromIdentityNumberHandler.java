@@ -2,7 +2,7 @@ package no.unit.nva.cristin.person.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
-import no.unit.nva.cristin.person.client.AuthorizedCristinPersonApiClient;
+import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.utils.AccessUtils;
@@ -12,8 +12,6 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.HttpURLConnection;
 import java.util.Objects;
@@ -22,14 +20,11 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUE
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
 
 @JacocoGenerated
-@SuppressWarnings("unused")
 public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
     public static final String NIN_TYPE = "NationalIdentificationNumber";
     public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Invalid payload in body";
-    private static final Logger logger = LoggerFactory.getLogger(FetchFromIdentityNumberHandler.class);
-    private static final String ERROR_MESSAGE_NOT_AUTHORIZED = "Not authorized to use National Identification Number";
 
-    private final transient AuthorizedCristinPersonApiClient apiClient;
+    private final transient CristinPersonApiClient apiClient;
 
     @JacocoGenerated
     public FetchFromIdentityNumberHandler() {
@@ -38,15 +33,14 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
 
     @JacocoGenerated
     public FetchFromIdentityNumberHandler(Environment environment) {
-        this(new AuthorizedCristinPersonApiClient(getHttpClient()), environment);
+        this(new CristinPersonApiClient(getHttpClient()), environment);
     }
 
-    public FetchFromIdentityNumberHandler(AuthorizedCristinPersonApiClient apiClient, Environment environment) {
+    public FetchFromIdentityNumberHandler(CristinPersonApiClient apiClient, Environment environment) {
         super(TypedValue.class, environment);
         this.apiClient = apiClient;
     }
 
-    @SuppressWarnings("PMD.EmptyCatchBlock")
     @Override
     protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {

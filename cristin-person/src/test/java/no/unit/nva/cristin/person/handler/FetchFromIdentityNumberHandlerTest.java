@@ -3,8 +3,8 @@ package no.unit.nva.cristin.person.handler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
-import no.unit.nva.cristin.person.client.AuthorizedCristinPersonApiClient;
-import no.unit.nva.cristin.person.client.AuthorizedCristinPersonApiClientStub;
+import no.unit.nva.cristin.person.client.CristinPersonApiClient;
+import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
@@ -34,6 +34,7 @@ import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.
 import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.NIN_TYPE;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -53,24 +54,23 @@ public class FetchFromIdentityNumberHandlerTest {
         "nvaApiGetPersonResponse.json";
     private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
     private static final String VALID_CRISTIN_NATIONAL_ID_URI = "https://api.cristin-test.uio"
-        + ".no/v2/persons?national_id=07117631634"; // &lang=en,nb,nn"; No need for language in first fetch
+        + ".no/v2/persons?national_id=07117631634&lang=en,nb,nn";
     private static final String URI_FIRST_HIT_FROM_CRISTIN = "https://api.cristin-test.uio"
         + ".no/v2/persons/359084?lang=en,nb,nn";
     public static final Map<String, String> SOME_QUERY_PARAM = Map.of("SomeQueryParam", "SomeValue");
     public static final String WRONG_TYPE = "WRONGTYPE";
     public static final String WRONG_VALUE = "wrongValue";
     public static final String EMPTY_ARRAY = "[]";
-    private static final String EMPTY_STRING = "";
 
     private final Environment environment = new Environment();
-    private AuthorizedCristinPersonApiClient apiClient;
+    private CristinPersonApiClient apiClient;
     private Context context;
     private ByteArrayOutputStream output;
     private FetchFromIdentityNumberHandler handler;
 
     @BeforeEach
     void setUp() {
-        apiClient = new AuthorizedCristinPersonApiClientStub();
+        apiClient = new CristinPersonApiClientStub();
 
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
@@ -100,7 +100,7 @@ public class FetchFromIdentityNumberHandlerTest {
     void shouldReturnServerErrorWhenBackendAuthenticationNotSentToUpstreamOrNotValid() throws Exception {
         HttpClient clientMock = mock(HttpClient.class);
         when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_STRING, 401));
-        AuthorizedCristinPersonApiClient apiClient = new AuthorizedCristinPersonApiClient(clientMock);
+        CristinPersonApiClient apiClient = new CristinPersonApiClient(clientMock);
         handler = new FetchFromIdentityNumberHandler(apiClient, environment);
         GatewayResponse<Person> gatewayResponse = sendQuery(defaultBody(), EMPTY_MAP);
 
