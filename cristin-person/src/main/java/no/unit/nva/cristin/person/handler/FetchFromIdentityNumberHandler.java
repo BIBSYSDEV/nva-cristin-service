@@ -30,7 +30,7 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Invalid payload in body";
     private static final Logger logger = LoggerFactory.getLogger(FetchFromIdentityNumberHandler.class);
     // Replace with real AccessRight:
-    public static final String READ_NATIONAL_IDENTIFICATION_NUMBER = "READ_NATIONAL_IDENTIFICATION_NUMBER";
+    public static final String EDIT_OWN_INSTITUTION_USERS = "EDIT_OWN_INSTITUTION_USERS";
     private static final String ERROR_MESSAGE_NOT_AUTHORIZED = "Not authorized to use National Identification Number";
 
     private final transient AuthorizedCristinPersonApiClient apiClient;
@@ -76,7 +76,7 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     }
 
     private boolean requesterHasAccessToReadNationalIdentificationNumber(RequestInfo requestInfo) {
-        return requestInfo.getAccessRights().contains(READ_NATIONAL_IDENTIFICATION_NUMBER);
+        return requestInfo.getAccessRights().contains(EDIT_OWN_INSTITUTION_USERS);
     }
 
     @Override
