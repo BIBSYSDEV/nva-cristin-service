@@ -14,9 +14,7 @@ import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.core.JacocoGenerated;
 
-@JacocoGenerated
 public class PostApiClient extends ApiClient {
 
     public static final String APPLICATION_JSON = MediaType.JSON_UTF_8.toString();

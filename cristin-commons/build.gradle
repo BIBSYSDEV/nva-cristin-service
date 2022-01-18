@@ -6,5 +6,4 @@ dependencies {
     implementation libs.aws.sdk.core
     implementation libs.aws.sdk.secrets
 
-    testImplementation project(":cristin-testing")
 }
