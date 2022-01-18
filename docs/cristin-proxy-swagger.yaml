@@ -329,6 +329,56 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+    post:
+      # TODO: Add authentication information
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinCreatePersonFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Create one person
+      description: Creates one person matching supplied payload
+      operationId: PostPerson
+      requestBody:
+        description: Payload containing names and identifier
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonPost'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonPostExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/PersonPost'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonPostExample'
+      responses:
+        201:
+          description: Successful creation of resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonPostResponse'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonPostResponseExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PersonPostResponse'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonPostResponseExample'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
   /person/{id}:
     get:
       x-amazon-apigateway-integration:
@@ -424,12 +474,6 @@ components:
   responses:
     400:
       description: Bad Request
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/Problem'
-    401:
-      description: Unauthorized
       content:
         application/problem+json:
           schema:
@@ -796,6 +840,70 @@ components:
           description: The list of person affiliations
           items:
             $ref: '#/components/schemas/Affiliation'
+    PersonPost:
+      type: object
+      properties:
+        identifiers:
+          type: array
+          required: true
+          description: Identifiers for this person
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'NationalIdentityNumber'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '[0-9]{11}'
+                description: Value of identifier
+        names:
+          type: array
+          required: true
+          description: Names for this person
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'PreferredFirstName|PreferredLastName|FirstName|LastName'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '.+'
+                description: Value of identifier
+    PersonPostResponse:
+      type: object
+      properties:
+        identifiers:
+          type: array
+          description: Identifiers for this person
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'CristinIdentifier'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '\d+'
+                description: Value of identifier
+        names:
+          type: array
+          description: Names for this person
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'PreferredFirstName|PreferredLastName|FirstName|LastName'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '.+'
+                description: Value of identifier
     PersonNIN:
       type: object
       properties:
@@ -1088,6 +1196,37 @@ components:
               labels:
                 en: 'Head Engineer'
                 nb: 'Overingeniør'
+    PersonPostExample:
+      value:
+        identifiers:
+          - type: 'NationalIdentityNumber'
+            value: '12345612345'
+        names:
+          - type: 'PreferredFirstName'
+            value: 'Ola'
+          - type: 'PreferredLastName'
+            value: 'Nordmann'
+          - type: 'FirstName'
+            value: 'Kjell Ola'
+          - type: 'LastName'
+            value: 'Nordmann'
+    PersonPostResponseExample:
+      value:
+        '@context': 'https://example.org/person-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
+        type: 'Person'
+        identifiers:
+          - type: 'CristinIdentifier'
+            value: '359084'
+        names:
+          - type: 'PreferredFirstName'
+            value: 'Ola'
+          - type: 'PreferredLastName'
+            value: 'Nordmann'
+          - type: 'FirstName'
+            value: 'Kjell Ola'
+          - type: 'LastName'
+            value: 'Nordmann'
   securitySchemes:
     CognitoUserPool:
       type: apiKey

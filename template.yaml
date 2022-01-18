@@ -42,8 +42,8 @@ Parameters:
     AllowedValues:
       - https://api.cristin-test.uio.no/v2
       - https://api.cristin.no/v2
-
 Resources:
+
   ApiAccessLogGroup:
     Type: AWS::Logs::LogGroup
 
@@ -210,6 +210,21 @@ Resources:
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/identityNumber/
+            Method: post
+
+  NvaCristinCreatePersonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.handler.CreateCristinPersonHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Events:
+        NvaCristinCreatePersonEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/
             Method: post
 
   NvaCristinProxyBasePathMapping:
