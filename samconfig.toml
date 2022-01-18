@@ -3,8 +3,10 @@ version = 0.1
 [default.deploy]
 [default.deploy.parameters]
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-plnc75nq3gkx"
-s3_prefix = "karate-cristin-service-temp"
+s3_prefix = "cristin-svenn"
 region = "eu-west-1"
 confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
 image_repositories = []
+stack_name = "cristin-svenn"
+parameter_overrides = "CognitoAuthorizerArn=\"CognitoAuthorizerArn\" ApiDomain=\"/NVA/ApiDomain\" CustomDomainBasePath=\"cristin-auth\" CristinApiUrl=\"https://api.cristin-test.uio.no/v2\""
