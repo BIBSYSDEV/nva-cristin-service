@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static no.unit.nva.cristin.common.Utils.distinctByKey;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
@@ -10,19 +11,27 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IDENTIFIERS
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import no.unit.nva.cristin.person.model.cristin.CristinPerson;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonSerializable;
 
 @JacocoGenerated
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
 public class Person implements JsonSerializable {
+
+    @JsonIgnore
+    public static final String NATIONAL_IDENTITY_NUMBER = "NationalIdentityNumber";
 
     @JsonProperty(TYPE)
     private static final String type = "Person";
@@ -127,6 +136,31 @@ public class Person implements JsonSerializable {
 
     public void setNames(Set<TypedValue> names) {
         this.names = names;
+    }
+
+    /**
+     * Converts this object to an appropriate format for POST to Cristin.
+     */
+    public CristinPersonPost toCristinPersonPost() {
+        CristinPersonPost cristinPersonPost = new CristinPersonPost();
+
+        Map<String, String> namesMap = convertTypedValuesToMap(getNames());
+        cristinPersonPost.setFirstName(namesMap.get(CristinPerson.FIRST_NAME));
+        cristinPersonPost.setSurname(namesMap.get(CristinPerson.LAST_NAME));
+        cristinPersonPost.setFirstNamePreferred(namesMap.get(CristinPerson.PREFERRED_FIRST_NAME));
+        cristinPersonPost.setSurnamePreferred(namesMap.get(CristinPerson.PREFERRED_LAST_NAME));
+
+        Map<String, String> identifierMap = convertTypedValuesToMap(getIdentifiers());
+        cristinPersonPost.setNorwegianNationalId(identifierMap.get(NATIONAL_IDENTITY_NUMBER));
+
+        return cristinPersonPost;
+    }
+
+    private Map<String, String> convertTypedValuesToMap(Set<TypedValue> typedValueSet) {
+        return typedValueSet.stream()
+            .filter(TypedValue::hasData)
+            .filter(distinctByKey(TypedValue::getType))
+            .collect(Collectors.toMap(TypedValue::getType, TypedValue::getValue));
     }
 
     @JacocoGenerated
