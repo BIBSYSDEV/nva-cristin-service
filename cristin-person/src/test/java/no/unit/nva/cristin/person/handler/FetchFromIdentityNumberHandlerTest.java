@@ -33,7 +33,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERRO
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.NIN_TYPE;
-import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.EDIT_OWN_INSTITUTION_USERS;
+import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;

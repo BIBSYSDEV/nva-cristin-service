@@ -330,7 +330,6 @@ paths:
         502:
           $ref: '#/components/responses/502'
     post:
-      # TODO: Add authentication information
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinCreatePersonFunction.Arn}/invocations
@@ -341,6 +340,8 @@ paths:
       summary: Create one person
       description: Creates one person matching supplied payload
       operationId: PostPerson
+      security:
+        - CognitoUserPool: [ ]
       requestBody:
         description: Payload containing names and identifier
         required: true
@@ -474,6 +475,12 @@ components:
   responses:
     400:
       description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    401:
+      description: Unauthorized
       content:
         application/problem+json:
           schema:
