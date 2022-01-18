@@ -14,12 +14,11 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
-import static no.unit.nva.cristin.person.client.CristinPersonQuery.CRISTIN_API_PERSONS_PATH;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
+import static no.unit.nva.cristin.person.client.CristinPersonQuery.NIN_PARAM_KEY;
 import static no.unit.nva.utils.UriUtils.PERSON;
 
 public class AuthorizedCristinPersonApiClient extends CristinPersonApiClient {
-
-    public static final String NATIONAL_ID = "national_id";
 
     public AuthorizedCristinPersonApiClient(HttpClient client) {
         super(client);
@@ -28,7 +27,6 @@ public class AuthorizedCristinPersonApiClient extends CristinPersonApiClient {
     public AuthorizedCristinPersonApiClient() {
         super();
     }
-
 
     @Override
     public Person getPersonFromNationalIdentityNumber(String nationalIdentificationNumber) throws ApiGatewayException {
@@ -50,8 +48,8 @@ public class AuthorizedCristinPersonApiClient extends CristinPersonApiClient {
 
     private URI fromNationalIdentificationNumber(String nationalIdentifier) {
         return new UriWrapper(CRISTIN_API_URL)
-                .addChild(CRISTIN_API_PERSONS_PATH)
-                .addQueryParameter(NATIONAL_ID, nationalIdentifier)
+                .addChild(PERSON_PATH)
+                .addQueryParameter(NIN_PARAM_KEY, nationalIdentifier)
                 .getUri();
     }
 }

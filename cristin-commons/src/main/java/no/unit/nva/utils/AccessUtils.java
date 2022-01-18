@@ -12,7 +12,7 @@ public class AccessUtils {
      * @param requestInfo information from request
      * @throws ForbiddenException thrown when user has no access to requested resource
      */
-    public static  void validateAccess(RequestInfo requestInfo) throws ForbiddenException {
+    public static  void validateIdentificationNumberAccess(RequestInfo requestInfo) throws ForbiddenException {
         if (!requesterHasAccessRightToUseNationalIdentificationNumber(requestInfo)) {
             throw new ForbiddenException();
         }

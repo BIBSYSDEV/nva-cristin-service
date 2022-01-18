@@ -196,7 +196,7 @@ Resources:
             Path: /person/{id}
             Method: get
 
-  NvaCristinFetchPersonUsingNinFunction: # TODO: Update OpenAPI
+  NvaCristinFetchPersonUsingNinFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person

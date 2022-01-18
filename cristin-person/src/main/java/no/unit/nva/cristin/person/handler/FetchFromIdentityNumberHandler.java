@@ -51,7 +51,7 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 
-        AccessUtils.validateAccess(requestInfo);
+        AccessUtils.validateIdentificationNumberAccess(requestInfo);
         validateQueryParameters(requestInfo);
         validateInput(input);
 
@@ -81,9 +81,6 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     }
 
     private boolean isValidNationalIdentificationNumber(String nationalIdentificationNumber) {
-        logger.debug("isValidNationalIdentificationNumber({}) = {}",
-                nationalIdentificationNumber,
-                FodselsnummerValidator.isValid(nationalIdentificationNumber));
         return FodselsnummerValidator.isValid(nationalIdentificationNumber);
     }
 

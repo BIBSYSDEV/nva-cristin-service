@@ -48,7 +48,7 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
 
     @Override
     protected Person processInput(Person input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        AccessUtils.validateAccess(requestInfo);
+        AccessUtils.validateIdentificationNumberAccess(requestInfo);
 
         Optional<TypedValue> nationalIdentityNumber = extractNationalIdentityNumber(input);
 

@@ -12,7 +12,6 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
-import nva.commons.core.JsonUtils;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +38,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -86,14 +84,6 @@ public class FetchFromIdentityNumberHandlerTest {
         Person expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
 
         assertThat(actual, equalTo(expected));
-    }
-
-    @Test
-    void typedValueTest() throws IOException {
-        TypedValue nin = new TypedValue("national", "2342442");
-        String s = JsonUtils.dtoObjectMapper.writeValueAsString(nin);
-        System.out.println(s);
-        assertNotNull(s);
     }
 
     @Test
