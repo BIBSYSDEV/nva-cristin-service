@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.institution.fetch;
 
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -37,7 +38,8 @@ public class FetchPersonInstitutionInfoClient extends ApiClient {
      * Fetches Cristin data from upstream into response object serialized to client.
      */
     public PersonInstitutionInfo generateGetResponse(String personId, String institutionId) throws ApiGatewayException {
-        return fetchCristinData(personId, institutionId).toPersonInstitutionInfo();
+        URI id = generateIdUri(personId, institutionId);
+        return fetchCristinData(personId, institutionId).toPersonInstitutionInfo(id);
     }
 
     private CristinPersonInstitutionInfo fetchCristinData(String personId, String orgId)
@@ -59,7 +61,7 @@ public class FetchPersonInstitutionInfoClient extends ApiClient {
     }
 
     private URI generateIdUri(String personId, String orgId) {
-        return new UriWrapper(HTTPS, DOMAIN_NAME)
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH)
             .addChild(PERSON_PATH_NVA).addChild(personId)
             .addChild(ORGANIZATION_PATH).addChild(orgId)
             .getUri();

@@ -1,6 +1,11 @@
 package no.unit.nva.cristin.person.institution.fetch;
 
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.INVALID_ORGANIZATION_ID;
 import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.INVALID_PERSON_ID;
 import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.ORG_ID;
@@ -32,6 +37,7 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
+import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,8 +50,9 @@ public class FetchPersonInstitutionInfoHandlerTest {
     private static final String EXPECTED_CRISTIN_URI =
         "https://api.cristin-test.uio.no/v2/persons/12345/institutions/185";
     private static final String INVALID_PATH_PARAM = "abcdef";
-    public static final String DUMMY_EMAIL = "email@example.org";
-    public static final String DUMMY_PHONE = "+4799112233";
+    private static final String DUMMY_EMAIL = "email@example.org";
+    private static final String DUMMY_PHONE = "+4799112233";
+    private static final URI EXPECTED_ID_URI = getExpectedId();
 
     private final HttpClient clientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -78,7 +85,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
             sendQuery(null, Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID));
 
         PersonInstitutionInfo actual = gatewayResponse.getBodyObject(PersonInstitutionInfo.class);
-        PersonInstitutionInfo expected = cristinInfo.toPersonInstitutionInfo();
+        PersonInstitutionInfo expected = cristinInfo.toPersonInstitutionInfo(EXPECTED_ID_URI);
 
         assertThat(actual, equalTo(expected));
     }
@@ -161,5 +168,12 @@ public class FetchPersonInstitutionInfoHandlerTest {
             .withQueryParameters(queryParams)
             .withPathParameters(pathParams)
             .build();
+    }
+
+    private static URI getExpectedId() {
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH)
+            .addChild(PERSON_PATH_NVA).addChild(VALID_PERSON_ID)
+            .addChild(ORGANIZATION_PATH).addChild(VALID_INSTITUTION_ID)
+            .getUri();
     }
 }
