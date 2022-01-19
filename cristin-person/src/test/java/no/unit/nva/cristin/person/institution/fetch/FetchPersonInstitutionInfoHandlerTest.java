@@ -10,6 +10,7 @@ import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutio
 import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.INVALID_PERSON_ID;
 import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.ORG_ID;
 import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.PERSON_ID;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -50,8 +51,6 @@ public class FetchPersonInstitutionInfoHandlerTest {
     private static final String EXPECTED_CRISTIN_URI =
         "https://api.cristin-test.uio.no/v2/persons/12345/institutions/185";
     private static final String INVALID_PATH_PARAM = "abcdef";
-    private static final String DUMMY_EMAIL = "email@example.org";
-    private static final String DUMMY_PHONE = "+4799112233";
     private static final URI EXPECTED_ID_URI = getExpectedId();
 
     private final HttpClient clientMock = mock(HttpClient.class);
@@ -71,10 +70,12 @@ public class FetchPersonInstitutionInfoHandlerTest {
     }
 
     @Test
-    void shouldReturnCorrectDataWhenGeneratingResponse() throws IOException, InterruptedException {
+    void shouldReturnCristinResponseMappedToNvaFormatWhenCallingEndpointWithValidParams()
+        throws IOException, InterruptedException {
+
         CristinPersonInstitutionInfo cristinInfo = new CristinPersonInstitutionInfo();
-        cristinInfo.setEmail(DUMMY_EMAIL);
-        cristinInfo.setPhone(DUMMY_PHONE);
+        cristinInfo.setEmail(randomString());
+        cristinInfo.setPhone(randomString());
         String responseBody = OBJECT_MAPPER.writeValueAsString(cristinInfo);
 
         when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseBody, 200));
