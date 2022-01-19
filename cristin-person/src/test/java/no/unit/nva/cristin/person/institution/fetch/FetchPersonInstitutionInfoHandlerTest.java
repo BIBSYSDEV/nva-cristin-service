@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutio
 import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.PERSON_ID;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.Map;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonInstitutionInfo;
 import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -42,6 +44,10 @@ public class FetchPersonInstitutionInfoHandlerTest {
     private static final String EXPECTED_CRISTIN_URI =
         "https://api.cristin-test.uio.no/v2/persons/12345/institutions/185";
     private static final String INVALID_PATH_PARAM = "abcdef";
+    public static final String DUMMY_EMAIL = "email@example.org";
+    public static final String DUMMY_PHONE = "+4799112233";
+
+    private final HttpClient clientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
     private FetchPersonInstitutionInfoClient apiClient;
     private Context context;
@@ -50,12 +56,31 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
-        HttpClient clientMock = mock(HttpClient.class);
         when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 200));
         apiClient = new FetchPersonInstitutionInfoClient(clientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new FetchPersonInstitutionInfoHandler(apiClient, environment);
+    }
+
+    @Test
+    void shouldReturnCorrectDataWhenGeneratingResponse() throws IOException, InterruptedException {
+        CristinPersonInstitutionInfo cristinInfo = new CristinPersonInstitutionInfo();
+        cristinInfo.setEmail(DUMMY_EMAIL);
+        cristinInfo.setPhone(DUMMY_PHONE);
+        String responseBody = OBJECT_MAPPER.writeValueAsString(cristinInfo);
+
+        when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseBody, 200));
+        apiClient = new FetchPersonInstitutionInfoClient(clientMock);
+        handler = new FetchPersonInstitutionInfoHandler(apiClient, environment);
+
+        GatewayResponse<PersonInstitutionInfo> gatewayResponse =
+            sendQuery(null, Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID));
+
+        PersonInstitutionInfo actual = gatewayResponse.getBodyObject(PersonInstitutionInfo.class);
+        PersonInstitutionInfo expected = cristinInfo.toPersonInstitutionInfo();
+
+        assertThat(actual, equalTo(expected));
     }
 
     @Test
