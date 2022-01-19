@@ -27,10 +27,10 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.NIN_TYPE;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
