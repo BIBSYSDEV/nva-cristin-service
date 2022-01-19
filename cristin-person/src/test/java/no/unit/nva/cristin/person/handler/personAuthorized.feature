@@ -6,16 +6,17 @@ Feature: API tests for Cristin Person fetch
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     * def illegalIdentifier = 'illegalIdentifier'
     * def samplePersonId = '07117631634'
-#    * def samplePersonId = '01010101006'
     * def nonExistingPersonId = '11077941012'
     * def personIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/person\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
+    * def token = 'just-a-invalid-token-for-now'
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
 
   Scenario Outline: Fetch returns valid data and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
     Given path '/person/identityNumber'
+    * header Authorization = 'Bearer ' + token
     And request { type : NationalIdentificationNumber, value : '07117631634' }
     When method POST
     Then status 200
@@ -32,6 +33,7 @@ Feature: API tests for Cristin Person fetch
 
   Scenario Outline: Query with unsupported Accept header returns Unsupported Media Type
     * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }
+    * header Authorization = 'Bearer ' + token
     Given path '/person/identityNumber'
     And request { type : NationalIdentificationNumber, value : '07117631634' }
     When method POST
@@ -51,6 +53,7 @@ Feature: API tests for Cristin Person fetch
 
   Scenario: Fetch returns status Bad request when requesting illegal person identifier
     Given path '/person/identityNumber'
+    * header Authorization = 'Bearer ' + token
     And request { type : NationalIdentificationNumber, value : 'abcdefghij' }
     When method POST
     Then status 400
@@ -61,6 +64,7 @@ Feature: API tests for Cristin Person fetch
 
   Scenario: Fetch returns status Bad request when sending illegal query parameter
     Given path '/person/identityNumber'
+    * header Authorization = 'Bearer ' + token
     And request { type : SwedishIdentificationNumber, value : 'medelsvenson' }
     When method POST
     Then status 400
@@ -70,6 +74,7 @@ Feature: API tests for Cristin Person fetch
 
   Scenario: Fetch returns status Not found when requesting unknown person identifier
     Given path '/person/identityNumber'
+    * header Authorization = 'Bearer ' + token
     And request { type : NationalIdentificationNumber, value : '11077941012' }
     When method POST
     Then status 404

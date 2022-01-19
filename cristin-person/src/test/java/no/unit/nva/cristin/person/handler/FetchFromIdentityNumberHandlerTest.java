@@ -48,20 +48,19 @@ import static org.mockito.Mockito.when;
 
 public class FetchFromIdentityNumberHandlerTest {
 
-    private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
     public static final Map<String, String> INVALID_PAYLOAD = Map.of("SomeKey", "SomeValue");
-    private static final String NVA_API_GET_PERSON_RESPONSE_JSON =
-        "nvaApiGetPersonResponse.json";
-    private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
-    private static final String VALID_CRISTIN_NATIONAL_ID_URI = "https://api.cristin-test.uio"
-        + ".no/v2/persons?national_id=07117631634&lang=en,nb,nn";
-    private static final String URI_FIRST_HIT_FROM_CRISTIN = "https://api.cristin-test.uio"
-        + ".no/v2/persons/359084?lang=en,nb,nn";
     public static final Map<String, String> SOME_QUERY_PARAM = Map.of("SomeQueryParam", "SomeValue");
     public static final String WRONG_TYPE = "WRONGTYPE";
     public static final String WRONG_VALUE = "wrongValue";
     public static final String EMPTY_ARRAY = "[]";
-
+    private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
+    private static final String NVA_API_GET_PERSON_RESPONSE_JSON =
+            "nvaApiGetPersonResponse.json";
+    private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
+    private static final String VALID_CRISTIN_NATIONAL_ID_URI = "https://api.cristin-test.uio"
+            + ".no/v2/persons?national_id=07117631634&lang=en,nb,nn";
+    private static final String URI_FIRST_HIT_FROM_CRISTIN = "https://api.cristin-test.uio"
+            + ".no/v2/persons/359084?lang=en,nb,nn";
     private final Environment environment = new Environment();
     private CristinPersonApiClient apiClient;
     private Context context;
@@ -128,16 +127,19 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenInvalidTypeOrValueSpecified() throws Exception {
+    void shouldReturnBadRequestWhenInvalidTypeSpecified() throws Exception {
         TypedValue invalidType = new TypedValue(WRONG_TYPE, DEFAULT_IDENTITY_NUMBER);
         GatewayResponse<Person> gatewayResponse = sendQuery(invalidType, EMPTY_MAP);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PAYLOAD));
+    }
 
+    @Test
+    void shouldReturnBadRequestWhenInvalidValueSpecified() throws Exception {
         TypedValue invalidValue = new TypedValue(NIN_TYPE, WRONG_VALUE);
-        gatewayResponse = sendQuery(invalidValue, EMPTY_MAP);
+        GatewayResponse<Person> gatewayResponse = sendQuery(invalidValue, EMPTY_MAP);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -155,7 +157,7 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     private GatewayResponse<Person> sendQuery(TypedValue body, Map<String, String> queryParams)
-        throws IOException {
+            throws IOException {
 
         InputStream input = requestWithParams(body, queryParams);
         handler.handleRequest(input, output, context);
@@ -163,13 +165,13 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     private InputStream requestWithParams(TypedValue body, Map<String, String> queryParams)
-        throws JsonProcessingException {
+            throws JsonProcessingException {
 
         return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
-            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
-            .withBody(body)
-            .withQueryParameters(queryParams)
-            .build();
+                .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
+                .withBody(body)
+                .withQueryParameters(queryParams)
+                .build();
     }
 
     private TypedValue defaultBody() {
@@ -184,8 +186,8 @@ public class FetchFromIdentityNumberHandlerTest {
 
     private InputStream requestWithInvalidPayload() throws JsonProcessingException {
         return new HandlerRequestBuilder<Map<String, String>>(OBJECT_MAPPER)
-            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
-            .withBody(INVALID_PAYLOAD)
-            .build();
+                .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
+                .withBody(INVALID_PAYLOAD)
+                .build();
     }
 }
