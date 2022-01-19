@@ -86,7 +86,7 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     @Test
-    void shouldProduceCorrectCristinUriFromNationalIdentifier() throws IOException, ApiGatewayException {
+    void shouldProduceCristinUriWithCristinIdFromNationalIdentifier() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
         handler = new FetchFromIdentityNumberHandler(apiClient, environment);
         sendQuery(defaultBody(), EMPTY_MAP);
