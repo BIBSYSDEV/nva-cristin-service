@@ -2,6 +2,7 @@ package no.unit.nva.cristin.person.model.cristin;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.net.URI;
 import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
 import nva.commons.core.JacocoGenerated;
 
@@ -29,7 +30,7 @@ public class CristinPersonInstitutionInfo {
         this.phone = phone;
     }
 
-    public PersonInstitutionInfo toPersonInstitutionInfo() {
-        return new PersonInstitutionInfo(getEmail(), getPhone());
+    public PersonInstitutionInfo toPersonInstitutionInfo(URI id) {
+        return new PersonInstitutionInfo(id, getEmail(), getPhone());
     }
 }
