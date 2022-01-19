@@ -16,13 +16,13 @@ import nva.commons.core.JacocoGenerated;
 import java.net.HttpURLConnection;
 import java.util.Objects;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
 
 @JacocoGenerated
 public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
     public static final String NIN_TYPE = "NationalIdentificationNumber";
-    public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Invalid payload in body";
 
     private final transient CristinPersonApiClient apiClient;
 
