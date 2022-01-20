@@ -1,26 +1,8 @@
 package no.unit.nva.cristin.person.handler;
 
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.person.handler.CreateCristinPersonHandler.DUMMY_FIRST_NAME;
-import static no.unit.nva.cristin.person.handler.CreateCristinPersonHandler.DUMMY_NATIONAL_IDENTITY_NUMBER;
-import static no.unit.nva.cristin.person.handler.CreateCristinPersonHandler.INVALID_PAYLOAD;
-import static no.unit.nva.cristin.person.handler.CreateCristinPersonHandler.NATIONAL_IDENTITY_NUMBER;
-import static no.unit.nva.cristin.person.model.cristin.CristinPerson.FIRST_NAME;
-import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.util.Map;
-import java.util.Set;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -28,6 +10,27 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.util.Map;
+import java.util.Set;
+
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.person.handler.CreateCristinPersonHandler.DUMMY_FIRST_NAME;
+import static no.unit.nva.cristin.person.handler.CreateCristinPersonHandler.DUMMY_NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.cristin.person.handler.CreateCristinPersonHandler.INVALID_PAYLOAD;
+import static no.unit.nva.cristin.person.handler.CreateCristinPersonHandler.NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.cristin.person.model.cristin.CristinPerson.FIRST_NAME;
+import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class CreateCristinPersonHandlerTest {
 
@@ -83,6 +86,7 @@ public class CreateCristinPersonHandlerTest {
 
         return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
             .withBody(body)
+            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
             .withQueryParameters(queryParams)
             .build();
     }

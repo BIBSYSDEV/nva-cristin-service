@@ -1,20 +1,22 @@
 package no.unit.nva.cristin.person.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
+import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+
+import java.net.HttpURLConnection;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
 public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person> {
@@ -46,6 +48,8 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
 
     @Override
     protected Person processInput(Person input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        AccessUtils.validateIdentificationNumberAccess(requestInfo);
+
         Optional<TypedValue> nationalIdentityNumber = extractNationalIdentityNumber(input);
 
         if (nationalIdentityNumber.isPresent() && isValid(nationalIdentityNumber.get())) {

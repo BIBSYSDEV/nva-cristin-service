@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 
@@ -19,7 +20,7 @@ public class CristinPersonQuery {
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_DEFAULT_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
-    private static final String CRISTIN_API_PERSONS_PATH = "persons";
+    public static final String NIN_PARAM_KEY = "national_id";
 
     private final transient Map<String, String> cristinQueryParameters;
 
@@ -43,7 +44,7 @@ public class CristinPersonQuery {
      * @return an URI to Cristin person with identifier
      */
     public static URI fromId(String identifier) {
-        return addLanguage(getCristinUri(identifier, CRISTIN_API_PERSONS_PATH));
+        return addLanguage(getCristinUri(identifier, PERSON_PATH));
     }
 
     /**
@@ -56,8 +57,23 @@ public class CristinPersonQuery {
         String identifier = String.format("ORCID:%s", orcid);
 
         URI uri = new UriWrapper(CRISTIN_API_URL)
-            .addChild(CRISTIN_API_PERSONS_PATH)
+            .addChild(PERSON_PATH)
             .addChild(identifier)
+            .getUri();
+
+        return addLanguage(uri);
+    }
+
+    /**
+     * Creates a URI to Cristin person with National Identification Number.
+     *
+     * @param identifier Cristin person National Identification Number to lookup in Cristin
+     * @return an URI to Cristin person with National Identification Number identifier
+     */
+    public static URI fromNationalIdentityNumber(String identifier) {
+        URI uri = new UriWrapper(CRISTIN_API_URL)
+            .addChild(PERSON_PATH)
+            .addQueryParameter(NIN_PARAM_KEY, identifier)
             .getUri();
 
         return addLanguage(uri);
@@ -85,7 +101,7 @@ public class CristinPersonQuery {
      */
     public URI toURI() {
         URI uri = new UriWrapper(CRISTIN_API_URL)
-            .addChild(CRISTIN_API_PERSONS_PATH)
+            .addChild(PERSON_PATH)
             .addQueryParameters(cristinQueryParameters)
             .getUri();
 
