@@ -19,6 +19,7 @@ import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthRequest;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.AdminSetUserPasswordRequest;
 import com.amazonaws.services.cognitoidp.model.AdminUpdateUserAttributesRequest;
+import com.amazonaws.services.cognitoidp.model.AdminUpdateUserAttributesResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.AuthFlowType;
 import com.amazonaws.services.cognitoidp.model.MessageActionType;
@@ -38,7 +39,12 @@ public class CognitoHelper {
     private final String region;
     private final AWSCognitoIdentityProvider cognitoIdentityProvider;
 
-
+    /**
+     * Create a CognitoHelper to help create a id_token to access services in API-gateway.
+     * @param userPoolId id of the userpool
+     * @param clientAppId clientapp secret from cognito
+     * @param region AWS region userpool is created in
+     */
     public CognitoHelper(String userPoolId, String clientAppId, String region) {
         this.userPoolId = userPoolId;
         this.clientAppId = clientAppId;
@@ -55,12 +61,12 @@ public class CognitoHelper {
     }
 
     /**
-     * Sign up the user to the user pool
+     * Create user in the user to the user pool.
      *
      * @param feideId     User name for the sign up
      * @param password    Password for the sign up
-     * @param accessRight
-     * @return whether the call was successful or not.
+     * @param accessRight String containing wanted accessRights in token
+     * @return token to access API-gateway.
      */
     public String createUser(String feideId, String password, String accessRight) {
 
@@ -94,7 +100,13 @@ public class CognitoHelper {
         }
     }
 
-    public void updateUserAttributes(String feideId) {
+    /**
+     * Update user accessRights attributes.
+     *
+     * @param feideId user identifier
+     * @return result of operation
+     */
+    public AdminUpdateUserAttributesResult updateUserAttributes(String feideId) {
         List<AttributeType> list = List.of(
                 new AttributeType()
                         .withName("custom:accessRights")
@@ -104,44 +116,47 @@ public class CognitoHelper {
                 .withUserPoolId(getPoolId())
                 .withUsername(feideId)
                 .withUserAttributes(list);
-        cognitoIdentityProvider.adminUpdateUserAttributes(adminUpdateUserAttributesRequest);
+        return cognitoIdentityProvider.adminUpdateUserAttributes(adminUpdateUserAttributesRequest);
     }
 
-
-    public boolean deleteUser(String feideId) {
+    /**
+     * Delete a user in Cognito userpool.
+     *
+     * @param feideId string identifying user in userpool
+     * @return result of operation
+     */
+    public AdminDeleteUserResult deleteUser(String feideId) {
         AdminDeleteUserRequest deleteUserRequest = new AdminDeleteUserRequest()
                 .withUserPoolId(getPoolId())
                 .withUsername(feideId);
-
-        AdminDeleteUserResult adminDeleteUserResult = getCognitoIdentityProvider().adminDeleteUser(deleteUserRequest);
-        return adminDeleteUserResult != null;
+        return getCognitoIdentityProvider().adminDeleteUser(deleteUserRequest);
     }
 
+    /**
+     * Sign the user in (login) to userpool.
+     *
+     * @param username username
+     * @param password password
+     * @return result of operation containing credentials and tokens
+     */
+    public AdminInitiateAuthResult loginUser(String username, String password) {
 
-    public AdminInitiateAuthResult signInUserToAWSCognitoPool(String username, String password) {
-        try {
-
-            final Map<String, String> authParams = Map.of("USERNAME", username, "PASSWORD", password);
-            final AdminInitiateAuthRequest initiateAuthRequest = new AdminInitiateAuthRequest()
-                    .withUserPoolId(getPoolId())
-                    .withClientId(getClientId())
-                    .withAuthFlow(AuthFlowType.ADMIN_USER_PASSWORD_AUTH)
-                    .withAuthParameters(authParams);
-
-            return cognitoIdentityProvider.adminInitiateAuth(initiateAuthRequest);
-        } catch (Exception e) {
-            System.out.println("Exception occured during sign up user : " + e);
-            return null;
-        }
+        final Map<String, String> authParams = Map.of("USERNAME", username, "PASSWORD", password);
+        final AdminInitiateAuthRequest initiateAuthRequest = new AdminInitiateAuthRequest()
+                .withUserPoolId(getPoolId())
+                .withClientId(getClientId())
+                .withAuthFlow(AuthFlowType.ADMIN_USER_PASSWORD_AUTH)
+                .withAuthParameters(authParams);
+        return cognitoIdentityProvider.adminInitiateAuth(initiateAuthRequest);
     }
+
     private AWSCognitoIdentityProvider getCognitoIdentityProvider() {
         AWSCredentials awsCreds = new DefaultAWSCredentialsProviderChain().getCredentials();
-        AWSCognitoIdentityProvider cognitoIdentityProvider = AWSCognitoIdentityProviderClientBuilder
+        return AWSCognitoIdentityProviderClientBuilder
                 .standard()
                 .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                 .withRegion(Regions.fromName(region))
                 .build();
-        return cognitoIdentityProvider;
     }
 
 }
