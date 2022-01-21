@@ -1,19 +1,14 @@
 package no.unit.nva.cristin.person.model.nva;
 
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.EMAIL;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PHONE;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.util.Objects;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonSerializable;
 
 @JacocoGenerated
-@JsonPropertyOrder({CONTEXT, ID, EMAIL, PHONE})
 public class PersonInstitutionInfo implements JsonSerializable {
 
     @JsonProperty(CONTEXT)
