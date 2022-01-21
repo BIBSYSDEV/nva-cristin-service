@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CreateTokenTest {
 
     public static final String REGION = "eu-west-1";
-    private final String USER_POOL_ID = "eu-west-1_DNRmDPtxY";
-    private final String CLIENT_APP_ID = "4qfhv3kl9qcr2knsfb8lhu1u40";
+    private static final String USER_POOL_ID = "eu-west-1_DNRmDPtxY";
+    private static final String CLIENT_APP_ID = "4qfhv3kl9qcr2knsfb8lhu1u40";
 
     @Test
     void shouldCreateAndDeleteUserShowToken() {
@@ -23,19 +23,14 @@ public class CreateTokenTest {
 
         String cognitoUserId = cognitoHelper.createUser(feideId, password, "EDIT_OWN_INSTITUTION_USERS,READ_DOI_REQUEST");
         assertNotNull(cognitoUserId);
-        System.out.println("cognitoUserId=" + cognitoUserId);
 
-
-//        cognitoHelper.updateUserAttributes(feideId);
+        cognitoHelper.updateUserAttributes(feideId);
 
         AdminInitiateAuthResult loginResult = cognitoHelper.signInUserToAWSCognitoPool(feideId, password);
         assertNotNull(loginResult);
 
-        String token  = loginResult.getAuthenticationResult().getIdToken();
+        String token = loginResult.getAuthenticationResult().getIdToken();
         assertNotNull(token);
-        System.out.println("-----id_token-------");
-        System.out.println(token);
-        System.out.println("---------------------");
 
         boolean deleted = cognitoHelper.deleteUser(feideId);
         assertTrue(deleted);

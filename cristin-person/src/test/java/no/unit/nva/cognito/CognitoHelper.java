@@ -46,24 +46,23 @@ public class CognitoHelper {
         cognitoIdentityProvider = getCognitoIdentityProvider();
     }
 
-    public String getPoolId() {
+    private String getPoolId() {
         return userPoolId;
     }
 
-    public String getClientId() {
+    private String getClientId() {
         return clientAppId;
     }
 
     /**
      * Sign up the user to the user pool
      *
-     * @param feideId    User name for the sign up
+     * @param feideId     User name for the sign up
      * @param password    Password for the sign up
      * @param accessRight
      * @return whether the call was successful or not.
      */
     public String createUser(String feideId, String password, String accessRight) {
-
 
         AdminCreateUserRequest createUserRequest = new AdminCreateUserRequest();
         createUserRequest.setUserPoolId(getPoolId());
@@ -76,7 +75,6 @@ public class CognitoHelper {
         list.add(new AttributeType().withName("custom:application").withValue("NVA"));
         list.add(new AttributeType().withName("custom:applicationRoles").withValue("Institution-admin"));
         list.add(new AttributeType().withName("custom:accessRights").withValue(accessRight));
-
 
         createUserRequest.setUserAttributes(list);
         createUserRequest.setMessageAction(MessageActionType.SUPPRESS);
@@ -91,15 +89,16 @@ public class CognitoHelper {
             cognitoIdentityProvider.adminSetUserPassword(adminSetUserPasswordRequest);
             return result.getUser().getUsername();
         } catch (Exception e) {
+            System.out.println(e);
             return null;
         }
     }
 
     public void updateUserAttributes(String feideId) {
-
-//        AWSCognitoIdentityProvider cognitoIdentityProvider = getCognitoIdentityProvider();
-
-        List<AttributeType> list = List.of(new AttributeType().withName("custom:accessRights").withValue("EDIT_OWN_INSTITUTION_USERS,READ_DOI_REQUEST"));
+        List<AttributeType> list = List.of(
+                new AttributeType()
+                        .withName("custom:accessRights")
+                        .withValue("EDIT_OWN_INSTITUTION_USERS,READ_DOI_REQUEST"));
 
         AdminUpdateUserAttributesRequest adminUpdateUserAttributesRequest = new AdminUpdateUserAttributesRequest()
                 .withUserPoolId(getPoolId())
@@ -109,34 +108,18 @@ public class CognitoHelper {
     }
 
 
-
     public boolean deleteUser(String feideId) {
-
-        AWSCognitoIdentityProvider cognitoIdentityProvider = getCognitoIdentityProvider();
-
         AdminDeleteUserRequest deleteUserRequest = new AdminDeleteUserRequest()
                 .withUserPoolId(getPoolId())
                 .withUsername(feideId);
 
-        AdminDeleteUserResult adminDeleteUserResult = cognitoIdentityProvider.adminDeleteUser(deleteUserRequest);
+        AdminDeleteUserResult adminDeleteUserResult = getCognitoIdentityProvider().adminDeleteUser(deleteUserRequest);
         return adminDeleteUserResult != null;
-    }
-
-    private AWSCognitoIdentityProvider getCognitoIdentityProvider() {
-        AWSCredentials awsCreds = new DefaultAWSCredentialsProviderChain().getCredentials();
-        AWSCognitoIdentityProvider cognitoIdentityProvider = AWSCognitoIdentityProviderClientBuilder
-                .standard()
-                .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
-                .withRegion(Regions.fromName(region))
-                .build();
-        return cognitoIdentityProvider;
     }
 
 
     public AdminInitiateAuthResult signInUserToAWSCognitoPool(String username, String password) {
-
         try {
-//            AWSCognitoIdentityProvider cognitoIdentityProvider = getCognitoIdentityProvider();
 
             final Map<String, String> authParams = Map.of("USERNAME", username, "PASSWORD", password);
             final AdminInitiateAuthRequest initiateAuthRequest = new AdminInitiateAuthRequest()
@@ -146,10 +129,19 @@ public class CognitoHelper {
                     .withAuthParameters(authParams);
 
             return cognitoIdentityProvider.adminInitiateAuth(initiateAuthRequest);
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("Exception occured during sign up user : " + e);
             return null;
         }
+    }
+    private AWSCognitoIdentityProvider getCognitoIdentityProvider() {
+        AWSCredentials awsCreds = new DefaultAWSCredentialsProviderChain().getCredentials();
+        AWSCognitoIdentityProvider cognitoIdentityProvider = AWSCognitoIdentityProviderClientBuilder
+                .standard()
+                .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+                .withRegion(Regions.fromName(region))
+                .build();
+        return cognitoIdentityProvider;
     }
 
 }
