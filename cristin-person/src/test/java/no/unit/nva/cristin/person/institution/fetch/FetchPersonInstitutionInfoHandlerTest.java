@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.institution.fetch;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -70,7 +71,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
     }
 
     @Test
-    void shouldReturnCristinResponseMappedToNvaFormatWhenCallingEndpointWithValidParams()
+    void shouldReturnPersonInstitutionInfoWhenCallingEndpointWithValidPersonAndInstitutionIdentifiers()
         throws IOException, InterruptedException {
 
         CristinPersonInstitutionInfo cristinInfo = new CristinPersonInstitutionInfo();
@@ -83,7 +84,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
         handler = new FetchPersonInstitutionInfoHandler(apiClient, environment);
 
         GatewayResponse<PersonInstitutionInfo> gatewayResponse =
-            sendQuery(null, Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID));
+            sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID));
 
         PersonInstitutionInfo actual = gatewayResponse.getBodyObject(PersonInstitutionInfo.class);
         PersonInstitutionInfo expected = cristinInfo.toPersonInstitutionInfo(EXPECTED_ID_URI);
@@ -95,7 +96,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
     void shouldGenerateCorrectCristinUriFromPathParams() throws ApiGatewayException, IOException {
         apiClient = spy(apiClient);
         handler = new FetchPersonInstitutionInfoHandler(apiClient, environment);
-        sendQuery(null, Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID));
+        sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID));
         verify(apiClient).fetchGetResult(getCristinUriFromIdentifiers());
     }
 
@@ -103,14 +104,14 @@ public class FetchPersonInstitutionInfoHandlerTest {
     void shouldParseUnitIdCorrectlyFromPathParam() throws ApiGatewayException, IOException {
         apiClient = spy(apiClient);
         handler = new FetchPersonInstitutionInfoHandler(apiClient, environment);
-        sendQuery(null, Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_UNIT_ID));
+        sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_UNIT_ID));
         verify(apiClient).fetchGetResult(getCristinUriFromIdentifiers());
     }
 
     @Test
     void shouldThrowBadRequestOnInvalidPersonIdPathParam() throws IOException {
         GatewayResponse<PersonInstitutionInfo> gatewayResponse =
-            sendQuery(null, Map.of(PERSON_ID, INVALID_PATH_PARAM, ORG_ID, VALID_INSTITUTION_ID));
+            sendQuery(Map.of(PERSON_ID, INVALID_PATH_PARAM, ORG_ID, VALID_INSTITUTION_ID));
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -120,7 +121,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
     @Test
     void shouldThrowBadRequestOnInvalidOrganizationPathParam() throws IOException {
         GatewayResponse<PersonInstitutionInfo> gatewayResponse =
-            sendQuery(null, Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, INVALID_PATH_PARAM));
+            sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, INVALID_PATH_PARAM));
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -131,7 +132,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
     @Test
     void shouldThrowBadRequestOnMissingPersonPathParam() throws IOException {
         GatewayResponse<PersonInstitutionInfo> gatewayResponse =
-            sendQuery(null, Map.of(ORG_ID, VALID_INSTITUTION_ID));
+            sendQuery(Map.of(ORG_ID, VALID_INSTITUTION_ID));
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -141,32 +142,49 @@ public class FetchPersonInstitutionInfoHandlerTest {
     @Test
     void shouldThrowBadRequestOnMissingOrganizationPathParam() throws IOException {
         GatewayResponse<PersonInstitutionInfo> gatewayResponse =
-            sendQuery(null, Map.of(PERSON_ID, VALID_PERSON_ID));
+            sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(INVALID_ORGANIZATION_ID));
     }
 
+    @Test
+    void shouldThrowBadRequestWhenClientSendsQueryParametersWhichIsNotSupported() throws IOException {
+        GatewayResponse<PersonInstitutionInfo> gatewayResponse = queryWithUnsupportedQueryParams();
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP));
+    }
+
+    private GatewayResponse<PersonInstitutionInfo> queryWithUnsupportedQueryParams() throws IOException {
+        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+            .withQueryParameters(Map.of(randomString(), randomString()))
+            .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID))
+            .build();
+        handler.handleRequest(input, output, context);
+
+        return GatewayResponse.fromOutputStream(output);
+    }
+
     private URI getCristinUriFromIdentifiers() {
         return URI.create(EXPECTED_CRISTIN_URI);
     }
 
-    private GatewayResponse<PersonInstitutionInfo> sendQuery(Map<String, String> queryParams,
-                                                             Map<String, String> pathParam)
+    private GatewayResponse<PersonInstitutionInfo> sendQuery(Map<String, String> pathParam)
         throws IOException {
 
-        InputStream input = requestWithParams(queryParams, pathParam);
+        InputStream input = requestWithParams(pathParam);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
     }
 
-    private InputStream requestWithParams(Map<String, String> queryParams, Map<String, String> pathParams)
+    private InputStream requestWithParams(Map<String, String> pathParams)
         throws JsonProcessingException {
 
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withQueryParameters(queryParams)
             .withPathParameters(pathParams)
             .build();
     }
