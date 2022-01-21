@@ -11,7 +11,6 @@ import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonInstitutionInfo;
 import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
@@ -19,16 +18,6 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.paths.UriWrapper;
 
 public class FetchPersonInstitutionInfoClient extends ApiClient {
-
-    /**
-     * Create FetchPersonInstitutionInfoClient with default HTTP client.
-     */
-    public FetchPersonInstitutionInfoClient() {
-        this(HttpClient.newBuilder()
-            .followRedirects(HttpClient.Redirect.ALWAYS)
-            .connectTimeout(Duration.ofSeconds(30))
-            .build());
-    }
 
     public FetchPersonInstitutionInfoClient(HttpClient client) {
         super(client);
