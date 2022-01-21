@@ -6,6 +6,8 @@ dependencies {
     implementation libs.nva.commons.apigateway
     implementation libs.bekkopen.nocommons
 
+    implementation libs.aws.sdk.core
+    implementation libs.aws.sdk.cognitoidp
 
     testImplementation project(":cristin-commons")
     testImplementation project(":cristin-testing")

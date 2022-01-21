@@ -16,6 +16,7 @@ log4jApi = { strictly = '2.17.1' }
 slf4j = { strictly = '1.8.0-beta4' }
 nva-language = { strictly = '1.0' }
 awsSdk = { strictly = '1.12.129' }
+awsCdk = { strickly = '1.139.0' }
 bekkopen-nocommons = { strictly = '0.12.0' }
 [libraries]
 
@@ -56,6 +57,7 @@ google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'goog
 
 aws-sdk-core = { group = 'com.amazonaws', name = 'aws-java-sdk-core', version.ref = 'awsSdk' }
 aws-sdk-secrets = { group = 'com.amazonaws', name = 'aws-java-sdk-secretsmanager', version.ref = 'awsSdk' }
+aws-sdk-cognitoidp = { group ='com.amazonaws', name = 'aws-java-sdk-cognitoidp', version.ref ='awsSdk' }
 
 log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4jApi' }
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }

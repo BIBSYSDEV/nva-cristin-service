@@ -4,37 +4,45 @@ Feature: API tests for Cristin Person fetch
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
+    * def tokenGenerator = Java.type('no.unit.nva.cristin.person.handler.CognitoUtil')
+    * def token = new tokenGenerator().createIdToken()
     * def illegalIdentifier = 'illegalIdentifier'
     * def samplePersonId = '07117631634'
     * def nonExistingPersonId = '11077941012'
     * def personIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/person\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
-    * def token = 'just-a-invalid-token-for-now'
+    * def invalidToken = 'just-a-invalid-token-for-now'
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
 
-#  Scenario Outline: Fetch returns valid data and with correct content negotiation <CONTENT_TYPE>
-#    * configure headers = { 'Accept': <CONTENT_TYPE> }
-#    Given path '/person/identityNumber'
-#    * header Authorization = 'Bearer ' + token
-#    And request { type : NationalIdentificationNumber, value : '07117631634' }
-#    When method POST
-#    Then status 200
-#    And match response == '#object'
-#    And match response['@context'] == '#present'
-#    And match response.id == '#regex ' + personIdRegex
-#    And match response.type == 'Person'
-#
-#    Examples:
-#      | CONTENT_TYPE       |
-#      # TODO: Implement ld json
-#      #| 'application/ld+json' |
-#      | 'application/json' |
+  Scenario Outline: Fetch returns valid data and with correct content negotiation <CONTENT_TYPE>
+    * configure headers = { 'Accept': <CONTENT_TYPE> }
+    Given path '/person/identityNumber'
+    * header Authorization = 'Bearer ' + token
+    And request { type : NationalIdentificationNumber, value : '07117631634' }
+    When method POST
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.id == '#regex ' + personIdRegex
+    And match response.type == 'Person'
 
+    Examples:
+      | CONTENT_TYPE       |
+      # TODO: Implement ld json
+      #| 'application/ld+json' |
+      | 'application/json' |
+
+
+
+#  Scenario: get a valid token
+#    * def tokenGenerator = Java.type('no.unit.nva.cristin.person.handler.TestTokenKarate')
+#    * def token = new tokenGenerator().createToken()
+#    Then print 'token=',token
 
   Scenario: Fetch returns status 401 Forbidden when requesting NationalIdentificationNumber without valid token
     Given path '/person/identityNumber'
-    * header Authorization = 'Bearer ' + token
+    * header Authorization = 'Bearer ' + invalidToken
     And request { type : NationalIdentificationNumber, value : '07117631634' }
     When method POST
     Then status 401
