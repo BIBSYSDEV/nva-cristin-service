@@ -37,12 +37,7 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     @SuppressWarnings("unused")
     @JacocoGenerated
     public CreateCristinPersonHandler() {
-        this(new Environment());
-    }
-
-    @JacocoGenerated
-    public CreateCristinPersonHandler(Environment environment) {
-        this(new CreateCristinPersonApiClient(CristinAuthenticator.getHttpClient()), environment);
+        this(new CreateCristinPersonApiClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
 
     @JacocoGenerated

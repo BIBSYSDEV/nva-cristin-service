@@ -19,7 +19,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.util.Map;
 import java.util.Set;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -65,25 +64,23 @@ public class CreateCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldCreatePersonAndReturnThatPersonWhenClientPayloadIsValid() throws IOException, InterruptedException {
+    void shouldCreateAndReturnPersonWhenClientSendsValidPayload() throws IOException, InterruptedException {
         String responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
         apiClient = new CreateCristinPersonApiClient(httpClientMock);
         handler = new CreateCristinPersonHandler(apiClient, environment);
 
-        GatewayResponse<Person> gatewayResponse = sendQuery(dummyPerson(), Map.of());
+        GatewayResponse<Person> gatewayResponse = sendQuery(dummyPerson());
         Person actual = gatewayResponse.getBodyObject(Person.class);
 
         assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
-        System.out.println(actual.toJsonString());
         assertThat(actual.getNames().containsAll(dummyPerson().getNames()), equalTo(true));
     }
 
     @Test
     void shouldAcceptAdditionalNamesAndReturnCreated() throws IOException {
         Person input = dummyPersonWithAdditionalNames();
-
-        GatewayResponse<Person> response = sendQuery(input, Map.of());
+        GatewayResponse<Person> response = sendQuery(input);
 
         assertEquals(HttpURLConnection.HTTP_CREATED, response.getStatusCode());
     }
@@ -93,7 +90,7 @@ public class CreateCristinPersonHandlerTest {
         Person personWithMissingIdentity = new Person.Builder()
             .withNames(Set.of(new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME))).build();
 
-        GatewayResponse<Person> gatewayResponse = sendQuery(personWithMissingIdentity, Map.of());
+        GatewayResponse<Person> gatewayResponse = sendQuery(personWithMissingIdentity);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -102,7 +99,7 @@ public class CreateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenClientPayloadIsEmpty() throws IOException {
-        GatewayResponse<Person> gatewayResponse = sendQuery(null, Map.of());
+        GatewayResponse<Person> gatewayResponse = sendQuery(null);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -119,7 +116,7 @@ public class CreateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenIdentityNumberNotValid() throws IOException {
-        GatewayResponse<Person> gatewayResponse = sendQuery(dummyPersonWithInvalidIdentityNumber(), Map.of());
+        GatewayResponse<Person> gatewayResponse = sendQuery(dummyPersonWithInvalidIdentityNumber());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -134,19 +131,16 @@ public class CreateCristinPersonHandlerTest {
         return GatewayResponse.fromOutputStream(output);
     }
 
-    private GatewayResponse<Person> sendQuery(Person body, Map<String, String> queryParams) throws IOException {
-        InputStream input = requestWithParams(body, queryParams);
+    private GatewayResponse<Person> sendQuery(Person body) throws IOException {
+        InputStream input = requestWithBody(body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
     }
 
-    private InputStream requestWithParams(Person body, Map<String, String> queryParams)
-        throws JsonProcessingException {
-
+    private InputStream requestWithBody(Person body) throws JsonProcessingException {
         return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
             .withBody(body)
             .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
-            .withQueryParameters(queryParams)
             .build();
     }
 
