@@ -26,14 +26,10 @@ public class FetchPersonInstitutionInfoHandler extends ApiGatewayHandler<Void, P
 
     private final transient FetchPersonInstitutionInfoClient apiClient;
 
+    @SuppressWarnings("unused")
     @JacocoGenerated
     public FetchPersonInstitutionInfoHandler() {
-        this(new Environment());
-    }
-
-    @JacocoGenerated
-    public FetchPersonInstitutionInfoHandler(Environment environment) {
-        this(new FetchPersonInstitutionInfoClient(), environment);
+        this(new FetchPersonInstitutionInfoClient(), new Environment());
     }
 
     public FetchPersonInstitutionInfoHandler(FetchPersonInstitutionInfoClient apiClient, Environment environment) {

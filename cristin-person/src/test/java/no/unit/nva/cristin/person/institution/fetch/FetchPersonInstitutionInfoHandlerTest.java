@@ -93,7 +93,9 @@ public class FetchPersonInstitutionInfoHandlerTest {
     }
 
     @Test
-    void shouldGenerateCorrectCristinUriFromPathParams() throws ApiGatewayException, IOException {
+    void shouldGenerateCristinUriWithPersonAndInstitutionIdentifierFromRequest()
+        throws ApiGatewayException, IOException {
+
         apiClient = spy(apiClient);
         handler = new FetchPersonInstitutionInfoHandler(apiClient, environment);
         sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID));
