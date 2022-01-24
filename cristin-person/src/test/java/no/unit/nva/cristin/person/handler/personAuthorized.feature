@@ -33,13 +33,6 @@ Feature: API tests for Cristin Person fetch
       #| 'application/ld+json' |
       | 'application/json' |
 
-
-
-#  Scenario: get a valid token
-#    * def tokenGenerator = Java.type('no.unit.nva.cristin.person.handler.TestTokenKarate')
-#    * def token = new tokenGenerator().createToken()
-#    Then print 'token=',token
-
   Scenario: Fetch returns status 401 Forbidden when requesting NationalIdentificationNumber without valid token
     Given path '/person/identityNumber'
     * header Authorization = 'Bearer ' + invalidToken
@@ -48,55 +41,55 @@ Feature: API tests for Cristin Person fetch
     Then status 401
 
 
-#
-#
-#  Scenario Outline: Query with unsupported Accept header returns Unsupported Media Type
-#    * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }
-#    * header Authorization = 'Bearer ' + token
-#    Given path '/person/identityNumber'
-#    And request { type : NationalIdentificationNumber, value : '07117631634' }
-#    When method POST
-#    Then status 415
-#    * def contentType = responseHeaders['Content-Type'][0]
-#    And match contentType == PROBLEM_JSON_MEDIA_TYPE
-#    And match response.title == 'Unsupported Media Type'
-#    And match response.status == 415
-#    And match response.detail == <UNACCEPTABLE_CONTENT_TYPE> + ' contains no supported Accept header values. Supported values are: application/json; charset=utf-8'
-#    And match response.requestId == '#notnull'
-#
-#    Examples:
-#      | UNACCEPTABLE_CONTENT_TYPE |
-#      | 'image/jpeg'              |
-#      | 'application/xml'         |
-#      | 'application/rdf+xml'     |
-#
-#  Scenario: Fetch returns status Bad request when requesting illegal person identifier
-#    Given path '/person/identityNumber'
-#    * header Authorization = 'Bearer ' + token
-#    And request { type : NationalIdentificationNumber, value : 'abcdefghij' }
-#    When method POST
-#    Then status 400
-#    And match response.title == 'Bad Request'
-#    And match response.status == 400
-#    And match response.detail == 'Invalid payload in body'
-#
-#
-#  Scenario: Fetch returns status Bad request when sending illegal query parameter
-#    Given path '/person/identityNumber'
-#    * header Authorization = 'Bearer ' + token
-#    And request { type : SwedishIdentificationNumber, value : 'medelsvenson' }
-#    When method POST
-#    Then status 400
-#    And match response.title == 'Bad Request'
-#    And match response.status == 400
-#    And match response.detail == 'Invalid payload in body'
-#
-#  Scenario: Fetch returns status Not found when requesting unknown person identifier
-#    Given path '/person/identityNumber'
-#    * header Authorization = 'Bearer ' + token
-#    And request { type : NationalIdentificationNumber, value : '11077941012' }
-#    When method POST
-#    Then status 404
-#    And match response.title == 'Not Found'
-#    And match response.status == 404
-#    And match response.detail == "No match found for supplied payload"
+
+
+  Scenario Outline: Query with unsupported Accept header returns Unsupported Media Type
+    * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }
+    * header Authorization = 'Bearer ' + token
+    Given path '/person/identityNumber'
+    And request { type : NationalIdentificationNumber, value : '07117631634' }
+    When method POST
+    Then status 415
+    * def contentType = responseHeaders['Content-Type'][0]
+    And match contentType == PROBLEM_JSON_MEDIA_TYPE
+    And match response.title == 'Unsupported Media Type'
+    And match response.status == 415
+    And match response.detail == <UNACCEPTABLE_CONTENT_TYPE> + ' contains no supported Accept header values. Supported values are: application/json; charset=utf-8'
+    And match response.requestId == '#notnull'
+
+    Examples:
+      | UNACCEPTABLE_CONTENT_TYPE |
+      | 'image/jpeg'              |
+      | 'application/xml'         |
+      | 'application/rdf+xml'     |
+
+  Scenario: Fetch returns status Bad request when requesting illegal person identifier
+    Given path '/person/identityNumber'
+    * header Authorization = 'Bearer ' + token
+    And request { type : NationalIdentificationNumber, value : 'abcdefghij' }
+    When method POST
+    Then status 400
+    And match response.title == 'Bad Request'
+    And match response.status == 400
+    And match response.detail == 'Supplied payload is not valid'
+
+
+  Scenario: Fetch returns status Bad request when sending illegal query parameter
+    Given path '/person/identityNumber'
+    * header Authorization = 'Bearer ' + token
+    And request { type : SwedishIdentificationNumber, value : 'medelsvenson' }
+    When method POST
+    Then status 400
+    And match response.title == 'Bad Request'
+    And match response.status == 400
+    And match response.detail == 'Supplied payload is not valid'
+
+  Scenario: Fetch returns status Not found when requesting unknown person identifier
+    Given path '/person/identityNumber'
+    * header Authorization = 'Bearer ' + token
+    And request { type : NationalIdentificationNumber, value : '11077941012' }
+    When method POST
+    Then status 404
+    And match response.title == 'Not Found'
+    And match response.status == 404
+    And match response.detail == "No match found for supplied payload"
