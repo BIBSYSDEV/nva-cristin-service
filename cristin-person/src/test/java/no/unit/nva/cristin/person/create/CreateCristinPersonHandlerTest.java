@@ -125,6 +125,19 @@ public class CreateCristinPersonHandlerTest {
             containsString(CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIER_NOT_VALID));
     }
 
+    @Test
+    void shouldReturnBadRequestWhenMissingRequiredNames() throws IOException {
+        Person personWithMissingNames = new Person.Builder()
+            .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER))).build();
+
+        GatewayResponse<Person> gatewayResponse = sendQuery(personWithMissingNames);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(gatewayResponse.getBody(),
+            containsString(CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_REQUIRED_NAMES));
+    }
+
     private GatewayResponse<Person> sendQueryWithoutAccessRights(Person body) throws IOException {
         InputStream input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
             .withBody(body)

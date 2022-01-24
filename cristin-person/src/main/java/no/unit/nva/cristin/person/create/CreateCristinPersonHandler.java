@@ -27,12 +27,14 @@ import java.util.Set;
 
 public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person> {
 
-    public static final String ERROR_MESSAGE_IDENTIFIER_NOT_VALID = NATIONAL_IDENTITY_NUMBER + " is not valid";
+    public static final String ERROR_MESSAGE_IDENTIFIER_NOT_VALID =
+        String.format("%s is not valid", NATIONAL_IDENTITY_NUMBER);
     public static final String ERROR_MESSAGE_PAYLOAD_EMPTY = "Payload cannot be empty";
     public static final String ERROR_MESSAGE_MISSING_IDENTIFIER =
-        "Missing required identifier: " + NATIONAL_IDENTITY_NUMBER;
+        String.format("Missing required identifier: %s", NATIONAL_IDENTITY_NUMBER);
     private static final Set<String> REQUIRED_NAMES = Set.of(CristinPerson.FIRST_NAME, CristinPerson.LAST_NAME);
-    public static final String ERROR_MESSAGE_MISSING_REQUIRED_NAMES = "Missing required names: " + REQUIRED_NAMES;
+    public static final String ERROR_MESSAGE_MISSING_REQUIRED_NAMES =
+        String.format("Missing required names: %s", REQUIRED_NAMES);
 
     private final transient CreateCristinPersonApiClient apiClient;
 
