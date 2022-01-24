@@ -24,10 +24,10 @@ import java.util.stream.Stream;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.projects.model.nva.NvaProject.PROJECT_TYPE;
 
 public class NvaProjectBuilder {
 
-    private static final String PROJECT_TYPE = "Project";
     private static final String CRISTIN_IDENTIFIER_TYPE = "CristinIdentifier";
 
     private static final String TYPE = "type";

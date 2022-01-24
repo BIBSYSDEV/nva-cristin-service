@@ -105,4 +105,10 @@ public class UriUtils {
         return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(path).getUri();
     }
 
+    public static URI createNvaProjectId(String identifier) {
+        return new UriWrapper(HTTPS, DOMAIN_NAME)
+                .addChild(BASE_PATH).addChild(UriUtils.PROJECT).addChild(identifier).getUri();
+    }
+
+
 }

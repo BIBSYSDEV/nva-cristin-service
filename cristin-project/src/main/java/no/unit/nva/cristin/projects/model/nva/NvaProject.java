@@ -3,8 +3,10 @@ package no.unit.nva.cristin.projects.model.nva;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import no.unit.nva.model.Organization;
+import no.unit.nva.cristin.projects.CristinProjectBuilder;
 import no.unit.nva.cristin.projects.ProjectStatus;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonSerializable;
 
@@ -38,6 +40,7 @@ import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_POPULAR_SCIE
         FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS, NVA_ACADEMIC_SUMMARY, NVA_POPULAR_SCIENTIFIC_SUMMARY})
 public class NvaProject implements JsonSerializable {
 
+    public static final String PROJECT_TYPE = "Project";
     public static final String NVA_ACADEMIC_SUMMARY = "academicSummary";
     public static final String NVA_POPULAR_SCIENTIFIC_SUMMARY = "popularScientificSummary";
 
@@ -241,5 +244,9 @@ public class NvaProject implements JsonSerializable {
     @Override
     public String toString() {
         return toJsonString();
+    }
+
+    public CristinProject toCristinProject() {
+        return new CristinProjectBuilder(this).build();
     }
 }
