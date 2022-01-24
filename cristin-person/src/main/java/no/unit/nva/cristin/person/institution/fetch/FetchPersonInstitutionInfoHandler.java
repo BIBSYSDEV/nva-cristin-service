@@ -8,7 +8,9 @@ import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
 import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
+import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -29,7 +31,7 @@ public class FetchPersonInstitutionInfoHandler extends ApiGatewayHandler<Void, P
     @SuppressWarnings("unused")
     @JacocoGenerated
     public FetchPersonInstitutionInfoHandler() {
-        this(new FetchPersonInstitutionInfoClient(), new Environment());
+        this(new FetchPersonInstitutionInfoClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
 
     public FetchPersonInstitutionInfoHandler(FetchPersonInstitutionInfoClient apiClient, Environment environment) {
@@ -45,6 +47,8 @@ public class FetchPersonInstitutionInfoHandler extends ApiGatewayHandler<Void, P
     @Override
     protected PersonInstitutionInfo processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
+
+        AccessUtils.validateIdentificationNumberAccess(requestInfo);
 
         validateQueryParameters(requestInfo);
         String personId = getValidPersonId(requestInfo);
