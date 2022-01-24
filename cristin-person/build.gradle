@@ -18,7 +18,7 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform {
-        excludeTags 'karateTest'
+        excludeTags 'karateTest','integrationTest'
     }
     failFast = true
     testLogging {
