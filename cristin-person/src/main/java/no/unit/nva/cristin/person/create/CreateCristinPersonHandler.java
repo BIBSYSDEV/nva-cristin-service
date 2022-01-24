@@ -4,11 +4,11 @@ import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.person.model.nva.Person.NATIONAL_IDENTITY_NUMBER;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
-import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
@@ -41,7 +41,7 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     @SuppressWarnings("unused")
     @JacocoGenerated
     public CreateCristinPersonHandler() {
-        this(new CreateCristinPersonApiClient(CristinAuthenticator.getHttpClient()), new Environment());
+        this(new CreateCristinPersonApiClient(HttpClient.newHttpClient()), new Environment());
     }
 
     @JacocoGenerated
