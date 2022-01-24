@@ -12,6 +12,7 @@ import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutio
 import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.ORG_ID;
 import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.PERSON_ID;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -160,8 +161,26 @@ public class FetchPersonInstitutionInfoHandlerTest {
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP));
     }
 
+    @Test
+    void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
+        GatewayResponse<PersonInstitutionInfo> gatewayResponse = queryWithoutRequiredAccessRights();
+
+        assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    private GatewayResponse<PersonInstitutionInfo> queryWithoutRequiredAccessRights() throws IOException {
+        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+            .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID))
+            .build();
+        handler.handleRequest(input, output, context);
+
+        return GatewayResponse.fromOutputStream(output);
+    }
+
     private GatewayResponse<PersonInstitutionInfo> queryWithUnsupportedQueryParams() throws IOException {
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
             .withQueryParameters(Map.of(randomString(), randomString()))
             .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID))
             .build();
@@ -187,6 +206,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
+            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
             .withPathParameters(pathParams)
             .build();
     }
