@@ -22,7 +22,10 @@ public class CristinProjectBuilder {
 //         URI id;
             cristinProject.setCristinProjectId(extractLastPathElement(nvaProject.getId()));
             cristinProject.setMainLanguage(extractLastPathElement(nvaProject.getLanguage()));
-            cristinProject.setTitle(Map.of(extractLastPathElement(nvaProject.getLanguage()),nvaProject.getTitle()));
+        Map<String, String> title = new java.util.HashMap<>();
+        title.put(extractLastPathElement(nvaProject.getLanguage()), nvaProject.getTitle());
+        cristinProject.setTitle(title);
+        cristinProject.setStatus(nvaProject.getStatus().name());
 //         String type;
 //         List<Map<String, String>> identifiers;
 //         String title;

@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import no.unit.nva.model.Organization;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -8,8 +7,9 @@ import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
-import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.projects.model.nva.Person;
+import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
 import nva.commons.core.paths.UriWrapper;
@@ -24,14 +24,14 @@ import java.util.stream.Stream;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
-import static no.unit.nva.cristin.projects.model.nva.NvaProject.PROJECT_TYPE;
 
 public class NvaProjectBuilder {
 
-    private static final String CRISTIN_IDENTIFIER_TYPE = "CristinIdentifier";
+    public static final String CRISTIN_IDENTIFIER_TYPE = "CristinIdentifier";
+    public static final String PROJECT_TYPE = "Project";
 
-    private static final String TYPE = "type";
-    private static final String VALUE = "value";
+    public static final String TYPE = "type";
+    public static final String VALUE = "value";
 
     private static final Map<String, String> cristinRolesToNva = Map.of("PRO_MANAGER", "ProjectManager",
             "PRO_PARTICIPANT", "ProjectParticipant");

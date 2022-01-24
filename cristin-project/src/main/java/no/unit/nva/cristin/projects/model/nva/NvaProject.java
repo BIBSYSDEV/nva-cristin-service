@@ -40,7 +40,6 @@ import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_POPULAR_SCIE
         FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS, NVA_ACADEMIC_SUMMARY, NVA_POPULAR_SCIENTIFIC_SUMMARY})
 public class NvaProject implements JsonSerializable {
 
-    public static final String PROJECT_TYPE = "Project";
     public static final String NVA_ACADEMIC_SUMMARY = "academicSummary";
     public static final String NVA_POPULAR_SCIENTIFIC_SUMMARY = "popularScientificSummary";
 
