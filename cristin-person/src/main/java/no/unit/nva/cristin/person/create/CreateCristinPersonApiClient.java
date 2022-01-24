@@ -1,13 +1,11 @@
 package no.unit.nva.cristin.person.create;
 
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -33,7 +31,7 @@ public class CreateCristinPersonApiClient extends PostApiClient {
         String postPayload = attempt(() -> OBJECT_MAPPER.writeValueAsString(requestCristinPerson)).orElseThrow();
         URI uri = getCristinPersonPostUri();
         HttpResponse<String> response = fetchPostResult(uri, postPayload);
-        checkPostHttpStatusCode(getIdUri(), response.statusCode());
+        checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode());
         CristinPerson responseCristinPerson = getDeserializedResponse(response, CristinPerson.class);
         Person createdPerson = responseCristinPerson.toPerson();
         createdPerson.setContext(PERSON_CONTEXT);
@@ -45,7 +43,4 @@ public class CreateCristinPersonApiClient extends PostApiClient {
         return new UriWrapper(CRISTIN_API_URL).addChild(PERSON_PATH).getUri();
     }
 
-    private URI getIdUri() {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH_NVA).getUri();
-    }
 }

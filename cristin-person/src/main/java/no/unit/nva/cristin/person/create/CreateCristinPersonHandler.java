@@ -5,10 +5,9 @@ import static no.unit.nva.cristin.person.model.nva.Person.NATIONAL_IDENTITY_NUMB
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
-import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -25,12 +24,15 @@ import java.net.HttpURLConnection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person> {
 
-    private static final Set<String> REQUIRED_IDENTIFIERS =
-        Set.of(NATIONAL_IDENTITY_NUMBER, CristinPerson.FIRST_NAME, CristinPerson.LAST_NAME);
+    public static final String ERROR_MESSAGE_IDENTIFIER_NOT_VALID = NATIONAL_IDENTITY_NUMBER + " is not valid";
+    public static final String ERROR_MESSAGE_PAYLOAD_EMPTY = "Payload cannot be empty";
+    public static final String ERROR_MESSAGE_MISSING_IDENTIFIER =
+        "Missing required identifier: " + NATIONAL_IDENTITY_NUMBER;
+    private static final Set<String> REQUIRED_NAMES = Set.of(CristinPerson.FIRST_NAME, CristinPerson.LAST_NAME);
+    public static final String ERROR_MESSAGE_MISSING_REQUIRED_NAMES = "Missing required names: " + REQUIRED_NAMES;
 
     private final transient CreateCristinPersonApiClient apiClient;
 
@@ -50,13 +52,12 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     protected Person processInput(Person input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
 
-        Set<TypedValue> identifiers = extractAggregatedIdentifiers(input);
+        validateContainsPayload(input);
+        validateContainsRequiredNames(extractIdentifiers(input.getNames()));
+        validateContainsRequiredIdentifiers(extractIdentifiers(input.getIdentifiers()));
+        validateValidIdentificationNumber(extractIdentificationNumber(input.getIdentifiers()));
 
-        if (hasAllRequiredIdentifiers(identifiers) && hasValidNationalIdentificationNumber(identifiers)) {
-            return apiClient.createPersonInCristin(input);
-        }
-
-        throw new BadRequestException(ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD);
+        return apiClient.createPersonInCristin(input);
     }
 
     @Override
@@ -69,35 +70,42 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
         return HttpURLConnection.HTTP_CREATED;
     }
 
-    private Set<TypedValue> extractAggregatedIdentifiers(Person input) {
-        return Stream.concat(
-                Optional.ofNullable(input)
-                    .map(Person::getIdentifiers)
-                    .orElse(Collections.emptySet()).stream(),
-                Optional.ofNullable(input)
-                    .map(Person::getNames)
-                    .orElse(Collections.emptySet()).stream())
+    private void validateContainsPayload(Person input) throws BadRequestException {
+        if (Objects.isNull(input)) {
+            throw new BadRequestException(ERROR_MESSAGE_PAYLOAD_EMPTY);
+        }
+    }
+
+    private Set<String> extractIdentifiers(Set<TypedValue> typedValues) {
+        return Optional.ofNullable(typedValues).orElse(Collections.emptySet()).stream().map(TypedValue::getType)
             .collect(Collectors.toSet());
     }
 
-    private boolean hasAllRequiredIdentifiers(Set<TypedValue> requestIdentifiers) {
-        Set<String> identifierKeys = requestIdentifiers.stream().map(TypedValue::getType).collect(Collectors.toSet());
-        return identifierKeys.containsAll(REQUIRED_IDENTIFIERS);
+    private void validateContainsRequiredNames(Set<String> names) throws BadRequestException {
+        if (names.containsAll(REQUIRED_NAMES)) {
+            return;
+        }
+        throw new BadRequestException(ERROR_MESSAGE_MISSING_REQUIRED_NAMES);
     }
 
-    private boolean hasValidNationalIdentificationNumber(Set<TypedValue> identifiers) {
-        return verifyIdentificationNumber().test(extractIdentificationNumber(identifiers));
+    private void validateContainsRequiredIdentifiers(Set<String> identificationNumbers) throws BadRequestException {
+        if (identificationNumbers.contains(NATIONAL_IDENTITY_NUMBER)) {
+            return;
+        }
+        throw new BadRequestException(ERROR_MESSAGE_MISSING_IDENTIFIER);
     }
 
-    private Predicate<TypedValue> verifyIdentificationNumber() {
-        return typedValue -> typedValue.hasData() && FodselsnummerValidator.isValid(typedValue.getValue());
+    private String extractIdentificationNumber(Set<TypedValue> identifiers) throws BadRequestException {
+        return identifiers.stream().filter(TypedValue::hasData)
+            .filter(elm -> NATIONAL_IDENTITY_NUMBER.equals(elm.getType()))
+            .map(TypedValue::getValue).findFirst()
+            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_IDENTIFIER_NOT_VALID));
     }
 
-    private TypedValue extractIdentificationNumber(Set<TypedValue> identifiers) {
-        return identifiers.stream().filter(containsIdentificationNumber()).findFirst().orElseThrow();
-    }
-
-    private Predicate<TypedValue> containsIdentificationNumber() {
-        return typedValue -> NATIONAL_IDENTITY_NUMBER.equals(typedValue.getType());
+    private void validateValidIdentificationNumber(String number) throws BadRequestException {
+        if (FodselsnummerValidator.isValid(number)) {
+            return;
+        }
+        throw new BadRequestException(ERROR_MESSAGE_IDENTIFIER_NOT_VALID);
     }
 }

@@ -4,7 +4,6 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
 import java.net.http.HttpClient;
-import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
@@ -88,13 +87,15 @@ public class CreateCristinPersonHandlerTest {
     @Test
     void shouldReturnBadRequestWhenClientPayloadIsMissingRequiredIdentifier() throws Exception {
         Person personWithMissingIdentity = new Person.Builder()
-            .withNames(Set.of(new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME))).build();
+            .withNames(Set.of(new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
+                new TypedValue(LAST_NAME, DUMMY_LAST_NAME))).build();
 
         GatewayResponse<Person> gatewayResponse = sendQuery(personWithMissingIdentity);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD));
+        assertThat(gatewayResponse.getBody(),
+            containsString(CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_IDENTIFIER));
     }
 
     @Test
@@ -103,7 +104,7 @@ public class CreateCristinPersonHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD));
+        assertThat(gatewayResponse.getBody(), containsString(CreateCristinPersonHandler.ERROR_MESSAGE_PAYLOAD_EMPTY));
     }
 
     @Test
@@ -120,7 +121,8 @@ public class CreateCristinPersonHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD));
+        assertThat(gatewayResponse.getBody(),
+            containsString(CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIER_NOT_VALID));
     }
 
     private GatewayResponse<Person> sendQueryWithoutAccessRights(Person body) throws IOException {
