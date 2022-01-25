@@ -56,6 +56,7 @@ google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'goog
 
 aws-sdk-core = { group = 'com.amazonaws', name = 'aws-java-sdk-core', version.ref = 'awsSdk' }
 aws-sdk-secrets = { group = 'com.amazonaws', name = 'aws-java-sdk-secretsmanager', version.ref = 'awsSdk' }
+aws-sdk-cognitoidp = { group ='com.amazonaws', name = 'aws-java-sdk-cognitoidp', version.ref ='awsSdk' }
 
 log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4jApi' }
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
