@@ -15,6 +15,7 @@ import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.paths.UriWrapper;
 
 public class CreateCristinPersonApiClient extends PostApiClient {
@@ -27,20 +28,27 @@ public class CreateCristinPersonApiClient extends PostApiClient {
      * Used for creating a person in Cristin from the supplied Person object.
      */
     public Person createPersonInCristin(Person person) throws ApiGatewayException {
-        CristinPersonPost requestCristinPerson = person.toCristinPersonPost();
-        String postPayload = attempt(() -> OBJECT_MAPPER.writeValueAsString(requestCristinPerson)).orElseThrow();
+        String payload = generatePayloadFromRequest(person);
         URI uri = getCristinPersonPostUri();
-        HttpResponse<String> response = fetchPostResult(uri, postPayload);
+        HttpResponse<String> response = post(uri, payload);
         checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode());
+
+        return createPersonFromResponse(response);
+    }
+
+    private Person createPersonFromResponse(HttpResponse<String> response) throws BadGatewayException {
         CristinPerson responseCristinPerson = getDeserializedResponse(response, CristinPerson.class);
         Person createdPerson = responseCristinPerson.toPerson();
         createdPerson.setContext(PERSON_CONTEXT);
-
         return createdPerson;
+    }
+
+    private String generatePayloadFromRequest(Person person) {
+        CristinPersonPost requestCristinPerson = person.toCristinPersonPost();
+        return attempt(() -> OBJECT_MAPPER.writeValueAsString(requestCristinPerson)).orElseThrow();
     }
 
     private URI getCristinPersonPostUri() {
         return new UriWrapper(CRISTIN_API_URL).addChild(PERSON_PATH).getUri();
     }
-
 }

@@ -29,7 +29,7 @@ public class PostApiClient extends ApiClient {
     /**
      * Initiate a synchronous POST to uri with supplied payload. Returns response from upstream.
      */
-    public HttpResponse<String> fetchPostResult(URI uri, String body)
+    public HttpResponse<String> post(URI uri, String body)
         throws GatewayTimeoutException, FailedHttpRequestException {
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
@@ -43,7 +43,7 @@ public class PostApiClient extends ApiClient {
     /**
      * Initiate an asynchronous POST to uri with supplied payload. Returns response from upstream.
      */
-    public CompletableFuture<HttpResponse<String>> fetchPostResultAsync(URI uri, String body) {
+    public CompletableFuture<HttpResponse<String>> postAsync(URI uri, String body) {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(uri)
             .header(CONTENT_TYPE, APPLICATION_JSON)
