@@ -239,7 +239,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
-            Path: /person/{personId}/organization/{orgId}/
+            Path: /person/{id}/organization/{orgId}/
             Method: get
 
   NvaCristinProxyBasePathMapping:

@@ -473,7 +473,7 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
-  /person/{personId}/organization/{orgId}:
+  /person/{id}/organization/{orgId}:
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -488,7 +488,7 @@ paths:
       security:
         - CognitoUserPool: [ ]
       parameters:
-        - name: personId
+        - name: id
           in: path
           description: Identifier of Person
           required: true
