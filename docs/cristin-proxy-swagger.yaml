@@ -94,6 +94,62 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinCreateProjectsFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Project
+      summary: Create and persist project
+      description: Create and persist project in Cristin
+      operationId: CreateProject
+      security:
+        - CognitoUserPool: [ ]
+      requestBody:
+        description: Payload containing valid project data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/ProjectExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/Project'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/ProjectExample'
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectsExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectsExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
   /project/{id}:
     get:
       x-amazon-apigateway-integration:
