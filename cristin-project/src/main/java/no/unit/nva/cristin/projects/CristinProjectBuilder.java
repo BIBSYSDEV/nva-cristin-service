@@ -11,11 +11,11 @@ import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class CristinProjectBuilder {
 
@@ -24,6 +24,7 @@ public class CristinProjectBuilder {
             "PRO_MANAGER",
             "ProjectParticipant",
             "PRO_PARTICIPANT");
+
     private final transient CristinProject cristinProject;
     private final transient NvaProject nvaProject;
 
@@ -60,12 +61,7 @@ public class CristinProjectBuilder {
     }
 
     private List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
-        List<CristinPerson> participants = new ArrayList<>();
-        for (NvaContributor contributor : contributors) {
-            CristinPerson cristinPerson = getCristinPerson(contributor);
-            participants.add(cristinPerson);
-        }
-        return participants;
+        return contributors.stream().map(this::getCristinPerson).collect(Collectors.toList());
     }
 
     private CristinPerson getCristinPerson(NvaContributor contributor) {
@@ -94,12 +90,7 @@ public class CristinProjectBuilder {
     }
 
     private List<CristinFundingSource> extractFundings(List<Funding> fundings) {
-        List<CristinFundingSource> cristinFundings = new ArrayList();
-        for (Funding funding : fundings) {
-            CristinFundingSource cristinFundingSource = getCristinFundingSource(funding);
-            cristinFundings.add(cristinFundingSource);
-        }
-        return cristinFundings;
+        return fundings.stream().map(this::getCristinFundingSource).collect(Collectors.toList());
     }
 
     private CristinFundingSource getCristinFundingSource(Funding funding) {
