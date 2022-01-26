@@ -10,12 +10,13 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinProjectBuilder {
 
@@ -31,10 +32,6 @@ public class CristinProjectBuilder {
     public CristinProjectBuilder(NvaProject nvaProject) {
         this.nvaProject = nvaProject;
         this.cristinProject = new CristinProject();
-    }
-
-    public static String extractLastPathElement(URI id) {
-        return id.getPath().substring(id.getPath().lastIndexOf('/') + 1);
     }
 
     /**

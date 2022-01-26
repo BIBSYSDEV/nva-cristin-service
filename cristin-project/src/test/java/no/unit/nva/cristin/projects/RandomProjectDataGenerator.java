@@ -35,9 +35,12 @@ public class RandomProjectDataGenerator {
     private static final String NORWEGIAN = "no";
     private static final String[] LANGUAGES = {"en", "nb", "nn"};
     private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
-    private static final String[] ROLE_TYPES = {"PRO_MANAGER", "PRO_PARTICIPANT"};
 
-
+    /**
+     * Create a NvaProject containing random data.
+     *
+     * @return valid NvaProject with random data
+     */
     public static NvaProject randomNvaProject() {
         NvaProject nvaProject = new NvaProject();
         nvaProject.setType(PROJECT_TYPE);
@@ -134,6 +137,5 @@ public class RandomProjectDataGenerator {
     private static String randomLanguageCode() {
         return LANGUAGES[randomInteger(LANGUAGES.length)];
     }
-
 
 }

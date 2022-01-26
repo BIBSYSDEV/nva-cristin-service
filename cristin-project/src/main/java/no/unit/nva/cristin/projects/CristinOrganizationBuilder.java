@@ -4,7 +4,7 @@ import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
 import no.unit.nva.model.Organization;
 
-import static no.unit.nva.cristin.projects.CristinProjectBuilder.extractLastPathElement;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinOrganizationBuilder {
 

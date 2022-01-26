@@ -19,7 +19,6 @@ class CristinProjectBuilderTest {
         assertNotNull(cristinProject);
         assertTrue(cristinProject.hasValidContent());
         NvaProject actual = cristinProject.toNvaProject();
-
         assertEquals(expected, actual);
     }
 

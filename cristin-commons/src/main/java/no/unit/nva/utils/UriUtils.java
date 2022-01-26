@@ -22,6 +22,7 @@ public class UriUtils {
     public static final String PERSON = "person";
     public static final String WHITESPACE_REGEX = "\\s+";
     public static final String WHITESPACE_REPLACEMENT = "+";
+    public static final String FORWARD_SLASH = "/";
     private static final String PARAMETER_KEY_VALUE_PAIR_TEMPLATE = "%s=%s";
     private static final String PARAMETER_DELIMITER = "&";
     private static final String EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR = null;
@@ -110,5 +111,9 @@ public class UriUtils {
                 .addChild(BASE_PATH).addChild(UriUtils.PROJECT).addChild(identifier).getUri();
     }
 
-
+    public static String extractLastPathElement(URI id) {
+        return id.getPath().contains(FORWARD_SLASH)
+                ? id.getPath().substring(id.getPath().lastIndexOf(FORWARD_SLASH) + 1)
+                : id.getPath();
+    }
 }
