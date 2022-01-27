@@ -112,8 +112,6 @@ public class UriUtils {
     }
 
     public static String extractLastPathElement(URI uri) {
-        return uri.getPath().contains(URI_PATH_SEPARATOR)
-                ? uri.getPath().substring(uri.getPath().lastIndexOf(URI_PATH_SEPARATOR) + 1)
-                : uri.getPath();
+        return new UriWrapper(uri).getFilename();
     }
 }
