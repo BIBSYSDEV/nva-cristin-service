@@ -6,9 +6,9 @@ import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
-import java.net.http.HttpClient;
 import java.util.List;
 import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -31,7 +31,7 @@ public class FetchPersonInstitutionInfoHandler extends ApiGatewayHandler<Void, P
     @SuppressWarnings("unused")
     @JacocoGenerated
     public FetchPersonInstitutionInfoHandler() {
-        this(new FetchPersonInstitutionInfoClient(HttpClient.newHttpClient()), new Environment());
+        this(new FetchPersonInstitutionInfoClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
 
     public FetchPersonInstitutionInfoHandler(FetchPersonInstitutionInfoClient apiClient, Environment environment) {
