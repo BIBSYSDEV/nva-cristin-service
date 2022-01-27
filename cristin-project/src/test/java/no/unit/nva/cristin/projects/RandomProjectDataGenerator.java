@@ -11,12 +11,13 @@ import nva.commons.core.language.LanguageMapper;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
@@ -25,9 +26,12 @@ import static no.unit.nva.cristin.projects.NvaProjectBuilder.CRISTIN_IDENTIFIER_
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.TYPE;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.VALUE;
+import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringFields;
+import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RandomProjectDataGenerator {
 
@@ -35,6 +39,17 @@ public class RandomProjectDataGenerator {
     private static final String NORWEGIAN = "no";
     private static final String[] LANGUAGES = {"en", "nb", "nn"};
     private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
+    public static final Set<String> IGNORE_LIST = Set.of(
+            ".context",                             // Context is not used in searchResponse
+            ".coordinatingInstitution.partOf",      // Ignoring Organization parts as we only nedd Id here
+            ".coordinatingInstitution.hasPart",
+            ".coordinatingInstitution.context",
+            ".coordinatingInstitution.acronym",
+            "contributors.affiliation.partOf",
+            "contributors.affiliation.hasPart",
+            ".contributors.affiliation.context",
+            ".contributors.affiliation.acronym"
+    );
 
     /**
      * Create a NvaProject containing random data.
@@ -42,43 +57,39 @@ public class RandomProjectDataGenerator {
      * @return valid NvaProject with random data
      */
     public static NvaProject randomNvaProject() {
-        NvaProject nvaProject = new NvaProject();
-        nvaProject.setType(PROJECT_TYPE);
         final String identifier = randomInteger().toString();
-        nvaProject.setId(UriUtils.createNvaProjectId(identifier));
-        nvaProject.setIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)));
-        nvaProject.setTitle(randomString());
-        nvaProject.setLanguage(LanguageMapper.toUri(NORWEGIAN));
-        nvaProject.setStatus(ProjectStatus.NOTSTARTED);
-        nvaProject.setAlternativeTitles(randomListOfTitles());
-        nvaProject.setStartDate(randomInstant());
-        nvaProject.setEndDate(randomInstant());
-        nvaProject.setAcademicSummary(randomSummary());
-        nvaProject.setPopularScientificSummary(randomSummary());
-        nvaProject.setFunding(randomFundings());
-        nvaProject.setContributors(randomContributors());
-        nvaProject.setCoordinatingInstitution(randomOrganization());
-
+        final NvaProject nvaProject = new NvaProject.Builder()
+                // .withContext(PROJECT_CONTEXT)
+                .withType(PROJECT_TYPE)
+                .withId(UriUtils.createNvaProjectId(identifier))
+                .withIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
+                .withTitle(randomString())
+                .withLanguage(LanguageMapper.toUri(NORWEGIAN))
+                .withStatus(randomElement(ProjectStatus.values()))
+                .withAlternativeTitles(randomListOfTitles())
+                .withStartDate(randomInstant())
+                .withEndDate(randomInstant())
+                .withAcademicSummary(randomSummary())
+                .withPopularScientificSummary(randomSummary())
+                .withFunding(randomFundings())
+                .withContributors(randomContributors())
+                .withCoordinatingInstitution(randomOrganization())
+                .build();
+        assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
     }
-
 
     private static URI semiRandomPersonId(String identifier) {
         return new UriWrapper(CRISTIN_API_URL).addChild(PERSON_PATH).addChild(identifier).getUri();
     }
-
 
     private static URI semiRandomOrganizationId(String identifier) {
         return new UriWrapper(CRISTIN_API_URL).addChild(INSTITUTION_PATH).addChild(identifier).getUri();
     }
 
     private static List<NvaContributor> randomContributors() {
-        List<NvaContributor> contributors = new ArrayList<>();
-        for (int i = 0; i <= randomInteger(5); i++) {
-            NvaContributor contributor = randomContributor();
-            contributors.add(contributor);
-        }
-        return contributors;
+        return IntStream.rangeClosed(1, randomInteger(5))
+                .mapToObj(i -> randomContributor()).collect(Collectors.toList());
     }
 
     private static NvaContributor randomContributor() {
@@ -90,7 +101,7 @@ public class RandomProjectDataGenerator {
     }
 
     private static String randomContributorType() {
-        return CONTRIBUTOR_TYPES[randomInteger(CONTRIBUTOR_TYPES.length)];
+        return randomElement(CONTRIBUTOR_TYPES);
     }
 
     private static Person randomPerson() {
@@ -98,20 +109,12 @@ public class RandomProjectDataGenerator {
     }
 
     private static List<Funding> randomFundings() {
-        List<Funding> fundings = new ArrayList<>();
-        for (int i = 0; i < randomInteger(7); i++) {
-            Funding funding = randomFunding();
-            fundings.add(funding);
-        }
-        return fundings;
+        return IntStream.rangeClosed(1, randomInteger(7))
+                .mapToObj(i -> randomFunding()).collect(Collectors.toList());
     }
 
     private static Funding randomFunding() {
-        String fundingSourceCode = randomString();
-        final FundingSource fundingSource = new FundingSource(randomNamesMap(), fundingSourceCode);
-        final String fundingCode = randomString();
-        Funding funding = new Funding(fundingSource, fundingCode);
-        return funding;
+        return new Funding(new FundingSource(randomNamesMap(), randomString()), randomString());
     }
 
     private static Map<String, String> randomNamesMap() {
@@ -135,7 +138,7 @@ public class RandomProjectDataGenerator {
     }
 
     private static String randomLanguageCode() {
-        return LANGUAGES[randomInteger(LANGUAGES.length)];
+        return randomElement(LANGUAGES);
     }
 
 }

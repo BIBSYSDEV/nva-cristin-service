@@ -9,6 +9,7 @@ import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
+import no.unit.nva.utils.ContributorRoleMapping;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,11 +21,7 @@ import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinProjectBuilder {
 
-    private static final Map<String, String> NvaTypesToCristinRoles = Map.of(
-            "ProjectManager",
-            "PRO_MANAGER",
-            "ProjectParticipant",
-            "PRO_PARTICIPANT");
+
 
     private final transient CristinProject cristinProject;
     private final transient NvaProject nvaProject;
@@ -73,16 +70,16 @@ public class CristinProjectBuilder {
 
     private List<CristinRole> extractCristinRoles(NvaContributor contributor) {
         CristinRole cristinRole = new CristinRole();
-        cristinRole.setRoleCode(NvaTypesToCristinRoles.get(contributor.getType()));
+        cristinRole.setRoleCode(ContributorRoleMapping.getCristinRole(contributor.getType()));
         cristinRole.setInstitution(toCristinInstitution(contributor.getAffiliation()));
         return List.of(cristinRole);
     }
 
-    private CristinInstitution toCristinInstitution(Organization affiliation) {
+    private CristinInstitution toCristinInstitution(Organization organization) {
         CristinInstitution institution = new CristinInstitution();
-        institution.setInstitutionName(affiliation.getName());
-        institution.setUrl(affiliation.getId().toString());
-        institution.setCristinInstitutionId(extractLastPathElement(affiliation.getId()));
+        institution.setInstitutionName(organization.getName());
+        institution.setUrl(organization.getId().toString());
+        institution.setCristinInstitutionId(extractLastPathElement(organization.getId()));
         return institution;
     }
 
