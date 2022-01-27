@@ -17,24 +17,36 @@ public enum ContributorRoleMapping {
         this.cristinRole = cristinRole;
     }
 
+    /**
+     * Maps a role from cristin to NVA.
+     * @param role cristinRole to map
+     * @return corresponding role in NVA
+     */
     public static String getNvaRole(String role) {
+        String result = null;
         if (mMap == null) {
             initializeMapping();
         }
         if (mMap.containsKey(role)) {
-            return mMap.get(role);
+            result = mMap.get(role);
         }
-        return null;
+        return result;
     }
 
+    /**
+     * Maps a role from NVA to Cristin.
+     * @param role String representing role in NVA
+     * @return role mapped to Cristin
+     */
     public static String getCristinRole(String role) {
+        String result = null;
         if (mMap == null) {
             initializeMapping();
         }
         if (mMap.containsKey(role)) {
-            return mMap.get(role);
+            result = mMap.get(role);
         }
-        return null;
+        return result;
     }
 
     private static void initializeMapping() {
