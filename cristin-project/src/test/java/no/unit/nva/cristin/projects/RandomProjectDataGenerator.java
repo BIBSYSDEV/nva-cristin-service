@@ -42,24 +42,23 @@ public class RandomProjectDataGenerator {
      * @return valid NvaProject with random data
      */
     public static NvaProject randomNvaProject() {
-        NvaProject nvaProject = new NvaProject();
-        nvaProject.setType(PROJECT_TYPE);
         final String identifier = randomInteger().toString();
-        nvaProject.setId(UriUtils.createNvaProjectId(identifier));
-        nvaProject.setIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)));
-        nvaProject.setTitle(randomString());
-        nvaProject.setLanguage(LanguageMapper.toUri(NORWEGIAN));
-        nvaProject.setStatus(ProjectStatus.NOTSTARTED);
-        nvaProject.setAlternativeTitles(randomListOfTitles());
-        nvaProject.setStartDate(randomInstant());
-        nvaProject.setEndDate(randomInstant());
-        nvaProject.setAcademicSummary(randomSummary());
-        nvaProject.setPopularScientificSummary(randomSummary());
-        nvaProject.setFunding(randomFundings());
-        nvaProject.setContributors(randomContributors());
-        nvaProject.setCoordinatingInstitution(randomOrganization());
-
-        return nvaProject;
+        return new NvaProject.Builder()
+                .withType(PROJECT_TYPE)
+                .withId(UriUtils.createNvaProjectId(identifier))
+                .withIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
+                .withTitle(randomString())
+                .withLanguage(LanguageMapper.toUri(NORWEGIAN))
+                .withStatus(ProjectStatus.NOTSTARTED)
+                .withAlternativeTitles(randomListOfTitles())
+                .withStartDate(randomInstant())
+                .withEndDate(randomInstant())
+                .withAcademicSummary(randomSummary())
+                .withPopularScientificSummary(randomSummary())
+                .withFunding(randomFundings())
+                .withContributors(randomContributors())
+                .withCoordinatingInstitution(randomOrganization())
+                .build();
     }
 
 

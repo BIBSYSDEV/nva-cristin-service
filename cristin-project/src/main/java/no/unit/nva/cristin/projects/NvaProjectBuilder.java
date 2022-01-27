@@ -35,11 +35,10 @@ public class NvaProjectBuilder {
     public static final String VALUE = "value";
 
     private final transient CristinProject cristinProject;
-    private final transient NvaProject nvaProject;
+    private transient String context;
 
     public NvaProjectBuilder(CristinProject cristinProject) {
         this.cristinProject = cristinProject;
-        nvaProject = new NvaProject();
     }
 
     private static List<NvaContributor> transformCristinPersonsToNvaContributors(List<CristinPerson> participants) {
@@ -68,22 +67,27 @@ public class NvaProjectBuilder {
      * @return a NvaProject converted from a CristinProject
      */
     public NvaProject build() {
-        nvaProject.setId(new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(UriUtils.PROJECT)
-                .addChild(cristinProject.getCristinProjectId()).getUri());
-        nvaProject.setType(PROJECT_TYPE);
-        nvaProject.setIdentifiers(createCristinIdentifier());
-        nvaProject.setTitle(extractMainTitle());
-        nvaProject.setAlternativeTitles(extractAlternativeTitles());
-        nvaProject.setLanguage(LanguageMapper.toUri(cristinProject.getMainLanguage()));
-        nvaProject.setStartDate(cristinProject.getStartDate());
-        nvaProject.setEndDate(cristinProject.getEndDate());
-        nvaProject.setFunding(extractFunding());
-        nvaProject.setCoordinatingInstitution(extractCoordinatingInstitution());
-        nvaProject.setContributors(extractContributors());
-        nvaProject.setStatus(extractProjectStatus());
-        nvaProject.setAcademicSummary(cristinProject.getAcademicSummary());
-        nvaProject.setPopularScientificSummary(cristinProject.getPopularScientificSummary());
-        return nvaProject;
+        return new NvaProject.Builder()
+                .withId(new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(UriUtils.PROJECT)
+                        .addChild(cristinProject.getCristinProjectId()).getUri())
+                .withContext(getContext())
+                .withType(PROJECT_TYPE)
+                .withIdentifiers(createCristinIdentifier())
+                .withTitle(extractMainTitle())
+                .withAlternativeTitles(extractAlternativeTitles())
+                .withLanguage(LanguageMapper.toUri(cristinProject.getMainLanguage()))
+                .withStartDate(cristinProject.getStartDate())
+                .withEndDate(cristinProject.getEndDate())
+                .withFunding(extractFunding())
+                .withCoordinatingInstitution(extractCoordinatingInstitution())
+                .withContributors(extractContributors())
+                .withStatus(extractProjectStatus())
+                .withAcademicSummary(cristinProject.getAcademicSummary())
+                .withPopularScientificSummary(cristinProject.getPopularScientificSummary()).build();
+    }
+
+    private String getContext() {
+        return context;
     }
 
     private List<Map<String, String>> createCristinIdentifier() {
@@ -130,7 +134,7 @@ public class NvaProjectBuilder {
     }
 
     public NvaProjectBuilder withContext(String context) {
-        this.nvaProject.setContext(context);
+        this.context = context;
         return this;
     }
 
