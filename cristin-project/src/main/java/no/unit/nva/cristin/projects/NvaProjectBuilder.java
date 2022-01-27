@@ -10,6 +10,7 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.model.Organization;
+import no.unit.nva.utils.ContributorRoleMapping;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
 import nva.commons.core.paths.UriWrapper;
@@ -33,9 +34,6 @@ public class NvaProjectBuilder {
     public static final String TYPE = "type";
     public static final String VALUE = "value";
 
-    private static final Map<String, String> cristinRolesToNva = Map.of("PRO_MANAGER", "ProjectManager",
-            "PRO_PARTICIPANT", "ProjectParticipant");
-
     private final transient CristinProject cristinProject;
     private final transient NvaProject nvaProject;
 
@@ -58,7 +56,7 @@ public class NvaProjectBuilder {
     private static NvaContributor createNvaContributorFromCristinPersonByRole(CristinPerson cristinPerson,
                                                                               CristinRole role) {
         NvaContributor nvaContributor = new NvaContributor();
-        nvaContributor.setType(cristinRolesToNva.get(role.getRoleCode()));
+        nvaContributor.setType(ContributorRoleMapping.getNvaRole(role.getRoleCode()));
         nvaContributor.setIdentity(Person.fromCristinPerson(cristinPerson));
         nvaContributor.setAffiliation(role.getInstitution().toOrganization());
         return nvaContributor;

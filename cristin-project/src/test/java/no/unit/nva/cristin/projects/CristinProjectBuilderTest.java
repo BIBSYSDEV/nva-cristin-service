@@ -13,7 +13,7 @@ class CristinProjectBuilderTest {
 
 
     @Test
-    void shouldBeEqualProjectsAfterDoubleConverted() {
+    void projectShouldBeLossLessConvertedAndEqualAfterConvertedToCristinAndBack() {
         final NvaProject expected = randomNvaProject();
         final CristinProject cristinProject = expected.toCristinProject();
         assertNotNull(cristinProject);
