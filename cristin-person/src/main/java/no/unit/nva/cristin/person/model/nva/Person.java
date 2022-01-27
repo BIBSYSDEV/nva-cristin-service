@@ -31,7 +31,7 @@ import nva.commons.core.JsonSerializable;
 public class Person implements JsonSerializable {
 
     @JsonIgnore
-    public static final String NATIONAL_IDENTITY_NUMBER = "NationalIdentityNumber";
+    public static final String NATIONAL_IDENTITY_NUMBER = "NationalIdentificationNumber";
 
     @JsonProperty(TYPE)
     private static final String type = "Person";
