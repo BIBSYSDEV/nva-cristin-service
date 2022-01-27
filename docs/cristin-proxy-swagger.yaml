@@ -376,6 +376,10 @@ paths:
                   $ref: '#/components/examples/PersonPostResponseExample'
         400:
           $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
         500:
           $ref: '#/components/responses/500'
         502:
@@ -920,13 +924,13 @@ components:
         identifiers:
           type: array
           required: true
-          description: Identifiers for this person
+          description: Identifier for this person
           items:
             type: object
             properties:
               type:
                 type: string
-                pattern: 'NationalIdentityNumber'
+                pattern: 'NationalIdentificationNumber'
                 description: Name of identifier
               value:
                 type: string
@@ -935,7 +939,7 @@ components:
         names:
           type: array
           required: true
-          description: Names for this person
+          description: Names for this person. Required fields are FirstName and LastName
           items:
             type: object
             properties:
@@ -1286,7 +1290,7 @@ components:
     PersonPostExample:
       value:
         identifiers:
-          - type: 'NationalIdentityNumber'
+          - type: 'NationalIdentificationNumber'
             value: '12345612345'
         names:
           - type: 'PreferredFirstName'

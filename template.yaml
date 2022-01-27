@@ -216,9 +216,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.CreateCristinPersonHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.create.CreateCristinPersonHandler::handleRequest
       Runtime: java11
       MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinCreatePersonEvent:
           Type: Api
