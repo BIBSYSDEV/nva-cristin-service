@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.model.nva;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.projects.CristinProjectBuilder;
 import no.unit.nva.cristin.projects.ProjectStatus;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -43,6 +44,7 @@ public class NvaProject implements JsonSerializable {
 
     public static final String NVA_ACADEMIC_SUMMARY = "academicSummary";
     public static final String NVA_POPULAR_SCIENTIFIC_SUMMARY = "popularScientificSummary";
+    public static final String PROJECT_CONTEXT = Constants.PROJECT_LOOKUP_CONTEXT_URL; // Until decided
 
     @JsonProperty(CONTEXT)
     @JsonInclude(NON_NULL)
