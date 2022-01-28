@@ -4,6 +4,7 @@ import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,8 +55,9 @@ public class UriUtils {
 
     /**
      * Create URI identifying NVA resource from path and identifier.
+     *
      * @param identifier of element
-     * @param path section of NVA API
+     * @param path       section of NVA API
      * @return valid URI for a NVA resource
      */
     public static URI getNvaApiId(String identifier, String path) {
@@ -68,8 +70,9 @@ public class UriUtils {
 
     /**
      * Create URI identifying a cristin resource from path and identifier.
+     *
      * @param identifier cristin identifier of resource
-     * @param path section of cristin api
+     * @param path       section of cristin api
      * @return valid URI for a cristin resource
      */
     public static URI getCristinUri(String identifier, String path) {
@@ -85,14 +88,15 @@ public class UriUtils {
 
     public static URI createIdUriFromParams(Map<String, String> requestQueryParams, String type) {
         return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(type)
-            .addQueryParameters(requestQueryParams).getUri();
+                .addQueryParameters(requestQueryParams).getUri();
     }
 
 
     /**
      * Create a valid query URI for cristin.
+     *
      * @param cristinRequestQueryParams limitations for request
-     * @param path section of cristin API
+     * @param path                      section of cristin API
      * @return valid URI for query against cristin
      */
     public static URI createCristinQueryUri(Map<String, String> cristinRequestQueryParams, String path) {
@@ -102,7 +106,7 @@ public class UriUtils {
                 .getUri();
     }
 
-    public static  URI getNvaApiUri(String path) {
+    public static URI getNvaApiUri(String path) {
         return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(path).getUri();
     }
 
@@ -112,6 +116,6 @@ public class UriUtils {
     }
 
     public static String extractLastPathElement(URI uri) {
-        return new UriWrapper(uri).getFilename();
+        return Objects.nonNull(uri) ? new UriWrapper(uri).getFilename() : null;
     }
 }

@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -9,8 +10,10 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
+import nva.commons.core.StringUtils;
 
 import java.net.HttpURLConnection;
+import java.util.Objects;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
@@ -19,10 +22,18 @@ import static nva.commons.core.attempt.Try.attempt;
 public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, NvaProject> {
 
     public static final String NEEDED_ROLE = "Creator";
+    private final transient CreateCristinProjectApiClient apiClient;
 
-    public CreateCristinProjectHandler(Environment environment) {
-        super(NvaProject.class, environment);
+    public CreateCristinProjectHandler() {
+        this(new CreateCristinProjectApiClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
+
+
+    public CreateCristinProjectHandler(CreateCristinProjectApiClient apiClient, Environment environment) {
+        super(NvaProject.class, environment);
+        this.apiClient = apiClient;
+    }
+
 
     /**
      * Implements the main logic of the handler. Any exception thrown by this method will be handled by {@link
@@ -41,11 +52,26 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
         validateAccess(requestInfo);
         validateInput(input);
 
-        return dummyPersistProject(input);
+        return apiClient.createProjectInCristin(input);
     }
 
     private void validateInput(NvaProject project) throws BadRequestException {
-        attempt(() -> project.toCristinProject().hasValidContent()).orElseThrow(failure -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
+        if (hasId(project) || !(hasTitle(project) && hasValidStatus(project))) {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
+        };
+    }
+
+    private boolean hasId(NvaProject project) {
+        return Objects.nonNull(project.getId());
+    }
+
+
+    private boolean hasValidStatus(NvaProject project) {
+        return ProjectStatus.isValidStatus(project.getStatus().name());
+    }
+
+    private boolean hasTitle(NvaProject project) {
+        return StringUtils.isNotBlank(project.getTitle());
     }
 
     private void validateAccess(RequestInfo requestInfo) throws ForbiddenException {
@@ -55,7 +81,7 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
         }
     }
 
-    private NvaProject dummyPersistProject(NvaProject input) {
+    private NvaProject persistProjectInCristin(NvaProject input) {
         input.setId(randomUri());
         return input;
     }

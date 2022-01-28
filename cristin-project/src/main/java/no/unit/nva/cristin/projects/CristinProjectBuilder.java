@@ -70,7 +70,7 @@ public class CristinProjectBuilder {
 
     private List<CristinRole> extractCristinRoles(NvaContributor contributor) {
         CristinRole cristinRole = new CristinRole();
-        cristinRole.setRoleCode(ContributorRoleMapping.getCristinRole(contributor.getType()));
+        cristinRole.setRoleCode(ContributorRoleMapping.getCristinRole(contributor.getType()).get());
         cristinRole.setInstitution(toCristinInstitution(contributor.getAffiliation()));
         return List.of(cristinRole);
     }
