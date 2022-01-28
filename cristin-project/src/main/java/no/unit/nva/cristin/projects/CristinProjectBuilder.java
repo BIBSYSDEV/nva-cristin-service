@@ -9,7 +9,6 @@ import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.ContributorRoleMapping;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static no.unit.nva.utils.ContributorRoleMapping.getCristinRole;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinProjectBuilder {
@@ -69,8 +69,14 @@ public class CristinProjectBuilder {
     }
 
     private List<CristinRole> extractCristinRoles(NvaContributor contributor) {
+        return getCristinRole(contributor.getType()).isPresent()
+                ? getCristinRoles(contributor)
+                : Collections.emptyList();
+    }
+
+    private List<CristinRole> getCristinRoles(NvaContributor contributor) {
         CristinRole cristinRole = new CristinRole();
-        cristinRole.setRoleCode(ContributorRoleMapping.getCristinRole(contributor.getType()).get());
+        cristinRole.setRoleCode(getCristinRole(contributor.getType()).get());
         cristinRole.setInstitution(toCristinInstitution(contributor.getAffiliation()));
         return List.of(cristinRole);
     }
