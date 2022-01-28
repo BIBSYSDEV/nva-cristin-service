@@ -1,20 +1,26 @@
 package no.unit.nva.utils;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import nva.commons.core.SingletonCollector;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 public enum ContributorRoleMapping {
 
     MANAGER("ProjectManager", "PRO_MANAGER"),
     PARTICIPANT("ProjectParticipant","PRO_PARTICIPANT");
 
+
     private final String nvaRole;
     private final String cristinRole;
-    private static Map<String, String> mMap;
 
     ContributorRoleMapping(String nvaRole, String cristinRole) {
         this.nvaRole = nvaRole;
         this.cristinRole = cristinRole;
+    }
+
+    private String getNvaRole() {
+        return nvaRole;
     }
 
     /**
@@ -22,15 +28,15 @@ public enum ContributorRoleMapping {
      * @param role cristinRole to map
      * @return corresponding role in NVA
      */
-    public static String getNvaRole(String role) {
-        String result = null;
-        if (mMap == null) {
-            initializeMapping();
-        }
-        if (mMap.containsKey(role)) {
-            result = mMap.get(role);
-        }
-        return result;
+    public static Optional<String> getNvaRole(String role) {
+        return Optional.ofNullable(Arrays.stream(values())
+                .filter(contributorRoleMapping -> contributorRoleMapping.getCristinRole().equals(role))
+                .map(ContributorRoleMapping::getNvaRole)
+                .collect(SingletonCollector.collectOrElse(null)));
+    }
+
+    private String getCristinRole() {
+        return cristinRole;
     }
 
     /**
@@ -38,23 +44,10 @@ public enum ContributorRoleMapping {
      * @param role String representing role in NVA
      * @return role mapped to Cristin
      */
-    public static String getCristinRole(String role) {
-        String result = null;
-        if (mMap == null) {
-            initializeMapping();
-        }
-        if (mMap.containsKey(role)) {
-            result = mMap.get(role);
-        }
-        return result;
+    public static Optional<String> getCristinRole(String role) {
+        return Optional.ofNullable(Arrays.stream(values())
+                .filter(contributorRoleMapping -> contributorRoleMapping.getNvaRole().equals(role))
+                .map(ContributorRoleMapping::getCristinRole)
+                .collect(SingletonCollector.collectOrElse(null)));
     }
-
-    private static void initializeMapping() {
-        mMap = new ConcurrentHashMap<>();
-        for (ContributorRoleMapping s : ContributorRoleMapping.values()) {
-            mMap.put(s.nvaRole, s.cristinRole);
-            mMap.put(s.cristinRole, s.nvaRole);
-        }
-    }
-
 }

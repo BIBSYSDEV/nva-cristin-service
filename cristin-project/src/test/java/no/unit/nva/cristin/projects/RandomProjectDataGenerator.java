@@ -88,7 +88,7 @@ public class RandomProjectDataGenerator {
     }
 
     private static List<NvaContributor> randomContributors() {
-        return IntStream.rangeClosed(1, randomInteger(5))
+        return IntStream.rangeClosed(0, randomInteger(5))
                 .mapToObj(i -> randomContributor()).collect(Collectors.toList());
     }
 
@@ -109,7 +109,7 @@ public class RandomProjectDataGenerator {
     }
 
     private static List<Funding> randomFundings() {
-        return IntStream.rangeClosed(1, randomInteger(7))
+        return IntStream.rangeClosed(0, randomInteger(7))
                 .mapToObj(i -> randomFunding()).collect(Collectors.toList());
     }
 

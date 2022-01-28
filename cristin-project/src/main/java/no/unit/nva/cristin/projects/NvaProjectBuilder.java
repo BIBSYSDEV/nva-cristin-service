@@ -49,13 +49,14 @@ public class NvaProjectBuilder {
 
     private static Stream<NvaContributor> generateRoleBasedContribution(CristinPerson cristinPerson) {
         return cristinPerson.getRoles().stream()
+                .filter(cristinRole -> ContributorRoleMapping.getNvaRole(cristinRole.getRoleCode()).isPresent())
                 .map(role -> createNvaContributorFromCristinPersonByRole(cristinPerson, role));
     }
 
     private static NvaContributor createNvaContributorFromCristinPersonByRole(CristinPerson cristinPerson,
                                                                               CristinRole role) {
         NvaContributor nvaContributor = new NvaContributor();
-        nvaContributor.setType(ContributorRoleMapping.getNvaRole(role.getRoleCode()));
+        nvaContributor.setType(ContributorRoleMapping.getNvaRole(role.getRoleCode()).get());
         nvaContributor.setIdentity(Person.fromCristinPerson(cristinPerson));
         nvaContributor.setAffiliation(role.getInstitution().toOrganization());
         return nvaContributor;
