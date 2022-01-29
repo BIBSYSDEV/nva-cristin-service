@@ -16,7 +16,6 @@ import java.net.HttpURLConnection;
 import java.util.Objects;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
-import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, NvaProject> {
@@ -24,16 +23,23 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
     public static final String NEEDED_ROLE = "Creator";
     private final transient CreateCristinProjectApiClient apiClient;
 
+    /**
+     * Create CreateCristinProjectHandler with default authenticated HttpClient.
+     */
     public CreateCristinProjectHandler() {
         this(new CreateCristinProjectApiClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
 
-
+    /**
+     * Create CreateCristinProjectHandler with supplied HttpClient.
+     *
+     * @param apiClient HttpClient to use for access external services
+     * @param environment configuration for service
+     */
     public CreateCristinProjectHandler(CreateCristinProjectApiClient apiClient, Environment environment) {
         super(NvaProject.class, environment);
         this.apiClient = apiClient;
     }
-
 
     /**
      * Implements the main logic of the handler. Any exception thrown by this method will be handled by {@link
@@ -47,7 +53,8 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
      *                             method {@link RestRequestHandler#getFailureStatusCode}
      */
     @Override
-    protected NvaProject processInput(NvaProject input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+    protected NvaProject processInput(NvaProject input, RequestInfo requestInfo, Context context)
+            throws ApiGatewayException {
 
         validateAccess(requestInfo);
         validateInput(input);
@@ -56,34 +63,29 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
     }
 
     private void validateInput(NvaProject project) throws BadRequestException {
-        if (hasId(project) || !(hasTitle(project) && hasValidStatus(project))) {
+        if (hasId(project) || noTitle(project) || invalidStatus(project)) {
             throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
-        };
+        }
     }
 
     private boolean hasId(NvaProject project) {
         return Objects.nonNull(project.getId());
     }
 
-
-    private boolean hasValidStatus(NvaProject project) {
-        return ProjectStatus.isValidStatus(project.getStatus().name());
+    private boolean invalidStatus(NvaProject project) {
+        return !ProjectStatus.isValidStatus(project.getStatus().name());
     }
 
-    private boolean hasTitle(NvaProject project) {
-        return StringUtils.isNotBlank(project.getTitle());
+    private boolean noTitle(NvaProject project) {
+        return StringUtils.isEmpty(project.getTitle());
     }
 
     private void validateAccess(RequestInfo requestInfo) throws ForbiddenException {
-        boolean hasAccess = attempt(() -> requestInfo.getAssignedRoles().get().contains(NEEDED_ROLE)).orElseThrow(failure -> new ForbiddenException());
+        boolean hasAccess = attempt(() -> requestInfo.getAssignedRoles()
+                .get().contains(NEEDED_ROLE)).orElseThrow(failure -> new ForbiddenException());
         if (!hasAccess) {
             throw new ForbiddenException();
         }
-    }
-
-    private NvaProject persistProjectInCristin(NvaProject input) {
-        input.setId(randomUri());
-        return input;
     }
 
     /**

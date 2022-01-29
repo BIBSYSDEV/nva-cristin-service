@@ -6,15 +6,13 @@ import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 
@@ -26,7 +24,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 class CreateCristinProjectHandlerTest {
@@ -34,31 +31,26 @@ class CreateCristinProjectHandlerTest {
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
+    private HttpClient mockHttpClient;
+    private CreateCristinProjectApiClient apiClient;
     private CreateCristinProjectHandler handler;
-    private NvaProject randomNvaProject;
-    private CreateCristinProjectApiClient mockApiClient;
 
-//    @BeforeEach
-    void setUp() throws ApiGatewayException {
+    @BeforeEach
+    void setUp() {
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        randomNvaProject = RandomProjectDataGenerator.randomNvaProject();
-        mockApiClient = mock(CreateCristinProjectApiClient.class);
-        final HttpResponse<String> httpResponse = echoRequest(randomNvaProject);
-        when(mockApiClient.post(any(URI.class), any(String.class))).thenReturn(httpResponse);
-        handler = new CreateCristinProjectHandler(mockApiClient, environment);
+        mockHttpClient = mock(HttpClient.class);
+        apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
     }
-
 
     @Test
     void shouldReturn403ForbiddenWhenRequestIsMissingRole() throws Exception {
-
-
+        NvaProject randomNvaProject = RandomProjectDataGenerator.randomNvaProject();
         InputStream input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
                 .withBody(randomNvaProject)
                 .withRoles(NO_ACCESS)
                 .build();
-
         handler.handleRequest(input, output, context);
         GatewayResponse<Object> response = GatewayResponse.fromOutputStream(output);
 
@@ -67,35 +59,36 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldReturn400BadRequestWhenInvalidInput() throws Exception {
-        NvaProject empty = new NvaProject.Builder().build();
-        GatewayResponse<NvaProject> response = postRequest(empty);
+
+        NvaProject randomNvaProject = RandomProjectDataGenerator.randomNvaProject();
+        randomNvaProject.setId(randomUri());
+        randomNvaProject.setTitle(null);
+
+        InputStream input = requestWithBodyAndRole(randomNvaProject);
+        handler.handleRequest(input, output, context);
+        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
     }
 
     @Test
     void shouldReturnProjectDataWithNewIdentifierWhenCreated() throws Exception {
         NvaProject expected = RandomProjectDataGenerator.randomNvaProject();
-        HttpClient httpClient = mock(HttpClient.class);
-        CreateCristinProjectApiClient cristinProjectApiClient = spy(new CreateCristinProjectApiClient(httpClient));
-        final HttpResponse<String> httpResponse = new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(updateId(expected)),201);
-        when(cristinProjectApiClient.post(any(), any())).thenReturn(httpResponse);
-        CreateCristinProjectHandler handler = new CreateCristinProjectHandler(cristinProjectApiClient, environment);
+        expected.setContext(NvaProject.PROJECT_CONTEXT);
+        HttpResponse<String> httpResponse =
+                new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(expected.toCristinProject()),201);
+        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
 
-        InputStream input = requestWithBodyAndRole(expected);
+        NvaProject requestProject = expected.toCristinProject().toNvaProject();
+        requestProject.setId(null);  // Cannot create with Id
+        InputStream input = requestWithBodyAndRole(requestProject);
         handler.handleRequest(input, output, context);
-        final GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
         NvaProject actual = response.getBodyObject(NvaProject.class);
         assertNotNull(actual.getId());
-        actual.setId(expected.getId());   // Id is supposed to generated by Cristin?
         assertThat(actual, equalTo(expected));
-    }
-
-    private GatewayResponse<NvaProject> postRequest(NvaProject body) throws IOException {
-        InputStream input = requestWithBodyAndRole(body);
-        handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
     }
 
     private InputStream requestWithBodyAndRole(NvaProject body) throws JsonProcessingException {
@@ -104,30 +97,4 @@ class CreateCristinProjectHandlerTest {
                 .withRoles(NEEDED_ROLE)
                 .build();
     }
-
-    private HttpResponse<String> echoRequest(NvaProject nvaProject) {
-        try {
-            String json = OBJECT_MAPPER.writeValueAsString(updateId(nvaProject));
-            return new HttpResponseFaker(json,201);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return new HttpResponseFaker(null, 500);
-    }
-
-
-    private NvaProject updateId(NvaProject nvaProject) {
-        nvaProject.setId(randomUri());
-        return nvaProject;
-    }
-
-//    private HttpResponse<String> echoRequest(String argument) {
-//        CristinProject cristinProject = attempt(() ->  OBJECT_MAPPER.readValue(argument, CristinProject.class)).orElseThrow();
-//        NvaProject nvaProject = updateId(cristinProject.toNvaProject());
-//        String json = attempt(() ->  OBJECT_MAPPER.writeValueAsString(nvaProject)).orElseThrow();
-//        HttpResponse<String> response =  new HttpResponseFaker(json, 201);
-//        return  response;
-//    }
-
-
 }

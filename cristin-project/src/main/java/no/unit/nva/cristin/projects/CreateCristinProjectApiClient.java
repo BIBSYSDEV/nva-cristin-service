@@ -3,8 +3,6 @@ package no.unit.nva.cristin.projects;
 import no.unit.nva.cristin.common.client.PostApiClient;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.exception.FailedHttpRequestException;
-import no.unit.nva.exception.GatewayTimeoutException;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.paths.UriWrapper;
@@ -27,29 +25,6 @@ public class CreateCristinProjectApiClient extends PostApiClient  {
     }
 
     /**
-     * Initiate a synchronous POST to uri with supplied payload. Returns response from upstream.
-     *
-     * @param uri
-     * @param body
-     */
-    @Override
-    public HttpResponse<String> post(URI uri, String body) throws GatewayTimeoutException, FailedHttpRequestException {
-        return super.post(uri, body);
-    }
-
-//    /**
-//     * Initiate a synchronous POST to uri with supplied payload. Returns response from upstream.
-//     *
-//     * @param uri
-//     * @param body
-//     */
-//    @Override
-//    public HttpResponse<String> post(URI uri, String body) throws GatewayTimeoutException, FailedHttpRequestException {
-//        return super.post(uri, body);
-//    }
-
-
-    /**
      * Used for creating a person in Cristin from the supplied Person object.
      */
     public NvaProject createProjectInCristin(NvaProject nvaProject) throws ApiGatewayException {
@@ -65,7 +40,6 @@ public class CreateCristinProjectApiClient extends PostApiClient  {
         CristinProject  cristinProject = nvaProject.toCristinProject();
         return attempt(() -> OBJECT_MAPPER.writeValueAsString(cristinProject)).orElseThrow();
     }
-
 
     private URI getCristinProjectPostUri() {
         return new UriWrapper(CRISTIN_API_URL).addChild(PROJECTS_PATH).getUri();
