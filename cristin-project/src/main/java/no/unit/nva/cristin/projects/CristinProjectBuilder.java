@@ -22,7 +22,6 @@ import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 public class CristinProjectBuilder {
 
 
-
     private final transient CristinProject cristinProject;
     private final transient NvaProject nvaProject;
 
@@ -76,7 +75,9 @@ public class CristinProjectBuilder {
 
     private List<CristinRole> getCristinRoles(NvaContributor contributor) {
         CristinRole cristinRole = new CristinRole();
-        cristinRole.setRoleCode(getCristinRole(contributor.getType()).get());
+        if (getCristinRole(contributor.getType()).isPresent()) {
+            cristinRole.setRoleCode(getCristinRole(contributor.getType()).get());
+        }
         cristinRole.setInstitution(toCristinInstitution(contributor.getAffiliation()));
         return List.of(cristinRole);
     }
@@ -108,7 +109,7 @@ public class CristinProjectBuilder {
     private Map<String, String> extractTitles(NvaProject nvaProject) {
         Map<String, String> titles = new ConcurrentHashMap<>();
         titles.put(extractLastPathElement(nvaProject.getLanguage()), nvaProject.getTitle());
-        nvaProject.getAlternativeTitles().stream().forEach(titles::putAll);
+        nvaProject.getAlternativeTitles().forEach(titles::putAll);
         return titles;
     }
 }

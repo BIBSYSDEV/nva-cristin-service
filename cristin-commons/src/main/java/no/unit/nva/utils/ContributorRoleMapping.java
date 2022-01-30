@@ -10,7 +10,6 @@ public enum ContributorRoleMapping {
     MANAGER("ProjectManager", "PRO_MANAGER"),
     PARTICIPANT("ProjectParticipant","PRO_PARTICIPANT");
 
-
     private final String nvaRole;
     private final String cristinRole;
 

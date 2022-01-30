@@ -10,7 +10,6 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.ContributorRoleMapping;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
 import nva.commons.core.paths.UriWrapper;
@@ -25,6 +24,7 @@ import java.util.stream.Stream;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
 
 public class NvaProjectBuilder {
 
@@ -55,8 +55,8 @@ public class NvaProjectBuilder {
     private static NvaContributor createNvaContributorFromCristinPersonByRole(CristinPerson cristinPerson,
                                                                               CristinRole role) {
         NvaContributor nvaContributor = new NvaContributor();
-        if (ContributorRoleMapping.getNvaRole(role.getRoleCode()).isPresent()) {
-            nvaContributor.setType(ContributorRoleMapping.getNvaRole(role.getRoleCode()).get());
+        if (getNvaRole(role.getRoleCode()).isPresent()) {
+            nvaContributor.setType(getNvaRole(role.getRoleCode()).get());
         }
         nvaContributor.setIdentity(Person.fromCristinPerson(cristinPerson));
         nvaContributor.setAffiliation(role.getInstitution().toOrganization());
