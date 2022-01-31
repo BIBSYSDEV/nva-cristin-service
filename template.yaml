@@ -228,6 +228,22 @@ Resources:
             Path: /person/
             Method: post
 
+  NvaCristinFetchPersonInstitutionInfoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinFetchPersonEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}/organization/{orgId}/
+            Method: get
+
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
