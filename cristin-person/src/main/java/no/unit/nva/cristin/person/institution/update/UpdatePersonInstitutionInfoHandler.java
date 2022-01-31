@@ -5,7 +5,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
-import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
+import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -13,7 +13,7 @@ import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class UpdatePersonInstitutionInfoHandler extends ApiGatewayHandler<PersonInstitutionInfo, String> {
+public class UpdatePersonInstitutionInfoHandler extends ApiGatewayHandler<PersonInstInfoPatch, String> {
 
     public static final String EMPTY_JSON = "{}";
 
@@ -25,11 +25,11 @@ public class UpdatePersonInstitutionInfoHandler extends ApiGatewayHandler<Person
 
     @JacocoGenerated
     public UpdatePersonInstitutionInfoHandler(Environment environment) {
-        super(PersonInstitutionInfo.class, environment);
+        super(PersonInstInfoPatch.class, environment);
     }
 
     @Override
-    protected String processInput(PersonInstitutionInfo input, RequestInfo requestInfo, Context context)
+    protected String processInput(PersonInstInfoPatch input, RequestInfo requestInfo, Context context)
         throws ForbiddenException {
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
@@ -43,7 +43,7 @@ public class UpdatePersonInstitutionInfoHandler extends ApiGatewayHandler<Person
     }
 
     @Override
-    protected Integer getSuccessStatusCode(PersonInstitutionInfo input, String output) {
+    protected Integer getSuccessStatusCode(PersonInstInfoPatch input, String output) {
         return HttpURLConnection.HTTP_NO_CONTENT;
     }
 }
