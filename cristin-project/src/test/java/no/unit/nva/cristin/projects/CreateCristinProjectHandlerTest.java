@@ -28,6 +28,8 @@ import static org.mockito.Mockito.when;
 
 class CreateCristinProjectHandlerTest {
     public static final String NO_ACCESS = "NoAccess";
+    public static final String ILLEGAL_CONTRIBUTOR_ROLE = "illegalContributorRole";
+    public static final int FIRST_CONTRIBUTOR = 0;
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
@@ -58,7 +60,7 @@ class CreateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldReturn400BadRequestWhenInvalidInput() throws Exception {
+    void shouldReturn400BadRequestWhenMissingRequiredFieldsInInput() throws Exception {
 
         NvaProject randomNvaProject = RandomProjectDataGenerator.randomNvaProject();
         randomNvaProject.setId(randomUri());
@@ -72,11 +74,24 @@ class CreateCristinProjectHandlerTest {
     }
 
     @Test
+    void shouldReturn400BadRequestWhenIllegalRoleValueInInput() throws Exception {
+
+        NvaProject randomNvaProject = RandomProjectDataGenerator.randomNvaProject();
+        randomNvaProject.getContributors().get(FIRST_CONTRIBUTOR).setType(ILLEGAL_CONTRIBUTOR_ROLE);
+
+        InputStream input = requestWithBodyAndRole(randomNvaProject);
+        handler.handleRequest(input, output, context);
+        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
+    }
+
+    @Test
     void shouldReturnProjectDataWithNewIdentifierWhenCreated() throws Exception {
         NvaProject expected = RandomProjectDataGenerator.randomNvaProject();
         expected.setContext(NvaProject.PROJECT_CONTEXT);
         HttpResponse<String> httpResponse =
-                new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(expected.toCristinProject()),201);
+                new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(expected.toCristinProject()), 201);
         when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
 
         NvaProject requestProject = expected.toCristinProject().toNvaProject();
