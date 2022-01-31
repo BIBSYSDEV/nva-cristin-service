@@ -3,8 +3,11 @@ package no.unit.nva.cristin.projects.model.nva;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import no.unit.nva.model.Organization;
+import no.unit.nva.cristin.model.Constants;
+import no.unit.nva.cristin.projects.CristinProjectBuilder;
 import no.unit.nva.cristin.projects.ProjectStatus;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonSerializable;
 
@@ -33,6 +36,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_POPULAR_SCIENTIFIC_SUMMARY;
 
+@SuppressWarnings("PMD.ExcessivePublicCount")
 @JsonInclude(ALWAYS)
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
         FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS, NVA_ACADEMIC_SUMMARY, NVA_POPULAR_SCIENTIFIC_SUMMARY})
@@ -40,6 +44,7 @@ public class NvaProject implements JsonSerializable {
 
     public static final String NVA_ACADEMIC_SUMMARY = "academicSummary";
     public static final String NVA_POPULAR_SCIENTIFIC_SUMMARY = "popularScientificSummary";
+    public static final String PROJECT_CONTEXT = Constants.PROJECT_LOOKUP_CONTEXT_URL; // Until decided
 
     @JsonProperty(CONTEXT)
     @JsonInclude(NON_NULL)
@@ -71,10 +76,12 @@ public class NvaProject implements JsonSerializable {
     @JsonProperty
     private ProjectStatus status;
     @JsonProperty
-    private Map<String, String>  academicSummary;
+    private Map<String, String> academicSummary;
     @JsonProperty
-    private Map<String, String>  popularScientificSummary;
+    private Map<String, String> popularScientificSummary;
 
+    private NvaProject() {
+    }
 
     public String getContext() {
         return context;
@@ -241,5 +248,98 @@ public class NvaProject implements JsonSerializable {
     @Override
     public String toString() {
         return toJsonString();
+    }
+
+    public CristinProject toCristinProject() {
+        return new CristinProjectBuilder(this).build();
+    }
+
+
+    public static final class Builder {
+
+        private final transient NvaProject nvaProject;
+
+        public Builder() {
+            nvaProject = new NvaProject();
+        }
+
+        public Builder withContext(String context) {
+            nvaProject.setContext(context);
+            return this;
+        }
+
+        public Builder withId(URI id) {
+            nvaProject.setId(id);
+            return this;
+        }
+
+        public Builder withType(String type) {
+            nvaProject.setType(type);
+            return this;
+        }
+
+        public Builder withIdentifiers(List<Map<String, String>> identifiers) {
+            nvaProject.setIdentifiers(identifiers);
+            return this;
+        }
+
+        public Builder withTitle(String title) {
+            nvaProject.setTitle(title);
+            return this;
+        }
+
+        public Builder withLanguage(URI language) {
+            nvaProject.setLanguage(language);
+            return this;
+        }
+
+        public Builder withAlternativeTitles(List<Map<String, String>> alternativeTitles) {
+            nvaProject.setAlternativeTitles(alternativeTitles);
+            return this;
+        }
+
+        public Builder withStartDate(Instant startDate) {
+            nvaProject.setStartDate(startDate);
+            return this;
+        }
+
+        public Builder withEndDate(Instant endDate) {
+            nvaProject.setEndDate(endDate);
+            return this;
+        }
+
+        public Builder withFunding(List<Funding> funding) {
+            nvaProject.setFunding(funding);
+            return this;
+        }
+
+        public Builder withCoordinatingInstitution(Organization coordinatingInstitution) {
+            nvaProject.setCoordinatingInstitution(coordinatingInstitution);
+            return this;
+        }
+
+        public Builder withContributors(List<NvaContributor> contributors) {
+            nvaProject.setContributors(contributors);
+            return this;
+        }
+
+        public Builder withStatus(ProjectStatus status) {
+            nvaProject.setStatus(status);
+            return this;
+        }
+
+        public Builder withAcademicSummary(Map<String, String> academicSummary) {
+            nvaProject.setAcademicSummary(academicSummary);
+            return this;
+        }
+
+        public Builder withPopularScientificSummary(Map<String, String> popularScientificSummary) {
+            nvaProject.setPopularScientificSummary(popularScientificSummary);
+            return this;
+        }
+
+        public NvaProject build() {
+            return nvaProject;
+        }
     }
 }
