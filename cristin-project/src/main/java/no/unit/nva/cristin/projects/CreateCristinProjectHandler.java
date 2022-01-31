@@ -3,7 +3,9 @@ package no.unit.nva.cristin.projects;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
+import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.model.Organization;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
@@ -14,6 +16,7 @@ import nva.commons.core.Environment;
 import nva.commons.core.StringUtils;
 
 import java.net.HttpURLConnection;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +39,7 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
     /**
      * Create CreateCristinProjectHandler with supplied HttpClient.
      *
-     * @param apiClient HttpClient to use for access external services
+     * @param apiClient   HttpClient to use for access external services
      * @param environment configuration for service
      */
     public CreateCristinProjectHandler(CreateCristinProjectApiClient apiClient, Environment environment) {
@@ -66,9 +69,27 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
     }
 
     private void validateInput(NvaProject project) throws BadRequestException {
-        if (hasId(project) || noTitle(project) || invalidStatus(project)) {
+        if (hasId(project)
+                || noTitle(project)
+                || invalidStatus(project)
+                || invalidStartDate(project.getStartDate())
+                || hasNoContributors(project.getContributors())
+                || hasNoCoordinatingOrganization(project.getCoordinatingInstitution())
+        ) {
             throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
         }
+    }
+
+    private boolean hasNoCoordinatingOrganization(Organization coordinatingInstitution) {
+        return Objects.isNull(coordinatingInstitution);
+    }
+
+    private boolean hasNoContributors(List<NvaContributor> contributors) {
+        return Objects.isNull(contributors) || contributors.isEmpty();
+    }
+
+    private boolean invalidStartDate(Instant startDate) {
+        return Objects.isNull(startDate);
     }
 
     private boolean hasId(NvaProject project) {

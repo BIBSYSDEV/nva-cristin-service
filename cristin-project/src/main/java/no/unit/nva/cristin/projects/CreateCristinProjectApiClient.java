@@ -30,7 +30,7 @@ public class CreateCristinProjectApiClient extends PostApiClient  {
     public NvaProject createProjectInCristin(NvaProject nvaProject) throws ApiGatewayException {
         String payload = generatePayloadFromRequest(nvaProject);
         URI uri = getCristinProjectPostUri();
-        HttpResponse<String> response = post(uri, payload);
+        var response = post(uri, payload);
         checkPostHttpStatusCode(getNvaApiUri(PROJECT_PATH_NVA), response.statusCode());
         return createProjectFromResponse(response);
     }

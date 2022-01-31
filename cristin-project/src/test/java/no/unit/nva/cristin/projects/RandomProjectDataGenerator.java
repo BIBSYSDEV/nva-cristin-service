@@ -95,6 +95,9 @@ public class RandomProjectDataGenerator {
                 .withTitle(randomString())
                 .withLanguage(LanguageMapper.toUri(randomElement(LANGUAGES)))
                 .withStatus(randomElement(ProjectStatus.values()))
+                .withCoordinatingInstitution(randomOrganization())
+                .withContributors(randomContributors())
+                .withStartDate(randomInstant())
                 .build();
     }
 
