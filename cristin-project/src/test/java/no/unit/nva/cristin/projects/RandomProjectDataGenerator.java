@@ -22,7 +22,6 @@ import java.util.stream.IntStream;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
-import static no.unit.nva.cristin.projects.CristinProjectBuilder.mapMainLanguageToCristin;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.TYPE;
@@ -32,6 +31,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.utils.LanguageMapperExtra.mapMainLanguageToCristin;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RandomProjectDataGenerator {

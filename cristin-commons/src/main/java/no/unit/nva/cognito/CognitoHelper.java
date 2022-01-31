@@ -29,9 +29,9 @@ import java.util.Map;
 public class CognitoHelper {
 
 
-    private final String userPoolId;
-    private final String clientAppId;
-    private final String region;
+    private final transient String userPoolId;
+    private final transient String clientAppId;
+    private final transient String region;
     private final AWSCognitoIdentityProvider cognitoIdentityProvider;
 
     /**

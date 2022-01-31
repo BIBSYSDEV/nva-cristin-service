@@ -36,7 +36,6 @@ class CreateCristinProjectHandlerTest {
     private Context context;
     private ByteArrayOutputStream output;
     private HttpClient mockHttpClient;
-    private CreateCristinProjectApiClient apiClient;
     private CreateCristinProjectHandler handler;
 
     @BeforeEach
@@ -44,7 +43,7 @@ class CreateCristinProjectHandlerTest {
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         mockHttpClient = mock(HttpClient.class);
-        apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        CreateCristinProjectApiClient apiClient = new CreateCristinProjectApiClient(mockHttpClient);
         handler = new CreateCristinProjectHandler(apiClient, environment);
     }
 

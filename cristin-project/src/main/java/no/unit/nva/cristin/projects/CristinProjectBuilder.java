@@ -10,7 +10,6 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static no.unit.nva.utils.ContributorRoleMapping.getCristinRole;
+import static no.unit.nva.utils.LanguageMapperExtra.mapMainLanguageToCristin;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinProjectBuilder {
@@ -55,16 +55,6 @@ public class CristinProjectBuilder {
         }
 
         return cristinProject;
-    }
-
-    public static  String mapMainLanguageToCristin(URI language) {
-        switch (language.toString()) {
-            case "http://lexvo.org/id/iso639-3/nob" : return "nb";
-            case "http://lexvo.org/id/iso639-3/nno" : return "nn";
-            case "http://lexvo.org/id/iso639-3/eng" : return "en";
-            default:
-                throw new IllegalStateException("Unexpected value: " + language);
-        }
     }
 
     private List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
