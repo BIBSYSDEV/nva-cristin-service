@@ -20,8 +20,8 @@ import nva.commons.core.JacocoGenerated;
 
 public class FetchPersonInstitutionInfoHandler extends ApiGatewayHandler<Void, PersonInstitutionInfo> {
 
-    public static final String PERSON_ID = "person-id";
-    public static final String ORG_ID = "org-id";
+    public static final String PERSON_ID = "id";
+    public static final String ORG_ID = "orgId";
     public static final String PUNCTUATION = ".";
     public static final String INVALID_ORGANIZATION_ID = "Invalid path parameter for organization id";
     public static final String INVALID_PERSON_ID = "Invalid path parameter for person id";
