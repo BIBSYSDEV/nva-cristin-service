@@ -18,6 +18,8 @@ import java.net.http.HttpResponse;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.CreateCristinProjectHandler.NEEDED_ROLE;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -48,7 +50,7 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldReturn403ForbiddenWhenRequestIsMissingRole() throws Exception {
-        NvaProject randomNvaProject = RandomProjectDataGenerator.randomNvaProject();
+        NvaProject randomNvaProject = randomNvaProject();
         InputStream input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
                 .withBody(randomNvaProject)
                 .withRoles(NO_ACCESS)
@@ -62,7 +64,7 @@ class CreateCristinProjectHandlerTest {
     @Test
     void shouldReturn400BadRequestWhenMissingRequiredFieldsInInput() throws Exception {
 
-        NvaProject randomNvaProject = RandomProjectDataGenerator.randomNvaProject();
+        NvaProject randomNvaProject = randomNvaProject();
         randomNvaProject.setId(randomUri());
         randomNvaProject.setTitle(null);
 
@@ -76,7 +78,7 @@ class CreateCristinProjectHandlerTest {
     @Test
     void shouldReturn400BadRequestWhenIllegalRoleValueInInput() throws Exception {
 
-        NvaProject randomNvaProject = RandomProjectDataGenerator.randomNvaProject();
+        NvaProject randomNvaProject = randomNvaProject();
         randomNvaProject.getContributors().get(FIRST_CONTRIBUTOR).setType(ILLEGAL_CONTRIBUTOR_ROLE);
 
         InputStream input = requestWithBodyAndRole(randomNvaProject);
@@ -88,7 +90,27 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldReturnProjectDataWithNewIdentifierWhenCreated() throws Exception {
-        NvaProject expected = RandomProjectDataGenerator.randomNvaProject();
+        NvaProject expected = randomNvaProject();
+        expected.setContext(NvaProject.PROJECT_CONTEXT);
+        HttpResponse<String> httpResponse =
+                new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(expected.toCristinProject()), 201);
+        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+
+        NvaProject requestProject = expected.toCristinProject().toNvaProject();
+        requestProject.setId(null);  // Cannot create with Id
+        InputStream input = requestWithBodyAndRole(requestProject);
+        handler.handleRequest(input, output, context);
+        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
+        NvaProject actual = response.getBodyObject(NvaProject.class);
+        assertNotNull(actual.getId());
+        assertThat(actual, equalTo(expected));
+    }
+
+    @Test
+    void shouldReturnMinimalProjectDataWhenCreatedWithTitleAndStatus() throws Exception {
+        NvaProject expected = randomMinimalNvaProject();
         expected.setContext(NvaProject.PROJECT_CONTEXT);
         HttpResponse<String> httpResponse =
                 new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(expected.toCristinProject()), 201);

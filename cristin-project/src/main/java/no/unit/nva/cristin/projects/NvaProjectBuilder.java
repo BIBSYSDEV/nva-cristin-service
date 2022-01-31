@@ -17,6 +17,7 @@ import nva.commons.core.paths.UriWrapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,6 +26,7 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
+import static nva.commons.core.StringUtils.isNotBlank;
 
 public class NvaProjectBuilder {
 
@@ -70,8 +72,11 @@ public class NvaProjectBuilder {
      */
     public NvaProject build() {
         return new NvaProject.Builder()
-                .withId(new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(UriUtils.PROJECT)
-                        .addChild(cristinProject.getCristinProjectId()).getUri())
+                .withId(new UriWrapper(HTTPS, DOMAIN_NAME)
+                        .addChild(BASE_PATH)
+                        .addChild(UriUtils.PROJECT)
+                        .addChild(cristinProject.getCristinProjectId())
+                        .getUri())
                 .withContext(getContext())
                 .withType(PROJECT_TYPE)
                 .withIdentifiers(createCristinIdentifier())
@@ -93,8 +98,10 @@ public class NvaProjectBuilder {
     }
 
     private List<Map<String, String>> createCristinIdentifier() {
-        return Collections.singletonList(
-                Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()));
+        return Objects.nonNull(cristinProject.getCristinProjectId())
+                ? Collections.singletonList(
+                        Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()))
+                : Collections.emptyList();
     }
 
     private Organization extractCoordinatingInstitution() {
@@ -105,12 +112,14 @@ public class NvaProjectBuilder {
 
     private String extractMainTitle() {
         return Optional.ofNullable(cristinProject.getTitle())
+                .filter(hastTitles -> isNotBlank(cristinProject.getMainLanguage()))
                 .map(titles -> titles.get(cristinProject.getMainLanguage()))
                 .orElse(null);
     }
 
     private List<Map<String, String>> extractAlternativeTitles() {
         return Optional.ofNullable(cristinProject.getTitle())
+                .filter(hasTitles -> !hasTitles.isEmpty())
                 .filter(titles -> titles.keySet().remove(cristinProject.getMainLanguage()))
                 .filter(remainingTitles -> !remainingTitles.isEmpty())
                 .map(Collections::singletonList)

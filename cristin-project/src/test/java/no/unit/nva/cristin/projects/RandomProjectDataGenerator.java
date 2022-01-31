@@ -22,6 +22,7 @@ import java.util.stream.IntStream;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
+import static no.unit.nva.cristin.projects.CristinProjectBuilder.mapMainLanguageToCristin;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.TYPE;
@@ -36,9 +37,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class RandomProjectDataGenerator {
 
 
-    private static final String NORWEGIAN = "no";
-    private static final String[] LANGUAGES = {"en", "nb", "nn"};
-    private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
+    public static final String[] LANGUAGES = {"en", "nb", "nn"};
     public static final Set<String> IGNORE_LIST = Set.of(
             ".context",                             // Context is not used in searchResponse
             ".coordinatingInstitution.partOf",      // Ignoring Organization parts as we only nedd Id here
@@ -50,6 +49,8 @@ public class RandomProjectDataGenerator {
             ".contributors.affiliation.context",
             ".contributors.affiliation.acronym"
     );
+    private static final String NORWEGIAN = "nb";
+    private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
 
     /**
      * Create a NvaProject containing random data.
@@ -58,15 +59,16 @@ public class RandomProjectDataGenerator {
      */
     public static NvaProject randomNvaProject() {
         final String identifier = randomInteger().toString();
+        final URI language = LanguageMapper.toUri(NORWEGIAN);
         final NvaProject nvaProject = new NvaProject.Builder()
                 // .withContext(PROJECT_CONTEXT)
                 .withType(PROJECT_TYPE)
                 .withId(UriUtils.createNvaProjectId(identifier))
                 .withIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
                 .withTitle(randomString())
-                .withLanguage(LanguageMapper.toUri(NORWEGIAN))
+                .withLanguage(language)
                 .withStatus(randomElement(ProjectStatus.values()))
-                .withAlternativeTitles(randomListOfTitles())
+                .withAlternativeTitles(randomListOfTitles(language))
                 .withStartDate(randomInstant())
                 .withEndDate(randomInstant())
                 .withAcademicSummary(randomSummary())
@@ -78,6 +80,24 @@ public class RandomProjectDataGenerator {
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
     }
+
+    /**
+     * Create a valid NvaProject containing so less as possible random data.
+     *
+     * @return valid NvaProject with random data
+     */
+    public static NvaProject randomMinimalNvaProject() {
+        final String identifier = randomString();
+        return new NvaProject.Builder()
+                .withId(UriUtils.createNvaProjectId(identifier))
+                .withIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
+                .withType(PROJECT_TYPE)
+                .withTitle(randomString())
+                .withLanguage(LanguageMapper.toUri(randomElement(LANGUAGES)))
+                .withStatus(randomElement(ProjectStatus.values()))
+                .build();
+    }
+
 
     private static URI semiRandomPersonId(String identifier) {
         return new UriWrapper(CRISTIN_API_URL).addChild(PERSON_PATH).addChild(identifier).getUri();
@@ -118,7 +138,7 @@ public class RandomProjectDataGenerator {
     }
 
     private static Map<String, String> randomNamesMap() {
-        return Map.of(randomLanguageCode(), randomString());
+        return Map.of(randomLanguage(), randomString());
     }
 
     private static Map<String, String> randomSummary() {
@@ -133,12 +153,22 @@ public class RandomProjectDataGenerator {
                 .build();
     }
 
-    private static List<Map<String, String>> randomListOfTitles() {
-        return List.of(Map.of(randomLanguageCode(), randomString()));
+    private static List<Map<String, String>> randomListOfTitles(URI usedLanguage) {
+        return List.of(Map.of(randomLanguageCodeExcept(usedLanguage), randomString()));
     }
 
-    private static String randomLanguageCode() {
+    private static String randomLanguage() {
         return randomElement(LANGUAGES);
     }
+
+    private static String randomLanguageCodeExcept(URI usedLanguage) {
+        String usedLanguageCode = mapMainLanguageToCristin(usedLanguage);
+        String lang = randomElement(LANGUAGES);
+        while (lang.equals(usedLanguageCode)) {
+            lang = randomElement(LANGUAGES);
+        }
+        return lang;
+    }
+
 
 }

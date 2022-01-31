@@ -10,9 +10,11 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -38,7 +40,7 @@ public class CristinProjectBuilder {
     public CristinProject build() {
 
         cristinProject.setCristinProjectId(extractLastPathElement(nvaProject.getId()));
-        cristinProject.setMainLanguage(extractLastPathElement(nvaProject.getLanguage()));
+        cristinProject.setMainLanguage(mapMainLanguageToCristin(nvaProject.getLanguage()));
         cristinProject.setTitle(extractTitles(nvaProject));
         cristinProject.setStatus(nvaProject.getStatus().name());
         cristinProject.setStartDate(nvaProject.getStartDate());
@@ -47,10 +49,22 @@ public class CristinProjectBuilder {
         cristinProject.setPopularScientificSummary(extractSummary(nvaProject.getPopularScientificSummary()));
         cristinProject.setProjectFundingSources(extractFundings(nvaProject.getFunding()));
         cristinProject.setParticipants(extractContributors(nvaProject.getContributors()));
-        cristinProject.setCoordinatingInstitution(
-                new CristinOrganizationBuilder(nvaProject.getCoordinatingInstitution()).build());
+        if (Objects.nonNull(nvaProject.getCoordinatingInstitution())) {
+            cristinProject.setCoordinatingInstitution(
+                    new CristinOrganizationBuilder(nvaProject.getCoordinatingInstitution()).build());
+        }
 
         return cristinProject;
+    }
+
+    public static  String mapMainLanguageToCristin(URI language) {
+        switch (language.toString()) {
+            case "http://lexvo.org/id/iso639-3/nob" : return "nb";
+            case "http://lexvo.org/id/iso639-3/nno" : return "nn";
+            case "http://lexvo.org/id/iso639-3/eng" : return "en";
+            default:
+                throw new IllegalStateException("Unexpected value: " + language);
+        }
     }
 
     private List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
@@ -103,12 +117,14 @@ public class CristinProjectBuilder {
     }
 
     private Map<String, String> extractSummary(Map<String, String> summary) {
-        return Collections.unmodifiableMap(summary);
+        return !summary.isEmpty() ? Collections.unmodifiableMap(summary) : null;
     }
 
     private Map<String, String> extractTitles(NvaProject nvaProject) {
         Map<String, String> titles = new ConcurrentHashMap<>();
-        titles.put(extractLastPathElement(nvaProject.getLanguage()), nvaProject.getTitle());
+        if (Objects.nonNull(nvaProject.getLanguage())) {
+            titles.put(mapMainLanguageToCristin(nvaProject.getLanguage()), nvaProject.getTitle());
+        }
         nvaProject.getAlternativeTitles().forEach(titles::putAll);
         return titles;
     }

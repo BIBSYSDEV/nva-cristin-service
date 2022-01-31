@@ -120,6 +120,7 @@ Resources:
       Handler: no.unit.nva.cristin.projects.CreateCristinProjectHandler::handleRequest
       Runtime: java11
       MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinProjectsEvent:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api

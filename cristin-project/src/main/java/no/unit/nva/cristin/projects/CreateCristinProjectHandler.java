@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.google.common.net.MediaType;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -13,9 +14,11 @@ import nva.commons.core.Environment;
 import nva.commons.core.StringUtils;
 
 import java.net.HttpURLConnection;
+import java.util.List;
 import java.util.Objects;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, NvaProject> {
@@ -98,6 +101,11 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
     @Override
     protected Integer getSuccessStatusCode(NvaProject input, NvaProject output) {
         return HttpURLConnection.HTTP_CREATED;
+    }
+
+    @Override
+    protected List<MediaType> listSupportedMediaTypes() {
+        return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
 }

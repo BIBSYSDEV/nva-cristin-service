@@ -32,7 +32,6 @@ public class CreateCristinProjectApiClient extends PostApiClient  {
         URI uri = getCristinProjectPostUri();
         HttpResponse<String> response = post(uri, payload);
         checkPostHttpStatusCode(getNvaApiUri(PROJECT_PATH_NVA), response.statusCode());
-
         return createProjectFromResponse(response);
     }
 
