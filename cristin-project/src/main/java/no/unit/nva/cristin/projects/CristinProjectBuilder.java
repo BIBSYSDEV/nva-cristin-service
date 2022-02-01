@@ -49,10 +49,8 @@ public class CristinProjectBuilder {
         cristinProject.setPopularScientificSummary(extractSummary(nvaProject.getPopularScientificSummary()));
         cristinProject.setProjectFundingSources(extractFundings(nvaProject.getFunding()));
         cristinProject.setParticipants(extractContributors(nvaProject.getContributors()));
-        if (Objects.nonNull(nvaProject.getCoordinatingInstitution())) {
-            cristinProject.setCoordinatingInstitution(
-                    new CristinOrganizationBuilder(nvaProject.getCoordinatingInstitution()).build());
-        }
+        cristinProject.setCoordinatingInstitution(
+                new CristinOrganizationBuilder(nvaProject.getCoordinatingInstitution()).build());
 
         return cristinProject;
     }

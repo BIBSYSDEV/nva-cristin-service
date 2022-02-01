@@ -112,7 +112,7 @@ public class NvaProjectBuilder {
 
     private String extractMainTitle() {
         return Optional.ofNullable(cristinProject.getTitle())
-                .filter(hastTitles -> isNotBlank(cristinProject.getMainLanguage()))
+                .filter(hasTitles -> isNotBlank(cristinProject.getMainLanguage()))
                 .map(titles -> titles.get(cristinProject.getMainLanguage()))
                 .orElse(null);
     }

@@ -71,7 +71,7 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.status == 400
     And match response.detail == 'Supplied payload is not valid'
 
-  Scenario: Create returns status 201 Created when input is valid
+  Scenario: Create returns status 201 Created when input is valid and persisted in crisin
     Given path '/project'
     * header Authorization = 'Bearer ' + token
     And request minimalCreateRequest
