@@ -136,6 +136,7 @@ Resources:
       Handler: no.unit.nva.cristin.projects.FetchOneCristinProject::handleRequest
       Runtime: java11
       MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinOneProjectEvent:
           Type: Api

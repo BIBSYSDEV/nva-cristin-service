@@ -1,13 +1,7 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
-import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
-import java.util.Set;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.common.handler.CristinHandler;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.RequestInfo;
@@ -15,6 +9,15 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+
+import java.net.HttpURLConnection;
+import java.util.Set;
+
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
@@ -30,7 +33,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     @JacocoGenerated
     public FetchOneCristinProject(Environment environment) {
-        this(new CristinApiClient(), environment);
+        this(new CristinApiClient(CristinAuthenticator.getHttpClient()), environment);
     }
 
     public FetchOneCristinProject(CristinApiClient cristinApiClient, Environment environment) {
