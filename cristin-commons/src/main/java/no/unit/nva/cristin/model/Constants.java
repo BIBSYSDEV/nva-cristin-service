@@ -16,7 +16,7 @@ public class Constants {
     public static final String REL_NEXT = "rel=\"next\"";
     public static final String REL_PREV = "rel=\"prev\"";
 
-    public static final ObjectMapper OBJECT_MAPPER = JsonUtils.dynamoObjectMapper;
+    public static final ObjectMapper OBJECT_MAPPER = JsonUtils.dtoObjectMapper;
     public static final Environment ENVIRONMENT = new Environment();
     public static final String PROJECT_SEARCH_CONTEXT_URL =
         "https://bibsysdev.github.io/src/project-search-context.json";

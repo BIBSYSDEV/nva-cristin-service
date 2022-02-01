@@ -17,10 +17,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.projects.CreateCristinProjectHandler.NEEDED_ROLE;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -130,7 +130,7 @@ class CreateCristinProjectHandlerTest {
     private InputStream requestWithBodyAndRole(NvaProject body) throws JsonProcessingException {
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
                 .withBody(body)
-                .withRoles(NEEDED_ROLE)
+                .withAccessRight(EDIT_OWN_INSTITUTION_PROJECTS)
                 .build();
     }
 }

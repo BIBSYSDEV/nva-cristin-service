@@ -19,7 +19,7 @@ public class CognitoUtil {
 
         CognitoHelper cognitoHelper = new CognitoHelper(USER_POOL_ID, CLIENT_APP_ID, REGION);
         cognitoHelper.createUser(FEIDE_ID, PASSWORD, ACCESS_RIGHT);
-        cognitoHelper.updateUserAttributes(FEIDE_ID);
+        cognitoHelper.updateUserAttributes(FEIDE_ID, ACCESS_RIGHT);
         return cognitoHelper.loginUser(FEIDE_ID, PASSWORD).getAuthenticationResult().getIdToken();
     }
 

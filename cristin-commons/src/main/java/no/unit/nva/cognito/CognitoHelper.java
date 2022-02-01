@@ -99,13 +99,14 @@ public class CognitoHelper {
      * Update user accessRights attributes.
      *
      * @param feideId user identifier
+     * @param accessRights
      * @return result of operation
      */
-    public AdminUpdateUserAttributesResult updateUserAttributes(String feideId) {
+    public AdminUpdateUserAttributesResult updateUserAttributes(String feideId, String accessRights) {
         List<AttributeType> list = List.of(
                 new AttributeType()
                         .withName("custom:accessRights")
-                        .withValue("EDIT_OWN_INSTITUTION_USERS,READ_DOI_REQUEST"));
+                        .withValue(accessRights));
 
         AdminUpdateUserAttributesRequest adminUpdateUserAttributesRequest = new AdminUpdateUserAttributesRequest()
                 .withUserPoolId(getPoolId())

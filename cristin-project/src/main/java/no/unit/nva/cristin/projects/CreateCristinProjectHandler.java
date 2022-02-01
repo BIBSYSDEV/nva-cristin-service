@@ -11,7 +11,6 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 import nva.commons.core.StringUtils;
 
@@ -22,11 +21,10 @@ import java.util.Objects;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static nva.commons.core.attempt.Try.attempt;
+import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
 
 public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, NvaProject> {
 
-    public static final String NEEDED_ROLE = "Creator";
     private final transient CreateCristinProjectApiClient apiClient;
 
     /**
@@ -62,7 +60,7 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
     protected NvaProject processInput(NvaProject input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 
-        validateAccess(requestInfo);
+        verifyRequesterCanEditProjects(requestInfo);
         validateInput(input);
 
         return apiClient.createProjectInCristin(input);
@@ -102,14 +100,6 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
 
     private boolean noTitle(NvaProject project) {
         return StringUtils.isEmpty(project.getTitle());
-    }
-
-    private void validateAccess(RequestInfo requestInfo) throws ForbiddenException {
-        boolean hasAccess = attempt(() -> requestInfo.getAssignedRoles()
-                .get().contains(NEEDED_ROLE)).orElseThrow(failure -> new ForbiddenException());
-        if (!hasAccess) {
-            throw new ForbiddenException();
-        }
     }
 
     /**

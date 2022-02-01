@@ -27,11 +27,11 @@ import static no.unit.nva.cristin.projects.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.TYPE;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.VALUE;
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringFields;
+import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
-import static no.unit.nva.utils.LanguageMapperExtra.mapMainLanguageToCristin;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RandomProjectDataGenerator {
@@ -40,7 +40,7 @@ public class RandomProjectDataGenerator {
     public static final String[] LANGUAGES = {"en", "nb", "nn"};
     public static final Set<String> IGNORE_LIST = Set.of(
             ".context",                             // Context is not used in searchResponse
-            ".coordinatingInstitution.partOf",      // Ignoring Organization parts as we only nedd Id here
+            ".coordinatingInstitution.partOf",      // Ignoring Organization parts as we only need Id here
             ".coordinatingInstitution.hasPart",
             ".coordinatingInstitution.context",
             ".coordinatingInstitution.acronym",
@@ -165,13 +165,12 @@ public class RandomProjectDataGenerator {
     }
 
     private static String randomLanguageCodeExcept(URI usedLanguage) {
-        String usedLanguageCode = mapMainLanguageToCristin(usedLanguage);
+        String usedLanguageCode = getLanguageByUri(usedLanguage).getIso6391Code();
         String lang = randomElement(LANGUAGES);
         while (lang.equals(usedLanguageCode)) {
             lang = randomElement(LANGUAGES);
         }
         return lang;
     }
-
 
 }

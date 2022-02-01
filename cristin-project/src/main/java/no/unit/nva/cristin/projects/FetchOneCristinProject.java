@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.common.handler.CristinHandler;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.exception.UnauthorizedException;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -17,6 +18,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAT
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
@@ -33,7 +35,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     @JacocoGenerated
     public FetchOneCristinProject(Environment environment) {
-        this(new CristinApiClient(CristinAuthenticator.getHttpClient()), environment);
+        this(new CristinApiClient(), environment);
     }
 
     public FetchOneCristinProject(CristinApiClient cristinApiClient, Environment environment) {
@@ -43,14 +45,19 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     @Override
     protected NvaProject processInput(Void input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         validateThatSuppliedQueryParamsIsSupported(requestInfo);
 
         String language = getValidLanguage(requestInfo);
         String id = getValidId(requestInfo);
 
-        return getTransformedProjectFromCristin(id, language);
+        try {
+            return getTransformedProjectFromCristin(id, language);
+        } catch (UnauthorizedException unauthorizedException) {
+            verifyRequesterCanEditProjects(requestInfo);
+            return authenticatedGetTransformedProjectFromCristin(id, language);
+        }
     }
 
     private void validateThatSuppliedQueryParamsIsSupported(RequestInfo requestInfo) throws BadRequestException {
@@ -66,7 +73,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     private String getValidId(RequestInfo requestInfo) throws BadRequestException {
         attempt(() -> Integer.parseInt(requestInfo.getPathParameter(ID)))
-            .orElseThrow(failure -> new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
+                .orElseThrow(failure -> new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
 
         return requestInfo.getPathParameter(ID);
     }
@@ -74,4 +81,10 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
     private NvaProject getTransformedProjectFromCristin(String id, String language) throws ApiGatewayException {
         return cristinApiClient.queryOneCristinProjectUsingIdIntoNvaProject(id, language);
     }
+
+    private NvaProject authenticatedGetTransformedProjectFromCristin(String id, String language) throws ApiGatewayException {
+        return new CristinApiClient(CristinAuthenticator.getHttpClient())
+                .queryOneCristinProjectUsingIdIntoNvaProject(id, language);
+    }
+
 }

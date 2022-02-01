@@ -6,6 +6,7 @@ import nva.commons.apigateway.exceptions.ForbiddenException;
 public class AccessUtils {
 
     public static final String EDIT_OWN_INSTITUTION_USERS = "EDIT_OWN_INSTITUTION_USERS";
+    public static final String EDIT_OWN_INSTITUTION_PROJECTS = "EDIT_OWN_INSTITUTION_PROJECTS";
 
     /**
      * Validate Requesters access to a resource.
@@ -18,8 +19,18 @@ public class AccessUtils {
         }
     }
 
+    public static void verifyRequesterCanEditProjects(RequestInfo requestInfo) throws ForbiddenException {
+        if (!requesterHasAccessRightToEditProjects(requestInfo)) {
+            throw new ForbiddenException();
+        }
+    }
+
     private static boolean requesterHasAccessRightToUseNationalIdentificationNumber(RequestInfo requestInfo) {
         return requestInfo.getAccessRights().contains(EDIT_OWN_INSTITUTION_USERS);
+    }
+
+    private static boolean requesterHasAccessRightToEditProjects(RequestInfo requestInfo) {
+        return requestInfo.getAccessRights().contains(EDIT_OWN_INSTITUTION_PROJECTS);
     }
 
 }
