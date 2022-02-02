@@ -13,16 +13,15 @@ import no.unit.nva.model.Organization;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.ContributorRoleMapping.getCristinRole;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinProjectBuilder {
-
 
     private final transient CristinProject cristinProject;
     private final transient NvaProject nvaProject;
@@ -105,12 +104,12 @@ public class CristinProjectBuilder {
     }
 
     private Map<String, String> extractSummary(Map<String, String> summary) {
-        return !summary.isEmpty() ? Collections.unmodifiableMap(summary) : null;
+        return summary.isEmpty() ? null : Collections.unmodifiableMap(summary);
     }
 
     private Map<String, String> extractTitles(NvaProject nvaProject) {
         Map<String, String> titles = new ConcurrentHashMap<>();
-        if (Objects.nonNull(nvaProject.getLanguage())) {
+        if (nonNull(nvaProject.getLanguage())) {
             titles.put(getLanguageByUri(nvaProject.getLanguage()).getIso6391Code(), nvaProject.getTitle());
         }
         nvaProject.getAlternativeTitles().forEach(titles::putAll);

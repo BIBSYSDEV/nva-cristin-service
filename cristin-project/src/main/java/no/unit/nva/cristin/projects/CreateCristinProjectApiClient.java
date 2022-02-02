@@ -19,9 +19,10 @@ import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
 
-public class CreateCristinProjectApiClient extends PostApiClient  {
+public class CreateCristinProjectApiClient extends PostApiClient {
 
     public static final ObjectMapper OBJECT_MAPPER_NON_EMPTY = JsonUtils.dynamoObjectMapper;
+
     public CreateCristinProjectApiClient(HttpClient client) {
         super(client);
     }
@@ -30,15 +31,15 @@ public class CreateCristinProjectApiClient extends PostApiClient  {
      * Used for creating a person in Cristin from the supplied Person object.
      */
     public NvaProject createProjectInCristin(NvaProject nvaProject) throws ApiGatewayException {
-        String payload = generatePayloadFromRequest(nvaProject);
-        URI uri = getCristinProjectPostUri();
+        var payload = generatePayloadFromRequest(nvaProject);
+        var uri = getCristinProjectPostUri();
         var response = post(uri, payload);
         checkPostHttpStatusCode(getNvaApiUri(PROJECT_PATH_NVA), response.statusCode());
         return createProjectFromResponse(response);
     }
 
     private String generatePayloadFromRequest(NvaProject nvaProject) {
-        CristinProject  cristinProject = nvaProject.toCristinProject();
+        var cristinProject = nvaProject.toCristinProject();
         return attempt(() -> OBJECT_MAPPER_NON_EMPTY.writeValueAsString(cristinProject)).orElseThrow();
     }
 
@@ -47,8 +48,8 @@ public class CreateCristinProjectApiClient extends PostApiClient  {
     }
 
     private NvaProject createProjectFromResponse(HttpResponse<String> response) throws BadGatewayException {
-        CristinProject cristinProject = getDeserializedResponse(response, CristinProject.class);
-        NvaProject nvaProject = cristinProject.toNvaProject();
+        var cristinProject = getDeserializedResponse(response, CristinProject.class);
+        var nvaProject = cristinProject.toNvaProject();
         nvaProject.setContext(NvaProject.PROJECT_CONTEXT);
         return nvaProject;
     }

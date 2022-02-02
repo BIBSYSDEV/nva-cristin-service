@@ -4,10 +4,10 @@ import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.ALL_QUERY_PARAMETER_LANGUAGES;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
@@ -23,7 +23,6 @@ public class UriUtils {
     public static final String PERSON = "person";
     public static final String WHITESPACE_REGEX = "\\s+";
     public static final String WHITESPACE_REPLACEMENT = "+";
-    public static final String URI_PATH_SEPARATOR = "/";
     private static final String PARAMETER_KEY_VALUE_PAIR_TEMPLATE = "%s=%s";
     private static final String PARAMETER_DELIMITER = "&";
     private static final String EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR = null;
@@ -116,6 +115,6 @@ public class UriUtils {
     }
 
     public static String extractLastPathElement(URI uri) {
-        return Objects.nonNull(uri) ? new UriWrapper(uri).getFilename() : null;
+        return nonNull(uri) ? new UriWrapper(uri).getFilename() : null;
     }
 }

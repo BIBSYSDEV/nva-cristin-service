@@ -18,6 +18,8 @@ import com.amazonaws.services.cognitoidp.model.AdminUpdateUserAttributesResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.AuthFlowType;
 import com.amazonaws.services.cognitoidp.model.MessageActionType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,17 +30,27 @@ import java.util.Map;
  */
 public class CognitoHelper {
 
-
+    public static final String CUSTOM_FEIDE_ID_ATTRIBUTE = "custom:feideId";
+    public static final String CUSTOM_AFFILIATION_ATTRIBUTE = "custom:affiliation";
+    public static final String CUSTOM_APPLICATION_ATTRIBUTE = "custom:application";
+    public static final String CUSTOM_APPLICATION_ROLES_ATTRIBUTE = "custom:applicationRoles";
+    public static final String CUSTOM_ACCESS_RIGHTS_ATTRIBUTE = "custom:accessRights";
+    public static final String INSTITUTION_ADMIN_ROLE = "Institution-admin";
+    public static final String FEIDE_AFFILIATION = "feide:[member, employee, staff]";
+    public static final String NVA_APPLICATION = "NVA";
+    public static final String PROBLEM_CREATING_USER_MESSAGE = "Problem creating user %s";
+    private static final Logger logger = LoggerFactory.getLogger(CognitoHelper.class);
     private final transient String userPoolId;
     private final transient String clientAppId;
     private final transient String region;
     private final AWSCognitoIdentityProvider cognitoIdentityProvider;
 
     /**
-     * Create a CognitoHelper to help create a id_token to access services in API-gateway.
-     * @param userPoolId id of the userpool
+     * Create a CognitoHelper to help create an id_token to access services in API-gateway.
+     *
+     * @param userPoolId  id of the userpool
      * @param clientAppId clientapp secret from cognito
-     * @param region AWS region userpool is created in
+     * @param region      AWS region userpool is created in
      */
     public CognitoHelper(String userPoolId, String clientAppId, String region) {
         this.userPoolId = userPoolId;
@@ -61,7 +73,7 @@ public class CognitoHelper {
      * @param feideId     User name for the sign up
      * @param password    Password for the sign up
      * @param accessRight String containing wanted accessRights in token
-     * @return token to access API-gateway.
+     * @return username of user created from parameters.
      */
     public String createUser(String feideId, String password, String accessRight) {
 
@@ -71,11 +83,11 @@ public class CognitoHelper {
         createUserRequest.withTemporaryPassword(password);
         List<AttributeType> list = new ArrayList<>();
 
-        list.add(new AttributeType().withName("custom:feideId").withValue(feideId));
-        list.add(new AttributeType().withName("custom:affiliation").withValue("feide:[member, employee, staff]"));
-        list.add(new AttributeType().withName("custom:application").withValue("NVA"));
-        list.add(new AttributeType().withName("custom:applicationRoles").withValue("Institution-admin"));
-        list.add(new AttributeType().withName("custom:accessRights").withValue(accessRight));
+        list.add(new AttributeType().withName(CUSTOM_FEIDE_ID_ATTRIBUTE).withValue(feideId));
+        list.add(new AttributeType().withName(CUSTOM_AFFILIATION_ATTRIBUTE).withValue(FEIDE_AFFILIATION));
+        list.add(new AttributeType().withName(CUSTOM_APPLICATION_ATTRIBUTE).withValue(NVA_APPLICATION));
+        list.add(new AttributeType().withName(CUSTOM_APPLICATION_ROLES_ATTRIBUTE).withValue(INSTITUTION_ADMIN_ROLE));
+        list.add(new AttributeType().withName(CUSTOM_ACCESS_RIGHTS_ATTRIBUTE).withValue(accessRight));
 
         createUserRequest.setUserAttributes(list);
         createUserRequest.setMessageAction(MessageActionType.SUPPRESS);
@@ -90,22 +102,23 @@ public class CognitoHelper {
             cognitoIdentityProvider.adminSetUserPassword(adminSetUserPasswordRequest);
             return result.getUser().getUsername();
         } catch (Exception e) {
-            System.out.println(e);
+            logger.warn(String.format(PROBLEM_CREATING_USER_MESSAGE, feideId), e);
             return null;
         }
     }
 
     /**
-     * Update user accessRights attributes.
+     * Update user accessRights attributes in AWS Cognito userpool.
      *
-     * @param feideId user identifier
-     * @param accessRights
-     * @return result of operation
+     * @param feideId      user identifier
+     * @param accessRights String literal containing accessRights as wanted in id_token generated from AWS Cognito
+     * @return If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body.
+     *         If not successful a runtime exception is thrown
      */
     public AdminUpdateUserAttributesResult updateUserAttributes(String feideId, String accessRights) {
         List<AttributeType> list = List.of(
                 new AttributeType()
-                        .withName("custom:accessRights")
+                        .withName(CUSTOM_ACCESS_RIGHTS_ATTRIBUTE)
                         .withValue(accessRights));
 
         AdminUpdateUserAttributesRequest adminUpdateUserAttributesRequest = new AdminUpdateUserAttributesRequest()
@@ -119,7 +132,8 @@ public class CognitoHelper {
      * Delete a user in Cognito userpool.
      *
      * @param feideId string identifying user in userpool
-     * @return result of operation
+     * @return If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body
+     *         If not successful a runtime exception is thrown
      */
     public AdminDeleteUserResult deleteUser(String feideId) {
         AdminDeleteUserRequest deleteUserRequest = new AdminDeleteUserRequest()
@@ -147,10 +161,10 @@ public class CognitoHelper {
     }
 
     private AWSCognitoIdentityProvider getCognitoIdentityProvider() {
-        AWSCredentials awsCreds = new DefaultAWSCredentialsProviderChain().getCredentials();
+        AWSCredentials awsCredentials = new DefaultAWSCredentialsProviderChain().getCredentials();
         return AWSCognitoIdentityProviderClientBuilder
                 .standard()
-                .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                 .withRegion(Regions.fromName(region))
                 .build();
     }
