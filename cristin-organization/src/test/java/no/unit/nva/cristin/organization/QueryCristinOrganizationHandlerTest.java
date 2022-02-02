@@ -62,14 +62,13 @@ class QueryCristinOrganizationHandlerTest {
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     private static final String CRISTIN_QUERY_RESPONSE = "cristin_query_response_sample.json";
     QueryCristinOrganizationHandler queryCristinOrganizationHandler;
-    private CristinOrganizationApiClient cristinApiClient;
     private ByteArrayOutputStream output;
     private Context context;
 
     @BeforeEach
     void setUp() throws NotFoundException, FailedHttpRequestException, InterruptedException {
         context = mock(Context.class);
-        cristinApiClient = mock(CristinOrganizationApiClient.class);
+        CristinOrganizationApiClient cristinApiClient = mock(CristinOrganizationApiClient.class);
         when(cristinApiClient.queryOrganizations(any())).thenReturn(emptySearchResponse());
         output = new ByteArrayOutputStream();
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
