@@ -17,12 +17,13 @@ import nva.commons.core.paths.UriWrapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Collections.*;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -99,7 +100,7 @@ public class NvaProjectBuilder {
     }
 
     private List<Map<String, String>> createCristinIdentifier() {
-        return Objects.nonNull(cristinProject.getCristinProjectId())
+        return nonNull(cristinProject.getCristinProjectId())
                 ? singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()))
                 : emptyList();
     }
