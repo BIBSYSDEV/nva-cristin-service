@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static nva.commons.core.attempt.Try.attempt;
+
 /**
  * The CognitoHelper class abstracts the functionality of connecting to the Cognito user pool and Federated Identities.
  */
@@ -76,6 +78,8 @@ public class CognitoHelper {
      * @return username of user created from parameters.
      */
     public String createUser(String feideId, String password, String accessRight) {
+
+        attempt(() -> deleteUser(feideId)).orElseThrow();
 
         AdminCreateUserRequest createUserRequest = new AdminCreateUserRequest();
         createUserRequest.setUserPoolId(getPoolId());
