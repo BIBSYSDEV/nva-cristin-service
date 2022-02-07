@@ -1,7 +1,9 @@
 package no.unit.nva.cristin.projects;
 
+import java.util.Optional;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
+import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
@@ -48,10 +50,14 @@ public class CristinProjectBuilder {
         cristinProject.setPopularScientificSummary(extractSummary(nvaProject.getPopularScientificSummary()));
         cristinProject.setProjectFundingSources(extractFundings(nvaProject.getFunding()));
         cristinProject.setParticipants(extractContributors(nvaProject.getContributors()));
-        cristinProject.setCoordinatingInstitution(
-                new CristinOrganizationBuilder(nvaProject.getCoordinatingInstitution()).build());
+        cristinProject.setCoordinatingInstitution(extractCristinOrganization(nvaProject.getCoordinatingInstitution()));
 
         return cristinProject;
+    }
+
+    private CristinOrganization extractCristinOrganization(Organization organization) {
+        return Optional.ofNullable(CristinOrganizationBuilder.fromUnitIdentifier(organization))
+            .orElse(new CristinOrganizationBuilder(organization).build());
     }
 
     private List<CristinPerson> extractContributors(List<NvaContributor> contributors) {

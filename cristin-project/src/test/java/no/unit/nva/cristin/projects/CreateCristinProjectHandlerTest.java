@@ -2,8 +2,10 @@ package no.unit.nva.cristin.projects;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.IOException;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
@@ -17,10 +19,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,9 +34,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class CreateCristinProjectHandlerTest {
+
     public static final String NO_ACCESS = "NoAccess";
     public static final String ILLEGAL_CONTRIBUTOR_ROLE = "illegalContributorRole";
     public static final int FIRST_CONTRIBUTOR = 0;
+    public static final String SOME_UNIT_IDENTIFIER = "185.90.0.0";
+
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
@@ -127,10 +135,38 @@ class CreateCristinProjectHandlerTest {
         assertThat(actual, equalTo(expected));
     }
 
+    @Test
+    void shouldReturnProjectDataWhenCreatingWithUnitIdentifier() throws IOException, InterruptedException {
+        NvaProject requestBody = randomMinimalNvaProject();
+        requestBody.setId(null);
+        requestBody.setCoordinatingInstitution(someOrganizationFromUnitIdentifier());
+
+        HttpResponse<String> httpResponse =
+            new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(requestBody.toCristinProject()), 201);
+        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+
+        InputStream input = requestWithBodyAndRole(requestBody);
+        handler.handleRequest(input, output, context);
+        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
+        NvaProject actual = response.getBodyObject(NvaProject.class);
+
+        Organization actualOrganization = actual.getCoordinatingInstitution();
+        Organization requestOrganization = requestBody.getCoordinatingInstitution();
+
+        assertThat(actualOrganization, equalTo(requestOrganization));
+        assertThat(extractLastPathElement(actualOrganization.getId()), equalTo(SOME_UNIT_IDENTIFIER));
+    }
+
+    private static Organization someOrganizationFromUnitIdentifier() {
+        return new Organization.Builder().withId(getNvaApiId(SOME_UNIT_IDENTIFIER, ORGANIZATION_PATH)).build();
+    }
+
     private InputStream requestWithBodyAndRole(NvaProject body) throws JsonProcessingException {
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
-                .withBody(body)
-                .withAccessRight(EDIT_OWN_INSTITUTION_PROJECTS)
-                .build();
+            .withBody(body)
+            .withAccessRight(EDIT_OWN_INSTITUTION_PROJECTS)
+            .build();
     }
 }
