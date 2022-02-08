@@ -10,6 +10,8 @@ import com.amazonaws.services.cognitoidp.model.AdminCreateUserRequest;
 import com.amazonaws.services.cognitoidp.model.AdminCreateUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminDeleteUserRequest;
 import com.amazonaws.services.cognitoidp.model.AdminDeleteUserResult;
+import com.amazonaws.services.cognitoidp.model.AdminGetUserRequest;
+import com.amazonaws.services.cognitoidp.model.AdminGetUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthRequest;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.AdminSetUserPasswordRequest;
@@ -79,8 +81,8 @@ public class CognitoHelper {
      */
     public String createUser(String feideId, String password, String accessRight) {
 
-        attempt(() -> deleteUser(feideId)).orElseThrow();
-        System.out.println("deleted user");
+        deleteUserIfExists(feideId);
+
         AdminCreateUserRequest createUserRequest = new AdminCreateUserRequest();
         createUserRequest.setUserPoolId(getPoolId());
         createUserRequest.setUsername(feideId);
@@ -109,6 +111,17 @@ public class CognitoHelper {
         } catch (Exception e) {
             logger.warn(String.format(PROBLEM_CREATING_USER_MESSAGE, feideId));
             return null;
+        }
+    }
+
+    private void deleteUserIfExists(String feideId) {
+        try {
+            if (attempt(() -> getUser(feideId)).isSuccess()) {
+                deleteUser(feideId);
+                logger.debug("Deleted user:{}", feideId);
+            }
+        } catch (Exception e) {
+            logger.warn("Deleting user:{}, {}", feideId,e.getMessage());
         }
     }
 
@@ -145,6 +158,13 @@ public class CognitoHelper {
                 .withUserPoolId(getPoolId())
                 .withUsername(feideId);
         return getCognitoIdentityProvider().adminDeleteUser(deleteUserRequest);
+    }
+
+    public AdminGetUserResult getUser(String feideId) {
+        AdminGetUserRequest getUserRequest = new AdminGetUserRequest()
+                .withUserPoolId(getPoolId())
+                .withUsername(feideId);
+        return getCognitoIdentityProvider().adminGetUser(getUserRequest);
     }
 
     /**
