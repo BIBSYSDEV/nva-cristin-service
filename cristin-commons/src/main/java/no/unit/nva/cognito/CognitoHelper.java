@@ -10,8 +10,7 @@ import com.amazonaws.services.cognitoidp.model.AdminCreateUserRequest;
 import com.amazonaws.services.cognitoidp.model.AdminCreateUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminDeleteUserRequest;
 import com.amazonaws.services.cognitoidp.model.AdminDeleteUserResult;
-import com.amazonaws.services.cognitoidp.model.AdminGetUserRequest;
-import com.amazonaws.services.cognitoidp.model.AdminGetUserResult;
+
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthRequest;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.AdminSetUserPasswordRequest;
@@ -20,7 +19,6 @@ import com.amazonaws.services.cognitoidp.model.AdminUpdateUserAttributesResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.AuthFlowType;
 import com.amazonaws.services.cognitoidp.model.ListUsersRequest;
-import com.amazonaws.services.cognitoidp.model.ListUsersResult;
 import com.amazonaws.services.cognitoidp.model.MessageActionType;
 import com.amazonaws.services.cognitoidp.model.UserType;
 import org.slf4j.Logger;
@@ -30,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import static nva.commons.core.attempt.Try.attempt;
 
 /**
  * The CognitoHelper class abstracts the functionality of connecting to the Cognito user pool and Federated Identities.
@@ -122,7 +118,7 @@ public class CognitoHelper {
         try {
             getUsername(feideId).ifPresent(this::deleteUser);
         } catch (Exception e) {
-            logger.warn("Tried to delete user:{}, {}", feideId,e.getMessage());
+            logger.warn("Tried to delete user:{}, {}", feideId, e.getMessage());
         }
     }
 
@@ -132,7 +128,7 @@ public class CognitoHelper {
      * @param feideId      user identifier
      * @param accessRights String literal containing accessRights as wanted in id_token generated from AWS Cognito
      * @return If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body.
-     *         If not successful a runtime exception is thrown
+     * If not successful a runtime exception is thrown
      */
     public AdminUpdateUserAttributesResult updateUserAttributes(String feideId, String accessRights) {
         List<AttributeType> list = List.of(
@@ -152,7 +148,7 @@ public class CognitoHelper {
      *
      * @param feideId string identifying user in userpool
      * @return If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body
-     *         If not successful a runtime exception is thrown
+     * If not successful a runtime exception is thrown
      */
     public AdminDeleteUserResult deleteUser(String feideId) {
         AdminDeleteUserRequest deleteUserRequest = new AdminDeleteUserRequest()
