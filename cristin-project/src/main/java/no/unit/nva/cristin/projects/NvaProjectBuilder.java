@@ -66,7 +66,13 @@ public class NvaProjectBuilder {
             nvaContributor.setType(getNvaRole(role.getRoleCode()).get());
         }
         nvaContributor.setIdentity(Person.fromCristinPerson(cristinPerson));
-        nvaContributor.setAffiliation(role.getInstitution().toOrganization());
+
+        Organization affiliation = Optional.ofNullable(role.getInstitutionUnit()).map(CristinUnit::toOrganization)
+            .orElse(Optional.ofNullable(role.getInstitution())
+                .map(CristinInstitution::toOrganization)
+                .orElse(null));
+
+        nvaContributor.setAffiliation(affiliation);
         return nvaContributor;
     }
 

@@ -53,9 +53,9 @@
           },
           "affiliation": {
             "type": "Organization",
-            "id": "https://api.cristin-test.uio.no/v2/institutions/1234",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
             "name": {
-              "en": "University"
+              "en": "Medical Department"
             }
           }
         }
@@ -111,9 +111,9 @@
           },
           "affiliation": {
             "type": "Organization",
-            "id": "https://api.cristin-test.uio.no/v2/institutions/1234",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
             "name": {
-              "en": "University"
+              "en": "Medical Department"
             }
           }
         }
@@ -169,9 +169,9 @@
           },
           "affiliation": {
             "type": "Organization",
-            "id": "https://api.cristin-test.uio.no/v2/institutions/1234",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
             "name": {
-              "en": "University"
+              "en": "Medical Department"
             }
           }
         }
@@ -227,9 +227,9 @@
           },
           "affiliation": {
             "type": "Organization",
-            "id": "https://api.cristin-test.uio.no/v2/institutions/1234",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
             "name": {
-              "en": "University"
+              "en": "Medical Department"
             }
           }
         }
@@ -285,9 +285,9 @@
           },
           "affiliation": {
             "type": "Organization",
-            "id": "https://api.cristin-test.uio.no/v2/institutions/1234",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
             "name": {
-              "en": "University"
+              "en": "Medical Department"
             }
           }
         }
