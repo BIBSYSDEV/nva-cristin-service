@@ -80,7 +80,7 @@ public class CognitoHelper {
     public String createUser(String feideId, String password, String accessRight) {
 
         attempt(() -> deleteUser(feideId)).orElseThrow();
-
+        System.out.println("deleted user");
         AdminCreateUserRequest createUserRequest = new AdminCreateUserRequest();
         createUserRequest.setUserPoolId(getPoolId());
         createUserRequest.setUsername(feideId);
@@ -104,9 +104,10 @@ public class CognitoHelper {
                     .withPassword(password)
                     .withPermanent(true);
             cognitoIdentityProvider.adminSetUserPassword(adminSetUserPasswordRequest);
+            System.out.println("user created");
             return result.getUser().getUsername();
         } catch (Exception e) {
-            logger.warn(String.format(PROBLEM_CREATING_USER_MESSAGE, feideId), e);
+            logger.warn(String.format(PROBLEM_CREATING_USER_MESSAGE, feideId));
             return null;
         }
     }
