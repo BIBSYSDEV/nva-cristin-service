@@ -42,7 +42,7 @@ public class CognitoHelper {
     public static final String INSTITUTION_ADMIN_ROLE = "Institution-admin";
     public static final String FEIDE_AFFILIATION = "feide:[member, employee, staff]";
     public static final String NVA_APPLICATION = "NVA";
-    public static final String PROBLEM_CREATING_USER_MESSAGE = "Problem creating user %s";
+    public static final String PROBLEM_CREATING_USER_MESSAGE = "Problem creating user {}, {}";
     private static final Logger logger = LoggerFactory.getLogger(CognitoHelper.class);
     private final transient String userPoolId;
     private final transient String clientAppId;
@@ -109,7 +109,7 @@ public class CognitoHelper {
             System.out.println("user created");
             return result.getUser().getUsername();
         } catch (Exception e) {
-            logger.warn(String.format(PROBLEM_CREATING_USER_MESSAGE, feideId));
+            logger.warn(PROBLEM_CREATING_USER_MESSAGE, feideId, e.getMessage());
             return null;
         }
     }
