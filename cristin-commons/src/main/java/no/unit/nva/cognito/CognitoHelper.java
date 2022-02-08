@@ -164,7 +164,8 @@ public class CognitoHelper {
     public Optional<String> getUsername(String feideId) {
         ListUsersRequest listUsersRequest = new ListUsersRequest()
                 .withUserPoolId(getPoolId())
-                .withFilter("email="+feideId);
+                .withFilter(String.format("email = \"%s\"", feideId))
+                .withLimit(1);
         var listUsersResult = getCognitoIdentityProvider().listUsers(listUsersRequest);
         return listUsersResult.getUsers().stream().findFirst().map(UserType::getUsername);
     }
