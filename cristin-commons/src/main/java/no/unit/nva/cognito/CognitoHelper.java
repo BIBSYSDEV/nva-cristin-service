@@ -115,11 +115,13 @@ public class CognitoHelper {
     }
 
     private void deleteUserIfExists(String feideId) {
-        try {
-            getUsername(feideId).ifPresent(this::deleteUser);
-        } catch (Exception e) {
-            logger.warn("Tried to delete user:{}, {}", feideId, e.getMessage());
-        }
+        getUsername(feideId).ifPresent(username -> {
+            try {
+                deleteUser(username);
+            } catch (Exception e) {
+                logger.warn("Error deleting user:{}, {}", username, e.getMessage());
+            }
+        });
     }
 
     /**
@@ -158,12 +160,18 @@ public class CognitoHelper {
     }
 
     public Optional<String> getUsername(String feideId) {
-        ListUsersRequest listUsersRequest = new ListUsersRequest()
-                .withUserPoolId(getPoolId())
-                .withFilter(String.format("email = \"%s\"", feideId))
-                .withLimit(1);
-        var listUsersResult = getCognitoIdentityProvider().listUsers(listUsersRequest);
-        return listUsersResult.getUsers().stream().findFirst().map(UserType::getUsername);
+        Optional<String> username = Optional.empty();
+        try {
+            ListUsersRequest listUsersRequest = new ListUsersRequest()
+                    .withUserPoolId(getPoolId())
+                    .withFilter(String.format("email = \"%s\"", feideId));
+            username = getCognitoIdentityProvider().listUsers(listUsersRequest).getUsers().stream()
+                    .findFirst()
+                    .map(UserType::getUsername);
+        } catch (Exception e) {
+            logger.warn("Error getting username:{}, {}", feideId, e.getMessage());
+        }
+        return username;
     }
 
     /**
