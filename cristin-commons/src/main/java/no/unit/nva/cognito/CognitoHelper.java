@@ -19,13 +19,17 @@ import com.amazonaws.services.cognitoidp.model.AdminUpdateUserAttributesRequest;
 import com.amazonaws.services.cognitoidp.model.AdminUpdateUserAttributesResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.AuthFlowType;
+import com.amazonaws.services.cognitoidp.model.ListUsersRequest;
+import com.amazonaws.services.cognitoidp.model.ListUsersResult;
 import com.amazonaws.services.cognitoidp.model.MessageActionType;
+import com.amazonaws.services.cognitoidp.model.UserType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -116,12 +120,9 @@ public class CognitoHelper {
 
     private void deleteUserIfExists(String feideId) {
         try {
-            if (attempt(() -> getUser(feideId)).isSuccess()) {
-                deleteUser(feideId);
-                logger.debug("Deleted user:{}", feideId);
-            }
+            getUsername(feideId).ifPresent(this::deleteUser);
         } catch (Exception e) {
-            logger.warn("Deleting user:{}, {}", feideId,e.getMessage());
+            logger.warn("Tried to delete user:{}, {}", feideId,e.getMessage());
         }
     }
 
@@ -160,11 +161,12 @@ public class CognitoHelper {
         return getCognitoIdentityProvider().adminDeleteUser(deleteUserRequest);
     }
 
-    public AdminGetUserResult getUser(String feideId) {
-        AdminGetUserRequest getUserRequest = new AdminGetUserRequest()
+    public Optional<String> getUsername(String feideId) {
+        ListUsersRequest listUsersRequest = new ListUsersRequest()
                 .withUserPoolId(getPoolId())
-                .withUsername(feideId);
-        return getCognitoIdentityProvider().adminGetUser(getUserRequest);
+                .withFilter("email="+feideId);
+        var listUsersResult = getCognitoIdentityProvider().listUsers(listUsersRequest);
+        return listUsersResult.getUsers().stream().findFirst().map(UserType::getUsername);
     }
 
     /**
