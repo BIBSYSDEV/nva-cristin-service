@@ -4,7 +4,7 @@ Feature: API tests for Cristin Person fetch
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
-    * def tokenGenerator = Java.type('no.unit.nva.cristin.person.handler.CognitoUtil')
+    * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
     * def token = new tokenGenerator().createIdToken()
     * def illegalIdentifier = 'illegalIdentifier'
     * def samplePersonId = '07117631634'

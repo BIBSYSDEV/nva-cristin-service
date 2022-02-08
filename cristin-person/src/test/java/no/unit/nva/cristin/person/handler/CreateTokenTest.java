@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.handler;
 
+import no.unit.nva.cognito.CognitoUtil;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
