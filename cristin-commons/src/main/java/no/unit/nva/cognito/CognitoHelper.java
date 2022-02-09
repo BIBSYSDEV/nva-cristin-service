@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static no.unit.nva.cognito.CognitoUtil.ACCESS_RIGHT;
+
 /**
  * The CognitoHelper class abstracts the functionality of connecting to the Cognito user pool and Federated Identities.
  */
@@ -187,6 +189,8 @@ public class CognitoHelper {
      * @return result of operation containing credentials and tokens
      */
     public AdminInitiateAuthResult loginUser(String username, String password) {
+
+        updateUserAttributes(username, ACCESS_RIGHT);  // Do this every time to get it included in token
 
         final Map<String, String> authParams = Map.of("USERNAME", username, "PASSWORD", password);
         final AdminInitiateAuthRequest initiateAuthRequest = new AdminInitiateAuthRequest()
