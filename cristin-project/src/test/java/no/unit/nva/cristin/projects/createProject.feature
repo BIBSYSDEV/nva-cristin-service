@@ -7,6 +7,7 @@ Feature: API tests for Cristin Project retrieve and search
     * def tokenGenerator = Java.type('no.unit.nva.cristin.projects.CognitoUtilProjects')
     * def token = new tokenGenerator().createIdToken()
     * def minimalCreateRequest =   { type: 'Project', title: 'Test Project', language: 'http://lexvo.org/id/iso639-3/nob', startDate: '2010-06-29T01:33:17.518Z',  coordinatingInstitution: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'},contributors: [{type: 'ProjectManager',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'}}],status: 'ACTIVE'}
+    * def minimalCreateRequestWithUnitIdentifiers =   { type: 'Project', title: 'Test Project', language: 'http://lexvo.org/id/iso639-3/nob', startDate: '2010-06-29T01:33:17.518Z',  coordinatingInstitution: {type: 'Organization',id: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'},contributors: [{type: 'ProjectManager',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'}}],status: 'ACTIVE'}
     * def lessThanMinimalCreateRequest =   { type: 'Project', startDate: '2010-06-29T01:33:17.518Z',  coordinatingInstitution: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'},contributors: [{type: 'ProjectManager',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'}}],status: 'ACTIVE'}
     * def requestWithIllegalValues =   { type: 'Project', startDate: '2010-06-29T01:33:17.518Z',  coordinatingInstitution: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'},contributors: [{type: 'ProjectMan',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'}}],status: 'ACTIVE'}
     * def requestWithId =   { id: 'https://api.dev.nva.aws.unit.no/cristin/project/2121331275', type: 'Project', title: 'Test Project', language: 'http://lexvo.org/id/iso639-3/nob', startDate: '2010-06-29T01:33:17.518Z',  coordinatingInstitution: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'},contributors: [{type: 'ProjectManager',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'}}],status: 'ACTIVE'}
@@ -79,3 +80,10 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 201
     And print response
 
+  Scenario: Create returns status 201 Created when input is valid with unit identifiers and persisted in crisin
+    Given path '/project'
+    * header Authorization = 'Bearer ' + token
+    And request minimalCreateRequestWithUnitIdentifiers
+    When method POST
+    Then status 201
+    And print response
