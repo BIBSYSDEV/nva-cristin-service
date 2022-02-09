@@ -34,6 +34,9 @@ jobs:
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest -x test --info
+      # Take a break waiting for tests to finish
+      - name: Sleep for 60 seconds
+        run: sleep 60s
       # Delete stack after running tests
       - name: Delete stack after running tests
         run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}
