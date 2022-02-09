@@ -13,8 +13,6 @@ import com.amazonaws.services.cognitoidp.model.AdminDeleteUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthRequest;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.AdminSetUserPasswordRequest;
-import com.amazonaws.services.cognitoidp.model.AdminUpdateUserAttributesRequest;
-import com.amazonaws.services.cognitoidp.model.AdminUpdateUserAttributesResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.AuthFlowType;
 import com.amazonaws.services.cognitoidp.model.ListUsersRequest;
@@ -27,8 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import static no.unit.nva.cognito.CognitoUtil.ACCESS_RIGHT;
 
 /**
  * The CognitoHelper class abstracts the functionality of connecting to the Cognito user pool and Federated Identities.
@@ -94,8 +90,6 @@ public class CognitoHelper {
         list.add(new AttributeType().withName(CUSTOM_FEIDE_ID_ATTRIBUTE).withValue(feideId));
         list.add(new AttributeType().withName(CUSTOM_AFFILIATION_ATTRIBUTE).withValue(FEIDE_AFFILIATION));
         list.add(new AttributeType().withName(CUSTOM_APPLICATION_ATTRIBUTE).withValue(NVA_APPLICATION));
-        list.add(new AttributeType().withName(CUSTOM_APPLICATION_ROLES_ATTRIBUTE).withValue(INSTITUTION_ADMIN_ROLE));
-        list.add(new AttributeType().withName(CUSTOM_ACCESS_RIGHTS_ATTRIBUTE).withValue(accessRight));
 
         createUserRequest.setUserAttributes(list);
         createUserRequest.setMessageAction(MessageActionType.SUPPRESS);
@@ -124,32 +118,6 @@ public class CognitoHelper {
                 logger.warn("Error deleting user:{}, {}", username, e.getMessage());
             }
         });
-    }
-
-    /**
-     * Update user accessRights attributes in AWS Cognito userpool.
-     *
-     * @param username     user identifier
-     * @param accessRights String literal containing accessRights as wanted in id_token generated from AWS Cognito
-     * @return If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body.
-     * If not successful a runtime exception is thrown
-     */
-    public AdminUpdateUserAttributesResult updateUserAttributes(String username, String accessRights) {
-        List<AttributeType> list = List.of(
-                new AttributeType()
-                        .withName(CUSTOM_ACCESS_RIGHTS_ATTRIBUTE)
-                        .withValue(accessRights));
-
-        AdminUpdateUserAttributesRequest adminUpdateUserAttributesRequest = new AdminUpdateUserAttributesRequest()
-                .withUserPoolId(getPoolId())
-                .withUsername(username)
-                .withUserAttributes(list);
-        try {
-            return cognitoIdentityProvider.adminUpdateUserAttributes(adminUpdateUserAttributesRequest);
-        } catch (Exception e) {
-            logger.warn(PROBLEM_UPDATING_USER_ATTRIBUTES__MESSAGE, username, e.getMessage());
-            return null;
-        }
     }
 
     /**
@@ -189,8 +157,6 @@ public class CognitoHelper {
      * @return result of operation containing credentials and tokens
      */
     public AdminInitiateAuthResult loginUser(String username, String password) {
-
-        updateUserAttributes(username, ACCESS_RIGHT);  // Do this every time to get it included in token
 
         final Map<String, String> authParams = Map.of("USERNAME", username, "PASSWORD", password);
         final AdminInitiateAuthRequest initiateAuthRequest = new AdminInitiateAuthRequest()

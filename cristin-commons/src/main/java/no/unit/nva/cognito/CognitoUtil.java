@@ -22,8 +22,7 @@ public class CognitoUtil {
 
         Optional<String> token = cognitoHelper.loginUserAndReturnToken(FEIDE_ID, PASSWORD);
         if (!token.isPresent()) {
-            var userName = cognitoHelper.createUser(FEIDE_ID, PASSWORD, ACCESS_RIGHT);
-            cognitoHelper.updateUserAttributes(userName, ACCESS_RIGHT);
+            cognitoHelper.createUser(FEIDE_ID, PASSWORD, ACCESS_RIGHT);
             token = cognitoHelper.loginUserAndReturnToken(FEIDE_ID, PASSWORD);
         }
         return token.get();
