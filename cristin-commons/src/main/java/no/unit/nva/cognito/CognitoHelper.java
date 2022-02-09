@@ -13,6 +13,8 @@ import com.amazonaws.services.cognitoidp.model.AdminDeleteUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthRequest;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.AdminSetUserPasswordRequest;
+import com.amazonaws.services.cognitoidp.model.AdminUpdateUserAttributesRequest;
+import com.amazonaws.services.cognitoidp.model.AdminUpdateUserAttributesResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.AuthFlowType;
 import com.amazonaws.services.cognitoidp.model.ListUsersRequest;
@@ -103,7 +105,7 @@ public class CognitoHelper {
                     .withPassword(password)
                     .withPermanent(true);
             cognitoIdentityProvider.adminSetUserPassword(adminSetUserPasswordRequest);
-            System.out.println("user created");
+            logger.warn("user created username={}, feideId={}", result.getUser().getUsername(), feideId);
             return result.getUser().getUsername();
         } catch (Exception e) {
             logger.warn(PROBLEM_CREATING_USER_MESSAGE, feideId, e.getMessage());
@@ -129,18 +131,18 @@ public class CognitoHelper {
      * @return If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body.
      * If not successful a runtime exception is thrown
      */
-//    private AdminUpdateUserAttributesResult updateUserAttributes(String feideId, String accessRights) {
-//        List<AttributeType> list = List.of(
-//                new AttributeType()
-//                        .withName(CUSTOM_ACCESS_RIGHTS_ATTRIBUTE)
-//                        .withValue(accessRights));
-//
-//        AdminUpdateUserAttributesRequest adminUpdateUserAttributesRequest = new AdminUpdateUserAttributesRequest()
-//                .withUserPoolId(getPoolId())
-//                .withUsername(feideId)
-//                .withUserAttributes(list);
-//        return cognitoIdentityProvider.adminUpdateUserAttributes(adminUpdateUserAttributesRequest);
-//    }
+    public AdminUpdateUserAttributesResult updateUserAttributes(String feideId, String accessRights) {
+        List<AttributeType> list = List.of(
+                new AttributeType()
+                        .withName(CUSTOM_ACCESS_RIGHTS_ATTRIBUTE)
+                        .withValue(accessRights));
+
+        AdminUpdateUserAttributesRequest adminUpdateUserAttributesRequest = new AdminUpdateUserAttributesRequest()
+                .withUserPoolId(getPoolId())
+                .withUsername(feideId)
+                .withUserAttributes(list);
+        return cognitoIdentityProvider.adminUpdateUserAttributes(adminUpdateUserAttributesRequest);
+    }
 
     /**
      * Delete a user in Cognito userpool.
