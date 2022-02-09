@@ -42,6 +42,7 @@ public class CognitoHelper {
     public static final String FEIDE_AFFILIATION = "feide:[member, employee, staff]";
     public static final String NVA_APPLICATION = "NVA";
     public static final String PROBLEM_CREATING_USER_MESSAGE = "Problem creating user {}, {}";
+    public static final String PROBLEM_UPDATING_USER_ATTRIBUTES__MESSAGE = "Problem updating user attributes {}, {}";
     private static final Logger logger = LoggerFactory.getLogger(CognitoHelper.class);
     private final transient String userPoolId;
     private final transient String clientAppId;
@@ -126,12 +127,12 @@ public class CognitoHelper {
     /**
      * Update user accessRights attributes in AWS Cognito userpool.
      *
-     * @param feideId      user identifier
+     * @param username     user identifier
      * @param accessRights String literal containing accessRights as wanted in id_token generated from AWS Cognito
      * @return If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body.
      * If not successful a runtime exception is thrown
      */
-    public AdminUpdateUserAttributesResult updateUserAttributes(String feideId, String accessRights) {
+    public AdminUpdateUserAttributesResult updateUserAttributes(String username, String accessRights) {
         List<AttributeType> list = List.of(
                 new AttributeType()
                         .withName(CUSTOM_ACCESS_RIGHTS_ATTRIBUTE)
@@ -139,9 +140,14 @@ public class CognitoHelper {
 
         AdminUpdateUserAttributesRequest adminUpdateUserAttributesRequest = new AdminUpdateUserAttributesRequest()
                 .withUserPoolId(getPoolId())
-                .withUsername(feideId)
+                .withUsername(username)
                 .withUserAttributes(list);
-        return cognitoIdentityProvider.adminUpdateUserAttributes(adminUpdateUserAttributesRequest);
+        try {
+            return cognitoIdentityProvider.adminUpdateUserAttributes(adminUpdateUserAttributesRequest);
+        } catch (Exception e) {
+            logger.warn(PROBLEM_UPDATING_USER_ATTRIBUTES__MESSAGE, username, e.getMessage());
+            return null;
+        }
     }
 
     /**
