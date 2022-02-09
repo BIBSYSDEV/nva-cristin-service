@@ -29,14 +29,11 @@ jobs:
       - name: Deploy
         run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${{env.STACK_NAME}} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${{env.BASE_PATH}} ParameterKey=CristinApiUrl,ParameterValue=${CRISTIN_API_URL}
       # Take a break waiting for API to deploy
-      - name: Sleep for 30 seconds
-        run: sleep 30s
+      - name: Sleep for 10 seconds
+        run: sleep 10s
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest -x test --info
-      # Take a break waiting for tests to finish
-      - name: Sleep for 60 seconds
-        run: sleep 60s
       # Delete stack after running tests
       - name: Delete stack after running tests
         run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}

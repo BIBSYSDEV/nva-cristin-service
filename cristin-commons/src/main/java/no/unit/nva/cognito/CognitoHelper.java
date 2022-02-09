@@ -34,13 +34,9 @@ public class CognitoHelper {
     public static final String CUSTOM_FEIDE_ID_ATTRIBUTE = "custom:feideId";
     public static final String CUSTOM_AFFILIATION_ATTRIBUTE = "custom:affiliation";
     public static final String CUSTOM_APPLICATION_ATTRIBUTE = "custom:application";
-    public static final String CUSTOM_APPLICATION_ROLES_ATTRIBUTE = "custom:applicationRoles";
-    public static final String CUSTOM_ACCESS_RIGHTS_ATTRIBUTE = "custom:accessRights";
-    public static final String INSTITUTION_ADMIN_ROLE = "Institution-admin";
     public static final String FEIDE_AFFILIATION = "feide:[member, employee, staff]";
     public static final String NVA_APPLICATION = "NVA";
     public static final String PROBLEM_CREATING_USER_MESSAGE = "Problem creating user {}, {}";
-    public static final String PROBLEM_UPDATING_USER_ATTRIBUTES__MESSAGE = "Problem updating user attributes {}, {}";
     private static final Logger logger = LoggerFactory.getLogger(CognitoHelper.class);
     private final transient String userPoolId;
     private final transient String clientAppId;
@@ -74,10 +70,9 @@ public class CognitoHelper {
      *
      * @param feideId     User name for the sign up
      * @param password    Password for the sign up
-     * @param accessRight String containing wanted accessRights in token
      * @return username of user created from parameters.
      */
-    public String createUser(String feideId, String password, String accessRight) {
+    public String createUser(String feideId, String password) {
 
         deleteUserIfExists(feideId);
 
