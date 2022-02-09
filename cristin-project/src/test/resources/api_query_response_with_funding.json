@@ -46,7 +46,7 @@
         {
           "type": "ProjectManager",
           "identity": {
-            "id": "https://api.cristin-test.uio.no/v2/persons/123456",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
             "lastName": "Nordmann"
@@ -104,7 +104,7 @@
         {
           "type": "ProjectManager",
           "identity": {
-            "id": "https://api.cristin-test.uio.no/v2/persons/123456",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
             "lastName": "Nordmann"
@@ -162,7 +162,7 @@
         {
           "type": "ProjectManager",
           "identity": {
-            "id": "https://api.cristin-test.uio.no/v2/persons/123456",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
             "lastName": "Nordmann"
@@ -220,7 +220,7 @@
         {
           "type": "ProjectManager",
           "identity": {
-            "id": "https://api.cristin-test.uio.no/v2/persons/123456",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
             "lastName": "Nordmann"
@@ -278,7 +278,7 @@
         {
           "type": "ProjectManager",
           "identity": {
-            "id": "https://api.cristin-test.uio.no/v2/persons/123456",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
             "lastName": "Nordmann"

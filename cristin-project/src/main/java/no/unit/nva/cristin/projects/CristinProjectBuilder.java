@@ -2,7 +2,6 @@ package no.unit.nva.cristin.projects;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
-import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
@@ -63,7 +62,7 @@ public class CristinProjectBuilder {
 
     private CristinOrganization extractCristinOrganization(Organization organization) {
         return Optional.ofNullable(CristinOrganizationBuilder.fromUnitIdentifier(organization))
-            .orElse(new CristinOrganizationBuilder(organization).build());
+            .orElse(CristinOrganizationBuilder.buildWithCristinInstitution(organization));
     }
 
     private List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
@@ -71,11 +70,7 @@ public class CristinProjectBuilder {
     }
 
     private CristinPerson getCristinPerson(NvaContributor contributor) {
-        CristinPerson cristinPerson = new CristinPerson();
-        cristinPerson.setCristinPersonId(extractLastPathElement(contributor.getIdentity().getId()));
-        cristinPerson.setUrl(contributor.getIdentity().getId().toString());
-        cristinPerson.setFirstName(contributor.getIdentity().getFirstName());
-        cristinPerson.setSurname(contributor.getIdentity().getLastName());
+        CristinPerson cristinPerson = contributor.getIdentity().toCristinPerson();
         cristinPerson.setRoles(extractCristinRoles(contributor));
         return cristinPerson;
     }
@@ -97,7 +92,7 @@ public class CristinProjectBuilder {
         if (nonNull(unitIdentifier)) {
             cristinRole.setInstitutionUnit(toCristinUnit(unitIdentifier));
         } else {
-            cristinRole.setInstitution(toCristinInstitution(contributor.getAffiliation()));
+            cristinRole.setInstitution(contributor.getAffiliation().toCristinInstitution());
         }
 
         return List.of(cristinRole);
@@ -114,14 +109,6 @@ public class CristinProjectBuilder {
             .map(Organization::getId).map(UriUtils::extractLastPathElement)
             .filter(identifier -> UNIT_ID_PATTERN.matcher(identifier).matches())
             .orElse(null);
-    }
-
-    private CristinInstitution toCristinInstitution(Organization organization) {
-        CristinInstitution institution = new CristinInstitution();
-        institution.setInstitutionName(organization.getName());
-        institution.setUrl(organization.getId().toString());
-        institution.setCristinInstitutionId(extractLastPathElement(organization.getId()));
-        return institution;
     }
 
     private List<CristinFundingSource> extractFundings(List<Funding> fundings) {

@@ -1,15 +1,13 @@
 package no.unit.nva.cristin.model;
 
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
-import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
 import java.util.Map;
 import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.paths.UriWrapper;
-
 
 @SuppressWarnings("unused")
 @JacocoGenerated
@@ -50,12 +48,8 @@ public class CristinInstitution {
      * @return Organization model
      */
     public Organization toOrganization() {
-
-        final URI id = new UriWrapper(CRISTIN_API_URL).addChild(INSTITUTION_PATH)
-            .addChild(getCristinInstitutionId()).getUri();
-        return new Organization.Builder()
-            .withId(id)
-            .withName(getInstitutionName()).build();
+        URI id = getNvaApiId(getCristinInstitutionId(), ORGANIZATION_PATH);
+        return new Organization.Builder().withId(id).withName(getInstitutionName()).build();
     }
 }
 
