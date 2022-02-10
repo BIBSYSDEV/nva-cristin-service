@@ -34,6 +34,9 @@ jobs:
       # Create tet users in cognito
       - name: Create karate test users
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew createTestUsers -x karateTest -x test --info
+      # Take a break waiting for users
+      - name: Sleep for 10 seconds
+        run: sleep 10s
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest -x test --info

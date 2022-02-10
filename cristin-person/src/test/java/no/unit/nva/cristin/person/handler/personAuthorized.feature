@@ -42,9 +42,6 @@ Feature: API tests for Cristin Person fetch
     When method POST
     Then status 401
 
-
-
-
   Scenario Outline: Query with unsupported Accept header returns Unsupported Media Type
     * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }
     * header Authorization = 'Bearer ' + token
