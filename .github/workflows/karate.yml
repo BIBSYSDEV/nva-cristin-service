@@ -31,9 +31,15 @@ jobs:
       # Take a break waiting for API to deploy
       - name: Sleep for 10 seconds
         run: sleep 10s
+      # Create tet users in cognito
+      - name: Create karate test users
+        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew createTestUsers -x karateTest -x test --info
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest -x test --info
+        # Delete tests users
+      - name: Delete karate test users
+        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew deleteTestUsers -x karateTest -x test --info
       # Delete stack after running tests
       - name: Delete stack after running tests
         run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}
