@@ -4,8 +4,10 @@ Feature: API tests for Cristin Project retrieve and search
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
+    * def FEIDE_ID = 'karate-user-administrator@sikt.no'
+    * def PASSWORD = 'p@ssW0rd'
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
-    * def token = new tokenGenerator().createIdToken()
+    * def token = new tokenGenerator().loginUser(FEIDE_ID, PASSWORD)
     * def minimalCreateRequest =   { type: 'Project', title: 'Test Project', language: 'http://lexvo.org/id/iso639-3/nob', startDate: '2010-06-29T01:33:17.518Z',  coordinatingInstitution: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'},contributors: [{type: 'ProjectManager',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'}}],status: 'ACTIVE'}
     * def lessThanMinimalCreateRequest =   { type: 'Project', startDate: '2010-06-29T01:33:17.518Z',  coordinatingInstitution: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'},contributors: [{type: 'ProjectManager',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'}}],status: 'ACTIVE'}
     * def requestWithIllegalValues =   { type: 'Project', startDate: '2010-06-29T01:33:17.518Z',  coordinatingInstitution: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'},contributors: [{type: 'ProjectMan',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'}}],status: 'ACTIVE'}

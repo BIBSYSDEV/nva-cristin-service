@@ -42,6 +42,14 @@ public class CognitoUtil {
     private final AWSCognitoIdentityProvider cognitoIdentityProvider;
 
 
+    public static final String REGION = "eu-west-1";
+    private static final String USER_POOL_ID = "eu-west-1_DNRmDPtxY";
+    private static final String CLIENT_APP_ID = "4qfhv3kl9qcr2knsfb8lhu1u40";
+
+    public CognitoUtil() {
+        this(USER_POOL_ID, CLIENT_APP_ID, REGION);
+    }
+
 
     /**
      * Create a CognitoUtil to help create an id_token to access services in API-gateway.
@@ -56,6 +64,7 @@ public class CognitoUtil {
         this.region = region;
         cognitoIdentityProvider = getCognitoIdentityProvider();
     }
+
 
     /**
      * Create user in the user to the user pool.
