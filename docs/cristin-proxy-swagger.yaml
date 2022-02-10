@@ -505,6 +505,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PersonNIN'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonNinExample'
       responses:
         200:
           description: successful operation
@@ -1089,16 +1092,16 @@ components:
   examples:
     ProjectsExample:
       value:
-        '@context': 'https://example.org/search-api-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&results=5&title=helse'
+        '@context': 'https://bibsysdev.github.io/src/project-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/project?query=helse&language=nb&page=1&results=5'
         size: 150
-        searchString: 'language=nb&page=1&results=5&title=helse'
+        searchString: 'query=helse&language=nb&page=1&results=5'
         processingTime: 800
         firstRecord: 1
-        nextResults: 'https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=helse'
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/project?query=helse&language=nb&page=2&results=5'
         previousResults: ''
         hits:
-          - id: 'https://api.dev.nva.aws.unit.no/project/359084'
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/project/359084'
             type: 'Project'
             identifiers:
               - type: 'CristinIdentifier'
@@ -1117,30 +1120,30 @@ components:
                   nb: "Egen institusjon"
                 code: "EI"
             coordinatingInstitution:
-              id: 'https://api.cristin.no/v2/institutions/215'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
             contributors:
               - type: 'ProjectManager'
                 identity:
-                  id: 'https://api.cristin.no/v2/persons/325953'
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
                   type: 'Person'
                   firstName: 'Ola'
                   lastName: 'Nordmann'
                 affiliation:
-                  id: 'https://api.cristin.no/v2/institutions/215'
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
                   name:
                     'nb': 'OsloMet - storbyuniversitetet'
               - type: 'ProjectParticipant'
                 identity:
-                  id: 'https://api.cristin.no/v2/persons/326035'
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
                   type: 'Person'
                   firstName: 'Kari'
                   lastName: 'Olsen'
                 affiliation:
-                  id: 'https://api.cristin.no/v2/institutions/215'
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
                   name:
                     'nb': 'OsloMet - storbyuniversitetet'
@@ -1151,8 +1154,8 @@ components:
               no: "<p>FoU-prosjektet skal fremme forskningsbasert undervisning i digitale medier knyttet til Faglærerutdanningen i formgiving, kunst og håndverk på Institutt for estetiske fag."
     ProjectExample:
       value:
-        '@context': 'https://example.org/project-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/project/359084'
+        '@context': 'https://bibsysdev.github.io/src/project-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/project/359084'
         type: 'Project'
         identifiers:
           - type: 'CristinIdentifier'
@@ -1171,30 +1174,30 @@ components:
               nb: "Egen institusjon"
             code: "EI"
         coordinatingInstitution:
-          id: 'https://api.cristin.no/v2/institutions/215'
+          id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
           type: 'Organization'
           name:
             'nb': 'OsloMet - storbyuniversitetet'
         contributors:
           - type: 'ProjectManager'
             identity:
-              id: 'https://api.cristin.no/v2/persons/325953'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
               type: 'Person'
               firstName: 'Ola'
               lastName: 'Nordmann'
             affiliation:
-              id: 'https://api.cristin.no/v2/institutions/215'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
           - type: 'ProjectParticipant'
             identity:
-              id: 'https://api.cristin.no/v2/persons/326035'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
               type: 'Person'
               firstName: 'Kari'
               lastName: 'Olsen'
             affiliation:
-              id: 'https://api.cristin.no/v2/institutions/215'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
@@ -1205,17 +1208,19 @@ components:
               en: "popularScientificSummary popularScientificSummary popularScientificSummary"
     OrganizationsExample:
       value:
-        '@context': 'https://example.org/search-api-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/cristin/organization/?results=5&title=storby'
+        # TODO: Change context in code. Below is what it currently is now
+        '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/organization?depth=top&query=storby&page=1&results=5'
         size: 150
-        searchString: 'language=nb&page=1&results=5&title=storby'
+        searchString: 'depth=top&query=storby&page=1&results=5'
         processingTime: 800
         firstRecord: 1
-        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/organization/?page=2&results=5&title=storby'
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/organization?depth=top&query=storby&page=2&results=5'
         previousResults: ''
         hits:
+          # TODO: Add hasPart, partOf
           organization:
-            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/359084'
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             type: 'Organization'
             name:
               'nb': 'OsloMet - storbyuniversitetet'
@@ -1223,8 +1228,9 @@ components:
             acronym: 'OSLOMET'
     OrganizationExample:
       value:
-        '@context': 'https://example.org/search-api-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/cristin/organization/359084'
+        # TODO: Change context in code. Below is what it currently is now
+        '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
         type: 'Organization'
         name:
           'nb': 'OsloMet - storbyuniversitetet'
@@ -1232,13 +1238,13 @@ components:
         acronym: 'OSLOMET'
     PersonsExample:
       value:
-        '@context': 'https://example.org/search-api-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?page=1&query=Ola+Nordmann&results=5'
+        '@context': 'https://example.org/person-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?query=Ola+Nordmann&page=1&results=5'
         size: 150
-        searchString: 'page=1&query=Ola+Nordmann&results=5'
+        searchString: 'query=Ola+Nordmann&page=1&results=5'
         processingTime: 800
         firstRecord: 1
-        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?page=2&query=Ola+Nordmann&results=5'
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?query=Ola+Nordmann&page=2&results=5'
         previousResults: ''
         hits:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
@@ -1262,7 +1268,7 @@ components:
             image: 'https://api.cristin.no/v2/persons/359084/picture'
             affiliations:
               - type: 'Affiliation'
-                organization: 'https://api.cristin.no/v2/units/185.11.0.0'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
                 active: true
                 role:
                   id: 'https://example.org/link/to/ontology#1026'
@@ -1272,7 +1278,7 @@ components:
                     nb: 'Forsker'
                     nn: 'Forskar'
               - type: 'Affiliation'
-                organization: 'https://api.cristin.no/v2/units/185.90.0.0'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
                 active: true
                 role:
                   id: 'https://example.org/link/to/ontology#1026'
@@ -1294,7 +1300,7 @@ components:
               telephone: '+4744335566'
             affiliations:
               - type: 'Affiliation'
-                organization: 'https://api.cristin.no/v2/units/185.90.0.0'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
                 active: true
                 role:
                   id: 'https://example.org/link/to/ontology#1026'
@@ -1325,7 +1331,7 @@ components:
         image: 'https://api.cristin.no/v2/persons/359084/picture'
         affiliations:
           - type: 'Affiliation'
-            organization: 'https://api.cristin.no/v2/units/185.11.0.0'
+            organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
             active: true
             role:
               id: 'https://example.org/link/to/ontology#1026'
@@ -1335,7 +1341,7 @@ components:
                 nb: 'Forsker'
                 nn: 'Forskar'
           - type: 'Affiliation'
-            organization: 'https://api.cristin.no/v2/units/185.90.0.0'
+            organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
             active: true
             role:
               id: 'https://example.org/link/to/ontology#1026'
@@ -1380,6 +1386,10 @@ components:
         id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084/organization/185'
         email: 'email@example.com'
         phone: '+4799112233'
+    PersonNinExample:
+      value:
+        type: 'NationalIdentificationNumber'
+        value: '2102193712345'
   securitySchemes:
     CognitoUserPool:
       type: apiKey
