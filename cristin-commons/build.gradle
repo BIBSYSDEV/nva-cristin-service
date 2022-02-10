@@ -13,7 +13,7 @@ dependencies {
 }
 tasks.named('test') {
     useJUnitPlatform {
-        excludeTags 'integrationTest'
+        excludeTags 'integrationTest', 'createTestUsers', 'deleteTestUsers'
     }
     failFast = true
     testLogging {
