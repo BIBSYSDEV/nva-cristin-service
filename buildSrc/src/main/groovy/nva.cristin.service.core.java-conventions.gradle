@@ -25,6 +25,7 @@ repositories {
 }
 
 tasks.named('test') {
+
     useJUnitPlatform()
     failFast = true
     testLogging {

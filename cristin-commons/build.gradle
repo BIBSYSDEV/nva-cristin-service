@@ -11,5 +11,15 @@ dependencies {
     implementation libs.aws.sdk.cognitoidp
 
 }
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags 'integrationTest'
+    }
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
+}
 
 
