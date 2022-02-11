@@ -4,12 +4,12 @@ Feature: API tests for Cristin Person fetch
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
-    * def FEIDE_ID = 'karate-user-administrator@sikt.no'
-    * def PASSWORD = 'p@ssW0rd'
+    * def username = java.lang.System.getenv('FEIDE_ID')
+    * def password = java.lang.System.getenv('PASSWORD')
     * def cognitoClientAppId = java.lang.System.getenv('COGNITO_CLIENT_APP_ID')
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
-    * def token = tokenGenerator.loginUser(FEIDE_ID, PASSWORD, cognitoUserpoolId, cognitoClientAppId)
+    * def token = tokenGenerator.loginUser(username, password, cognitoUserpoolId, cognitoClientAppId)
     * def illegalIdentifier = 'illegalIdentifier'
     * def samplePersonId = '07117631634'
     * def nonExistingPersonId = '11077941012'
