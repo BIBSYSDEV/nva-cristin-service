@@ -16,6 +16,7 @@ Feature: API tests for Cristin Person fetch
     * def invalidToken = 'just-a-invalid-token-for-now'
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
+    * print 'Token: ' + token
 
   Scenario Outline: Fetch returns valid data and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
