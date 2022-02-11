@@ -20,8 +20,8 @@ import no.unit.nva.model.Organization;
 
 public class CristinProjectBuilder {
 
-    private final CristinProject cristinProject;
-    private final NvaProject nvaProject;
+    private final transient CristinProject cristinProject;
+    private final transient NvaProject nvaProject;
 
     public CristinProjectBuilder(NvaProject nvaProject) {
         this.nvaProject = nvaProject;
