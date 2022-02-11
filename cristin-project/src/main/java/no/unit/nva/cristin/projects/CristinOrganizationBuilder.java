@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
@@ -13,7 +14,7 @@ import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinOrganizationBuilder {
 
-    public static final Pattern UNIT_ID_PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
+    public static final Pattern CRISTIN_UNIT_IDENTIFIER = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
 
     private final transient Organization nvaOrganization;
 
@@ -40,9 +41,13 @@ public class CristinOrganizationBuilder {
         return Optional.ofNullable(organization)
             .map(Organization::getId)
             .map(UriUtils::extractLastPathElement)
-            .filter(identifier -> UNIT_ID_PATTERN.matcher(identifier).matches())
+            .filter(isCristinUnitIdentifier())
             .map(CristinOrganizationBuilder::mapUnitIdentifierToCristinOrganization)
             .orElse(null);
+    }
+
+    private static Predicate<String> isCristinUnitIdentifier() {
+        return identifier -> CRISTIN_UNIT_IDENTIFIER.matcher(identifier).matches();
     }
 
     private static CristinOrganization mapUnitIdentifierToCristinOrganization(String identifier) {
