@@ -58,14 +58,6 @@ task karateTest(type: Test) {
     outputs.upToDateWhen { false }
 }
 
-task integrationTest(type: Test) {
-    useJUnitPlatform {
-        includeTags('integrationTest')
-    }
-    outputs.upToDateWhen { false }
-}
-
-
 task createTestUsers(type: Test) {
     useJUnitPlatform {
         includeTags('createTestUsers')
