@@ -35,16 +35,14 @@ public class CognitoUtil {
     public static final String FEIDE_AFFILIATION = "feide:[member, employee, staff]";
     public static final String NVA_APPLICATION = "NVA";
     public static final String PROBLEM_CREATING_USER_MESSAGE = "Problem creating user {}, {}";
+    public static final String REGION = "eu-west-1";
     private static final Logger logger = LoggerFactory.getLogger(CognitoUtil.class);
+    private static final String USER_POOL_ID = "eu-west-1_DNRmDPtxY";
+    private static final String CLIENT_APP_ID = "4qfhv3kl9qcr2knsfb8lhu1u40";
     private final transient String userPoolId;
     private final transient String clientAppId;
     private final transient String region;
     private final AWSCognitoIdentityProvider cognitoIdentityProvider;
-
-
-    public static final String REGION = "eu-west-1";
-    private static final String USER_POOL_ID = "eu-west-1_DNRmDPtxY";
-    private static final String CLIENT_APP_ID = "4qfhv3kl9qcr2knsfb8lhu1u40";
 
     public CognitoUtil() {
         this(USER_POOL_ID, CLIENT_APP_ID, REGION);
@@ -69,8 +67,8 @@ public class CognitoUtil {
     /**
      * Create user in the user to the user pool.
      *
-     * @param feideId     User name for the sign up
-     * @param password    Password for the sign up
+     * @param feideId  User name for the sign up
+     * @param password Password for the sign up
      * @return username in cognito for user created from parameters.
      */
     public String createUser(String feideId, String password) {
@@ -109,21 +107,25 @@ public class CognitoUtil {
     /**
      * Create a user using default values.
      *
-     * @return id_token from loginUser()
      * @param feideId
      * @param password
+     * @return id_token from loginUser()
      */
     public String loginUser(String feideId, String password) {
-
-        return  loginUserAndReturnToken(feideId, password).orElse(null);
+        try {
+            return loginUserCognito(feideId, password).getAuthenticationResult().getIdToken();
+        } catch (Exception e) {
+            logger.warn("Error loginUserAndReturnToken username:{}, {}", feideId, e.getMessage());
+            return null;
+        }
     }
 
 
     /**
      * Delete the user with feideId from Cognito Userpool.
      *
-     * @return true if operation is a success
      * @param feideId
+     * @return true if operation is a success
      */
     public void deleteUser(String feideId) {
         getUsername(feideId).ifPresent(username -> {
@@ -184,16 +186,6 @@ public class CognitoUtil {
                 .withAuthFlow(AuthFlowType.ADMIN_USER_PASSWORD_AUTH)
                 .withAuthParameters(authParams);
         return cognitoIdentityProvider.adminInitiateAuth(initiateAuthRequest);
-    }
-
-    private Optional<String> loginUserAndReturnToken(String username, String password) {
-        Optional<String> token = Optional.empty();
-        try {
-            token = Optional.of(loginUserCognito(username, password).getAuthenticationResult().getIdToken());
-        } catch (Exception e) {
-            logger.warn("Error loginUserAndReturnToken username:{}, {}", username, e.getMessage());
-        }
-        return token;
     }
 
 
