@@ -1,3 +1,13 @@
 plugins {
     id 'nva.cristin.service.core.rootplugin'
 }
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
+    }
+//    failFast = true
+//    testLogging {
+//        events 'skipped', 'passed', 'failed'
+//    }
+//    finalizedBy jacocoTestReport
+}

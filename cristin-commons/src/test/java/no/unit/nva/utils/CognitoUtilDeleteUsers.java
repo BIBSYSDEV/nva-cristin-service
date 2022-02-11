@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 @Tag("deleteTestUsers")
 public class CognitoUtilDeleteUsers {
 
-
     public static final String REGION = "eu-west-1";
     public static final String FEIDE_ID = "karate-user-administrator@sikt.no";
     private static final String USER_POOL_ID = "eu-west-1_DNRmDPtxY";
@@ -16,6 +15,8 @@ public class CognitoUtilDeleteUsers {
 
     private static final CognitoUtil cognitoUtil = new CognitoUtil(USER_POOL_ID, CLIENT_APP_ID, REGION);
 
+    @Tag("integrationTest")
+    @Tag("deleteTestUsers")
     @Test
     void deleteTestUser() {
         System.out.println("deleteTestUser");

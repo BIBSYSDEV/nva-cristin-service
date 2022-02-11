@@ -7,9 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.isNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@Tag("integrationTest")
-@Tag("createTestUsers")
 public class CognitoUtilCreateUsers {
 
 
@@ -23,13 +22,15 @@ public class CognitoUtilCreateUsers {
 
     private static final CognitoUtil cognitoUtil = new CognitoUtil(USER_POOL_ID, CLIENT_APP_ID, REGION);
 
+    @Tag("integrationTest")
+    @Tag("createTestUsers")
     @Test
-
     void createTestUser() {
         if (isNull(cognitoUtil.loginUser(FEIDE_ID, PASSWORD))) {
             logger.info("createTestUser");
             cognitoUtil.deleteUser(FEIDE_ID);
             cognitoUtil.createUser(FEIDE_ID, PASSWORD);
+            assertNotNull(cognitoUtil.loginUser(FEIDE_ID, PASSWORD));
         } else {
             logger.info("testuser not changed, exists and can login");
         }

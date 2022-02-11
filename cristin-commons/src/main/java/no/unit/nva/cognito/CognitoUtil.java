@@ -32,7 +32,9 @@ public class CognitoUtil {
     public static final String CUSTOM_FEIDE_ID_ATTRIBUTE = "custom:feideId";
     public static final String CUSTOM_AFFILIATION_ATTRIBUTE = "custom:affiliation";
     public static final String CUSTOM_APPLICATION_ATTRIBUTE = "custom:application";
-    public static final String FEIDE_AFFILIATION = "feide:[member, employee, staff]";
+    public static final String CUSTOM_APPLICATION_ROLES_ATTRIBUTE = "custom:applicationRoles";
+    public static final String TEST_USER_ROLES_ADMIN_AND_CREATOR = "Creator,Institution-admin";
+    public static final String FEIDE_AFFILIATION = "[member, employee, staff]";
     public static final String NVA_APPLICATION = "NVA";
     public static final String PROBLEM_CREATING_USER_MESSAGE = "Problem creating user {}, {}";
     public static final String REGION = "eu-west-1";
@@ -83,6 +85,8 @@ public class CognitoUtil {
         list.add(new AttributeType().withName(CUSTOM_FEIDE_ID_ATTRIBUTE).withValue(feideId));
         list.add(new AttributeType().withName(CUSTOM_AFFILIATION_ATTRIBUTE).withValue(FEIDE_AFFILIATION));
         list.add(new AttributeType().withName(CUSTOM_APPLICATION_ATTRIBUTE).withValue(NVA_APPLICATION));
+        list.add(new AttributeType().withName(CUSTOM_APPLICATION_ROLES_ATTRIBUTE).withValue(TEST_USER_ROLES_ADMIN_AND_CREATOR));
+
 
         createUserRequest.setUserAttributes(list);
         createUserRequest.setMessageAction(MessageActionType.SUPPRESS);
@@ -149,10 +153,6 @@ public class CognitoUtil {
                 .withUserPoolId(getPoolId())
                 .withUsername(feideId);
         return getCognitoIdentityProvider().adminDeleteUser(deleteUserRequest);
-    }
-
-    private Optional<String> getUsername() {
-        return getUsername();
     }
 
     private Optional<String> getUsername(String feideId) {
