@@ -9,7 +9,7 @@ Feature: API tests for Cristin Person fetch
     * def USER_POOL_ID = 'eu-west-1_DNRmDPtxY'
     * def CLIENT_APP_ID = '4qfhv3kl9qcr2knsfb8lhu1u40'
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
-    * def token = new tokenGenerator().loginUser(FEIDE_ID, PASSWORD, USER_POOL_ID, CLIENT_APP_ID)
+    * def token = tokenGenerator.loginUser(FEIDE_ID, PASSWORD, USER_POOL_ID, CLIENT_APP_ID)
     * def illegalIdentifier = 'illegalIdentifier'
     * def samplePersonId = '07117631634'
     * def nonExistingPersonId = '11077941012'
@@ -18,7 +18,6 @@ Feature: API tests for Cristin Person fetch
     * def invalidToken = 'just-a-invalid-token-for-now'
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
-    * print 'Token: ' + token
 
   Scenario Outline: Fetch returns valid data and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
