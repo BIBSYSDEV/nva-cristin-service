@@ -25,11 +25,7 @@ repositories {
 }
 
 tasks.named('test') {
-
-    useJUnitPlatform {
-        excludeTags 'karateTest','integrationTest', 'createTestUsers', 'deleteTestUsers'
-    }
-
+    useJUnitPlatform()
     failFast = true
     testLogging {
         events 'skipped', 'passed', 'failed'
