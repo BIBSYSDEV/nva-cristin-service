@@ -6,6 +6,9 @@ env:
   BASE_PATH: cristin-$GITHUB_REF_NAME
   DOMAIN_NAME:  "api.dev.nva.aws.unit.no"
   CRISTIN_API_URL: "https://api.cristin-test.uio.no/v2"
+  COGNITO_USER_POOL_ID:  "eu-west-1_DNRmDPtxY"
+  COGNITO_CLIENT_APP_ID:  "4qfhv3kl9qcr2knsfb8lhu1u40"
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest

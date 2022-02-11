@@ -28,7 +28,6 @@ import java.util.Optional;
 
 public class CognitoUtil {
 
-
     public static final String CUSTOM_FEIDE_ID_ATTRIBUTE = "custom:feideId";
     public static final String CUSTOM_AFFILIATION_ATTRIBUTE = "custom:affiliation";
     public static final String CUSTOM_APPLICATION_ATTRIBUTE = "custom:application";
@@ -39,27 +38,6 @@ public class CognitoUtil {
     public static final String PROBLEM_CREATING_USER_MESSAGE = "Problem creating user {}, {}";
     public static final String REGION = "eu-west-1";
     private static final Logger logger = LoggerFactory.getLogger(CognitoUtil.class);
-//    private static final AWSCognitoIdentityProvider cognitoIdentityProvider;
-
-    /**
-     * Create a CognitoUtil to help create an id_token to access services in API-gateway.
-     */
-    public CognitoUtil() {
-    }
-
-//    /**
-//     * Create a CognitoUtil to help create an id_token to access services in API-gateway.
-//     *
-//     * @param userPoolId  id of the userpool
-//     * @param clientAppId clientapp secret from cognito
-//     * @param region      AWS region userpool is created in
-//     */
-//    public CognitoUtil(String userPoolId, String clientAppId, String region) {
-//        this.userPoolId = userPoolId;
-//        this.clientAppId = clientAppId;
-//        this.region = region;
-//        cognitoIdentityProvider = getCognitoIdentityProvider();
-//    }
 
 
     /**

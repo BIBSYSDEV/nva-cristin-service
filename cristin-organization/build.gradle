@@ -10,16 +10,16 @@ dependencies {
 }
 
 
-tasks.named('test') {
-    useJUnitPlatform {
-        excludeTags 'karateTest'
-    }
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    finalizedBy jacocoTestReport
-}
+//tasks.named('test') {
+//    useJUnitPlatform {
+//        excludeTags 'karateTest'
+//    }
+//    failFast = true
+//    testLogging {
+//        events 'skipped', 'passed', 'failed'
+//    }
+//    finalizedBy jacocoTestReport
+//}
 
 sourceSets {
     test {

@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import static java.util.Objects.isNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@Tag("integrationTest")
+@Tag("createTestUsers")
 public class CognitoUtilCreateUsers {
 
     public static final String FEIDE_ID = "karate-user-administrator@sikt.no";
@@ -19,8 +21,6 @@ public class CognitoUtilCreateUsers {
     private static final Logger logger = LoggerFactory.getLogger(CognitoUtilCreateUsers.class);
 
 
-    @Tag("integrationTest")
-    @Tag("createTestUsers")
     @Test
     void createTestUser() {
         if (isNull(CognitoUtil.loginUser(FEIDE_ID, PASSWORD, USER_POOL_ID, CLIENT_APP_ID))) {

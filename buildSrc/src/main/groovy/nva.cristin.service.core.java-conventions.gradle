@@ -26,7 +26,10 @@ repositories {
 
 tasks.named('test') {
 
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'karateTest','integrationTest', 'createTestUsers', 'deleteTestUsers'
+    }
+
     failFast = true
     testLogging {
         events 'skipped', 'passed', 'failed'
@@ -54,6 +57,14 @@ task karateTest(type: Test) {
     systemProperty "karate.env", System.properties.getProperty("karate.env")
     outputs.upToDateWhen { false }
 }
+
+task integrationTest(type: Test) {
+    useJUnitPlatform {
+        includeTags('integrationTest')
+    }
+    outputs.upToDateWhen { false }
+}
+
 
 task createTestUsers(type: Test) {
     useJUnitPlatform {
