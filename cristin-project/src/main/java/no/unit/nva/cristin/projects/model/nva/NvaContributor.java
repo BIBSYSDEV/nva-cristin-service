@@ -72,15 +72,13 @@ public class NvaContributor {
                && getAffiliation().equals(that.getAffiliation());
     }
 
-    public CristinPerson toCristinPerson() {
-        CristinPerson cristinPerson = new CristinPerson();
-        cristinPerson.setCristinPersonId(extractLastPathElement(this.getIdentity().getId()));
-        cristinPerson.setUrl(this.getIdentity().getId().toString());
-        cristinPerson.setFirstName(this.getIdentity().getFirstName());
-        cristinPerson.setSurname(this.getIdentity().getLastName());
+    public CristinPerson toCristinPersonWithRoles() {
+        CristinPerson cristinPerson = getIdentity().toCristinPersonWithoutRoles();
         cristinPerson.setRoles(extractCristinRoles());
         return cristinPerson;
     }
+
+
 
     private List<CristinRole> extractCristinRoles() {
         return contributorTypeCanBeMappedToCristinRole()

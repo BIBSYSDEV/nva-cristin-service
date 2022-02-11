@@ -64,7 +64,7 @@ public class CristinProjectBuilder {
     }
 
     private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
-        return contributors.stream().map(NvaContributor::toCristinPerson).collect(Collectors.toList());
+        return contributors.stream().map(NvaContributor::toCristinPersonWithRoles).collect(Collectors.toList());
     }
 
     private List<CristinFundingSource> extractFundings(List<Funding> fundings) {
