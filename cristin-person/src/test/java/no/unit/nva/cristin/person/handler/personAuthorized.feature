@@ -6,8 +6,10 @@ Feature: API tests for Cristin Person fetch
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     * def FEIDE_ID = 'karate-user-administrator@sikt.no'
     * def PASSWORD = 'p@ssW0rd'
+    * def USER_POOL_ID = 'eu-west-1_DNRmDPtxY'
+    * def CLIENT_APP_ID = '4qfhv3kl9qcr2knsfb8lhu1u40'
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
-    * def token = new tokenGenerator().loginUser(FEIDE_ID, PASSWORD)
+    * def token = new tokenGenerator().loginUser(FEIDE_ID, PASSWORD, USER_POOL_ID, CLIENT_APP_ID)
     * def illegalIdentifier = 'illegalIdentifier'
     * def samplePersonId = '07117631634'
     * def nonExistingPersonId = '11077941012'

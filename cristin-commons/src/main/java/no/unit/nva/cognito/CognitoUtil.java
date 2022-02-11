@@ -39,31 +39,27 @@ public class CognitoUtil {
     public static final String PROBLEM_CREATING_USER_MESSAGE = "Problem creating user {}, {}";
     public static final String REGION = "eu-west-1";
     private static final Logger logger = LoggerFactory.getLogger(CognitoUtil.class);
-    private static final String USER_POOL_ID = "eu-west-1_DNRmDPtxY";
-    private static final String CLIENT_APP_ID = "4qfhv3kl9qcr2knsfb8lhu1u40";
-    private final transient String userPoolId;
-    private final transient String clientAppId;
-    private final transient String region;
-    private final AWSCognitoIdentityProvider cognitoIdentityProvider;
-
-    public CognitoUtil() {
-        this(USER_POOL_ID, CLIENT_APP_ID, REGION);
-    }
-
+//    private static final AWSCognitoIdentityProvider cognitoIdentityProvider;
 
     /**
      * Create a CognitoUtil to help create an id_token to access services in API-gateway.
-     *
-     * @param userPoolId  id of the userpool
-     * @param clientAppId clientapp secret from cognito
-     * @param region      AWS region userpool is created in
      */
-    public CognitoUtil(String userPoolId, String clientAppId, String region) {
-        this.userPoolId = userPoolId;
-        this.clientAppId = clientAppId;
-        this.region = region;
-        cognitoIdentityProvider = getCognitoIdentityProvider();
+    public CognitoUtil() {
     }
+
+//    /**
+//     * Create a CognitoUtil to help create an id_token to access services in API-gateway.
+//     *
+//     * @param userPoolId  id of the userpool
+//     * @param clientAppId clientapp secret from cognito
+//     * @param region      AWS region userpool is created in
+//     */
+//    public CognitoUtil(String userPoolId, String clientAppId, String region) {
+//        this.userPoolId = userPoolId;
+//        this.clientAppId = clientAppId;
+//        this.region = region;
+//        cognitoIdentityProvider = getCognitoIdentityProvider();
+//    }
 
 
     /**
@@ -71,13 +67,14 @@ public class CognitoUtil {
      *
      * @param feideId  User name for the sign up
      * @param password Password for the sign up
+     * @param poolId
      * @return username in cognito for user created from parameters.
      */
-    public String createUser(String feideId, String password) {
+    public static String createUser(String feideId, String password, String poolId) {
 
 
         AdminCreateUserRequest createUserRequest = new AdminCreateUserRequest();
-        createUserRequest.setUserPoolId(getPoolId());
+        createUserRequest.setUserPoolId(poolId);
         createUserRequest.setUsername(feideId);
         createUserRequest.withTemporaryPassword(password);
         List<AttributeType> list = new ArrayList<>();
@@ -92,13 +89,13 @@ public class CognitoUtil {
         createUserRequest.setMessageAction(MessageActionType.SUPPRESS);
 
         try {
-            AdminCreateUserResult result = cognitoIdentityProvider.adminCreateUser(createUserRequest);
+            AdminCreateUserResult result = getCognitoIdentityProvider().adminCreateUser(createUserRequest);
             AdminSetUserPasswordRequest adminSetUserPasswordRequest = new AdminSetUserPasswordRequest()
-                    .withUserPoolId(getPoolId())
+                    .withUserPoolId(poolId)
                     .withUsername(feideId)
                     .withPassword(password)
                     .withPermanent(true);
-            cognitoIdentityProvider.adminSetUserPassword(adminSetUserPasswordRequest);
+            getCognitoIdentityProvider().adminSetUserPassword(adminSetUserPasswordRequest);
             logger.warn("user created username={}, feideId={}", result.getUser().getUsername(), feideId);
             return result.getUser().getUsername();
         } catch (Exception e) {
@@ -113,11 +110,13 @@ public class CognitoUtil {
      *
      * @param feideId
      * @param password
+     * @param poolId
+     * @param clientId
      * @return id_token from loginUser()
      */
-    public String loginUser(String feideId, String password) {
+    public static String loginUser(String feideId, String password, String poolId, String clientId) {
         try {
-            return loginUserCognito(feideId, password).getAuthenticationResult().getIdToken();
+            return loginUserCognito(feideId, password, poolId, clientId).getAuthenticationResult().getIdToken();
         } catch (Exception e) {
             logger.warn("Error loginUserAndReturnToken username:{}, {}", feideId, e.getMessage());
             return null;
@@ -129,12 +128,13 @@ public class CognitoUtil {
      * Delete the user with feideId from Cognito Userpool.
      *
      * @param feideId
+     * @param poolId
      * @return true if operation is a success
      */
-    public void deleteUser(String feideId) {
-        getUsername(feideId).ifPresent(username -> {
+    public static void deleteUser(String feideId, String poolId) {
+        getUsername(feideId, poolId).ifPresent(username -> {
             try {
-                deleteUserCognito(username);
+                deleteUserCognito(username, poolId);
             } catch (Exception e) {
                 logger.warn("Error deleting user:{}, {}", username, e.getMessage());
             }
@@ -145,21 +145,22 @@ public class CognitoUtil {
      * Delete a user in Cognito userpool.
      *
      * @param feideId string identifying user in userpool
+     * @param poolId
      * @return If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body
      * If not successful a runtime exception is thrown
      */
-    private AdminDeleteUserResult deleteUserCognito(String feideId) {
+    private static AdminDeleteUserResult deleteUserCognito(String feideId, String poolId) {
         AdminDeleteUserRequest deleteUserRequest = new AdminDeleteUserRequest()
-                .withUserPoolId(getPoolId())
+                .withUserPoolId(poolId)
                 .withUsername(feideId);
         return getCognitoIdentityProvider().adminDeleteUser(deleteUserRequest);
     }
 
-    private Optional<String> getUsername(String feideId) {
+    private static Optional<String> getUsername(String feideId, String poolId) {
         Optional<String> username = Optional.empty();
         try {
             ListUsersRequest listUsersRequest = new ListUsersRequest()
-                    .withUserPoolId(getPoolId())
+                    .withUserPoolId(poolId)
                     .withFilter(String.format("email = \"%s\"", feideId));
             username = getCognitoIdentityProvider().listUsers(listUsersRequest).getUsers().stream()
                     .findFirst()
@@ -175,36 +176,29 @@ public class CognitoUtil {
      *
      * @param username username
      * @param password password
+     * @param poolId
+     * @param clientId
      * @return result of operation containing credentials and tokens
      */
-    private AdminInitiateAuthResult loginUserCognito(String username, String password) {
+    private static AdminInitiateAuthResult loginUserCognito(String username, String password, String poolId, String clientId) {
 
         final Map<String, String> authParams = Map.of("USERNAME", username, "PASSWORD", password);
         final AdminInitiateAuthRequest initiateAuthRequest = new AdminInitiateAuthRequest()
-                .withUserPoolId(getPoolId())
-                .withClientId(getClientId())
+                .withUserPoolId(poolId)
+                .withClientId(clientId)
                 .withAuthFlow(AuthFlowType.ADMIN_USER_PASSWORD_AUTH)
                 .withAuthParameters(authParams);
-        return cognitoIdentityProvider.adminInitiateAuth(initiateAuthRequest);
+        return getCognitoIdentityProvider().adminInitiateAuth(initiateAuthRequest);
     }
 
 
-    private AWSCognitoIdentityProvider getCognitoIdentityProvider() {
+    private static AWSCognitoIdentityProvider getCognitoIdentityProvider() {
         AWSCredentials awsCredentials = new DefaultAWSCredentialsProviderChain().getCredentials();
         return AWSCognitoIdentityProviderClientBuilder
                 .standard()
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                .withRegion(Regions.fromName(region))
+                .withRegion(Regions.fromName(REGION))
                 .build();
     }
-
-    private String getPoolId() {
-        return userPoolId;
-    }
-
-    private String getClientId() {
-        return clientAppId;
-    }
-
 
 }

@@ -11,8 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CognitoUtilCreateUsers {
 
-
-    public static final String REGION = "eu-west-1";
     public static final String FEIDE_ID = "karate-user-administrator@sikt.no";
     public static final String PASSWORD = "p@ssW0rd";
     private static final String USER_POOL_ID = "eu-west-1_DNRmDPtxY";
@@ -20,17 +18,16 @@ public class CognitoUtilCreateUsers {
 
     private static final Logger logger = LoggerFactory.getLogger(CognitoUtilCreateUsers.class);
 
-    private static final CognitoUtil cognitoUtil = new CognitoUtil(USER_POOL_ID, CLIENT_APP_ID, REGION);
 
     @Tag("integrationTest")
     @Tag("createTestUsers")
     @Test
     void createTestUser() {
-        if (isNull(cognitoUtil.loginUser(FEIDE_ID, PASSWORD))) {
+        if (isNull(CognitoUtil.loginUser(FEIDE_ID, PASSWORD, USER_POOL_ID, CLIENT_APP_ID))) {
             logger.info("createTestUser");
-            cognitoUtil.deleteUser(FEIDE_ID);
-            cognitoUtil.createUser(FEIDE_ID, PASSWORD);
-            assertNotNull(cognitoUtil.loginUser(FEIDE_ID, PASSWORD));
+            CognitoUtil.deleteUser(FEIDE_ID, USER_POOL_ID);
+            CognitoUtil.createUser(FEIDE_ID, PASSWORD, USER_POOL_ID);
+            assertNotNull(CognitoUtil.loginUser(FEIDE_ID, PASSWORD, USER_POOL_ID, CLIENT_APP_ID));
         } else {
             logger.info("testuser not changed, exists and can login");
         }
