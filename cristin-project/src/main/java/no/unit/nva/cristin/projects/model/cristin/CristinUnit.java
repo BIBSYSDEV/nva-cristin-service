@@ -67,9 +67,14 @@ public class CristinUnit {
     }
 
     public static Optional<String> extractUnitIdentifier(Organization organization) {
-        return Optional.of(organization)
-            .map(Organization::getId).map(UriUtils::extractLastPathElement)
-            .filter(identifier -> CRISTIN_UNIT_IDENTIFIER.matcher(identifier).matches());
+        return Optional.ofNullable(organization)
+            .map(Organization::getId)
+            .map(UriUtils::extractLastPathElement)
+            .filter(CristinUnit::isCristinUnitIdentifier);
+    }
+
+    public static boolean isCristinUnitIdentifier(String identifier) {
+        return CRISTIN_UNIT_IDENTIFIER.matcher(identifier).matches();
     }
 }
 

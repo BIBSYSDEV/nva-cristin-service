@@ -1,20 +1,14 @@
 package no.unit.nva.cristin.projects;
 
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
-import no.unit.nva.cristin.projects.model.cristin.CristinUnit;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.UriUtils;
 
-import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
+import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.extractUnitIdentifier;
+import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.fromCristinUnitIdentifier;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinOrganizationBuilder {
-
-    public static final Pattern CRISTIN_UNIT_IDENTIFIER = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
 
     private final transient Organization nvaOrganization;
 
@@ -38,23 +32,14 @@ public class CristinOrganizationBuilder {
     }
 
     public static CristinOrganization fromUnitIdentifier(Organization organization) {
-        return Optional.ofNullable(organization)
-            .map(Organization::getId)
-            .map(UriUtils::extractLastPathElement)
-            .filter(isCristinUnitIdentifier())
+        return extractUnitIdentifier(organization)
             .map(CristinOrganizationBuilder::mapUnitIdentifierToCristinOrganization)
             .orElse(null);
     }
 
-    private static Predicate<String> isCristinUnitIdentifier() {
-        return identifier -> CRISTIN_UNIT_IDENTIFIER.matcher(identifier).matches();
-    }
-
-    private static CristinOrganization mapUnitIdentifierToCristinOrganization(String identifier) {
-        CristinUnit unit = new CristinUnit();
-        unit.setCristinUnitId(identifier);
+    private static CristinOrganization mapUnitIdentifierToCristinOrganization(String unitIdentifier) {
         CristinOrganization cristinOrganization = new CristinOrganization();
-        cristinOrganization.setInstitutionUnit(unit);
+        cristinOrganization.setInstitutionUnit(fromCristinUnitIdentifier(unitIdentifier));
         return cristinOrganization;
     }
 }
