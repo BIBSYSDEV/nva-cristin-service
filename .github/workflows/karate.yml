@@ -41,8 +41,6 @@ jobs:
         run: sudo apt-get install pwgen
       - name: generate random password
         run: echo PASSWORD=$(pwgen --symbols 15 1) >> $GITHUB_ENV
-      - name: just debug pw
-        run: echo $PASSWORD
       # Create tet users in cognito
       - name: Create karate test users
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew createTestUsers -x karateTest -x test --info
