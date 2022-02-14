@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import java.util.Optional;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
 import no.unit.nva.model.Organization;
@@ -31,10 +32,9 @@ public class CristinOrganizationBuilder {
         return cristinOrganization;
     }
 
-    public static CristinOrganization fromUnitIdentifier(Organization organization) {
+    public static Optional<CristinOrganization> fromOrganizationContainingUnitIfPresent(Organization organization) {
         return extractUnitIdentifier(organization)
-            .map(CristinOrganizationBuilder::mapUnitIdentifierToCristinOrganization)
-            .orElse(null);
+            .map(CristinOrganizationBuilder::mapUnitIdentifierToCristinOrganization);
     }
 
     private static CristinOrganization mapUnitIdentifierToCristinOrganization(String unitIdentifier) {

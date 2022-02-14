@@ -60,12 +60,22 @@ public class CristinUnit {
         return new Organization.Builder().withId(id).withName(getUnitName()).build();
     }
 
+    /**
+     * Create a CristinUnit from a Cristin unit identifier.
+     *
+     * @return a CristinUnit with one field, the identifier
+     */
     public static CristinUnit fromCristinUnitIdentifier(String unitIdentifier) {
         CristinUnit cristinUnit = new CristinUnit();
         cristinUnit.setCristinUnitId(unitIdentifier);
         return cristinUnit;
     }
 
+    /**
+     * Extract Cristin Unit identifier from an Organization if it is present.
+     *
+     * @return an Optional containing either Cristin Unit identifier or empty
+     */
     public static Optional<String> extractUnitIdentifier(Organization organization) {
         return Optional.ofNullable(organization)
             .map(Organization::getId)

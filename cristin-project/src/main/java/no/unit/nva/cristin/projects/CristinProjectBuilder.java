@@ -1,12 +1,12 @@
 package no.unit.nva.cristin.projects;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
@@ -51,16 +51,11 @@ public class CristinProjectBuilder {
     }
 
     private CristinOrganization extractCristinOrganization(Organization organization) {
-        return Optional.ofNullable(createOrganizationBasedOnDepartment(organization))
-            .orElse(fallBackToInstitutionLevel(organization));
+        return fromOrganizationContainingUnitIfPresent(organization).orElse(fallBackToInstitutionLevel(organization));
     }
 
     private CristinOrganization fallBackToInstitutionLevel(Organization organization) {
         return new CristinOrganizationBuilder(organization).build();
-    }
-
-    private CristinOrganization createOrganizationBasedOnDepartment(Organization organization) {
-        return CristinOrganizationBuilder.fromUnitIdentifier(organization);
     }
 
     private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {

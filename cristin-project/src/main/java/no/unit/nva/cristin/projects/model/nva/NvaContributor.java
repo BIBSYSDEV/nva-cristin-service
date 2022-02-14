@@ -64,10 +64,15 @@ public class NvaContributor {
         }
         NvaContributor that = (NvaContributor) o;
         return getType().equals(that.getType())
-               && getIdentity().equals(that.getIdentity())
-               && getAffiliation().equals(that.getAffiliation());
+            && getIdentity().equals(that.getIdentity())
+            && getAffiliation().equals(that.getAffiliation());
     }
 
+    /**
+     * Create a CristinPerson from identity with added roles.
+     *
+     * @return a CristinPerson from identity and roles
+     */
     public CristinPerson toCristinPersonWithRoles() {
         CristinPerson cristinPerson = getIdentity().toCristinPersonWithoutRoles();
         cristinPerson.setRoles(extractCristinRoles());
