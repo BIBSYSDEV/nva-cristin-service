@@ -54,7 +54,7 @@ public class CognitoUtil {
         AdminCreateUserRequest createUserRequest = new AdminCreateUserRequest();
         createUserRequest.setUserPoolId(poolId);
         createUserRequest.setUsername(feideId);
-        createUserRequest.withTemporaryPassword(password);
+//        createUserRequest.withTemporaryPassword(password);
         List<AttributeType> list = new ArrayList<>();
 
         list.add(new AttributeType().withName(CUSTOM_FEIDE_ID_ATTRIBUTE).withValue(feideId));
