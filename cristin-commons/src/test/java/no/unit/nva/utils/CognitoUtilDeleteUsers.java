@@ -1,21 +1,27 @@
 package no.unit.nva.utils;
 
 import no.unit.nva.cognito.CognitoUtil;
+import nva.commons.core.Environment;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import static no.unit.nva.cognito.CognitoUtil.COGNITO_USER_POOL_ID_KEY;
+import static no.unit.nva.cognito.CognitoUtil.TESTUSER_FEIDE_ID_KEY;
 
 @Tag("integrationTest")
 public class CognitoUtilDeleteUsers {
 
-    public static final String FEIDE_ID = "karate-user-administrator@sikt.no";
-    private static final String USER_POOL_ID = "eu-west-1_DNRmDPtxY";
 
 
     @Tag("deleteTestUsers")
     @Test
     void deleteTestUser() {
+        final Environment environment = new Environment();
+        String feideUserName = environment.readEnv(TESTUSER_FEIDE_ID_KEY);
+        String userpoolId = environment.readEnv(COGNITO_USER_POOL_ID_KEY);
+
         System.out.println("deleteTestUser");
-        CognitoUtil.deleteUser(FEIDE_ID, USER_POOL_ID);
+        CognitoUtil.deleteUser(feideUserName, userpoolId);
     }
 
 }

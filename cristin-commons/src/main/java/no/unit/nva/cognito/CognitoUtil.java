@@ -37,6 +37,11 @@ public class CognitoUtil {
     public static final String NVA_APPLICATION = "NVA";
     public static final String PROBLEM_CREATING_USER_MESSAGE = "Problem creating user {}, {}";
     public static final String REGION = "eu-west-1";
+    public static final String TESTUSER_FEIDE_ID_KEY = "TESTUSER_FEIDE_ID";
+    public static final String TESTUSER_PASSWORD_KEY = "TESTUSER_PASSWORD";
+    public static final String COGNITO_CLIENT_APP_ID_KEY = "COGNITO_CLIENT_APP_ID";
+    public static final String COGNITO_USER_POOL_ID_KEY = "COGNITO_USER_POOL_ID";
+
     private static final Logger logger = LoggerFactory.getLogger(CognitoUtil.class);
 
 
@@ -45,22 +50,21 @@ public class CognitoUtil {
      *
      * @param feideId  User name for the sign up
      * @param password Password for the sign up
-     * @param poolId
+     * @param poolId   Identifier for Cognito userpool
      * @return username in cognito for user created from parameters.
      */
     public static String createUser(String feideId, String password, String poolId) {
 
-
         AdminCreateUserRequest createUserRequest = new AdminCreateUserRequest();
         createUserRequest.setUserPoolId(poolId);
         createUserRequest.setUsername(feideId);
-//        createUserRequest.withTemporaryPassword(password);
         List<AttributeType> list = new ArrayList<>();
 
         list.add(new AttributeType().withName(CUSTOM_FEIDE_ID_ATTRIBUTE).withValue(feideId));
         list.add(new AttributeType().withName(CUSTOM_AFFILIATION_ATTRIBUTE).withValue(FEIDE_AFFILIATION));
         list.add(new AttributeType().withName(CUSTOM_APPLICATION_ATTRIBUTE).withValue(NVA_APPLICATION));
-        list.add(new AttributeType().withName(CUSTOM_APPLICATION_ROLES_ATTRIBUTE).withValue(TEST_USER_ROLES_ADMIN_AND_CREATOR));
+        list.add(new AttributeType().withName(CUSTOM_APPLICATION_ROLES_ATTRIBUTE)
+                .withValue(TEST_USER_ROLES_ADMIN_AND_CREATOR));
 
 
         createUserRequest.setUserAttributes(list);
@@ -84,12 +88,12 @@ public class CognitoUtil {
 
 
     /**
-     * Create a user using default values.
+     * Create a user using given values.
      *
-     * @param feideId
-     * @param password
-     * @param poolId
-     * @param clientId
+     * @param feideId  Username to use for login
+     * @param password users password
+     * @param poolId   Cognito userpoolid
+     * @param clientId Cognito AppClientId
      * @return id_token from loginUser()
      */
     public static String loginUser(String feideId, String password, String poolId, String clientId) {
@@ -101,13 +105,11 @@ public class CognitoUtil {
         }
     }
 
-
     /**
      * Delete the user with feideId from Cognito Userpool.
      *
-     * @param feideId
-     * @param poolId
-     * @return true if operation is a success
+     * @param feideId Username to use for login
+     * @param poolId  Cognito userpool id
      */
     public static void deleteUser(String feideId, String poolId) {
         getUsername(feideId, poolId).ifPresent(username -> {
@@ -123,7 +125,7 @@ public class CognitoUtil {
      * Delete a user in Cognito userpool.
      *
      * @param feideId string identifying user in userpool
-     * @param poolId
+     * @param poolId  Cognito Userpool Id
      * @return If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body
      * If not successful a runtime exception is thrown
      */
@@ -154,11 +156,14 @@ public class CognitoUtil {
      *
      * @param username username
      * @param password password
-     * @param poolId
-     * @param clientId
+     * @param poolId   Cognito userpoo Id
+     * @param clientId Cognito AppClientId
      * @return result of operation containing credentials and tokens
      */
-    private static AdminInitiateAuthResult loginUserCognito(String username, String password, String poolId, String clientId) {
+    private static AdminInitiateAuthResult loginUserCognito(String username,
+                                                            String password,
+                                                            String poolId,
+                                                            String clientId) {
 
         final Map<String, String> authParams = Map.of("USERNAME", username, "PASSWORD", password);
         final AdminInitiateAuthRequest initiateAuthRequest = new AdminInitiateAuthRequest()
@@ -178,5 +183,4 @@ public class CognitoUtil {
                 .withRegion(Regions.fromName(REGION))
                 .build();
     }
-
 }

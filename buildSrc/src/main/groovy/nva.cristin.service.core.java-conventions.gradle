@@ -59,6 +59,11 @@ task createTestUsers(type: Test) {
         includeTags('createTestUsers')
     }
 
+    environment "COGNITO_USER_POOL_ID",  "eu-west-1_DNRmDPtxY"
+    environment "COGNITO_CLIENT_APP_ID",  "4qfhv3kl9qcr2knsfb8lhu1u40"
+    environment "TESTUSER_FEIDE_ID",  "karate-user-administrator@sikt.no"
+    environment "TESTUSER_PASSWORD", "SampleP@ssW0rd"
+
     outputs.upToDateWhen { false }
 }
 
@@ -67,6 +72,8 @@ task deleteTestUsers(type: Test) {
         includeTags('deleteTestUsers')
     }
 
+    environment "COGNITO_USER_POOL_ID",  "eu-west-1_DNRmDPtxY"
+    environment "TESTUSER_FEIDE_ID",  "karate-user-administrator@sikt.no"
     outputs.upToDateWhen { false }
 }
 
