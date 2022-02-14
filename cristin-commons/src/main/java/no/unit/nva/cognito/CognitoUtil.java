@@ -53,7 +53,7 @@ public class CognitoUtil {
      * @param poolId   Identifier for Cognito userpool
      * @return username in cognito for user created from parameters.
      */
-    public static String createUser(String feideId, String password, String poolId) {
+    public static String createUser(String feideId, String password, String poolId, String clientId) {
 
         AdminCreateUserRequest createUserRequest = new AdminCreateUserRequest();
         createUserRequest.setUserPoolId(poolId);
@@ -79,7 +79,9 @@ public class CognitoUtil {
                     .withPermanent(true);
             getCognitoIdentityProvider().adminSetUserPassword(adminSetUserPasswordRequest);
             logger.warn("user created username={}, feideId={}", result.getUser().getUsername(), feideId);
-            return result.getUser().getUsername();
+            var username =  result.getUser().getUsername();
+            loginUser(feideId, password, poolId, clientId);  // Force setting of user attributes in Cognito
+            return username;
         } catch (Exception e) {
             logger.warn(PROBLEM_CREATING_USER_MESSAGE, feideId, e.getMessage());
             return null;

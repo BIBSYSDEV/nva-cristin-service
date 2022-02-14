@@ -39,7 +39,7 @@ public class CognitoUtilCreateUsers {
         if (isNull(CognitoUtil.loginUser(feideUserName, password, userpoolId, clientAppId))) {
             logger.info(CREATE_TEST_USER_WITH_FEIDE_USER_NAME, feideUserName);
             CognitoUtil.deleteUser(feideUserName, userpoolId);
-            String cognitoUserName = CognitoUtil.createUser(feideUserName, password, userpoolId);
+            String cognitoUserName = CognitoUtil.createUser(feideUserName, password, userpoolId, clientAppId);
             assertNotNull(cognitoUserName);  // user is created
             assertNotNull(CognitoUtil.loginUser(feideUserName, password, userpoolId, clientAppId)); // verify login
         } else {
