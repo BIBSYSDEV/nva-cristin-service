@@ -40,7 +40,7 @@ jobs:
       - name: install pwgen
         run: sudo apt-get install pwgen
       - name: generate random password
-        run: PASSWORD = pwgen 15 1
+        run: PASSWORD=$(pwgen 15 1)
       - name: just debug pw
         run: echo $PASSWORD
       # Create tet users in cognito
