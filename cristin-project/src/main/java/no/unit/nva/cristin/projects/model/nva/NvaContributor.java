@@ -1,11 +1,11 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import static no.unit.nva.cristin.model.CristinInstitution.fromOrganization;
 import static no.unit.nva.cristin.model.JsonPropertyNames.AFFILIATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTITY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import static no.unit.nva.utils.ContributorRoleMapping.getCristinRole;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Collections;
 import java.util.List;
@@ -108,7 +108,7 @@ public class NvaContributor {
             CristinUnit institutionUnit = toCristinUnit(extractUnitIdentifier().orElseThrow());
             cristinRole.setInstitutionUnit(institutionUnit);
         } else {
-            CristinInstitution defaultOrganization = convertOrganizationToCristinInstitution(getAffiliation());
+            CristinInstitution defaultOrganization = fromOrganization(getAffiliation());
             cristinRole.setInstitution(defaultOrganization);
         }
     }
@@ -137,11 +137,4 @@ public class NvaContributor {
             .filter(identifier -> UNIT_ID_PATTERN.matcher(identifier).matches());
     }
 
-    private CristinInstitution convertOrganizationToCristinInstitution(Organization organization) {
-        CristinInstitution institution = new CristinInstitution();
-        institution.setInstitutionName(organization.getName());
-        institution.setUrl(organization.getId().toString());
-        institution.setCristinInstitutionId(extractLastPathElement(organization.getId()));
-        return institution;
-    }
 }
