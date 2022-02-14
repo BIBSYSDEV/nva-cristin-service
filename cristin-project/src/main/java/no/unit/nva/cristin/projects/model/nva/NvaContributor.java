@@ -4,26 +4,22 @@ import static no.unit.nva.cristin.model.CristinInstitution.fromOrganization;
 import static no.unit.nva.cristin.model.JsonPropertyNames.AFFILIATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTITY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
-import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
+import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.extractUnitIdentifier;
+import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.fromCristinUnitIdentifier;
 import static no.unit.nva.utils.ContributorRoleMapping.getCristinRole;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Pattern;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.projects.model.cristin.CristinUnit;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.UriUtils;
 
 @SuppressWarnings("unused")
 @JsonPropertyOrder({TYPE, IDENTITY, AFFILIATION})
 public class NvaContributor {
-
-    private static final Pattern UNIT_ID_PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
 
     private String type;
     private Person identity;
@@ -78,22 +74,12 @@ public class NvaContributor {
         return cristinPerson;
     }
 
-
-
     private List<CristinRole> extractCristinRoles() {
-        return contributorTypeCanBeMappedToCristinRole()
-                   ? getCristinRoles()
-                   : Collections.emptyList();
+        return contributorTypeCanBeMappedToCristinRole() ? getCristinRoles() : Collections.emptyList();
     }
 
     private boolean contributorTypeCanBeMappedToCristinRole() {
         return getCristinRole(getType()).isPresent();
-    }
-
-    private List<CristinRole> extractCristinRoles(NvaContributor contributor) {
-        return contributorTypeCanBeMappedToCristinRole()
-                   ? getCristinRoles()
-                   : Collections.emptyList();
     }
 
     private List<CristinRole> getCristinRoles() {
@@ -105,7 +91,8 @@ public class NvaContributor {
 
     private void addOrganizationInformationToCristinRole(CristinRole cristinRole) {
         if (contributorHasValidUnitIdentifier()) {
-            CristinUnit institutionUnit = toCristinUnit(extractUnitIdentifier().orElseThrow());
+            String unitIdentifier = extractUnitIdentifier(getAffiliation()).orElseThrow();
+            CristinUnit institutionUnit = fromCristinUnitIdentifier(unitIdentifier);
             cristinRole.setInstitutionUnit(institutionUnit);
         } else {
             CristinInstitution defaultOrganization = fromOrganization(getAffiliation());
@@ -122,19 +109,7 @@ public class NvaContributor {
     }
 
     private boolean contributorHasValidUnitIdentifier() {
-        return extractUnitIdentifier().isPresent();
-    }
-
-    private CristinUnit toCristinUnit(String unitIdentifier) {
-        CristinUnit cristinUnit = new CristinUnit();
-        cristinUnit.setCristinUnitId(unitIdentifier);
-        return cristinUnit;
-    }
-
-    private Optional<String> extractUnitIdentifier() {
-        return Optional.of(getAffiliation())
-            .map(Organization::getId).map(UriUtils::extractLastPathElement)
-            .filter(identifier -> UNIT_ID_PATTERN.matcher(identifier).matches());
+        return extractUnitIdentifier(getAffiliation()).isPresent();
     }
 
 }
