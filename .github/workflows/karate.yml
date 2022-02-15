@@ -9,7 +9,7 @@ env:
   COGNITO_USER_POOL_ID:  "eu-west-1_DNRmDPtxY"
   COGNITO_CLIENT_APP_ID:  "4qfhv3kl9qcr2knsfb8lhu1u40"
   TESTUSER_FEIDE_ID: "karate-user-administrator@sikt.no"
-#  TESTUSER_PASSWORD: "to be reassigned...."
+  TESTUSER_PASSWORD: P@ssW00rd$GITHUB_SHA
 
 jobs:
   build_and_deploy:
@@ -36,11 +36,11 @@ jobs:
       # Take a break waiting for API to deploy
       - name: Sleep for 10 seconds
         run: sleep 10s
-      # generate random password for testuser
-      - name: install pwgen
-        run: sudo apt-get install pwgen
-      - name: generate random password
-        run: echo TESTUSER_PASSWORD=$(pwgen --symbols 15 1) >> $GITHUB_ENV
+#      # generate random password for testuser
+#      - name: install pwgen
+#        run: sudo apt-get install pwgen
+#      - name: generate random password
+#        run: echo TESTUSER_PASSWORD=$(pwgen --symbols 15 1) >> $GITHUB_ENV
       # Create tet users in cognito
       - name: Create karate test users
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew createTestUsers -x karateTest -x test --info
