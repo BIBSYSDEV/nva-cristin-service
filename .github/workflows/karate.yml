@@ -10,7 +10,6 @@ env:
   COGNITO_CLIENT_APP_ID:  "4qfhv3kl9qcr2knsfb8lhu1u40"
   TESTUSER_FEIDE_ID: "karate-user-administrator@sikt.no"
 
-
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -37,12 +36,9 @@ jobs:
       - name: Sleep for 10 seconds
         run: sleep 10s
       # Create test users in cognito
-      - uses: actions/checkout@v2
-      - name: Decrypt large secret
-        run: ./.github/scripts/decrypt_secret.sh
-        env:
-          TESTUSER_PASSWORD: ${{secrets.COGNITO_TESTUSER_PASSWORD}}
       - name: Create karate test users
+        env:
+          TESTUSER_PASSWORD: ${{ secrets.COGNITO_TESTUSER_PASSWORD }}
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew createTestUsers --info
       # Take a break waiting for users
       - name: Sleep for 10 seconds
