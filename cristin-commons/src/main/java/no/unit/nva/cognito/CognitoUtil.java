@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 public class CognitoUtil {
 
     public static final String CUSTOM_FEIDE_ID_ATTRIBUTE = "custom:feideId";
@@ -78,9 +80,11 @@ public class CognitoUtil {
                     .withPassword(password)
                     .withPermanent(true);
             getCognitoIdentityProvider().adminSetUserPassword(adminSetUserPasswordRequest);
-            logger.warn("user created username={}, feideId={}", result.getUser().getUsername(), feideId);
+            logger.info("user created username={}, feideId={}", result.getUser().getUsername(), feideId);
             var username =  result.getUser().getUsername();
-            loginUser(feideId, password, poolId, clientId);  // Force setting of user attributes in Cognito
+            if (isNull(loginUser(feideId, password, poolId, clientId))) {
+                logger.error("User cannot login after create");
+            };  // Force setting of user attributes in Cognito
             return username;
         } catch (Exception e) {
             logger.warn(PROBLEM_CREATING_USER_MESSAGE, feideId, e.getMessage());

@@ -39,7 +39,7 @@ jobs:
       - name: Create karate test users
         env:
           TESTUSER_PASSWORD : ${{ secrets.COGNITO_TESTUSER_PASSWORD }}
-        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew createTestUsers --debug
+        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew createTestUsers --info
       # Take a break waiting for users
       - name: Sleep for 10 seconds
         run: sleep 10s
