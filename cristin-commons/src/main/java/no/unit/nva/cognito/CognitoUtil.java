@@ -84,7 +84,7 @@ public class CognitoUtil {
             var username =  result.getUser().getUsername();
             if (isNull(loginUser(feideId, password, poolId, clientId))) {
                 logger.error("User cannot login after create");
-            };  // Force setting of user attributes in Cognito
+            }  // Force setting of user attributes in Cognito
             return username;
         } catch (Exception e) {
             logger.warn(PROBLEM_CREATING_USER_MESSAGE, feideId, e.getMessage());
