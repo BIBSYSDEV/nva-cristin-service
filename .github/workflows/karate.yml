@@ -45,6 +45,8 @@ jobs:
         run: sleep 10s
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
+        env:
+          TESTUSER_PASSWORD: ${{ secrets.COGNITO_TESTUSER_PASSWORD }}
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest --info
         # Delete tests users
       - name: Delete karate test users
