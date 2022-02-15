@@ -7,7 +7,6 @@ import no.unit.nva.model.Organization;
 
 import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.extractUnitIdentifier;
 import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.fromCristinUnitIdentifier;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinOrganizationBuilder {
 
@@ -23,10 +22,7 @@ public class CristinOrganizationBuilder {
      * @return valid CristinOrganization containing data from source
      */
     public CristinOrganization build() {
-        CristinInstitution cristinInstitution = new CristinInstitution();
-        cristinInstitution.setCristinInstitutionId(extractLastPathElement(nvaOrganization.getId()));
-        cristinInstitution.setUrl(nvaOrganization.getId().toString());
-        cristinInstitution.setInstitutionName(nvaOrganization.getName());
+        CristinInstitution cristinInstitution = CristinInstitution.fromOrganization(nvaOrganization);
         CristinOrganization cristinOrganization = new CristinOrganization();
         cristinOrganization.setInstitution(cristinInstitution);
         return cristinOrganization;
