@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects.model.nva;
 
 import static java.util.Objects.isNull;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
@@ -8,6 +9,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import static no.unit.nva.utils.UriUtils.nvaIdentifierToCristinIdentifier;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -91,7 +93,7 @@ public class Person {
     public CristinPerson toCristinPersonWithoutRoles() {
         CristinPerson cristinPerson = new CristinPerson();
         cristinPerson.setCristinPersonId(toCristinPersonIdentity());
-        cristinPerson.setUrl(getId().toString());
+        cristinPerson.setUrl(nvaIdentifierToCristinIdentifier(getId(), PERSON_PATH).toString());
         cristinPerson.setFirstName(getFirstName());
         cristinPerson.setSurname(getLastName());
         return cristinPerson;
