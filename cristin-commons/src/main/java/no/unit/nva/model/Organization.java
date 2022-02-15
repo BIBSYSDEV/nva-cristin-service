@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import no.unit.nva.cristin.model.CristinInstitution;
 import nva.commons.core.JsonSerializable;
 
 import java.net.URI;
@@ -19,9 +18,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PART_OF;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
-import static no.unit.nva.utils.UriUtils.INSTITUTION;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
-import static no.unit.nva.utils.UriUtils.getCristinUri;
 
 @SuppressWarnings({"PMD.BeanMembersShouldSerialize", "PMD.LinguisticNaming"})
 @JsonPropertyOrder({CONTEXT, ID, TYPE, NAME, ACRONYM, PART_OF, HAS_PART})
@@ -166,14 +162,6 @@ public class Organization implements JsonSerializable {
         }
     }
 
-    public CristinInstitution toCristinInstitution() {
-        CristinInstitution institution = new CristinInstitution();
-        String identifier = extractLastPathElement(getId());
-        institution.setInstitutionName(getName());
-        institution.setUrl(getCristinUri(identifier, INSTITUTION).toString());
-        institution.setCristinInstitutionId(identifier);
-        return institution;
-    }
 }
 
 

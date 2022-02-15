@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -55,7 +56,7 @@ public class CristinProjectBuilder {
     }
 
     private CristinOrganization fallBackToInstitutionLevel(Organization organization) {
-        return new CristinOrganizationBuilder(organization).build();
+        return fromOrganizationContainingInstitution(organization);
     }
 
     private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {

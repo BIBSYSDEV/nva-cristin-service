@@ -1,33 +1,31 @@
 package no.unit.nva.cristin.projects;
 
 import java.util.Optional;
-import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
 import no.unit.nva.model.Organization;
 
+import static no.unit.nva.cristin.model.CristinInstitution.fromOrganization;
 import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.extractUnitIdentifier;
 import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.fromCristinUnitIdentifier;
 
 public class CristinOrganizationBuilder {
 
-    private final transient Organization nvaOrganization;
-
-    public CristinOrganizationBuilder(Organization organization) {
-        this.nvaOrganization = organization;
-    }
-
     /**
-     * Build a CristinOrganization from given source.
+     * Create a CristinOrganization from Organization containing an CristinInstitution.
      *
-     * @return valid CristinOrganization containing data from source
+     * @return valid CristinOrganization containing data from CristinInstitution
      */
-    public CristinOrganization build() {
-        CristinInstitution cristinInstitution = CristinInstitution.fromOrganization(nvaOrganization);
+    public static CristinOrganization fromOrganizationContainingInstitution(Organization organization) {
         CristinOrganization cristinOrganization = new CristinOrganization();
-        cristinOrganization.setInstitution(cristinInstitution);
+        cristinOrganization.setInstitution(fromOrganization(organization));
         return cristinOrganization;
     }
 
+    /**
+     * Create a CristinOrganization from Organization containing a CristinUnit if present.
+     *
+     * @return valid Optional CristinOrganization containing data from CristinUnit or else empty
+     */
     public static Optional<CristinOrganization> fromOrganizationContainingUnitIfPresent(Organization organization) {
         return extractUnitIdentifier(organization)
             .map(CristinOrganizationBuilder::mapUnitIdentifierToCristinOrganization);
