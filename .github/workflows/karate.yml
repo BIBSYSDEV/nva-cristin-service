@@ -9,7 +9,7 @@ env:
   COGNITO_USER_POOL_ID:  "eu-west-1_DNRmDPtxY"
   COGNITO_CLIENT_APP_ID:  "4qfhv3kl9qcr2knsfb8lhu1u40"
   TESTUSER_FEIDE_ID: "karate-user-administrator@sikt.no"
-
+  TESTUSER_PASSWORD: "AP@ssW00rd2Remember"
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -37,16 +37,12 @@ jobs:
         run: sleep 10s
       # Create test users in cognito
       - name: Create karate test users
-        env:
-          TESTUSER_PASSWORD : ${{ secrets.COGNITO_TESTUSER_PASSWORD }}
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew createTestUsers --info
       # Take a break waiting for users
       - name: Sleep for 10 seconds
         run: sleep 10s
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
-        env:
-          TESTUSER_PASSWORD : ${{ secrets.COGNITO_TESTUSER_PASSWORD }}
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest --info
         # Delete tests users
       - name: Delete karate test users
