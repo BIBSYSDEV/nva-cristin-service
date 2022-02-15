@@ -1,34 +1,24 @@
 package no.unit.nva.cristin.projects;
 
-import java.util.Optional;
-import java.util.regex.Pattern;
-import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
-import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
-import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.cristin.CristinRole;
-import no.unit.nva.cristin.projects.model.cristin.CristinUnit;
-import no.unit.nva.cristin.projects.model.nva.Funding;
-import no.unit.nva.cristin.projects.model.nva.NvaContributor;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.model.Organization;
-
+import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
+import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import no.unit.nva.utils.UriUtils;
-
-import static java.util.Objects.nonNull;
-import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
-import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
-import static no.unit.nva.utils.ContributorRoleMapping.getCristinRole;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
+import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
+import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.Funding;
+import no.unit.nva.cristin.projects.model.nva.NvaContributor;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.model.Organization;
 
 public class CristinProjectBuilder {
-
-    private static final Pattern UNIT_ID_PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
 
     private final transient CristinProject cristinProject;
     private final transient NvaProject nvaProject;
@@ -61,54 +51,15 @@ public class CristinProjectBuilder {
     }
 
     private CristinOrganization extractCristinOrganization(Organization organization) {
-        return Optional.ofNullable(CristinOrganizationBuilder.fromUnitIdentifier(organization))
-            .orElse(CristinOrganizationBuilder.buildWithCristinInstitution(organization));
+        return fromOrganizationContainingUnitIfPresent(organization).orElse(fallBackToInstitutionLevel(organization));
     }
 
-    private List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
-        return contributors.stream().map(this::getCristinPerson).collect(Collectors.toList());
+    private CristinOrganization fallBackToInstitutionLevel(Organization organization) {
+        return new CristinOrganizationBuilder(organization).build();
     }
 
-    private CristinPerson getCristinPerson(NvaContributor contributor) {
-        CristinPerson cristinPerson = contributor.getIdentity().toCristinPerson();
-        cristinPerson.setRoles(extractCristinRoles(contributor));
-        return cristinPerson;
-    }
-
-    private List<CristinRole> extractCristinRoles(NvaContributor contributor) {
-        return getCristinRole(contributor.getType()).isPresent()
-                ? getCristinRoles(contributor)
-                : Collections.emptyList();
-    }
-
-    private List<CristinRole> getCristinRoles(NvaContributor contributor) {
-        CristinRole cristinRole = new CristinRole();
-        if (getCristinRole(contributor.getType()).isPresent()) {
-            cristinRole.setRoleCode(getCristinRole(contributor.getType()).get());
-        }
-
-        String unitIdentifier = extractUnitIdentifierIfPresent(contributor);
-
-        if (nonNull(unitIdentifier)) {
-            cristinRole.setInstitutionUnit(toCristinUnit(unitIdentifier));
-        } else {
-            cristinRole.setInstitution(contributor.getAffiliation().toCristinInstitution());
-        }
-
-        return List.of(cristinRole);
-    }
-
-    private CristinUnit toCristinUnit(String unitIdentifier) {
-        CristinUnit cristinUnit = new CristinUnit();
-        cristinUnit.setCristinUnitId(unitIdentifier);
-        return cristinUnit;
-    }
-
-    private String extractUnitIdentifierIfPresent(NvaContributor contributor) {
-        return Optional.of(contributor).map(NvaContributor::getAffiliation)
-            .map(Organization::getId).map(UriUtils::extractLastPathElement)
-            .filter(identifier -> UNIT_ID_PATTERN.matcher(identifier).matches())
-            .orElse(null);
+    private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
+        return contributors.stream().map(NvaContributor::toCristinPersonWithRoles).collect(Collectors.toList());
     }
 
     private List<CristinFundingSource> extractFundings(List<Funding> fundings) {

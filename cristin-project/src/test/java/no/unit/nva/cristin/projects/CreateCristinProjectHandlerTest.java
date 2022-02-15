@@ -76,9 +76,7 @@ class CreateCristinProjectHandlerTest {
         randomNvaProject.setId(randomUri());
         randomNvaProject.setTitle(null);
 
-        InputStream input = requestWithBodyAndRole(randomNvaProject);
-        handler.handleRequest(input, output, context);
-        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<NvaProject> response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
     }
@@ -89,9 +87,7 @@ class CreateCristinProjectHandlerTest {
         NvaProject randomNvaProject = randomNvaProject();
         randomNvaProject.getContributors().get(FIRST_CONTRIBUTOR).setType(ILLEGAL_CONTRIBUTOR_ROLE);
 
-        InputStream input = requestWithBodyAndRole(randomNvaProject);
-        handler.handleRequest(input, output, context);
-        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<NvaProject> response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
     }
@@ -100,15 +96,11 @@ class CreateCristinProjectHandlerTest {
     void shouldReturnProjectDataWithNewIdentifierWhenCreated() throws Exception {
         NvaProject expected = randomNvaProject();
         expected.setContext(NvaProject.PROJECT_CONTEXT);
-        HttpResponse<String> httpResponse =
-                new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(expected.toCristinProject()), 201);
-        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+        mockUpstreamUsingRequest(expected);
 
         NvaProject requestProject = expected.toCristinProject().toNvaProject();
         requestProject.setId(null);  // Cannot create with Id
-        InputStream input = requestWithBodyAndRole(requestProject);
-        handler.handleRequest(input, output, context);
-        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<NvaProject> response = executeRequest(requestProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
         NvaProject actual = response.getBodyObject(NvaProject.class);
@@ -120,15 +112,11 @@ class CreateCristinProjectHandlerTest {
     void shouldReturnMinimalProjectDataWhenCreatedWithTitleAndStatus() throws Exception {
         NvaProject expected = randomMinimalNvaProject();
         expected.setContext(NvaProject.PROJECT_CONTEXT);
-        HttpResponse<String> httpResponse =
-                new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(expected.toCristinProject()), 201);
-        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+        mockUpstreamUsingRequest(expected);
 
         NvaProject requestProject = expected.toCristinProject().toNvaProject();
         requestProject.setId(null);  // Cannot create with Id
-        InputStream input = requestWithBodyAndRole(requestProject);
-        handler.handleRequest(input, output, context);
-        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<NvaProject> response = executeRequest(requestProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
         NvaProject actual = response.getBodyObject(NvaProject.class);
@@ -138,32 +126,47 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldReturnProjectDataWhenCreatingWithUnitIdentifier() throws IOException, InterruptedException {
+        NvaProject request = nvaProjectUsingUnitIdentifiers();
+        mockUpstreamUsingRequest(request);
+        GatewayResponse<NvaProject> response = executeRequest(request);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
+
+        NvaProject actual = response.getBodyObject(NvaProject.class);
+
+        Organization actualOrganization = actual.getCoordinatingInstitution();
+        Organization expectedOrganization = request.getCoordinatingInstitution();
+        assertThat(actualOrganization, equalTo(expectedOrganization));
+        assertThat(actualIdentifierFromOrganization(actualOrganization), equalTo(SOME_UNIT_IDENTIFIER));
+
+        Organization actualAffiliation = actual.getContributors().get(0).getAffiliation();
+        Organization expectedAffiliation = request.getContributors().get(0).getAffiliation();
+        assertThat(actualAffiliation, equalTo(expectedAffiliation));
+        assertThat(actualIdentifierFromOrganization(actualAffiliation), equalTo(SOME_UNIT_IDENTIFIER));
+    }
+
+    private String actualIdentifierFromOrganization(Organization organization) {
+        return extractLastPathElement(organization.getId());
+    }
+
+    private void mockUpstreamUsingRequest(NvaProject request) throws IOException, InterruptedException {
+        HttpResponse<String> httpResponse =
+            new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(request.toCristinProject()), 201);
+        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+    }
+
+    private GatewayResponse<NvaProject> executeRequest(NvaProject request) throws IOException {
+        InputStream input = requestWithBodyAndRole(request);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output);
+    }
+
+    private NvaProject nvaProjectUsingUnitIdentifiers() {
         NvaProject requestBody = randomMinimalNvaProject();
         requestBody.setId(null);
         requestBody.setCoordinatingInstitution(someOrganizationFromUnitIdentifier());
         requestBody.setContributors(List.of(randomContributorWithUnitAffiliation()));
-
-        HttpResponse<String> httpResponse =
-            new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(requestBody.toCristinProject()), 201);
-        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
-
-        InputStream input = requestWithBodyAndRole(requestBody);
-        handler.handleRequest(input, output, context);
-        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
-
-        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
-        NvaProject actual = response.getBodyObject(NvaProject.class);
-
-        Organization actualOrganization = actual.getCoordinatingInstitution();
-        Organization requestOrganization = requestBody.getCoordinatingInstitution();
-
-        Organization actualAffiliation = actual.getContributors().get(0).getAffiliation();
-        Organization requestAffiliation = requestBody.getContributors().get(0).getAffiliation();
-
-        assertThat(actualOrganization, equalTo(requestOrganization));
-        assertThat(extractLastPathElement(actualOrganization.getId()), equalTo(SOME_UNIT_IDENTIFIER));
-        assertThat(actualAffiliation, equalTo(requestAffiliation));
-        assertThat(extractLastPathElement(actualAffiliation.getId()), equalTo(SOME_UNIT_IDENTIFIER));
+        return requestBody;
     }
 
     private InputStream requestWithBodyAndRole(NvaProject body) throws JsonProcessingException {

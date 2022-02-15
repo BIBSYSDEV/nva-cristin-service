@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.model;
 
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -50,6 +51,19 @@ public class CristinInstitution {
     public Organization toOrganization() {
         URI id = getNvaApiId(getCristinInstitutionId(), ORGANIZATION_PATH);
         return new Organization.Builder().withId(id).withName(getInstitutionName()).build();
+    }
+
+    /**
+     * Creates a CristinInstitution from an Organization model.
+     *
+     * @return CristinInstitution
+     */
+    public static CristinInstitution fromOrganization(Organization organization) {
+        CristinInstitution institution = new CristinInstitution();
+        institution.setInstitutionName(organization.getName());
+        institution.setUrl(organization.getId().toString());
+        institution.setCristinInstitutionId(extractLastPathElement(organization.getId()));
+        return institution;
     }
 }
 

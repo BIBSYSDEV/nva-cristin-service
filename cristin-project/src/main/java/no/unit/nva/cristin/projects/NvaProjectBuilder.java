@@ -66,14 +66,17 @@ public class NvaProjectBuilder {
             nvaContributor.setType(getNvaRole(role.getRoleCode()).get());
         }
         nvaContributor.setIdentity(Person.fromCristinPerson(cristinPerson));
-
-        Organization affiliation = Optional.ofNullable(role.getInstitutionUnit()).map(CristinUnit::toOrganization)
-            .orElse(Optional.ofNullable(role.getInstitution())
-                .map(CristinInstitution::toOrganization)
-                .orElse(null));
-
-        nvaContributor.setAffiliation(affiliation);
+        nvaContributor.setAffiliation(extractDepartmentOrFallbackToInstitutionForUserRole(role));
         return nvaContributor;
+    }
+
+    private static Organization extractDepartmentOrFallbackToInstitutionForUserRole(CristinRole role) {
+        Optional<Organization> unitAffiliation = Optional.ofNullable(role.getInstitutionUnit())
+            .map(CristinUnit::toOrganization);
+        Optional<Organization> institutionAffiliation = Optional.ofNullable(role.getInstitution())
+            .map(CristinInstitution::toOrganization);
+
+        return unitAffiliation.orElse(institutionAffiliation.orElse(null));
     }
 
     /**
@@ -83,8 +86,8 @@ public class NvaProjectBuilder {
      */
     public NvaProject build() {
         return new NvaProject.Builder()
-                .withId(new UriWrapper(HTTPS, DOMAIN_NAME)
-                        .addChild(BASE_PATH)
+            .withId(new UriWrapper(HTTPS, DOMAIN_NAME)
+                .addChild(BASE_PATH)
                         .addChild(UriUtils.PROJECT)
                         .addChild(cristinProject.getCristinProjectId())
                         .getUri())
