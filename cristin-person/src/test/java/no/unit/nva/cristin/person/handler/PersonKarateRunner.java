@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Tag;
 @Tag("karateTest")
 public class PersonKarateRunner {
 
-    @Tag("karateTest")
     @Karate.Test
     Karate runKarateFeatures() {
         return Karate.run().relativeTo(getClass());
