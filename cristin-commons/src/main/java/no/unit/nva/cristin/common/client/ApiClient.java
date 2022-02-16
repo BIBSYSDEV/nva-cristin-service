@@ -3,6 +3,7 @@ package no.unit.nva.cristin.common.client;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
+import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
@@ -141,13 +142,15 @@ public class ApiClient {
     }
 
     protected void checkHttpStatusCode(URI uri, int statusCode)
-        throws NotFoundException, BadGatewayException {
+            throws NotFoundException, BadGatewayException, UnauthorizedException {
 
         String uriAsString = Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
 
         if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
             String msg = String.format(ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, uriAsString);
             throw new NotFoundException(msg);
+        } else if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            throw new UnauthorizedException();
         } else if (remoteServerHasInternalProblems(statusCode)) {
             logBackendFetchFail(uriAsString, statusCode);
             throw new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);

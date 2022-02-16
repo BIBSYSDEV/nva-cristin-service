@@ -17,6 +17,7 @@ slf4j = { strictly = '1.8.0-beta4' }
 nva-language = { strictly = '1.0' }
 awsSdk = { strictly = '1.12.129' }
 bekkopen-nocommons = { strictly = '0.12.0' }
+
 [libraries]
 
 #Test

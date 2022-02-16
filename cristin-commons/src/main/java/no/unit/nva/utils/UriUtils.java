@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.ALL_QUERY_PARAMETER_LANGUAGES;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
@@ -22,7 +23,6 @@ public class UriUtils {
     public static final String PERSON = "person";
     public static final String WHITESPACE_REGEX = "\\s+";
     public static final String WHITESPACE_REPLACEMENT = "+";
-    public static final String URI_PATH_SEPARATOR = "/";
     private static final String PARAMETER_KEY_VALUE_PAIR_TEMPLATE = "%s=%s";
     private static final String PARAMETER_DELIMITER = "&";
     private static final String EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR = null;
@@ -54,8 +54,9 @@ public class UriUtils {
 
     /**
      * Create URI identifying NVA resource from path and identifier.
+     *
      * @param identifier of element
-     * @param path section of NVA API
+     * @param path       section of NVA API
      * @return valid URI for a NVA resource
      */
     public static URI getNvaApiId(String identifier, String path) {
@@ -68,8 +69,9 @@ public class UriUtils {
 
     /**
      * Create URI identifying a cristin resource from path and identifier.
+     *
      * @param identifier cristin identifier of resource
-     * @param path section of cristin api
+     * @param path       section of cristin api
      * @return valid URI for a cristin resource
      */
     public static URI getCristinUri(String identifier, String path) {
@@ -85,14 +87,15 @@ public class UriUtils {
 
     public static URI createIdUriFromParams(Map<String, String> requestQueryParams, String type) {
         return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(type)
-            .addQueryParameters(requestQueryParams).getUri();
+                .addQueryParameters(requestQueryParams).getUri();
     }
 
 
     /**
      * Create a valid query URI for cristin.
+     *
      * @param cristinRequestQueryParams limitations for request
-     * @param path section of cristin API
+     * @param path                      section of cristin API
      * @return valid URI for query against cristin
      */
     public static URI createCristinQueryUri(Map<String, String> cristinRequestQueryParams, String path) {
@@ -102,7 +105,7 @@ public class UriUtils {
                 .getUri();
     }
 
-    public static  URI getNvaApiUri(String path) {
+    public static URI getNvaApiUri(String path) {
         return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(path).getUri();
     }
 
@@ -112,6 +115,6 @@ public class UriUtils {
     }
 
     public static String extractLastPathElement(URI uri) {
-        return new UriWrapper(uri).getFilename();
+        return nonNull(uri) ? new UriWrapper(uri).getFilename() : null;
     }
 }

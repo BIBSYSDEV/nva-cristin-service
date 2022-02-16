@@ -21,10 +21,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
+import static nva.commons.core.StringUtils.isNotBlank;
 
 public class NvaProjectBuilder {
 
@@ -70,8 +74,11 @@ public class NvaProjectBuilder {
      */
     public NvaProject build() {
         return new NvaProject.Builder()
-                .withId(new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(UriUtils.PROJECT)
-                        .addChild(cristinProject.getCristinProjectId()).getUri())
+                .withId(new UriWrapper(HTTPS, DOMAIN_NAME)
+                        .addChild(BASE_PATH)
+                        .addChild(UriUtils.PROJECT)
+                        .addChild(cristinProject.getCristinProjectId())
+                        .getUri())
                 .withContext(getContext())
                 .withType(PROJECT_TYPE)
                 .withIdentifiers(createCristinIdentifier())
@@ -93,8 +100,9 @@ public class NvaProjectBuilder {
     }
 
     private List<Map<String, String>> createCristinIdentifier() {
-        return Collections.singletonList(
-                Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()));
+        return nonNull(cristinProject.getCristinProjectId())
+                ? singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()))
+                : emptyList();
     }
 
     private Organization extractCoordinatingInstitution() {
@@ -105,22 +113,24 @@ public class NvaProjectBuilder {
 
     private String extractMainTitle() {
         return Optional.ofNullable(cristinProject.getTitle())
+                .filter(hasTitles -> isNotBlank(cristinProject.getMainLanguage()))
                 .map(titles -> titles.get(cristinProject.getMainLanguage()))
                 .orElse(null);
     }
 
     private List<Map<String, String>> extractAlternativeTitles() {
         return Optional.ofNullable(cristinProject.getTitle())
+                .filter(hasTitles -> !hasTitles.isEmpty())
                 .filter(titles -> titles.keySet().remove(cristinProject.getMainLanguage()))
                 .filter(remainingTitles -> !remainingTitles.isEmpty())
                 .map(Collections::singletonList)
-                .orElse(Collections.emptyList());
+                .orElse(emptyList());
     }
 
     private List<NvaContributor> extractContributors() {
         return Optional.ofNullable(cristinProject.getParticipants())
                 .map(NvaProjectBuilder::transformCristinPersonsToNvaContributors)
-                .orElse(Collections.emptyList());
+                .orElse(emptyList());
     }
 
     private List<Funding> extractFunding() {
