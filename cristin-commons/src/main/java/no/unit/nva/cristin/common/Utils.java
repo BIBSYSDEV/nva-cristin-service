@@ -13,6 +13,8 @@ import static java.util.Objects.nonNull;
 
 public class Utils {
 
+    public static final String PUNCTUATION = ".";
+
     /**
      * Check if a string supplied is a positive integer.
      *
@@ -50,5 +52,17 @@ public class Utils {
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Map<Object, Boolean> seen = new ConcurrentHashMap<>();
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
+    /**
+     * Takes a Cristin unit identifier and converts it to its corresponding institution identifier.
+     *
+     * @return String with top level institution identifier
+     */
+    public static String removeUnitPartFromIdentifierIfPresent(String identifier) {
+        if (nonNull(identifier) && identifier.contains(PUNCTUATION)) {
+            return identifier.substring(0, identifier.indexOf(PUNCTUATION));
+        }
+        return identifier;
     }
 }

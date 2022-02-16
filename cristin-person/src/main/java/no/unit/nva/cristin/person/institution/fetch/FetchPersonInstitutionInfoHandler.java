@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.institution.fetch;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
+import static no.unit.nva.cristin.common.Utils.removeUnitPartFromIdentifierIfPresent;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -22,7 +23,6 @@ public class FetchPersonInstitutionInfoHandler extends ApiGatewayHandler<Void, P
 
     public static final String PERSON_ID = "id";
     public static final String ORG_ID = "orgId";
-    public static final String PUNCTUATION = ".";
     public static final String INVALID_ORGANIZATION_ID = "Invalid path parameter for organization id";
     public static final String INVALID_PERSON_ID = "Invalid path parameter for person id";
 
@@ -78,18 +78,11 @@ public class FetchPersonInstitutionInfoHandler extends ApiGatewayHandler<Void, P
 
     private String getValidOrgId(RequestInfo requestInfo) throws BadRequestException {
         String identifier = attempt(() -> requestInfo.getPathParameter(ORG_ID)).orElse(fail -> EMPTY_STRING);
-        String cristinInstitutionId = removeUnitIfPresent(identifier);
+        String cristinInstitutionId = removeUnitPartFromIdentifierIfPresent(identifier);
         if (isValidIdentifier(cristinInstitutionId)) {
             return cristinInstitutionId;
         }
         throw new BadRequestException(INVALID_ORGANIZATION_ID);
-    }
-
-    private String removeUnitIfPresent(String identifier) {
-        if (identifier.contains(PUNCTUATION)) {
-            return identifier.substring(0, identifier.indexOf(PUNCTUATION));
-        }
-        return identifier;
     }
 
     private boolean isValidIdentifier(String identifier) {
