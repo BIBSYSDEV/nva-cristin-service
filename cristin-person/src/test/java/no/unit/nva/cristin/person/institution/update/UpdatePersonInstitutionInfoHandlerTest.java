@@ -2,7 +2,7 @@ package no.unit.nva.cristin.person.institution.update;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstInfoClient.EMPTY_JSON;
+import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstitutionInfoClient.EMPTY_JSON;
 import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstitutionInfoHandler.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
@@ -38,7 +38,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
         Map.of(PERSON_ID, randomIntegerAsString(), ORG_ID, randomIntegerAsString());
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
-    private UpdatePersonInstInfoClient apiClient;
+    private UpdatePersonInstitutionInfoClient apiClient;
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
@@ -47,7 +47,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
-        apiClient = new UpdatePersonInstInfoClient(httpClientMock);
+        apiClient = new UpdatePersonInstitutionInfoClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new UpdatePersonInstitutionInfoHandler(apiClient, environment);

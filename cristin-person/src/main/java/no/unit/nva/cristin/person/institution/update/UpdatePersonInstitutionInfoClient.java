@@ -18,9 +18,9 @@ import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.paths.UriWrapper;
 
-public class UpdatePersonInstInfoClient extends PatchApiClient {
+public class UpdatePersonInstitutionInfoClient extends PatchApiClient {
 
-    public UpdatePersonInstInfoClient(HttpClient client) {
+    public UpdatePersonInstitutionInfoClient(HttpClient client) {
         super(client);
     }
 

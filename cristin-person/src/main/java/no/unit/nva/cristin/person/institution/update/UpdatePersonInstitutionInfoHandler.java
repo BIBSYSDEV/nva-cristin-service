@@ -18,16 +18,16 @@ public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHan
     public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
         "No supported fields in payload, not doing anything";
 
-    private final transient UpdatePersonInstInfoClient apiClient;
+    private final transient UpdatePersonInstitutionInfoClient apiClient;
 
     @SuppressWarnings("unused")
     @JacocoGenerated
     public UpdatePersonInstitutionInfoHandler() {
-        this(new UpdatePersonInstInfoClient(CristinAuthenticator.getHttpClient()), new Environment());
+        this(new UpdatePersonInstitutionInfoClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
 
     @JacocoGenerated
-    public UpdatePersonInstitutionInfoHandler(UpdatePersonInstInfoClient apiClient, Environment environment) {
+    public UpdatePersonInstitutionInfoHandler(UpdatePersonInstitutionInfoClient apiClient, Environment environment) {
         super(PersonInstInfoPatch.class, environment);
         this.apiClient = apiClient;
     }
