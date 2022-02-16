@@ -1,10 +1,10 @@
 package no.unit.nva.cristin.person.institution.update;
 
+import static java.util.Objects.nonNull;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
-import java.util.Objects;
 import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
 
 public class PersonInstInfoPatchSerializer extends StdSerializer<PersonInstInfoPatch> {
@@ -22,16 +22,16 @@ public class PersonInstInfoPatchSerializer extends StdSerializer<PersonInstInfoP
 
     @Override
     public void serialize(
-        PersonInstInfoPatch value, JsonGenerator jgen, SerializerProvider provider)
+        PersonInstInfoPatch value, JsonGenerator generator, SerializerProvider provider)
         throws IOException {
 
-        jgen.writeStartObject();
-        if (Objects.nonNull(value.getEmail())) {
-            jgen.writeStringField(EMAIL_FIELD, value.getEmail().orElse(null));
+        generator.writeStartObject();
+        if (nonNull(value.getEmail())) {
+            generator.writeStringField(EMAIL_FIELD, value.getEmail().orElse(null));
         }
-        if (Objects.nonNull(value.getPhone())) {
-            jgen.writeStringField(PHONE_FIELD, value.getPhone().orElse(null));
+        if (nonNull(value.getPhone())) {
+            generator.writeStringField(PHONE_FIELD, value.getPhone().orElse(null));
         }
-        jgen.writeEndObject();
+        generator.writeEndObject();
     }
 }

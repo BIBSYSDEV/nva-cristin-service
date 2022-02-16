@@ -26,6 +26,7 @@ public class PersonInstInfoPatch implements JsonSerializable {
         return phone;
     }
 
+    @JacocoGenerated
     @Override
     public boolean equals(Object o) {
         if (this == o) {
