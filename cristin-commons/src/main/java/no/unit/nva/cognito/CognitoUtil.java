@@ -84,6 +84,7 @@ public class CognitoUtil {
             var username =  result.getUser().getUsername();
             if (isNull(loginUser(feideId, password, poolId, clientId))) {
                 logger.error("User cannot login after create");
+                return null;
             }  // Force setting of user attributes in Cognito
             return username;
         } catch (Exception e) {
@@ -104,7 +105,9 @@ public class CognitoUtil {
      */
     public static String loginUser(String feideId, String password, String poolId, String clientId) {
         try {
-            return loginUserCognito(feideId, password, poolId, clientId).getAuthenticationResult().getIdToken();
+            final AdminInitiateAuthResult loginResult = loginUserCognito(feideId, password, poolId, clientId);
+            logger.info("LoginResult.getAuthenticationResult={}", loginResult.getAuthenticationResult());
+            return loginResult.getAuthenticationResult().getIdToken();
         } catch (Exception e) {
             logger.warn("Error loginUserAndReturnToken username:{}, {}", feideId, e.getMessage());
             return null;
