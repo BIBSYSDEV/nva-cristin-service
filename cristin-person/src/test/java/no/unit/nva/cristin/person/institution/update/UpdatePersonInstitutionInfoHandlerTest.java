@@ -3,9 +3,12 @@ package no.unit.nva.cristin.person.institution.update;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstInfoClient.EMPTY_JSON;
+import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstitutionInfoHandler.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -67,10 +70,12 @@ public class UpdatePersonInstitutionInfoHandlerTest {
     }
 
     @Test
-    void shouldIgnoreUnsupportedFieldsFromRequestButStillAllowThePatch() throws IOException {
+    void shouldThrowBadRequestIfNoSupportedFieldsIsPresentInRequest() throws IOException {
         GatewayResponse<String> gatewayResponse = sendQuery(validPath, bodyWithUnsupportedFields());
 
-        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));
     }
 
     @Test

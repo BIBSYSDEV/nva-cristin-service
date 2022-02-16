@@ -1,7 +1,6 @@
 package no.unit.nva.cristin.person.institution.update;
 
 import static java.util.Objects.isNull;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
@@ -15,6 +14,9 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHandler<PersonInstInfoPatch, String> {
+
+    public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
+        "No supported fields in payload, not doing anything";
 
     private final transient UpdatePersonInstInfoClient apiClient;
 
@@ -36,7 +38,7 @@ public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHan
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
 
-        validateNotNull(input);
+        validateNotEmpty(input);
         validateQueryParameters(requestInfo);
         String personId = getValidPersonId(requestInfo);
         String orgId = getValidOrgId(requestInfo);
@@ -44,10 +46,14 @@ public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHan
         return apiClient.updatePersonInstitutionInfoInCristin(personId, orgId, input);
     }
 
-    private void validateNotNull(PersonInstInfoPatch input) throws BadRequestException {
-        if (isNull(input)) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
+    private void validateNotEmpty(PersonInstInfoPatch input) throws BadRequestException {
+        if (isNull(input) || noSupportedValuesPresent(input)) {
+            throw new BadRequestException(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD);
         }
+    }
+
+    private boolean noSupportedValuesPresent(PersonInstInfoPatch input) {
+        return isNull(input.getPhone()) && isNull(input.getEmail());
     }
 
     @Override
