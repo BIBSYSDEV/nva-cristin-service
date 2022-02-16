@@ -1,12 +1,15 @@
 package no.unit.nva.cristin.person.institution.update;
 
+import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstitutionInfoHandler.EMPTY_JSON;
+import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstInfoClient.EMPTY_JSON;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
@@ -14,8 +17,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
 import java.util.Map;
 import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
@@ -29,16 +34,20 @@ public class UpdatePersonInstitutionInfoHandlerTest {
     private static final Map<String, String> validPath =
         Map.of(PERSON_ID, randomIntegerAsString(), ORG_ID, randomIntegerAsString());
 
+    private final HttpClient httpClientMock = mock(HttpClient.class);
+    private UpdatePersonInstInfoClient apiClient;
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
     private UpdatePersonInstitutionInfoHandler handler;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException, InterruptedException {
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
+        apiClient = new UpdatePersonInstInfoClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        handler = new UpdatePersonInstitutionInfoHandler(environment);
+        handler = new UpdatePersonInstitutionInfoHandler(apiClient, environment);
     }
 
     @Test
@@ -55,6 +64,20 @@ public class UpdatePersonInstitutionInfoHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void shouldIgnoreUnsupportedFieldsFromRequestButStillAllowThePatch() throws IOException {
+        GatewayResponse<String> gatewayResponse = sendQuery(validPath, bodyWithUnsupportedFields());
+
+        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenSendingNullBody() throws IOException {
+        GatewayResponse<String> gatewayResponse = sendQuery(validPath, null);
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
     }
 
     private static String randomIntegerAsString() {
@@ -91,6 +114,11 @@ public class UpdatePersonInstitutionInfoHandlerTest {
 
     private PersonInstInfoPatch defaultBody() throws JsonProcessingException {
         String body = "{\"email\":\"test@example.com\", \"phone\":\"99112233\"}";
+        return OBJECT_MAPPER.readValue(body, PersonInstInfoPatch.class);
+    }
+
+    private PersonInstInfoPatch bodyWithUnsupportedFields() throws JsonProcessingException {
+        String body = "{\"hello\":\"world\", \"lorem\":\"ipsum\"}";
         return OBJECT_MAPPER.readValue(body, PersonInstInfoPatch.class);
     }
 }

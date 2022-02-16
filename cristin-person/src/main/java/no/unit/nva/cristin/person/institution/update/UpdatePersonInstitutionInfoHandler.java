@@ -1,40 +1,53 @@
 package no.unit.nva.cristin.person.institution.update;
 
+import static java.util.Objects.isNull;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
-import nva.commons.apigateway.exceptions.ForbiddenException;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 public class UpdatePersonInstitutionInfoHandler extends ApiGatewayHandler<PersonInstInfoPatch, String> {
 
-    public static final String EMPTY_JSON = "{}";
+    private final transient UpdatePersonInstInfoClient apiClient;
 
     @SuppressWarnings("unused")
     @JacocoGenerated
     public UpdatePersonInstitutionInfoHandler() {
-        this(new Environment());
+        this(new UpdatePersonInstInfoClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
 
     @JacocoGenerated
-    public UpdatePersonInstitutionInfoHandler(Environment environment) {
+    public UpdatePersonInstitutionInfoHandler(UpdatePersonInstInfoClient apiClient, Environment environment) {
         super(PersonInstInfoPatch.class, environment);
+        this.apiClient = apiClient;
     }
 
     @Override
     protected String processInput(PersonInstInfoPatch input, RequestInfo requestInfo, Context context)
-        throws ForbiddenException {
+        throws ApiGatewayException {
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
 
-        return EMPTY_JSON;
+        validateNotNull(input);
+
+        return apiClient.updatePersonInstitutionInfoInCristin("123456", "185", input);
+    }
+
+    private void validateNotNull(PersonInstInfoPatch input) throws BadRequestException {
+        if (isNull(input)) {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
+        }
     }
 
     @Override
