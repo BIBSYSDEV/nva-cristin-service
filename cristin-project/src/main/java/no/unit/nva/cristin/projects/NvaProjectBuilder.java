@@ -13,9 +13,7 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
-import nva.commons.core.paths.UriWrapper;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,10 +25,9 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
+import static no.unit.nva.utils.UriUtils.PROJECT;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.StringUtils.isNotBlank;
 
 public class NvaProjectBuilder {
@@ -86,11 +83,7 @@ public class NvaProjectBuilder {
      */
     public NvaProject build() {
         return new NvaProject.Builder()
-            .withId(new UriWrapper(HTTPS, DOMAIN_NAME)
-                .addChild(BASE_PATH)
-                        .addChild(UriUtils.PROJECT)
-                        .addChild(cristinProject.getCristinProjectId())
-                        .getUri())
+            .withId(getNvaApiId(cristinProject.getCristinProjectId(), PROJECT))
                 .withContext(getContext())
                 .withType(PROJECT_TYPE)
                 .withIdentifiers(createCristinIdentifier())
