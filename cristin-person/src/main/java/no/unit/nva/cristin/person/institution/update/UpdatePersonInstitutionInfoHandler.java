@@ -2,22 +2,19 @@ package no.unit.nva.cristin.person.institution.update;
 
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
-import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
-import java.util.List;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
+import no.unit.nva.cristin.person.institution.common.PersonInstitutionInfoHandler;
 import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
 import no.unit.nva.utils.AccessUtils;
-import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class UpdatePersonInstitutionInfoHandler extends ApiGatewayHandler<PersonInstInfoPatch, String> {
+public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHandler<PersonInstInfoPatch, String> {
 
     private final transient UpdatePersonInstInfoClient apiClient;
 
@@ -40,19 +37,17 @@ public class UpdatePersonInstitutionInfoHandler extends ApiGatewayHandler<Person
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
 
         validateNotNull(input);
+        validateQueryParameters(requestInfo);
+        String personId = getValidPersonId(requestInfo);
+        String orgId = getValidOrgId(requestInfo);
 
-        return apiClient.updatePersonInstitutionInfoInCristin("123456", "185", input);
+        return apiClient.updatePersonInstitutionInfoInCristin(personId, orgId, input);
     }
 
     private void validateNotNull(PersonInstInfoPatch input) throws BadRequestException {
         if (isNull(input)) {
             throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
         }
-    }
-
-    @Override
-    protected List<MediaType> listSupportedMediaTypes() {
-        return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
     @Override

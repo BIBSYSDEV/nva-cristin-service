@@ -24,6 +24,12 @@ public class UpdatePersonInstInfoClient extends PatchApiClient {
         super(client);
     }
 
+    /**
+     * Updates a persons information related to supplied institution.
+     *
+     * @return An empty json if update was successful
+     * @throws ApiGatewayException if something went wrong that can be mapped to a client response
+     */
     public String updatePersonInstitutionInfoInCristin(String personId, String orgId, PersonInstInfoPatch request)
         throws ApiGatewayException {
 
