@@ -9,7 +9,7 @@ env:
   COGNITO_USER_POOL_ID:  "eu-west-1_DNRmDPtxY"
   COGNITO_CLIENT_APP_ID:  "4qfhv3kl9qcr2knsfb8lhu1u40"
   TESTUSER_FEIDE_ID: "karate-user-administrator@sikt.no"
-  TESTUSER_PASSWORD: "hats_and_cats22"
+  TESTUSER_PASSWORD: "hats_and_c@ts22"
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -32,13 +32,16 @@ jobs:
       # Prevent prompts and failure when the stack is unchanged
       - name: Deploy
         run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${{env.STACK_NAME}} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${{env.BASE_PATH}} ParameterKey=CristinApiUrl,ParameterValue=${CRISTIN_API_URL}
+        # Delete existing tests users
+      - name: Delete karate test users
+        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew deleteTestUsers --info
       # Create test users in cognito
       - name: Create karate test users
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew createTestUsers --info
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest --info
-        # Delete tests users
+        # Delete tests users after tests have run
       - name: Delete karate test users
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew deleteTestUsers --info
       # Delete stack after running tests
