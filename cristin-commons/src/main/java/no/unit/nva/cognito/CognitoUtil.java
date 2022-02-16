@@ -81,12 +81,11 @@ public class CognitoUtil {
                     .withPermanent(true);
             getCognitoIdentityProvider().adminSetUserPassword(adminSetUserPasswordRequest);
             logger.info("user created username={}, feideId={}", result.getUser().getUsername(), feideId);
-            var username =  result.getUser().getUsername();
             if (isNull(loginUser(feideId, password, poolId, clientId))) {
                 logger.error("User cannot login after create");
                 return null;
             }  // Force setting of user attributes in Cognito
-            return username;
+            return result.getUser().getUsername();
         } catch (Exception e) {
             logger.warn(PROBLEM_CREATING_USER_MESSAGE, feideId, e.getMessage());
             return null;
@@ -136,7 +135,7 @@ public class CognitoUtil {
      * @param feideId string identifying user in userpool
      * @param poolId  Cognito Userpool Id
      * @return If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body
-     * If not successful a runtime exception is thrown
+     *         If not successful a runtime exception is thrown
      */
     private static AdminDeleteUserResult deleteUserCognito(String feideId, String poolId) {
         AdminDeleteUserRequest deleteUserRequest = new AdminDeleteUserRequest()
