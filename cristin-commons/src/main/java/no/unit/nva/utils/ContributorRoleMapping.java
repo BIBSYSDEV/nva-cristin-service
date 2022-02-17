@@ -44,7 +44,7 @@ public enum ContributorRoleMapping {
      * @return role mapped to Cristin
      */
     public static Optional<String> getCristinRole(String role) {
-        return Optional.ofNullable(Arrays.stream(values())
+        return Optional.ofNullable(Arrays.stream(ContributorRoleMapping.values())
                 .filter(contributorRoleMapping -> contributorRoleMapping.getNvaRole().equals(role))
                 .map(ContributorRoleMapping::getCristinRole)
                 .collect(SingletonCollector.collectOrElse(null)));

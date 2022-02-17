@@ -1,9 +1,12 @@
 package no.unit.nva.cristin.projects;
 
+import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
+import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
+import no.unit.nva.cristin.projects.model.cristin.CristinUnit;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
@@ -63,8 +66,17 @@ public class NvaProjectBuilder {
             nvaContributor.setType(getNvaRole(role.getRoleCode()).get());
         }
         nvaContributor.setIdentity(Person.fromCristinPerson(cristinPerson));
-        nvaContributor.setAffiliation(role.getInstitution().toOrganization());
+        nvaContributor.setAffiliation(extractDepartmentOrFallbackToInstitutionForUserRole(role));
         return nvaContributor;
+    }
+
+    private static Organization extractDepartmentOrFallbackToInstitutionForUserRole(CristinRole role) {
+        Optional<Organization> unitAffiliation = Optional.ofNullable(role.getInstitutionUnit())
+            .map(CristinUnit::toOrganization);
+        Optional<Organization> institutionAffiliation = Optional.ofNullable(role.getInstitution())
+            .map(CristinInstitution::toOrganization);
+
+        return unitAffiliation.orElse(institutionAffiliation.orElse(null));
     }
 
     /**
@@ -74,8 +86,8 @@ public class NvaProjectBuilder {
      */
     public NvaProject build() {
         return new NvaProject.Builder()
-                .withId(new UriWrapper(HTTPS, DOMAIN_NAME)
-                        .addChild(BASE_PATH)
+            .withId(new UriWrapper(HTTPS, DOMAIN_NAME)
+                .addChild(BASE_PATH)
                         .addChild(UriUtils.PROJECT)
                         .addChild(cristinProject.getCristinProjectId())
                         .getUri())
@@ -106,9 +118,12 @@ public class NvaProjectBuilder {
     }
 
     private Organization extractCoordinatingInstitution() {
-        return Optional.ofNullable(cristinProject.getCoordinatingInstitution())
-                .map(coordinatingInstitution -> coordinatingInstitution.getInstitution().toOrganization())
-                .orElse(null);
+        Optional<Organization> unit = Optional.ofNullable(cristinProject.getCoordinatingInstitution())
+            .map(CristinOrganization::getInstitutionUnit).map(CristinUnit::toOrganization);
+        Optional<Organization> institution = Optional.ofNullable(cristinProject.getCoordinatingInstitution())
+            .map(CristinOrganization::getInstitution).map(CristinInstitution::toOrganization);
+
+        return unit.orElse(institution.orElse(null));
     }
 
     private String extractMainTitle() {
