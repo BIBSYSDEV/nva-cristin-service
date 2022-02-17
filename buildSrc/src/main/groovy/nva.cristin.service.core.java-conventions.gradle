@@ -54,6 +54,23 @@ task karateTest(type: Test) {
     outputs.upToDateWhen { false }
 }
 
+task createTestUsers(type: Test) {
+    useJUnitPlatform {
+        includeTags('createTestUsers')
+    }
+
+    outputs.upToDateWhen { false }
+}
+
+task deleteTestUsers(type: Test) {
+    useJUnitPlatform {
+        includeTags('deleteTestUsers')
+    }
+
+    outputs.upToDateWhen { false }
+}
+
+
 pmd {
     toolVersion = '6.20.0'
     ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
@@ -81,6 +98,9 @@ jacocoTestCoverageVerification {
 
     violationRules {
         rule {
+            excludes = [
+                    'cristin-commons:*'
+            ]
             limit {
                 counter = 'METHOD'
                 value = 'COVEREDRATIO'
@@ -89,6 +109,9 @@ jacocoTestCoverageVerification {
         }
 
         rule {
+            excludes = [
+                    'cristin-commons:*'
+            ]
             limit {
                 counter = 'CLASS'
                 value = 'COVEREDRATIO'
