@@ -4,14 +4,10 @@ Feature: API tests for Cristin Person fetch
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
-    * def illegalIdentifier = 'illegalIdentifier'
-    * def nonExistingPersonId = '999999'
-    * def validIdentifier = '738'
-    * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
 
-  Scenario Outline: Unsupported method <METHOD> returns 403
+  Scenario Outline: Unsupported method <METHOD> returns 403 Forbidden
     Given path '/person/'
     When method <METHOD>
     Then status 403
@@ -40,7 +36,7 @@ Feature: API tests for Cristin Person fetch
     Then status 401
     And match response.message == 'Unauthorized'
 
-  Scenario: Supported method PATCH returns 401 Unauthorized whe no authentication token
+  Scenario: Supported method PATCH returns 403 Unauthorized when no authentication token
     Given path '/person/'
     When method PATCH
     Then status 403
