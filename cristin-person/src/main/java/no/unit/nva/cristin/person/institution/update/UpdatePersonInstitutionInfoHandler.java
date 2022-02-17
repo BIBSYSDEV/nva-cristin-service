@@ -1,45 +1,59 @@
 package no.unit.nva.cristin.person.institution.update;
 
-import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static java.util.Objects.isNull;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
-import java.util.List;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
+import no.unit.nva.cristin.person.institution.common.PersonInstitutionInfoHandler;
 import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
 import no.unit.nva.utils.AccessUtils;
-import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
-import nva.commons.apigateway.exceptions.ForbiddenException;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class UpdatePersonInstitutionInfoHandler extends ApiGatewayHandler<PersonInstInfoPatch, String> {
+public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHandler<PersonInstInfoPatch, String> {
 
-    public static final String EMPTY_JSON = "{}";
+    public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
+        "No supported fields in payload, not doing anything";
+
+    private final transient UpdatePersonInstitutionInfoClient apiClient;
 
     @SuppressWarnings("unused")
     @JacocoGenerated
     public UpdatePersonInstitutionInfoHandler() {
-        this(new Environment());
+        this(new UpdatePersonInstitutionInfoClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
 
     @JacocoGenerated
-    public UpdatePersonInstitutionInfoHandler(Environment environment) {
+    public UpdatePersonInstitutionInfoHandler(UpdatePersonInstitutionInfoClient apiClient, Environment environment) {
         super(PersonInstInfoPatch.class, environment);
+        this.apiClient = apiClient;
     }
 
     @Override
     protected String processInput(PersonInstInfoPatch input, RequestInfo requestInfo, Context context)
-        throws ForbiddenException {
+        throws ApiGatewayException {
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
 
-        return EMPTY_JSON;
+        validateNotEmpty(input);
+        validateQueryParameters(requestInfo);
+        String personId = getValidPersonId(requestInfo);
+        String orgId = getValidOrgId(requestInfo);
+
+        return apiClient.updatePersonInstitutionInfoInCristin(personId, orgId, input);
     }
 
-    @Override
-    protected List<MediaType> listSupportedMediaTypes() {
-        return DEFAULT_RESPONSE_MEDIA_TYPES;
+    private void validateNotEmpty(PersonInstInfoPatch input) throws BadRequestException {
+        if (isNull(input) || noSupportedValuesPresent(input)) {
+            throw new BadRequestException(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD);
+        }
+    }
+
+    private boolean noSupportedValuesPresent(PersonInstInfoPatch input) {
+        return isNull(input.getPhone()) && isNull(input.getEmail());
     }
 
     @Override
