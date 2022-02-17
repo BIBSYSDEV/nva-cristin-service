@@ -19,7 +19,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PART_OF;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 
-
 @SuppressWarnings({"PMD.BeanMembersShouldSerialize", "PMD.LinguisticNaming"})
 @JsonPropertyOrder({CONTEXT, ID, TYPE, NAME, ACRONYM, PART_OF, HAS_PART})
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")

@@ -4,8 +4,12 @@ Feature: API tests for Cristin Person fetch
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
-    * def tokenGenerator = Java.type('no.unit.nva.cristin.person.handler.CognitoUtil')
-    * def token = new tokenGenerator().createIdToken()
+    * def username = java.lang.System.getenv('TESTUSER_FEIDE_ID')
+    * def password = java.lang.System.getenv('TESTUSER_PASSWORD')
+    * def cognitoClientAppId = java.lang.System.getenv('COGNITO_CLIENT_APP_ID')
+    * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
+    * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
+    * def token = tokenGenerator.loginUser(username, password, cognitoUserpoolId, cognitoClientAppId)
     * def illegalIdentifier = 'illegalIdentifier'
     * def samplePersonId = '07117631634'
     * def nonExistingPersonId = '11077941012'
@@ -39,9 +43,6 @@ Feature: API tests for Cristin Person fetch
     And request { type : NationalIdentificationNumber, value : '07117631634' }
     When method POST
     Then status 401
-
-
-
 
   Scenario Outline: Query with unsupported Accept header returns Unsupported Media Type
     * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }

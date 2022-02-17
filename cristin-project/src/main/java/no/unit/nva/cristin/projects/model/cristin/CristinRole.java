@@ -1,12 +1,11 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
+import static no.unit.nva.cristin.model.JsonPropertyNames.UNIT;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import no.unit.nva.cristin.model.CristinInstitution;
 import nva.commons.core.JacocoGenerated;
-
-import static no.unit.nva.cristin.model.JsonPropertyNames.UNIT;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
@@ -17,6 +16,7 @@ public class CristinRole {
     private CristinInstitution institution;
     @JsonProperty(UNIT)
     private CristinUnit institutionUnit;
+
 
     public String getRoleCode() {
         return roleCode;
@@ -41,5 +41,6 @@ public class CristinRole {
     public void setInstitutionUnit(CristinUnit institutionUnit) {
         this.institutionUnit = institutionUnit;
     }
+
 }
 

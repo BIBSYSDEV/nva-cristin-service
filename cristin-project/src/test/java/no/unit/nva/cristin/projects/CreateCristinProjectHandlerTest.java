@@ -2,8 +2,11 @@ package no.unit.nva.cristin.projects;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.IOException;
+import java.util.List;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
@@ -17,10 +20,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,9 +36,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class CreateCristinProjectHandlerTest {
+
     public static final String NO_ACCESS = "NoAccess";
     public static final String ILLEGAL_CONTRIBUTOR_ROLE = "illegalContributorRole";
     public static final int FIRST_CONTRIBUTOR = 0;
+
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
@@ -67,9 +76,7 @@ class CreateCristinProjectHandlerTest {
         randomNvaProject.setId(randomUri());
         randomNvaProject.setTitle(null);
 
-        InputStream input = requestWithBodyAndRole(randomNvaProject);
-        handler.handleRequest(input, output, context);
-        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<NvaProject> response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
     }
@@ -80,9 +87,7 @@ class CreateCristinProjectHandlerTest {
         NvaProject randomNvaProject = randomNvaProject();
         randomNvaProject.getContributors().get(FIRST_CONTRIBUTOR).setType(ILLEGAL_CONTRIBUTOR_ROLE);
 
-        InputStream input = requestWithBodyAndRole(randomNvaProject);
-        handler.handleRequest(input, output, context);
-        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<NvaProject> response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
     }
@@ -91,15 +96,11 @@ class CreateCristinProjectHandlerTest {
     void shouldReturnProjectDataWithNewIdentifierWhenCreated() throws Exception {
         NvaProject expected = randomNvaProject();
         expected.setContext(NvaProject.PROJECT_CONTEXT);
-        HttpResponse<String> httpResponse =
-                new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(expected.toCristinProject()), 201);
-        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+        mockUpstreamUsingRequest(expected);
 
         NvaProject requestProject = expected.toCristinProject().toNvaProject();
         requestProject.setId(null);  // Cannot create with Id
-        InputStream input = requestWithBodyAndRole(requestProject);
-        handler.handleRequest(input, output, context);
-        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<NvaProject> response = executeRequest(requestProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
         NvaProject actual = response.getBodyObject(NvaProject.class);
@@ -111,15 +112,11 @@ class CreateCristinProjectHandlerTest {
     void shouldReturnMinimalProjectDataWhenCreatedWithTitleAndStatus() throws Exception {
         NvaProject expected = randomMinimalNvaProject();
         expected.setContext(NvaProject.PROJECT_CONTEXT);
-        HttpResponse<String> httpResponse =
-                new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(expected.toCristinProject()), 201);
-        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+        mockUpstreamUsingRequest(expected);
 
         NvaProject requestProject = expected.toCristinProject().toNvaProject();
         requestProject.setId(null);  // Cannot create with Id
-        InputStream input = requestWithBodyAndRole(requestProject);
-        handler.handleRequest(input, output, context);
-        GatewayResponse<NvaProject> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<NvaProject> response = executeRequest(requestProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
         NvaProject actual = response.getBodyObject(NvaProject.class);
@@ -127,10 +124,55 @@ class CreateCristinProjectHandlerTest {
         assertThat(actual, equalTo(expected));
     }
 
+    @Test
+    void shouldReturnProjectDataWhenCreatingWithUnitIdentifier() throws IOException, InterruptedException {
+        NvaProject request = nvaProjectUsingUnitIdentifiers();
+        mockUpstreamUsingRequest(request);
+        GatewayResponse<NvaProject> response = executeRequest(request);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
+
+        NvaProject actual = response.getBodyObject(NvaProject.class);
+
+        Organization actualOrganization = actual.getCoordinatingInstitution();
+        Organization expectedOrganization = request.getCoordinatingInstitution();
+        assertThat(actualOrganization, equalTo(expectedOrganization));
+        assertThat(actualIdentifierFromOrganization(actualOrganization), equalTo(SOME_UNIT_IDENTIFIER));
+
+        Organization actualAffiliation = actual.getContributors().get(0).getAffiliation();
+        Organization expectedAffiliation = request.getContributors().get(0).getAffiliation();
+        assertThat(actualAffiliation, equalTo(expectedAffiliation));
+        assertThat(actualIdentifierFromOrganization(actualAffiliation), equalTo(SOME_UNIT_IDENTIFIER));
+    }
+
+    private String actualIdentifierFromOrganization(Organization organization) {
+        return extractLastPathElement(organization.getId());
+    }
+
+    private void mockUpstreamUsingRequest(NvaProject request) throws IOException, InterruptedException {
+        HttpResponse<String> httpResponse =
+            new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(request.toCristinProject()), 201);
+        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+    }
+
+    private GatewayResponse<NvaProject> executeRequest(NvaProject request) throws IOException {
+        InputStream input = requestWithBodyAndRole(request);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output);
+    }
+
+    private NvaProject nvaProjectUsingUnitIdentifiers() {
+        NvaProject requestBody = randomMinimalNvaProject();
+        requestBody.setId(null);
+        requestBody.setCoordinatingInstitution(someOrganizationFromUnitIdentifier());
+        requestBody.setContributors(List.of(randomContributorWithUnitAffiliation()));
+        return requestBody;
+    }
+
     private InputStream requestWithBodyAndRole(NvaProject body) throws JsonProcessingException {
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
-                .withBody(body)
-                .withAccessRight(EDIT_OWN_INSTITUTION_PROJECTS)
-                .build();
+            .withBody(body)
+            .withAccessRight(EDIT_OWN_INSTITUTION_PROJECTS)
+            .build();
     }
 }

@@ -1,31 +1,39 @@
 package no.unit.nva.cristin.projects;
 
-import no.unit.nva.cristin.model.CristinInstitution;
+import java.util.Optional;
 import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
 import no.unit.nva.model.Organization;
 
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static no.unit.nva.cristin.model.CristinInstitution.fromOrganization;
+import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.extractUnitIdentifier;
+import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.fromCristinUnitIdentifier;
 
 public class CristinOrganizationBuilder {
 
-    private final transient Organization nvaOrganization;
-
-    public CristinOrganizationBuilder(Organization organization) {
-        this.nvaOrganization = organization;
+    /**
+     * Create a CristinOrganization from Organization containing an CristinInstitution.
+     *
+     * @return valid CristinOrganization containing data from CristinInstitution
+     */
+    public static CristinOrganization fromOrganizationContainingInstitution(Organization organization) {
+        CristinOrganization cristinOrganization = new CristinOrganization();
+        cristinOrganization.setInstitution(fromOrganization(organization));
+        return cristinOrganization;
     }
 
     /**
-     * Build a CristinOrganization from given source.
+     * Create a CristinOrganization from Organization containing a CristinUnit if present.
      *
-     * @return valid CristinOrganization containing data from source
+     * @return valid Optional CristinOrganization containing data from CristinUnit or else empty
      */
-    public CristinOrganization build() {
-        CristinInstitution cristinInstitution = new CristinInstitution();
-        cristinInstitution.setCristinInstitutionId(extractLastPathElement(nvaOrganization.getId()));
-        cristinInstitution.setUrl(nvaOrganization.getId().toString());
-        cristinInstitution.setInstitutionName(nvaOrganization.getName());
+    public static Optional<CristinOrganization> fromOrganizationContainingUnitIfPresent(Organization organization) {
+        return extractUnitIdentifier(organization)
+            .map(CristinOrganizationBuilder::mapUnitIdentifierToCristinOrganization);
+    }
+
+    private static CristinOrganization mapUnitIdentifierToCristinOrganization(String unitIdentifier) {
         CristinOrganization cristinOrganization = new CristinOrganization();
-        cristinOrganization.setInstitution(cristinInstitution);
+        cristinOrganization.setInstitutionUnit(fromCristinUnitIdentifier(unitIdentifier));
         return cristinOrganization;
     }
 }
