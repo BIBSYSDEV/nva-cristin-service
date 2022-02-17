@@ -111,10 +111,14 @@ public class UriUtils {
 
     public static URI createNvaProjectId(String identifier) {
         return new UriWrapper(HTTPS, DOMAIN_NAME)
-                .addChild(BASE_PATH).addChild(UriUtils.PROJECT).addChild(identifier).getUri();
+            .addChild(BASE_PATH).addChild(UriUtils.PROJECT).addChild(identifier).getUri();
     }
 
     public static String extractLastPathElement(URI uri) {
         return nonNull(uri) ? new UriWrapper(uri).getFilename() : null;
+    }
+
+    public static URI nvaIdentifierToCristinIdentifier(URI nvaUri, String newPath) {
+        return getCristinUri(extractLastPathElement(nvaUri), newPath);
     }
 }

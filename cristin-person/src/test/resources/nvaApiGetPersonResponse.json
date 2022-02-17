@@ -37,7 +37,7 @@
   "affiliations": [
     {
       "type": "Affiliation",
-      "organization": "https://api.cristin.no/v2/units/185.11.0.0",
+      "organization": "https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0",
       "active": true,
       "role": {
         "id": "https://example.org/link/to/ontology#1026",
@@ -51,7 +51,7 @@
     },
     {
       "type": "Affiliation",
-      "organization": "https://api.cristin.no/v2/units/185.90.0.0",
+      "organization": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
       "active": true,
       "role": {
         "id": "https://example.org/link/to/ontology#1026",

@@ -1,5 +1,7 @@
 package no.unit.nva.cristin.person.model.cristin;
 
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -8,6 +10,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
 import no.unit.nva.cristin.person.model.nva.Role;
 import nva.commons.core.JacocoGenerated;
@@ -52,8 +55,14 @@ public class CristinAffiliation {
      * @return The transformed Cristin model.
      */
     public Affiliation toAffiliation() {
-        URI organization = attempt(() -> new URI(getUnit().getUrl())).orElse(uriFailure -> null);
-        return new Affiliation(organization, isActive(), extractAffiliationRole());
+        return new Affiliation(extractOrganizationIdentifierUri(), isActive(), extractAffiliationRole());
+    }
+
+    private URI extractOrganizationIdentifierUri() {
+        return Optional.ofNullable(getUnit())
+            .map(CristinUnit::getCristinUnitId)
+            .map(identifier -> getNvaApiId(identifier, ORGANIZATION_PATH))
+            .orElse(null);
     }
 
     private Role extractAffiliationRole() {
