@@ -113,16 +113,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Project'
+              $ref: '#/components/schemas/ProjectPost'
             examples:
               objectExample:
-                $ref: '#/components/examples/ProjectExample'
+                $ref: '#/components/examples/ProjectPostExample'
           application/ld+json:
             schema:
-              $ref: '#/components/schemas/Project'
+              $ref: '#/components/schemas/ProjectPost'
             examples:
               objectExample:
-                $ref: '#/components/examples/ProjectExample'
+                $ref: '#/components/examples/ProjectPostExample'
 
       responses:
         200:
@@ -766,6 +766,101 @@ components:
           type: String
           description: Summary intended for not so academic audience
           $ref: '#/components/schemas/Languages'
+    ProjectPost:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        type:
+          type: string
+          pattern: 'Project'
+          description: The type of the returned object, always Project
+#        identifiers:
+#          type: array
+#          description: Identifiers for this project
+#          items:
+#            type: object
+#            properties:
+#              type:
+#                type: string
+#                pattern: 'CristinIdentifier'
+#                description: Name of identifier, always CristinIdentifier
+#              value:
+#                type: integer
+#                format: int32
+#                description: Cristin ID of project
+        title:
+          type: string
+          pattern: '.+'
+          description: Title of the project
+        language:
+          type: string
+          pattern: '^http:\/\/lexvo.org\/id\/iso639-3\/[a-z]{3}$'
+          description: The lexvo URI for the language of the Project
+        alternativeTitles:
+          type: array
+          description: Titles in alternative languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        startDate:
+          type: string
+          pattern: '.+'
+          description: Project start date
+        endDate:
+          type: string
+          pattern: '.+'
+          description: Project end date
+        coordinatingInstitution:
+          $ref: '#/components/schemas/Organization'
+        funding:
+          $ref: '#/components/schemas/Funding'
+        contributors:
+          type: array
+          description: List of contributors on the project
+          items:
+            type: object
+            description: One contributor
+            properties:
+              type:
+                type: string
+                enum:
+                  - ProjectManager
+                  - ProjectParticipant
+                description: Type of contributor. Can be ProjectManager or ProjectParticipant
+              identity:
+                type: object
+                properties:
+                  id:
+                    $ref: '#/components/schemas/Id'
+                  type:
+                    type: string
+                    pattern: 'Person'
+                    description: Type of identity. Always Person
+                  firstName:
+                    type: string
+                    pattern: '.+'
+                    description: First name
+                  lastName:
+                    type: string
+                    pattern: '.+'
+                    description: Last name
+              affiliation:
+                $ref: '#/components/schemas/Organization'
+        status:
+          type: string
+          enum:
+            - NOTSTARTED
+            - ACTIVE
+            - CONCLUDED
+          description: Project status, based on start_date and end_date.
+        academicSummary:
+          type: string
+          description: Summary intended for an academic audience
+          $ref: '#/components/schemas/Languages'
+        popularScientificSummary:
+          type: String
+          description: Summary intended for not so academic audience
+          $ref: '#/components/schemas/Languages'
 
     Problem:
       type: object
@@ -1201,6 +1296,59 @@ components:
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
+            status: CONCLUDED
+            academicSummary:
+              en: "Summary in an academic manner"
+            popularScientificSummary:
+              en: "popularScientificSummary popularScientificSummary popularScientificSummary"
+    ProjectPostExample:
+      value:
+        '@context': 'https://bibsysdev.github.io/src/project-context.json'
+        type: 'Project'
+#        identifiers:
+#          - type: 'CristinIdentifier'
+#            value: '359084'
+        title: 'Example Title'
+        language: 'http://lexvo.org/id/iso639-3/nno'
+        alternativeTitles:
+          - 'nb': 'Eksempel på tittel'
+        startDate: '2012-01-09T00:00:00Z'
+        endDate: '2017-12-31T00:00:00Z'
+        funding:
+          type: 'Funding'
+          source:
+            type: "FundingSource"
+            names:
+              nb: "Egen institusjon"
+            code: "EI"
+        coordinatingInstitution:
+          id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+          type: 'Organization'
+#          name:
+#            'nb': 'OsloMet - storbyuniversitetet'
+        contributors:
+          - type: 'ProjectManager'
+            identity:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+              type: 'Person'
+#              firstName: 'Ola'
+#              lastName: 'Nordmann'
+            affiliation:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+              type: 'Organization'
+#              name:
+#                'nb': 'OsloMet - storbyuniversitetet'
+          - type: 'ProjectParticipant'
+            identity:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
+              type: 'Person'
+#              firstName: 'Kari'
+#              lastName: 'Olsen'
+            affiliation:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+              type: 'Organization'
+#              name:
+#                'nb': 'OsloMet - storbyuniversitetet'
             status: CONCLUDED
             academicSummary:
               en: "Summary in an academic manner"
