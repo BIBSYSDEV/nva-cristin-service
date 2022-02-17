@@ -6,6 +6,10 @@ env:
   BASE_PATH: cristin-$GITHUB_REF_NAME
   DOMAIN_NAME:  "api.dev.nva.aws.unit.no"
   CRISTIN_API_URL: "https://api.cristin-test.uio.no/v2"
+  COGNITO_USER_POOL_ID:  "eu-west-1_DNRmDPtxY"
+  COGNITO_CLIENT_APP_ID:  "4qfhv3kl9qcr2knsfb8lhu1u40"
+  TESTUSER_FEIDE_ID: "karate-user-administrator@sikt.no"
+  TESTUSER_PASSWORD: ${{ secrets.COGNITO_TESTUSER_PASSWORD }}
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -28,12 +32,18 @@ jobs:
       # Prevent prompts and failure when the stack is unchanged
       - name: Deploy
         run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${{env.STACK_NAME}} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${{env.BASE_PATH}} ParameterKey=CristinApiUrl,ParameterValue=${CRISTIN_API_URL}
-      # Take a break waiting for API to deploy
-      - name: Sleep for 30 seconds
-        run: sleep 30s
+        # Delete existing tests users
+      - name: Delete karate test users
+        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew deleteTestUsers --info
+      # Create test users in cognito
+      - name: Create karate test users
+        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew createTestUsers --info
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
-        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest -x test --info
+        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest --info
+        # Delete tests users after tests have run
+      - name: Delete karate test users
+        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew deleteTestUsers --info
       # Delete stack after running tests
       - name: Delete stack after running tests
         run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}
