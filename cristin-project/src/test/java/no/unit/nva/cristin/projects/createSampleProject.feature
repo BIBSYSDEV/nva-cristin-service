@@ -12,19 +12,20 @@ Feature: API tests for Cristin Project retrieve and search
     * def token = tokenGenerator.loginUser(username, password, cognitoUserpoolId, cognitoClientAppId)
     * def sampleProject =
     """
-      {
-        '@context': 'https://bibsysdev.github.io/src/project-context.json',
-        'type': 'Project',
-        'title': 'Example Title',
-        'language': 'http://lexvo.org/id/iso639-3/nno',
-        'alternativeTitles': [
-          {
-            'nb': 'Eksempel på tittel'
-          }
-        ],
-        'startDate': '2012-01-09T00:00:00Z',
-        'endDate': '2017-12-31T00:00:00Z',
-        'funding': {
+    {
+      '@context': 'https://bibsysdev.github.io/src/project-context.json',
+      'type': 'Project',
+      'title': 'Example Title',
+      'language': 'http://lexvo.org/id/iso639-3/nno',
+      'alternativeTitles': [
+        {
+          'nb': 'Eksempel på tittel'
+        }
+      ],
+      'startDate': '2012-01-09T00:00:00Z',
+      'endDate': '2017-12-31T00:00:00Z',
+      'funding': [
+        {
           'type': 'Funding',
           'source': {
             'type': 'FundingSource',
@@ -33,39 +34,44 @@ Feature: API tests for Cristin Project retrieve and search
             },
             'code': 'EI'
           }
-        },
-        'coordinatingInstitution': {
-          'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0',
-          'type': 'Organization'
-        },
-        'contributors': [
-          {
-            'type': 'ProjectManager',
-            'identity': {
-              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
-            },
-            'affiliation': {
-              'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-            }
+        }
+      ],
+      'coordinatingInstitution': {
+        'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0',
+        'type': 'Organization'
+      },
+      'contributors': [
+        {
+          'type': 'ProjectManager',
+          'identity': {
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/325953',
+            'type': 'Person'
           },
-          {
-            'type': 'ProjectParticipant',
-            'identity': {
-              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
-            },
-            'affiliation': {
-              'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-            },
-            'status': 'CONCLUDED',
-            'academicSummary': {
-              'en': 'Summary in an academic manner'
-            },
-            'popularScientificSummary': {
-              'en': 'popularScientificSummary popularScientificSummary popularScientificSummary'
-            }
+          'affiliation': {
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0',
+            'type': 'Organization'
           }
-        ]
-      }
+        },
+        {
+          'type': 'ProjectParticipant',
+          'identity': {
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/326035',
+            'type': 'Person'
+          },
+          'affiliation': {
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0',
+            'type': 'Organization'
+          },
+          'status': 'CONCLUDED',
+          'academicSummary': {
+            'en': 'Summary in an academic manner'
+          },
+          'popularScientificSummary': {
+            'en': 'popularScientificSummary popularScientificSummary popularScientificSummary'
+          }
+        }
+      ]
+    }
     """
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE

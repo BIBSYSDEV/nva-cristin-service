@@ -80,7 +80,7 @@ public class CognitoUtil {
                     .withPassword(password)
                     .withPermanent(true);
             getCognitoIdentityProvider().adminSetUserPassword(adminSetUserPasswordRequest);
-            logger.info("user created username={}, feideId={}", result.getUser().getUsername(), feideId);
+            logger.debug("user created username={}, feideId={}", result.getUser().getUsername(), feideId);
             if (isNull(loginUser(feideId, password, poolId, clientId))) {
                 logger.error("User cannot login after create");
                 return null;
