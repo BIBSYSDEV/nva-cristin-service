@@ -595,6 +595,57 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+    patch:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinUpdatePersonInstitutionInfoFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Update person organization info by identifiers
+      description: Updates person email and phone information at given organization
+      operationId: UpdatePersonInstitutionInfo
+      security:
+        - CognitoUserPool: [ ]
+      requestBody:
+        description: Payload containing one or more optional fields email and phone. Fields can be set to null to erase content
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonInstInfoPatch'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonInstInfoPatchExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/PersonInstInfoPatch'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonInstInfoPatchExample'
+      responses:
+        204:
+          description: Successful update of resource
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{}'
+            application/ld+json:
+              schema:
+                type: string
+                example: '{}'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 components:
   responses:
     400:
@@ -1088,6 +1139,17 @@ components:
         phone:
           type: string
           description: Phone at this organization
+    PersonInstInfoPatch:
+      type: object
+      properties:
+        phone:
+          type: string
+          required: false
+          description: Phone number at this institution
+        email:
+          type: string
+          required: false
+          description: Email address at this institution
 
   examples:
     ProjectsExample:
@@ -1390,6 +1452,10 @@ components:
       value:
         type: 'NationalIdentificationNumber'
         value: '2102193712345'
+    PersonInstInfoPatchExample:
+      value:
+        phone: '+4799112233'
+        email: 'mail@example.com'
   securitySchemes:
     CognitoUserPool:
       type: apiKey
