@@ -832,18 +832,18 @@ components:
                 properties:
                   id:
                     $ref: '#/components/schemas/Id'
-                  type:
-                    type: string
-                    pattern: 'Person'
-                    description: Type of identity. Always Person
-                  firstName:
-                    type: string
-                    pattern: '.+'
-                    description: First name
-                  lastName:
-                    type: string
-                    pattern: '.+'
-                    description: Last name
+#                  type:
+#                    type: string
+#                    pattern: 'Person'
+#                    description: Type of identity. Always Person
+#                  firstName:
+#                    type: string
+#                    pattern: '.+'
+#                    description: First name
+#                  lastName:
+#                    type: string
+#                    pattern: '.+'
+#                    description: Last name
               affiliation:
                 $ref: '#/components/schemas/Organization'
         status:
@@ -1330,23 +1330,23 @@ components:
           - type: 'ProjectManager'
             identity:
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
-              type: 'Person'
+#              type: 'Person'
 #              firstName: 'Ola'
 #              lastName: 'Nordmann'
             affiliation:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-              type: 'Organization'
+#              type: 'Organization'
 #              name:
 #                'nb': 'OsloMet - storbyuniversitetet'
           - type: 'ProjectParticipant'
             identity:
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
-              type: 'Person'
+#              type: 'Person'
 #              firstName: 'Kari'
 #              lastName: 'Olsen'
             affiliation:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-              type: 'Organization'
+#              type: 'Organization'
 #              name:
 #                'nb': 'OsloMet - storbyuniversitetet'
             status: CONCLUDED
