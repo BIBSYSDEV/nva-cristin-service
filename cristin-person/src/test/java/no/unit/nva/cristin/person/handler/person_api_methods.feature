@@ -43,8 +43,11 @@ Feature: API tests for Cristin Person fetch
     And match response.message == 'Missing Authentication Token'
 
 
-  Scenario: Supported method OPTIONS returns 200
+  Scenario: Supported method OPTIONS returns 200 and 'Access-Control-Allow-Methods' header
     Given path '/person/'
     When method OPTIONS
     Then status 200
+    * def accessControlAllowMethods = responseHeaders['Access-Control-Allow-Methods'][0]
+    And match accessControlAllowMethods contains 'GET'
+    And match accessControlAllowMethods contains 'OPTIONS'
 
