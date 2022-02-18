@@ -1,21 +1,22 @@
 package no.unit.nva.cristin.projects.model.nva;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
-import nva.commons.core.paths.UriWrapper;
-
-import java.net.URI;
-import java.util.Objects;
-
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import static no.unit.nva.utils.UriUtils.nvaIdentifierToCristinIdentifier;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.net.URI;
+import java.util.Objects;
+import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 
 @SuppressWarnings("unused")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
@@ -45,15 +46,12 @@ public class Person {
      * @return a Person converted from a CristinPerson
      */
     public static Person fromCristinPerson(CristinPerson cristinPerson) {
-        if (cristinPerson == null) {
+        if (isNull(cristinPerson)) {
             return null;
         }
 
-        final URI id = new UriWrapper(CRISTIN_API_URL).addChild(PERSON_PATH)
-                .addChild(cristinPerson.getCristinPersonId()).getUri();
-        return new Person(id,
-                cristinPerson.getFirstName(),
-                cristinPerson.getSurname());
+        URI id = getNvaApiId(cristinPerson.getCristinPersonId(), PERSON_PATH_NVA);
+        return new Person(id, cristinPerson.getFirstName(), cristinPerson.getSurname());
     }
 
     public URI getId() {
@@ -69,6 +67,11 @@ public class Person {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getFirstName(), getLastName());
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -78,12 +81,25 @@ public class Person {
         }
         Person nvaPerson = (Person) o;
         return getId().equals(nvaPerson.getId())
-                && Objects.equals(getFirstName(), nvaPerson.getFirstName())
-                && Objects.equals(getLastName(), nvaPerson.getLastName());
+            && Objects.equals(getFirstName(), nvaPerson.getFirstName())
+            && Objects.equals(getLastName(), nvaPerson.getLastName());
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getFirstName(), getLastName());
+    /**
+     * Create a CristinPerson from this object with all fields but roles.
+     *
+     * @return CristinPerson converted from Person
+     */
+    public CristinPerson toCristinPersonWithoutRoles() {
+        CristinPerson cristinPerson = new CristinPerson();
+        cristinPerson.setCristinPersonId(toCristinPersonIdentity());
+        cristinPerson.setUrl(nvaIdentifierToCristinIdentifier(getId(), PERSON_PATH).toString());
+        cristinPerson.setFirstName(getFirstName());
+        cristinPerson.setSurname(getLastName());
+        return cristinPerson;
+    }
+
+    private String toCristinPersonIdentity() {
+        return extractLastPathElement(getId());
     }
 }

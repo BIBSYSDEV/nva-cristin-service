@@ -1,18 +1,19 @@
 package no.unit.nva.cristin.projects;
 
+import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
+import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
+import no.unit.nva.cristin.projects.model.cristin.CristinUnit;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
-import nva.commons.core.paths.UriWrapper;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,10 +25,9 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
+import static no.unit.nva.utils.UriUtils.PROJECT;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.StringUtils.isNotBlank;
 
 public class NvaProjectBuilder {
@@ -63,8 +63,17 @@ public class NvaProjectBuilder {
             nvaContributor.setType(getNvaRole(role.getRoleCode()).get());
         }
         nvaContributor.setIdentity(Person.fromCristinPerson(cristinPerson));
-        nvaContributor.setAffiliation(role.getInstitution().toOrganization());
+        nvaContributor.setAffiliation(extractDepartmentOrFallbackToInstitutionForUserRole(role));
         return nvaContributor;
+    }
+
+    private static Organization extractDepartmentOrFallbackToInstitutionForUserRole(CristinRole role) {
+        Optional<Organization> unitAffiliation = Optional.ofNullable(role.getInstitutionUnit())
+            .map(CristinUnit::toOrganization);
+        Optional<Organization> institutionAffiliation = Optional.ofNullable(role.getInstitution())
+            .map(CristinInstitution::toOrganization);
+
+        return unitAffiliation.orElse(institutionAffiliation.orElse(null));
     }
 
     /**
@@ -74,11 +83,7 @@ public class NvaProjectBuilder {
      */
     public NvaProject build() {
         return new NvaProject.Builder()
-                .withId(new UriWrapper(HTTPS, DOMAIN_NAME)
-                        .addChild(BASE_PATH)
-                        .addChild(UriUtils.PROJECT)
-                        .addChild(cristinProject.getCristinProjectId())
-                        .getUri())
+            .withId(getNvaApiId(cristinProject.getCristinProjectId(), PROJECT))
                 .withContext(getContext())
                 .withType(PROJECT_TYPE)
                 .withIdentifiers(createCristinIdentifier())
@@ -106,9 +111,12 @@ public class NvaProjectBuilder {
     }
 
     private Organization extractCoordinatingInstitution() {
-        return Optional.ofNullable(cristinProject.getCoordinatingInstitution())
-                .map(coordinatingInstitution -> coordinatingInstitution.getInstitution().toOrganization())
-                .orElse(null);
+        Optional<Organization> unit = Optional.ofNullable(cristinProject.getCoordinatingInstitution())
+            .map(CristinOrganization::getInstitutionUnit).map(CristinUnit::toOrganization);
+        Optional<Organization> institution = Optional.ofNullable(cristinProject.getCoordinatingInstitution())
+            .map(CristinOrganization::getInstitution).map(CristinInstitution::toOrganization);
+
+        return unit.orElse(institution.orElse(null));
     }
 
     private String extractMainTitle() {

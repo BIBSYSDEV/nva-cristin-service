@@ -8,7 +8,6 @@ import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
-import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -19,9 +18,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
-import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
-import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.NvaProjectBuilder.TYPE;
@@ -32,6 +30,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RandomProjectDataGenerator {
@@ -51,6 +50,7 @@ public class RandomProjectDataGenerator {
     );
     private static final String NORWEGIAN = "nb";
     private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
+    public static final String SOME_UNIT_IDENTIFIER = "185.90.0.0";
 
     /**
      * Create a NvaProject containing random data.
@@ -103,11 +103,11 @@ public class RandomProjectDataGenerator {
 
 
     private static URI semiRandomPersonId(String identifier) {
-        return new UriWrapper(CRISTIN_API_URL).addChild(PERSON_PATH).addChild(identifier).getUri();
+        return getNvaApiId(identifier, PERSON_PATH_NVA);
     }
 
     private static URI semiRandomOrganizationId(String identifier) {
-        return new UriWrapper(CRISTIN_API_URL).addChild(INSTITUTION_PATH).addChild(identifier).getUri();
+        return getNvaApiId(identifier, ORGANIZATION_PATH);
     }
 
     private static List<NvaContributor> randomContributors() {
@@ -173,4 +173,15 @@ public class RandomProjectDataGenerator {
         return lang;
     }
 
+    protected static NvaContributor randomContributorWithUnitAffiliation() {
+        NvaContributor contributor = new NvaContributor();
+        contributor.setAffiliation(someOrganizationFromUnitIdentifier());
+        contributor.setIdentity(randomPerson());
+        contributor.setType(randomContributorType());
+        return contributor;
+    }
+
+    protected static Organization someOrganizationFromUnitIdentifier() {
+        return new Organization.Builder().withId(getNvaApiId(SOME_UNIT_IDENTIFIER, ORGANIZATION_PATH)).build();
+    }
 }
