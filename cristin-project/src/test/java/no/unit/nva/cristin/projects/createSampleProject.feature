@@ -62,7 +62,6 @@ Feature: API tests for Cristin Project retrieve and search
             'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0',
             'type': 'Organization'
           },
-          'status': 'CONCLUDED',
           'academicSummary': {
             'en': 'Summary in an academic manner'
           },
@@ -70,7 +69,8 @@ Feature: API tests for Cristin Project retrieve and search
             'en': 'popularScientificSummary popularScientificSummary popularScientificSummary'
           }
         }
-      ]
+      ],
+      'status': 'CONCLUDED'
     }
     """
     Given url CRISTIN_BASE
