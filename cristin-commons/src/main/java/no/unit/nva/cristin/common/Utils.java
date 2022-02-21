@@ -4,11 +4,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import no.unit.nva.cristin.model.Constants;
 
 import static java.util.Objects.nonNull;
 
 public class Utils {
+
+    public static final String PUNCTUATION = ".";
 
     /**
      * Check if a string supplied is a positive integer.
@@ -39,5 +44,25 @@ public class Utils {
 
     public static boolean isOrcid(String identifier) {
         return Constants.ORCID_PATTERN.matcher(identifier).matches();
+    }
+
+    /**
+     * A function that can be used to filter out duplicate values based on a given key.
+     */
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
+    /**
+     * Takes a Cristin unit identifier and converts it to its corresponding institution identifier.
+     *
+     * @return String with top level institution identifier
+     */
+    public static String removeUnitPartFromIdentifierIfPresent(String identifier) {
+        if (nonNull(identifier) && identifier.contains(PUNCTUATION)) {
+            return identifier.substring(0, identifier.indexOf(PUNCTUATION));
+        }
+        return identifier;
     }
 }

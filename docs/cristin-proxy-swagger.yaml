@@ -94,6 +94,62 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinCreateProjectsFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Project
+      summary: Create and persist project
+      description: Create and persist project in Cristin
+      operationId: CreateProject
+      security:
+        - CognitoUserPool: [ ]
+      requestBody:
+        description: Payload containing valid project data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/ProjectExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/Project'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/ProjectExample'
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectsExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectsExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
   /project/{id}:
     get:
       x-amazon-apigateway-integration:
@@ -173,6 +229,15 @@ paths:
             type: string
             pattern: '.+'
           example: 'Universitetet i Nesna'
+        - name: depth
+          in: query
+          description: Depth of sub-organizations included in response
+          required: false
+          schema:
+            type: string
+            enum:
+              - full
+              - top
         - name: page
           in: query
           description: Current page requested
@@ -320,6 +385,61 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinCreatePersonFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Create one person
+      description: Creates one person matching supplied payload
+      operationId: PostPerson
+      security:
+        - CognitoUserPool: [ ]
+      requestBody:
+        description: Payload containing names and identifier
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonPost'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonPostExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/PersonPost'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonPostExample'
+      responses:
+        201:
+          description: Successful creation of resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonPostResponse'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonPostResponseExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PersonPostResponse'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonPostResponseExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
   /person/{id}:
     get:
       x-amazon-apigateway-integration:
@@ -365,11 +485,132 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
-
+  /person/identityNumber:
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonUsingNinFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Query person by national identity number
+      description: Returns a single person matching nin query parameter
+      operationId: GetPersonByNIN
+      security:
+        - CognitoUserPool: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonNIN'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonNinExample'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Person'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+  /person/{id}/organization/{orgId}:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonInstitutionInfoFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Fetch person organization info by identifiers
+      description: Returns person information at organization matching identifier parameters
+      operationId: GetPersonOrganizationInfoByIdentifiers
+      security:
+        - CognitoUserPool: [ ]
+      parameters:
+        - name: id
+          in: path
+          description: Identifier of Person
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9]+$'
+          example: '359084'
+        - name: orgId
+          in: path
+          description: Identifier of Organization. Sub unit will be converted to parent institution
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9.]+$'
+          example: '185'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonOrganizationInfo'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonOrganizationInfoExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PersonOrganizationInfo'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonOrganizationInfoExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 components:
   responses:
     400:
       description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    401:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    403:
+      description: Forbidden
       content:
         application/problem+json:
           schema:
@@ -736,6 +977,79 @@ components:
           description: The list of person affiliations
           items:
             $ref: '#/components/schemas/Affiliation'
+    PersonPost:
+      type: object
+      properties:
+        identifiers:
+          type: array
+          required: true
+          description: Identifier for this person
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'NationalIdentificationNumber'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '[0-9]{11}'
+                description: Value of identifier
+        names:
+          type: array
+          required: true
+          description: Names for this person. Required fields are FirstName and LastName
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'PreferredFirstName|PreferredLastName|FirstName|LastName'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '.+'
+                description: Value of identifier
+    PersonPostResponse:
+      type: object
+      properties:
+        identifiers:
+          type: array
+          description: Identifiers for this person
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'CristinIdentifier'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '\d+'
+                description: Value of identifier
+        names:
+          type: array
+          description: Names for this person
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'PreferredFirstName|PreferredLastName|FirstName|LastName'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '.+'
+                description: Value of identifier
+    PersonNIN:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of the object
+        value:
+          type: string
+          description: String representing the value of the object
     Affiliation:
       type: object
       description: Person affiliation
@@ -761,20 +1075,33 @@ components:
               description: Always Role
             labels:
               $ref: '#/components/schemas/Languages'
+    PersonOrganizationInfo:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        email:
+          type: string
+          description: Email at this organization
+        phone:
+          type: string
+          description: Phone at this organization
 
   examples:
     ProjectsExample:
       value:
-        '@context': 'https://example.org/search-api-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/project/?language=nb&page=1&results=5&title=helse'
+        '@context': 'https://bibsysdev.github.io/src/project-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/project?query=helse&language=nb&page=1&results=5'
         size: 150
-        searchString: 'language=nb&page=1&results=5&title=helse'
+        searchString: 'query=helse&language=nb&page=1&results=5'
         processingTime: 800
         firstRecord: 1
-        nextResults: 'https://api.dev.nva.aws.unit.no/project/?language=nb&page=2&results=5&title=helse'
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/project?query=helse&language=nb&page=2&results=5'
         previousResults: ''
         hits:
-          - id: 'https://api.dev.nva.aws.unit.no/project/359084'
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/project/359084'
             type: 'Project'
             identifiers:
               - type: 'CristinIdentifier'
@@ -793,30 +1120,30 @@ components:
                   nb: "Egen institusjon"
                 code: "EI"
             coordinatingInstitution:
-              id: 'https://api.cristin.no/v2/institutions/215'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
             contributors:
               - type: 'ProjectManager'
                 identity:
-                  id: 'https://api.cristin.no/v2/persons/325953'
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
                   type: 'Person'
                   firstName: 'Ola'
                   lastName: 'Nordmann'
                 affiliation:
-                  id: 'https://api.cristin.no/v2/institutions/215'
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
                   name:
                     'nb': 'OsloMet - storbyuniversitetet'
               - type: 'ProjectParticipant'
                 identity:
-                  id: 'https://api.cristin.no/v2/persons/326035'
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
                   type: 'Person'
                   firstName: 'Kari'
                   lastName: 'Olsen'
                 affiliation:
-                  id: 'https://api.cristin.no/v2/institutions/215'
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
                   name:
                     'nb': 'OsloMet - storbyuniversitetet'
@@ -827,8 +1154,8 @@ components:
               no: "<p>FoU-prosjektet skal fremme forskningsbasert undervisning i digitale medier knyttet til Faglærerutdanningen i formgiving, kunst og håndverk på Institutt for estetiske fag."
     ProjectExample:
       value:
-        '@context': 'https://example.org/project-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/project/359084'
+        '@context': 'https://bibsysdev.github.io/src/project-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/project/359084'
         type: 'Project'
         identifiers:
           - type: 'CristinIdentifier'
@@ -847,30 +1174,30 @@ components:
               nb: "Egen institusjon"
             code: "EI"
         coordinatingInstitution:
-          id: 'https://api.cristin.no/v2/institutions/215'
+          id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
           type: 'Organization'
           name:
             'nb': 'OsloMet - storbyuniversitetet'
         contributors:
           - type: 'ProjectManager'
             identity:
-              id: 'https://api.cristin.no/v2/persons/325953'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
               type: 'Person'
               firstName: 'Ola'
               lastName: 'Nordmann'
             affiliation:
-              id: 'https://api.cristin.no/v2/institutions/215'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
           - type: 'ProjectParticipant'
             identity:
-              id: 'https://api.cristin.no/v2/persons/326035'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
               type: 'Person'
               firstName: 'Kari'
               lastName: 'Olsen'
             affiliation:
-              id: 'https://api.cristin.no/v2/institutions/215'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
@@ -881,17 +1208,19 @@ components:
               en: "popularScientificSummary popularScientificSummary popularScientificSummary"
     OrganizationsExample:
       value:
-        '@context': 'https://example.org/search-api-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/cristin/organization/?results=5&title=storby'
+        # TODO: Change context in code. Below is what it currently is now
+        '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/organization?depth=top&query=storby&page=1&results=5'
         size: 150
-        searchString: 'language=nb&page=1&results=5&title=storby'
+        searchString: 'depth=top&query=storby&page=1&results=5'
         processingTime: 800
         firstRecord: 1
-        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/organization/?page=2&results=5&title=storby'
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/organization?depth=top&query=storby&page=2&results=5'
         previousResults: ''
         hits:
+          # TODO: Add hasPart, partOf
           organization:
-            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/359084'
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             type: 'Organization'
             name:
               'nb': 'OsloMet - storbyuniversitetet'
@@ -899,8 +1228,9 @@ components:
             acronym: 'OSLOMET'
     OrganizationExample:
       value:
-        '@context': 'https://example.org/search-api-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/cristin/organization/359084'
+        # TODO: Change context in code. Below is what it currently is now
+        '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
         type: 'Organization'
         name:
           'nb': 'OsloMet - storbyuniversitetet'
@@ -908,13 +1238,13 @@ components:
         acronym: 'OSLOMET'
     PersonsExample:
       value:
-        '@context': 'https://example.org/search-api-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?page=1&query=Ola+Nordmann&results=5'
+        '@context': 'https://example.org/person-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?query=Ola+Nordmann&page=1&results=5'
         size: 150
-        searchString: 'page=1&query=Ola+Nordmann&results=5'
+        searchString: 'query=Ola+Nordmann&page=1&results=5'
         processingTime: 800
         firstRecord: 1
-        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?page=2&query=Ola+Nordmann&results=5'
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?query=Ola+Nordmann&page=2&results=5'
         previousResults: ''
         hits:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
@@ -938,7 +1268,7 @@ components:
             image: 'https://api.cristin.no/v2/persons/359084/picture'
             affiliations:
               - type: 'Affiliation'
-                organization: 'https://api.cristin.no/v2/units/185.11.0.0'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
                 active: true
                 role:
                   id: 'https://example.org/link/to/ontology#1026'
@@ -948,7 +1278,7 @@ components:
                     nb: 'Forsker'
                     nn: 'Forskar'
               - type: 'Affiliation'
-                organization: 'https://api.cristin.no/v2/units/185.90.0.0'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
                 active: true
                 role:
                   id: 'https://example.org/link/to/ontology#1026'
@@ -970,7 +1300,7 @@ components:
               telephone: '+4744335566'
             affiliations:
               - type: 'Affiliation'
-                organization: 'https://api.cristin.no/v2/units/185.90.0.0'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
                 active: true
                 role:
                   id: 'https://example.org/link/to/ontology#1026'
@@ -1001,7 +1331,7 @@ components:
         image: 'https://api.cristin.no/v2/persons/359084/picture'
         affiliations:
           - type: 'Affiliation'
-            organization: 'https://api.cristin.no/v2/units/185.11.0.0'
+            organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
             active: true
             role:
               id: 'https://example.org/link/to/ontology#1026'
@@ -1011,7 +1341,7 @@ components:
                 nb: 'Forsker'
                 nn: 'Forskar'
           - type: 'Affiliation'
-            organization: 'https://api.cristin.no/v2/units/185.90.0.0'
+            organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
             active: true
             role:
               id: 'https://example.org/link/to/ontology#1026'
@@ -1019,3 +1349,55 @@ components:
               labels:
                 en: 'Head Engineer'
                 nb: 'Overingeniør'
+    PersonPostExample:
+      value:
+        identifiers:
+          - type: 'NationalIdentificationNumber'
+            value: '12345612345'
+        names:
+          - type: 'PreferredFirstName'
+            value: 'Ola'
+          - type: 'PreferredLastName'
+            value: 'Nordmann'
+          - type: 'FirstName'
+            value: 'Kjell Ola'
+          - type: 'LastName'
+            value: 'Nordmann'
+    PersonPostResponseExample:
+      value:
+        '@context': 'https://example.org/person-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
+        type: 'Person'
+        identifiers:
+          - type: 'CristinIdentifier'
+            value: '359084'
+        names:
+          - type: 'PreferredFirstName'
+            value: 'Ola'
+          - type: 'PreferredLastName'
+            value: 'Nordmann'
+          - type: 'FirstName'
+            value: 'Kjell Ola'
+          - type: 'LastName'
+            value: 'Nordmann'
+    PersonOrganizationInfoExample:
+      value:
+        '@context': 'https://ontology.org'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084/organization/185'
+        email: 'email@example.com'
+        phone: '+4799112233'
+    PersonNinExample:
+      value:
+        type: 'NationalIdentificationNumber'
+        value: '2102193712345'
+  securitySchemes:
+    CognitoUserPool:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: cognito_user_pools
+      x-amazon-apigateway-authorizer:
+        type: cognito_user_pools
+        providerARNs:
+          - Ref:
+              CognitoAuthorizerArn

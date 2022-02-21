@@ -15,26 +15,26 @@
   "endDate": "2021-05-01T00:00:00Z",
   "grants": [],
   "coordinatingInstitution": {
-    "id": "https://api.cristin.no/v2/institutions/1234",
+    "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
     "type": "Organization",
     "name": {
-      "en": "University"
+      "en": "Medical Department"
     }
   },
   "contributors": [
     {
       "type": "ProjectManager",
       "identity": {
-        "id": "https://api.cristin.no/v2/persons/123456",
+        "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
         "type": "Person",
         "firstName": "Ola",
         "lastName": "Nordmann"
       },
       "affiliation": {
-        "id": "https://api.cristin.no/v2/institutions/1234",
+        "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
         "type": "Organization",
         "name": {
-          "en": "University"
+          "en": "Medical Department"
         }
       }
     }

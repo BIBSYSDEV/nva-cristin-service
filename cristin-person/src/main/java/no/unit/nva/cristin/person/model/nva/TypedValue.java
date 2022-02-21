@@ -25,6 +25,10 @@ public class TypedValue {
         return value;
     }
 
+    public boolean hasData() {
+        return Objects.nonNull(getType()) && Objects.nonNull(getValue());
+    }
+
     @JacocoGenerated
     @Override
     public boolean equals(Object o) {

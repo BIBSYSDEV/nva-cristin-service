@@ -19,6 +19,11 @@ public class CristinAuthenticator {
     private static final String PASSWORD_KEY = "password";
     private static final String USERNAME_KEY = "username";
 
+    /**
+     * Creates an Authenticator from credentials stored in AWS SecretsManager.
+     *
+     * @return Authenticator from resolved credentials
+     */
     public static Authenticator getBasicAuthenticator() {
         final SecretsReader secretsReader =
                 new SecretsReader(AWSSecretsManagerClientBuilder.standard().withRegion("eu-west-1").build());
@@ -33,6 +38,11 @@ public class CristinAuthenticator {
         };
     }
 
+    /**
+     * Create an HTTPClient with authentication.
+     *
+     * @return HTTPClient with authentication
+     */
     public static HttpClient getHttpClient() {
         return HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)

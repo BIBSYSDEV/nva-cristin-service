@@ -40,5 +40,5 @@ public class JsonPropertyNames {
     public static final String PAGE = "page";
     public static final String NUMBER_OF_RESULTS = "results";
     public static final String IDENTIFIER = "identifier";
-
+    public static final String DEPTH = "depth";
 }

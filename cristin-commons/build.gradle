@@ -3,6 +3,23 @@ dependencies {
     implementation libs.google.guava
     implementation libs.aws.lambda.java.core
     implementation libs.nva.secrets
+    implementation libs.nva.lambdaauthorizer
     implementation libs.aws.sdk.core
     implementation libs.aws.sdk.secrets
+
+    implementation libs.aws.sdk.core
+    implementation libs.aws.sdk.cognitoidp
+
 }
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
+    }
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
+}
+
+

@@ -2,12 +2,12 @@ package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
-import java.util.regex.Pattern;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.core.Environment;
 import nva.commons.core.JsonUtils;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class Constants {
 
@@ -28,6 +28,8 @@ public class Constants {
     public static final String INSTITUTION_PATH = "institutions";
     public static final String PERSON_PATH = "persons";
     public static final String PROJECTS_PATH = "projects";
+    public static final String PROJECT_PATH_NVA = "project";
+
 
     public static final String BASE_PATH = ENVIRONMENT.readEnv("BASE_PATH");
     public static final String DOMAIN_NAME = ENVIRONMENT.readEnvOpt("DOMAIN_NAME")
@@ -46,6 +48,8 @@ public class Constants {
     public static final String QUERY_PARAMETER_LANGUAGE = "lang";
     public static final String ALL_QUERY_PARAMETER_LANGUAGES = "en,nb,nn";
     public static final Pattern ORCID_PATTERN = Pattern.compile("[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9|Xx]");
+    public static final String TOP = "top";
+    public static final String FULL = "full";
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,

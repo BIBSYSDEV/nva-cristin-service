@@ -27,6 +27,8 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS =
         "Parameter 'query' is missing or invalid. "
             + "May only contain alphanumeric characters, dash, comma, period and whitespace";
+    public static final String ERROR_MESSAGE_DEPTH_INVALID = "Parameter 'depth' has invalid value. "
+            + "Must be 'top' or 'full'";
     public static final String ERROR_MESSAGE_LANGUAGE_INVALID = "Parameter 'language' has invalid value";
     public static final String ERROR_MESSAGE_PAGE_VALUE_INVALID = "Parameter 'page' has invalid value";
     public static final String ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE =
@@ -45,4 +47,6 @@ public class ErrorMessages {
         "This endpoint does not support query parameters";
     public static final String ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI =
         "The requested resource '%s' was not found";
+    public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Supplied payload is not valid";
+
 }

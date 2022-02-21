@@ -23,6 +23,10 @@ Globals:
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Parameters:
+  CognitoAuthorizerArn:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Reference to Cognito UserPool for the stage
+    Default: CognitoAuthorizerArn
   ApiDomain:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /NVA/ApiDomain
@@ -59,6 +63,36 @@ Resources:
         DefaultAuthorizer: NONE
       EndpointConfiguration: Regional
 
+  ReadCristinAuthenticationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [lambda.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      Policies:
+        - PolicyName: writeLog
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:*'
+        - PolicyName: readSecret
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:CristinClientBasicAuth*'
+
 
   NvaCristinProjectsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -79,6 +113,22 @@ Resources:
               - method.request.querystring.page
               - method.request.querystring.results
 
+  NvaCristinCreateProjectsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: cristin-project
+      Handler: no.unit.nva.cristin.projects.CreateCristinProjectHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinProjectsEvent:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /project/
+            Method: post
+
   NvaCristinOneProjectFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -86,6 +136,7 @@ Resources:
       Handler: no.unit.nva.cristin.projects.FetchOneCristinProject::handleRequest
       Runtime: java11
       MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinOneProjectEvent:
           Type: Api
@@ -160,6 +211,54 @@ Resources:
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/{id}
+            Method: get
+
+  NvaCristinFetchPersonUsingNinFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinFetchPersonUsingNinEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/identityNumber/
+            Method: post
+
+  NvaCristinCreatePersonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.create.CreateCristinPersonHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinCreatePersonEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/
+            Method: post
+
+  NvaCristinFetchPersonInstitutionInfoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinFetchPersonEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}/organization/{orgId}/
             Method: get
 
   NvaCristinProxyBasePathMapping:
