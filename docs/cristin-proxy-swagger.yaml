@@ -9,7 +9,7 @@ info:
       The data is reformatted as JSON-LD with a schema defined in the [search ontology](https://bibsysdev.github.io/src/search-ontology.ttl), the [Organization ontology](https://bibsysdev.github.io/src/organization-ontology.ttl) and the [project ontology](https://bibsysdev.github.io/src/publication-channel-ontology.ttl).
 
       To understand the semantic layer, take a look at the @context URI returned by the API, the data is marked up according to this and may be interpreted directly to RDF using this.
-  termsOfService: http://nva.unit.no/terms/
+  termsOfService: https://nva.unit.no/terms/
   contact:
     email: nva@unit.no
   license:
@@ -595,6 +595,47 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /position:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPositionFunction.Arn}/invocations
+        httpMethod: POST
+          type: "AWS_PROXY"
+        tags:
+          - Position
+      summary: Fetch position codes
+      description: Returns postion codes for affiliations
+      operationId: GetPositionsCodes
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PositionCodes'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PositionCodesSample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PositionCodes'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PositionCodesSample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+
 components:
   responses:
     400:
@@ -759,14 +800,13 @@ components:
             - CONCLUDED
           description: Project status, based on start_date and end_date.
         academicSummary:
-          type: string
-          description: Summary intended for an academic audience
+#          type: string
+#          description: Summary intended for an academic audience
           $ref: '#/components/schemas/Languages'
         popularScientificSummary:
-          type: String
-          description: Summary intended for not so academic audience
+#          type: string
+#          description: Summary intended for not so academic audience
           $ref: '#/components/schemas/Languages'
-
     Problem:
       type: object
       properties:
@@ -1088,6 +1128,30 @@ components:
         phone:
           type: string
           description: Phone at this organization
+    PositionCodes:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        positions:
+          type: array
+          description: The list of position codes returned by the service
+          items:
+            $ref: '#/components/schemas/PositionCode'
+    PositionCode:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        label:
+          type: array
+          description: Titles in alternative languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        active:
+          type: boolean
 
   examples:
     ProjectsExample:
@@ -1390,6 +1454,18 @@ components:
       value:
         type: 'NationalIdentificationNumber'
         value: '2102193712345'
+    PositionCodesSample:
+      value:
+        "@context": "https://api.{env.}nva.aws.unit.no/ontology/employment#"
+        positions:
+          - id: '9308'
+            name:
+              nb: Overstyrmann
+            active: false
+          - id: VITRÅDGIVER
+            name:
+              en: Academic adviser
+            active: true
   securitySchemes:
     CognitoUserPool:
       type: apiKey
