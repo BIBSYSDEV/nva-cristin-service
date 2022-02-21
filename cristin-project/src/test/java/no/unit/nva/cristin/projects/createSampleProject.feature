@@ -10,7 +10,7 @@ Feature: API tests for Cristin Project retrieve and search
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
     * def token = tokenGenerator.loginUser(username, password, cognitoUserpoolId, cognitoClientAppId)
-    * def sampleProject =
+    * def swaggerSampleProject =
     """
     {
       '@context': 'https://bibsysdev.github.io/src/project-context.json',
@@ -33,44 +33,45 @@ Feature: API tests for Cristin Project retrieve and search
               'nb': 'Egen institusjon'
             },
             'code': 'EI'
-          }
+          },
+          'code': '654321'
         }
       ],
       'coordinatingInstitution': {
-        'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0',
-        'type': 'Organization'
+        'type': 'Organization',
+        'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
       },
       'contributors': [
         {
           'type': 'ProjectManager',
           'identity': {
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/325953',
-            'type': 'Person'
+            'type': 'Person',
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
           },
           'affiliation': {
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0',
-            'type': 'Organization'
+            'type': 'Organization',
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
           }
         },
         {
           'type': 'ProjectParticipant',
           'identity': {
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/326035',
-            'type': 'Person'
+            'type': 'Person',
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
           },
           'affiliation': {
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0',
-            'type': 'Organization'
-          },
-          'academicSummary': {
-            'en': 'Summary in an academic manner'
-          },
-          'popularScientificSummary': {
-            'en': 'popularScientificSummary popularScientificSummary popularScientificSummary'
+            'type': 'Organization',
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
           }
         }
       ],
-      'status': 'CONCLUDED'
+      'status': 'CONCLUDED',
+      'academicSummary': {
+        'en': 'Summary in an academic manner'
+      },
+      'popularScientificSummary': {
+        'en': 'popularScientificSummary popularScientificSummary popularScientificSummary'
+      }
     }
     """
     Given url CRISTIN_BASE
@@ -79,7 +80,7 @@ Feature: API tests for Cristin Project retrieve and search
   Scenario: Create returns status 201 Created when input is sample project from swagger documentation
     Given path '/project'
     * header Authorization = 'Bearer ' + token
-    And request sampleProject
+    And request swaggerSampleProject
     When method POST
     Then status 201
     And print response
