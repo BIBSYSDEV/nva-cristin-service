@@ -44,6 +44,6 @@ jobs:
         # Delete tests users after tests have run
       - name: Delete karate test users
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew deleteTestUsers --info
-      # Delete stack after running tests
-      - name: Delete stack after running tests
-        run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}
+        # Delete stack after running tests
+        #- name: Delete stack after running tests
+        #run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}
