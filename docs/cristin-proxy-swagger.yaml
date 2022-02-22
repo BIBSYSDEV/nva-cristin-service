@@ -24,6 +24,7 @@ servers:
   - url: https://api.dev.nva.aws.unit.no/cristin
   - url: https://api.sandbox.nva.aws.unit.no/cristin
   - url: https://api.test.nva.aws.unit.no/cristin
+
 paths:
   /project:
     get:
@@ -37,9 +38,9 @@ paths:
       summary: List projects matching query
       description: Returns a list of projects based on query parameters
       operationId: ListProjects
-      produces:
-        - application/json
-        - application/ld+json
+      #      produces:
+      #        - application/json
+      #        - application/ld+json
       parameters:
         - name: query
           in: query
@@ -162,9 +163,9 @@ paths:
       summary: Find project by ID
       description: Returns a single project matching id parameter
       operationId: GetProjectById
-      produces:
-        - application/json
-        - application/ld+json
+      #      produces:
+      #        - application/json
+      #        - application/ld+json
       parameters:
         - name: id
           in: path
@@ -217,9 +218,9 @@ paths:
       summary: List organizations matching query
       description: Returns a list of organizations based on query parameters
       operationId: ListOrganizations
-      produces:
-        - application/json
-        - application/ld+json
+      #      produces:
+      #        - application/json
+      #        - application/ld+json
       parameters:
         - name: query
           in: query
@@ -290,9 +291,9 @@ paths:
       summary: Fetch Organization by identifier
       description: Returns a single Organization matching identifier parameter
       operationId: GetOrganizationByIdentifier
-      produces:
-        - application/json
-        - application/ld+json
+      #      produces:
+      #        - application/json
+      #        - application/ld+json
       parameters:
         - name: identifier
           in: path
@@ -601,7 +602,7 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPositionFunction.Arn}/invocations
         httpMethod: POST
-          type: "AWS_PROXY"
+        type: "AWS_PROXY"
         tags:
           - Position
       summary: Fetch position codes
@@ -800,13 +801,14 @@ components:
             - CONCLUDED
           description: Project status, based on start_date and end_date.
         academicSummary:
-#          type: string
-#          description: Summary intended for an academic audience
           $ref: '#/components/schemas/Languages'
+        #          type: string
+        #          description: Summary intended for an academic audience
         popularScientificSummary:
-#          type: string
-#          description: Summary intended for not so academic audience
           $ref: '#/components/schemas/Languages'
+    #          type: String
+    #          description: Summary intended for not so academic audience
+
     Problem:
       type: object
       properties:
@@ -904,7 +906,7 @@ components:
             type: object
             properties:
               organization:
-                $ref:  '#/components/schemas/Organization'
+                $ref: '#/components/schemas/Organization'
     Funding:
       type: object
       description: Funding
@@ -1022,7 +1024,7 @@ components:
       properties:
         identifiers:
           type: array
-          required: true
+          #          required: true
           description: Identifier for this person
           items:
             type: object
@@ -1037,7 +1039,7 @@ components:
                 description: Value of identifier
         names:
           type: array
-          required: true
+          #          required: true
           description: Names for this person. Required fields are FirstName and LastName
           items:
             type: object
@@ -1143,14 +1145,12 @@ components:
       properties:
         id:
           type: string
-        type:
-          type: string
-        label:
+        name:
           type: array
           description: Titles in alternative languages
           items:
             $ref: '#/components/schemas/Languages'
-        active:
+        enabled:
           type: boolean
 
   examples:
@@ -1458,14 +1458,14 @@ components:
       value:
         "@context": "https://api.{env.}nva.aws.unit.no/ontology/employment#"
         positions:
-          - id: '9308'
+          - id: "https://api.{env.}nva.aws.unit.no/positions#9308"
             name:
               nb: Overstyrmann
-            active: false
-          - id: VITRÅDGIVER
+            enabled: false
+          - id: "https://api.{env.}nva.aws.unit.no/positions#VITRÅDGIVER"
             name:
               en: Academic adviser
-            active: true
+            enabled: true
   securitySchemes:
     CognitoUserPool:
       type: apiKey
