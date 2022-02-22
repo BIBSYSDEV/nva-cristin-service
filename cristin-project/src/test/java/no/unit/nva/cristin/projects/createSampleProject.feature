@@ -13,64 +13,52 @@ Feature: API tests for Cristin Project retrieve and search
     * def swaggerSampleProject =
     """
     {
-      '@context': 'https://bibsysdev.github.io/src/project-context.json',
-      'type': 'Project',
-      'title': 'Example Title',
-      'language': 'http://lexvo.org/id/iso639-3/nno',
-      'alternativeTitles': [
-        {
-          'nb': 'Eksempel på tittel'
-        }
-      ],
-      'startDate': '2012-01-09T00:00:00.001Z',
-      'endDate': '2017-12-31T00:00:00.001Z',
-      'funding': [
-        {
-          'type': 'Funding',
-          'source': {
-            'type': 'FundingSource',
-            'names': {
-              'nb': 'Egen institusjon'
-            },
-            'code': 'EI'
-          },
-          'code': '654321'
-        }
-      ],
-      'coordinatingInstitution': {
-        'type': 'Organization',
-        'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+      'title' : {
+        'nn' : 'Example Title',
+        'nb' : 'Eksempel på tittel'
       },
-      'contributors': [
-        {
-          'type': 'ProjectManager',
-          'identity': {
-            'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
-          },
-          'affiliation': {
-            'type': 'Organization',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-          }
-        },
-        {
-          'type': 'ProjectParticipant',
-          'identity': {
-            'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
-          },
-          'affiliation': {
-            'type': 'Organization',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-          }
+      'main_language' : 'nn',
+      'start_date' : '2012-01-09T00:00:00.001Z',
+      'end_date' : '2017-12-31T00:00:00.001Z',
+      'status' : 'CONCLUDED',
+      'created' : { },
+      'last_modified' : { },
+      'coordinating_institution' : {
+        'unit' : {
+          'cristin_unit_id' : '215.0.0.0'
         }
-      ],
-      'status': 'CONCLUDED',
-      'academicSummary': {
-        'en': 'Summary in an academic manner'
       },
-      'popularScientificSummary': {
-        'en': 'popularScientificSummary popularScientificSummary popularScientificSummary'
+      'project_funding_sources' : [ {
+        'funding_source_code' : 'EI',
+        'project_code' : '654321',
+        'funding_source_name' : {
+          'nb' : 'Egen institusjon'
+        }
+      } ],
+      'participants' : [ {
+        'cristin_person_id' : '325953',
+        'url' : 'https://api.cristin-test.uio.no/v2/persons/325953',
+        'roles' : [ {
+          'role_code' : 'PRO_MANAGER',
+          'unit' : {
+            'cristin_unit_id' : '215.0.0.0'
+          }
+        } ]
+      }, {
+        'cristin_person_id' : '326035',
+        'url' : 'https://api.cristin-test.uio.no/v2/persons/326035',
+        'roles' : [ {
+          'role_code' : 'PRO_PARTICIPANT',
+          'unit' : {
+            'cristin_unit_id' : '215.0.0.0'
+          }
+        } ]
+      } ],
+      'academic_summary' : {
+        'en' : 'Summary in an academic manner'
+      },
+      'popular_scientific_summary' : {
+        'en' : 'popularScientificSummary popularScientificSummary popularScientificSummary'
       }
     }
     """
