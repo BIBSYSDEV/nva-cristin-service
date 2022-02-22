@@ -1456,7 +1456,7 @@ components:
         value: '2102193712345'
     PositionCodesSample:
       value:
-        "@context": "https://bibsysdev.github.io/src/positions-ontology.ttl"
+        "@context": "https://bibsysdev.github.io/src/position-context.json"
         positions:
           - id: "https://api.{env.}nva.aws.unit.no/positions#9308"
             name:
