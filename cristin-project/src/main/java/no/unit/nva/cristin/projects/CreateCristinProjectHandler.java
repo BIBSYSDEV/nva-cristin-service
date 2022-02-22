@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
+import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
@@ -67,35 +68,31 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
     }
 
     private void validateInput(NvaProject project) throws BadRequestException {
-        if (hasId(project)
-                || noTitle(project)
-                || invalidStatus(project)
-                || invalidStartDate(project.getStartDate())
-                || hasNoContributors(project.getContributors())
-                || hasNoCoordinatingOrganization(project.getCoordinatingInstitution())
+        if (isNull(project)
+            || hasId(project)
+            || noTitle(project)
+            || invalidStartDate(project.getStartDate())
+            || hasNoContributors(project.getContributors())
+            || hasNoCoordinatingOrganization(project.getCoordinatingInstitution())
         ) {
             throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
         }
     }
 
     private boolean hasNoCoordinatingOrganization(Organization coordinatingInstitution) {
-        return Objects.isNull(coordinatingInstitution);
+        return isNull(coordinatingInstitution);
     }
 
     private boolean hasNoContributors(List<NvaContributor> contributors) {
-        return Objects.isNull(contributors) || contributors.isEmpty();
+        return isNull(contributors) || contributors.isEmpty();
     }
 
     private boolean invalidStartDate(Instant startDate) {
-        return Objects.isNull(startDate);
+        return isNull(startDate);
     }
 
     private boolean hasId(NvaProject project) {
         return Objects.nonNull(project.getId());
-    }
-
-    private boolean invalidStatus(NvaProject project) {
-        return !ProjectStatus.isValidStatus(project.getStatus().name());
     }
 
     private boolean noTitle(NvaProject project) {
