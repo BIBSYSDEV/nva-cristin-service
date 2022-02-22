@@ -9,7 +9,7 @@ info:
       The data is reformatted as JSON-LD with a schema defined in the [search ontology](https://bibsysdev.github.io/src/search-ontology.ttl), the [Organization ontology](https://bibsysdev.github.io/src/organization-ontology.ttl) and the [project ontology](https://bibsysdev.github.io/src/publication-channel-ontology.ttl).
 
       To understand the semantic layer, take a look at the @context URI returned by the API, the data is marked up according to this and may be interpreted directly to RDF using this.
-  termsOfService: https://nva.unit.no/terms/
+  termsOfService: http://nva.unit.no/terms/
   contact:
     email: nva@unit.no
   license:
@@ -24,7 +24,6 @@ servers:
   - url: https://api.dev.nva.aws.unit.no/cristin
   - url: https://api.sandbox.nva.aws.unit.no/cristin
   - url: https://api.test.nva.aws.unit.no/cristin
-
 paths:
   /project:
     get:
@@ -38,9 +37,6 @@ paths:
       summary: List projects matching query
       description: Returns a list of projects based on query parameters
       operationId: ListProjects
-      #      produces:
-      #        - application/json
-      #        - application/ld+json
       parameters:
         - name: query
           in: query
@@ -114,16 +110,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Project'
+              $ref: '#/components/schemas/ProjectPost'
             examples:
               objectExample:
-                $ref: '#/components/examples/ProjectExample'
+                $ref: '#/components/examples/ProjectPostExample'
           application/ld+json:
             schema:
-              $ref: '#/components/schemas/Project'
+              $ref: '#/components/schemas/ProjectPost'
             examples:
               objectExample:
-                $ref: '#/components/examples/ProjectExample'
+                $ref: '#/components/examples/ProjectPostExample'
 
       responses:
         200:
@@ -163,9 +159,6 @@ paths:
       summary: Find project by ID
       description: Returns a single project matching id parameter
       operationId: GetProjectById
-      #      produces:
-      #        - application/json
-      #        - application/ld+json
       parameters:
         - name: id
           in: path
@@ -218,9 +211,6 @@ paths:
       summary: List organizations matching query
       description: Returns a list of organizations based on query parameters
       operationId: ListOrganizations
-      #      produces:
-      #        - application/json
-      #        - application/ld+json
       parameters:
         - name: query
           in: query
@@ -291,9 +281,6 @@ paths:
       summary: Fetch Organization by identifier
       description: Returns a single Organization matching identifier parameter
       operationId: GetOrganizationByIdentifier
-      #      produces:
-      #        - application/json
-      #        - application/ld+json
       parameters:
         - name: identifier
           in: path
@@ -760,7 +747,10 @@ components:
         coordinatingInstitution:
           $ref: '#/components/schemas/Organization'
         funding:
-          $ref: '#/components/schemas/Funding'
+          type: array
+          description: Fundings of this project
+          items:
+            $ref: '#/components/schemas/Funding'
         contributors:
           type: array
           description: List of contributors on the project
@@ -802,13 +792,77 @@ components:
           description: Project status, based on start_date and end_date.
         academicSummary:
           $ref: '#/components/schemas/Languages'
-        #          type: string
-        #          description: Summary intended for an academic audience
         popularScientificSummary:
           $ref: '#/components/schemas/Languages'
-    #          type: String
-    #          description: Summary intended for not so academic audience
-
+    ProjectPost:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        type:
+          type: string
+          pattern: 'Project'
+          description: The type of the returned object, always Project
+        title:
+          type: string
+          pattern: '.+'
+          description: Title of the project
+        language:
+          type: string
+          pattern: '^http:\/\/lexvo.org\/id\/iso639-3\/[a-z]{3}$'
+          description: The lexvo URI for the language of the Project
+        alternativeTitles:
+          type: array
+          description: Titles in alternative languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        startDate:
+          type: string
+          pattern: '.+'
+          description: Project start date
+          example: '2012-01-09T00:00:00.001Z'
+        endDate:
+          type: string
+          pattern: '.+'
+          description: Project end date
+          example: '2018-01-09T00:00:00.001Z'
+        coordinatingInstitution:
+          $ref: '#/components/schemas/Organization'
+        contributors:
+          type: array
+          description: List of contributors on the project
+          items:
+            type: object
+            description: One contributor
+            properties:
+              type:
+                type: string
+                enum:
+                  - ProjectManager
+                  - ProjectParticipant
+                description: Type of contributor. Can be ProjectManager or ProjectParticipant
+              identity:
+                type: object
+                properties:
+                  id:
+                    $ref: '#/components/schemas/Id'
+                  type:
+                    type: string
+                    pattern: 'Person'
+                    description: Type of identity. Always Person
+              affiliation:
+                $ref: '#/components/schemas/Organization'
+        status:
+          type: string
+          enum:
+            - NOTSTARTED
+            - ACTIVE
+            - CONCLUDED
+          description: Project status, based on start_date and end_date.
+        academicSummary:
+          $ref: '#/components/schemas/Languages'
+        popularScientificSummary:
+          $ref: '#/components/schemas/Languages'
     Problem:
       type: object
       properties:
@@ -1039,7 +1093,7 @@ components:
                 description: Value of identifier
         names:
           type: array
-          #          required: true
+          required: true
           description: Names for this person. Required fields are FirstName and LastName
           items:
             type: object
@@ -1177,12 +1231,13 @@ components:
             startDate: '2012-01-09T00:00:00Z'
             endDate: '2017-12-31T00:00:00Z'
             funding:
-              type: 'Funding'
-              source:
-                type: "FundingSource"
-                names:
-                  nb: "Egen institusjon"
-                code: "EI"
+              - type: 'Funding'
+                source:
+                  type: "FundingSource"
+                  names:
+                    nb: "Egen institusjon"
+                  code: "EI"
+                code: "1234556"
             coordinatingInstitution:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
@@ -1231,12 +1286,13 @@ components:
         startDate: '2012-01-09T00:00:00Z'
         endDate: '2017-12-31T00:00:00Z'
         funding:
-          type: 'Funding'
-          source:
-            type: "FundingSource"
-            names:
-              nb: "Egen institusjon"
-            code: "EI"
+          - type: 'Funding'
+            source:
+              type: "FundingSource"
+              names:
+                nb: "Egen institusjon"
+              code: "EI"
+            code: "134455"
         coordinatingInstitution:
           id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
           type: 'Organization'
@@ -1265,11 +1321,44 @@ components:
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
-            status: CONCLUDED
-            academicSummary:
-              en: "Summary in an academic manner"
-            popularScientificSummary:
-              en: "popularScientificSummary popularScientificSummary popularScientificSummary"
+        status: CONCLUDED
+        academicSummary:
+          en: "Summary in an academic manner"
+        popularScientificSummary:
+          en: "popularScientificSummary popularScientificSummary popularScientificSummary"
+    ProjectPostExample:
+      value:
+        '@context': 'https://bibsysdev.github.io/src/project-context.json'
+        type: 'Project'
+        title: 'Example Title'
+        language: 'http://lexvo.org/id/iso639-3/nno'
+        alternativeTitles:
+          - 'nb': 'Eksempel på tittel'
+        startDate: '2012-01-09T00:00:00.001Z'
+        endDate: '2017-12-31T00:00:00.001Z'
+        coordinatingInstitution:
+          type: 'Organization'
+          id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+        contributors:
+          - type: 'ProjectManager'
+            identity:
+              type: 'Person'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+            affiliation:
+              type: 'Organization'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+          - type: 'ProjectParticipant'
+            identity:
+              type: 'Person'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
+            affiliation:
+              type: 'Organization'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+        status: CONCLUDED
+        academicSummary:
+          en: "Summary in an academic manner"
+        popularScientificSummary:
+          en: "popularScientificSummary popularScientificSummary popularScientificSummary"
     OrganizationsExample:
       value:
         # TODO: Change context in code. Below is what it currently is now
