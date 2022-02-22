@@ -594,7 +594,14 @@ paths:
           - Position
       summary: Fetch position codes
       description: Returns postion codes for affiliations
-      operationId: GetPositionsCodes
+      operationId: GetPositionCodes
+      parameters:
+        - name: active
+          in: query
+          description: Fetch only active postition codes
+          required: false
+          schema:
+            type: boolean
       responses:
         200:
           description: successful operation
