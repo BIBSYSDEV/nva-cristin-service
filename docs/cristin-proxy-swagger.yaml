@@ -37,9 +37,6 @@ paths:
       summary: List projects matching query
       description: Returns a list of projects based on query parameters
       operationId: ListProjects
-      produces:
-        - application/json
-        - application/ld+json
       parameters:
         - name: query
           in: query
@@ -162,9 +159,6 @@ paths:
       summary: Find project by ID
       description: Returns a single project matching id parameter
       operationId: GetProjectById
-      produces:
-        - application/json
-        - application/ld+json
       parameters:
         - name: id
           in: path
@@ -217,9 +211,6 @@ paths:
       summary: List organizations matching query
       description: Returns a list of organizations based on query parameters
       operationId: ListOrganizations
-      produces:
-        - application/json
-        - application/ld+json
       parameters:
         - name: query
           in: query
@@ -290,9 +281,6 @@ paths:
       summary: Fetch Organization by identifier
       description: Returns a single Organization matching identifier parameter
       operationId: GetOrganizationByIdentifier
-      produces:
-        - application/json
-        - application/ld+json
       parameters:
         - name: identifier
           in: path
@@ -762,12 +750,8 @@ components:
             - CONCLUDED
           description: Project status, based on start_date and end_date.
         academicSummary:
-          type: string
-          description: Summary intended for an academic audience
           $ref: '#/components/schemas/Languages'
         popularScientificSummary:
-          type: String
-          description: Summary intended for not so academic audience
           $ref: '#/components/schemas/Languages'
     ProjectPost:
       type: object
@@ -778,20 +762,6 @@ components:
           type: string
           pattern: 'Project'
           description: The type of the returned object, always Project
-#        identifiers:
-#          type: array
-#          description: Identifiers for this project
-#          items:
-#            type: object
-#            properties:
-#              type:
-#                type: string
-#                pattern: 'CristinIdentifier'
-#                description: Name of identifier, always CristinIdentifier
-#              value:
-#                type: integer
-#                format: int32
-#                description: Cristin ID of project
         title:
           type: string
           pattern: '.+'
@@ -842,14 +812,6 @@ components:
                     type: string
                     pattern: 'Person'
                     description: Type of identity. Always Person
-#                  firstName:
-#                    type: string
-#                    pattern: '.+'
-#                    description: First name
-#                  lastName:
-#                    type: string
-#                    pattern: '.+'
-#                    description: Last name
               affiliation:
                 $ref: '#/components/schemas/Organization'
         status:
@@ -860,14 +822,9 @@ components:
             - CONCLUDED
           description: Project status, based on start_date and end_date.
         academicSummary:
-          type: string
-          description: Summary intended for an academic audience
           $ref: '#/components/schemas/Languages'
         popularScientificSummary:
-          type: String
-          description: Summary intended for not so academic audience
           $ref: '#/components/schemas/Languages'
-
     Problem:
       type: object
       properties:
