@@ -537,6 +537,23 @@ paths:
         502:
           $ref: '#/components/responses/502'
   /person/{id}/organization/{orgId}:
+    parameters:
+      - name: id
+        in: path
+        description: Identifier of Person
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]+$'
+        example: '359084'
+      - name: orgId
+        in: path
+        description: Identifier of Organization. Sub unit will be converted to parent institution
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9.]+$'
+        example: '185'
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -550,23 +567,6 @@ paths:
       operationId: GetPersonOrganizationInfoByIdentifiers
       security:
         - CognitoUserPool: [ ]
-      parameters:
-        - name: id
-          in: path
-          description: Identifier of Person
-          required: true
-          schema:
-            type: string
-            pattern: '^[0-9]+$'
-          example: '359084'
-        - name: orgId
-          in: path
-          description: Identifier of Organization. Sub unit will be converted to parent institution
-          required: true
-          schema:
-            type: string
-            pattern: '^[0-9.]+$'
-          example: '185'
       responses:
         200:
           description: successful operation
@@ -1030,10 +1030,10 @@ components:
             $ref: '#/components/schemas/Affiliation'
     PersonPost:
       type: object
+      required: [ identifiers, names ]
       properties:
         identifiers:
           type: array
-          required: true
           description: Identifier for this person
           items:
             type: object
@@ -1048,7 +1048,6 @@ components:
                 description: Value of identifier
         names:
           type: array
-          required: true
           description: Names for this person. Required fields are FirstName and LastName
           items:
             type: object
@@ -1144,11 +1143,9 @@ components:
       properties:
         phone:
           type: string
-          required: false
           description: Phone number at this institution
         email:
           type: string
-          required: false
           description: Email address at this institution
 
   examples:
