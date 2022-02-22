@@ -1270,15 +1270,12 @@ components:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
         type: 'Project'
-#        identifiers:
-#          - type: 'CristinIdentifier'
-#            value: '359084'
         title: 'Example Title'
         language: 'http://lexvo.org/id/iso639-3/nno'
         alternativeTitles:
           - 'nb': 'Eksempel på tittel'
-        startDate: '2012-01-09T00:00:00Z'
-        endDate: '2017-12-31T00:00:00Z'
+        startDate: '2012-01-09T00:00:00.001Z'
+        endDate: '2017-12-31T00:00:00.001Z'
         funding:
           - type: 'Funding'
             source:
@@ -1290,31 +1287,21 @@ components:
         coordinatingInstitution:
           type: 'Organization'
           id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-#          name:
-#            'nb': 'OsloMet - storbyuniversitetet'
         contributors:
           - type: 'ProjectManager'
             identity:
               type: 'Person'
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
-#              firstName: 'Ola'
-#              lastName: 'Nordmann'
             affiliation:
               type: 'Organization'
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-#              name:
-#                'nb': 'OsloMet - storbyuniversitetet'
           - type: 'ProjectParticipant'
             identity:
               type: 'Person'
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
-#              firstName: 'Kari'
-#              lastName: 'Olsen'
             affiliation:
               type: 'Organization'
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-#              name:
-#                'nb': 'OsloMet - storbyuniversitetet'
         status: CONCLUDED
         academicSummary:
           en: "Summary in an academic manner"
