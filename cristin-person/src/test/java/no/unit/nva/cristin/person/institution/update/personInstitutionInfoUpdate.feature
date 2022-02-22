@@ -50,6 +50,7 @@ Feature: API tests for Cristin Person Institution Info Update
   Scenario: Update returns status 400 when invalid person identifier
     Given path '/person/' + invalidIdentifier + '/organization/' + organizationIdentifier
     * header Authorization = 'Bearer ' + token
+    And request updateFieldsRequest
     When method PATCH
     Then status 400
     And match response.detail == 'Invalid path parameter for person id'
@@ -57,6 +58,7 @@ Feature: API tests for Cristin Person Institution Info Update
   Scenario: Update returns status 400 when invalid organization identifier
     Given path '/person/' + personIdentifier + '/organization/' + invalidIdentifier
     * header Authorization = 'Bearer ' + token
+    And request updateFieldsRequest
     When method PATCH
     Then status 400
     And match response.detail == 'Invalid path parameter for organization id'
