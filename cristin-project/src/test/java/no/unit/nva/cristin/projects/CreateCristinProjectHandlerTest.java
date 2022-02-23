@@ -22,6 +22,7 @@ import java.net.http.HttpResponse;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithUnitAffiliation;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithoutUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
@@ -145,6 +146,23 @@ class CreateCristinProjectHandlerTest {
         assertThat(actualIdentifierFromOrganization(actualAffiliation), equalTo(SOME_UNIT_IDENTIFIER));
     }
 
+    @Test
+    void shouldCreateProjectWithoutNonRequiredFieldContributorAffiliation()
+        throws IOException, InterruptedException {
+
+        NvaProject request = nvaProjectWithoutContributorAffiliation();
+        mockUpstreamUsingRequest(request);
+        GatewayResponse<NvaProject> response = executeRequest(request);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
+
+        NvaProject actual = response.getBodyObject(NvaProject.class);
+
+        Organization actualAffiliation = actual.getContributors().get(0).getAffiliation();
+        Organization expectedAffiliation = request.getContributors().get(0).getAffiliation();
+        assertThat(actualAffiliation, equalTo(expectedAffiliation));
+    }
+
     private String actualIdentifierFromOrganization(Organization organization) {
         return extractLastPathElement(organization.getId());
     }
@@ -166,6 +184,14 @@ class CreateCristinProjectHandlerTest {
         requestBody.setId(null);
         requestBody.setCoordinatingInstitution(someOrganizationFromUnitIdentifier());
         requestBody.setContributors(List.of(randomContributorWithUnitAffiliation()));
+        return requestBody;
+    }
+
+    private NvaProject nvaProjectWithoutContributorAffiliation() {
+        NvaProject requestBody = randomMinimalNvaProject();
+        requestBody.setId(null);
+        requestBody.setCoordinatingInstitution(someOrganizationFromUnitIdentifier());
+        requestBody.setContributors(List.of(randomContributorWithoutUnitAffiliation()));
         return requestBody;
     }
 
