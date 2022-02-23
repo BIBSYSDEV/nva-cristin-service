@@ -7,6 +7,7 @@ import no.unit.nva.cristin.common.Utils;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonSerializable;
 
+import java.net.URI;
 import java.util.Objects;
 import java.util.Set;
 
@@ -18,19 +19,19 @@ public class PositionCodes implements JsonSerializable {
 
     @JsonProperty(CONTEXT)
     @JsonInclude(NON_NULL)
-    private final String context;
+    private final URI context;
     private final Set<PositionCode> positions;
 
     /**
      * Creates a Position Code wrapper for serialization to client.
      */
     @JsonCreator
-    public PositionCodes(@JsonProperty("@context") String context, @JsonProperty("codes") Set<PositionCode> codes) {
+    public PositionCodes(@JsonProperty("@context") URI context, @JsonProperty("codes") Set<PositionCode> codes) {
         this.context = context;
         this.positions = codes;
     }
 
-    public String getContext() {
+    public URI getContext() {
         return context;
     }
 

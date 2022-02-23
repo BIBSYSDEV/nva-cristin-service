@@ -26,7 +26,7 @@ import static no.unit.nva.utils.UriUtils.addLanguage;
 
 public class CristinPositionCodesClient extends ApiClient {
 
-    public static final String CONTEXT = "https://bibsysdev.github.io/src/position-context.json";
+    public static final URI CONTEXT = URI.create("https://bibsysdev.github.io/src/position-context.json");
     public static final String AFFILIATIONS_POSITIONS = "affiliations/positions";
 
     /**
