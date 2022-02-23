@@ -598,7 +598,7 @@ paths:
       parameters:
         - name: active
           in: query
-          description: Fetch only active postition codes
+          description: Fetch only active position codes
           required: false
           schema:
             type: boolean

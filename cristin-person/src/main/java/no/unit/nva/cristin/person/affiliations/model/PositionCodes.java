@@ -1,36 +1,41 @@
 package no.unit.nva.cristin.person.affiliations.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Objects;
-import java.util.Set;
 import no.unit.nva.cristin.common.Utils;
-import no.unit.nva.model.Context;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonSerializable;
+
+import java.util.Objects;
+import java.util.Set;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 
 @JacocoGenerated
 public class PositionCodes implements JsonSerializable {
 
-    @JsonProperty("@context")
-    private final Context context;
-    private final Set<PositionCode> codes;
+    @JsonProperty(CONTEXT)
+    @JsonInclude(NON_NULL)
+    private final String context;
+    private final Set<PositionCode> positions;
 
     /**
      * Creates a Position Code wrapper for serialization to client.
      */
     @JsonCreator
-    public PositionCodes(@JsonProperty("@context") Context context, @JsonProperty("codes") Set<PositionCode> codes) {
+    public PositionCodes(@JsonProperty("@context") String context, @JsonProperty("codes") Set<PositionCode> codes) {
         this.context = context;
-        this.codes = codes;
+        this.positions = codes;
     }
 
-    public Context getContext() {
+    public String getContext() {
         return context;
     }
 
-    public Set<PositionCode> getCodes() {
-        return Utils.nonEmptyOrDefault(codes);
+    public Set<PositionCode> getPositions() {
+        return Utils.nonEmptyOrDefault(positions);
     }
 
     @JacocoGenerated
@@ -44,7 +49,7 @@ public class PositionCodes implements JsonSerializable {
         }
         PositionCodes that = (PositionCodes) o;
         return Objects.equals(getContext(), that.getContext())
-            && getCodes().equals(that.getCodes());
+            && getPositions().equals(that.getPositions());
     }
 
     @Override
@@ -54,6 +59,6 @@ public class PositionCodes implements JsonSerializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getContext(), getCodes());
+        return Objects.hash(getContext(), getPositions());
     }
 }
