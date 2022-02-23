@@ -92,7 +92,7 @@ public class SearchResponse<E> implements JsonSerializable {
 
     @JsonProperty
     public String getSearchString() {
-        return id.getQuery();
+        return Objects.nonNull(id) ? id.getQuery() : null;
     }
 
     public Long getProcessingTime() {

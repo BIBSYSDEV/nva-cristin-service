@@ -277,6 +277,21 @@ Resources:
             Path: /person/{id}/organization/{orgId}/
             Method: patch
 
+  NvaCristinFetchPositionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.affiliations.handler.PositionCodesHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Events:
+        NvaCristinFetchPositionsEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /position/
+            Method: get
+
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
