@@ -11,5 +11,5 @@ Feature: API tests for Cristin Organization retrieve and search
     When method GET
     Then status 200
     And match response.hits == '#array'
-    And match response.size >= 1
+    And  response.size >= 1
 
