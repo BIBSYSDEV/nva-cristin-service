@@ -127,7 +127,6 @@ public class UriUtils {
 
     public static URI createNvaPositionId(String code) {
         URI positionBase = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(POSITION).getUri();
-//        String scheme, String host, String path, String fragment
         return attempt(() -> new URI(positionBase.getScheme(), positionBase.getHost(), positionBase.getPath(),code))
                 .orElseThrow();
     }

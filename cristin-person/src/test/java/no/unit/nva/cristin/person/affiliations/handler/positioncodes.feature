@@ -12,5 +12,4 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 200
     And match response.positions == '#array'
     And  response.size >= 1
-    And print response
 
