@@ -1,18 +1,18 @@
 package no.unit.nva.cristin.person.affiliations.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
-import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.affiliations.client.CristinPositionCodesClient;
-import no.unit.nva.cristin.person.affiliations.model.PositionCode;
+import no.unit.nva.cristin.person.affiliations.model.PositionCodes;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
+import java.net.HttpURLConnection;
+
 @SuppressWarnings("unused")
-public class PositionCodesHandler extends ApiGatewayHandler<Void, SearchResponse<PositionCode>> {
+public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes> {
 
     private final transient CristinPositionCodesClient apiClient;
 
@@ -32,14 +32,14 @@ public class PositionCodesHandler extends ApiGatewayHandler<Void, SearchResponse
     }
 
     @Override
-    protected SearchResponse<PositionCode> processInput(Void input, RequestInfo requestInfo, Context context)
+    protected PositionCodes processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
         return apiClient.generateQueryResponse();
     }
 
     @Override
-    protected Integer getSuccessStatusCode(Void input, SearchResponse<PositionCode> output) {
+    protected Integer getSuccessStatusCode(Void input, PositionCodes output) {
         return HttpURLConnection.HTTP_OK;
     }
 }
