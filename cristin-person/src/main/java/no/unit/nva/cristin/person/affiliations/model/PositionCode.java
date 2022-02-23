@@ -6,13 +6,14 @@ import no.unit.nva.cristin.common.Utils;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonSerializable;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 
 @JacocoGenerated
 public class PositionCode implements JsonSerializable {
 
-    private final String id;
+    private final URI id;
     private final Map<String, String> name;
     private final boolean enabled;
 
@@ -20,14 +21,14 @@ public class PositionCode implements JsonSerializable {
      * Creates a PositionCode for serialization to client.
      */
     @JsonCreator
-    public PositionCode(@JsonProperty("id") String id, @JsonProperty("name") Map<String, String> name,
+    public PositionCode(@JsonProperty("id") URI id, @JsonProperty("name") Map<String, String> name,
                         @JsonProperty("enabled") boolean enabled) {
         this.id = id;
         this.name = name;
         this.enabled = enabled;
     }
 
-    public String getId() {
+    public URI getId() {
         return id;
     }
 

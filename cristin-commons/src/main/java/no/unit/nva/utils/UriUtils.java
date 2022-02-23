@@ -18,6 +18,8 @@ import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
 
 public class UriUtils {
 
+    public static final String POSITION = "position";
+    public static final String FRAGMENT = "#";
     public static final String PROJECT = "project";
     public static final String INSTITUTION = "institution";
     public static final String PERSON = "person";
@@ -121,4 +123,10 @@ public class UriUtils {
     public static URI nvaIdentifierToCristinIdentifier(URI nvaUri, String newPath) {
         return getCristinUri(extractLastPathElement(nvaUri), newPath);
     }
+
+    public static URI createNvaPositionId(String identifier) {
+        return new UriWrapper(HTTPS, DOMAIN_NAME)
+                .addChild(BASE_PATH).addChild(UriUtils.POSITION).addChild(FRAGMENT).addChild(identifier).getUri();
+    }
+
 }
