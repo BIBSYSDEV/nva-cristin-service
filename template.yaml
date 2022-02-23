@@ -273,7 +273,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
-            Path: /positions/
+            Path: /position/
             Method: get
 
   NvaCristinProxyBasePathMapping:
