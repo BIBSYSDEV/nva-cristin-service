@@ -8,6 +8,7 @@ import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
@@ -39,7 +40,7 @@ public class CristinProjectBuilder {
         cristinProject.setCristinProjectId(extractLastPathElement(nvaProject.getId()));
         cristinProject.setMainLanguage(getLanguageByUri(nvaProject.getLanguage()).getIso6391Code());
         cristinProject.setTitle(extractTitles(nvaProject));
-        cristinProject.setStatus(nvaProject.getStatus().name());
+        cristinProject.setStatus(extractStatus(nvaProject));
         cristinProject.setStartDate(nvaProject.getStartDate());
         cristinProject.setEndDate(nvaProject.getEndDate());
         cristinProject.setAcademicSummary(extractSummary(nvaProject.getAcademicSummary()));
@@ -86,5 +87,12 @@ public class CristinProjectBuilder {
         }
         nvaProject.getAlternativeTitles().forEach(titles::putAll);
         return titles;
+    }
+
+    private String extractStatus(NvaProject project) {
+        return Optional.ofNullable(project.getStatus())
+            .map(ProjectStatus::name)
+            .filter(ProjectStatus::isValidStatus)
+            .orElse(null);
     }
 }

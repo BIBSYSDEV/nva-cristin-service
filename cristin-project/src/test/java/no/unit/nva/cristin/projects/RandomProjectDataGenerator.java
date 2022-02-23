@@ -181,6 +181,13 @@ public class RandomProjectDataGenerator {
         return contributor;
     }
 
+    protected static NvaContributor randomContributorWithoutUnitAffiliation() {
+        NvaContributor contributor = new NvaContributor();
+        contributor.setIdentity(randomPerson());
+        contributor.setType(randomContributorType());
+        return contributor;
+    }
+
     protected static Organization someOrganizationFromUnitIdentifier() {
         return new Organization.Builder().withId(getNvaApiId(SOME_UNIT_IDENTIFIER, ORGANIZATION_PATH)).build();
     }

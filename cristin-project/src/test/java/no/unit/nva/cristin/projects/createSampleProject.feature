@@ -52,7 +52,6 @@ Feature: API tests for Cristin Project retrieve and search
           }
         }
       ],
-      'status': 'CONCLUDED',
       'academicSummary': {
         'en': 'Summary in an academic manner'
       },

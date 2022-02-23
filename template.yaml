@@ -261,6 +261,22 @@ Resources:
             Path: /person/{id}/organization/{orgId}/
             Method: get
 
+  NvaCristinUpdatePersonInstitutionInfoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.institution.update.UpdatePersonInstitutionInfoHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinUpdatePersonInstitutionInfoEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}/organization/{orgId}/
+            Method: patch
+
   NvaCristinFetchPositionFunction:
     Type: AWS::Serverless::Function
     Properties:
