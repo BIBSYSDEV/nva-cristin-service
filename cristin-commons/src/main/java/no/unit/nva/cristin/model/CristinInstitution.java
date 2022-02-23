@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.model;
 
+import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
@@ -61,6 +62,9 @@ public class CristinInstitution {
      * @return CristinInstitution
      */
     public static CristinInstitution fromOrganization(Organization organization) {
+        if (isNull(organization) || isNull(organization.getId())) {
+            return null;
+        }
         CristinInstitution institution = new CristinInstitution();
         institution.setInstitutionName(organization.getName());
         institution.setUrl(nvaIdentifierToCristinIdentifier(organization.getId(), INSTITUTION_PATH).toString());
