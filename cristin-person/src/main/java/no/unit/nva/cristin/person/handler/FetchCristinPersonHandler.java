@@ -1,22 +1,30 @@
 package no.unit.nva.cristin.person.handler;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.HttpURLConnection;
+
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
+import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 
 @SuppressWarnings("unused")
 public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
+
+    private static final Logger logger = LoggerFactory.getLogger(FetchCristinPersonHandler.class);
 
     private final transient CristinPersonApiClient apiClient;
 
@@ -40,7 +48,17 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
         validateQueryParameters(requestInfo);
         String identifier = getValidId(requestInfo);
 
-        return apiClient.generateGetResponse(identifier);
+        return getApiClient(requestInfo).generateGetResponse(identifier);
+    }
+
+    private CristinPersonApiClient getApiClient(RequestInfo requestInfo) {
+        if (AccessUtils.requesterIsUserAdministrator(requestInfo)) {
+            logger.info("requester is UserAdministrator");
+            return new CristinPersonApiClient(getHttpClient());
+        } else {
+            logger.info("requester is NOT authorized, requestInfo.getAccessRights()={}", requestInfo.getAccessRights());
+            return apiClient;
+        }
     }
 
     @Override

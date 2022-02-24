@@ -87,6 +87,7 @@ public class ApiClient {
     }
 
     public static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
+        logger.info("json fra cristin: {}", body);
         return OBJECT_MAPPER.readValue(body, classOfT);
     }
 
