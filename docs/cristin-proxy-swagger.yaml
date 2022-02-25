@@ -634,6 +634,54 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /position:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPositionFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+        tags:
+          - Position
+      summary: Fetch position codes
+      description: Returns postion codes for affiliations
+      operationId: GetPositionCodes
+      parameters:
+        - name: active
+          in: query
+          description: Fetch only active position codes
+          required: false
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PositionCodes'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PositionCodesSample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PositionCodes'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PositionCodesSample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+
 components:
   responses:
     400:
@@ -970,7 +1018,7 @@ components:
             type: object
             properties:
               organization:
-                $ref:  '#/components/schemas/Organization'
+                $ref: '#/components/schemas/Organization'
     Funding:
       type: object
       description: Funding
@@ -1202,6 +1250,28 @@ components:
         email:
           type: string
           description: Email address at this institution
+    PositionCodes:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        positions:
+          type: array
+          description: The list of position codes returned by the service
+          items:
+            $ref: '#/components/schemas/PositionCode'
+    PositionCode:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: array
+          description: Titles in alternative languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        enabled:
+          type: boolean
 
   examples:
     ProjectsExample:
@@ -1543,6 +1613,18 @@ components:
       value:
         phone: '+4799112233'
         email: 'mail@example.com'
+    PositionCodesSample:
+      value:
+        "@context": "https://bibsysdev.github.io/src/position-context.json"
+        positions:
+          - id: "https://api.{env.}nva.aws.unit.no/positions#9308"
+            name:
+              nb: Overstyrmann
+            enabled: false
+          - id: "https://api.{env.}nva.aws.unit.no/positions#VITRÅDGIVER"
+            name:
+              en: Academic adviser
+            enabled: true
   securitySchemes:
     CognitoUserPool:
       type: apiKey

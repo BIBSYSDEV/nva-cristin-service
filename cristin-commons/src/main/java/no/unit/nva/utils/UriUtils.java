@@ -14,10 +14,13 @@ import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
+import static nva.commons.core.attempt.Try.attempt;
 
 
 public class UriUtils {
 
+    public static final String POSITION = "position";
+    public static final String FRAGMENT = "#";
     public static final String PROJECT = "project";
     public static final String INSTITUTION = "institution";
     public static final String PERSON = "person";
@@ -111,7 +114,7 @@ public class UriUtils {
 
     public static URI createNvaProjectId(String identifier) {
         return new UriWrapper(HTTPS, DOMAIN_NAME)
-            .addChild(BASE_PATH).addChild(UriUtils.PROJECT).addChild(identifier).getUri();
+                .addChild(BASE_PATH).addChild(UriUtils.PROJECT).addChild(identifier).getUri();
     }
 
     public static String extractLastPathElement(URI uri) {
@@ -120,5 +123,11 @@ public class UriUtils {
 
     public static URI nvaIdentifierToCristinIdentifier(URI nvaUri, String newPath) {
         return getCristinUri(extractLastPathElement(nvaUri), newPath);
+    }
+
+    public static URI createNvaPositionId(String code) {
+        URI positionBase = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(POSITION).getUri();
+        return attempt(() -> new URI(positionBase.getScheme(), positionBase.getHost(), positionBase.getPath(),code))
+                .orElseThrow();
     }
 }
