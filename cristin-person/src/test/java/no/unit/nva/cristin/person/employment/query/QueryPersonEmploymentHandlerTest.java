@@ -1,10 +1,13 @@
 package no.unit.nva.cristin.person.employment.query;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PERSON_ID;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -29,6 +32,7 @@ import org.junit.jupiter.api.Test;
 public class QueryPersonEmploymentHandlerTest {
 
     private static final String VALID_PERSON_ID = "123456";
+    private static final String INVALID_IDENTIFIER = "hello";
 
     private final HttpClient clientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -59,6 +63,14 @@ public class QueryPersonEmploymentHandlerTest {
         GatewayResponse<CristinPersonEmployment> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenCallingHandlerWithInvalidIdentifier() throws IOException {
+        GatewayResponse<CristinPersonEmployment> gatewayResponse = sendQuery(Map.of(PERSON_ID, INVALID_IDENTIFIER));
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PERSON_ID));
     }
 
     private GatewayResponse<CristinPersonEmployment> queryWithoutRequiredAccessRights() throws IOException {

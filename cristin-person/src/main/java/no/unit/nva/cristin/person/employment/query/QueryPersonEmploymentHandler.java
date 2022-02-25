@@ -42,7 +42,7 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Cristi
         return apiClient.queryUpstreamUsingIdentifier(identifier);
     }
 
-    protected String getValidPersonId(RequestInfo requestInfo) throws BadRequestException {
+    private String getValidPersonId(RequestInfo requestInfo) throws BadRequestException {
         String identifier = attempt(() -> requestInfo.getPathParameter(PERSON_ID)).orElse(fail -> EMPTY_STRING);
         if (isValidIdentifier(identifier)) {
             return identifier;
