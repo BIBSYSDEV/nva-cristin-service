@@ -5,8 +5,8 @@ import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
 import no.unit.nva.cristin.common.Utils;
-import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -23,7 +23,7 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Cristi
     @SuppressWarnings("unused")
     @JacocoGenerated
     public QueryPersonEmploymentHandler() {
-        this(new QueryPersonEmploymentClient(CristinAuthenticator.getHttpClient()), new Environment());
+        this(new QueryPersonEmploymentClient(HttpClient.newHttpClient()), new Environment());
     }
 
     public QueryPersonEmploymentHandler(QueryPersonEmploymentClient apiClient, Environment environment) {
