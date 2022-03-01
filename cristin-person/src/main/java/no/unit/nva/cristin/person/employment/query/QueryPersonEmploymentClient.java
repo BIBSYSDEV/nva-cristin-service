@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -15,6 +16,7 @@ import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.paths.UriWrapper;
 
 public class QueryPersonEmploymentClient extends ApiClient {
@@ -22,6 +24,8 @@ public class QueryPersonEmploymentClient extends ApiClient {
     public static final String EMPLOYMENT_PATH_CRISTIN = "affiliations";
     public static final String EMPLOYMENT_PATH = "employment";
     public static final String EMPLOYMENT_QUERY_CONTEXT = "https://example.org/person-employment-search-context.json";
+    public static final String BAD_REQUEST_FROM_UPSTREAM = "Upstream returned Bad Request. This might occur if "
+        + "person identifier is not found in upstream";
 
     public QueryPersonEmploymentClient(HttpClient client) {
         super(client);
@@ -32,6 +36,7 @@ public class QueryPersonEmploymentClient extends ApiClient {
         URI cristinUri = generateCristinUri(identifier);
         HttpResponse<String> response = fetchQueryResults(cristinUri);
         URI idUri = generateIdUri(identifier);
+        checkResponseForBadRequestIndicatingNotFoundIdentifier(response.statusCode());
         checkHttpStatusCode(idUri, response.statusCode());
         long requestTime = calculateProcessingTime(startRequestTime, System.currentTimeMillis());
         List<CristinPersonEmployment> employments =
@@ -42,6 +47,12 @@ public class QueryPersonEmploymentClient extends ApiClient {
             .withProcessingTime(requestTime)
             .withSize(employments.size())
             .withHits(employments);
+    }
+
+    private void checkResponseForBadRequestIndicatingNotFoundIdentifier(int statusCode) throws BadRequestException {
+        if (statusCode == HttpURLConnection.HTTP_BAD_REQUEST) {
+            throw new BadRequestException(BAD_REQUEST_FROM_UPSTREAM);
+        }
     }
 
     private URI generateCristinUri(String personId) {
