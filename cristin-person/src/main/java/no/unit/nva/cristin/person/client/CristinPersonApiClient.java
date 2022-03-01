@@ -173,11 +173,29 @@ public class CristinPersonApiClient extends ApiClient {
         return person;
     }
 
+    /**
+     * Creates a Person object based on what is fetched from Cristin upstream for an authorized user.
+     *
+     * @param identifier the identifier of the person to fetch
+     * @return Person object with person data from upstream
+     */
+    public Person authorizedGenerateGetResponse(String identifier) throws ApiGatewayException {
+        Person person = getCristinPersonWithAuthentication(identifier).toPerson();
+        person.setContext(PERSON_CONTEXT);
+        return person;
+    }
+
+    protected CristinPerson getCristinPersonWithAuthentication(String identifier) throws ApiGatewayException {
+        URI uri = getCorrectUriForIdentifier(identifier);
+        HttpResponse<String> response = fetchGetResultWithAuthentication(uri);
+        checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode());
+        return getDeserializedResponse(response, CristinPerson.class);
+    }
+
     protected CristinPerson getCristinPerson(String identifier) throws ApiGatewayException {
         URI uri = getCorrectUriForIdentifier(identifier);
         HttpResponse<String> response = fetchGetResult(uri);
         checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode());
-
         return getDeserializedResponse(response, CristinPerson.class);
     }
 

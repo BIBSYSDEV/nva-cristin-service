@@ -10,4 +10,7 @@ public class JsonPropertyNames {
     public static final String CONTACT_DETAILS = "contactDetails";
     public static final String IMAGE = "image";
     public static final String AFFILIATIONS = "affiliations";
+    public static final String NATIONAL_IDENTITY_NUMBER = "NationalIdentificationNumber";
+    public static final String RESERVED = "reserved";
+
 }

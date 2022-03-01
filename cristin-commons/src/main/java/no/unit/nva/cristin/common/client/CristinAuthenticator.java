@@ -7,6 +7,7 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.Base64;
 
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -15,9 +16,12 @@ import static nva.commons.core.attempt.Try.attempt;
  */
 public class CristinAuthenticator {
 
-    private static final String SECRET_NAME = "CristinClientBasicAuth";
-    private static final String PASSWORD_KEY = "password";
-    private static final String USERNAME_KEY = "username";
+    public static final String SECRET_NAME = "CristinClientBasicAuth";
+    public static final String PASSWORD_KEY = "password";
+    public static final String USERNAME_KEY = "username";
+    public static final String EU_WEST_1 = "eu-west-1";
+    public static final SecretsReader SECRETS_READER =
+            new SecretsReader(AWSSecretsManagerClientBuilder.standard().withRegion(EU_WEST_1).build());
 
     /**
      * Creates an Authenticator from credentials stored in AWS SecretsManager.
@@ -25,15 +29,11 @@ public class CristinAuthenticator {
      * @return Authenticator from resolved credentials
      */
     public static Authenticator getBasicAuthenticator() {
-        final SecretsReader secretsReader =
-                new SecretsReader(AWSSecretsManagerClientBuilder.standard().withRegion("eu-west-1").build());
 
-        String userName = attempt(() -> secretsReader.fetchSecret(SECRET_NAME, USERNAME_KEY)).orElseThrow();
-        String passWord = attempt(() -> secretsReader.fetchSecret(SECRET_NAME, PASSWORD_KEY)).orElseThrow();
         return new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(userName, passWord.toCharArray());
+                return new PasswordAuthentication(getUserName(), getPassWord().toCharArray());
             }
         };
     }
@@ -49,6 +49,23 @@ public class CristinAuthenticator {
                 .authenticator(getBasicAuthenticator())
                 .connectTimeout(Duration.ofSeconds(30))
                 .build();
+    }
+
+    /**
+     * Create value part of a basic authHeader.
+     *
+     * @return String containing encoded header
+     */
+    public static String basicAuthHeader() {
+        return "Basic " + Base64.getEncoder().encodeToString((getUserName() + ":" + getPassWord()).getBytes());
+    }
+
+    private static String getPassWord() {
+        return attempt(() -> SECRETS_READER.fetchSecret(SECRET_NAME, PASSWORD_KEY)).orElseThrow();
+    }
+
+    private static String getUserName() {
+        return attempt(() -> SECRETS_READER.fetchSecret(SECRET_NAME, USERNAME_KEY)).orElseThrow();
     }
 
 }

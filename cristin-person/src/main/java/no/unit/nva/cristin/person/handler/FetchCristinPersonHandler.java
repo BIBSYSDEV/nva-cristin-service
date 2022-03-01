@@ -18,7 +18,6 @@ import java.net.HttpURLConnection;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
-import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 
 @SuppressWarnings("unused")
@@ -48,16 +47,16 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
         validateQueryParameters(requestInfo);
         String identifier = getValidId(requestInfo);
 
-        return getApiClient(requestInfo).generateGetResponse(identifier);
+        return getPersonWithAuthorization(requestInfo, identifier);
     }
 
-    private CristinPersonApiClient getApiClient(RequestInfo requestInfo) {
+    private Person getPersonWithAuthorization(RequestInfo requestInfo, String identifier) throws ApiGatewayException {
         if (AccessUtils.requesterIsUserAdministrator(requestInfo)) {
             logger.info("requester is UserAdministrator");
-            return new CristinPersonApiClient(getHttpClient());
+            return apiClient.authorizedGenerateGetResponse(identifier);
         } else {
             logger.info("requester is NOT authorized, requestInfo.getAccessRights()={}", requestInfo.getAccessRights());
-            return apiClient;
+            return apiClient.generateGetResponse(identifier);
         }
     }
 

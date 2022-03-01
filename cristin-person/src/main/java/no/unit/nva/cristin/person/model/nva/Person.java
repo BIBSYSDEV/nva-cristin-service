@@ -1,5 +1,21 @@
 package no.unit.nva.cristin.person.model.nva;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import no.unit.nva.cristin.person.model.cristin.CristinPerson;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonSerializable;
+
+import java.net.URI;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.common.Utils.distinctByKey;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
@@ -10,28 +26,11 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DET
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.net.URI;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import no.unit.nva.cristin.person.model.cristin.CristinPerson;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 
 @JacocoGenerated
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
 public class Person implements JsonSerializable {
-
-    @JsonIgnore
-    public static final String NATIONAL_IDENTITY_NUMBER = "NationalIdentificationNumber";
 
     @JsonProperty(TYPE)
     private static final String type = "Person";
@@ -50,6 +49,10 @@ public class Person implements JsonSerializable {
     private URI image;
     @JsonProperty(AFFILIATIONS)
     private Set<Affiliation> affiliations;
+    @JsonProperty(JsonPropertyNames.NATIONAL_IDENTITY_NUMBER)
+    private String norwegianNationalId;
+    @JsonProperty(RESERVED)
+    private Boolean reserved;
 
     private Person() {
 
@@ -138,6 +141,22 @@ public class Person implements JsonSerializable {
         this.names = names;
     }
 
+    public String getNorwegianNationalId() {
+        return norwegianNationalId;
+    }
+
+    public void setNorwegianNationalId(String norwegianNationalId) {
+        this.norwegianNationalId = norwegianNationalId;
+    }
+
+    public Boolean getReserved() {
+        return reserved;
+    }
+
+    public void setReserved(Boolean reserved) {
+        this.reserved = reserved;
+    }
+
     /**
      * Converts this object to an appropriate format for POST to Cristin.
      */
@@ -151,7 +170,7 @@ public class Person implements JsonSerializable {
         cristinPersonPost.setSurnamePreferred(namesMap.get(CristinPerson.PREFERRED_LAST_NAME));
 
         Map<String, String> identifierMap = convertTypedValuesToMap(getIdentifiers());
-        cristinPersonPost.setNorwegianNationalId(identifierMap.get(NATIONAL_IDENTITY_NUMBER));
+        cristinPersonPost.setNorwegianNationalId(identifierMap.get(JsonPropertyNames.NATIONAL_IDENTITY_NUMBER));
 
         return cristinPersonPost;
     }
@@ -235,6 +254,16 @@ public class Person implements JsonSerializable {
 
         public Builder withAffiliations(Set<Affiliation> affiliations) {
             person.setAffiliations(affiliations);
+            return this;
+        }
+
+        public Builder withNorwegianNationalId(String norwegianNationalId) {
+            person.setNorwegianNationalId(norwegianNationalId);
+            return this;
+        }
+
+        public Builder withReserved(Boolean reserved) {
+            person.setReserved(reserved);
             return this;
         }
 
