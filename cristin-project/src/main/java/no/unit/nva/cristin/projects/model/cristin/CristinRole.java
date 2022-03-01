@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import no.unit.nva.cristin.model.CristinInstitution;
+import no.unit.nva.cristin.model.CristinUnit;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
