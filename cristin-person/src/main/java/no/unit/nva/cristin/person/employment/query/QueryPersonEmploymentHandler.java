@@ -1,12 +1,15 @@
 package no.unit.nva.cristin.person.employment.query;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PERSON_ID;
+import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
+import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
-import java.net.http.HttpClient;
+import java.util.List;
 import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.utils.AccessUtils;
@@ -24,7 +27,7 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Search
     @SuppressWarnings("unused")
     @JacocoGenerated
     public QueryPersonEmploymentHandler() {
-        this(new QueryPersonEmploymentClient(HttpClient.newHttpClient()), new Environment());
+        this(new QueryPersonEmploymentClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
 
     public QueryPersonEmploymentHandler(QueryPersonEmploymentClient apiClient, Environment environment) {
@@ -54,6 +57,11 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Search
     @Override
     protected Integer getSuccessStatusCode(Void input, SearchResponse<CristinPersonEmployment> output) {
         return HttpURLConnection.HTTP_OK;
+    }
+
+    @Override
+    protected List<MediaType> listSupportedMediaTypes() {
+        return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
     private boolean isValidIdentifier(String identifier) {

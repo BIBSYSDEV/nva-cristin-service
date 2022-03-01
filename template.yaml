@@ -299,6 +299,7 @@ Resources:
       Handler: no.unit.nva.cristin.person.employment.query.QueryPersonEmploymentHandler::handleRequest
       Runtime: java11
       MemorySize: 512
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinQueryPersonEmploymentEvent:
           Type: Api

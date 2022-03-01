@@ -31,6 +31,9 @@ public class QueryPersonEmploymentClient extends ApiClient {
         super(client);
     }
 
+    /**
+     * Fetches Cristin data from upstream into response object serialized to client.
+     */
     public SearchResponse<CristinPersonEmployment> generateQueryResponse(String identifier) throws ApiGatewayException {
         long startRequestTime = System.currentTimeMillis();
         URI cristinUri = generateCristinUri(identifier);
