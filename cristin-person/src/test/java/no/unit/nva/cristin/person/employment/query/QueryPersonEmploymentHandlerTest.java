@@ -21,12 +21,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
+import java.nio.file.Path;
 import java.util.Map;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +36,11 @@ public class QueryPersonEmploymentHandlerTest {
 
     private static final String VALID_PERSON_ID = "123456";
     private static final String INVALID_IDENTIFIER = "hello";
-    private static final String DUMMY_RESPONSE = "[{\"id\": \"123456\"}]";
     private static final String EMPTY_ARRAY = "[]";
+    private static final String CRISTIN_QUERY_RESPONSE_JSON =
+        "cristinQueryEmploymentResponse.json";
+    private static final String DUMMY_CRISTIN_RESPONSE =
+        IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_JSON));
 
     private final HttpClient clientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -46,7 +51,7 @@ public class QueryPersonEmploymentHandlerTest {
 
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
-        when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(DUMMY_RESPONSE, 200));
+        when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(DUMMY_CRISTIN_RESPONSE, 200));
         apiClient = new QueryPersonEmploymentClient(clientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
@@ -62,10 +67,12 @@ public class QueryPersonEmploymentHandlerTest {
     }
 
     @Test
-    void shouldReturnStatusOkWhenCallingHandlerWithValidIdentifier() throws IOException {
+    void shouldReturnStatusOkWithDummyHitsWhenCallingHandlerWithValidIdentifier() throws IOException {
         GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
+        SearchResponse response = gatewayResponse.getBodyObject(SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(response.getHits().size(), equalTo(2));
     }
 
     @Test
