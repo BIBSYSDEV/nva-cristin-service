@@ -7,6 +7,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -16,7 +17,7 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, CristinPersonEmployment> {
+public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, SearchResponse<CristinPersonEmployment>> {
 
     private final transient QueryPersonEmploymentClient apiClient;
 
@@ -32,14 +33,14 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Cristi
     }
 
     @Override
-    protected CristinPersonEmployment processInput(Void input, RequestInfo requestInfo, Context context)
+    protected SearchResponse<CristinPersonEmployment> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
 
         String identifier = getValidPersonId(requestInfo);
 
-        return apiClient.queryUpstreamUsingIdentifier(identifier);
+        return apiClient.generateQueryResponse(identifier);
     }
 
     private String getValidPersonId(RequestInfo requestInfo) throws BadRequestException {
@@ -51,7 +52,7 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Cristi
     }
 
     @Override
-    protected Integer getSuccessStatusCode(Void input, CristinPersonEmployment output) {
+    protected Integer getSuccessStatusCode(Void input, SearchResponse<CristinPersonEmployment> output) {
         return HttpURLConnection.HTTP_OK;
     }
 

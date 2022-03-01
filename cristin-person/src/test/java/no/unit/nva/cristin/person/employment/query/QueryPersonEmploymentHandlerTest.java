@@ -33,6 +33,7 @@ public class QueryPersonEmploymentHandlerTest {
 
     private static final String VALID_PERSON_ID = "123456";
     private static final String INVALID_IDENTIFIER = "hello";
+    private static final String DUMMY_RESPONSE = "[{\"id\": \"123456\"}]";
 
     private final HttpClient clientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -43,7 +44,7 @@ public class QueryPersonEmploymentHandlerTest {
 
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
-        when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_STRING, 200));
+        when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(DUMMY_RESPONSE, 200));
         apiClient = new QueryPersonEmploymentClient(clientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
