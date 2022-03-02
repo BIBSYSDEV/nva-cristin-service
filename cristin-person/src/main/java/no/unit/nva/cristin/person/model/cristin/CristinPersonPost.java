@@ -12,10 +12,12 @@ public class CristinPersonPost extends CristinPerson implements JsonSerializable
 
     private String norwegianNationalId;
 
+    @Override
     public String getNorwegianNationalId() {
         return norwegianNationalId;
     }
 
+    @Override
     public void setNorwegianNationalId(String norwegianNationalId) {
         this.norwegianNationalId = norwegianNationalId;
     }

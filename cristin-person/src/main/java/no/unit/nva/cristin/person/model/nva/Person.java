@@ -1,5 +1,21 @@
 package no.unit.nva.cristin.person.model.nva;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import no.unit.nva.cristin.person.model.cristin.CristinPerson;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.JsonSerializable;
+
+import java.net.URI;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.common.Utils.distinctByKey;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
@@ -10,28 +26,12 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DET
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.net.URI;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import no.unit.nva.cristin.person.model.cristin.CristinPerson;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 
 @JacocoGenerated
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
 public class Person implements JsonSerializable {
-
-    @JsonIgnore
-    public static final String NATIONAL_IDENTITY_NUMBER = "NationalIdentificationNumber";
 
     @JsonProperty(TYPE)
     private static final String type = "Person";
@@ -50,6 +50,10 @@ public class Person implements JsonSerializable {
     private URI image;
     @JsonProperty(AFFILIATIONS)
     private Set<Affiliation> affiliations;
+    @JsonProperty(NATIONAL_IDENTITY_NUMBER)
+    private String norwegianNationalId;
+    @JsonProperty(RESERVED)
+    private Boolean reserved;
 
     private Person() {
 
@@ -136,6 +140,22 @@ public class Person implements JsonSerializable {
 
     public void setNames(Set<TypedValue> names) {
         this.names = names;
+    }
+
+    public String getNorwegianNationalId() {
+        return norwegianNationalId;
+    }
+
+    public void setNorwegianNationalId(String norwegianNationalId) {
+        this.norwegianNationalId = norwegianNationalId;
+    }
+
+    public Boolean getReserved() {
+        return reserved;
+    }
+
+    public void setReserved(Boolean reserved) {
+        this.reserved = reserved;
     }
 
     /**
@@ -235,6 +255,16 @@ public class Person implements JsonSerializable {
 
         public Builder withAffiliations(Set<Affiliation> affiliations) {
             person.setAffiliations(affiliations);
+            return this;
+        }
+
+        public Builder withNorwegianNationalId(String norwegianNationalId) {
+            person.setNorwegianNationalId(norwegianNationalId);
+            return this;
+        }
+
+        public Builder withReserved(Boolean reserved) {
+            person.setReserved(reserved);
             return this;
         }
 

@@ -1,5 +1,32 @@
 package no.unit.nva.cristin.person.handler;
 
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.HttpHeaders;
+import no.unit.nva.cristin.person.client.CristinPersonApiClient;
+import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
+import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
+import nva.commons.core.paths.UriWrapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpConnectTimeoutException;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
+
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
@@ -20,31 +47,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.HttpHeaders;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpConnectTimeoutException;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
-import no.unit.nva.cristin.person.client.CristinPersonApiClient;
-import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
-import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.Environment;
-import nva.commons.core.ioutils.IoUtils;
-import nva.commons.core.paths.UriWrapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 public class FetchCristinPersonHandlerTest {
 

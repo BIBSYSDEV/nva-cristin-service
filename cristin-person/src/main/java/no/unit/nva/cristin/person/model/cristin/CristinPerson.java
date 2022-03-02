@@ -1,12 +1,15 @@
 package no.unit.nva.cristin.person.model.cristin;
 
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.model.Constants.HTTPS;
-import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import no.unit.nva.cristin.person.model.nva.Affiliation;
+import no.unit.nva.cristin.person.model.nva.ContactDetails;
+import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.TypedValue;
+import nva.commons.core.JacocoGenerated;
+import nva.commons.core.paths.UriWrapper;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
@@ -15,12 +18,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import no.unit.nva.cristin.person.model.nva.Affiliation;
-import no.unit.nva.cristin.person.model.nva.ContactDetails;
-import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.cristin.person.model.nva.TypedValue;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.paths.UriWrapper;
+
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
@@ -49,6 +51,8 @@ public class CristinPerson {
     private String tel;
     private String pictureUrl;
     private List<CristinAffiliation> affiliations;
+    private Boolean reserved;
+    private String norwegianNationalId;
 
     public String getCristinPersonId() {
         return cristinPersonId;
@@ -122,6 +126,24 @@ public class CristinPerson {
         this.affiliations = affiliations;
     }
 
+
+    public String getNorwegianNationalId() {
+        return norwegianNationalId;
+    }
+
+    public void setNorwegianNationalId(String norwegianNationalId) {
+        this.norwegianNationalId = norwegianNationalId;
+    }
+
+    public Boolean getReserved() {
+        return reserved;
+    }
+
+    public void setReserved(Boolean reserved) {
+        this.reserved = reserved;
+    }
+
+
     /**
      * Creates a Nva person model from a Cristin person model.
      *
@@ -135,6 +157,8 @@ public class CristinPerson {
             .withContactDetails(extractContactDetails())
             .withImage(extractImage())
             .withAffiliations(extractAffiliations())
+            .withNorwegianNationalId(getNorwegianNationalId())
+            .withReserved(getReserved())
             .build();
     }
 
