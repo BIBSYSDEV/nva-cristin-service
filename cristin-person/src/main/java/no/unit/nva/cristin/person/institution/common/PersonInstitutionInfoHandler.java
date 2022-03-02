@@ -1,8 +1,10 @@
 package no.unit.nva.cristin.person.institution.common;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PERSON_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.common.Utils.removeUnitPartFromIdentifierIfPresent;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static nva.commons.core.attempt.Try.attempt;
 import com.google.common.net.MediaType;
 import java.util.List;
@@ -14,10 +16,8 @@ import nva.commons.core.Environment;
 
 public abstract class PersonInstitutionInfoHandler<I, O> extends ApiGatewayHandler<I, O> {
 
-    public static final String PERSON_ID = "id";
     public static final String ORG_ID = "orgId";
     public static final String INVALID_ORGANIZATION_ID = "Invalid path parameter for organization id";
-    public static final String INVALID_PERSON_ID = "Invalid path parameter for person id";
 
     public PersonInstitutionInfoHandler(Class<I> iclass, Environment environment) {
         super(iclass, environment);
@@ -39,7 +39,7 @@ public abstract class PersonInstitutionInfoHandler<I, O> extends ApiGatewayHandl
         if (isValidIdentifier(identifier)) {
             return identifier;
         }
-        throw new BadRequestException(INVALID_PERSON_ID);
+        throw new BadRequestException(ERROR_MESSAGE_INVALID_PERSON_ID);
     }
 
     protected String getValidOrgId(RequestInfo requestInfo) throws BadRequestException {

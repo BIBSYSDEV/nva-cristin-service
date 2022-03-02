@@ -1,16 +1,16 @@
 package no.unit.nva.cristin.person.institution.fetch;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PERSON_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.INVALID_ORGANIZATION_ID;
-import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.INVALID_PERSON_ID;
 import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.ORG_ID;
-import static no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler.PERSON_ID;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -118,7 +118,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(FetchPersonInstitutionInfoHandler.INVALID_PERSON_ID));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PERSON_ID));
     }
 
     @Test
@@ -139,7 +139,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(INVALID_PERSON_ID));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PERSON_ID));
     }
 
     @Test

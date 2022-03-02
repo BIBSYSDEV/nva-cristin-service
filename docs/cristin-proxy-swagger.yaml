@@ -636,6 +636,57 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /person/{id}/employment:
+    parameters:
+      - name: id
+        in: path
+        description: Identifier of Person
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]+$'
+        example: '359084'
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinQueryPersonEmploymentFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Fetch person employments by identifier
+      description: Returns all person employments
+      operationId: GetPersonEmploymentsByIdentifier
+      security:
+        - CognitoUserPool: [ ]
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonEmployment'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonEmploymentExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PersonEmployment'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonEmploymentExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
   /position:
     get:
       x-amazon-apigateway-integration:
@@ -1274,6 +1325,12 @@ components:
             $ref: '#/components/schemas/Languages'
         enabled:
           type: boolean
+    PersonEmployment:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Person identifier
 
   examples:
     ProjectsExample:
@@ -1627,6 +1684,9 @@ components:
             name:
               en: Academic adviser
             enabled: true
+    PersonEmploymentExample:
+      value:
+        identifier: '359084'
   securitySchemes:
     CognitoUserPool:
       type: apiKey
