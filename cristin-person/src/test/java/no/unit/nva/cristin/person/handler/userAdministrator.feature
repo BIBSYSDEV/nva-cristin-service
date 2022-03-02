@@ -6,10 +6,13 @@ Feature: API tests for Cristin Person fetch
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     * def username = java.lang.System.getenv('TESTUSER_FEIDE_ID')
     * def password = java.lang.System.getenv('TESTUSER_PASSWORD')
+    * def simple_user_name = java.lang.System.getenv('SIMPLE_TESTUSER_FEIDE_ID')
+    * def simple_user_password = java.lang.System.getenv('SIMPLE_TESTUSER_PASSWORD')
     * def cognitoClientAppId = java.lang.System.getenv('COGNITO_CLIENT_APP_ID')
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
     * def token = tokenGenerator.loginUser(username, password, cognitoUserpoolId, cognitoClientAppId)
+    * def simpleUserToken = tokenGenerator.loginUser(simple_user_name, simple_user_password, cognitoUserpoolId, cognitoClientAppId)
     * def samplePersonIdentifier = '515114'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
     Given url CRISTIN_BASE
@@ -17,20 +20,27 @@ Feature: API tests for Cristin Person fetch
 #    * print 'token:' + token
 
 
-  Scenario: Fetch returns unclassified person data when no authorization
+  Scenario: Fetch returns unclassified person data when authenticated but not authorized
     Given path '/person/' + samplePersonIdentifier
+    * header Authorization = 'Bearer ' + simpleUserToken
     When method GET
     Then status 200
     And print response
 
 
-  Scenario: Fetch returns classified person data when authorized
+  Scenario: Fetch returns classified person data when authenticated and authorized
     Given path '/person/' + samplePersonIdentifier
     And header Authorization = 'Bearer ' + token
     And request
     When method GET
     Then status 200
     And print response
+
+  Scenario: Fetch returns 401 Unauthorized when not authenticated
+    Given path '/person/' + samplePersonIdentifier
+    And request
+    When method GET
+    Then status 401
 
 
   Scenario: Fetch returns status Not found when requesting unknown person identifier

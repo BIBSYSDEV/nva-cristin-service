@@ -41,6 +41,8 @@ public class CognitoUtil {
     public static final String REGION = "eu-west-1";
     public static final String TESTUSER_FEIDE_ID_KEY = "TESTUSER_FEIDE_ID";
     public static final String TESTUSER_PASSWORD_KEY = "TESTUSER_PASSWORD";
+    public static final String SIMPLE_TESTUSER_FEIDE_ID_KEY = "SIMPLE_TESTUSER_FEIDE_ID";
+    public static final String SIMPLE_TESTUSER_PASSWORD_KEY = "SIMPLE_TESTUSER_PASSWORD";
     public static final String COGNITO_CLIENT_APP_ID_KEY = "COGNITO_CLIENT_APP_ID";
     public static final String COGNITO_USER_POOL_ID_KEY = "COGNITO_USER_POOL_ID";
 
