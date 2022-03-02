@@ -292,6 +292,21 @@ Resources:
             Path: /position/
             Method: get
 
+  NvaCristinQueryPersonEmploymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.employment.query.QueryPersonEmploymentHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Events:
+        NvaCristinQueryPersonEmploymentEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}/employment/
+            Method: get
+
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
