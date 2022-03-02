@@ -17,7 +17,6 @@ Feature: API tests for Cristin Person fetch
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
-#    * print 'token:' + token
 
 
   Scenario: Fetch returns unclassified person data when authenticated but not authorized
@@ -25,6 +24,7 @@ Feature: API tests for Cristin Person fetch
     * header Authorization = 'Bearer ' + simpleUserToken
     When method GET
     Then status 200
+    And response.NationalIdentificationNumber != '#present'
     And print response
 
 
@@ -34,6 +34,7 @@ Feature: API tests for Cristin Person fetch
     And request
     When method GET
     Then status 200
+    And response.NationalIdentificationNumber == '#present'
     And print response
 
   Scenario: Fetch returns 401 Unauthorized when not authenticated
@@ -52,3 +53,13 @@ Feature: API tests for Cristin Person fetch
     And match response.title == 'Not Found'
     And match response.status == 404
     And match response.detail == "No match found for supplied payload"
+
+  Scenario: Fetch returns status 403 Forbidden when not authorized
+    Given path '/person/identityNumber'
+    And header Authorization = 'Bearer ' + simpleUserToken
+    And request { type : NationalIdentificationNumber, value : '07117631634' }
+    When method POST
+    Then status 403
+    And match response.title == 'Forbidden'
+    And match response.status == 403
+
