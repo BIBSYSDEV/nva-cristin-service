@@ -21,6 +21,7 @@ import static no.unit.nva.cristin.common.Utils.distinctByKey;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.*;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AFFILIATIONS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IDENTIFIERS;
@@ -49,7 +50,7 @@ public class Person implements JsonSerializable {
     private URI image;
     @JsonProperty(AFFILIATIONS)
     private Set<Affiliation> affiliations;
-    @JsonProperty(JsonPropertyNames.NATIONAL_IDENTITY_NUMBER)
+    @JsonProperty(NATIONAL_IDENTITY_NUMBER)
     private String norwegianNationalId;
     @JsonProperty(RESERVED)
     private Boolean reserved;
@@ -170,7 +171,7 @@ public class Person implements JsonSerializable {
         cristinPersonPost.setSurnamePreferred(namesMap.get(CristinPerson.PREFERRED_LAST_NAME));
 
         Map<String, String> identifierMap = convertTypedValuesToMap(getIdentifiers());
-        cristinPersonPost.setNorwegianNationalId(identifierMap.get(JsonPropertyNames.NATIONAL_IDENTITY_NUMBER));
+        cristinPersonPost.setNorwegianNationalId(identifierMap.get(NATIONAL_IDENTITY_NUMBER));
 
         return cristinPersonPost;
     }
