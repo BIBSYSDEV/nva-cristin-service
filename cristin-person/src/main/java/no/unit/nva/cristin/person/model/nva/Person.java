@@ -21,12 +21,12 @@ import static no.unit.nva.cristin.common.Utils.distinctByKey;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
-import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.*;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AFFILIATIONS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 
 @JacocoGenerated

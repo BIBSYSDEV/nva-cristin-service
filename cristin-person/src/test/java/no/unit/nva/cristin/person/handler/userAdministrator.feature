@@ -18,15 +18,6 @@ Feature: API tests for Cristin Person fetch
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
 
-
-  Scenario: Fetch returns unclassified person data when authenticated but not authorized
-    Given path '/person/' + samplePersonIdentifier
-    * header Authorization = 'Bearer ' + simpleUserToken
-    When method GET
-    Then status 200
-    And response.NationalIdentificationNumber != '#present'
-
-
   Scenario: Fetch returns classified person data when authenticated and authorized
     Given path '/person/' + samplePersonIdentifier
     And header Authorization = 'Bearer ' + token
@@ -35,22 +26,12 @@ Feature: API tests for Cristin Person fetch
     Then status 200
     And response.NationalIdentificationNumber == '#present'
 
-  Scenario: Fetch returns 401 Unauthorized when not authenticated
+  Scenario: Fetch returns unclassified person data when authenticated but not authorized
     Given path '/person/' + samplePersonIdentifier
-    And request
+    * header Authorization = 'Bearer ' + simpleUserToken
     When method GET
-    Then status 401
-
-
-  Scenario: Fetch returns status Not found when requesting unknown person identifier
-    Given path '/person/identityNumber'
-    And header Authorization = 'Bearer ' + token
-    And request { type : NationalIdentificationNumber, value : '11077941012' }
-    When method POST
-    Then status 404
-    And match response.title == 'Not Found'
-    And match response.status == 404
-    And match response.detail == "No match found for supplied payload"
+    Then status 200
+    And response.NationalIdentificationNumber != '#present'
 
   Scenario: Fetch returns status 403 Forbidden when not authorized
     Given path '/person/identityNumber'
@@ -61,3 +42,18 @@ Feature: API tests for Cristin Person fetch
     And match response.title == 'Forbidden'
     And match response.status == 403
 
+  Scenario: Fetch returns 401 Unauthorized when not authenticated
+    Given path '/person/' + samplePersonIdentifier
+    And request
+    When method GET
+    Then status 401
+
+  Scenario: Fetch returns status Not found when requesting unknown person identifier
+    Given path '/person/identityNumber'
+    And header Authorization = 'Bearer ' + token
+    And request { type : NationalIdentificationNumber, value : '11077941012' }
+    When method POST
+    Then status 404
+    And match response.title == 'Not Found'
+    And match response.status == 404
+    And match response.detail == "No match found for supplied payload"
