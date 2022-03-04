@@ -36,6 +36,9 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     private static final Set<String> REQUIRED_NAMES = Set.of(CristinPerson.FIRST_NAME, CristinPerson.LAST_NAME);
     public static final String ERROR_MESSAGE_MISSING_REQUIRED_NAMES =
         String.format("Missing required names: %s", REQUIRED_NAMES);
+    public static final String ERROR_MESSAGE_IDENTIFIERS_REPEATED =
+            String.format("Unique identifier %s is repeated", NATIONAL_IDENTITY_NUMBER);
+    public static final int MAX_NATIONAL_IDENTITY_NUMBER_COUNT = 1;
 
     private final transient CreateCristinPersonApiClient apiClient;
 
@@ -57,6 +60,7 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
 
         validateContainsPayload(input);
         validateContainsRequiredNames(extractIdentifiers(input.getNames()));
+        validateNoDuplicateNationalIdentifiers(input.getIdentifiers());
         validateContainsRequiredIdentifiers(extractIdentifiers(input.getIdentifiers()));
         validateValidIdentificationNumber(extractIdentificationNumber(input.getIdentifiers()));
 
@@ -110,5 +114,14 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
             return;
         }
         throw new BadRequestException(ERROR_MESSAGE_IDENTIFIER_NOT_VALID);
+    }
+
+    private void validateNoDuplicateNationalIdentifiers(Set<TypedValue> identifiers) throws BadRequestException {
+        if (identifiers.stream().map(TypedValue::getType)
+                .filter(type ->  NATIONAL_IDENTITY_NUMBER.equals(type))
+                .collect(Collectors.toList())
+                .size() > MAX_NATIONAL_IDENTITY_NUMBER_COUNT) {
+            throw new BadRequestException(ERROR_MESSAGE_IDENTIFIERS_REPEATED);
+        }
     }
 }
