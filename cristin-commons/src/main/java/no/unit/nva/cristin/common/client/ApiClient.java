@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static no.unit.nva.cristin.common.client.CristinAuthenticator.basicAuthHeader;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
@@ -46,6 +47,7 @@ public class ApiClient {
     public static final int MAX_EFFORTS = 2;
     public static final int WAITING_TIME = 500; //500 milliseconds
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
+    public static final String AUTHORIZATION = "Authorization";
 
     private final transient HttpClient client;
 
@@ -68,6 +70,14 @@ public class ApiClient {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
+
+    public HttpResponse<String> fetchGetResultWithAuthentication(URI uri) throws ApiGatewayException {
+        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
+                .headers(AUTHORIZATION, basicAuthHeader())
+                .build();
+        return getSuccessfulResponseOrThrowException(httpRequest);
+    }
+
 
     public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();

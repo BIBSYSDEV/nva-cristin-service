@@ -1,12 +1,7 @@
 package no.unit.nva.cristin.person.create;
 
-import static java.util.Objects.isNull;
-import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.person.model.nva.Person.NATIONAL_IDENTITY_NUMBER;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
-import java.util.List;
-import java.util.stream.Collectors;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -22,8 +17,14 @@ import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
+import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 
 public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person> {
 

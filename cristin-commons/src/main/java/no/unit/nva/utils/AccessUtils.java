@@ -46,6 +46,11 @@ public class AccessUtils {
         return !requestInfo.getAccessRights().contains(EDIT_OWN_INSTITUTION_USERS);
     }
 
+    public static boolean requesterIsUserAdministrator(RequestInfo requestInfo) {
+        return requestInfo.getAccessRights().contains(EDIT_OWN_INSTITUTION_USERS);
+    }
+
+
     private static boolean requesterHasNoAccessRightToEditProjects(RequestInfo requestInfo) {
         return !requestInfo.getAccessRights().contains(EDIT_OWN_INSTITUTION_PROJECTS);
     }

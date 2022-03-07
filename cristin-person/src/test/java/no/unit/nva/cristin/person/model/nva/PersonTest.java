@@ -1,11 +1,13 @@
 package no.unit.nva.cristin.person.model.nva;
 
-import static no.unit.nva.cristin.person.model.nva.Person.NATIONAL_IDENTITY_NUMBER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.util.Set;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
+
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PersonTest {
 
