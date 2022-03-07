@@ -429,6 +429,15 @@ paths:
         502:
           $ref: '#/components/responses/502'
   /person/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: ID of person
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]+$'
+        example: '359084'
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -442,15 +451,6 @@ paths:
       operationId: GetPersonById
       security:
         - CognitoUserPool: [ ]
-      parameters:
-        - name: id
-          in: path
-          description: ID of person to return
-          required: true
-          schema:
-            type: string
-            pattern: '^[0-9]+$'
-          example: '359084'
       responses:
         200:
           description: successful operation
@@ -471,6 +471,57 @@ paths:
           $ref: '#/components/responses/400'
         404:
           $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+    patch:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinUpdatePersonFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Update person matching identifier
+      description: Updates person data
+      operationId: UpdatePerson
+      security:
+        - CognitoUserPool: [ ]
+      requestBody:
+        description: Payload containing one or more fields. Fields except reserved, FirstName and LastName can be set to null to erase content
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonPatch'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonPatchExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/PersonPatch'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonPatchExample'
+      responses:
+        204:
+          description: Successful update of resource
+          content:
+            application/json:
+              schema:
+                type: string
+                example: '{}'
+            application/ld+json:
+              schema:
+                type: string
+                example: '{}'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
         500:
           $ref: '#/components/responses/500'
         502:
@@ -1247,6 +1298,26 @@ components:
                 type: string
                 pattern: '.+'
                 description: Value of identifier
+    PersonPatch: # Depends on future datamodel
+      type: object
+      properties:
+        names:
+          type: array
+          description: Names for this person.
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'PreferredFirstName|PreferredLastName|FirstName|LastName'
+                description: Name of identifier
+              value:
+                type: string
+                pattern: '.+'
+                description: Value of identifier
+        reserved:
+          type: boolean
+          description: If person should hidden from public view
     PersonNIN:
       type: object
       properties:
@@ -1627,6 +1698,18 @@ components:
               labels:
                 en: 'Head Engineer'
                 nb: 'Overingeniør'
+    PersonPatchExample:
+      value:
+        names:
+          - type: 'PreferredFirstName'
+            value: 'Ola'
+          - type: 'PreferredLastName'
+            value: 'Nordmann'
+          - type: 'FirstName'
+            value: 'Kjell Ola'
+          - type: 'LastName'
+            value: 'Nordmann'
+        reserved: false
     PersonPostExample:
       value:
         identifiers:
