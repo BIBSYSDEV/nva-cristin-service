@@ -13,6 +13,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUE
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.utils.SqlRecognizer.containsSqlInjectionFragmentCandidate;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
@@ -63,7 +64,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
                 return false;
             }
         }
-        return true;
+        return !containsSqlInjectionFragmentCandidate(str);
     }
 
     private boolean isUnsupportedCharacter(Character c) {
