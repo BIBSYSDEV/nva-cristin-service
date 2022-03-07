@@ -3,10 +3,11 @@ package no.unit.nva.cristin.person.employment.query;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PERSON_ID;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
+import static no.unit.nva.cristin.person.employment.query.QueryPersonEmploymentClient.BAD_REQUEST_FROM_UPSTREAM;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
-import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,12 +21,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
+import java.nio.file.Path;
 import java.util.Map;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +36,11 @@ public class QueryPersonEmploymentHandlerTest {
 
     private static final String VALID_PERSON_ID = "123456";
     private static final String INVALID_IDENTIFIER = "hello";
+    private static final String EMPTY_ARRAY = "[]";
+    private static final String CRISTIN_QUERY_RESPONSE_JSON =
+        "cristinQueryEmploymentResponse.json";
+    private static final String DUMMY_CRISTIN_RESPONSE =
+        IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_JSON));
 
     private final HttpClient clientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -43,7 +51,7 @@ public class QueryPersonEmploymentHandlerTest {
 
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
-        when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_STRING, 200));
+        when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(DUMMY_CRISTIN_RESPONSE, 200));
         apiClient = new QueryPersonEmploymentClient(clientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
@@ -52,28 +60,57 @@ public class QueryPersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
-        GatewayResponse<CristinPersonEmployment> gatewayResponse = queryWithoutRequiredAccessRights();
+        GatewayResponse<SearchResponse> gatewayResponse = queryWithoutRequiredAccessRights();
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @Test
-    void shouldReturnStatusOkWhenCallingHandlerWithValidIdentifier() throws IOException {
-        GatewayResponse<CristinPersonEmployment> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
+    void shouldReturnStatusOkWithDummyHitsWhenCallingHandlerWithValidIdentifier() throws IOException {
+        GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
+        SearchResponse response = gatewayResponse.getBodyObject(SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(response.getHits().size(), equalTo(2));
     }
 
     @Test
     void shouldReturnBadRequestWhenCallingHandlerWithInvalidIdentifier() throws IOException {
-        GatewayResponse<CristinPersonEmployment> gatewayResponse = sendQuery(Map.of(PERSON_ID, INVALID_IDENTIFIER));
+        GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, INVALID_IDENTIFIER));
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PERSON_ID));
     }
 
-    private GatewayResponse<CristinPersonEmployment> queryWithoutRequiredAccessRights() throws IOException {
+    @Test
+    void shouldReturnEmptySearchResponseWhenUpstreamReturnsZeroHits() throws IOException, InterruptedException {
+        when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_ARRAY, 200));
+        apiClient = new QueryPersonEmploymentClient(clientMock);
+        handler = new QueryPersonEmploymentHandler(apiClient, environment);
+
+        GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
+        SearchResponse response = gatewayResponse.getBodyObject(SearchResponse.class);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(response.getHits().size(), equalTo(0));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenUpstreamReturnsBadRequestIndicatingIdentifierNotFound()
+        throws IOException, InterruptedException {
+
+        when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_ARRAY, 400));
+        apiClient = new QueryPersonEmploymentClient(clientMock);
+        handler = new QueryPersonEmploymentHandler(apiClient, environment);
+
+        GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(BAD_REQUEST_FROM_UPSTREAM));
+    }
+
+    private GatewayResponse<SearchResponse> queryWithoutRequiredAccessRights() throws IOException {
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID))
             .build();
@@ -82,7 +119,7 @@ public class QueryPersonEmploymentHandlerTest {
         return GatewayResponse.fromOutputStream(output);
     }
 
-    private GatewayResponse<CristinPersonEmployment> sendQuery(Map<String, String> pathParam)
+    private GatewayResponse<SearchResponse> sendQuery(Map<String, String> pathParam)
         throws IOException {
 
         InputStream input = requestWithParams(pathParam);

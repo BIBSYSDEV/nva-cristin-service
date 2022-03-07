@@ -42,3 +42,20 @@ Feature: API tests for Cristin Person Employments
     When method GET
     Then status 400
     And match response.detail == 'Invalid path parameter for person id'
+
+  Scenario Outline: Query returns valid data and with correct content negotiation <CONTENT_TYPE>
+    Given path '/person/' + personIdentifier + '/employment/'
+    * header Authorization = 'Bearer ' + token
+    * header Accept = <CONTENT_TYPE>
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.id == '#present'
+    And match response.size == '#present'
+    And match response.hits == '#present'
+
+    Examples:
+      | CONTENT_TYPE          |
+      | 'application/ld+json' |
+      | 'application/json'    |

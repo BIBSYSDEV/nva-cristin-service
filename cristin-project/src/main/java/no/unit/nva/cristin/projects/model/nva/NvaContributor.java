@@ -4,8 +4,8 @@ import static no.unit.nva.cristin.model.CristinInstitution.fromOrganization;
 import static no.unit.nva.cristin.model.JsonPropertyNames.AFFILIATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTITY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
-import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.extractUnitIdentifier;
-import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.fromCristinUnitIdentifier;
+import static no.unit.nva.cristin.model.CristinUnit.extractUnitIdentifier;
+import static no.unit.nva.cristin.model.CristinUnit.fromCristinUnitIdentifier;
 import static no.unit.nva.utils.ContributorRoleMapping.getCristinRole;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Collections;
@@ -14,7 +14,7 @@ import java.util.Objects;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
-import no.unit.nva.cristin.projects.model.cristin.CristinUnit;
+import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.model.Organization;
 
 @SuppressWarnings("unused")
