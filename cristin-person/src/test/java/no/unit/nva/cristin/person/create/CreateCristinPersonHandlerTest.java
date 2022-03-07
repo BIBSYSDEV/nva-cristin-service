@@ -9,6 +9,7 @@ import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.when;
 public class CreateCristinPersonHandlerTest {
 
     private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
+    private static final String ANOTHER_IDENTITY_NUMBER = "12111739534";
     private static final String INVALID_IDENTITY_NUMBER = "11223344556";
     private static final String EMPTY_JSON = "{}";
     private static final String DUMMY_FIRST_NAME = randomString();
@@ -47,8 +49,8 @@ public class CreateCristinPersonHandlerTest {
     private static final String DUMMY_CRISTIN_ID = "123456";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
-    private CreateCristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
+    private CreateCristinPersonApiClient apiClient;
     private Context context;
     private ByteArrayOutputStream output;
     private CreateCristinPersonHandler handler;
@@ -87,15 +89,15 @@ public class CreateCristinPersonHandlerTest {
     @Test
     void shouldReturnBadRequestWhenClientPayloadIsMissingRequiredIdentifier() throws Exception {
         Person personWithMissingIdentity = new Person.Builder()
-            .withNames(Set.of(new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
-                new TypedValue(LAST_NAME, DUMMY_LAST_NAME))).build();
+                .withNames(Set.of(new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
+                        new TypedValue(LAST_NAME, DUMMY_LAST_NAME))).build();
 
         GatewayResponse<Person> gatewayResponse = sendQuery(personWithMissingIdentity);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-            containsString(CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_IDENTIFIER));
+                containsString(CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_IDENTIFIER));
     }
 
     @Test
@@ -122,26 +124,50 @@ public class CreateCristinPersonHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-            containsString(CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIER_NOT_VALID));
+                containsString(CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIER_NOT_VALID));
     }
 
     @Test
     void shouldReturnBadRequestWhenMissingRequiredNames() throws IOException {
         Person personWithMissingNames = new Person.Builder()
-            .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER))).build();
+                .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER))).build();
 
         GatewayResponse<Person> gatewayResponse = sendQuery(personWithMissingNames);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-            containsString(CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_REQUIRED_NAMES));
+                containsString(CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_REQUIRED_NAMES));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenRepeatedIdentityNumber() throws IOException, BadRequestException {
+
+        Person dummyPersonWithRepeatedIdentityNumber = getPersonWithRepeatedIdentityNumber();
+
+        GatewayResponse<Person> gatewayResponse = sendQuery(dummyPersonWithRepeatedIdentityNumber);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(gatewayResponse.getBody(),
+                containsString(CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_REPEATED));
+    }
+
+    private Person getPersonWithRepeatedIdentityNumber() {
+        return new Person.Builder()
+                .withNames(Set.of(
+                        new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
+                        new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
+                .withIdentifiers(Set.of(
+                        new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER),
+                        new TypedValue(NATIONAL_IDENTITY_NUMBER, ANOTHER_IDENTITY_NUMBER)))
+                .build();
     }
 
     private GatewayResponse<Person> sendQueryWithoutAccessRights(Person body) throws IOException {
         InputStream input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
-            .withBody(body)
-            .build();
+                .withBody(body)
+                .build();
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
     }
@@ -154,23 +180,27 @@ public class CreateCristinPersonHandlerTest {
 
     private InputStream requestWithBody(Person body) throws JsonProcessingException {
         return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
-            .withBody(body)
-            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
-            .build();
+                .withBody(body)
+                .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
+                .build();
     }
 
     private Person dummyPerson() {
         return new Person.Builder()
-            .withNames(Set.of(new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME), new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
-            .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER)))
-            .build();
+                .withNames(Set.of(
+                        new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
+                        new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
+                .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER)))
+                .build();
     }
 
     private Person dummyPersonWithInvalidIdentityNumber() {
         return new Person.Builder()
-            .withNames(Set.of(new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME), new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
-            .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, INVALID_IDENTITY_NUMBER)))
-            .build();
+                .withNames(Set.of(
+                        new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
+                        new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
+                .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, INVALID_IDENTITY_NUMBER)))
+                .build();
     }
 
     private CristinPerson dummyCristinPerson() {
@@ -183,12 +213,12 @@ public class CreateCristinPersonHandlerTest {
 
     private Person dummyPersonWithAdditionalNames() {
         return new Person.Builder()
-            .withNames(Set.of(
-                new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
-                new TypedValue(LAST_NAME, DUMMY_LAST_NAME),
-                new TypedValue(PREFERRED_FIRST_NAME, randomString()),
-                new TypedValue(PREFERRED_LAST_NAME, randomString())))
-            .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER)))
-            .build();
+                .withNames(Set.of(
+                        new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
+                        new TypedValue(LAST_NAME, DUMMY_LAST_NAME),
+                        new TypedValue(PREFERRED_FIRST_NAME, randomString()),
+                        new TypedValue(PREFERRED_LAST_NAME, randomString())))
+                .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER)))
+                .build();
     }
 }
