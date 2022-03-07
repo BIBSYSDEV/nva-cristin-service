@@ -122,8 +122,8 @@ paths:
                 $ref: '#/components/examples/ProjectPostExample'
 
       responses:
-        200:
-          description: successful operation
+        201:
+          description: Successful creation of project
           content:
             application/json:
               schema:
@@ -219,7 +219,7 @@ paths:
           schema:
             type: string
             pattern: '.+'
-          example: 'Universitetet i Nesna'
+          example: 'Universitetet i'
         - name: depth
           in: query
           description: Depth of sub-organizations included in response
@@ -236,7 +236,7 @@ paths:
           schema:
             type: number
             default: '1'
-          example: '3'
+          example: '1'
         - name: results
           in: query
           description: Results per page
@@ -288,8 +288,8 @@ paths:
           required: true
           schema:
             type: string
-            pattern: '^[0-9]+$'
-          example: '495216'
+            pattern: '^(?:[0-9]+\.){3}[0-9]{1,3}$'
+            example: '20202.0.0.0'
       responses:
         200:
           description: successful operation
@@ -535,7 +535,7 @@ paths:
         schema:
           type: string
           pattern: '^[0-9]+$'
-        example: '359084'
+        example: '538786'
       - name: orgId
         in: path
         description: Identifier of Organization. Sub unit will be converted to parent institution
@@ -543,7 +543,7 @@ paths:
         schema:
           type: string
           pattern: '^[0-9.]+$'
-        example: '185'
+        example: '186.32.15.0'
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -1667,7 +1667,7 @@ components:
     PersonNinExample:
       value:
         type: 'NationalIdentificationNumber'
-        value: '2102193712345'
+        value: '17101602885'
     PersonInstInfoPatchExample:
       value:
         phone: '+4799112233'
