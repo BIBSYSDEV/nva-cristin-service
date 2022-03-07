@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1016",
+    "affiliation": {
+      "institution": {
+        "cristin_institution_id": "20202",
+        "url": "https://api.cristin.no/v2/institutions/20202"
+      },
+      "unit": {
+        "cristin_unit_id": "20202.0.0.0",
+        "url": "https://api.cristin.no/v2/units/20202.0.0.0"
+      }
+    },
+    "active": true,
+    "position": {
+      "code": "M0000029",
+      "name": {
+        "nb": "Gjest"
+      },
+      "enabled": false
+    },
+    "start_date": "2008-01-01T00:00:00.000Z",
+    "fte_percentage": 100.0,
+    "url": "https://api.cristin.no/v2/persons/738/affiliations/1016"
+  },
+  {
+    "id": "1014",
+    "affiliation": {
+      "institution": {
+        "cristin_institution_id": "185",
+        "url": "https://api.cristin.no/v2/institutions/185"
+      },
+      "unit": {
+        "cristin_unit_id": "185.39.55.20",
+        "url": "https://api.cristin.no/v2/units/185.39.55.20"
+      }
+    },
+    "active": false,
+    "position": {
+      "code": "M0000029",
+      "name": {
+        "nb": "Gjest"
+      },
+      "enabled": false
+    },
+    "start_date": "2017-12-01T00:00:00.000Z",
+    "end_date": "2019-12-31T00:00:00.000Z",
+    "url": "https://api.cristin.no/v2/persons/738/affiliationss/1014"
+  }
+]

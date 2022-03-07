@@ -2,11 +2,11 @@ package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
-import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
+import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
-import no.unit.nva.cristin.projects.model.cristin.CristinUnit;
+import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
