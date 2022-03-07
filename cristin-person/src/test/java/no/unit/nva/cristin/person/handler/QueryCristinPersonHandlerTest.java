@@ -175,7 +175,7 @@ public class QueryCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnBadGatewayToClientWhenSQLisInjected() throws IOException {
+    void shouldReturnBadRequestToClientWhenSQLisInjected() throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(QUERY, RANDOM_NAME_WITH_SQL));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output);
