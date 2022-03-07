@@ -1,12 +1,12 @@
 package no.unit.nva.cristin.projects;
 
 import java.util.Optional;
-import no.unit.nva.cristin.projects.model.cristin.CristinOrganization;
+import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.model.Organization;
 
 import static no.unit.nva.cristin.model.CristinInstitution.fromOrganization;
-import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.extractUnitIdentifier;
-import static no.unit.nva.cristin.projects.model.cristin.CristinUnit.fromCristinUnitIdentifier;
+import static no.unit.nva.cristin.model.CristinUnit.extractUnitIdentifier;
+import static no.unit.nva.cristin.model.CristinUnit.fromCristinUnitIdentifier;
 
 public class CristinOrganizationBuilder {
 
