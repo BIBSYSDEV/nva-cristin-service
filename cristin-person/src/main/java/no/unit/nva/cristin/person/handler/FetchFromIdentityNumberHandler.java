@@ -22,6 +22,7 @@ import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClie
 
 @JacocoGenerated
 public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
+
     public static final String NIN_TYPE = "NationalIdentificationNumber";
 
     private final transient CristinPersonApiClient apiClient;

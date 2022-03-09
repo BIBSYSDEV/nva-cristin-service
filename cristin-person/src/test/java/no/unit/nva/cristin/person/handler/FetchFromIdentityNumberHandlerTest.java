@@ -1,8 +1,41 @@
 package no.unit.nva.cristin.person.handler;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.NIN_TYPE;
+import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_FIELD;
+import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_SCOPE_FIELD;
+import static no.unit.nva.utils.AccessUtils.AUTHORIZER_FIELD;
+import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -17,34 +50,6 @@ import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Map;
-
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.NIN_TYPE;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
-import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
-import static nva.commons.core.StringUtils.EMPTY_STRING;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class FetchFromIdentityNumberHandlerTest {
 
@@ -61,6 +66,8 @@ public class FetchFromIdentityNumberHandlerTest {
             + ".no/v2/persons?national_id=07117631634&lang=en,nb,nn";
     private static final String URI_FIRST_HIT_FROM_CRISTIN = "https://api.cristin-test.uio"
             + ".no/v2/persons/359084?lang=en,nb,nn";
+    public static final String ACCESS_TOKEN_BACKEND_SCOPE = "https://api.nva.unit.no/scopes/backend";
+
     private final Environment environment = new Environment();
     private CristinPersonApiClient apiClient;
     private Context context;
@@ -154,6 +161,31 @@ public class FetchFromIdentityNumberHandlerTest {
         GatewayResponse<Person> gatewayResponse = sendQuery(defaultBody(), EMPTY_MAP);
 
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldReturnPersonWhenClientIsAuthenticatedWithAccessTokenContaininingTheBackendScope()
+        throws IOException {
+        var request = requestWithBackendScope();
+        handler.handleRequest(request,output,context);
+        GatewayResponse<Person> response = GatewayResponse.fromOutputStream(output);
+        assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
+        Person person = response.getBodyObject(Person.class);
+        assertThat(person,is(not(nullValue())));
+
+    }
+
+    private InputStream requestWithBackendScope() throws JsonProcessingException {
+        ObjectNode requestContext = OBJECT_MAPPER.createObjectNode();
+        ObjectNode authorizerNode = OBJECT_MAPPER.createObjectNode();
+        ObjectNode claimsFromAccessToken = OBJECT_MAPPER.createObjectNode();
+        claimsFromAccessToken.put(ACCESS_TOKEN_CLAIMS_SCOPE_FIELD, ACCESS_TOKEN_BACKEND_SCOPE);
+        authorizerNode.set(ACCESS_TOKEN_CLAIMS_FIELD, claimsFromAccessToken);
+        requestContext.set(AUTHORIZER_FIELD, authorizerNode);
+        return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
+            .withBody(defaultBody())
+           .withRequestContext(requestContext)
+            .build();
     }
 
     private GatewayResponse<Person> sendQuery(TypedValue body, Map<String, String> queryParams)
