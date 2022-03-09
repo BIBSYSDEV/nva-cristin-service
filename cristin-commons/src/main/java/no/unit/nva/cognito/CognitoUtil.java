@@ -108,9 +108,11 @@ public class CognitoUtil {
         try {
             final AdminInitiateAuthResult loginResult = loginUserCognito(feideId, password, poolId, clientId);
             logger.debug("LoginResult.getAuthenticationResult={}", loginResult.getAuthenticationResult());
-            return loginResult.getAuthenticationResult().getIdToken();
+            var token =loginResult.getAuthenticationResult().getIdToken();
+            logger.info("IDTOKENNNNNNNNNNNN:" + token);
+            return token;
         } catch (Exception e) {
-            logger.warn("Error loginUserAndReturnToken username:{}, {}", feideId, e.getMessage());
+            logger.error("Error loginUserAndReturnToken username:{}, {}", feideId, e.getMessage());
             return null;
         }
     }
