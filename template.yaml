@@ -51,14 +51,13 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Auth:
+        DefaultAuthorizer: None
         Authorizers:
-          DefaultAuthorizer: NONE
           CognitoAuthorizer:
             UserPoolArn: !Ref CognitoAuthorizerArn
             Identity:
               Header: Authorization
-              ValidationExpression: Bearer.*
-              ReauthorizeEvery: 10
+              ReauthorizeEvery: 3600
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
