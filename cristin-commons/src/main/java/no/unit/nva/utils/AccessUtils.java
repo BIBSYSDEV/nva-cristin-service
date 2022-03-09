@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Optional;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ForbiddenException;
-import nva.commons.core.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +19,7 @@ public class AccessUtils {
     public static final String USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT =
         "User:{} does not have required access right:{}";
     private static final Logger logger = LoggerFactory.getLogger(AccessUtils.class);
-    private static final String BACKEND_SCOPE = "https://api.nva.unit.no/scopes/backend";
+    private static final String BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE = "https://api.nva.unit.no/scopes/backend";
 
     /**
      * Validate if Requester is authorized to use IdentificationNumber to a access a user.
@@ -67,7 +66,7 @@ public class AccessUtils {
             .map(authorizerNode -> authorizerNode.get(ACCESS_TOKEN_CLAIMS_FIELD))
             .map(claims -> claims.get(ACCESS_TOKEN_CLAIMS_SCOPE_FIELD))
             .map(JsonNode::textValue)
-            .filter(BACKEND_SCOPE::equals)
+            .filter(BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE::equals)
             .isPresent();
     }
 
