@@ -27,6 +27,7 @@ servers:
 paths:
   /project:
     get:
+      security: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinProjectsFunction.Arn}/invocations
@@ -149,6 +150,7 @@ paths:
           $ref: '#/components/responses/502'
   /project/{id}:
     get:
+      security: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinOneProjectFunction.Arn}/invocations
@@ -201,6 +203,7 @@ paths:
           $ref: '#/components/responses/502'
   /organization:
     get:
+      security: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinQueryOrganizationFunction.Arn}/invocations
@@ -271,6 +274,7 @@ paths:
           $ref: '#/components/responses/502'
   /organization/{identifier}:
     get:
+      security: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchOrganizationFunction.Arn}/invocations
@@ -316,6 +320,7 @@ paths:
           $ref: '#/components/responses/502'
   /person:
     get:
+      security: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinQueryPersonFunction.Arn}/invocations
@@ -740,6 +745,7 @@ paths:
           $ref: '#/components/responses/502'
   /position:
     get:
+      security: []
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPositionFunction.Arn}/invocations
