@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: NVA Cristin Proxy API
+  title: Internal NVA Cristin Proxy API
   description: >
     The NVA Cristin Proxy API.
 
