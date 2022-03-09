@@ -52,6 +52,7 @@ Resources:
     Properties:
       Auth:
         Authorizers:
+          DefaultAuthorizer: NONE
           CognitoAuthorizer:
             UserPoolArn: !Ref CognitoAuthorizerArn
             Identity:
