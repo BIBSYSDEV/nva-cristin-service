@@ -51,7 +51,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Auth:
-        DefaultAuthorizer: None
+#        DefaultAuthorizer: None
         Authorizers:
           CognitoAuthorizer:
             UserPoolArn: !Ref CognitoAuthorizerArn
