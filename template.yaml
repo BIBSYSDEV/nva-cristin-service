@@ -355,3 +355,20 @@ Resources:
       RestApiId: !Ref NvaCristinProxyApi
       Stage: !Ref NvaCristinProxyApi.Stage
 
+  NvaCristinProxyInternalApiBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !Ref CustomDomainBasePath
+      DomainName: !Ref ApiDomain
+      RestApiId: !Ref NvaCristinProxyApi
+      Stage: !Ref NvaCristinProxyApi.Stage
+
+  InternalBasePathMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: !Sub '${CustomDomainBasePath}-internal'
+      DomainName: !Ref ApiDomain
+      RestApiId: !Ref NvaCristinProxyInternalApi
+      Stage: !Ref NvaCristinProxyInternalApi.Stage
+
+
