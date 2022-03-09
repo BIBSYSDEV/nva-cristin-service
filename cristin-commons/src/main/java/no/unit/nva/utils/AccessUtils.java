@@ -1,6 +1,5 @@
 package no.unit.nva.utils;
 
-import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Optional;
 import nva.commons.apigateway.RequestInfo;
