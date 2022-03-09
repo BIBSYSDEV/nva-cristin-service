@@ -1,7 +1,9 @@
 package no.unit.nva.utils;
 
+import static nva.commons.core.attempt.Try.attempt;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ForbiddenException;
+import nva.commons.core.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +23,8 @@ public class AccessUtils {
      * @throws ForbiddenException thrown when user is not authorized to access a user with IdentificationNumber
      */
     public static void validateIdentificationNumberAccess(RequestInfo requestInfo) throws ForbiddenException {
+        String requestInfoString = attempt(()->JsonUtils.dtoObjectMapper.writeValueAsString(requestInfo)).orElseThrow();
+        logger.info("RequestInfo:{}",requestInfoString);
         if (requesterHasNoAccessRightToUseNationalIdentificationNumber(requestInfo)) {
             logger.warn(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT,
                     requestInfo.getFeideId(), EDIT_OWN_INSTITUTION_USERS);
