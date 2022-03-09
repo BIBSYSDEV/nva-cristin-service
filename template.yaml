@@ -8,6 +8,8 @@ Description: >
 Globals:
   Function:
     Timeout: 40
+    MemorySize: 1798
+    Runtime: java11
     Architectures:
       - arm64
     Environment:
@@ -115,8 +117,6 @@ Resources:
     Properties:
       CodeUri: cristin-project
       Handler: no.unit.nva.cristin.projects.FetchCristinProjects::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Events:
         NvaCristinProjectsEvent:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -134,8 +134,6 @@ Resources:
     Properties:
       CodeUri: cristin-project
       Handler: no.unit.nva.cristin.projects.CreateCristinProjectHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinProjectsEvent:
@@ -150,8 +148,6 @@ Resources:
     Properties:
       CodeUri: cristin-project
       Handler: no.unit.nva.cristin.projects.FetchOneCristinProject::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinOneProjectEvent:
@@ -166,8 +162,6 @@ Resources:
     Properties:
       CodeUri: cristin-organization
       Handler: no.unit.nva.cristin.organization.QueryCristinOrganizationHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Events:
         NvaCristinOrganizationsEvent:
           Type: Api
@@ -185,8 +179,6 @@ Resources:
     Properties:
       CodeUri: cristin-organization
       Handler: no.unit.nva.cristin.organization.FetchCristinOrganizationHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Events:
         NvaCristinOneProjectEvent:
           Type: Api
@@ -200,8 +192,6 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.handler.QueryCristinPersonHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Events:
         NvaCristinQueryPersonEvent:
           Type: Api
@@ -219,8 +209,6 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.handler.FetchCristinPersonHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinFetchPersonEvent:
@@ -230,14 +218,16 @@ Resources:
             Path: /person/{id}
             Method: get
 
-  NvaCristinFetchPersonUsingNinFunction:
+  NvaCristinFetchPersonUsingNin:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Enabled: true
+        Type: AllAtOnce
       Events:
         NvaCristinFetchPersonUsingNinEvent:
           Type: Api
@@ -252,13 +242,34 @@ Resources:
             Path: /person/identityNumber/
             Method: post
 
+  NvaCristinFetchPersonUsingNinTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 10
+      MinCapacity: 1
+      ResourceId: !Sub function:${NvaCristinFetchPersonUsingNin}:live
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lambda.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_LambdaConcurrency
+      ScalableDimension: lambda:function:ProvisionedConcurrency
+      ServiceNamespace: lambda
+    DependsOn: NvaCristinFetchPersonUsingNinAliaslive
+
+  NvaCristinFetchPersonUsingNinScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: NvaCristinFetchPersonUsingNinScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref NvaCristinFetchPersonUsingNinTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 0.90
+        PredefinedMetricSpecification:
+          PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
+
+
   NvaCristinCreatePersonFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.create.CreateCristinPersonHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinCreatePersonEvent:
@@ -273,8 +284,6 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.update.UpdateCristinPersonHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
       #Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinUpdatePersonEvent:
@@ -289,8 +298,6 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.institution.fetch.FetchPersonInstitutionInfoHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinFetchPersonEvent:
@@ -305,8 +312,6 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.institution.update.UpdatePersonInstitutionInfoHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinUpdatePersonInstitutionInfoEvent:
@@ -321,8 +326,6 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.affiliations.handler.PositionCodesHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
       Events:
         NvaCristinFetchPositionsEvent:
           Type: Api
@@ -336,8 +339,8 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.employment.query.QueryPersonEmploymentHandler::handleRequest
-      Runtime: java11
-      MemorySize: 512
+
+
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinQueryPersonEmploymentEvent:
