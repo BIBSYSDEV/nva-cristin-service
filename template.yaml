@@ -63,6 +63,22 @@ Resources:
         DefaultAuthorizer: NONE
       EndpointConfiguration: Regional
 
+  NvaCristinProxyInternalApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionBody:
+        'Fn::Transform':
+          Name: AWS::Include
+          Parameters:
+            Location: ./docs/cristin-proxy-internal-apidoc.yaml
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiAccessLogGroup.Arn
+        Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
+      StageName: Prod
+
+      EndpointConfiguration: Regional
+
+
   ReadCristinAuthenticationRole:
     Type: AWS::IAM::Role
     Properties:
@@ -227,6 +243,12 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/identityNumber/
+            Method: post
+        NvaCristinFetchPersonUsingInternalRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyInternalApi
             Path: /person/identityNumber/
             Method: post
 
