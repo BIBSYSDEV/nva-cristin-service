@@ -1,7 +1,6 @@
 package no.unit.nva.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Optional;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.JsonUtils;
@@ -10,7 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
 import java.util.Base64;
+import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.client.ApiClient.AUTHORIZATION;
 
 public class AccessUtils {
@@ -23,9 +24,7 @@ public class AccessUtils {
     public static final String AUTHORIZER_FIELD = "authorizer";
     public static final String USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT =
         "User:{} does not have required access right:{}";
-    private static final Logger logger = LoggerFactory.getLogger(AccessUtils.class);
     private static final String BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE = "https://api.nva.unit.no/scopes/backend";
-            "User:{} does not have required access right:{}";
     public static final String BEARER = "Bearer";
     public static final String DOT_SEPARATOR = "\\.";
     public static final int PAYLOAD_SEGMENT = 1;
@@ -89,7 +88,7 @@ public class AccessUtils {
     private static boolean requesterHasAccessRightInBearerToken(RequestInfo requestInfo) {
         try {
             final var authorizationHeader = requestInfo.getHeaders().get(AUTHORIZATION);
-            if (authorizationHeader != null && authorizationHeader.startsWith(BEARER)) {
+            if (nonNull(authorizationHeader) && authorizationHeader.startsWith(BEARER)) {
                 var token = authorizationHeader.substring(BEARER.length() + 1, authorizationHeader.length());
                 var payload = new String(Base64.getUrlDecoder().decode(token.split(DOT_SEPARATOR)[PAYLOAD_SEGMENT]));
                 var accessRights = JsonUtils.dtoObjectMapper.readTree(new StringReader(payload))
@@ -101,5 +100,4 @@ public class AccessUtils {
         }
         return false;
     }
-
 }
