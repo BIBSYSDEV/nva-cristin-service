@@ -33,14 +33,11 @@ Feature: API tests for Cristin Person fetch
     Then status 200
     And response.NationalIdentificationNumber != '#present'
 
-  Scenario: Fetch returns status 403 Forbidden when not authorized
-    Given path '/person/identityNumber'
-    And header Authorization = 'Bearer ' + simpleUserToken
-    And request { type : NationalIdentificationNumber, value : '07117631634' }
-    When method POST
-    Then status 403
-    And match response.title == 'Forbidden'
-    And match response.status == 403
+  Scenario: Fetch returns unclassified person data when not authenticated nor authorized
+    Given path '/person/' + samplePersonIdentifier
+    When method GET
+    Then status 200
+    And response.NationalIdentificationNumber != '#present'
 
   Scenario: Fetch returns 401 Unauthorized when not authenticated
     Given path '/person/' + samplePersonIdentifier
