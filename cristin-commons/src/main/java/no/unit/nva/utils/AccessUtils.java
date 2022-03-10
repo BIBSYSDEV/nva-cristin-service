@@ -60,7 +60,6 @@ public class AccessUtils {
                 || requesterHasAccessRightInBearerToken(requestInfo);
     }
 
-
     private static boolean requesterHasNoAccessRightToEditProjects(RequestInfo requestInfo) {
         return !requestInfo.getAccessRights().contains(EDIT_OWN_INSTITUTION_PROJECTS);
     }
@@ -73,12 +72,10 @@ public class AccessUtils {
                 var payload = new String(Base64.getUrlDecoder().decode(token.split(DOT_SEPARATOR)[PAYLOAD_SEGMENT]));
                 var accessRights = JsonUtils.dtoObjectMapper.readTree(new StringReader(payload))
                         .get(CUSTOM_ACCESS_RIGHTS).asText();
-                logger.info("accessRights={}", accessRights);
                 return accessRights.contains(EDIT_OWN_INSTITUTION_USERS);
             }
         } catch (Exception ignored) {
-            logger.info("Exception!", ignored);
-            logger.info("No valid access information in request authorization header");
+            logger.debug("No valid access information in request authorization header");
         }
         return false;
     }
