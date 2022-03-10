@@ -1,6 +1,11 @@
 package no.unit.nva.cristin.person.handler;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
+import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
 import com.amazonaws.services.lambda.runtime.Context;
+import java.net.HttpURLConnection;
+import java.util.Objects;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -13,15 +18,9 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-import java.net.HttpURLConnection;
-import java.util.Objects;
-
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
-import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
-
 @JacocoGenerated
 public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
+
     public static final String NIN_TYPE = "NationalIdentificationNumber";
 
     private final transient CristinPersonApiClient apiClient;
@@ -43,7 +42,7 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
 
     @Override
     protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
-            throws ApiGatewayException {
+        throws ApiGatewayException {
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
         validateQueryParameters(requestInfo);
@@ -65,9 +64,9 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
 
     private void validateInput(TypedValue input) throws BadRequestException {
         if (Objects.nonNull(input)
-                && NIN_TYPE.equals(input.getType())
-                && Objects.nonNull(input.getValue())
-                && isValidNationalIdentificationNumber(input.getValue())) {
+            && NIN_TYPE.equals(input.getType())
+            && Objects.nonNull(input.getValue())
+            && isValidNationalIdentificationNumber(input.getValue())) {
 
             return;
         }
@@ -77,5 +76,4 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     private boolean isValidNationalIdentificationNumber(String nationalIdentificationNumber) {
         return FodselsnummerValidator.isValid(nationalIdentificationNumber);
     }
-
 }
