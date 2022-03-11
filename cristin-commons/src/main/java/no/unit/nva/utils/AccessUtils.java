@@ -8,14 +8,12 @@ import com.auth0.jwt.interfaces.RSAKeyProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ForbiddenException;
-import nva.commons.core.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
-import static no.unit.nva.cognito.CognitoUtil.COGNITO_USER_POOL_ID_KEY;
 import static no.unit.nva.cognito.CognitoUtil.REGION;
 import static no.unit.nva.cristin.common.client.ApiClient.AUTHORIZATION;
 
@@ -31,7 +29,7 @@ public class AccessUtils {
     public static final String BEARER = "Bearer";
     public static final String CUSTOM_ACCESS_RIGHTS = "custom:accessRights";
     public static final String REQUEST_AUTHORIZATION_FAILURE_REASON = "No valid access information in request authorization header, reason: {}";
-    private static final String USERPOOL_ID = new Environment().readEnv(COGNITO_USER_POOL_ID_KEY);
+    private static final String USERPOOL_ID = "eu-west-1_DNRmDPtxY"; //new Environment().readEnv(COGNITO_USER_POOL_ID_KEY);
     private static final String BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE = "https://api.nva.unit.no/scopes/backend";
     private static final JWTVerifier VERIFIER = JWT.require(getAlgorithm()).build();
     private static final Logger logger = LoggerFactory.getLogger(AccessUtils.class);
