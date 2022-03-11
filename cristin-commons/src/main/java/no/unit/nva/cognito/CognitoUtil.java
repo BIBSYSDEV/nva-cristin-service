@@ -53,6 +53,9 @@ public class CognitoUtil {
         return new Environment().readEnv(COGNITO_USER_POOL_ID_KEY);
     }
 
+    public static String getCognitoAppClientId() {
+        return new  Environment().readEnv(COGNITO_CLIENT_APP_ID_KEY);
+    }
 
     /**
      * Create user in the user to the user pool.

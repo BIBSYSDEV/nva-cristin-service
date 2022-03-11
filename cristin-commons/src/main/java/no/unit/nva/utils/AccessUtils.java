@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cognito.CognitoUtil.REGION;
+import static no.unit.nva.cognito.CognitoUtil.getCognitoAppClientId;
 import static no.unit.nva.cognito.CognitoUtil.getCognitoUserPoolId;
 import static no.unit.nva.cristin.common.client.ApiClient.AUTHORIZATION;
 
@@ -92,7 +93,8 @@ public class AccessUtils {
             final var authorizationHeader = requestInfo.getHeaders().get(AUTHORIZATION);
             if (nonNull(authorizationHeader)) {
                 DecodedJWT jwt = JWT.require(getAlgorithm()).build().verify(getToken(authorizationHeader));
-                return jwt.getClaim(CUSTOM_ACCESS_RIGHTS).asString().contains(EDIT_OWN_INSTITUTION_USERS);
+                return jwt.getAudience().contains(getCognitoAppClientId())
+                        && jwt.getClaim(CUSTOM_ACCESS_RIGHTS).asString().contains(EDIT_OWN_INSTITUTION_USERS);
             }
         } catch (Exception e) {
             logger.debug(REQUEST_AUTHORIZATION_FAILURE_REASON, e.getMessage());
