@@ -1,7 +1,6 @@
 package no.unit.nva.utils;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cognito.CognitoUtil.COGNITO_USER_POOL_ID_KEY;
 import static no.unit.nva.cognito.CognitoUtil.REGION;
 import static no.unit.nva.cristin.common.client.ApiClient.AUTHORIZATION;
 
@@ -29,9 +29,7 @@ public class AccessUtils {
     public static final String BEARER = "Bearer";
     public static final String CUSTOM_ACCESS_RIGHTS = "custom:accessRights";
     public static final String REQUEST_AUTHORIZATION_FAILURE_REASON = "No valid access information in request authorization header, reason: {}";
-    private static final String USERPOOL_ID = "eu-west-1_DNRmDPtxY"; //new Environment().readEnv(COGNITO_USER_POOL_ID_KEY);
     private static final String BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE = "https://api.nva.unit.no/scopes/backend";
-    private static final JWTVerifier VERIFIER = JWT.require(getAlgorithm()).build();
     private static final Logger logger = LoggerFactory.getLogger(AccessUtils.class);
 
 
@@ -93,7 +91,7 @@ public class AccessUtils {
         try {
             final var authorizationHeader = requestInfo.getHeaders().get(AUTHORIZATION);
             if (nonNull(authorizationHeader)) {
-                DecodedJWT jwt = VERIFIER.verify(getToken(authorizationHeader));
+                DecodedJWT jwt = JWT.require(getAlgorithm()).build().verify(getToken(authorizationHeader));
                 return jwt.getClaim(CUSTOM_ACCESS_RIGHTS).asString().contains(EDIT_OWN_INSTITUTION_USERS);
             }
         } catch (Exception e) {
@@ -103,7 +101,7 @@ public class AccessUtils {
     }
 
     private static Algorithm getAlgorithm() {
-        RSAKeyProvider keyProvider = new AwsCognitoRSAKeyProvider(REGION, USERPOOL_ID);
+        RSAKeyProvider keyProvider = new AwsCognitoRSAKeyProvider(REGION, System.getenv().get(COGNITO_USER_POOL_ID_KEY));
         return Algorithm.RSA256(keyProvider);
     }
 
