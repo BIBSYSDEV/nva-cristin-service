@@ -18,6 +18,7 @@ import com.amazonaws.services.cognitoidp.model.AuthFlowType;
 import com.amazonaws.services.cognitoidp.model.ListUsersRequest;
 import com.amazonaws.services.cognitoidp.model.MessageActionType;
 import com.amazonaws.services.cognitoidp.model.UserType;
+import nva.commons.core.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,10 @@ public class CognitoUtil {
     public static final String COGNITO_USER_POOL_ID_KEY = "COGNITO_USER_POOL_ID";
 
     private static final Logger logger = LoggerFactory.getLogger(CognitoUtil.class);
+
+    public static String getCognitoUserPoolId() {
+        return new Environment().readEnv(COGNITO_USER_POOL_ID_KEY);
+    }
 
 
     /**

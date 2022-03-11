@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
-import static no.unit.nva.cognito.CognitoUtil.COGNITO_USER_POOL_ID_KEY;
 import static no.unit.nva.cognito.CognitoUtil.REGION;
+import static no.unit.nva.cognito.CognitoUtil.getCognitoUserPoolId;
 import static no.unit.nva.cristin.common.client.ApiClient.AUTHORIZATION;
 
 public class AccessUtils {
@@ -101,7 +101,7 @@ public class AccessUtils {
     }
 
     private static Algorithm getAlgorithm() {
-        RSAKeyProvider keyProvider = new AwsCognitoRSAKeyProvider(REGION, System.getenv().get(COGNITO_USER_POOL_ID_KEY));
+        RSAKeyProvider keyProvider = new AwsCognitoRSAKeyProvider(REGION, getCognitoUserPoolId());
         return Algorithm.RSA256(keyProvider);
     }
 
