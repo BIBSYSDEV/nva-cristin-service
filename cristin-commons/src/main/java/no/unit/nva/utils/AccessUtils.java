@@ -1,17 +1,22 @@
 package no.unit.nva.utils;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.RSAKeyProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ForbiddenException;
+import nva.commons.core.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.Optional;
 
-import static com.auth0.jwt.JWT.decode;
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cognito.CognitoUtil.COGNITO_USER_POOL_ID_KEY;
+import static no.unit.nva.cognito.CognitoUtil.REGION;
 import static no.unit.nva.cristin.common.client.ApiClient.AUTHORIZATION;
 
 public class AccessUtils {
@@ -25,11 +30,10 @@ public class AccessUtils {
     public static final String USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT =
             "User:{} does not have required access right:{}";
     public static final String BEARER = "Bearer";
-    public static final String DOT_SEPARATOR = "\\.";
-    public static final int PAYLOAD_SEGMENT = 1;
     public static final String CUSTOM_ACCESS_RIGHTS = "custom:accessRights";
     private static final String BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE = "https://api.nva.unit.no/scopes/backend";
     private static final Logger logger = LoggerFactory.getLogger(AccessUtils.class);
+
 
     /**
      * Validate if Requester is authorized to use IdentificationNumber to a access a user.
@@ -88,17 +92,26 @@ public class AccessUtils {
     private static boolean requesterHasAccessRightInBearerToken(RequestInfo requestInfo) {
         try {
             final var authorizationHeader = requestInfo.getHeaders().get(AUTHORIZATION);
-            if (nonNull(authorizationHeader) && authorizationHeader.startsWith(BEARER)) {
-                var token = authorizationHeader.substring(BEARER.length() + 1, authorizationHeader.length());
-                DecodedJWT jwt = decode(token);
-                if(new Date().after(jwt.getExpiresAt())) {
-                    return false;
-                }
+            if (nonNull(authorizationHeader)) {
+                JWTVerifier verifier = JWT.require(getAlgorithm()).build(); //Reusable verifier instance
+                DecodedJWT jwt = verifier.verify(getToken(authorizationHeader));
                 return jwt.getClaim(CUSTOM_ACCESS_RIGHTS).asString().contains(EDIT_OWN_INSTITUTION_USERS);
             }
-        } catch (Exception ignored) {
-            logger.debug("No valid access information in request authorization header");
+        } catch (Exception e) {
+            logger.debug("No valid access information in request authorization header, reason: {}", e.getMessage());
         }
         return false;
+    }
+
+    private static Algorithm getAlgorithm() {
+        String userpoolId = new Environment().readEnv(COGNITO_USER_POOL_ID_KEY);
+        RSAKeyProvider keyProvider = new AwsCognitoRSAKeyProvider(REGION, userpoolId);
+        return Algorithm.RSA256(keyProvider);
+    }
+
+    private static String getToken(String authorizationHeader) {
+        return authorizationHeader.startsWith(BEARER)
+                ? authorizationHeader.substring(BEARER.length() + 1)
+                : null;
     }
 }

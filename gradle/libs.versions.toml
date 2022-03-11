@@ -66,6 +66,7 @@ slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
 bekkopen-nocommons = { group = 'no.bekk.bekkopen', name =  'nocommons', version.ref =  'bekkopen-nocommons' }
 
 com-auth0-jwt = { group = 'com.auth0', name =  'java-jwt', version.ref = 'com-auth0-jwt' }
+com-auth0-jwks = { group = 'com.auth0', name =  'jwks-rsa', version= '0.20.2' }
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
