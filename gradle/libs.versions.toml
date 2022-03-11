@@ -17,6 +17,7 @@ slf4j = { strictly = '1.8.0-beta4' }
 nva-language = { strictly = '1.0' }
 awsSdk = { strictly = '1.12.129' }
 bekkopen-nocommons = { strictly = '0.12.0' }
+com-auth0-jwt = { strictly = '3.18.3'}
 
 [libraries]
 
@@ -63,6 +64,8 @@ log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.re
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
 
 bekkopen-nocommons = { group = 'no.bekk.bekkopen', name =  'nocommons', version.ref =  'bekkopen-nocommons' }
+
+com-auth0-jwt = { group = 'com.auth0', name =  'java-jwt', version.ref = 'com-auth0-jwt' }
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
