@@ -17,8 +17,8 @@ slf4j = { strictly = '1.8.0-beta4' }
 nva-language = { strictly = '1.0' }
 awsSdk = { strictly = '1.12.129' }
 bekkopen-nocommons = { strictly = '0.12.0' }
-com-auth0-jwt = { strictly = '3.18.3'}
-
+com-auth0-jwt = { strictly = '3.18.3' }
+com-auth0-jwks = { strictly = '0.20.2' }
 [libraries]
 
 #Test
@@ -66,7 +66,7 @@ slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
 bekkopen-nocommons = { group = 'no.bekk.bekkopen', name =  'nocommons', version.ref =  'bekkopen-nocommons' }
 
 com-auth0-jwt = { group = 'com.auth0', name =  'java-jwt', version.ref = 'com-auth0-jwt' }
-com-auth0-jwks = { group = 'com.auth0', name =  'jwks-rsa', version= '0.20.2' }
+com-auth0-jwks = { group = 'com.auth0', name =  'jwks-rsa', version.ref= 'com-auth0-jwks' }
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
