@@ -31,8 +31,10 @@ public class AccessUtils {
             "User:{} does not have required access right:{}";
     public static final String BEARER = "Bearer";
     public static final String CUSTOM_ACCESS_RIGHTS = "custom:accessRights";
+    public static final JWTVerifier VERIFIER = JWT.require(getAlgorithm()).build();
     private static final String BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE = "https://api.nva.unit.no/scopes/backend";
     private static final Logger logger = LoggerFactory.getLogger(AccessUtils.class);
+    public static final String REQUEST_AUTHORIZATION_FAILURE_REASON = "No valid access information in request authorization header, reason: {}";
 
 
     /**
@@ -93,12 +95,11 @@ public class AccessUtils {
         try {
             final var authorizationHeader = requestInfo.getHeaders().get(AUTHORIZATION);
             if (nonNull(authorizationHeader)) {
-                JWTVerifier verifier = JWT.require(getAlgorithm()).build(); //Reusable verifier instance
-                DecodedJWT jwt = verifier.verify(getToken(authorizationHeader));
+                DecodedJWT jwt = VERIFIER.verify(getToken(authorizationHeader));
                 return jwt.getClaim(CUSTOM_ACCESS_RIGHTS).asString().contains(EDIT_OWN_INSTITUTION_USERS);
             }
         } catch (Exception e) {
-            logger.debug("No valid access information in request authorization header, reason: {}", e.getMessage());
+            logger.debug(REQUEST_AUTHORIZATION_FAILURE_REASON, e.getMessage());
         }
         return false;
     }
