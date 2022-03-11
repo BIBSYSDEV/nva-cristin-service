@@ -23,7 +23,6 @@ public class AccessUtils {
 
     public static final String EDIT_OWN_INSTITUTION_USERS = "EDIT_OWN_INSTITUTION_USERS";
     public static final String EDIT_OWN_INSTITUTION_PROJECTS = "EDIT_OWN_INSTITUTION_PROJECTS";
-
     public static final String ACCESS_TOKEN_CLAIMS_SCOPE_FIELD = "scope";
     public static final String ACCESS_TOKEN_CLAIMS_FIELD = "claims";
     public static final String AUTHORIZER_FIELD = "authorizer";
@@ -32,9 +31,10 @@ public class AccessUtils {
     public static final String BEARER = "Bearer";
     public static final String CUSTOM_ACCESS_RIGHTS = "custom:accessRights";
     public static final JWTVerifier VERIFIER = JWT.require(getAlgorithm()).build();
+    public static final String REQUEST_AUTHORIZATION_FAILURE_REASON = "No valid access information in request authorization header, reason: {}";
+    private static final String USERPOOL_ID = new Environment().readEnv(COGNITO_USER_POOL_ID_KEY);
     private static final String BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE = "https://api.nva.unit.no/scopes/backend";
     private static final Logger logger = LoggerFactory.getLogger(AccessUtils.class);
-    public static final String REQUEST_AUTHORIZATION_FAILURE_REASON = "No valid access information in request authorization header, reason: {}";
 
 
     /**
@@ -105,8 +105,7 @@ public class AccessUtils {
     }
 
     private static Algorithm getAlgorithm() {
-        String userpoolId = new Environment().readEnv(COGNITO_USER_POOL_ID_KEY);
-        RSAKeyProvider keyProvider = new AwsCognitoRSAKeyProvider(REGION, userpoolId);
+        RSAKeyProvider keyProvider = new AwsCognitoRSAKeyProvider(REGION, USERPOOL_ID);
         return Algorithm.RSA256(keyProvider);
     }
 
