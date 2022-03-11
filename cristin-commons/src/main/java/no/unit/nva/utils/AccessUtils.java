@@ -30,10 +30,10 @@ public class AccessUtils {
             "User:{} does not have required access right:{}";
     public static final String BEARER = "Bearer";
     public static final String CUSTOM_ACCESS_RIGHTS = "custom:accessRights";
-    public static final JWTVerifier VERIFIER = JWT.require(getAlgorithm()).build();
     public static final String REQUEST_AUTHORIZATION_FAILURE_REASON = "No valid access information in request authorization header, reason: {}";
     private static final String USERPOOL_ID = new Environment().readEnv(COGNITO_USER_POOL_ID_KEY);
     private static final String BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE = "https://api.nva.unit.no/scopes/backend";
+    private static final JWTVerifier VERIFIER = JWT.require(getAlgorithm()).build();
     private static final Logger logger = LoggerFactory.getLogger(AccessUtils.class);
 
 
