@@ -17,7 +17,7 @@ Globals:
         DOMAIN_NAME: !Ref ApiDomain
         BASE_PATH: !Ref CustomDomainBasePath
         COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
-
+        COGNITO_CLIENT_APP_ID: !Ref CognitoUserPoolAppClientId
   Api:
     Cors:
       AllowOrigin: "'*'"
@@ -46,8 +46,12 @@ Parameters:
       - https://api.cristin.no/v2
   CognitoUserPoolId:
     Type: 'AWS::SSM::Parameter::Value<String>'
-    Description: Reference to Cognito UserPool for the stage
+    Description: Cognito UserPoolId for the stage
     Default: CognitoUserPoolId
+  CognitoUserPoolAppClientId:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Cognito UserPool AppClientId for the stage
+    Default: CognitoUserPoolAppClientId
 
 Resources:
 
