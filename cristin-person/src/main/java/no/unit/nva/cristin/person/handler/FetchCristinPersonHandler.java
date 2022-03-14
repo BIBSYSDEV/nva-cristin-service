@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.HttpURLConnection;
+import java.util.Map;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
@@ -40,6 +41,7 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
     public FetchCristinPersonHandler(CristinPersonApiClient apiClient, Environment environment) {
         super(Void.class, environment);
         this.apiClient = apiClient;
+        addAdditionalHeaders(this::addAuthenticateResponseHeader);
     }
 
     @Override
@@ -81,5 +83,10 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
 
     private boolean isValidIdentifier(String identifier) {
         return Utils.isPositiveInteger(identifier) || Utils.isOrcid(identifier);
+    }
+
+
+    private Map<String, String> addAuthenticateResponseHeader() {
+        return Map.of("WWW-Authenticate","Basic");
     }
 }
