@@ -87,7 +87,7 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
 
 
     private Map<String, String> addAuthenticateResponseHeader() {
-        logger.info("addAuthenticateResponseHeader -> 'WWW-Authenticate Basic'");
+        logger.info("addAuthenticateResponseHeader -> 'WWW-Authenticate: Basic'");
         return Map.of("WWW-Authenticate","Basic");
     }
 }
