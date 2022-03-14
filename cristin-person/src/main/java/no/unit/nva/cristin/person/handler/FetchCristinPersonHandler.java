@@ -9,6 +9,7 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.apigateway.exceptions.UnsupportedAcceptHeaderException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 import org.slf4j.Logger;
@@ -16,7 +17,10 @@ import org.slf4j.LoggerFactory;
 
 import java.net.HttpURLConnection;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
@@ -89,5 +93,14 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
     private Map<String, String> addAuthenticateResponseHeader() {
         logger.info("addAuthenticateResponseHeader -> 'WWW-Authenticate: Basic'");
         return Map.of("WWW-Authenticate","Basic");
+    }
+
+
+    private Map<String, String> defaultHeaders(RequestInfo requestInfo) throws UnsupportedAcceptHeaderException {
+        Map<String, String> headers = new ConcurrentHashMap<>();
+        headers.put(ACCESS_CONTROL_ALLOW_ORIGIN, allowedOrigin);
+        headers.put(CONTENT_TYPE, getDefaultResponseContentTypeHeaderValue(requestInfo).toString());
+        headers.put("WWW-Authenticate", "Bearer");
+        return headers;
     }
 }
