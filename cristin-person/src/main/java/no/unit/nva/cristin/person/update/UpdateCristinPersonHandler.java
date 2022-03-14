@@ -1,11 +1,8 @@
 package no.unit.nva.cristin.person.update;
 
-import static java.util.Objects.isNull;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
-import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -14,6 +11,12 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+
+import java.net.HttpURLConnection;
+
+import static java.util.Objects.isNull;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 
 public class UpdateCristinPersonHandler extends ApiGatewayHandler<Person, String> {
 
@@ -42,7 +45,7 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<Person, String
         return HttpURLConnection.HTTP_NO_CONTENT;
     }
 
-    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {
+    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException, UnauthorizedException {
         if (!AccessUtils.requesterIsUserAdministrator(requestInfo)) {
             throw new ForbiddenException();
         }

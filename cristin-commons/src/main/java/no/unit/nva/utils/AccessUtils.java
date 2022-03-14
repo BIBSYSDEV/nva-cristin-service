@@ -1,10 +1,11 @@
 package no.unit.nva.utils;
 
-import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import com.fasterxml.jackson.databind.JsonNode;
+import no.unit.nva.exception.UnauthorizedException;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
+import static com.auth0.jwt.JWT.require;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cognito.CognitoUtil.REGION;
 import static no.unit.nva.cognito.CognitoUtil.getCognitoAppClientId;
@@ -62,7 +64,7 @@ public class AccessUtils {
         }
     }
 
-    public static boolean requesterIsUserAdministrator(RequestInfo requestInfo) {
+    public static boolean requesterIsUserAdministrator(RequestInfo requestInfo) throws UnauthorizedException {
         return requestInfo.getAccessRights().contains(EDIT_OWN_INSTITUTION_USERS)
                 || requesterHasAccessRightInBearerToken(requestInfo);
     }
@@ -88,16 +90,17 @@ public class AccessUtils {
         return !requestInfo.getAccessRights().contains(EDIT_OWN_INSTITUTION_PROJECTS);
     }
 
-    private static boolean requesterHasAccessRightInBearerToken(RequestInfo requestInfo) {
-        try {
-            final var authorizationHeader = requestInfo.getHeaders().get(AUTHORIZATION);
-            if (nonNull(authorizationHeader)) {
-                DecodedJWT jwt = JWT.require(getAlgorithm()).build().verify(getToken(authorizationHeader));
+    private static boolean requesterHasAccessRightInBearerToken(RequestInfo requestInfo) throws UnauthorizedException {
+        final var authorizationHeader = requestInfo.getHeaders().get(AUTHORIZATION);
+        if (nonNull(authorizationHeader)) {
+            try {
+                DecodedJWT jwt = require(getAlgorithm()).build().verify(getToken(authorizationHeader));
                 return jwt.getAudience().contains(getCognitoAppClientId())
                         && jwt.getClaim(CUSTOM_ACCESS_RIGHTS).asString().contains(EDIT_OWN_INSTITUTION_USERS);
+            } catch (JWTVerificationException e) {
+                logger.debug(REQUEST_AUTHORIZATION_FAILURE_REASON, e.getMessage());
+                throw new UnauthorizedException();
             }
-        } catch (Exception e) {
-            logger.debug(REQUEST_AUTHORIZATION_FAILURE_REASON, e.getMessage());
         }
         return false;
     }
