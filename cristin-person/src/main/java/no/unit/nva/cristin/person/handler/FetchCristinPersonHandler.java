@@ -45,7 +45,7 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
     public FetchCristinPersonHandler(CristinPersonApiClient apiClient, Environment environment) {
         super(Void.class, environment);
         this.apiClient = apiClient;
-        addAdditionalHeaders(this::addAuthenticateResponseHeader);
+//        addAdditionalHeaders(this::addAuthenticateResponseHeader);
     }
 
     @Override

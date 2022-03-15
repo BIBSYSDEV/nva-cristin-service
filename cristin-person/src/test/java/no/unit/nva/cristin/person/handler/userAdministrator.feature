@@ -45,7 +45,7 @@ Feature: API tests for Cristin Person fetch
     When method GET
     Then status 401
     And match response.title == 'Unauthorized'
-    And match responseHeaders['WWW-Authenticate'][0] == 'WWW-Authenticate'
+#    And match responseHeaders['WWW-Authenticate'][0] == 'WWW-Authenticate'
 
   Scenario: Fetch returns status Not found when requesting unknown person identifier
     Given path '/person/identityNumber'
