@@ -174,11 +174,15 @@ Resources:
               - method.request.querystring.page
               - method.request.querystring.results
 
-  NvaCristinFetchOrganizationFunction:
+  NvaCristinFetchOrganization:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-organization
       Handler: no.unit.nva.cristin.organization.FetchCristinOrganizationHandler::handleRequest
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Enabled: true
+        Type: AllAtOnce
       Events:
         NvaCristinOneProjectEvent:
           Type: Api
@@ -186,6 +190,28 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /organization/{id}
             Method: get
+
+  NvaCristinFetchOrganizationTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 10
+      MinCapacity: 1
+      ResourceId: !Sub function:${NvaCristinFetchOrganization}:live
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lambda.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_LambdaConcurrency
+      ScalableDimension: lambda:function:ProvisionedConcurrency
+      ServiceNamespace: lambda
+    DependsOn: NvaCristinFetchOrganizationAliaslive
+
+  NvaCristinFetchOrganizationScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: NvaCristinFetchOrganizationScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref NvaCristinFetchOrganizationTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 0.70
+        PredefinedMetricSpecification:
+          PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
 
   NvaCristinQueryPersonFunction:
     Type: AWS::Serverless::Function
@@ -304,6 +330,12 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}/organization/{orgId}/
+            Method: get
+        NvaCristinFetchPersonUsingInternalRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyInternalApi
             Path: /person/{id}/organization/{orgId}/
             Method: get
 
