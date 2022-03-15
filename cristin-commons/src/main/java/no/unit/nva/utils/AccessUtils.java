@@ -90,7 +90,7 @@ public class AccessUtils {
     }
 
     private static boolean requesterHasAccessRightInBearerToken(RequestInfo requestInfo) throws UnauthorizedException {
-        final var authorizationHeader = requestInfo.getHeaders().get(AUTHORIZATION);
+        final String authorizationHeader = requestInfo.getHeaders().get(AUTHORIZATION);
         if (nonNull(authorizationHeader)) {
             try {
                 DecodedJWT jwt = require(getAlgorithm()).build().verify(getToken(authorizationHeader));
