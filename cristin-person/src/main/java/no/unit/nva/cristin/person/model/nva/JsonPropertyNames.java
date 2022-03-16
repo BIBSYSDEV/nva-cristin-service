@@ -12,5 +12,9 @@ public class JsonPropertyNames {
     public static final String AFFILIATIONS = "affiliations";
     public static final String NATIONAL_IDENTITY_NUMBER = "NationalIdentificationNumber";
     public static final String RESERVED = "reserved";
-
+    public static final String ORCID = "orcid";
+    public static final String FIRST_NAME = "firstName";
+    public static final String LAST_NAME = "lastName";
+    public static final String PREFERRED_FIRST_NAME = "preferredFirstName";
+    public static final String PREFERRED_LAST_NAME = "preferredLastName";
 }
