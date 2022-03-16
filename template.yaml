@@ -217,7 +217,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.organization.ListCristinOrganizationPersonsHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler::handleRequest
       Events:
         NvaListOrganizationPersonsEvent:
           Type: Api

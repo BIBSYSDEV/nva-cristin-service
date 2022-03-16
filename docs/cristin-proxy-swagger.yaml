@@ -325,7 +325,7 @@ paths:
       tags:
         - Organization
       summary: Fetch Persons associated with an given organization
-      description: Returns a single Organization with a list of persons belonging to that organization
+      description: Returns a list of persons belonging to specified organization
       operationId: GetPersonsByOrganization
       parameters:
         - name: identifier
