@@ -29,7 +29,7 @@ paths:
     post:
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonUsingNinFunction.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonUsingNin.Arn}:live/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
@@ -76,7 +76,65 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
-
+  /person/{id}/organization/{orgId}:
+    parameters:
+      - name: id
+        in: path
+        description: Identifier of Person
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]+$'
+        example: '538786'
+      - name: orgId
+        in: path
+        description: Identifier of Organization. Sub unit will be converted to parent institution
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9.]+$'
+        example: '186.32.15.0'
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonInstitutionInfoFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Fetch person organization info by identifiers
+      description: Returns person information at organization matching identifier parameters
+      operationId: GetPersonOrganizationInfoByIdentifiers
+      security:
+        - CognitoUserPool: ["https://api.nva.unit.no/scopes/backend"]
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonOrganizationInfo'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonOrganizationInfoExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PersonOrganizationInfo'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonOrganizationInfoExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 components:
   responses:
     400:
