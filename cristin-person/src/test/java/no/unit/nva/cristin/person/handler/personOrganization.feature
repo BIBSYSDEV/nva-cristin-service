@@ -25,7 +25,7 @@ Feature: API tests for Cristin Person fetch
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'This endpoint does not support parameters except \'page\' and \'results\''
+    And match response.detail == 'Invalid query param supplied. Valid ones are 'page' and 'results''
 
   Scenario: Get returns status OK and context in dummy response
     Given path '/organization/'+organizationIdentifier+'/persons'
@@ -33,4 +33,3 @@ Feature: API tests for Cristin Person fetch
     And param results = '10'
     When method GET
     Then status 200
-    And match response.status == 200
