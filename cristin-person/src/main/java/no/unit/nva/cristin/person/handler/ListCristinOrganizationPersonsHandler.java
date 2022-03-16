@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.HttpURLConnection;
+import java.util.Collections;
 
 @SuppressWarnings({"unused","PMD.SingularField"})
 public class ListCristinOrganizationPersonsHandler extends ApiGatewayHandler<Void, SearchResponse<Person>> {
@@ -51,7 +52,9 @@ public class ListCristinOrganizationPersonsHandler extends ApiGatewayHandler<Voi
     protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
         logger.debug("Will be processing input soon....");
-        return null;
+        return new SearchResponse<Person>(requestInfo.getRequestUri())
+                .withHits(Collections.emptyList())
+                .withSize(0);
     }
 
     /**
