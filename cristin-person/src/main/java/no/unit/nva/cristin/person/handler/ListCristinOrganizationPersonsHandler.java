@@ -11,6 +11,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,17 +20,20 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
-import static no.unit.nva.utils.UriUtils.getNvaApiId;
 
 @SuppressWarnings({"unused","PMD.SingularField"})
 public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
@@ -79,14 +83,20 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
         validateHasIdentifierPathParameter(requestInfo);
         validateQueryParamKeys(requestInfo);
         String identifier = getValidId(requestInfo);
-        return new SearchResponse<Person>(getServiceUri(identifier))
+        return new SearchResponse<Person>(getServiceUri(identifier, requestInfo.getQueryParameters()))
                 .withHits(Collections.emptyList())
-                .withContext(ORGANIZATION_CONTEXT)
+                .withContext(PERSON_CONTEXT)
                 .withSize(0);
     }
 
-    private URI getServiceUri(String identifier) {
-        return getNvaApiId(identifier, ORGANIZATION_PATH);
+    private URI getServiceUri(String identifier, Map<String, String> queryParameters) {
+        return new UriWrapper(HTTPS,
+                DOMAIN_NAME).addChild(BASE_PATH)
+                .addChild(ORGANIZATION_PATH)
+                .addChild(identifier)
+                .addChild("persons")
+                .addQueryParameters(queryParameters)
+                .getUri();
     }
 
     /**
