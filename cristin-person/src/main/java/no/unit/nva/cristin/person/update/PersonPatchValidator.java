@@ -15,7 +15,9 @@ public class PersonPatchValidator {
     public static final String RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE =
         "Reserved field can only be set to true if present";
 
-    // Validate according to rules of upstream json schema
+    /**
+     * Validate according to rules of upstream json schema.
+     */
     public static void validate(JSONObject input) throws BadRequestException {
         validateOrcidIfPresent(input);
         validateFirstNameIfPresent(input);
