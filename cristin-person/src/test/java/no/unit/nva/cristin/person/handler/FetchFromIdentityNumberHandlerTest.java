@@ -58,16 +58,16 @@ public class FetchFromIdentityNumberHandlerTest {
     public static final String WRONG_TYPE = "WRONGTYPE";
     public static final String WRONG_VALUE = "wrongValue";
     public static final String EMPTY_ARRAY = "[]";
+    public static final String ACCESS_TOKEN_BACKEND_SCOPE = "https://api.nva.unit.no/scopes/backend";
     private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
     private static final String NVA_API_GET_PERSON_RESPONSE_JSON =
-            "nvaApiGetPersonResponse.json";
+        "nvaApiGetPersonResponse.json";
     private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
     private static final String VALID_CRISTIN_NATIONAL_ID_URI = "https://api.cristin-test.uio"
-            + ".no/v2/persons?national_id=07117631634&lang=en,nb,nn";
+                                                                + ".no/v2/persons?national_id=07117631634&lang=en,nb,"
+                                                                + "nn";
     private static final String URI_FIRST_HIT_FROM_CRISTIN = "https://api.cristin-test.uio"
-            + ".no/v2/persons/359084?lang=en,nb,nn";
-    public static final String ACCESS_TOKEN_BACKEND_SCOPE = "https://api.nva.unit.no/scopes/backend";
-
+                                                             + ".no/v2/persons/359084?lang=en,nb,nn";
     private final Environment environment = new Environment();
     private CristinPersonApiClient apiClient;
     private Context context;
@@ -167,12 +167,11 @@ public class FetchFromIdentityNumberHandlerTest {
     void shouldReturnPersonWhenClientIsAuthenticatedWithAccessTokenContaininingTheBackendScope()
         throws IOException {
         var request = requestWithBackendScope();
-        handler.handleRequest(request,output,context);
+        handler.handleRequest(request, output, context);
         GatewayResponse<Person> response = GatewayResponse.fromOutputStream(output);
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
         Person person = response.getBodyObject(Person.class);
-        assertThat(person,is(not(nullValue())));
-
+        assertThat(person, is(not(nullValue())));
     }
 
     private InputStream requestWithBackendScope() throws JsonProcessingException {
@@ -184,12 +183,12 @@ public class FetchFromIdentityNumberHandlerTest {
         requestContext.set(AUTHORIZER_FIELD, authorizerNode);
         return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
             .withBody(defaultBody())
-           .withRequestContext(requestContext)
+            .withRequestContext(requestContext)
             .build();
     }
 
     private GatewayResponse<Person> sendQuery(TypedValue body, Map<String, String> queryParams)
-            throws IOException {
+        throws IOException {
 
         InputStream input = requestWithParams(body, queryParams);
         handler.handleRequest(input, output, context);
@@ -197,13 +196,13 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     private InputStream requestWithParams(TypedValue body, Map<String, String> queryParams)
-            throws JsonProcessingException {
+        throws JsonProcessingException {
 
         return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
-                .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
-                .withBody(body)
-                .withQueryParameters(queryParams)
-                .build();
+            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
+            .withBody(body)
+            .withQueryParameters(queryParams)
+            .build();
     }
 
     private TypedValue defaultBody() {
@@ -218,8 +217,8 @@ public class FetchFromIdentityNumberHandlerTest {
 
     private InputStream requestWithInvalidPayload() throws JsonProcessingException {
         return new HandlerRequestBuilder<Map<String, String>>(OBJECT_MAPPER)
-                .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
-                .withBody(INVALID_PAYLOAD)
-                .build();
+            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
+            .withBody(INVALID_PAYLOAD)
+            .build();
     }
 }
