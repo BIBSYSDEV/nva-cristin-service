@@ -195,6 +195,24 @@ Resources:
             Path: /organization/{id}
             Method: get
 
+  NvaCristinListOrganizationPersonsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.organization.ListCristinOrganizationPersonsHandler::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Events:
+        NvaListOrganizationPersonsEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /organization/{id}/persons
+            Method: get
+            RequestParameters:
+              - method.request.querystring.page
+              - method.request.querystring.results
+
   NvaCristinQueryPersonFunction:
     Type: AWS::Serverless::Function
     Properties:
