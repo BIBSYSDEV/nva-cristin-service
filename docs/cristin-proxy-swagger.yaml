@@ -449,8 +449,6 @@ paths:
       summary: Find person by identifier
       description: Returns a single person matching id parameter
       operationId: GetPersonById
-      security:
-        - CognitoUserPool: [ ]
       responses:
         200:
           description: successful operation
@@ -469,6 +467,8 @@ paths:
                   $ref: '#/components/examples/PersonExample'
         400:
           $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
         404:
           $ref: '#/components/responses/404'
         500:
