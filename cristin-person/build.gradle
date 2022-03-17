@@ -5,7 +5,6 @@ dependencies {
     implementation libs.nva.logutils
     implementation libs.nva.commons.apigateway
     implementation libs.bekkopen.nocommons
-    implementation libs.org.json
 
     implementation libs.aws.sdk.cognitoidp
 

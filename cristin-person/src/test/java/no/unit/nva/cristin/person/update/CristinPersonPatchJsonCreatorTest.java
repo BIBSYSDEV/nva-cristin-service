@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.update;
 
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.LAST_NAME;
@@ -15,7 +16,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
 
 public class CristinPersonPatchJsonCreatorTest {
@@ -27,39 +28,39 @@ public class CristinPersonPatchJsonCreatorTest {
 
     @Test
     void shouldParseInputJsonIntoCristinJsonWithCorrectMappingOfFields() {
-        JSONObject input = new JSONObject();
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
         input.put(ORCID, VALID_ORCID);
         input.put(FIRST_NAME, SOME_NAME);
         input.put(LAST_NAME, SOME_OTHER_NAME);
         input.put(PREFERRED_FIRST_NAME, SOME_PREFERRED_NAME);
-        input.put(PREFERRED_LAST_NAME, JSONObject.NULL);
+        input.putNull(PREFERRED_LAST_NAME);
         input.put(RESERVED, true);
 
-        JSONObject result = new CristinPersonPatchJsonCreator(input).create().getResult();
+        ObjectNode result = new CristinPersonPatchJsonCreator(input).create().getOutput();
 
-        assertEquals(VALID_ORCID, result.getJSONObject(ORCID).get(ID));
-        assertEquals(SOME_NAME, result.get(CRISTIN_FIRST_NAME));
-        assertEquals(SOME_OTHER_NAME, result.get(CRISTIN_SURNAME));
-        assertEquals(SOME_PREFERRED_NAME, result.get(CRISTIN_FIRST_NAME_PREFERRED));
+        assertEquals(VALID_ORCID, result.get(ORCID).get(ID).asText());
+        assertEquals(SOME_NAME, result.get(CRISTIN_FIRST_NAME).asText());
+        assertEquals(SOME_OTHER_NAME, result.get(CRISTIN_SURNAME).asText());
+        assertEquals(SOME_PREFERRED_NAME, result.get(CRISTIN_FIRST_NAME_PREFERRED).asText());
         assertThat(result.has(CRISTIN_SURNAME_PREFERRED), equalTo(true));
-        assertThat(result.isNull(CRISTIN_SURNAME_PREFERRED), equalTo(true));
-        assertEquals(true, result.get(RESERVED));
+        assertThat(result.get(CRISTIN_SURNAME_PREFERRED).isNull(), equalTo(true));
+        assertThat(result.get(RESERVED).asBoolean(), equalTo(true));
     }
 
     @Test
     void shouldParseOrcidIntoCristinFormatEvenIfNull() {
-        JSONObject input = new JSONObject();
-        input.put(ORCID, JSONObject.NULL);
-        JSONObject result = new CristinPersonPatchJsonCreator(input).create().getResult();
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        input.putNull(ORCID);
+        ObjectNode result = new CristinPersonPatchJsonCreator(input).create().getOutput();
 
-        assertThat(result.getJSONObject(ORCID).has(ID), equalTo(true));
-        assertThat(result.getJSONObject(ORCID).isNull(ID), equalTo(true));
+        assertThat(result.get(ORCID).has(ID), equalTo(true));
+        assertThat(result.get(ORCID).get(ID).isNull(), equalTo(true));
     }
 
     @Test
     void shouldNotCreateCristinFieldsIfNotInInput() {
-        JSONObject emptyJson = new JSONObject();
-        JSONObject result = new CristinPersonPatchJsonCreator(emptyJson).create().getResult();
+        ObjectNode emptyJson = OBJECT_MAPPER.createObjectNode();
+        ObjectNode result = new CristinPersonPatchJsonCreator(emptyJson).create().getOutput();
 
         assertThat(result.isEmpty(), equalTo(true));
     }

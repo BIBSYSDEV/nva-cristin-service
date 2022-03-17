@@ -2,8 +2,10 @@ package no.unit.nva.cristin.person.update;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.HttpURLConnection;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -13,7 +15,6 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
-import org.json.JSONObject;
 
 public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, String> {
 
@@ -32,8 +33,8 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, String
 
         validateHasAccessRights(requestInfo);
 
-        JSONObject jsonObject = readJsonFromInput(input);
-        PersonPatchValidator.validate(jsonObject);
+        ObjectNode objectNode = readJsonFromInput(input);
+        PersonPatchValidator.validate(objectNode);
 
         return EMPTY_JSON;
     }
@@ -49,8 +50,8 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, String
         }
     }
 
-    private JSONObject readJsonFromInput(String input) throws BadRequestException {
-        return attempt(() -> new JSONObject(input))
+    private ObjectNode readJsonFromInput(String input) throws BadRequestException {
+        return attempt(() -> (ObjectNode) OBJECT_MAPPER.readTree(input))
             .orElseThrow(fail -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 }

@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,7 +34,6 @@ import java.util.Map;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -58,11 +58,11 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnNoContentResponseWhenCallingHandlerWithValidJson() throws IOException {
-        JSONObject jsonObject = new JSONObject();
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(ORCID, VALID_ORCID);
         jsonObject.put(FIRST_NAME, randomString());
         jsonObject.put(PREFERRED_FIRST_NAME, randomString());
-        jsonObject.put(PREFERRED_LAST_NAME, JSONObject.NULL);
+        jsonObject.putNull(PREFERRED_LAST_NAME);
 
         GatewayResponse<String> gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
@@ -88,8 +88,8 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnOkNoContentWhenOrcidIsPresentAndNull() throws IOException {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(ORCID, JSONObject.NULL);
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.putNull(ORCID);
 
         GatewayResponse<String> gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
@@ -98,7 +98,7 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenOrcidHasInvalidValue() throws IOException {
-        JSONObject jsonObject = new JSONObject();
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(ORCID, INVALID_ORCID);
 
         GatewayResponse<String> gatewayResponse = sendQuery(validPath, jsonObject.toString());
@@ -109,8 +109,8 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenPrimaryNameIsNull() throws IOException {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(FIRST_NAME, JSONObject.NULL);
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.putNull(FIRST_NAME);
 
         GatewayResponse<String> gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
@@ -120,8 +120,8 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenReservedIsNull() throws IOException {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(RESERVED, JSONObject.NULL);
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.putNull(RESERVED);
 
         GatewayResponse<String> gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
@@ -131,7 +131,7 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenReservedIsNotBoolean() throws IOException {
-        JSONObject jsonObject = new JSONObject();
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(RESERVED, SOME_TEXT);
 
         GatewayResponse<String> gatewayResponse = sendQuery(validPath, jsonObject.toString());
@@ -142,7 +142,7 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenReservedIsFalse() throws IOException {
-        JSONObject jsonObject = new JSONObject();
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(RESERVED, false);
 
         GatewayResponse<String> gatewayResponse = sendQuery(validPath, jsonObject.toString());
