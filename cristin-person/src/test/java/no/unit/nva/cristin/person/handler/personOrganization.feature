@@ -30,14 +30,21 @@ Feature: API tests for Cristin Person fetch
 
   Scenario: Get returns status OK and context in dummy response
     Given path '/organization/'+dummyOrganizationIdentifier+'/persons'
-    And param page = '4'
     And param results = '10'
     When method GET
     Then status 200
 
+
+  Scenario: Get returns status 400 Bad Request when page is out of scope
+    Given path '/organization/'+dummyOrganizationIdentifier+'/persons'
+    And param page = '4'
+    And param results = '10'
+    When method GET
+    Then status 400
+
   Scenario: Get returns status OK and context, next and prev in real organization query response
     Given path '/organization/'+realOrganizationIdentifier+'/persons'
-    And param page = '4'
+    And param page = '2'
     And param results = '10'
     When method GET
     Then status 200
