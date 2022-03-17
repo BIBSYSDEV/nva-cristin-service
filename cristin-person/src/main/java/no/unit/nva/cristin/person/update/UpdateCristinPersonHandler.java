@@ -7,6 +7,7 @@ import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.HttpURLConnection;
+import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -44,7 +45,7 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, String
         return HttpURLConnection.HTTP_NO_CONTENT;
     }
 
-    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {
+    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException, UnauthorizedException {
         if (!AccessUtils.requesterIsUserAdministrator(requestInfo)) {
             throw new ForbiddenException();
         }
