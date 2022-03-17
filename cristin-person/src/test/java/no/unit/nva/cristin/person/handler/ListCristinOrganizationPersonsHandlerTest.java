@@ -27,6 +27,9 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LIST;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
@@ -34,6 +37,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -43,9 +47,6 @@ class ListCristinOrganizationPersonsHandlerTest {
 
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     public static final String DUMMY_ORGANIZATION_IDENTIFIER = "4.3.2.1";
-    public static final String IDENTIFIER_KEY = "identifier";
-    public static final String PAGE_KEY = "page";
-    public static final String RESULTS_KEY = "results";
     public static final String SAMPLE_PAGE = "2";
     public static final String SAMPLE_RESULTS_SIZE = "10";
     public static final String INVALID_KEY = "invalid";
@@ -96,6 +97,16 @@ class ListCristinOrganizationPersonsHandlerTest {
     }
 
     @Test
+    void shouldReturnOKAndIdInResponseOnValidDummyInput() throws IOException {
+        InputStream inputStream = generateHandlerDummyRequest();
+        handler.handleRequest(inputStream, output, context);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        final SearchResponse searchResponse = gatewayResponse.getBodyObject(SearchResponse.class);
+        assertTrue(searchResponse.getId().toString().contains(DUMMY_ORGANIZATION_IDENTIFIER));
+    }
+
+    @Test
     void shouldReturnSearchResponseWithEmptyHitsWhenBackendFetchIsEmpty() throws ApiGatewayException, IOException {
 
         CristinOrganizationPersonsClient apiClient = spy(cristinApiClient);
@@ -112,7 +123,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     private InputStream generateHandlerDummyRequestWithIllegalQueryParameters() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withPathParameters(Map.of(IDENTIFIER_KEY, DUMMY_ORGANIZATION_IDENTIFIER))
+                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                 .withQueryParameters(Map.of(INVALID_KEY, INVALID_VALUE))
                 .build();
     }
@@ -120,16 +131,10 @@ class ListCristinOrganizationPersonsHandlerTest {
     private InputStream generateHandlerDummyRequest() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withPathParameters(Map.of(IDENTIFIER_KEY, DUMMY_ORGANIZATION_IDENTIFIER))
-                .withQueryParameters(Map.of(PAGE_KEY, SAMPLE_PAGE))
-                .withQueryParameters(Map.of(RESULTS_KEY, SAMPLE_RESULTS_SIZE))
+                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                .withQueryParameters(Map.of(PAGE, SAMPLE_PAGE))
+                .withQueryParameters(Map.of(NUMBER_OF_RESULTS, SAMPLE_RESULTS_SIZE))
                 .build();
-    }
-
-    private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
-        InputStream input = generateHandlerDummyRequest();
-        handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
     }
 
     private InputStream generateHandlerRequestWithoutOrganizationIdentifier() throws JsonProcessingException {

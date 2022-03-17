@@ -8,6 +8,7 @@ import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,12 +16,14 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.PERSONS_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 
 public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
+
 
     /**
      * Creates a SearchResponse based on fetch from Cristin upstream.
@@ -34,7 +37,7 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
             throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
-        HttpResponse<String> response = queryOrganizationPersons(requestQueryParams);
+        HttpResponse<String> response = queryOrganizationPersons(new HashMap(requestQueryParams));
         List<CristinPerson> cristinPersons = getEnrichedPersonsUsingQueryResponse(response);
         List<Person> persons = mapCristinPersonsToNvaPersons(cristinPersons);
         long endRequestTime = System.currentTimeMillis();
@@ -45,7 +48,6 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
                 .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
                 .withHits(persons);
     }
-
 
     /**
      * Perform a query for Persons matching criteria in parameters.
@@ -76,9 +78,8 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
                 DOMAIN_NAME).addChild(BASE_PATH)
                 .addChild(ORGANIZATION_PATH)
                 .addChild(identifier)
-                .addChild("persons")
+                .addChild(PERSONS_PATH)
                 .addQueryParameters(queryParameters)
                 .getUri();
     }
-
 }
