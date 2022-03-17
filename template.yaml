@@ -224,6 +224,22 @@ Resources:
         PredefinedMetricSpecification:
           PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
 
+  NvaCristinListOrganizationPersonsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler::handleRequest
+      Events:
+        NvaListOrganizationPersonsEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /organization/{id}/persons
+            Method: get
+            RequestParameters:
+              - method.request.querystring.page
+              - method.request.querystring.results
+
   NvaCristinQueryPersonFunction:
     Type: AWS::Serverless::Function
     Properties:

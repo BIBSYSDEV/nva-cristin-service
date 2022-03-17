@@ -314,6 +314,69 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+
+  /organization/{identifier}/persons:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListOrganizationPersonsFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Organization
+      summary: Fetch Persons associated with an given organization
+      description: Returns a list of persons belonging to specified organization
+      operationId: GetPersonsByOrganization
+      parameters:
+        - name: identifier
+          in: path
+          description: Identifier of Organization to return
+          required: true
+          schema:
+            type: string
+            pattern: '^(?:[0-9]+\.){3}[0-9]{1,3}$'
+            example: '20202.0.0.0'
+        - name: page
+          in: query
+          description: Current page requested
+          required: false
+          schema:
+            type: number
+            default: '1'
+          example: '3'
+        - name: results
+          in: query
+          description: Results per page
+          required: false
+          schema:
+            type: number
+            default: '5'
+          example: '10'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationPersons'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/OrganizationPersonsExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/OrganizationPersons'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/OrganizationPersonsExample'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+
   /person:
     get:
       x-amazon-apigateway-integration:
@@ -1402,6 +1465,39 @@ components:
         identifier:
           type: string
           description: Person identifier
+    OrganizationPersons:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of persons returned by the query
+          items:
+            $ref: '#/components/schemas/Person'
+
 
   examples:
     ProjectsExample:
@@ -1770,6 +1866,78 @@ components:
     PersonEmploymentExample:
       value:
         identifier: '359084'
+
+    OrganizationPersonsExample:
+      value:
+        '@context': 'https://example.org/person-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0/persons?page=1&results=5'
+        size: 150
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0/persons?page=2&results=5'
+        previousResults: ''
+        hits:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
+            type: 'Person'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '359084'
+              - type: 'ORCID'
+                value: '1234-1234-1234-1234'
+            names:
+              - type: 'PreferredFirstName'
+                value: 'Ola'
+              - type: 'PreferredLastName'
+                value: 'Nordmann'
+              - type: 'FirstName'
+                value: 'Kjell Ola'
+              - type: 'LastName'
+                value: 'Nordmann'
+            contactDetails:
+              telephone: '+4799885566'
+            image: 'https://api.cristin.no/v2/persons/359084/picture'
+            affiliations:
+              - type: 'Affiliation'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+                active: true
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Researcher'
+                    nb: 'Forsker'
+                    nn: 'Forskar'
+              - type: 'Affiliation'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+                active: true
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Head Engineer'
+                    nb: 'Overingeniør'
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
+            type: 'Person'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '567987'
+            names:
+              - type: 'FirstName'
+                value: 'Kjetil'
+              - type: 'LastName'
+                value: 'Nordmann'
+            contactDetails:
+              telephone: '+4744335566'
+            affiliations:
+              - type: 'Affiliation'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+                active: true
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Consultant'
+
   securitySchemes:
     CognitoUserPool:
       type: apiKey
