@@ -98,7 +98,7 @@ Feature: API tests for Cristin persons query
     And match response.title == 'Bad Request'
     And match response.status == 400
     # TODO: Change detail to exclude language
-    And match response.detail == "Invalid query param supplied. Valid ones are 'query', 'page', 'results' and 'language'"
+    And match response.detail == "Invalid query param supplied. Valid ones are 'name', 'page', 'results' and 'language'"
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
@@ -129,7 +129,7 @@ Feature: API tests for Cristin persons query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == "Parameter 'query' is missing or invalid. May only contain alphanumeric characters, dash, comma, period and whitespace"
+    And match response.detail == "Parameter 'name' is missing or invalid. May only contain alphanumeric characters, dash, comma, period and whitespace"
     And match response.requestId == '#notnull'
 
   Scenario: Query returns correct pagination values and URIs
@@ -139,8 +139,8 @@ Feature: API tests for Cristin persons query
     And param page = '2'
     When method GET
     Then status 200
-    * def nextResultsPath = CRISTIN_BASE + '/person?query=' + queryString + '&page=3&results=3'
-    * def previousResultsPath = CRISTIN_BASE + '/person?query=' + queryString + '&page=1&results=3'
+    * def nextResultsPath = CRISTIN_BASE + '/person?name=' + queryString + '&page=3&results=3'
+    * def previousResultsPath = CRISTIN_BASE + '/person?name=' + queryString + '&page=1&results=3'
     And match response.nextResults == nextResultsPath
     And match response.previousResults == previousResultsPath
     And match response.firstRecord == 4

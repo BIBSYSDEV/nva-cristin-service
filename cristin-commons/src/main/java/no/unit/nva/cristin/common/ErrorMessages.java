@@ -41,6 +41,8 @@ public class ErrorMessages {
             + "application/ld+json";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH =
         "Invalid query param supplied. Valid ones are 'query', 'page', 'results' and 'language'";
+    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_SEARCH =
+            "Invalid query param supplied. Valid ones are 'name', 'page', 'results' and 'language'";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP =
         "Invalid query param supplied. Valid one are 'language'";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP =
