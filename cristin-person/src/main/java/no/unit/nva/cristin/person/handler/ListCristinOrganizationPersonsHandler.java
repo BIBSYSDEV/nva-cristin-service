@@ -28,7 +28,7 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_LIST =
-            "Invalid query parameter supplied. Valid ones are 'page' and 'results'";
+            "Invalid query parameter supplied. Valid parameters are 'page' and 'results'";
     private static final Set<String> VALID_QUERY_PARAMS = Set.of(PAGE, NUMBER_OF_RESULTS);
     private final transient CristinOrganizationPersonsClient apiClient;
 

@@ -88,7 +88,7 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == "Invalid query parameter supplied. Valid one is 'language'"
+    And match response.detail == "Invalid query parameter supplied. Valid parameter is 'language'"
 
   Scenario: Fetch returns status Not found when requesting unknown project identifier
     Given path '/project/' + nonExistingProjectId
