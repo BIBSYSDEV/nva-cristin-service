@@ -29,9 +29,9 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PERSON_QUERY_CONTEXT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.utils.UriUtils.PERSON;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static nva.commons.core.attempt.Try.attempt;
@@ -134,7 +134,7 @@ public class CristinPersonApiClient extends ApiClient {
         return new CristinPersonQuery()
             .withFromPage(parameters.get(PAGE))
             .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
-            .withName(parameters.get(QUERY)).toURI();
+            .withName(parameters.get(NAME)).toURI();
     }
 
     private List<URI> extractCristinUrisFromPersons(List<CristinPerson> personsFromQuery) {

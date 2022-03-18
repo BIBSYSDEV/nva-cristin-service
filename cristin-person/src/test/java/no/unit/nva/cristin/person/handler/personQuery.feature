@@ -24,7 +24,7 @@ Feature: API tests for Cristin persons query
     }
   """
     Given path '/person/'
-    And param query = queryString
+    And param name = queryString
     When method OPTIONS
     Then status 200
     And match responseHeaders['Access-Control-Allow-Origin'][0] == '*'
@@ -42,7 +42,7 @@ Feature: API tests for Cristin persons query
   Scenario Outline: Query returns valid data and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
     Given path '/person/'
-    And param query = queryString
+    And param name = queryString
     When method GET
     Then status 200
     And match response == '#object'
@@ -60,7 +60,7 @@ Feature: API tests for Cristin persons query
 
   Scenario: Query accepts special characters and whitespace
     Given path '/person/'
-    And param query = 'John Smith'
+    And param name = 'John Smith'
     When method GET
     Then status 200
     And match response == '#object'
@@ -72,7 +72,7 @@ Feature: API tests for Cristin persons query
   Scenario Outline: Query with unsupported Accept header returns Unsupported Media Type
     * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }
     Given path '/person/'
-    And param query = queryString
+    And param name = queryString
     When method GET
     Then status 415
     * def contentType = responseHeaders['Content-Type'][0]
@@ -103,7 +103,7 @@ Feature: API tests for Cristin persons query
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
     Given path '/person/'
-    And param query = queryString
+    And param name = queryString
     And param <VALID_PARAM> = <INVALID_PARAM_VALUE>
     When method GET
     Then status 400
@@ -134,7 +134,7 @@ Feature: API tests for Cristin persons query
 
   Scenario: Query returns correct pagination values and URIs
     Given path '/person/'
-    And param query = queryString
+    And param name = queryString
     And param results = '3'
     And param page = '2'
     When method GET

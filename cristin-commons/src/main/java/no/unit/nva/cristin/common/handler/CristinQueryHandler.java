@@ -15,6 +15,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
@@ -56,6 +57,14 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
                 .map(UriUtils::escapeWhiteSpace)
                 .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
+
+    protected String getValidName(RequestInfo requestInfo) throws BadRequestException {
+        return getQueryParam(requestInfo, NAME)
+                .filter(this::isValidQuery)
+                .map(UriUtils::escapeWhiteSpace)
+                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+    }
+
 
     private boolean isValidQuery(String str) {
         for (Character c : str.toCharArray()) {

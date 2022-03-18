@@ -253,7 +253,7 @@ Resources:
             Path: /person/
             Method: get
             RequestParameters:
-              - method.request.querystring.query
+              - method.request.querystring.name
               - method.request.querystring.page
               - method.request.querystring.results
 
