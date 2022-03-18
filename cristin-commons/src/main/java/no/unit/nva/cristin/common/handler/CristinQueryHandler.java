@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NAME_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
@@ -62,7 +63,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
         return getQueryParam(requestInfo, NAME)
                 .filter(this::isValidQuery)
                 .map(UriUtils::escapeWhiteSpace)
-                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NAME_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
 
