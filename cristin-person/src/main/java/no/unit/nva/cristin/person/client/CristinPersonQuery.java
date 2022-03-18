@@ -21,6 +21,8 @@ public class CristinPersonQuery {
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
     public static final String NIN_PARAM_KEY = "national_id";
+    public static final String PARENT_UNIT_ID = "parent_unit_id";
+
 
     private final transient Map<String, String> cristinQueryParameters;
 
@@ -81,6 +83,11 @@ public class CristinPersonQuery {
 
     public CristinPersonQuery withName(String name) {
         cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_NAME_KEY, name);
+        return this;
+    }
+
+    public CristinPersonQuery withParentUnitId(String unitId) {
+        cristinQueryParameters.put(PARENT_UNIT_ID, unitId);
         return this;
     }
 
