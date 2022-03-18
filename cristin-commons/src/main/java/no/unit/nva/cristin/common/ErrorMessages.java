@@ -43,11 +43,11 @@ public class ErrorMessages {
         "%s contains no supported Accept header values. Supported values are: application/json; charset=utf-8, "
             + "application/ld+json";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH =
-        "Invalid query param supplied. Valid parameters are 'query', 'page', 'results' and 'language'";
+        "Invalid query parameter supplied. Valid parameters are 'query', 'page', 'results' and 'language'";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_PERSON_SEARCH =
-            "Invalid query param supplied. Valid parameters are 'name', 'page', 'results' and 'language'";
+            "Invalid query parameter supplied. Valid parameters are 'name', 'page', 'results' and 'language'";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_LOOKUP =
-        "Invalid query param supplied. Valid parameter is 'language'";
+        "Invalid query parameter supplied. Valid parameter is 'language'";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP =
         "This endpoint does not support query parameters";
     public static final String ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI =

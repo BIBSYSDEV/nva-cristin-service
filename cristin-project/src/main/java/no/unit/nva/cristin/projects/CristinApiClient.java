@@ -85,30 +85,30 @@ public class CristinApiClient extends ApiClient {
      * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
      * for serialization to the client.
      *
-     * @param requestQueryParams Request parameters from client containing title and language
+     * @param requestQueryParameters Request parameters from client containing title and language
      * @return a SearchResponse filled with transformed Cristin Projects and metadata
      * @throws ApiGatewayException if some errors happen we should return this to client
      */
     public SearchResponse<NvaProject> queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
-            Map<String, String> requestQueryParams) throws ApiGatewayException {
+            Map<String, String> requestQueryParameters) throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
-        QueryType queryType = getQueryTypeBasedOnParams(requestQueryParams);
-        HttpResponse<String> response = queryProjects(requestQueryParams, queryType);
+        QueryType queryType = getQueryTypeBasedOnParameters(requestQueryParameters);
+        HttpResponse<String> response = queryProjects(requestQueryParameters, queryType);
         List<CristinProject> cristinProjects =
-                getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
+                getEnrichedProjectsUsingQueryResponse(response, requestQueryParameters.get(LANGUAGE));
         if (cristinProjects.isEmpty() && queryType == QUERY_USING_GRANT_ID) {
-            response = queryProjects(requestQueryParams, QUERY_USING_TITLE);
-            cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
+            response = queryProjects(requestQueryParameters, QUERY_USING_TITLE);
+            cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParameters.get(LANGUAGE));
         }
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        URI id = createIdUriFromParams(requestQueryParams, PROJECT);
+        URI id = createIdUriFromParams(requestQueryParameters, PROJECT);
 
         return new SearchResponse<NvaProject>(id)
                 .withContext(PROJECT_SEARCH_CONTEXT_URL)
-                .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
+                .usingHeadersAndQueryParams(response.headers(), requestQueryParameters)
                 .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
                 .withHits(nvaProjects);
     }
@@ -180,7 +180,7 @@ public class CristinApiClient extends ApiClient {
                 .collect(Collectors.toList());
     }
 
-    private QueryType getQueryTypeBasedOnParams(Map<String, String> requestQueryParams) {
+    private QueryType getQueryTypeBasedOnParameters(Map<String, String> requestQueryParams) {
         return Utils.isPositiveInteger(requestQueryParams.get(QUERY)) ? QUERY_USING_GRANT_ID : QUERY_USING_TITLE;
     }
 
