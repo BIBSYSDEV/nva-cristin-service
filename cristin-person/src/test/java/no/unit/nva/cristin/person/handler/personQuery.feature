@@ -98,7 +98,7 @@ Feature: API tests for Cristin persons query
     And match response.title == 'Bad Request'
     And match response.status == 400
     # TODO: Change detail to exclude language
-    And match response.detail == "Invalid query param supplied. Valid ones are 'name', 'page', 'results' and 'language'"
+    And match response.detail == "Invalid query parameter supplied. Valid parameters are 'name', 'page', 'results' and 'language'"
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
