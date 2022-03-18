@@ -28,7 +28,7 @@ public class ErrorMessages {
         "Parameter 'query' is missing or invalid. "
             + "May only contain alphanumeric characters, dash, comma, period and whitespace";
     public static final String ERROR_MESSAGE_NAME_MISSING_OR_HAS_ILLEGAL_CHARACTERS =
-            "Parameter 'query' is missing or invalid. "
+            "Parameter 'name' is missing or invalid. "
                     + "May only contain alphanumeric characters, dash, comma, period and whitespace";
     public static final String ERROR_MESSAGE_DEPTH_INVALID = "Parameter 'depth' has invalid value. "
             + "Must be 'top' or 'full'";
