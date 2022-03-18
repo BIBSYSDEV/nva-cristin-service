@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_SEARCH;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_PERSON_SEARCH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
@@ -25,7 +25,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
 
-    private static final Set<String> VALID_QUERY_PARAMS = Set.of(NAME, PAGE, NUMBER_OF_RESULTS);
+    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(NAME, PAGE, NUMBER_OF_RESULTS);
     private final transient CristinPersonApiClient apiClient;
 
     @JacocoGenerated
@@ -47,15 +47,15 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        validateQueryParamKeys(requestInfo);
+        validateQueryParameterKeys(requestInfo);
 
         String name = getValidName(requestInfo);
         String page = getValidPage(requestInfo);
         String numberOfResults = getValidNumberOfResults(requestInfo);
 
-        Map<String, String> requestQueryParams = buildParamMap(name, page, numberOfResults);
+        Map<String, String> requestQueryParameters = buildParametersMap(name, page, numberOfResults);
 
-        return apiClient.generateQueryResponse(requestQueryParams);
+        return apiClient.generateQueryResponse(requestQueryParameters);
     }
 
     @Override
@@ -64,18 +64,18 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     }
 
     @Override
-    protected void validateQueryParamKeys(RequestInfo requestInfo) throws BadRequestException {
-        if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_SEARCH);
+    protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
+        if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_PERSON_SEARCH);
         }
     }
 
 
-    private Map<String, String> buildParamMap(String name, String page, String numberOfResults) {
-        Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
-        requestQueryParams.put(NAME, name);
-        requestQueryParams.put(PAGE, page);
-        requestQueryParams.put(NUMBER_OF_RESULTS, numberOfResults);
-        return requestQueryParams;
+    private Map<String, String> buildParametersMap(String name, String page, String numberOfResults) {
+        Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
+        requestQueryParameters.put(NAME, name);
+        requestQueryParameters.put(PAGE, page);
+        requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
+        return requestQueryParameters;
     }
 }

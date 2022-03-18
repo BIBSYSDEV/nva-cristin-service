@@ -44,7 +44,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     protected SearchResponse<Organization> processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 
-        validateQueryParamKeys(requestInfo);
+        validateQueryParameterKeys(requestInfo);
         Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
         requestQueryParams.put(QUERY, getValidQuery(requestInfo));
         requestQueryParams.put(DEPTH, getValidDepth(requestInfo));
@@ -54,9 +54,9 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     }
 
     @Override
-    protected void validateQueryParamKeys(RequestInfo requestInfo) throws BadRequestException {
+    protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH);
+            throw new BadRequestException(ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH);
         }
     }
 

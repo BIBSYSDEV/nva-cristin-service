@@ -9,7 +9,7 @@ import nva.commons.core.Environment;
 import java.util.List;
 import java.util.Set;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NAME_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
@@ -23,21 +23,21 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 
 public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
 
-    private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS);
+    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS);
     private static final List<Character> VALID_SPECIAL_CHARS = List.of('-', ',', '.');
 
     public CristinQueryHandler(Class<I> iclass, Environment environment) {
         super(iclass, environment);
     }
 
-    protected void validateQueryParamKeys(RequestInfo requestInfo) throws BadRequestException {
-        if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH);
+    protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
+        if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH);
         }
     }
 
     protected String getValidPage(RequestInfo requestInfo) throws BadRequestException {
-        String page = getQueryParam(requestInfo, PAGE).orElse(FIRST_PAGE);
+        String page = getQueryParameter(requestInfo, PAGE).orElse(FIRST_PAGE);
         if (Utils.isPositiveInteger(page)) {
             return page;
         }
@@ -45,7 +45,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     protected String getValidNumberOfResults(RequestInfo requestInfo) throws BadRequestException {
-        String results = getQueryParam(requestInfo, NUMBER_OF_RESULTS).orElse(DEFAULT_NUMBER_OF_RESULTS);
+        String results = getQueryParameter(requestInfo, NUMBER_OF_RESULTS).orElse(DEFAULT_NUMBER_OF_RESULTS);
         if (Utils.isPositiveInteger(results)) {
             return results;
         }
@@ -53,21 +53,21 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     protected String getValidQuery(RequestInfo requestInfo) throws BadRequestException {
-        return getQueryParam(requestInfo, QUERY)
-                .filter(this::isValidQuery)
+        return getQueryParameter(requestInfo, QUERY)
+                .filter(this::isValidQueryString)
                 .map(UriUtils::escapeWhiteSpace)
                 .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
     protected String getValidName(RequestInfo requestInfo) throws BadRequestException {
-        return getQueryParam(requestInfo, NAME)
-                .filter(this::isValidQuery)
+        return getQueryParameter(requestInfo, NAME)
+                .filter(this::isValidQueryString)
                 .map(UriUtils::escapeWhiteSpace)
                 .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NAME_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
 
-    private boolean isValidQuery(String str) {
+    private boolean isValidQueryString(String str) {
         for (Character c : str.toCharArray()) {
             if (isUnsupportedCharacter(c)) {
                 return false;

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.net.HttpURLConnection;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 
 @SuppressWarnings("unused")
@@ -67,7 +67,7 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
 
     private void validateQueryParameters(RequestInfo requestInfo) throws BadRequestException {
         if (!requestInfo.getQueryParameters().keySet().isEmpty()) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP);
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP);
         }
     }
 

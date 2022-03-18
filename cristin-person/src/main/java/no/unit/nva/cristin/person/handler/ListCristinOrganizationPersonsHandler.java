@@ -63,7 +63,7 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
             throws ApiGatewayException {
 
         validateHasIdentifierPathParameter(requestInfo);
-        validateQueryParamKeys(requestInfo);
+        validateQueryParameterKeys(requestInfo);
 
         String identifier = getValidId(requestInfo);
         String page = getValidPage(requestInfo);
@@ -86,7 +86,7 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
     }
 
     @Override
-    protected void validateQueryParamKeys(RequestInfo requestInfo) throws BadRequestException {
+    protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
             throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LIST);
         }

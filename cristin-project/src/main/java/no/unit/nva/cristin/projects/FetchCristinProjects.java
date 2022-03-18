@@ -4,7 +4,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
     protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        validateQueryParamKeys(requestInfo);
+        validateQueryParameterKeys(requestInfo);
 
         String language = getValidLanguage(requestInfo);
         String query = getValidQuery(requestInfo);
@@ -59,9 +59,9 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
     }
 
     @Override
-    protected void validateQueryParamKeys(RequestInfo requestInfo) throws BadRequestException {
+    protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH);
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH);
         }
     }
 
