@@ -157,7 +157,7 @@ public class CristinPersonApiClient extends ApiClient {
         return personsFromQuery.size() == enrichedCristinPersons.size();
     }
 
-    private List<Person> mapCristinPersonsToNvaPersons(List<CristinPerson> cristinPersons) {
+    public List<Person> mapCristinPersonsToNvaPersons(List<CristinPerson> cristinPersons) {
         return cristinPersons.stream().map(CristinPerson::toPerson).collect(Collectors.toList());
     }
 
