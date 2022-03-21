@@ -52,3 +52,98 @@ Feature: API tests for Cristin Person Update
     And request updateFieldsRequest
     When method PATCH
     Then status 204
+
+  Scenario: Update returns status 400 when invalid json payload
+    Given path '/person/' + personIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def invalidRequest =
+    """
+    Hello
+    """
+    And request invalidRequest
+    When method PATCH
+    Then status 400
+    And match response.detail == 'Supplied payload is not valid'
+
+  Scenario: Update returns status 204 when sending null orcid to erase
+    Given path '/person/' + personIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def validRequest =
+    """
+    {
+      'orcid': null
+    }
+    """
+    And request validRequest
+    When method PATCH
+    Then status 204
+
+  Scenario: Update returns status 400 when invalid orcid
+    Given path '/person/' + personIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def invalidRequest =
+    """
+    {
+      'orcid': '1234'
+    }
+    """
+    And request invalidRequest
+    When method PATCH
+    Then status 400
+    And match response.detail == 'ORCID is not valid'
+
+  Scenario: Update returns status 400 when trying to erase non nullable name
+    Given path '/person/' + personIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def invalidRequest =
+    """
+    {
+      'firstName': null
+    }
+    """
+    And request invalidRequest
+    When method PATCH
+    Then status 400
+    And match response.detail == 'Field firstName can not be erased'
+
+  Scenario: Update returns status 400 when trying to erase non nullable reserved
+    Given path '/person/' + personIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def invalidRequest =
+    """
+    {
+      'reserved': null
+    }
+    """
+    And request invalidRequest
+    When method PATCH
+    Then status 400
+    And match response.detail == 'Reserved field can only be set to true if present'
+
+  Scenario: Update returns status 400 when trying to set reserved to unsupported value
+    Given path '/person/' + personIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def invalidRequest =
+    """
+    {
+      'reserved': false
+    }
+    """
+    And request invalidRequest
+    When method PATCH
+    Then status 400
+    And match response.detail == 'Reserved field can only be set to true if present'
+
+  Scenario: Update returns status 400 when no supported values present
+    Given path '/person/' + personIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def invalidRequest =
+    """
+    {
+      'invalidField': 'invalidValue'
+    }
+    """
+    And request invalidRequest
+    When method PATCH
+    Then status 400
+    And match response.detail == 'No supported fields in payload, not doing anything'
