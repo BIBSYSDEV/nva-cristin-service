@@ -398,6 +398,14 @@ paths:
             type: string
             pattern: '.+'
           example: 'Ola Nordmann'
+        - name: organization
+          in: query
+          description: Search string. Parts of organization name or identifier
+          required: false
+          schema:
+            type: string
+            pattern: '.+'
+          example: 'Universitetet i Tromsø'
         - name: page
           in: query
           description: Current page requested

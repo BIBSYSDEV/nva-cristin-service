@@ -7,6 +7,7 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
@@ -17,6 +18,7 @@ import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 
@@ -65,6 +67,11 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
                 .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NAME_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
     }
 
+    protected Optional<String> getValidOrganization(RequestInfo requestInfo) throws BadRequestException {
+        return getQueryParameter(requestInfo, ORGANIZATION)
+                .filter(this::isValidQueryString)
+                .map(UriUtils::escapeWhiteSpace);
+    }
 
     private boolean isValidQueryString(String str) {
         for (Character c : str.toCharArray()) {

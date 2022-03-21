@@ -13,6 +13,7 @@ import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -51,10 +52,14 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         validateQueryParameterKeys(requestInfo);
 
         String name = getValidName(requestInfo);
+        Optional<String> organization = getValidOrganization(requestInfo);
         String page = getValidPage(requestInfo);
         String numberOfResults = getValidNumberOfResults(requestInfo);
 
         Map<String, String> requestQueryParameters = buildParametersMap(name, page, numberOfResults);
+        if (organization.isPresent()) {
+            requestQueryParameters.put(ORGANIZATION, organization.get());
+        }
 
         return apiClient.generateQueryResponse(requestQueryParameters);
     }
