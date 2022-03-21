@@ -27,6 +27,9 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS =
         "Parameter 'query' is missing or invalid. "
             + "May only contain alphanumeric characters, dash, comma, period and whitespace";
+    public static final String ERROR_MESSAGE_NAME_MISSING_OR_HAS_ILLEGAL_CHARACTERS =
+            "Parameter 'name' is missing or invalid. "
+                    + "May only contain alphanumeric characters, dash, comma, period and whitespace";
     public static final String ERROR_MESSAGE_DEPTH_INVALID = "Parameter 'depth' has invalid value. "
             + "Must be 'top' or 'full'";
     public static final String ERROR_MESSAGE_LANGUAGE_INVALID = "Parameter 'language' has invalid value";
@@ -39,11 +42,13 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE =
         "%s contains no supported Accept header values. Supported values are: application/json; charset=utf-8, "
             + "application/ld+json";
-    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH =
-        "Invalid query param supplied. Valid ones are 'query', 'page', 'results' and 'language'";
-    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP =
-        "Invalid query param supplied. Valid one are 'language'";
-    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP =
+    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH =
+        "Invalid query parameter supplied. Valid parameters are 'query', 'page', 'results' and 'language'";
+    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_PERSON_SEARCH =
+            "Invalid query parameter supplied. Valid parameters are 'name', 'page', 'results' and 'language'";
+    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_LOOKUP =
+        "Invalid query parameter supplied. Valid parameter is 'language'";
+    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP =
         "This endpoint does not support query parameters";
     public static final String ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI =
         "The requested resource '%s' was not found";

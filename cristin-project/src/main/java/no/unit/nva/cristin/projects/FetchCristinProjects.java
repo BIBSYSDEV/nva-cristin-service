@@ -1,15 +1,6 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
 import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -19,12 +10,23 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
+import java.net.HttpURLConnection;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+
 /**
  * Handler for requests to Lambda function.
  */
 public class FetchCristinProjects extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
 
-    private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
+    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
 
     private final transient CristinApiClient cristinApiClient;
 
@@ -48,7 +50,7 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
     protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        validateQueryParamKeys(requestInfo);
+        validateQueryParameterKeys(requestInfo);
 
         String language = getValidLanguage(requestInfo);
         String query = getValidQuery(requestInfo);
@@ -59,9 +61,9 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
     }
 
     @Override
-    protected void validateQueryParamKeys(RequestInfo requestInfo) throws BadRequestException {
-        if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH);
+    protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
+        if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH);
         }
     }
 
@@ -76,13 +78,13 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
                                                                                        String numberOfResults)
             throws ApiGatewayException {
 
-        Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
-        requestQueryParams.put(LANGUAGE, language);
-        requestQueryParams.put(QUERY, query);
-        requestQueryParams.put(PAGE, page);
-        requestQueryParams.put(NUMBER_OF_RESULTS, numberOfResults);
+        Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
+        requestQueryParameters.put(LANGUAGE, language);
+        requestQueryParameters.put(QUERY, query);
+        requestQueryParameters.put(PAGE, page);
+        requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
 
-        return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParams);
+        return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParameters);
     }
 
 }
