@@ -1,11 +1,11 @@
 {
   "@context": "https://example.org/person-search-context.json",
-  "id": "https://api.dev.nva.aws.unit.no/cristin/person?query=John+Smith&page=1&results=5",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/person?name=John+Smith&page=1&results=5",
   "size": 135,
-  "searchString": "query=John+Smith&page=1&results=5",
+  "searchString": "name=John+Smith&page=1&results=5",
   "processingTime": 1000,
   "firstRecord": 1,
-  "nextResults": "https://api.dev.nva.aws.unit.no/cristin/person?query=John+Smith&page=2&results=5",
+  "nextResults": "https://api.dev.nva.aws.unit.no/cristin/person?name=John+Smith&page=2&results=5",
   "previousResults": null,
   "hits": [
     {

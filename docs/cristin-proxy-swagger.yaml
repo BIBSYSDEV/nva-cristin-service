@@ -386,11 +386,11 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Person
-      summary: List persons matching query
+      summary: List persons matching query parameters
       description: Returns a list of persons based on query parameters
       operationId: ListPersons
       parameters:
-        - name: query
+        - name: name
           in: query
           description: Search string. First name and/or last name
           required: true
@@ -1683,12 +1683,12 @@ components:
     PersonsExample:
       value:
         '@context': 'https://example.org/person-search-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?query=Ola+Nordmann&page=1&results=5'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?name=Ola+Nordmann&page=1&results=5'
         size: 150
-        searchString: 'query=Ola+Nordmann&page=1&results=5'
+        searchString: 'name=Ola+Nordmann&page=1&results=5'
         processingTime: 800
         firstRecord: 1
-        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?query=Ola+Nordmann&page=2&results=5'
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?name=Ola+Nordmann&page=2&results=5'
         previousResults: ''
         hits:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'

@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.institution.common;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PERSON_ID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.common.Utils.removeUnitPartFromIdentifierIfPresent;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
@@ -30,7 +30,7 @@ public abstract class PersonInstitutionInfoHandler<I, O> extends ApiGatewayHandl
 
     protected void validateQueryParameters(RequestInfo requestInfo) throws BadRequestException {
         if (!requestInfo.getQueryParameters().keySet().isEmpty()) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP);
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP);
         }
     }
 

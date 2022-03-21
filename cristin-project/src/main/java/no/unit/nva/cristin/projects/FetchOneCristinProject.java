@@ -15,7 +15,7 @@ import java.net.HttpURLConnection;
 import java.util.Set;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_LOOKUP;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
@@ -62,7 +62,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     private void validateThatSuppliedQueryParamsIsSupported(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP);
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_LOOKUP);
         }
     }
 

@@ -30,7 +30,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAT
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LIST;
+import static no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler.ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_LIST;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -85,7 +85,7 @@ class ListCristinOrganizationPersonsHandlerTest {
         GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LIST));
+        assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_LIST));
     }
 
     @Test
