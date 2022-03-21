@@ -53,9 +53,8 @@ public class ErrorMessages {
     }
 
     public static String invalidQueryParametersMessage(String queryParameterName, String validValues) {
-        return String.format(ERROR_MESSAGE_DEPTH_INVALID + validValues, queryParameterName);
+        return String.format(ERROR_MESSAGE_INVALID_VALUE + validValues, queryParameterName);
     }
-
 
     private static String prettifyList(Set<String> queryParameters) {
         return queryParameters.size() > 1
