@@ -28,8 +28,6 @@ import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
-//    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_LIST =
-//            "Invalid query parameter supplied. Valid parameters are 'page' and 'results'";
     public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(PAGE, NUMBER_OF_RESULTS);
     private final transient CristinOrganizationPersonsClient apiClient;
 
