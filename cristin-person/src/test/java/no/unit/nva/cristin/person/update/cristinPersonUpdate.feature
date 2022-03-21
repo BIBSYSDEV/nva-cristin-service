@@ -53,18 +53,6 @@ Feature: API tests for Cristin Person Update
     When method PATCH
     Then status 204
 
-  Scenario: Update returns status 400 when invalid json payload
-    Given path '/person/' + personIdentifier
-    * header Authorization = 'Bearer ' + token
-    * def invalidRequest =
-    """
-    Hello
-    """
-    And request invalidRequest
-    When method PATCH
-    Then status 400
-    And match response.detail == 'Supplied payload is not valid'
-
   Scenario: Update returns status 204 when sending null orcid to erase
     Given path '/person/' + personIdentifier
     * header Authorization = 'Bearer ' + token
