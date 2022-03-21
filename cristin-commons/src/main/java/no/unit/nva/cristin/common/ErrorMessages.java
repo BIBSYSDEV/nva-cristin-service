@@ -58,7 +58,7 @@ public class ErrorMessages {
 
     private static String prettifyList(Set<String> queryParameters) {
         return queryParameters.size() > 1
-                ? "are " + queryParameters.stream()
+                ? "are " + queryParameters.stream().sorted()
                     .map(parameterName -> "'" + parameterName + "'")
                     .collect(Collectors.joining(", ", "[", "]"))
                 : "is " + queryParameters.stream()
