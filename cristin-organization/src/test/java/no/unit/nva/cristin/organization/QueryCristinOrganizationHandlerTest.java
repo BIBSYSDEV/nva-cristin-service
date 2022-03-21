@@ -68,7 +68,7 @@ class QueryCristinOrganizationHandlerTest {
     private Context context;
 
     @BeforeEach
-    void setUp() throws NotFoundException, FailedHttpRequestException, InterruptedException {
+    void setUp() throws NotFoundException, FailedHttpRequestException {
         context = mock(Context.class);
         CristinOrganizationApiClient cristinApiClient = mock(CristinOrganizationApiClient.class);
         when(cristinApiClient.queryOrganizations(any())).thenReturn(emptySearchResponse());
@@ -94,7 +94,8 @@ class QueryCristinOrganizationHandlerTest {
         GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(invalidQueryParametersMessage(QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
+        assertThat(actualDetail, containsString(invalidQueryParametersMessage(
+                QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
     @Test

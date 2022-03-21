@@ -69,7 +69,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
                         invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
-    protected Optional<String> getValidOrganization(RequestInfo requestInfo) throws BadRequestException {
+    protected Optional<String> getValidOrganization(RequestInfo requestInfo) {
         return getQueryParameter(requestInfo, ORGANIZATION)
                 .filter(this::isValidQueryString)
                 .map(UriUtils::escapeWhiteSpace);

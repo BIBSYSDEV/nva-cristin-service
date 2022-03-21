@@ -138,7 +138,7 @@ class FetchCristinOrganizationHandlerTest {
             doThrow(new NullPointerException())
                     .when(serviceThrowingException)
                     .getOrganization(any());
-        } catch (ApiGatewayException | InterruptedException e) {
+        } catch (ApiGatewayException e) {
             e.printStackTrace();
         }
 

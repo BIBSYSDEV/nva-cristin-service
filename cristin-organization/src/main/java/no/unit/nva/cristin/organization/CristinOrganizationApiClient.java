@@ -75,8 +75,7 @@ public class CristinOrganizationApiClient extends ApiClient {
      * @return an {@link Organization} containing the information
      * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
-    public Organization getOrganization(URI uri)
-            throws ApiGatewayException, InterruptedException {
+    public Organization getOrganization(URI uri) throws ApiGatewayException  {
         return fromSubSubunit(getSubSubUnitDtoWithMultipleEfforts(uri));
     }
 
