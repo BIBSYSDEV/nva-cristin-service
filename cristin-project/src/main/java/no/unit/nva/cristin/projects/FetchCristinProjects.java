@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParametersMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
@@ -26,7 +26,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
  */
 public class FetchCristinProjects extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
 
-    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
+    public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
 
     private final transient CristinApiClient cristinApiClient;
 
@@ -63,7 +63,7 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
     @Override
     protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH);
+            throw new BadRequestException(validQueryParametersMessage(VALID_QUERY_PARAMETERS));
         }
     }
 

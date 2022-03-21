@@ -9,11 +9,10 @@ import nva.commons.core.Environment;
 import java.util.List;
 import java.util.Set;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NAME_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_VALUE_INVALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
@@ -32,7 +31,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
 
     protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_SEARCH);
+            throw new BadRequestException(validQueryParametersMessage(VALID_QUERY_PARAMETERS));
         }
     }
 
@@ -41,7 +40,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
         if (Utils.isPositiveInteger(page)) {
             return page;
         }
-        throw new BadRequestException(ERROR_MESSAGE_PAGE_VALUE_INVALID);
+        throw new BadRequestException(String.format(ERROR_MESSAGE_INVALID_VALUE, PAGE));
     }
 
     protected String getValidNumberOfResults(RequestInfo requestInfo) throws BadRequestException {
@@ -49,7 +48,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
         if (Utils.isPositiveInteger(results)) {
             return results;
         }
-        throw new BadRequestException(ERROR_MESSAGE_NUMBER_OF_RESULTS_VALUE_INVALID);
+        throw new BadRequestException(String.format(ERROR_MESSAGE_INVALID_VALUE, NUMBER_OF_RESULTS));
     }
 
     protected String getValidQuery(RequestInfo requestInfo) throws BadRequestException {
