@@ -82,7 +82,8 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
         return cristinApiClient.queryOneCristinProjectUsingIdIntoNvaProject(id, language);
     }
 
-    private NvaProject authenticatedGetTransformedProjectFromCristin(String id, String language) throws ApiGatewayException {
+    private NvaProject authenticatedGetTransformedProjectFromCristin(String id, String language)
+            throws ApiGatewayException {
         return new CristinApiClient(CristinAuthenticator.getHttpClient())
                 .queryOneCristinProjectUsingIdIntoNvaProject(id, language);
     }

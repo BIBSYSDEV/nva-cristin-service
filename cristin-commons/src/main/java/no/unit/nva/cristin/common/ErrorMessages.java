@@ -27,12 +27,8 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS =
             "Invalid path parameter for identifier,"
                     + " needs to be organization identifier matching pattern /(?:\\d+.){3}\\d+/, e.g. (100.0.0.0)";
-    public static final String ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS =
-            "Parameter 'query' is missing or invalid. "
-                    + "May only contain alphanumeric characters, dash, comma, period and whitespace";
-    public static final String ERROR_MESSAGE_NAME_MISSING_OR_HAS_ILLEGAL_CHARACTERS =
-            "Parameter 'name' is missing or invalid. "
-                    + "May only contain alphanumeric characters, dash, comma, period and whitespace";
+    public static final String ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE =
+            "May only contain alphanumeric characters, dash, comma, period and whitespace";
     public static final String ERROR_MESSAGE_DEPTH_INVALID = "Parameter 'depth' has invalid value. "
             + "Must be 'top' or 'full'";
     public static final String ERROR_MESSAGE_INVALID_VALUE = "Parameter '%s' has invalid value";
@@ -55,6 +51,11 @@ public class ErrorMessages {
     public static String validQueryParametersMessage(Set<String> queryParameters) {
         return String.format(ERROR_MESSAGE_TEMPLATE_INVALID_QUERY_PARAMETERS, prettifyList(queryParameters));
     }
+
+    public static String invalidQueryParametersMessage(String queryParameterName, String validValues) {
+        return String.format(ERROR_MESSAGE_DEPTH_INVALID + validValues, queryParameterName);
+    }
+
 
     private static String prettifyList(Set<String> queryParameters) {
         return queryParameters.size() > 1

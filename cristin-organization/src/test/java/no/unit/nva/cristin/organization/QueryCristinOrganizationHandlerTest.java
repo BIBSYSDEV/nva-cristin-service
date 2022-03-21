@@ -38,14 +38,16 @@ import static com.google.common.net.MediaType.JSON_UTF_8;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Collections.emptyList;
+import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_DEPTH_INVALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -92,7 +94,7 @@ class QueryCristinOrganizationHandlerTest {
         GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(actualDetail, containsString(invalidQueryParametersMessage(QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
     @Test

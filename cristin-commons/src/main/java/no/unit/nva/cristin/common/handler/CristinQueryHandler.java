@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NAME_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
@@ -57,14 +57,16 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
         return getQueryParameter(requestInfo, QUERY)
                 .filter(this::isValidQueryString)
                 .map(UriUtils::escapeWhiteSpace)
-                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+                .orElseThrow(() -> new BadRequestException(
+                        invalidQueryParametersMessage(QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
     protected String getValidName(RequestInfo requestInfo) throws BadRequestException {
         return getQueryParameter(requestInfo, NAME)
                 .filter(this::isValidQueryString)
                 .map(UriUtils::escapeWhiteSpace)
-                .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_NAME_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+                .orElseThrow(() -> new BadRequestException(
+                        invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
     protected Optional<String> getValidOrganization(RequestInfo requestInfo) throws BadRequestException {

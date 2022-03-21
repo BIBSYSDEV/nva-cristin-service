@@ -38,11 +38,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.QueryType;
@@ -163,7 +164,8 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(
+                invalidQueryParametersMessage(QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
     @Test
@@ -192,7 +194,8 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(
+                invalidQueryParametersMessage(QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
     @Test
@@ -204,7 +207,8 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(gatewayResponse.getBody(), containsString(
+                invalidQueryParametersMessage(QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
     @Test
@@ -411,7 +415,8 @@ public class FetchCristinProjectsTest {
         GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(String.format(ERROR_MESSAGE_INVALID_VALUE, NUMBER_OF_RESULTS)));
+        assertThat(gatewayResponse.getBody(),
+                containsString(String.format(ERROR_MESSAGE_INVALID_VALUE, NUMBER_OF_RESULTS)));
     }
 
     @ParameterizedTest(
@@ -535,7 +540,8 @@ public class FetchCristinProjectsTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(body.getDetail(), containsString(validQueryParametersMessage(FetchCristinProjects.VALID_QUERY_PARAMETERS)));
+        assertThat(body.getDetail(), containsString(
+                validQueryParametersMessage(FetchCristinProjects.VALID_QUERY_PARAMETERS)));
     }
 
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
