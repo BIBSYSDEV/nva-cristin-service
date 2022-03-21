@@ -14,8 +14,15 @@ Feature: API tests for Cristin Person Update
     * def token = tokenGenerator.loginUser(username, password, cognitoUserpoolId, cognitoClientAppId)
     * def simpleUserToken = tokenGenerator.loginUser(simple_user_name, simple_user_password, cognitoUserpoolId, cognitoClientAppId)
     * def invalidToken = 'just-a-invalid-token-for-now'
-    * def updateFieldsRequest = { type: 'Person' }
     * def personIdentifier = '515114'
+    * def updateFieldsRequest =
+    """
+    {
+      'firstName': 'Helge',
+      'lastName': 'Pettersen',
+      'preferredFirstName': null
+    }
+    """
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
 
