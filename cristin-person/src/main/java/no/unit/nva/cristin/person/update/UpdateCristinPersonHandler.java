@@ -1,7 +1,12 @@
 package no.unit.nva.cristin.person.update;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
-import no.unit.nva.cristin.person.model.nva.Person;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.HttpURLConnection;
 import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -12,13 +17,7 @@ import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-import java.net.HttpURLConnection;
-
-import static java.util.Objects.isNull;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
-import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
-
-public class UpdateCristinPersonHandler extends ApiGatewayHandler<Person, String> {
+public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, String> {
 
     @SuppressWarnings("unused")
     @JacocoGenerated
@@ -27,21 +26,22 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<Person, String
     }
 
     public UpdateCristinPersonHandler(Environment environment) {
-        super(Person.class, environment);
+        super(String.class, environment);
     }
 
     @Override
-    protected String processInput(Person input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+    protected String processInput(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
 
         validateHasAccessRights(requestInfo);
 
-        validateContainsPayload(input);
+        ObjectNode objectNode = readJsonFromInput(input);
+        PersonPatchValidator.validate(objectNode);
 
         return EMPTY_JSON;
     }
 
     @Override
-    protected Integer getSuccessStatusCode(Person input, String output) {
+    protected Integer getSuccessStatusCode(String input, String output) {
         return HttpURLConnection.HTTP_NO_CONTENT;
     }
 
@@ -51,9 +51,8 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<Person, String
         }
     }
 
-    private void validateContainsPayload(Person input) throws BadRequestException {
-        if (isNull(input)) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
-        }
+    private ObjectNode readJsonFromInput(String input) throws BadRequestException {
+        return attempt(() -> (ObjectNode) OBJECT_MAPPER.readTree(input))
+            .orElseThrow(fail -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 }

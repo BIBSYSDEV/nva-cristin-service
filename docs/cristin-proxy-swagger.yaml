@@ -560,7 +560,7 @@ paths:
       security:
         - CognitoUserPool: [ ]
       requestBody:
-        description: Payload containing one or more fields. Fields except reserved, FirstName and LastName can be set to null to erase content
+        description: Payload containing modifiable data for person
         required: true
         content:
           application/json:
@@ -1369,26 +1369,25 @@ components:
                 type: string
                 pattern: '.+'
                 description: Value of identifier
-    PersonPatch: # Depends on future datamodel
+    PersonPatch:
       type: object
       properties:
-        names:
-          type: array
-          description: Names for this person.
-          items:
-            type: object
-            properties:
-              type:
-                type: string
-                pattern: 'PreferredFirstName|PreferredLastName|FirstName|LastName'
-                description: Name of identifier
-              value:
-                type: string
-                pattern: '.+'
-                description: Value of identifier
+        orcid:
+          type: string
+          nullable: true
+        firstName:
+          type: string
+        lastName:
+          type: string
+        preferredFirstName:
+          type: string
+          nullable: true
+        preferredLastName:
+          type: string
+          nullable: true
         reserved:
           type: boolean
-          description: If person should hidden from public view
+          description: If person should be hidden from public view
     PersonNIN:
       type: object
       properties:
@@ -1804,16 +1803,10 @@ components:
                 nb: 'Overingeniør'
     PersonPatchExample:
       value:
-        names:
-          - type: 'PreferredFirstName'
-            value: 'Ola'
-          - type: 'PreferredLastName'
-            value: 'Nordmann'
-          - type: 'FirstName'
-            value: 'Kjell Ola'
-          - type: 'LastName'
-            value: 'Nordmann'
-        reserved: false
+        orcid: '1234-1234-1234-1234'
+        firstName: 'Kjell'
+        lastName: 'Hansen'
+        preferredFirstName: 'null'
     PersonPostExample:
       value:
         identifiers:
