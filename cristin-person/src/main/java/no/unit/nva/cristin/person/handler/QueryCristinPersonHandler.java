@@ -57,9 +57,7 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         String numberOfResults = getValidNumberOfResults(requestInfo);
 
         Map<String, String> requestQueryParameters = buildParametersMap(name, page, numberOfResults);
-        if (organization.isPresent()) {
-            requestQueryParameters.put(ORGANIZATION, organization.get());
-        }
+        organization.ifPresent(s -> requestQueryParameters.put(ORGANIZATION, s));
 
         return apiClient.generateQueryResponse(requestQueryParameters);
     }

@@ -111,7 +111,7 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseOnQuery() throws IOException, ApiGatewayException, InterruptedException {
+    void shouldReturnResponseOnQuery() throws IOException, ApiGatewayException {
 
         HttpClient httpClient = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
