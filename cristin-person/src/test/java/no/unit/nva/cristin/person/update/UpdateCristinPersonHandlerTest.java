@@ -79,7 +79,6 @@ public class UpdateCristinPersonHandlerTest {
         GatewayResponse<String> gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
-        assertEquals(EMPTY_JSON, gatewayResponse.getBodyObject(String.class));
     }
 
     @Test
@@ -164,7 +163,7 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenNoSupportedFields() throws IOException {
+    void shouldReturnBadRequestWhenNoSupportedFieldsArePresent() throws IOException {
         ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(UNSUPPORTED_FIELD, randomString());
 

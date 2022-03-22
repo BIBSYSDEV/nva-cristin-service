@@ -31,7 +31,7 @@ public class UpdateCristinPersonApiClient extends PatchApiClient {
         HttpResponse<String> response = patch(uri, request.toString());
         checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode());
 
-        return EMPTY_JSON;
+        return null;
     }
 
     private URI generateCristinUri(String personId) {

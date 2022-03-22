@@ -82,17 +82,17 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, String
 
     protected String getValidPersonId(RequestInfo requestInfo) throws BadRequestException {
         String identifier = attempt(() -> requestInfo.getPathParameter(PERSON_ID)).orElse(fail -> EMPTY_STRING);
-        if (isValidIdentifier(identifier)) {
-            return identifier;
+        if (isNotValidIdentifier(identifier)) {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PERSON_ID);
         }
-        throw new BadRequestException(ERROR_MESSAGE_INVALID_PERSON_ID);
+        return identifier;
     }
 
     private boolean noSupportedValuesPresent(ObjectNode cristinJson) {
         return cristinJson.isEmpty();
     }
 
-    private boolean isValidIdentifier(String identifier) {
-        return Utils.isPositiveInteger(identifier);
+    private boolean isNotValidIdentifier(String identifier) {
+        return !Utils.isPositiveInteger(identifier);
     }
 }
