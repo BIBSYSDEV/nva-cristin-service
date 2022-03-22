@@ -135,3 +135,4 @@ Feature: API tests for Cristin Person Update
     When method PATCH
     Then status 400
     And match response.detail == 'No supported fields in payload, not doing anything'
+    
