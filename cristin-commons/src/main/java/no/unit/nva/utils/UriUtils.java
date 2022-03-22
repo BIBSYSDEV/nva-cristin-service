@@ -84,6 +84,8 @@ public class UriUtils {
                 .getUri();
     }
 
+
+
     public static URI addLanguage(URI uri) {
         return new UriWrapper(uri).addQueryParameter(QUERY_PARAMETER_LANGUAGE, ALL_QUERY_PARAMETER_LANGUAGES).getUri();
     }

@@ -184,7 +184,7 @@ Resources:
               - method.request.querystring.query
               - method.request.querystring.page
               - method.request.querystring.results
-
+              - method.request.querystring.depth
   NvaCristinFetchOrganization:
     Type: AWS::Serverless::Function
     Properties:
@@ -201,6 +201,8 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /organization/{id}
             Method: get
+            RequestParameters:
+              - method.request.querystring.depth
 
   NvaCristinFetchOrganizationTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget

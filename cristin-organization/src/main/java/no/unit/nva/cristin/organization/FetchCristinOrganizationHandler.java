@@ -20,6 +20,7 @@ import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.cristin.organization.QueryCristinOrganizationHandler.getValidDepth;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
@@ -46,8 +47,13 @@ public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, O
             throws ApiGatewayException {
         validateThatSuppliedParamsIsSupported(requestInfo);
         final String identifier = getValidId(requestInfo);
+        final String depth = getValidDepth(requestInfo);
+
         try {
-            Organization organization = cristinApiClient.getOrganization(getCristinUri(identifier, UNITS_PATH));
+            final Organization organization =  "none".equals(depth)
+                    ? cristinApiClient.getFlatOrganization(identifier)
+                    :  cristinApiClient.getOrganization(getCristinUri(identifier, UNITS_PATH));
+
             organization.setContext(ORGANIZATION_CONTEXT);
             return organization;
         } catch (NotFoundException e) {
@@ -76,5 +82,9 @@ public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, O
         }
         throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
     }
+
+
+
+
 
 }

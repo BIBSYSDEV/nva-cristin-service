@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.util.Objects.isNull;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
@@ -46,6 +47,7 @@ import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
 
+@SuppressWarnings("PMD.GodClass")
 public class CristinOrganizationApiClient extends ApiClient {
 
     public static final String CRISTIN_LEVELS_PARAM = "levels";
@@ -78,6 +80,38 @@ public class CristinOrganizationApiClient extends ApiClient {
     public Organization getOrganization(URI uri)
             throws ApiGatewayException, InterruptedException {
         return fromSubSubunit(getSubSubUnitDtoWithMultipleEfforts(uri));
+    }
+
+    /**
+     * Get information for an Organization without parent of subunits.
+     *
+     * @param identifier the Cristin unit URI
+     * @return an {@link Organization} containing the information
+     * @throws NotFoundException when the URI does not correspond to an existing unit.
+     */
+    public Organization getFlatOrganization(String identifier) throws ApiGatewayException, InterruptedException {
+        URI cristinUri =  new UriWrapper(CRISTIN_API_URL)
+                    .addChild(UNITS_PATH)
+                    .addQueryParameter("id", identifier)
+                    .getUri();
+
+        HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(cristinUri)).get();
+        if (isSuccessful(response.statusCode())) {
+            try {
+                List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() {
+                });
+                SubUnitDto subUnitDto = units.get(0);
+                Organization organization = new Organization.Builder()
+                        .withId(getNvaApiId(identifier, ORGANIZATION_PATH))
+                        .withName(subUnitDto.getName())
+                        .withAcronym(subUnitDto.getAcronym())
+                        .build();
+                return organization;
+            } catch (JsonProcessingException e) {
+                throw new FailedHttpRequestException(NULL_HTTP_RESPONSE_ERROR_MESSAGE);
+            }
+        }
+        return null;
     }
 
     /**

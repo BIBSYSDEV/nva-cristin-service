@@ -4,6 +4,7 @@ Feature: API tests for Cristin Organization retrieve and search
     * def testOrganizationNameSearchTerm = 'univers'
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingOrganizationId = '0.1.2.3'
+    * def existingOrganizationIdentifier = '185.90.0.0'
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
@@ -59,3 +60,20 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.hits == '#array'
     And match response.size == '#number'
     And match response.hits == '#[2]' // hits array length == 0
+
+  Scenario: GET organization for known organization returns list of search results with depth
+    Given  path '/organization'
+    And param query = existingOrganizationIdentifier
+    When method GET
+    Then status 200
+    And match response.hits == '#array'
+    And match response.hits[0].partOf == '#present"
+
+  Scenario: GET organization for known organization returns list of search results with depth
+    Given  path '/organization'
+    And param query = existingOrganizationIdentifier
+    And param depth = top
+    When method GET
+    Then status 200
+    And match response.hits == '#array'
+    And match response.hits[0].partOf != '#present"
