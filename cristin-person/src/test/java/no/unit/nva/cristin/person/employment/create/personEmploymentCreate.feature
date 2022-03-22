@@ -15,6 +15,7 @@ Feature: API tests for Creation of Cristin Person Employments
     * def simpleUserToken = tokenGenerator.loginUser(simple_user_name, simple_user_password, cognitoUserpoolId, cognitoClientAppId)
     * def invalidToken = 'just-a-invalid-token-for-now'
     * def personIdentifier = '515114'
+    Given url CRISTIN_BASE
 
   Scenario: Create returns status 401 Unauthorized when invalid token
     Given path '/person/' + personIdentifier + '/employment/'
