@@ -801,6 +801,61 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinCreatePersonEmploymentFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Create one person employment
+      description: Creates one person employment matching supplied payload
+      operationId: PostPersonEmployment
+      security:
+        - CognitoUserPool: [ ]
+      requestBody:
+        description: Payload containing employment information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonEmployment'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonEmploymentExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/PersonEmployment'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonEmploymentExample'
+      responses:
+        201:
+          description: Successful creation of resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonEmployment'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonEmploymentExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PersonEmployment'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonEmploymentExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
   /position:
     get:
       x-amazon-apigateway-integration:
