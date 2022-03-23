@@ -184,7 +184,7 @@ Resources:
               - method.request.querystring.query
               - method.request.querystring.page
               - method.request.querystring.results
-
+              - method.request.querystring.depth
   NvaCristinFetchOrganization:
     Type: AWS::Serverless::Function
     Properties:
@@ -254,6 +254,7 @@ Resources:
             Method: get
             RequestParameters:
               - method.request.querystring.name
+              - method.request.querystring.organization
               - method.request.querystring.page
               - method.request.querystring.results
 

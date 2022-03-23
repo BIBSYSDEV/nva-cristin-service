@@ -16,6 +16,7 @@ import static no.unit.nva.utils.UriUtils.getCristinUri;
 public class CristinPersonQuery {
 
     private static final String CRISTIN_QUERY_PARAMETER_NAME_KEY = "name";
+    private static final String CRISTIN_QUERY_PARAMETER_ORGANIZATION_KEY = "institution";
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_DEFAULT_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
@@ -85,6 +86,12 @@ public class CristinPersonQuery {
         cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_NAME_KEY, name);
         return this;
     }
+
+    public CristinPersonQuery withOrganization(String organization) {
+        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_ORGANIZATION_KEY, organization);
+        return this;
+    }
+
 
     public CristinPersonQuery withParentUnitId(String unitId) {
         cristinQueryParameters.put(PARENT_UNIT_ID, unitId);

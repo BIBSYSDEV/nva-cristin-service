@@ -9,6 +9,17 @@ dependencies {
     testImplementation libs.karate.junit5
 }
 
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
+    }
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
+}
+
 sourceSets {
     test {
         resources {

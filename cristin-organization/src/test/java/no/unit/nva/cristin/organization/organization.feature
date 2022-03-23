@@ -39,7 +39,7 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Parameter \'query\' is missing or invalid. May only contain alphanumeric characters, dash, comma, period and whitespace'
+    And match response.detail == 'Parameter \'query\' has invalid value. May only contain alphanumeric characters, dash, comma, period and whitespace'
 
   Scenario: GET returns 404 status Not found when requesting unknown organization identifier
     Given path '/organization/' + nonExistingOrganizationId
