@@ -26,7 +26,7 @@ public class UpdateCristinPersonApiClient extends PatchApiClient {
      * @return An empty json if update was successful
      * @throws ApiGatewayException if something went wrong that can be mapped to a client response
      */
-    public String updatePersonInCristin(String personId, ObjectNode request) throws ApiGatewayException {
+    public Void updatePersonInCristin(String personId, ObjectNode request) throws ApiGatewayException {
         URI uri = generateCristinUri(personId);
         HttpResponse<String> response = patch(uri, request.toString());
         checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode());

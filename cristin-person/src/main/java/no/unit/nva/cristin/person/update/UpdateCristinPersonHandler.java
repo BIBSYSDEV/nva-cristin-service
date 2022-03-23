@@ -23,7 +23,7 @@ import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, String> {
+public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> {
 
     public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
         "No supported fields in payload, not doing anything";
@@ -42,7 +42,7 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, String
     }
 
     @Override
-    protected String processInput(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+    protected Void processInput(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
 
         validateHasAccessRights(requestInfo);
 
@@ -60,7 +60,7 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, String
     }
 
     @Override
-    protected Integer getSuccessStatusCode(String input, String output) {
+    protected Integer getSuccessStatusCode(String input, Void output) {
         return HttpURLConnection.HTTP_NO_CONTENT;
     }
 
