@@ -165,15 +165,20 @@ class FetchCristinOrganizationHandlerTest {
 
         CristinOrganizationApiClient mySpy = spy(cristinApiClient);
         final URI level1 = getCristinUri("185.90.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_90_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level1);
+        doReturn(getSubSubUnit("unit_18_90_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level1);
         final URI level2a = getCristinUri("185.53.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2a);
+        doReturn(getSubSubUnit("unit_18_53_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2a);
         final URI level2b = getCristinUri("185.50.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_50_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2b);
+        doReturn(getSubSubUnit("unit_18_50_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2b);
         final URI level3 = getCristinUri("185.53.18.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_18_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level3);
+        doReturn(getSubSubUnit("unit_18_53_18_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level3);
         final URI level4 = getCristinUri("185.53.18.14", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_18_14.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level4);
+        doReturn(getSubSubUnit("unit_18_53_18_14.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level4);
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
         final String identifier = "185.53.18.14";
@@ -222,19 +227,25 @@ class FetchCristinOrganizationHandlerTest {
 
         CristinOrganizationApiClient mySpy = spy(cristinApiClient);
         final URI level1 = getCristinUri("185.90.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_90_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level1);
+        doReturn(getSubSubUnit("unit_18_90_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level1);
         final URI level2a = getCristinUri("185.53.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2a);
+        doReturn(getSubSubUnit("unit_18_53_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2a);
         final URI level2b = getCristinUri("185.50.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_50_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2b);
+        doReturn(getSubSubUnit("unit_18_50_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2b);
         final URI level3 = getCristinUri("185.53.18.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_18_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level3);
+        doReturn(getSubSubUnit("unit_18_53_18_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level3);
         final URI level4 = getCristinUri("185.53.18.14", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_18_14.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level4);
+        doReturn(getSubSubUnit("unit_18_53_18_14.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level4);
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
         final String identifier = "185.53.18.14";
-        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequestWithAdditionalQueryParameters(identifier, NONE), output, context);
+        fetchCristinOrganizationHandler
+                .handleRequest(generateHandlerRequestWithAdditionalQueryParameters(identifier, NONE), output, context);
         GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output);
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
@@ -264,7 +275,8 @@ class FetchCristinOrganizationHandlerTest {
                 .build();
     }
 
-    private InputStream generateHandlerRequestWithAdditionalQueryParameters(String organizationIdentifier, String depth) throws JsonProcessingException {
+    private InputStream generateHandlerRequestWithAdditionalQueryParameters(String organizationIdentifier, String depth)
+            throws JsonProcessingException {
         Map<String, String> headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type());
         Map<String, String> pathParameters = Map.of(IDENTIFIER, organizationIdentifier);
         Map<String, String> queryParameters = Map.of(DEPTH, depth);

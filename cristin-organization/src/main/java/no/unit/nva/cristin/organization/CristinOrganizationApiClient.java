@@ -95,31 +95,31 @@ public class CristinOrganizationApiClient extends ApiClient {
      *
      * @param identifier the Cristin unit URI
      * @return an {@link Organization} containing the information
-     * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
-    public Organization getFlatOrganization(String identifier) throws ApiGatewayException, InterruptedException {
+    public Organization getFlatOrganization(String identifier) throws InterruptedException {
         URI cristinUri = getCristinOrganizationByIdentifierUri(identifier);
-
         HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(cristinUri)).get();
-        if (isSuccessful(response.statusCode())) {
-            try {
-                List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() {
-                });
-                if (SINGLE_HIT == units.size()) {
-                    SubUnitDto subUnitDto = units.get(FIRST_AND_ONLY_UNIT);
-                    return new Organization.Builder()
-                            .withId(getNvaApiId(identifier, ORGANIZATION_PATH))
-                            .withName(subUnitDto.getName())
-                            .withAcronym(subUnitDto.getAcronym())
-                            .build();
-                } else {
-                    throw new BadRequestException(UNIQUELY_IDENTIFY_ORGANIZATION);
-                }
-            } catch (JsonProcessingException e) {
-                throw new FailedHttpRequestException(NULL_HTTP_RESPONSE_ERROR_MESSAGE);
+        return isSuccessful(response.statusCode()) ? extractOrganization(identifier, response) : null;
+    }
+
+    private Organization extractOrganization(String identifier, HttpResponse<String> response) {
+        return attempt(() -> {
+            List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() {
+            });
+            if (SINGLE_HIT == units.size()) {
+                return toOrganization(identifier, units.get(FIRST_AND_ONLY_UNIT));
+            } else {
+                throw new BadRequestException(UNIQUELY_IDENTIFY_ORGANIZATION);
             }
-        }
-        return null;
+        }).orElseThrow();
+    }
+
+    private Organization toOrganization(String identifier, SubUnitDto subUnitDto) {
+        return new Organization.Builder()
+                .withId(getNvaApiId(identifier, ORGANIZATION_PATH))
+                .withName(subUnitDto.getName())
+                .withAcronym(subUnitDto.getAcronym())
+                .build();
     }
 
     private URI getCristinOrganizationByIdentifierUri(String identifier) {
@@ -175,7 +175,6 @@ public class CristinOrganizationApiClient extends ApiClient {
         searchResponse.setProcessingTime(timeUsed);
         return searchResponse;
     }
-
 
     private URI previousResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
         int firstPage = Integer.parseInt(requestQueryParams.get(PAGE)) - SINGLE_HIT;
@@ -241,14 +240,10 @@ public class CristinOrganizationApiClient extends ApiClient {
 
     private Set<Organization> getSubUnits(SubSubUnitDto subSubUnitDto) {
         List<SubUnitDto> subUnits = subSubUnitDto.getSubUnits();
-        if (!isNull(subUnits)) {
-            return subUnits.stream()
-                    .parallel()
-                    .map((SubUnitDto subUnitDto) -> getSubUnitDto(subUnitDto.getUri()))
-                    .collect(Collectors.toSet());
-        } else {
-            return null;
-        }
+        return !isNull(subUnits) ? subUnits.stream()
+                .parallel()
+                .map((SubUnitDto subUnitDto) -> getSubUnitDto(subUnitDto.getUri()))
+                .collect(Collectors.toSet()) : null;
     }
 
     private Organization getSubUnitDto(URI cristinUri) {
@@ -275,7 +270,6 @@ public class CristinOrganizationApiClient extends ApiClient {
                 .map(uri -> attempt(() -> getOrganization(uri)).orElseThrow())
                 .collect(Collectors.toList());
     }
-
 
     protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri) throws ApiGatewayException {
 
@@ -315,5 +309,4 @@ public class CristinOrganizationApiClient extends ApiClient {
     private String errorMessage(HttpResponse<String> response) {
         return String.format(ERROR_MESSAGE_FORMAT, response.statusCode(), response.body());
     }
-
 }
