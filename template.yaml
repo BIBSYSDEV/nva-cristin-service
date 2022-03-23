@@ -399,8 +399,6 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.employment.query.QueryPersonEmploymentHandler::handleRequest
-
-
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinQueryPersonEmploymentEvent:
@@ -409,6 +407,20 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/{id}/employment/
             Method: get
+
+  NvaCristinCreatePersonEmploymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.employment.create.CreatePersonEmploymentHandler::handleRequest
+      #Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinCreatePersonEmploymentEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}/employment/
+            Method: post
 
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
