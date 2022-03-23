@@ -76,7 +76,7 @@ class FetchCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnsNotFoundResponseWhenUnitIsMissing()
-            throws IOException, ApiGatewayException, InterruptedException {
+            throws IOException, ApiGatewayException {
 
         cristinApiClient = spy(cristinApiClient);
         doThrow(new NotFoundException(NOT_FOUND_MESSAGE_TEMPLATE + IDENTIFIER_VALUE))
@@ -140,7 +140,7 @@ class FetchCristinOrganizationHandlerTest {
             doThrow(new NullPointerException())
                     .when(serviceThrowingException)
                     .getOrganization(any());
-        } catch (ApiGatewayException | InterruptedException e) {
+        } catch (ApiGatewayException e) {
             e.printStackTrace();
         }
 

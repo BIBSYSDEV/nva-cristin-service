@@ -14,7 +14,6 @@ import nva.commons.core.JacocoGenerated;
 import java.net.HttpURLConnection;
 import java.util.regex.Pattern;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
@@ -60,8 +59,6 @@ public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, O
         } catch (NotFoundException e) {
             throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE,
                     getNvaApiId(identifier, ORGANIZATION_PATH)));
-        } catch (InterruptedException e) {
-            throw new BadRequestException(ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE);
         }
     }
 

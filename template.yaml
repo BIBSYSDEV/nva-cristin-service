@@ -256,6 +256,7 @@ Resources:
             Method: get
             RequestParameters:
               - method.request.querystring.name
+              - method.request.querystring.organization
               - method.request.querystring.page
               - method.request.querystring.results
 
