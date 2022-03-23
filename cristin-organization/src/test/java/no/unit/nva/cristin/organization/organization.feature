@@ -66,7 +66,7 @@ Feature: API tests for Cristin Organization retrieve and search
     And param query = existingOrganizationIdentifier
     When method GET
     Then status 200
-    And match response.size > 0
+    And match response.size != '0'
     And match response.hits == '#array'
     And match response.hits[0].partOf == '#present'
     And match response.hits[0].hasPart  == '#present'
