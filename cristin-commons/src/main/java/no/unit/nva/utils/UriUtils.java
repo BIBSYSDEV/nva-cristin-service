@@ -54,7 +54,6 @@ public class UriUtils {
                 .collect(Collectors.joining(PARAMETER_DELIMITER));
     }
 
-
     /**
      * Create URI identifying NVA resource from path and identifier.
      *
@@ -84,8 +83,6 @@ public class UriUtils {
                 .getUri();
     }
 
-
-
     public static URI addLanguage(URI uri) {
         return new UriWrapper(uri).addQueryParameter(QUERY_PARAMETER_LANGUAGE, ALL_QUERY_PARAMETER_LANGUAGES).getUri();
     }
@@ -94,7 +91,6 @@ public class UriUtils {
         return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(type)
                 .addQueryParameters(requestQueryParams).getUri();
     }
-
 
     /**
      * Create a valid query URI for cristin.
@@ -129,7 +125,7 @@ public class UriUtils {
 
     public static URI createNvaPositionId(String code) {
         URI positionBase = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(POSITION).getUri();
-        return attempt(() -> new URI(positionBase.getScheme(), positionBase.getHost(), positionBase.getPath(),code))
+        return attempt(() -> new URI(positionBase.getScheme(), positionBase.getHost(), positionBase.getPath(), code))
                 .orElseThrow();
     }
 }

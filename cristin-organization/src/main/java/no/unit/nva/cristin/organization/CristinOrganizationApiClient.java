@@ -98,10 +98,7 @@ public class CristinOrganizationApiClient extends ApiClient {
      * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
     public Organization getFlatOrganization(String identifier) throws ApiGatewayException, InterruptedException {
-        URI cristinUri = new UriWrapper(CRISTIN_API_URL)
-                .addChild(UNITS_PATH)
-                .addQueryParameter(UNIT_ID, identifier)
-                .getUri();
+        URI cristinUri = getCristinOrganizationByIdentifierUri(identifier);
 
         HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(cristinUri)).get();
         if (isSuccessful(response.statusCode())) {
@@ -123,6 +120,14 @@ public class CristinOrganizationApiClient extends ApiClient {
             }
         }
         return null;
+    }
+
+    private URI getCristinOrganizationByIdentifierUri(String identifier) {
+        URI cristinUri = new UriWrapper(CRISTIN_API_URL)
+                .addChild(UNITS_PATH)
+                .addQueryParameter(UNIT_ID, identifier)
+                .getUri();
+        return cristinUri;
     }
 
     /**

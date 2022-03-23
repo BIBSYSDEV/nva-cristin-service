@@ -245,9 +245,10 @@ class FetchCristinOrganizationHandlerTest {
         Organization actualOrganization = gatewayResponse.getBodyObject(Organization.class);
         assertEquals(actualOrganization.getId(), expectedId);
         assertThat(actualOrganization.getName().get("en"), containsString("Department of Medical Biochemistry"));
+        assertEquals(actualOrganization.getHasPart(), null);
+        assertEquals(actualOrganization.getPartOf(), null);
         System.out.println(actualOrganization);
     }
-
 
 
     private Object getSubSubUnit(String subUnitFile) {

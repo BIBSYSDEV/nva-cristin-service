@@ -71,8 +71,9 @@ Feature: API tests for Cristin Organization retrieve and search
   Scenario: GET organization for known organization returns list of search results without depth
     Given  path '/organization'
     And param query = existingOrganizationIdentifier
-    And param depth = 'top'
+    And param depth = 'none'
     When method GET
     Then status 200
     And match response.hits == '#array'
-    And match response.hits[0].partOf != '#present'
+    And match response.hits[0].partOf == '#notpresent'
+    And match response.hits[0].hasPart  == '#notpresent'

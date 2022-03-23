@@ -20,7 +20,6 @@ tasks.named('test') {
     finalizedBy jacocoTestReport
 }
 
-
 sourceSets {
     test {
         resources {
