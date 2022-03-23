@@ -40,7 +40,7 @@ public class ErrorMessages {
             "%s contains no supported Accept header values. Supported values are: application/json; charset=utf-8, "
                     + "application/ld+json";
     public static final String ERROR_MESSAGE_TEMPLATE_INVALID_QUERY_PARAMETERS =
-            "Invalid query parameter supplied. Valid parameter(s) %s";
+            "Invalid query parameter supplied. Valid parameters: %s";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP =
             "This endpoint does not support query parameters";
     public static final String ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI =
