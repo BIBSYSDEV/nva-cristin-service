@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
@@ -50,9 +51,9 @@ public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, O
         final String depth = getValidDepth(requestInfo);
 
         try {
-            final Organization organization =  "none".equals(depth)
+            final Organization organization = NONE.equals(depth)
                     ? cristinApiClient.getFlatOrganization(identifier)
-                    :  cristinApiClient.getOrganization(getCristinUri(identifier, UNITS_PATH));
+                    : cristinApiClient.getOrganization(getCristinUri(identifier, UNITS_PATH));
 
             organization.setContext(ORGANIZATION_CONTEXT);
             return organization;
@@ -82,9 +83,4 @@ public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, O
         }
         throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
     }
-
-
-
-
-
 }

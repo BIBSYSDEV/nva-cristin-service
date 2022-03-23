@@ -11,6 +11,7 @@ import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
 import nva.commons.core.attempt.Try;
@@ -30,11 +31,13 @@ import java.util.stream.Collectors;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.TOP;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
+import static no.unit.nva.cristin.model.Constants.UNIT_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
@@ -54,7 +57,12 @@ public class CristinOrganizationApiClient extends ApiClient {
     public static final String CRISTIN_PER_PAGE_PARAM = "per_page";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
     public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
-    private static final String CRISTIN_QUERY_NAME_PARAM = "name";
+    public static final int SINGLE_HIT = 1;
+    public static final String UNIQUELY_IDENTIFY_ORGANIZATION = "Identifier does not uniquely identify organization";
+    public static final String FIRST_LEVEL = "1";
+    public static final String ALL_SUB_LEVELS = "32";
+    public static final int FIRST_AND_ONLY_UNIT = 0;
+    private static final int NO_HITS = 0;
 
     /**
      * Create a CristinOrganizationApiClient with default HTTPClient.
@@ -90,23 +98,26 @@ public class CristinOrganizationApiClient extends ApiClient {
      * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
     public Organization getFlatOrganization(String identifier) throws ApiGatewayException, InterruptedException {
-        URI cristinUri =  new UriWrapper(CRISTIN_API_URL)
-                    .addChild(UNITS_PATH)
-                    .addQueryParameter("id", identifier)
-                    .getUri();
+        URI cristinUri = new UriWrapper(CRISTIN_API_URL)
+                .addChild(UNITS_PATH)
+                .addQueryParameter(UNIT_ID, identifier)
+                .getUri();
 
         HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(cristinUri)).get();
         if (isSuccessful(response.statusCode())) {
             try {
                 List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() {
                 });
-                SubUnitDto subUnitDto = units.get(0);
-                Organization organization = new Organization.Builder()
-                        .withId(getNvaApiId(identifier, ORGANIZATION_PATH))
-                        .withName(subUnitDto.getName())
-                        .withAcronym(subUnitDto.getAcronym())
-                        .build();
-                return organization;
+                if (SINGLE_HIT == units.size()) {
+                    SubUnitDto subUnitDto = units.get(FIRST_AND_ONLY_UNIT);
+                    return new Organization.Builder()
+                            .withId(getNvaApiId(identifier, ORGANIZATION_PATH))
+                            .withName(subUnitDto.getName())
+                            .withAcronym(subUnitDto.getAcronym())
+                            .build();
+                } else {
+                    throw new BadRequestException(UNIQUELY_IDENTIFY_ORGANIZATION);
+                }
             } catch (JsonProcessingException e) {
                 throw new FailedHttpRequestException(NULL_HTTP_RESPONSE_ERROR_MESSAGE);
             }
@@ -138,7 +149,7 @@ public class CristinOrganizationApiClient extends ApiClient {
     }
 
     private String toCristinLevel(String depth) {
-        return TOP.equals(depth) || isNull(depth) ? "1" : "32";
+        return TOP.equals(depth) || isNull(depth) ? FIRST_LEVEL : ALL_SUB_LEVELS;
     }
 
     private SearchResponse<Organization> updateSearchResponseMetadata(
@@ -162,14 +173,16 @@ public class CristinOrganizationApiClient extends ApiClient {
 
 
     private URI previousResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
-        int firstPage = Integer.parseInt(requestQueryParams.get(PAGE)) - 1;
-        return firstPage > 0 && totalSize > 0 ? getUri(requestQueryParams, firstPage, baseUri) : null;
+        int firstPage = Integer.parseInt(requestQueryParams.get(PAGE)) - SINGLE_HIT;
+        return firstPage > NO_HITS && totalSize > NO_HITS ? getUri(requestQueryParams, firstPage, baseUri) : null;
     }
 
     private URI nextResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
         int currentPage = Integer.parseInt(requestQueryParams.get(PAGE));
         int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
-        return currentPage * pageSize < totalSize ? getUri(requestQueryParams, currentPage + 1, baseUri) : null;
+        return currentPage * pageSize < totalSize
+                ? getUri(requestQueryParams, currentPage + SINGLE_HIT, baseUri)
+                : null;
     }
 
     private URI getUri(Map<String, String> requestQueryParams, int firstPage, URI baseUri) {
