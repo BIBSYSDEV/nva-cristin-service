@@ -13,7 +13,7 @@ import java.util.Set;
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
-import static no.unit.nva.cristin.common.ErrorMessages.validQueryParametersMessage;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
@@ -33,7 +33,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
 
     protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(validQueryParametersMessage(VALID_QUERY_PARAMETERS));
+            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
         }
     }
 

@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static no.unit.nva.cristin.common.ErrorMessages.validQueryParametersMessage;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
@@ -63,7 +63,7 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
     @Override
     protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(validQueryParametersMessage(VALID_QUERY_PARAMETERS));
+            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
         }
     }
 

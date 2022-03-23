@@ -15,7 +15,7 @@ import java.net.HttpURLConnection;
 import java.util.Set;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
-import static no.unit.nva.cristin.common.ErrorMessages.validQueryParametersMessage;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
@@ -62,7 +62,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     private void validateThatSuppliedQueryParamsIsSupported(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(validQueryParametersMessage(VALID_QUERY_PARAMETERS));
+            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
         }
     }
 

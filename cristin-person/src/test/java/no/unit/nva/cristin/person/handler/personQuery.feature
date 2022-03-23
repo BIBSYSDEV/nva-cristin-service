@@ -98,7 +98,6 @@ Feature: API tests for Cristin persons query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    # TODO: Change detail to exclude language
     And match response.detail == "Invalid query parameter supplied. Valid parameter: ['name', 'organization', 'page', 'results']"
     And match response.requestId == '#notnull'
 

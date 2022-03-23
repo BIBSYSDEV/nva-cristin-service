@@ -39,7 +39,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PRO
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE;
-import static no.unit.nva.cristin.common.ErrorMessages.validQueryParametersMessage;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
@@ -318,7 +318,7 @@ public class FetchOneCristinProjectTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(body.getDetail(), containsString(
-                validQueryParametersMessage(FetchOneCristinProject.VALID_QUERY_PARAMETERS)));
+                validQueryParameterNamesMessage(FetchOneCristinProject.VALID_QUERY_PARAMETERS)));
     }
 
     @Test

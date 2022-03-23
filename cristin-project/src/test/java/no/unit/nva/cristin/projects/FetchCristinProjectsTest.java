@@ -44,7 +44,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VAL
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
-import static no.unit.nva.cristin.common.ErrorMessages.validQueryParametersMessage;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.QueryType;
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
@@ -541,7 +541,7 @@ public class FetchCristinProjectsTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(body.getDetail(), containsString(
-                validQueryParametersMessage(FetchCristinProjects.VALID_QUERY_PARAMETERS)));
+                validQueryParameterNamesMessage(FetchCristinProjects.VALID_QUERY_PARAMETERS)));
     }
 
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {

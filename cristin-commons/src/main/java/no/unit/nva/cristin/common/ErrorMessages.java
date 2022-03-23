@@ -48,10 +48,21 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Supplied payload is not valid";
     public static final String ERROR_MESSAGE_INVALID_PERSON_ID = "Invalid path parameter for person id";
 
-    public static String validQueryParametersMessage(Set<String> queryParameters) {
+    /**
+     * Formats and emits a message with valid parameter names.
+     * @param queryParameters list of valid parameter names
+     * @return formatted string containing a list of valid parameters
+     */
+    public static String validQueryParameterNamesMessage(Set<String> queryParameters) {
         return String.format(ERROR_MESSAGE_TEMPLATE_INVALID_QUERY_PARAMETERS, prettifyList(queryParameters));
     }
 
+    /**
+     * Creates a error message containing which parameter that has invalid value and what the value is supposed to be.
+     * @param queryParameterName name of parameter with invalid value
+     * @param validValues what values are allowed for this parameter
+     * @return formatted string containing a message with allowed values for this parameter
+     */
     public static String invalidQueryParametersMessage(String queryParameterName, String validValues) {
         return String.format(ERROR_MESSAGE_INVALID_VALUE + validValues, queryParameterName);
     }

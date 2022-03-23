@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static no.unit.nva.cristin.common.ErrorMessages.validQueryParametersMessage;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.FULL;
 import static no.unit.nva.cristin.model.Constants.TOP;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
@@ -57,7 +57,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     @Override
     protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(validQueryParametersMessage(VALID_QUERY_PARAMETERS));
+            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
         }
     }
 
