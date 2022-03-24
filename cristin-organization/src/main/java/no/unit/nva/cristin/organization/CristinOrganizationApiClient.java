@@ -14,7 +14,6 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
-import nva.commons.core.attempt.Try;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
@@ -49,6 +48,7 @@ import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
+import static nva.commons.core.attempt.Try.of;
 
 @SuppressWarnings("PMD.GodClass")
 public class CristinOrganizationApiClient extends ApiClient {
@@ -85,7 +85,7 @@ public class CristinOrganizationApiClient extends ApiClient {
      * @return an {@link Organization} containing the information
      * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
-    public Organization getOrganization(URI uri) throws ApiGatewayException  {
+    public Organization getOrganization(URI uri) throws ApiGatewayException {
         return fromSubSubunit(getSubSubUnitDtoWithMultipleEfforts(uri));
     }
 
@@ -95,22 +95,23 @@ public class CristinOrganizationApiClient extends ApiClient {
      * @param identifier the Cristin unit URI
      * @return an {@link Organization} containing the information
      */
-    public Organization getFlatOrganization(String identifier) {
+    public Organization getFlatOrganization(String identifier) throws ApiGatewayException {
         URI cristinUri = getCristinOrganizationByIdentifierUri(identifier);
         HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(cristinUri)).get();
         return isSuccessful(response.statusCode()) ? extractOrganization(identifier, response) : null;
     }
 
-    private Organization extractOrganization(String identifier, HttpResponse<String> response) {
-        return attempt(() -> {
-            List<SubUnitDto> units = OBJECT_MAPPER.readValue(response.body(), new TypeReference<>() {
-            });
-            if (SINGLE_HIT == units.size()) {
-                return toOrganization(identifier, units.get(FIRST_AND_ONLY_UNIT));
-            } else {
-                throw new BadRequestException(UNIQUELY_IDENTIFY_ORGANIZATION);
-            }
-        }).orElseThrow();
+    private Organization extractOrganization(String identifier, HttpResponse<String> response)
+            throws ApiGatewayException {
+        List<SubUnitDto> units = attempt(() ->
+                OBJECT_MAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>() {
+                }))
+                .orElseThrow(fail -> new FailedHttpRequestException(fail.getException()));
+        if (SINGLE_HIT == units.size()) {
+            return toOrganization(identifier, units.get(FIRST_AND_ONLY_UNIT));
+        } else {
+            throw new BadRequestException(UNIQUELY_IDENTIFY_ORGANIZATION);
+        }
     }
 
     private Organization toOrganization(String identifier, SubUnitDto subUnitDto) {
@@ -272,7 +273,7 @@ public class CristinOrganizationApiClient extends ApiClient {
 
     protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri) throws ApiGatewayException {
 
-        SubSubUnitDto subsubUnitDto = Try.of(subunitUri)
+        SubSubUnitDto subsubUnitDto = of(subunitUri)
                 .map(UriUtils::addLanguage)
                 .flatMap(this::sendRequestMultipleTimes)
                 .map((HttpResponse<String> response) -> throwExceptionIfNotSuccessful(response, subunitUri))

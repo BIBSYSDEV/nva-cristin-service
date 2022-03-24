@@ -67,7 +67,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         return HttpURLConnection.HTTP_OK;
     }
 
-    public static String getValidDepth(RequestInfo requestInfo) throws BadRequestException {
+    protected static String getValidDepth(RequestInfo requestInfo) throws BadRequestException {
         if (isValidDepth(requestInfo)) {
             return requestInfo.getQueryParameters().containsKey(DEPTH)
                     ? requestInfo.getQueryParameter(DEPTH)
