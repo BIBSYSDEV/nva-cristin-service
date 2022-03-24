@@ -95,7 +95,7 @@ public class CristinOrganizationApiClient extends ApiClient {
      * @param identifier the Cristin unit URI
      * @return an {@link Organization} containing the information
      */
-    public Organization getFlatOrganization(String identifier) throws InterruptedException {
+    public Organization getFlatOrganization(String identifier) {
         URI cristinUri = getCristinOrganizationByIdentifierUri(identifier);
         HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(cristinUri)).get();
         return isSuccessful(response.statusCode()) ? extractOrganization(identifier, response) : null;
