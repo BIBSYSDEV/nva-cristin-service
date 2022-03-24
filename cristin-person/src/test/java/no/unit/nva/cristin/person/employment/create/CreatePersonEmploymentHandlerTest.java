@@ -17,12 +17,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
+import java.nio.file.Path;
 import java.util.Map;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,6 +32,8 @@ public class CreatePersonEmploymentHandlerTest {
 
     private static final Map<String, String> validPath = Map.of(PERSON_ID, randomIntegerAsString());
     private static final String EMPTY_JSON = "{}";
+    private static final String validJson =
+        IoUtils.stringFromResources(Path.of("nvaApiCreateEmploymentRequest.json"));
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -49,7 +53,8 @@ public class CreatePersonEmploymentHandlerTest {
 
     @Test
     void shouldReturnStatusCreatedWhenSendingValidPayload() throws IOException {
-        GatewayResponse<CristinPersonEmployment> gatewayResponse = sendQuery(validPath, new CristinPersonEmployment());
+        CristinPersonEmployment employment = OBJECT_MAPPER.readValue(validJson, CristinPersonEmployment.class);
+        GatewayResponse<CristinPersonEmployment> gatewayResponse = sendQuery(validPath, employment);
 
         assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
     }
