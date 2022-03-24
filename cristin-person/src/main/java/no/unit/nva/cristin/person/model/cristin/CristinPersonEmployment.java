@@ -14,7 +14,7 @@ public class CristinPersonEmployment {
 
     private String id;
     private CristinOrganization affiliation;
-    private boolean active;
+    private Boolean active;
     private CristinPositionCode position;
     private Instant startDate;
     private Instant endDate;
@@ -37,11 +37,11 @@ public class CristinPersonEmployment {
         this.affiliation = affiliation;
     }
 
-    public boolean isActive() {
+    public Boolean getActive() {
         return active;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(Boolean active) {
         this.active = active;
     }
 
