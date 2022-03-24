@@ -52,6 +52,8 @@ public class Constants {
     public static final String FULL = "full";
     public static final String PERSON_ID = "id";
     public static final String PERSONS_PATH = "persons";
+    public static final String EMPLOYMENT_ID = "employmentid";
+    public static final String ORG_ID = "orgId";
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,
