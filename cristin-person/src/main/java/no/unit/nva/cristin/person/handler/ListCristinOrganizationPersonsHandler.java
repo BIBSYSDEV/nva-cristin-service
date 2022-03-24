@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
@@ -27,9 +28,7 @@ import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
-    public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_LIST =
-            "Invalid query parameter supplied. Valid parameters are 'page' and 'results'";
-    private static final Set<String> VALID_QUERY_PARAMS = Set.of(PAGE, NUMBER_OF_RESULTS);
+    public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(PAGE, NUMBER_OF_RESULTS);
     private final transient CristinOrganizationPersonsClient apiClient;
 
     @JacocoGenerated
@@ -87,8 +86,8 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
 
     @Override
     protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
-        if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_LIST);
+        if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
+            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
         }
     }
 

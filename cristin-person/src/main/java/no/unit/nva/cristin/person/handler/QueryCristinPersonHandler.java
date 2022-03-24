@@ -13,19 +13,21 @@ import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_PERSON_SEARCH;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 
 @SuppressWarnings("unused")
 public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
 
-    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(NAME, PAGE, NUMBER_OF_RESULTS);
+    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(NAME, ORGANIZATION,  PAGE, NUMBER_OF_RESULTS);
     private final transient CristinPersonApiClient apiClient;
 
     @JacocoGenerated
@@ -50,10 +52,12 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         validateQueryParameterKeys(requestInfo);
 
         String name = getValidName(requestInfo);
+        Optional<String> organization = getValidOrganization(requestInfo);
         String page = getValidPage(requestInfo);
         String numberOfResults = getValidNumberOfResults(requestInfo);
 
         Map<String, String> requestQueryParameters = buildParametersMap(name, page, numberOfResults);
+        organization.ifPresent(s -> requestQueryParameters.put(ORGANIZATION, s));
 
         return apiClient.generateQueryResponse(requestQueryParameters);
     }
@@ -66,7 +70,7 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     @Override
     protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETERS_ON_PERSON_SEARCH);
+            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
         }
     }
 

@@ -50,8 +50,12 @@ public class Constants {
     public static final Pattern ORCID_PATTERN = Pattern.compile("[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9|Xx]");
     public static final String TOP = "top";
     public static final String FULL = "full";
+    public static final String NONE = "none";
     public static final String PERSON_ID = "id";
     public static final String PERSONS_PATH = "persons";
+    public static final String CRISTIN_QUERY_NAME_PARAM = "name";
+    public static final String UNIT_ID = "id";
+
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,

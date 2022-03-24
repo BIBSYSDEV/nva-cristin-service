@@ -35,9 +35,11 @@ import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
@@ -74,7 +76,7 @@ class FetchCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnsNotFoundResponseWhenUnitIsMissing()
-            throws IOException, ApiGatewayException, InterruptedException {
+            throws IOException, ApiGatewayException {
 
         cristinApiClient = spy(cristinApiClient);
         doThrow(new NotFoundException(NOT_FOUND_MESSAGE_TEMPLATE + IDENTIFIER_VALUE))
@@ -138,7 +140,7 @@ class FetchCristinOrganizationHandlerTest {
             doThrow(new NullPointerException())
                     .when(serviceThrowingException)
                     .getOrganization(any());
-        } catch (ApiGatewayException | InterruptedException e) {
+        } catch (ApiGatewayException e) {
             e.printStackTrace();
         }
 
@@ -163,15 +165,20 @@ class FetchCristinOrganizationHandlerTest {
 
         CristinOrganizationApiClient mySpy = spy(cristinApiClient);
         final URI level1 = getCristinUri("185.90.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_90_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level1);
+        doReturn(getSubSubUnit("unit_18_90_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level1);
         final URI level2a = getCristinUri("185.53.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2a);
+        doReturn(getSubSubUnit("unit_18_53_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2a);
         final URI level2b = getCristinUri("185.50.0.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_50_0_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2b);
+        doReturn(getSubSubUnit("unit_18_50_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2b);
         final URI level3 = getCristinUri("185.53.18.0", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_18_0.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level3);
+        doReturn(getSubSubUnit("unit_18_53_18_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level3);
         final URI level4 = getCristinUri("185.53.18.14", UNITS_PATH);
-        doReturn(getSubSubUnit("unit_18_53_18_14.json")).when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level4);
+        doReturn(getSubSubUnit("unit_18_53_18_14.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level4);
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
         final String identifier = "185.53.18.14";
@@ -210,6 +217,51 @@ class FetchCristinOrganizationHandlerTest {
     }
 
 
+    @Test
+    void shouldReturnOrganizationFlatHierarchy() throws IOException, ApiGatewayException {
+
+        HttpClient httpClient = mock(HttpClient.class);
+        when(httpClient.sendAsync(any(), any())).thenThrow(new RuntimeException("This should Not happen!"));
+        output = new ByteArrayOutputStream();
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+
+        CristinOrganizationApiClient mySpy = spy(cristinApiClient);
+        final URI level1 = getCristinUri("185.90.0.0", UNITS_PATH);
+        doReturn(getSubSubUnit("unit_18_90_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level1);
+        final URI level2a = getCristinUri("185.53.0.0", UNITS_PATH);
+        doReturn(getSubSubUnit("unit_18_53_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2a);
+        final URI level2b = getCristinUri("185.50.0.0", UNITS_PATH);
+        doReturn(getSubSubUnit("unit_18_50_0_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level2b);
+        final URI level3 = getCristinUri("185.53.18.0", UNITS_PATH);
+        doReturn(getSubSubUnit("unit_18_53_18_0.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level3);
+        final URI level4 = getCristinUri("185.53.18.14", UNITS_PATH);
+        doReturn(getSubSubUnit("unit_18_53_18_14.json"))
+                .when(mySpy).getSubSubUnitDtoWithMultipleEfforts(level4);
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+        final String identifier = "185.53.18.14";
+        fetchCristinOrganizationHandler
+                .handleRequest(generateHandlerRequestWithAdditionalQueryParameters(identifier, NONE), output, context);
+        GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getHeaders(), hasKey(CONTENT_TYPE));
+        assertThat(gatewayResponse.getHeaders(), hasKey(ACCESS_CONTROL_ALLOW_ORIGIN));
+
+        URI expectedId = getNvaApiId(identifier, ORGANIZATION_PATH);
+        Organization actualOrganization = gatewayResponse.getBodyObject(Organization.class);
+        assertEquals(actualOrganization.getId(), expectedId);
+        assertThat(actualOrganization.getName().get("en"), containsString("Department of Medical Biochemistry"));
+        assertEquals(actualOrganization.getHasPart(), null);
+        assertEquals(actualOrganization.getPartOf(), null);
+        System.out.println(actualOrganization);
+    }
+
+
     private Object getSubSubUnit(String subUnitFile) {
         return SubSubUnitDto.fromJson(IoUtils.stringFromResources(Path.of(subUnitFile)));
     }
@@ -222,6 +274,19 @@ class FetchCristinOrganizationHandlerTest {
                 .withPathParameters(pathParameters)
                 .build();
     }
+
+    private InputStream generateHandlerRequestWithAdditionalQueryParameters(String organizationIdentifier, String depth)
+            throws JsonProcessingException {
+        Map<String, String> headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type());
+        Map<String, String> pathParameters = Map.of(IDENTIFIER, organizationIdentifier);
+        Map<String, String> queryParameters = Map.of(DEPTH, depth);
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                .withHeaders(headers)
+                .withPathParameters(pathParameters)
+                .withQueryParameters(queryParameters)
+                .build();
+    }
+
 
     private InputStream generateHandlerRequestWithMissingPathParameter() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
