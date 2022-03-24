@@ -9,7 +9,6 @@ import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -141,7 +140,7 @@ public class CreateCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenRepeatedIdentityNumber() throws IOException, BadRequestException {
+    void shouldReturnBadRequestWhenRepeatedIdentityNumber() throws IOException {
 
         Person dummyPersonWithRepeatedIdentityNumber = getPersonWithRepeatedIdentityNumber();
 

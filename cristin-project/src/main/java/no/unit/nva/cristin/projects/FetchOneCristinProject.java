@@ -15,7 +15,7 @@ import java.net.HttpURLConnection;
 import java.util.Set;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_LOOKUP;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
@@ -23,7 +23,7 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
-    private static final Set<String> VALID_QUERY_PARAMS = Set.of(LANGUAGE);
+    public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(LANGUAGE);
 
     private final transient CristinApiClient cristinApiClient;
 
@@ -61,8 +61,8 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
     }
 
     private void validateThatSuppliedQueryParamsIsSupported(RequestInfo requestInfo) throws BadRequestException {
-        if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_LOOKUP);
+        if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
+            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
         }
     }
 
@@ -82,7 +82,8 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
         return cristinApiClient.queryOneCristinProjectUsingIdIntoNvaProject(id, language);
     }
 
-    private NvaProject authenticatedGetTransformedProjectFromCristin(String id, String language) throws ApiGatewayException {
+    private NvaProject authenticatedGetTransformedProjectFromCristin(String id, String language)
+            throws ApiGatewayException {
         return new CristinApiClient(CristinAuthenticator.getHttpClient())
                 .queryOneCristinProjectUsingIdIntoNvaProject(id, language);
     }

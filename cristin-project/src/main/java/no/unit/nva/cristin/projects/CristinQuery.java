@@ -3,7 +3,6 @@ package no.unit.nva.cristin.projects;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,9 +41,8 @@ public class CristinQuery {
      * @param id       Project ID to lookup in Cristin
      * @param language what language we want some of the result fields to be in
      * @return an URI to Cristin Projects with ID and language parameters
-     * @throws URISyntaxException if URI is invalid
      */
-    public static URI fromIdAndLanguage(String id, String language) throws URISyntaxException {
+    public static URI fromIdAndLanguage(String id, String language) {
         return new UriWrapper(CRISTIN_API_URL)
                 .addChild(CRISTIN_API_PROJECTS_PATH)
                 .addChild(id)
@@ -81,9 +79,8 @@ public class CristinQuery {
      * Builds URI to search Cristin projects based on parameters supplied to the builder methods.
      *
      * @return an URI to Cristin Projects with parameters
-     * @throws URISyntaxException if URI is invalid
      */
-    public URI toURI() throws URISyntaxException {
+    public URI toURI() {
         return new UriWrapper(CRISTIN_API_URL)
                 .addChild(CRISTIN_API_PROJECTS_PATH)
                 .addQueryParameters(cristinQueryParameters)

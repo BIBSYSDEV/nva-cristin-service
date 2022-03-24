@@ -290,6 +290,14 @@ paths:
             type: string
             pattern: '^(?:[0-9]+\.){3}[0-9]{1,3}$'
             example: '20202.0.0.0'
+        - name: depth
+          in: query
+          description: Depth of sub-organizations included in response
+          required: false
+          schema:
+            type: string
+            enum:
+              - none
       responses:
         200:
           description: successful operation
@@ -398,6 +406,14 @@ paths:
             type: string
             pattern: '.+'
           example: 'Ola Nordmann'
+        - name: organization
+          in: query
+          description: Search string. Parts of organization name or identifier
+          required: false
+          schema:
+            type: string
+            pattern: '.+'
+          example: 'Universitetet i Tromsø'
         - name: page
           in: query
           description: Current page requested
@@ -863,8 +879,8 @@ paths:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPositionFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
-        tags:
-          - Position
+      tags:
+        - Position
       summary: Fetch position codes
       description: Returns postion codes for affiliations
       operationId: GetPositionCodes

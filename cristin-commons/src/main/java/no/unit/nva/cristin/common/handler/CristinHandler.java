@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static nva.commons.core.attempt.Try.attempt;
@@ -33,7 +33,7 @@ public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
         return Optional.of(getQueryParameter(requestInfo, LANGUAGE)
             .orElse(DEFAULT_LANGUAGE_CODE))
             .filter(VALID_LANGUAGE_CODES::contains)
-            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_LANGUAGE_INVALID));
+            .orElseThrow(() -> new BadRequestException(String.format(ERROR_MESSAGE_INVALID_VALUE, LANGUAGE)));
     }
 
     protected static Optional<String> getQueryParameter(RequestInfo requestInfo, String queryParameter) {

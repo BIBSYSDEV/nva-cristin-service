@@ -5,6 +5,7 @@ Feature: API tests for Cristin persons query
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     * def queryString = 'John'
+    * def organizationQuery = 'BI Norwegian Business School'
     * def personIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/person\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
     Given url CRISTIN_BASE
@@ -97,8 +98,7 @@ Feature: API tests for Cristin persons query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    # TODO: Change detail to exclude language
-    And match response.detail == "Invalid query parameter supplied. Valid parameters are 'name', 'page', 'results' and 'language'"
+    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['name', 'organization', 'page', 'results']"
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
@@ -129,7 +129,7 @@ Feature: API tests for Cristin persons query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == "Parameter 'name' is missing or invalid. May only contain alphanumeric characters, dash, comma, period and whitespace"
+    And match response.detail == "Parameter 'name' has invalid value. May only contain alphanumeric characters, dash, comma, period and whitespace"
     And match response.requestId == '#notnull'
 
   Scenario: Query returns correct pagination values and URIs
@@ -145,3 +145,19 @@ Feature: API tests for Cristin persons query
     And match response.previousResults == previousResultsPath
     And match response.firstRecord == 4
     And match response.hits == '#[3]'
+
+  Scenario: Query returns correct pagination values and URIs when organization is added to query
+    Given path '/person'
+    And param name = queryString
+    And param organization = organizationQuery
+    And param results = '3'
+    And param page = '2'
+    When method GET
+    Then status 200
+    And match response['@context'] == '#present'
+    And match response.id == '#present'
+    And match response.size == '#present'
+    And match response.hits == '#present'
+    And match response.hits[0].type == 'Person'
+
+
