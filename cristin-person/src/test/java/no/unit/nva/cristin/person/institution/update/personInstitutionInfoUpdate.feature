@@ -53,7 +53,7 @@ Feature: API tests for Cristin Person Institution Info Update
     And request updateFieldsRequest
     When method PATCH
     Then status 400
-    And match response.detail == 'Invalid path parameter for person id'
+    And match response.detail == 'Invalid path parameter for \'id\''
 
   Scenario: Update returns status 400 when invalid organization identifier
     Given path '/person/' + personIdentifier + '/organization/' + invalidIdentifier
@@ -61,4 +61,4 @@ Feature: API tests for Cristin Person Institution Info Update
     And request updateFieldsRequest
     When method PATCH
     Then status 400
-    And match response.detail == 'Invalid path parameter for organization id'
+    And match response.detail == 'Invalid path parameter for \'orgId\''
