@@ -1,14 +1,11 @@
 package no.unit.nva.cristin.person.employment.query;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PERSON_ID;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.model.Constants.PERSON_ID;
-import static nva.commons.core.attempt.Try.attempt;
+import static no.unit.nva.cristin.person.HandlerUtil.getValidPersonId;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
-import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
@@ -16,7 +13,6 @@ import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
@@ -46,14 +42,6 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Search
         return apiClient.generateQueryResponse(identifier);
     }
 
-    private String getValidPersonId(RequestInfo requestInfo) throws BadRequestException {
-        String identifier = attempt(() -> requestInfo.getPathParameter(PERSON_ID)).orElse(fail -> EMPTY_STRING);
-        if (isValidIdentifier(identifier)) {
-            return identifier;
-        }
-        throw new BadRequestException(ERROR_MESSAGE_INVALID_PERSON_ID);
-    }
-
     @Override
     protected Integer getSuccessStatusCode(Void input, SearchResponse<CristinPersonEmployment> output) {
         return HttpURLConnection.HTTP_OK;
@@ -64,7 +52,4 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Search
         return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
-    private boolean isValidIdentifier(String identifier) {
-        return Utils.isPositiveInteger(identifier);
-    }
 }

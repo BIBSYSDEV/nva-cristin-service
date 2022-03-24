@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.institution.fetch;
 
+import static no.unit.nva.cristin.person.HandlerUtil.getValidPersonId;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;

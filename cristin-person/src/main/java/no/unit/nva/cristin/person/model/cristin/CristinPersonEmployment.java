@@ -2,7 +2,7 @@ package no.unit.nva.cristin.person.model.cristin;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.util.Date;
+import java.time.Instant;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
 import nva.commons.core.JacocoGenerated;
@@ -16,8 +16,8 @@ public class CristinPersonEmployment {
     private CristinOrganization affiliation;
     private boolean active;
     private CristinPositionCode position;
-    private Date startDate;
-    private Date endDate;
+    private Instant startDate;
+    private Instant endDate;
     private Double ftePercentage;
     private String url;
 
@@ -53,19 +53,19 @@ public class CristinPersonEmployment {
         this.position = position;
     }
 
-    public Date getStartDate() {
+    public Instant getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(Instant startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public Instant getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(Instant endDate) {
         this.endDate = endDate;
     }
 

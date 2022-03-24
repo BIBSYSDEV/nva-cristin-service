@@ -6,7 +6,9 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
@@ -14,8 +16,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
 import java.util.Map;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
@@ -25,7 +29,9 @@ import org.junit.jupiter.api.Test;
 public class CreatePersonEmploymentHandlerTest {
 
     private static final Map<String, String> validPath = Map.of(PERSON_ID, randomIntegerAsString());
+    private static final String EMPTY_JSON = "{}";
 
+    private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
     private CreatePersonEmploymentClient apiClient;
     private Context context;
@@ -33,15 +39,16 @@ public class CreatePersonEmploymentHandlerTest {
     private CreatePersonEmploymentHandler handler;
 
     @BeforeEach
-    void setUp() {
-        apiClient = new CreatePersonEmploymentClient();
+    void setUp() throws IOException, InterruptedException {
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 201));
+        apiClient = new CreatePersonEmploymentClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new CreatePersonEmploymentHandler(apiClient, environment);
     }
 
     @Test
-    void shouldReturnDummyStatusCreatedWhenPassingAuthCheck() throws IOException {
+    void shouldReturnStatusCreatedWhenSendingValidPayload() throws IOException {
         GatewayResponse<CristinPersonEmployment> gatewayResponse = sendQuery(validPath, new CristinPersonEmployment());
 
         assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
