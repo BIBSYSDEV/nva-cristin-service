@@ -415,7 +415,7 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.employment.create.CreatePersonEmploymentHandler::handleRequest
-      #Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinCreatePersonEmploymentEvent:
           Type: Api
