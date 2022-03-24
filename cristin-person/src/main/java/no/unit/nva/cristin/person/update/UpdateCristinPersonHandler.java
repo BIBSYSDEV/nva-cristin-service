@@ -1,17 +1,8 @@
 package no.unit.nva.cristin.person.update;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PERSON_ID;
-import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.model.Constants.PERSON_ID;
-import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
-import java.net.HttpURLConnection;
-import java.util.List;
-import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
@@ -22,6 +13,15 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+
+import java.net.HttpURLConnection;
+import java.util.List;
+
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.common.Utils.getValidPersonId;
+import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> {
 
@@ -80,19 +80,8 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
             .orElseThrow(fail -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 
-    protected String getValidPersonId(RequestInfo requestInfo) throws BadRequestException {
-        String identifier = attempt(() -> requestInfo.getPathParameter(PERSON_ID)).orElse(fail -> EMPTY_STRING);
-        if (isNotValidIdentifier(identifier)) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PERSON_ID);
-        }
-        return identifier;
-    }
-
     private boolean noSupportedValuesPresent(ObjectNode cristinJson) {
         return cristinJson.isEmpty();
     }
 
-    private boolean isNotValidIdentifier(String identifier) {
-        return !Utils.isPositiveInteger(identifier);
-    }
 }
