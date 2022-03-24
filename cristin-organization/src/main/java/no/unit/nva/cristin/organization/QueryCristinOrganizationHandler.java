@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.FULL;
+import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.TOP;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
@@ -66,7 +67,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         return HttpURLConnection.HTTP_OK;
     }
 
-    private String getValidDepth(RequestInfo requestInfo) throws BadRequestException {
+    protected static String getValidDepth(RequestInfo requestInfo) throws BadRequestException {
         if (isValidDepth(requestInfo)) {
             return requestInfo.getQueryParameters().containsKey(DEPTH)
                     ? requestInfo.getQueryParameter(DEPTH)
@@ -76,10 +77,10 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         }
     }
 
-    private boolean isValidDepth(RequestInfo requestInfo) throws BadRequestException {
+    private static boolean isValidDepth(RequestInfo requestInfo) throws BadRequestException {
         return !requestInfo.getQueryParameters().containsKey(DEPTH)
                 || requestInfo.getQueryParameters().containsKey(DEPTH)
-                && Set.of(TOP, FULL).contains(requestInfo.getQueryParameter(DEPTH));
+                && Set.of(TOP, FULL, NONE).contains(requestInfo.getQueryParameter(DEPTH));
     }
 
 

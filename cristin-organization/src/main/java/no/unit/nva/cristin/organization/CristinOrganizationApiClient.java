@@ -11,9 +11,9 @@ import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
-import nva.commons.core.attempt.Try;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
@@ -29,11 +29,14 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.util.Objects.isNull;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.TOP;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
+import static no.unit.nva.cristin.model.Constants.UNIT_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
@@ -45,14 +48,21 @@ import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
+import static nva.commons.core.attempt.Try.of;
 
+@SuppressWarnings("PMD.GodClass")
 public class CristinOrganizationApiClient extends ApiClient {
 
     public static final String CRISTIN_LEVELS_PARAM = "levels";
     public static final String CRISTIN_PER_PAGE_PARAM = "per_page";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
     public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
-    private static final String CRISTIN_QUERY_NAME_PARAM = "name";
+    public static final int SINGLE_HIT = 1;
+    public static final String UNIQUELY_IDENTIFY_ORGANIZATION = "Identifier does not uniquely identify organization";
+    public static final String FIRST_LEVEL = "1";
+    public static final String ALL_SUB_LEVELS = "32";
+    public static final int FIRST_AND_ONLY_UNIT = 0;
+    private static final int NO_HITS = 0;
 
     /**
      * Create a CristinOrganizationApiClient with default HTTPClient.
@@ -75,8 +85,49 @@ public class CristinOrganizationApiClient extends ApiClient {
      * @return an {@link Organization} containing the information
      * @throws NotFoundException when the URI does not correspond to an existing unit.
      */
-    public Organization getOrganization(URI uri) throws ApiGatewayException  {
+    public Organization getOrganization(URI uri) throws ApiGatewayException {
         return fromSubSubunit(getSubSubUnitDtoWithMultipleEfforts(uri));
+    }
+
+    /**
+     * Get information for an Organization without parent of subunits.
+     *
+     * @param identifier the Cristin unit URI
+     * @return an {@link Organization} containing the information
+     */
+    public Organization getFlatOrganization(String identifier) throws ApiGatewayException {
+        URI cristinUri = getCristinOrganizationByIdentifierUri(identifier);
+        HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(cristinUri)).get();
+        return isSuccessful(response.statusCode()) ? extractOrganization(identifier, response) : null;
+    }
+
+    private Organization extractOrganization(String identifier, HttpResponse<String> response)
+            throws ApiGatewayException {
+        List<SubUnitDto> units = attempt(() ->
+                OBJECT_MAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>() {
+                }))
+                .orElseThrow(fail -> new FailedHttpRequestException(fail.getException()));
+        if (SINGLE_HIT == units.size()) {
+            return toOrganization(identifier, units.get(FIRST_AND_ONLY_UNIT));
+        } else {
+            throw new BadRequestException(UNIQUELY_IDENTIFY_ORGANIZATION);
+        }
+    }
+
+    private Organization toOrganization(String identifier, SubUnitDto subUnitDto) {
+        return new Organization.Builder()
+                .withId(getNvaApiId(identifier, ORGANIZATION_PATH))
+                .withName(subUnitDto.getName())
+                .withAcronym(subUnitDto.getAcronym())
+                .build();
+    }
+
+    private URI getCristinOrganizationByIdentifierUri(String identifier) {
+        URI cristinUri = new UriWrapper(CRISTIN_API_URL)
+                .addChild(UNITS_PATH)
+                .addQueryParameter(UNIT_ID, identifier)
+                .getUri();
+        return cristinUri;
     }
 
     /**
@@ -103,7 +154,7 @@ public class CristinOrganizationApiClient extends ApiClient {
     }
 
     private String toCristinLevel(String depth) {
-        return TOP.equals(depth) || isNull(depth) ? "1" : "32";
+        return TOP.equals(depth) || isNull(depth) ? FIRST_LEVEL : ALL_SUB_LEVELS;
     }
 
     private SearchResponse<Organization> updateSearchResponseMetadata(
@@ -125,16 +176,17 @@ public class CristinOrganizationApiClient extends ApiClient {
         return searchResponse;
     }
 
-
     private URI previousResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
-        int firstPage = Integer.parseInt(requestQueryParams.get(PAGE)) - 1;
-        return firstPage > 0 && totalSize > 0 ? getUri(requestQueryParams, firstPage, baseUri) : null;
+        int firstPage = Integer.parseInt(requestQueryParams.get(PAGE)) - SINGLE_HIT;
+        return firstPage > NO_HITS && totalSize > NO_HITS ? getUri(requestQueryParams, firstPage, baseUri) : null;
     }
 
     private URI nextResult(URI baseUri, Map<String, String> requestQueryParams, int totalSize) {
         int currentPage = Integer.parseInt(requestQueryParams.get(PAGE));
         int pageSize = Integer.parseInt(requestQueryParams.get(NUMBER_OF_RESULTS));
-        return currentPage * pageSize < totalSize ? getUri(requestQueryParams, currentPage + 1, baseUri) : null;
+        return currentPage * pageSize < totalSize
+                ? getUri(requestQueryParams, currentPage + SINGLE_HIT, baseUri)
+                : null;
     }
 
     private URI getUri(Map<String, String> requestQueryParams, int firstPage, URI baseUri) {
@@ -188,14 +240,10 @@ public class CristinOrganizationApiClient extends ApiClient {
 
     private Set<Organization> getSubUnits(SubSubUnitDto subSubUnitDto) {
         List<SubUnitDto> subUnits = subSubUnitDto.getSubUnits();
-        if (!isNull(subUnits)) {
-            return subUnits.stream()
-                    .parallel()
-                    .map((SubUnitDto subUnitDto) -> getSubUnitDto(subUnitDto.getUri()))
-                    .collect(Collectors.toSet());
-        } else {
-            return null;
-        }
+        return !isNull(subUnits) ? subUnits.stream()
+                .parallel()
+                .map((SubUnitDto subUnitDto) -> getSubUnitDto(subUnitDto.getUri()))
+                .collect(Collectors.toSet()) : null;
     }
 
     private Organization getSubUnitDto(URI cristinUri) {
@@ -223,10 +271,9 @@ public class CristinOrganizationApiClient extends ApiClient {
                 .collect(Collectors.toList());
     }
 
-
     protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri) throws ApiGatewayException {
 
-        SubSubUnitDto subsubUnitDto = Try.of(subunitUri)
+        SubSubUnitDto subsubUnitDto = of(subunitUri)
                 .map(UriUtils::addLanguage)
                 .flatMap(this::sendRequestMultipleTimes)
                 .map((HttpResponse<String> response) -> throwExceptionIfNotSuccessful(response, subunitUri))
@@ -262,5 +309,4 @@ public class CristinOrganizationApiClient extends ApiClient {
     private String errorMessage(HttpResponse<String> response) {
         return String.format(ERROR_MESSAGE_FORMAT, response.statusCode(), response.body());
     }
-
 }

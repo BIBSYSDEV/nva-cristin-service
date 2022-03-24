@@ -290,6 +290,14 @@ paths:
             type: string
             pattern: '^(?:[0-9]+\.){3}[0-9]{1,3}$'
             example: '20202.0.0.0'
+        - name: depth
+          in: query
+          description: Depth of sub-organizations included in response
+          required: false
+          schema:
+            type: string
+            enum:
+              - none
       responses:
         200:
           description: successful operation
