@@ -3,11 +3,13 @@ package no.unit.nva.cristin.person.handler;
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.client.DeletePersonEmploymentClient;
+import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 
 import java.net.HttpURLConnection;
@@ -15,7 +17,7 @@ import java.net.HttpURLConnection;
 import static no.unit.nva.cristin.common.Utils.getValidEmploymentId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 
-@SuppressWarnings({"unused","PMD.SingularField"})
+@SuppressWarnings({"unused", "PMD.SingularField"})
 public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void> {
 
 
@@ -31,8 +33,6 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
     }
 
 
-
-
     /**
      * Implements the main logic of the handler. Any exception thrown by this method will be handled by {@link
      * RestRequestHandler#handleExpectedException} method.
@@ -46,13 +46,9 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
      */
     @Override
     protected Void processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        AccessUtils.validateIdentificationNumberAccess(requestInfo);
-
+        validateHasAccessRights(requestInfo);
         String personId = getValidPersonId(requestInfo);
-
         String employmentId = getValidEmploymentId(requestInfo);
-
-
         return apiClient.deletePersonEmployment(personId, employmentId);
     }
 
@@ -68,5 +64,10 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
         return HttpURLConnection.HTTP_NO_CONTENT;
     }
 
+    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException, UnauthorizedException {
+        if (!AccessUtils.requesterIsUserAdministrator(requestInfo)) {
+            throw new ForbiddenException();
+        }
+    }
 
 }
