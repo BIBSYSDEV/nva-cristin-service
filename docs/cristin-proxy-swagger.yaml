@@ -879,8 +879,8 @@ paths:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPositionFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
-        tags:
-          - Position
+      tags:
+        - Position
       summary: Fetch position codes
       description: Returns postion codes for affiliations
       operationId: GetPositionCodes
