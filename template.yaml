@@ -438,6 +438,20 @@ Resources:
             Path: /person/{id}/employment/{employmentId}
             Method: delete
 
+  NvaCristinUpdatePersonEmploymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.employment.update.UpdatePersonEmploymentHandler::handleRequest
+      #Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinCreatePersonEmploymentEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}/employment/{employmentId}/
+            Method: patch
+
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
