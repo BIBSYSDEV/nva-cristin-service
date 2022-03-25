@@ -1,5 +1,9 @@
 package no.unit.nva.cristin.common;
 
+import no.unit.nva.cristin.model.Constants;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.BadRequestException;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -7,9 +11,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import no.unit.nva.cristin.model.Constants;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidPathParameterMessage;
+import static no.unit.nva.cristin.model.Constants.EMPLOYMENT_ID;
+import static no.unit.nva.cristin.model.Constants.ORG_ID;
+import static no.unit.nva.cristin.model.Constants.PERSON_ID;
+import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class Utils {
 
@@ -65,4 +74,35 @@ public class Utils {
         }
         return identifier;
     }
+
+    public static String getValidPersonId(RequestInfo requestInfo) throws BadRequestException {
+        String identifier = attempt(() -> requestInfo.getPathParameter(PERSON_ID)).orElse(fail -> EMPTY_STRING);
+        if (isValidIdentifier(identifier)) {
+            return identifier;
+        }
+        throw new BadRequestException(invalidPathParameterMessage(PERSON_ID));
+    }
+
+    public static String getValidEmploymentId(RequestInfo requestInfo) throws BadRequestException {
+        String identifier = attempt(() -> requestInfo.getPathParameter(EMPLOYMENT_ID)).orElse(fail -> EMPTY_STRING);
+        if (isValidIdentifier(identifier)) {
+            return identifier;
+        }
+        throw new BadRequestException(invalidPathParameterMessage(EMPLOYMENT_ID));
+    }
+
+    public static String getValidOrgId(RequestInfo requestInfo) throws BadRequestException {
+        String identifier = attempt(() -> requestInfo.getPathParameter(ORG_ID)).orElse(fail -> EMPTY_STRING);
+        String cristinInstitutionId = removeUnitPartFromIdentifierIfPresent(identifier);
+        if (isValidIdentifier(cristinInstitutionId)) {
+            return cristinInstitutionId;
+        }
+        throw new BadRequestException(invalidPathParameterMessage(ORG_ID));
+    }
+
+
+    private static boolean isValidIdentifier(String identifier) {
+        return Utils.isPositiveInteger(identifier);
+    }
+
 }

@@ -46,7 +46,7 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI =
             "The requested resource '%s' was not found";
     public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Supplied payload is not valid";
-    public static final String ERROR_MESSAGE_INVALID_PERSON_ID = "Invalid path parameter for person id";
+    public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER = "Invalid path parameter for '%s'";
 
     /**
      * Formats and emits a message with valid parameter names.
@@ -66,6 +66,17 @@ public class ErrorMessages {
     public static String invalidQueryParametersMessage(String queryParameterName, String validValues) {
         return String.format(ERROR_MESSAGE_INVALID_VALUE + validValues, queryParameterName);
     }
+
+
+    /**
+     * Creates a error message containing which path parameter that has invalid value.
+     * @param pathParameterName name of parameter with invalid value
+     * @return formatted string containing a message with allowed values for this path parameter
+     */
+    public static String invalidPathParameterMessage(String pathParameterName) {
+        return String.format(ERROR_MESSAGE_INVALID_PATH_PARAMETER, pathParameterName);
+    }
+
 
     private static String prettifyList(Set<String> queryParameters) {
         return queryParameters.size() > 1

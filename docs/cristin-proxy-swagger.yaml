@@ -872,6 +872,53 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /person/{id}/employment/{employmentId}:
+    parameters:
+      - name: id
+        in: path
+        description: Identifier of Person
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]+$'
+        example: '359084'
+      - name: employmentId
+        in: path
+        description: Identifier of employment
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]+$'
+        example: '49272'
+    delete:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinDeletePersonEmploymentFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Delete person employment by identifier
+      description: Delete person employment by identifier
+      operationId: DeletePersonEmploymentsByIdentifier
+      security:
+        - CognitoUserPool: [ ]
+      responses:
+        204:
+          description: successful operation
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+
   /position:
     get:
       x-amazon-apigateway-integration:

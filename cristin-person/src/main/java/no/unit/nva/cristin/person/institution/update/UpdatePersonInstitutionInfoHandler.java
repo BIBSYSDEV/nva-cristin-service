@@ -1,8 +1,6 @@
 package no.unit.nva.cristin.person.institution.update;
 
-import static java.util.Objects.isNull;
 import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.institution.common.PersonInstitutionInfoHandler;
 import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
@@ -12,6 +10,12 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+
+import java.net.HttpURLConnection;
+
+import static java.util.Objects.isNull;
+import static no.unit.nva.cristin.common.Utils.getValidOrgId;
+import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 
 public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHandler<PersonInstInfoPatch, String> {
 
