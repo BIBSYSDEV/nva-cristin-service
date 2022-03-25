@@ -1,8 +1,7 @@
-package no.unit.nva.cristin.person.handler;
+package no.unit.nva.cristin.person.employment.delete;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.cristin.person.client.DeletePersonEmploymentClient;
 import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;

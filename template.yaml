@@ -428,10 +428,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.employment.DeletePersonEmploymentHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.employment.delete.DeletePersonEmploymentHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
-        NvaCristinCreatePersonEmploymentEvent:
+        NvaCristinDeletePersonEmploymentEvent:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
