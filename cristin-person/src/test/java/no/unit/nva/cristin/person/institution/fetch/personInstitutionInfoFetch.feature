@@ -42,11 +42,11 @@ Feature: API tests for Cristin Person Institution Info
     * header Authorization = 'Bearer ' + token
     When method GET
     Then status 400
-    And match response.detail == 'Invalid path parameter for person id'
+    And match response.detail == 'Invalid path parameter for \'id\''
 
   Scenario: Fetch returns status 400 when invalid organization identifier
     Given path '/person/' + personIdentifier + '/organization/' + invalidIdentifier
     * header Authorization = 'Bearer ' + token
     When method GET
     Then status 400
-    And match response.detail == 'Invalid path parameter for organization id'
+    And match response.detail == 'Invalid path parameter for \'orgId\''

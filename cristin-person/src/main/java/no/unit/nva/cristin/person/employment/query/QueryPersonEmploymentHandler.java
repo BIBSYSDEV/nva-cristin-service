@@ -1,11 +1,7 @@
 package no.unit.nva.cristin.person.employment.query;
 
-import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.person.HandlerUtil.getValidPersonId;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
-import java.net.HttpURLConnection;
-import java.util.List;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
@@ -15,6 +11,12 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+
+import java.net.HttpURLConnection;
+import java.util.List;
+
+import static no.unit.nva.cristin.common.Utils.getValidPersonId;
+import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 
 public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, SearchResponse<CristinPersonEmployment>> {
 
@@ -41,6 +43,7 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Search
 
         return apiClient.generateQueryResponse(identifier);
     }
+
 
     @Override
     protected Integer getSuccessStatusCode(Void input, SearchResponse<CristinPersonEmployment> output) {

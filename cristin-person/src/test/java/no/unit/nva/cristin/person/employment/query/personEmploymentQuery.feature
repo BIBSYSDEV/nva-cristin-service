@@ -41,7 +41,7 @@ Feature: API tests for Cristin Person Employments
     * header Authorization = 'Bearer ' + token
     When method GET
     Then status 400
-    And match response.detail == 'Invalid path parameter for person id'
+    And match response.detail == 'Invalid path parameter for \'id\''
 
   Scenario Outline: Query returns valid data and with correct content negotiation <CONTENT_TYPE>
     Given path '/person/' + personIdentifier + '/employment/'
