@@ -39,15 +39,25 @@ public class DeletePersonEmploymentClient extends QueryPersonEmploymentClient {
         super(client);
     }
 
+    /**
+     * Deletes a identified persons specified employment.
+     * @param personId identification of person
+     * @param employmentId identification of employment
+     * @return empty response ig successful
+     * @throws ApiGatewayException when service encounters problems or user is not authorized.
+     */
     public Void deletePersonEmployment(String personId, String employmentId) throws ApiGatewayException {
-        SearchResponse<CristinPersonEmployment> response = attempt(() -> generateQueryResponse(personId)).orElseThrow();
-        validateResponse(response);
-        CristinPersonEmployment cristinPersonEmployment = (CristinPersonEmployment) response.getHits().get(FIRST_HIT);
-        if (response.getHits().isEmpty() || !employmentId.equals(cristinPersonEmployment.getId())) {
+        SearchResponse<CristinPersonEmployment> searchResponse =
+                attempt(() -> generateQueryResponse(personId)).orElseThrow();
+        validateResponse(searchResponse);
+        CristinPersonEmployment cristinPersonEmployment =
+                (CristinPersonEmployment) searchResponse.getHits().get(FIRST_HIT);
+        if (searchResponse.getHits().isEmpty() || !employmentId.equals(cristinPersonEmployment.getId())) {
             throw new NotFoundException(EMPLOYMENT_NOT_FOUND);
         }
         URI cristinUri = generateCristinUri(personId, employmentId);
-        deleteResults(cristinUri);
+        HttpResponse<String> response = deleteResults(cristinUri);
+        checkResponseForBadRequestIndicatingNotFoundIdentifier(response.statusCode());
         return null;
     }
 
@@ -69,7 +79,7 @@ public class DeletePersonEmploymentClient extends QueryPersonEmploymentClient {
         }
     }
 
-    public HttpResponse<String> deleteResults(URI uri) throws ApiGatewayException {
+    private HttpResponse<String> deleteResults(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri).DELETE().build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }

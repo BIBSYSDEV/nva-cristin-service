@@ -16,9 +16,7 @@ import java.net.HttpURLConnection;
 import static no.unit.nva.cristin.common.Utils.getValidEmploymentId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 
-@SuppressWarnings({"unused", "PMD.SingularField"})
 public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void> {
-
 
     private final transient DeletePersonEmploymentClient apiClient;
 
@@ -30,7 +28,6 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
         super(Void.class, environment);
         this.apiClient = apiClient;
     }
-
 
     /**
      * Implements the main logic of the handler. Any exception thrown by this method will be handled by {@link
@@ -68,5 +65,4 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
             throw new ForbiddenException();
         }
     }
-
 }

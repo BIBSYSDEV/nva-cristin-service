@@ -1,5 +1,18 @@
 package no.unit.nva.cristin.person.employment.query;
 
+import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.core.paths.UriWrapper;
+
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.util.List;
+
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
@@ -7,17 +20,6 @@ import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
-import java.util.List;
-import no.unit.nva.cristin.common.client.ApiClient;
-import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.core.paths.UriWrapper;
 
 public class QueryPersonEmploymentClient extends ApiClient {
 
@@ -52,7 +54,7 @@ public class QueryPersonEmploymentClient extends ApiClient {
             .withHits(employments);
     }
 
-    private void checkResponseForBadRequestIndicatingNotFoundIdentifier(int statusCode) throws BadRequestException {
+    protected void checkResponseForBadRequestIndicatingNotFoundIdentifier(int statusCode) throws BadRequestException {
         if (statusCode == HttpURLConnection.HTTP_BAD_REQUEST) {
             throw new BadRequestException(BAD_REQUEST_FROM_UPSTREAM);
         }
