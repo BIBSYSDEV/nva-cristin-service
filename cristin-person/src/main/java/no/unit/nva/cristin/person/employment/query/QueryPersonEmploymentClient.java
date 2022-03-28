@@ -20,11 +20,11 @@ import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+import static no.unit.nva.cristin.person.employment.Constants.EMPLOYMENT_PATH;
+import static no.unit.nva.cristin.person.employment.Constants.EMPLOYMENT_PATH_CRISTIN;
 
 public class QueryPersonEmploymentClient extends ApiClient {
 
-    public static final String EMPLOYMENT_PATH_CRISTIN = "affiliations";
-    public static final String EMPLOYMENT_PATH = "employment";
     public static final String EMPLOYMENT_QUERY_CONTEXT = "https://example.org/person-employment-search-context.json";
     public static final String BAD_REQUEST_FROM_UPSTREAM = "Upstream returned Bad Request. This might occur if "
         + "person identifier is not found in upstream";

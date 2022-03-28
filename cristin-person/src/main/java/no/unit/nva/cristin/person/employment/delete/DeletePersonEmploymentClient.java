@@ -14,7 +14,7 @@ import java.net.http.HttpResponse;
 
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
-import static no.unit.nva.cristin.person.employment.query.QueryPersonEmploymentClient.EMPLOYMENT_PATH_CRISTIN;
+import static no.unit.nva.cristin.person.employment.Constants.EMPLOYMENT_PATH_CRISTIN;
 
 public class DeletePersonEmploymentClient extends ApiClient {
     public static final String BAD_REQUEST_FROM_UPSTREAM = "Upstream returned Bad Request. This might occur if "
