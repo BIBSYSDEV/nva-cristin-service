@@ -1,10 +1,12 @@
 package no.unit.nva.cristin.person.employment.create;
 
+import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
@@ -22,7 +24,7 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<CristinPers
     @SuppressWarnings("unused")
     @JacocoGenerated
     public CreatePersonEmploymentHandler() {
-        this(new CreatePersonEmploymentClient(), new Environment());
+        this(new CreatePersonEmploymentClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
 
     @JacocoGenerated
@@ -37,7 +39,9 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<CristinPers
 
         validateHasAccessRights(requestInfo);
 
-        return apiClient.createEmploymentInCristin();
+        String identifier = getValidPersonId(requestInfo);
+
+        return apiClient.createEmploymentInCristin(identifier, input);
     }
 
     @Override

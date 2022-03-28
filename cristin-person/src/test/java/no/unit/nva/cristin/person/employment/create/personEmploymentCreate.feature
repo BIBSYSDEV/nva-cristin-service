@@ -36,9 +36,3 @@ Feature: API tests for Creation of Cristin Person Employments
     When method POST
     Then status 403
     And match response.title == 'Forbidden'
-
-  Scenario: Create returns status 201 when passing auth check
-    Given path '/person/' + personIdentifier + '/employment/'
-    * header Authorization = 'Bearer ' + token
-    When method POST
-    Then status 201
