@@ -33,7 +33,7 @@ Feature: API tests for Cristin Person fetch
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Upstream returned Bad Request. This might occur if person identifier or employment identifier are invalid'
+    And match response.detail == 'Invalid path parameter for \'id\''
 
 
   Scenario: Delete returns status Bad request when sending nonvalid employmentId parameter
@@ -43,7 +43,7 @@ Feature: API tests for Cristin Person fetch
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Upstream returned Bad Request. This might occur if person identifier or employment identifier are invalid'
+    And match response.detail == 'Invalid path parameter for \'employmentId\''
 
   Scenario: Delete returns status Not found when requesting unknown person identifier
     Given path '/person/' + nonExistingPersonId +'/employment/' + nonExistingEmploymentId
