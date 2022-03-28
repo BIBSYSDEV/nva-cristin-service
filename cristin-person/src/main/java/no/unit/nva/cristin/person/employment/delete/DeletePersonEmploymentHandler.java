@@ -1,8 +1,7 @@
-package no.unit.nva.cristin.person.handler;
+package no.unit.nva.cristin.person.employment.delete;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.cristin.person.client.DeletePersonEmploymentClient;
 import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -17,9 +16,7 @@ import java.net.HttpURLConnection;
 import static no.unit.nva.cristin.common.Utils.getValidEmploymentId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 
-@SuppressWarnings({"unused", "PMD.SingularField"})
 public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void> {
-
 
     private final transient DeletePersonEmploymentClient apiClient;
 
@@ -31,7 +28,6 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
         super(Void.class, environment);
         this.apiClient = apiClient;
     }
-
 
     /**
      * Implements the main logic of the handler. Any exception thrown by this method will be handled by {@link
@@ -69,5 +65,4 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
             throw new ForbiddenException();
         }
     }
-
 }
