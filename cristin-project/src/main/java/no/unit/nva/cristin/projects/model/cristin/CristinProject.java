@@ -28,9 +28,9 @@ public class CristinProject {
     private Boolean published;
     private Map<String, String> title;
     private String mainLanguage;
-    @JsonSerialize(using= CustomInstantSerializer.class)
+    @JsonSerialize(using = CustomInstantSerializer.class)
     private Instant startDate;
-    @JsonSerialize(using= CustomInstantSerializer.class)
+    @JsonSerialize(using = CustomInstantSerializer.class)
     private Instant endDate;
     private String status;
     private Map<String, String> created;
@@ -166,6 +166,7 @@ public class CristinProject {
 
     /**
      * Verifies CristinProject has enough data to be considered as valid.
+     *
      * @return project has enough data to be considered valid
      */
     public boolean hasValidContent() {

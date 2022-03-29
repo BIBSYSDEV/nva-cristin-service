@@ -2,10 +2,13 @@ package no.unit.nva.cristin.person.model.cristin;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.time.Instant;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
+import no.unit.nva.utils.CustomInstantSerializer;
 import nva.commons.core.JacocoGenerated;
+
+import java.time.Instant;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
@@ -16,7 +19,9 @@ public class CristinPersonEmployment {
     private CristinOrganization affiliation;
     private Boolean active;
     private CristinPositionCode position;
+    @JsonSerialize(using= CustomInstantSerializer.class)
     private Instant startDate;
+    @JsonSerialize(using= CustomInstantSerializer.class)
     private Instant endDate;
     private Double ftePercentage;
     private String url;
