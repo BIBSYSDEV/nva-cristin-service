@@ -1,16 +1,33 @@
 package no.unit.nva.cristin.person.model.cristin;
 
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+import static no.unit.nva.cristin.person.employment.Constants.EMPLOYMENT_PATH;
+import static nva.commons.core.attempt.Try.attempt;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.net.URI;
 import java.time.Instant;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
+import no.unit.nva.cristin.person.model.nva.Employment;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.paths.UriWrapper;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPersonEmployment {
+
+    @JsonIgnore
+    public static final String POSITION = "position";
+    @JsonIgnore
+    public static final String HASHTAG = "#";
+    @JsonIgnore
+    public static final String SLASH_DELIMITER = "/";
 
     private String id;
     private CristinOrganization affiliation;
@@ -83,5 +100,38 @@ public class CristinPersonEmployment {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    /**
+     * Creates Employment model using person identifier and this object's data.
+     */
+    public Employment toEmployment(String personId) {
+        return new Employment.Builder()
+            .withId(generateIdUriFromIdentifier(personId))
+            .withType(generateTypeUri())
+            .withOrganization(extractOrganizationUri())
+            .withStartDate(getStartDate())
+            .withEndDate(getEndDate())
+            .withFullTimeEquivalentPercentage(getFtePercentage())
+            .build();
+    }
+
+    private URI generateIdUriFromIdentifier(String personId) {
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH_NVA)
+            .addChild(personId).addChild(EMPLOYMENT_PATH).addChild(getId()).getUri();
+    }
+
+    private URI generateTypeUri() {
+        URI uri = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).getUri();
+        return createUriWithUnescapedHashtagPath(uri);
+    }
+
+    private URI createUriWithUnescapedHashtagPath(URI uri) {
+        String positionCode = getPosition().getCode();
+        return attempt(() -> new URI(uri + SLASH_DELIMITER + POSITION + HASHTAG + positionCode)).orElseThrow();
+    }
+
+    private URI extractOrganizationUri() {
+        return getAffiliation().extractPreferredTypeOfOrganization().getId();
     }
 }
