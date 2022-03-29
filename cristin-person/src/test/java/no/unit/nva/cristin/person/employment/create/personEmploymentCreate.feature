@@ -59,4 +59,3 @@ Feature: API tests for Creation of Cristin Person Employments
     And request TestPersonEmployment
     When method POST
     Then status 201
-    And match response.title == 'Created'
