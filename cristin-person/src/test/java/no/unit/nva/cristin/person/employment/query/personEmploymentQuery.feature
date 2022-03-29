@@ -35,6 +35,7 @@ Feature: API tests for Cristin Person Employments
     When method GET
     Then status 200
     And match response == '#object'
+    And print response
 
   Scenario: Fetch returns status 400 when invalid identifier
     Given path '/person/' + invalidIdentifier + '/employment/'
