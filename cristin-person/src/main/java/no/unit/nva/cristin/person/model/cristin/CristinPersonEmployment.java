@@ -11,9 +11,11 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
 import java.time.Instant;
+import java.util.Optional;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
 import no.unit.nva.cristin.person.model.nva.Employment;
+import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
 
@@ -132,6 +134,8 @@ public class CristinPersonEmployment {
     }
 
     private URI extractOrganizationUri() {
-        return getAffiliation().extractPreferredTypeOfOrganization().getId();
+        return Optional.ofNullable(getAffiliation().extractPreferredTypeOfOrganization())
+            .map(Organization::getId)
+            .orElse(null);
     }
 }
