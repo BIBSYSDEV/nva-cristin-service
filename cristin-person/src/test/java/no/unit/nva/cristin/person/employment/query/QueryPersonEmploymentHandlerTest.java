@@ -50,6 +50,7 @@ public class QueryPersonEmploymentHandlerTest {
         "nvaApiQueryEmploymentResponse.json";
     private static final String EXPECTED_NVA_RESPONSE =
         IoUtils.stringFromResources(Path.of(NVA_QUERY_RESPONSE_JSON));
+    private static final String ONE_EMPTY_RESULT = "[{}]";
 
     private final HttpClient clientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -120,6 +121,16 @@ public class QueryPersonEmploymentHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(BAD_REQUEST_FROM_UPSTREAM));
+    }
+
+    @Test
+    void shouldNotThrowNullExceptionWhenReceivingEmptyData() throws IOException, InterruptedException {
+        when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(ONE_EMPTY_RESULT, 200));
+        apiClient = new QueryPersonEmploymentClient(clientMock);
+        handler = new QueryPersonEmploymentHandler(apiClient, environment);
+        GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
     }
 
     private List<Employment> extractHitsFromSearchResponse(SearchResponse response) {

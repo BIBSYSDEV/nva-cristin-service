@@ -129,16 +129,17 @@ public class CristinPersonEmployment {
 
     private URI generateTypeUri() {
         URI uri = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).getUri();
-        return createUriWithUnescapedHashtagPath(uri);
+        Optional<String> positionCode = Optional.ofNullable(getPosition()).map(CristinPositionCode::getCode);
+        return positionCode.map(code -> createUriWithUnescapedHashtagPath(uri, code)).orElse(null);
     }
 
-    private URI createUriWithUnescapedHashtagPath(URI uri) {
-        String positionCode = getPosition().getCode();
-        return attempt(() -> new URI(uri + SLASH_DELIMITER + POSITION + HASHTAG + positionCode)).orElseThrow();
+    private URI createUriWithUnescapedHashtagPath(URI uri, String code) {
+        return attempt(() -> new URI(uri + SLASH_DELIMITER + POSITION + HASHTAG + code)).orElse(fail -> null);
     }
 
     private URI extractOrganizationUri() {
-        return Optional.ofNullable(getAffiliation().extractPreferredTypeOfOrganization())
+        return Optional.ofNullable(getAffiliation())
+            .map(CristinOrganization::extractPreferredTypeOfOrganization)
             .map(Organization::getId)
             .orElse(null);
     }
