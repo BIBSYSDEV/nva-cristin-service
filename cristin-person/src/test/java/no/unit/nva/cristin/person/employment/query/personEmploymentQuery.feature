@@ -29,14 +29,6 @@ Feature: API tests for Cristin Person Employments
     Then status 401
     And match response.message == 'Unauthorized'
 
-  Scenario: Fetch returns status 200 when valid token
-    Given path '/person/' + personIdentifier + '/employment/'
-    * header Authorization = 'Bearer ' + token
-    When method GET
-    Then status 200
-    And match response == '#object'
-    And print response
-
   Scenario: Fetch returns status 400 when invalid identifier
     Given path '/person/' + invalidIdentifier + '/employment/'
     * header Authorization = 'Bearer ' + token
@@ -55,6 +47,7 @@ Feature: API tests for Cristin Person Employments
     And match response.id == '#present'
     And match response.size == '#present'
     And match response.hits == '#present'
+    And print response
 
     Examples:
       | CONTENT_TYPE          |
