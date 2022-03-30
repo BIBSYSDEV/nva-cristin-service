@@ -16,7 +16,7 @@ Feature: API tests for Creation of Cristin Person Employments
     * def invalidToken = 'just-a-invalid-token-for-now'
     * def personIdentifier = '515114'
      # 'Test Testesen' has id 538786:
-    * def testPersonIdentifier = '538786'
+    * def cristinTestPersonIdentifier = java.lang.System.getenv('CRISTIN_EMPLOYMENT_TEST_PERSON_IDENTIFIER')
     * def TestPersonEmployment =
     """
     {
@@ -53,12 +53,9 @@ Feature: API tests for Creation of Cristin Person Employments
     Then status 403
     And match response.title == 'Forbidden'
 
-#
-#  Disabled until we can delete/clear testdata for person
-#
-#  Scenario: Create returns status 201 Created for timestamp with zero millis
-#    Given path '/person/' + testPersonIdentifier + '/employment/'
-#    And header Authorization = 'Bearer ' + token
-#    And request TestPersonEmployment
-#    When method POST
-#    Then status 201
+  Scenario: Create returns status 201 Created for timestamp with zero millis
+    Given path '/person/' + cristinTestPersonIdentifier + '/employment/'
+    And header Authorization = 'Bearer ' + token
+    And request TestPersonEmployment
+    When method POST
+    Then status 201
