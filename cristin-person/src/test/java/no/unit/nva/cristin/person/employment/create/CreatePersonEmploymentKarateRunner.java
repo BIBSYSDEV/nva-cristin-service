@@ -13,6 +13,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class CreatePersonEmploymentKarateRunner {
 
     public static final String TEST_PERSON_IDENTIFIER = "CRISTIN_EMPLOYMENT_TEST_PERSON_IDENTIFIER";
+    public static final String ERROR_READING_ENVIRONMENT_VARIABLE_MESSAGE =
+            "Error reading environment variable " + TEST_PERSON_IDENTIFIER;
+    public static final String APIGATEWAY_EXCEPTION_DELETING_EMPLOYMENT =
+            "ApiGatewayException deleting employment for person";
 
     @BeforeAll
     static void clearTestUserEmployments() {
@@ -20,9 +24,9 @@ public class CreatePersonEmploymentKarateRunner {
             String cristinTestUserId = new Environment().readEnv(TEST_PERSON_IDENTIFIER);
             ClearCristinTestPersonEmployment.clearEmployment(cristinTestUserId);
         } catch (ApiGatewayException e) {
-            fail("ApiGatewayException deleting employment for person", e);
+            fail(APIGATEWAY_EXCEPTION_DELETING_EMPLOYMENT, e);
         } catch (IllegalStateException e) {
-            fail("Error reading environment variable " + TEST_PERSON_IDENTIFIER);
+            fail(ERROR_READING_ENVIRONMENT_VARIABLE_MESSAGE);
         }
     }
 
