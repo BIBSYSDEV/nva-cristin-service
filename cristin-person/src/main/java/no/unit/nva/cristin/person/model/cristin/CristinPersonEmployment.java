@@ -12,10 +12,12 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Optional;
-import no.unit.nva.cristin.model.CristinOrganization;
-import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.model.Organization;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import no.unit.nva.cristin.model.CristinOrganization;
+import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
+import no.unit.nva.utils.CustomInstantSerializer;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
 
@@ -35,7 +37,9 @@ public class CristinPersonEmployment {
     private CristinOrganization affiliation;
     private Boolean active;
     private CristinPositionCode position;
+    @JsonSerialize(using = CustomInstantSerializer.class)
     private Instant startDate;
+    @JsonSerialize(using = CustomInstantSerializer.class)
     private Instant endDate;
     private Double ftePercentage;
     private String url;
