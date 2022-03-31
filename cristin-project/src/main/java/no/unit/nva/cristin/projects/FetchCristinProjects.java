@@ -58,9 +58,9 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
         String page = getValidPage(requestInfo);
         String numberOfResults = getValidNumberOfResults(requestInfo);
         Map<String, String> requestQueryParameters = getQueryParameters(language, page, numberOfResults);
-        if (requestInfo.getQueryParameters().containsKey(QUERY)) {
-            requestQueryParameters.put(QUERY, getValidQuery(requestInfo));
-        }
+//        if (requestInfo.getQueryParameters().containsKey(QUERY)) {
+        requestQueryParameters.put(QUERY, getValidQuery(requestInfo));
+//        }
         Optional<String> organizationQuery = getValidOrganizationUri(requestInfo);
         if (organizationQuery.isPresent()) {
             requestQueryParameters.put(ORGANIZATION, organizationQuery.get());

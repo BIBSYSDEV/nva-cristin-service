@@ -166,7 +166,7 @@ public class FetchCristinProjectsTest {
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(gatewayResponse.getBody()));
     }
 
-//    @Test
+    @Test
     void handlerThrowsBadRequestWhenMissingTitleQueryParameter() throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(LANGUAGE, LANGUAGE_NB));
 
