@@ -46,6 +46,17 @@ paths:
             type: string
             pattern: '.+'
           example: 'Helse'
+        - name: status
+          in: query
+          description: Search for project with status
+          required: false
+          schema:
+            type: string
+            enum:
+            - active
+            - concluded
+            - not started
+            example: 'active'
         - name: language
           in: query
           description: Preferred language for some fields
