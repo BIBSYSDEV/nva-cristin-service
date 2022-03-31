@@ -134,9 +134,9 @@ public class UriUtils {
     }
 
     /**
-     * Convenience method to encode a uri.
+     * Convenience method to decode a uri.
      * @param uri string containing a uri.
-     * @return urlencoded uri
+     * @return uri decoded from string
      */
     public static String decodeUri(String uri) {
         return URLDecoder.decode(uri, StandardCharsets.UTF_8);
