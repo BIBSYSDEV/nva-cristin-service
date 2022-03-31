@@ -143,14 +143,14 @@ public class UriUtils {
     }
 
     /**
-     * verifies that a String contains a valid URI.
+     * verifies that a String contains a valid and dereferenceable URI.
      * @param str  a String containing an URI
      * @return true if str is a valid URI otherwise false
      */
     public static boolean isValidURI(String str) {
         try {
             URI organizationId = new URI(str);
-            organizationId.toURL();
+            organizationId.toURL();   // forcing URI to be dereferenceable
         } catch (URISyntaxException | MalformedURLException e) {
             return false;
         }
