@@ -15,6 +15,22 @@ Feature: API tests for Creation of Cristin Person Employments
     * def simpleUserToken = tokenGenerator.loginUser(simple_user_name, simple_user_password, cognitoUserpoolId, cognitoClientAppId)
     * def invalidToken = 'just-a-invalid-token-for-now'
     * def personIdentifier = '515114'
+     # 'Test Testesen' has id 538786:
+    * def cristinTestPersonIdentifier = java.lang.System.getenv('CRISTIN_EMPLOYMENT_TEST_PERSON_IDENTIFIER')
+    * def TestPersonEmployment =
+    """
+    {
+      'affiliation': {
+        'unit': {
+          'cristin_unit_id': '186.32.15.0'
+        }
+      },
+      'position': {
+        'code': '1087'
+      },
+      'start_date': '2022-03-29T00:00:00.000Z'
+    }
+    """
     Given url CRISTIN_BASE
 
   Scenario: Create returns status 401 Unauthorized when invalid token
@@ -36,3 +52,10 @@ Feature: API tests for Creation of Cristin Person Employments
     When method POST
     Then status 403
     And match response.title == 'Forbidden'
+
+  Scenario: Create returns status 201 Created for timestamp with zero millis
+    Given path '/person/' + cristinTestPersonIdentifier + '/employment/'
+    And header Authorization = 'Bearer ' + token
+    And request TestPersonEmployment
+    When method POST
+    Then status 201

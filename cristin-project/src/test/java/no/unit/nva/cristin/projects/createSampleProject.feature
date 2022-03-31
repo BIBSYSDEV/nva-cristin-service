@@ -22,8 +22,8 @@ Feature: API tests for Cristin Project retrieve and search
           'nb': 'Eksempel på tittel'
         }
       ],
-      'startDate': '2012-01-09T00:00:00.001Z',
-      'endDate': '2017-12-31T00:00:00.001Z',
+      'startDate': '2012-01-09T00:00:00.000Z',
+      'endDate': '2017-12-31T00:00:00.000Z',
       'coordinatingInstitution': {
         'type': 'Organization',
         'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'

@@ -3,10 +3,12 @@ package no.unit.nva.cristin.projects.model.cristin;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.NvaProjectBuilder;
 import no.unit.nva.cristin.projects.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.utils.CustomInstantSerializer;
 import nva.commons.core.StringUtils;
 
 import java.time.Instant;
@@ -26,7 +28,9 @@ public class CristinProject {
     private Boolean published;
     private Map<String, String> title;
     private String mainLanguage;
+    @JsonSerialize(using = CustomInstantSerializer.class)
     private Instant startDate;
+    @JsonSerialize(using = CustomInstantSerializer.class)
     private Instant endDate;
     private String status;
     private Map<String, String> created;
@@ -162,6 +166,7 @@ public class CristinProject {
 
     /**
      * Verifies CristinProject has enough data to be considered as valid.
+     *
      * @return project has enough data to be considered valid
      */
     public boolean hasValidContent() {
