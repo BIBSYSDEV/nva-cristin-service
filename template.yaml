@@ -445,7 +445,7 @@ Resources:
       Handler: no.unit.nva.cristin.person.employment.update.UpdatePersonEmploymentHandler::handleRequest
       #Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
-        NvaCristinCreatePersonEmploymentEvent:
+        NvaCristinUpdatePersonEmploymentEvent:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
