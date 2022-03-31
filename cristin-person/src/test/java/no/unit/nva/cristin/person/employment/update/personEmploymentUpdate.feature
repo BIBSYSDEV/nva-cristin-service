@@ -1,4 +1,4 @@
-Feature: API tests for Creation of Cristin Person Employments
+Feature: API tests for Cristin Person Employment Update
 
   Background:
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
@@ -15,47 +15,38 @@ Feature: API tests for Creation of Cristin Person Employments
     * def simpleUserToken = tokenGenerator.loginUser(simple_user_name, simple_user_password, cognitoUserpoolId, cognitoClientAppId)
     * def invalidToken = 'just-a-invalid-token-for-now'
     * def personIdentifier = '515114'
-     # 'Test Testesen' has id 538786:
-    * def cristinTestPersonIdentifier = java.lang.System.getenv('CRISTIN_EMPLOYMENT_TEST_PERSON_IDENTIFIER')
-    * def TestPersonEmployment =
+    * def employmentIdentifier = '206517'
+    * def updateFieldsRequest =
     """
     {
-      'affiliation': {
-        'unit': {
-          'cristin_unit_id': '186.32.15.0'
-        }
-      },
-      'position': {
-        'code': '1087'
-      },
-      'start_date': '2022-03-29T00:00:00.000Z'
+      'test': 'test'
     }
     """
     Given url CRISTIN_BASE
 
-  Scenario: Create returns status 401 Unauthorized when invalid token
-    Given path '/person/' + personIdentifier + '/employment/'
+  Scenario: Update returns status 401 Unauthorized when invalid token
+    Given path '/person/' + personIdentifier + '/employment/' + employmentIdentifier
     * header Authorization = 'Bearer ' + invalidToken
-    When method POST
+    When method PATCH
     Then status 401
     And match response.message == 'Unauthorized'
 
-  Scenario: Create returns status 401 Unauthorized when missing token
-    Given path '/person/' + personIdentifier + '/employment/'
-    When method POST
+  Scenario: Update returns status 401 Unauthorized when missing token
+    Given path '/person/' + personIdentifier + '/employment/' + employmentIdentifier
+    When method PATCH
     Then status 401
     And match response.message == 'Unauthorized'
 
-  Scenario: Create returns status 403 Forbidden when not authorized
-    Given path '/person/' + personIdentifier + '/employment/'
+  Scenario: Update returns status 403 Forbidden when not authorized
+    Given path '/person/' + personIdentifier + '/employment/' + employmentIdentifier
     And header Authorization = 'Bearer ' + simpleUserToken
-    When method POST
+    When method PATCH
     Then status 403
     And match response.title == 'Forbidden'
 
-  Scenario: Create returns status 201 Created for timestamp with zero millis
-    Given path '/person/' + cristinTestPersonIdentifier + '/employment/'
-    And header Authorization = 'Bearer ' + token
-    And request TestPersonEmployment
-    When method POST
-    Then status 201
+  Scenario: Update returns status 204 when valid payload
+    Given path '/person/' + personIdentifier + '/employment/' + employmentIdentifier
+    * header Authorization = 'Bearer ' + token
+    And request updateFieldsRequest
+    When method PATCH
+    Then status 204

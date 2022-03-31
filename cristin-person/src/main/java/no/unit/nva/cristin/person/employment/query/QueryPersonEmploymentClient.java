@@ -1,8 +1,10 @@
 package no.unit.nva.cristin.person.employment.query;
 
+import java.util.stream.Collectors;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.person.model.nva.Employment;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.paths.UriWrapper;
@@ -36,7 +38,7 @@ public class QueryPersonEmploymentClient extends ApiClient {
     /**
      * Fetches Cristin data from upstream into response object serialized to client.
      */
-    public SearchResponse<CristinPersonEmployment> generateQueryResponse(String identifier) throws ApiGatewayException {
+    public SearchResponse<Employment> generateQueryResponse(String identifier) throws ApiGatewayException {
         long startRequestTime = System.currentTimeMillis();
         URI cristinUri = generateCristinUri(identifier);
         HttpResponse<String> response = fetchQueryResults(cristinUri);
@@ -44,14 +46,22 @@ public class QueryPersonEmploymentClient extends ApiClient {
         checkResponseForBadRequestIndicatingNotFoundIdentifier(response.statusCode());
         checkHttpStatusCode(idUri, response.statusCode());
         long requestTime = calculateProcessingTime(startRequestTime, System.currentTimeMillis());
-        List<CristinPersonEmployment> employments =
+        List<CristinPersonEmployment> cristinEmployments =
             asList(getDeserializedResponse(response, CristinPersonEmployment[].class));
+        List<Employment> employments = mapEmploymentsToNvaFormat(identifier, cristinEmployments);
 
-        return new SearchResponse<CristinPersonEmployment>(idUri)
+        return new SearchResponse<Employment>(idUri)
             .withContext(EMPLOYMENT_QUERY_CONTEXT)
             .withProcessingTime(requestTime)
             .withSize(employments.size())
             .withHits(employments);
+    }
+
+    private static List<Employment> mapEmploymentsToNvaFormat(String identifier,
+                                                              List<CristinPersonEmployment> cristinEmployments) {
+        return cristinEmployments.stream()
+            .map(cristinEmployment -> cristinEmployment.toEmployment(identifier))
+            .collect(Collectors.toList());
     }
 
     private void checkResponseForBadRequestIndicatingNotFoundIdentifier(int statusCode) throws BadRequestException {

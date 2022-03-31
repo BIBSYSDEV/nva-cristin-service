@@ -111,12 +111,8 @@ public class NvaProjectBuilder {
     }
 
     private Organization extractCoordinatingInstitution() {
-        Optional<Organization> unit = Optional.ofNullable(cristinProject.getCoordinatingInstitution())
-            .map(CristinOrganization::getInstitutionUnit).map(CristinUnit::toOrganization);
-        Optional<Organization> institution = Optional.ofNullable(cristinProject.getCoordinatingInstitution())
-            .map(CristinOrganization::getInstitution).map(CristinInstitution::toOrganization);
-
-        return unit.orElse(institution.orElse(null));
+        return Optional.ofNullable(cristinProject.getCoordinatingInstitution())
+            .map(CristinOrganization::extractPreferredTypeOfOrganization).orElse(null);
     }
 
     private String extractMainTitle() {

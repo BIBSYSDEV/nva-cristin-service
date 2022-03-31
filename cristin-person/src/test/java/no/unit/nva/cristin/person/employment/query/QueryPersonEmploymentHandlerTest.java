@@ -2,8 +2,11 @@ package no.unit.nva.cristin.person.employment.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.net.HttpHeaders;
+import java.util.List;
 import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -43,6 +46,11 @@ public class QueryPersonEmploymentHandlerTest {
         "cristinQueryEmploymentResponse.json";
     private static final String DUMMY_CRISTIN_RESPONSE =
         IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_JSON));
+    private static final String NVA_QUERY_RESPONSE_JSON =
+        "nvaApiQueryEmploymentResponse.json";
+    private static final String EXPECTED_NVA_RESPONSE =
+        IoUtils.stringFromResources(Path.of(NVA_QUERY_RESPONSE_JSON));
+    private static final String ONE_EMPTY_RESULT = "[{}]";
 
     private final HttpClient clientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -69,12 +77,15 @@ public class QueryPersonEmploymentHandlerTest {
     }
 
     @Test
-    void shouldReturnStatusOkWithDummyHitsWhenCallingHandlerWithValidIdentifier() throws IOException {
+    void shouldReturnStatusOkWithDataInResponseMatchingUpstreamWhenSuccessfulQuery() throws IOException {
+        List<Employment> expectedEmployments = extractHitsFromSearchResponse(readExpectedResponse());
         GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
         SearchResponse response = gatewayResponse.getBodyObject(SearchResponse.class);
+        List<Employment> actualEmployments = extractHitsFromSearchResponse(response);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertThat(response.getHits().size(), equalTo(2));
+        assertEquals(actualEmployments.size(), 2);
+        assertThat(actualEmployments.containsAll(expectedEmployments), equalTo(true));
     }
 
     @Test
@@ -110,6 +121,24 @@ public class QueryPersonEmploymentHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(BAD_REQUEST_FROM_UPSTREAM));
+    }
+
+    @Test
+    void shouldNotThrowNullExceptionWhenReceivingEmptyData() throws IOException, InterruptedException {
+        when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(ONE_EMPTY_RESULT, 200));
+        apiClient = new QueryPersonEmploymentClient(clientMock);
+        handler = new QueryPersonEmploymentHandler(apiClient, environment);
+        GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
+    private List<Employment> extractHitsFromSearchResponse(SearchResponse response) {
+        return OBJECT_MAPPER.convertValue(response.getHits(), new TypeReference<>() {});
+    }
+
+    private SearchResponse readExpectedResponse() throws JsonProcessingException {
+        return OBJECT_MAPPER.readValue(EXPECTED_NVA_RESPONSE, SearchResponse.class);
     }
 
     private GatewayResponse<SearchResponse> queryWithoutRequiredAccessRights() throws IOException {

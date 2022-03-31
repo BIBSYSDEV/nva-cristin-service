@@ -4,7 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -18,7 +18,7 @@ import java.util.List;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 
-public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, SearchResponse<CristinPersonEmployment>> {
+public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, SearchResponse<Employment>> {
 
     private final transient QueryPersonEmploymentClient apiClient;
 
@@ -34,7 +34,7 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Search
     }
 
     @Override
-    protected SearchResponse<CristinPersonEmployment> processInput(Void input, RequestInfo requestInfo, Context context)
+    protected SearchResponse<Employment> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
@@ -44,9 +44,8 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Search
         return apiClient.generateQueryResponse(identifier);
     }
 
-
     @Override
-    protected Integer getSuccessStatusCode(Void input, SearchResponse<CristinPersonEmployment> output) {
+    protected Integer getSuccessStatusCode(Void input, SearchResponse<Employment> output) {
         return HttpURLConnection.HTTP_OK;
     }
 
