@@ -156,3 +156,16 @@ Feature: API tests for Cristin projects query
     * def matchingProject = '432742'
     And match response.hits[0].id contains matchingProject
     And match response.hits[0].title == '#present'
+
+
+  Scenario: Query accepts organization uri as query parameter
+    Given path '/project/'
+    * def organizationId = 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+    And param query = queryString
+    And param organization = organizationId
+    When method GET
+    Then status 200
+#    And match response.hits == '#[1]'
+#    * def matchingProject = '432742'
+#    And match response.hits[0].id contains matchingProject
+#    And match response.hits[0].title == '#present'

@@ -12,12 +12,14 @@ import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 
@@ -26,7 +28,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
  */
 public class FetchCristinProjects extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
 
-    public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
+    public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, ORGANIZATION, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
 
     private final transient CristinApiClient cristinApiClient;
 
@@ -48,16 +50,23 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
 
     @Override
     protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         validateQueryParameterKeys(requestInfo);
 
         String language = getValidLanguage(requestInfo);
-        String query = getValidQuery(requestInfo);
         String page = getValidPage(requestInfo);
         String numberOfResults = getValidNumberOfResults(requestInfo);
+        Map<String, String> requestQueryParameters = getQueryParameters(language, page, numberOfResults);
+        if (requestInfo.getQueryParameters().containsKey(QUERY)) {
+            requestQueryParameters.put(QUERY, getValidQuery(requestInfo));
+        }
+        Optional<String> organizationQuery = getValidOrganizationUri(requestInfo);
+        if (organizationQuery.isPresent()) {
+            requestQueryParameters.put(ORGANIZATION, organizationQuery.get());
+        }
 
-        return getTransformedCristinProjectsUsingWrapperObject(language, query, page, numberOfResults);
+        return getTransformedCristinProjectsUsingWrapperObject(requestQueryParameters);
     }
 
     @Override
@@ -72,19 +81,19 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
         return HttpURLConnection.HTTP_OK;
     }
 
-    private SearchResponse<NvaProject> getTransformedCristinProjectsUsingWrapperObject(String language,
-                                                                                       String query,
-                                                                                       String page,
-                                                                                       String numberOfResults)
+    private SearchResponse<NvaProject> getTransformedCristinProjectsUsingWrapperObject(
+            Map<String, String> requestQueryParameters)
             throws ApiGatewayException {
+        return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParameters);
+    }
 
+    private Map<String, String> getQueryParameters(String language, String page, String numberOfResults) {
         Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
         requestQueryParameters.put(LANGUAGE, language);
-        requestQueryParameters.put(QUERY, query);
+//        requestQueryParameters.put(QUERY, query);
         requestQueryParameters.put(PAGE, page);
         requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
-
-        return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParameters);
+        return requestQueryParameters;
     }
 
 }

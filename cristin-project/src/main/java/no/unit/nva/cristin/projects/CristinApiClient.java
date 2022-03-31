@@ -35,10 +35,13 @@ import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
+import static no.unit.nva.utils.UriUtils.encodeOrganizationUri;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -104,7 +107,7 @@ public class CristinApiClient extends ApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        URI id = createIdUriFromParams(requestQueryParameters, PROJECT);
+        URI id = createIdUriFromParams(encodeOrganizationUri(requestQueryParameters), PROJECT);
 
         return new SearchResponse<NvaProject>(id)
                 .withContext(PROJECT_SEARCH_CONTEXT_URL)
@@ -112,6 +115,8 @@ public class CristinApiClient extends ApiClient {
                 .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
                 .withHits(nvaProjects);
     }
+
+
 
     protected HttpResponse<String> queryProjects(Map<String, String> parameters, QueryType queryType)
             throws ApiGatewayException {
@@ -191,9 +196,16 @@ public class CristinApiClient extends ApiClient {
                 .withLanguage(parameters.get(LANGUAGE))
                 .withFromPage(parameters.get(PAGE))
                 .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
+        if (parameters.containsKey(ORGANIZATION)) {
+            query = query.withParentUnitId(getUnitIdFromOrganization(parameters.get(ORGANIZATION)));
+        }
 
         return queryType == QUERY_USING_GRANT_ID ? query.withGrantId(parameters.get(QUERY)).toURI() :
                 query.withTitle(parameters.get(QUERY)).toURI();
+    }
+
+    private String getUnitIdFromOrganization(String organizationId) {
+        return extractLastPathElement(URI.create(organizationId));
     }
 
     protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {

@@ -75,6 +75,12 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
                 .map(UriUtils::escapeWhiteSpace);
     }
 
+    protected Optional<String> getValidOrganizationUri(RequestInfo requestInfo) {
+        return getQueryParameter(requestInfo, ORGANIZATION)
+                .map(UriUtils::decodeUri)
+                .filter(UriUtils::isValidURI);
+    }
+
     private boolean isValidQueryString(String str) {
         for (Character c : str.toCharArray()) {
             if (isUnsupportedCharacter(c)) {
