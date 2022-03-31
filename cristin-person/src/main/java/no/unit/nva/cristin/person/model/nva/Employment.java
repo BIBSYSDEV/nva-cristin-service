@@ -1,12 +1,19 @@
 package no.unit.nva.cristin.person.model.nva;
 
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
+import static no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment.HASHTAG;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
+import no.unit.nva.cristin.model.CristinOrganization;
+import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.JsonSerializable;
+import nva.commons.core.StringUtils;
 
 @JacocoGenerated
 public class Employment implements JsonSerializable {
@@ -151,6 +158,41 @@ public class Employment implements JsonSerializable {
 
         public Employment build() {
             return employment;
+        }
+    }
+
+    public static Optional<String> extractPositionCodeFromTypeUri(URI type) {
+        return Optional.ofNullable(type)
+            .map(URI::toString)
+            .map(str -> str.substring(str.lastIndexOf(HASHTAG) + 1))
+            .filter(StringUtils::isNotBlank);
+    }
+
+    public CristinPersonEmployment toCristinEmployment() {
+        CristinPersonEmployment cristinEmployment = new CristinPersonEmployment();
+
+        cristinEmployment.setAffiliation(generateCristinAffiliation());
+        cristinEmployment.setPosition(generateCristinPositionCode());
+        cristinEmployment.setStartDate(getStartDate());
+        cristinEmployment.setEndDate(getEndDate());
+        cristinEmployment.setFtePercentage(getFullTimeEquivalentPercentage());
+
+        return cristinEmployment;
+    }
+
+    private CristinOrganization generateCristinAffiliation() {
+        String orgId = extractLastPathElement(getOrganization());
+        return CristinOrganization.fromIdentifier(orgId);
+    }
+
+    private CristinPositionCode generateCristinPositionCode() {
+        Optional<String> code = extractPositionCodeFromTypeUri(getType());
+        if (code.isPresent()) {
+            CristinPositionCode positionCode = new CristinPositionCode();
+            positionCode.setCode(code.get());
+            return positionCode;
+        } else {
+            return null;
         }
     }
 }
