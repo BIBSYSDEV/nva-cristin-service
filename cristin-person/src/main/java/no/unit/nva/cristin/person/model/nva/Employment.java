@@ -187,12 +187,6 @@ public class Employment implements JsonSerializable {
 
     private CristinPositionCode generateCristinPositionCode() {
         Optional<String> code = extractPositionCodeFromTypeUri(getType());
-        if (code.isPresent()) {
-            CristinPositionCode positionCode = new CristinPositionCode();
-            positionCode.setCode(code.get());
-            return positionCode;
-        } else {
-            return null;
-        }
+        return code.map(CristinPositionCode::new).orElse(null);
     }
 }
