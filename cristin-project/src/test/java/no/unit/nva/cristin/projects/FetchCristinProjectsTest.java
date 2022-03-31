@@ -110,6 +110,10 @@ public class FetchCristinProjectsTest {
             "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer+reindeer&organization="
                     + SAMPLE_NVA_ORGANIZATION_ENCODED
                     + "&language=nb&page=1&results=5";
+    private static final String ILLEGAL_NVA_ORGANIZATION =
+            "hps:/api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0";
+    private static final String ILLEGAL_NVA_ORGANIZATION_ENCODED  =
+            URLEncoder.encode(ILLEGAL_NVA_ORGANIZATION, StandardCharsets.UTF_8);
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -567,6 +571,20 @@ public class FetchCristinProjectsTest {
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(SAMPLE_NVA_ORGANIZATION_ENCODED));
     }
+
+    @Test
+    void handlerReturnsBadRequestWhenOrganizationUriIsInvalid() throws Exception {
+        InputStream input = requestWithQueryParameters(Map.of(
+                QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE,
+                ORGANIZATION, ILLEGAL_NVA_ORGANIZATION_ENCODED,
+                LANGUAGE, LANGUAGE_NB));
+        handler.handleRequest(input, output, context);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
 
 
 

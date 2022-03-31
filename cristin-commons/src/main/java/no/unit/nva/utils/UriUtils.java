@@ -2,10 +2,10 @@ package no.unit.nva.utils;
 
 import nva.commons.core.paths.UriWrapper;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
@@ -18,7 +18,6 @@ import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static nva.commons.core.attempt.Try.attempt;
 
 
@@ -134,23 +133,25 @@ public class UriUtils {
                 .orElseThrow();
     }
 
-    public static Map<String, String> encodeOrganizationUri(Map<String, String> requestQueryParameters) {
-        if (requestQueryParameters.containsKey(ORGANIZATION)) {
-            String organizationId = requestQueryParameters.get(ORGANIZATION);
-            requestQueryParameters.put(ORGANIZATION, URLEncoder.encode(organizationId, StandardCharsets.UTF_8));
-        }
-        return requestQueryParameters;
-    }
-
+    /**
+     * Convenience method to encode a uri.
+     * @param uri string containing a uri.
+     * @return urlencoded uri
+     */
     public static String decodeUri(String uri) {
         return URLDecoder.decode(uri, StandardCharsets.UTF_8);
     }
 
-
+    /**
+     * verifies that a String contains a valid URI.
+     * @param str  a String containing an URI
+     * @return true if str is a valid URI otherwise false
+     */
     public static boolean isValidURI(String str) {
         try {
-            new URI(str);
-        } catch (URISyntaxException e) {
+            URI organizationId = new URI(str);
+            organizationId.toURL();
+        } catch (URISyntaxException | MalformedURLException e) {
             return false;
         }
         return true;

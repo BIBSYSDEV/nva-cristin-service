@@ -165,7 +165,11 @@ Feature: API tests for Cristin projects query
     And param organization = organizationId
     When method GET
     Then status 200
-#    And match response.hits == '#[1]'
-#    * def matchingProject = '432742'
-#    And match response.hits[0].id contains matchingProject
-#    And match response.hits[0].title == '#present'
+
+  Scenario: Query with illegal organizationId  returns 400 Bad request
+    Given path '/project/'
+    * def organizationId = 'htttps:/api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+    And param query = queryString
+    And param organization = organizationId
+    When method GET
+    Then status 400

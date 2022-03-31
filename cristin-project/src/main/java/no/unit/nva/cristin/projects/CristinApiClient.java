@@ -14,8 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
-import static no.unit.nva.utils.UriUtils.encodeOrganizationUri;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
@@ -107,7 +108,7 @@ public class CristinApiClient extends ApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        URI id = createIdUriFromParams(encodeOrganizationUri(requestQueryParameters), PROJECT);
+        URI id = createIdUriFromParams(rewrapOrganizationUri(requestQueryParameters), PROJECT);
 
         return new SearchResponse<NvaProject>(id)
                 .withContext(PROJECT_SEARCH_CONTEXT_URL)
@@ -231,5 +232,14 @@ public class CristinApiClient extends ApiClient {
                 .map(CristinProject::toNvaProject)
                 .collect(Collectors.toList());
     }
+
+    private Map<String, String> rewrapOrganizationUri(Map<String, String> requestQueryParameters) {
+        if (requestQueryParameters.containsKey(ORGANIZATION)) {
+            String organizationId = requestQueryParameters.get(ORGANIZATION);
+            requestQueryParameters.put(ORGANIZATION, URLEncoder.encode(organizationId, StandardCharsets.UTF_8));
+        }
+        return requestQueryParameters;
+    }
+
 
 }
