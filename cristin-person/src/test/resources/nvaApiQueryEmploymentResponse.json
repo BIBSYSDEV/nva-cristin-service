@@ -1,0 +1,26 @@
+{
+  "@context": "https://example.org/person-employment-search-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456/employment",
+  "size": 2,
+  "searchString": null,
+  "processingTime": 29,
+  "firstRecord": null,
+  "nextResults": null,
+  "previousResults": null,
+  "hits": [
+    {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456/employment/1016",
+      "type": "https://api.dev.nva.aws.unit.no/cristin/position#M0000029",
+      "organization": "https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0",
+      "startDate": "2008-01-01T00:00:00Z",
+      "fullTimeEquivalentPercentage": 100.0
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456/employment/1014",
+      "type": "https://api.dev.nva.aws.unit.no/cristin/position#M0000029",
+      "organization": "https://api.dev.nva.aws.unit.no/cristin/organization/185.39.55.20",
+      "startDate": "2017-12-01T00:00:00Z",
+      "endDate": "2019-12-31T00:00:00Z"
+    }
+  ]
+}
