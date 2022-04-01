@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessageWithRange;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
@@ -106,7 +106,7 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
     private Optional<ProjectStatus> getValidProjectStatus(RequestInfo requestInfo) throws BadRequestException {
         if (requestInfo.getQueryParameters().containsKey(STATUS)) {
             return Optional.ofNullable(attempt(() -> ProjectStatus.lookup(requestInfo.getQueryParameters().get(STATUS)))
-                    .orElseThrow(fail -> new BadRequestException(invalidQueryParametersMessage(STATUS, Arrays.toString(ProjectStatus.values())))));
+                    .orElseThrow(fail -> new BadRequestException(invalidQueryParametersMessageWithRange(STATUS, Arrays.toString(ProjectStatus.values())))));
 
         } else {
             return Optional.empty();

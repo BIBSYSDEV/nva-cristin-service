@@ -203,7 +203,7 @@ public class CristinApiClient extends ApiClient {
         }
 
         if (parameters.containsKey(STATUS)) {
-            query = query.withStatus(getUnitIdFromOrganization(parameters.get(ORGANIZATION)));
+            query = query.withStatus(parameters.get(STATUS));
         }
 
         return queryType == QUERY_USING_GRANT_ID ? query.withGrantId(parameters.get(QUERY)).toURI() :
