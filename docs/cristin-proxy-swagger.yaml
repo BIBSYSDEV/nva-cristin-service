@@ -784,7 +784,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Person
-      summary: Fetch person employments by identifier
+      summary: Query person employments by identifier
       description: Returns all person employments
       operationId: GetPersonEmploymentsByIdentifier
       security:
@@ -795,16 +795,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PersonEmployment'
+                $ref: '#/components/schemas/PersonEmploymentQuery'
               examples:
                 objectExample:
-                  $ref: '#/components/examples/PersonEmploymentExample'
+                  $ref: '#/components/examples/PersonEmploymentQueryExample'
             application/ld+json:
               schema:
-                $ref: '#/components/schemas/PersonEmployment'
+                $ref: '#/components/schemas/PersonEmploymentQuery'
               examples:
                 objectExample:
-                  $ref: '#/components/examples/PersonEmploymentExample'
+                  $ref: '#/components/examples/PersonEmploymentQueryExample'
         400:
           $ref: '#/components/responses/400'
         401:
@@ -1576,12 +1576,62 @@ components:
             $ref: '#/components/schemas/Languages'
         enabled:
           type: boolean
+    PersonEmploymentQuery:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of employments returned by the query
+          items:
+            $ref: '#/components/schemas/PersonEmployment'
     PersonEmployment:
       type: object
       properties:
-        identifier:
+        id:
+          $ref: '#/components/schemas/Id'
+        type:
+          $ref: '#/components/schemas/Id'
+        organization:
+          $ref: '#/components/schemas/Id'
+        startDate:
           type: string
-          description: Person identifier
+          format: date-time
+          description: Employment start date
+        endDate:
+          type: string
+          format: date-time
+          description: Optional employment end date
+        fullTimeEquivalentPercentage:
+          type: number
+          format: double
+          description: Optional employment percentage
     OrganizationPersons:
       type: object
       properties:
@@ -1974,9 +2024,34 @@ components:
             name:
               en: Academic adviser
             enabled: true
+    PersonEmploymentQueryExample:
+      value:
+        '@context': 'https://example.org/person-employment-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/123456/employment'
+        size: 2
+        processingTime: 800
+        firstRecord: 'null'
+        nextResults: 'null'
+        previousResults: 'null'
+        hits:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/123456/employment/1016'
+            type: 'https://api.dev.nva.aws.unit.no/cristin/position#1087'
+            organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+            startDate: '2008-01-01T00:00:00Z'
+            fullTimeEquivalentPercentage: 100.0
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/123456/employment/1014'
+            type: 'https://api.dev.nva.aws.unit.no/cristin/position#1087'
+            organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.39.55.20'
+            startDate: '2017-12-01T00:00:00Z'
+            endDate: '2019-12-31T00:00:00Z'
     PersonEmploymentExample:
       value:
-        identifier: '359084'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/123456/employment/1016'
+        type: 'https://api.dev.nva.aws.unit.no/cristin/position#1087'
+        organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+        startDate: '2008-01-01T00:00:00Z'
+        endDate: '2019-12-31T00:00:00Z'
+        fullTimeEquivalentPercentage: 100.0
 
     OrganizationPersonsExample:
       value:
