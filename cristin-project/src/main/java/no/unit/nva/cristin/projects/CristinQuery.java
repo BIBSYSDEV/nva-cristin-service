@@ -16,6 +16,7 @@ public class CristinQuery {
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_DEFAULT_VALUE = "1";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
+    private static final String CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID = "parent_unit_id";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
     private static final String CRISTIN_API_PROJECTS_PATH = "projects";
 
@@ -74,6 +75,12 @@ public class CristinQuery {
         cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY, itemsPerPage);
         return this;
     }
+
+    public CristinQuery withParentUnitId(String parentUnitId) {
+        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, parentUnitId);
+        return this;
+    }
+
 
     /**
      * Builds URI to search Cristin projects based on parameters supplied to the builder methods.

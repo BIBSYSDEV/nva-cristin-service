@@ -12,6 +12,7 @@ import java.util.Set;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
+import static no.unit.nva.cristin.common.ErrorMessages.INVALID_URI_MESSAGE;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
@@ -73,6 +74,15 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
         return getQueryParameter(requestInfo, ORGANIZATION)
                 .filter(this::isValidQueryString)
                 .map(UriUtils::escapeWhiteSpace);
+    }
+
+    protected String getValidOrganizationUri(RequestInfo requestInfo) throws BadRequestException {
+        return getQueryParameter(requestInfo, ORGANIZATION)
+                .map(UriUtils::decodeUri)
+                .filter(UriUtils::isValidURI)
+                .orElseThrow(() -> new BadRequestException(
+                        invalidQueryParametersMessage(ORGANIZATION, INVALID_URI_MESSAGE)));
+
     }
 
     private boolean isValidQueryString(String str) {
