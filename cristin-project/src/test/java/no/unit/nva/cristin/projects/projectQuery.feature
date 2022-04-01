@@ -173,3 +173,11 @@ Feature: API tests for Cristin projects query
     And param organization = organizationId
     When method GET
     Then status 400
+
+  Scenario: Query accepts status parameter value case independent
+    Given path '/project/'
+    And param query = queryString
+    And param organization = organizationId
+    And param status = nOtsTaRtEd
+    When method GET
+    Then status 200

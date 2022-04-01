@@ -55,7 +55,7 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
 
     @Override
     protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         validateQueryParameterKeys(requestInfo);
 

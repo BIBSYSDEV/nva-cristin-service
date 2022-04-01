@@ -607,6 +607,21 @@ public class FetchCristinProjectsTest {
         assertThat(body.getDetail(), containsString(invalidQueryParametersMessage(STATUS, Arrays.toString(ProjectStatus.values()))));
     }
 
+    @ParameterizedTest(
+            name = "Handler accepts query parameter status in any case {0}")
+    @CsvSource({"ACTIVE", "CONCLUDED", "NOTSTARTED", "active", "concluded", "notstarted"})
+    void handlerAcceptsQueryParamsStatusInAnycase(String statusQuery) throws IOException {
+        InputStream input = requestWithQueryParameters(Map.of(
+                QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE,
+                STATUS, statusQuery));
+
+        handler.handleRequest(input, output, context);
+
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        Problem body = gatewayResponse.getBodyObject(Problem.class);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+    }
 
 
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {

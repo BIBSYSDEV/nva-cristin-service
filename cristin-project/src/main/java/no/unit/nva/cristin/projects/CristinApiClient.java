@@ -40,6 +40,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -199,6 +200,10 @@ public class CristinApiClient extends ApiClient {
                 .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
         if (parameters.containsKey(ORGANIZATION)) {
             query = query.withParentUnitId(getUnitIdFromOrganization(parameters.get(ORGANIZATION)));
+        }
+
+        if (parameters.containsKey(STATUS)) {
+            query = query.withStatus(getUnitIdFromOrganization(parameters.get(ORGANIZATION)));
         }
 
         return queryType == QUERY_USING_GRANT_ID ? query.withGrantId(parameters.get(QUERY)).toURI() :
