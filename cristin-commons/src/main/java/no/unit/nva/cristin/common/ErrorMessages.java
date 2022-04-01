@@ -31,7 +31,7 @@ public class ErrorMessages {
             "May only contain alphanumeric characters, dash, comma, period and whitespace";
     public static final String ERROR_MESSAGE_DEPTH_INVALID = "Parameter 'depth' has invalid value. "
             + "Must be 'top' or 'full'";
-    public static final String ERROR_MESSAGE_INVALID_VALUE = "Parameter '%s' has invalid value. ";
+    public static final String ERROR_MESSAGE_INVALID_VALUE = "Parameter '%s' has invalid value. Supported values are: ";
     public static final String ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE =
             "Remote service responded with status: %s when client called uri: %s";
     public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =

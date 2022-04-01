@@ -37,4 +37,5 @@ public enum ProjectStatus {
                 format(ERROR_MESSAGE_TEMPLATE, name, stream(ProjectStatus.values())
                         .map(ProjectStatus::toString).collect(joining(DELIMITER))));
     }
-}
+
+ }

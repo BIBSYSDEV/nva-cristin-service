@@ -31,6 +31,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -54,6 +55,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.TOTAL_COUNT_EXAMPLE_VALUE;
@@ -99,6 +101,7 @@ public class FetchCristinProjectsTest {
     public static final String INVALID_QUERY_PARAM_VALUE = "value";
     public static final String PROBLEM_JSON = APPLICATION_PROBLEM_JSON.toString();
     public static final String MEDIATYPE_JSON_UTF8 = MediaType.JSON_UTF_8.toString();
+    public static final String ILLEGAL_PROJECT_STATUS = "snart ferdig";
 
     private CristinApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -543,6 +546,24 @@ public class FetchCristinProjectsTest {
         assertThat(body.getDetail(), containsString(
                 validQueryParameterNamesMessage(FetchCristinProjects.VALID_QUERY_PARAMETERS)));
     }
+
+    @Test
+    void handlerThrowsBadRequestWhenStatusQueryParamsIsInvalid() throws IOException {
+        InputStream input = requestWithQueryParameters(Map.of(
+                QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE,
+                STATUS, ILLEGAL_PROJECT_STATUS));
+
+        handler.handleRequest(input, output, context);
+
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        Problem body = gatewayResponse.getBodyObject(Problem.class);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+        assertThat(body.getDetail(), containsString(invalidQueryParametersMessage(STATUS, Arrays.toString(ProjectStatus.values()))));
+    }
+
+
 
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
         cristinApiClientStub = spy(cristinApiClientStub);
