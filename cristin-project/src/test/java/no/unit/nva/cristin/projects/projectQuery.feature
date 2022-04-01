@@ -98,7 +98,7 @@ Feature: API tests for Cristin projects query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['language', 'page', 'query', 'results']"
+    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['language', 'organization', 'page', 'query', 'results']"
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
@@ -156,3 +156,20 @@ Feature: API tests for Cristin projects query
     * def matchingProject = '432742'
     And match response.hits[0].id contains matchingProject
     And match response.hits[0].title == '#present'
+
+
+  Scenario: Query accepts organization uri as query parameter
+    Given path '/project/'
+    * def organizationId = 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+    And param query = queryString
+    And param organization = organizationId
+    When method GET
+    Then status 200
+
+  Scenario: Query with illegal organizationId  returns 400 Bad request
+    Given path '/project/'
+    * def organizationId = 'htttps:/api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+    And param query = queryString
+    And param organization = organizationId
+    When method GET
+    Then status 400

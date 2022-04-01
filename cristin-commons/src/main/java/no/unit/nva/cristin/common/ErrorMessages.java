@@ -47,6 +47,7 @@ public class ErrorMessages {
             "The requested resource '%s' was not found";
     public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Supplied payload is not valid";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER = "Invalid path parameter for '%s'";
+    public static final String INVALID_URI_MESSAGE = "Must be valid URI";
 
     /**
      * Formats and emits a message with valid parameter names.
