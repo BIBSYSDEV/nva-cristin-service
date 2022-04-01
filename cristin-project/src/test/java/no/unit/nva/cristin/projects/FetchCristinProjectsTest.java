@@ -611,10 +611,11 @@ public class FetchCristinProjectsTest {
 
     @ParameterizedTest(
             name = "Handler accepts query parameter status in any case {0}")
-    @CsvSource({"ACTIVE", "CONCLUDED", "NOTSTARTED", "active", "concluded", "notstarted"})
+    @CsvSource({"ACTIVE", "CONCLUDED", "NOTSTARTED", "active", "concluded", "notstarted", "nOtsTaRtEd"})
     void handlerAcceptsQueryParamsStatusInAnycase(String statusQuery) throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(
                 QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE,
+                ORGANIZATION, SAMPLE_NVA_ORGANIZATION_ENCODED,
                 STATUS, statusQuery));
 
         handler.handleRequest(input, output, context);

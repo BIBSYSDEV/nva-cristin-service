@@ -169,8 +169,9 @@ Feature: API tests for Cristin projects query
 
   Scenario: Query with illegal organizationId  returns 400 Bad request
     Given path '/project/'
+    * def illegalOrganizationId = 'htttps:/api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
     And param query = queryString
-    And param organization = organizationId
+    And param organization = illegalOrganizationId
     When method GET
     Then status 400
 
@@ -178,6 +179,6 @@ Feature: API tests for Cristin projects query
     Given path '/project/'
     And param query = queryString
     And param organization = organizationId
-    And param status = 'nOtsTaRtEd'
+    And param status = 'cOnClUdEd'
     When method GET
     Then status 200
