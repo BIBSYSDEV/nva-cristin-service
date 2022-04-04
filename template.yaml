@@ -76,20 +76,6 @@ Resources:
         DefaultAuthorizer: NONE
       EndpointConfiguration: Regional
 
-  NvaCristinProxyInternalApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      DefinitionBody:
-        'Fn::Transform':
-          Name: AWS::Include
-          Parameters:
-            Location: ./docs/cristin-proxy-internal-apidoc.yaml
-      AccessLogSetting:
-        DestinationArn: !GetAtt ApiAccessLogGroup.Arn
-        Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
-      StageName: Prod
-
-      EndpointConfiguration: Regional
 
 
   ReadCristinAuthenticationRole:
@@ -291,12 +277,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/identityNumber/
             Method: post
-        NvaCristinFetchPersonUsingInternalRequest:
-          Type: Api
-          Properties:
-            RestApiId: !Ref NvaCristinProxyInternalApi
-            Path: /person/identityNumber/
-            Method: post
 
   NvaCristinFetchPersonUsingNinTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
@@ -362,12 +342,7 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/{id}/organization/{orgId}/
             Method: get
-        NvaCristinFetchPersonUsingInternalRequest:
-          Type: Api
-          Properties:
-            RestApiId: !Ref NvaCristinProxyInternalApi
-            Path: /person/{id}/organization/{orgId}/
-            Method: get
+
 
   NvaCristinUpdatePersonInstitutionInfoFunction:
     Type: AWS::Serverless::Function
@@ -459,14 +434,6 @@ Resources:
       DomainName: !Ref ApiDomain
       RestApiId: !Ref NvaCristinProxyApi
       Stage: !Ref NvaCristinProxyApi.Stage
-
-  InternalBasePathMapping:
-    Type: AWS::ApiGateway::BasePathMapping
-    Properties:
-      BasePath: !Sub '${CustomDomainBasePath}-internal'
-      DomainName: !Ref ApiDomain
-      RestApiId:  !Ref NvaCristinProxyInternalApi
-      Stage: !Ref NvaCristinProxyInternalApi.Stage
 
 
 
