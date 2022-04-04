@@ -46,6 +46,14 @@ paths:
             type: string
             pattern: '.+'
           example: 'Helse'
+        - name: organization
+          in: query
+          description: Search projects by organization id.
+          required: false
+          schema:
+            type: string
+            pattern: '.+'
+          example: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
         - name: language
           in: query
           description: Preferred language for some fields

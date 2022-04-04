@@ -22,6 +22,13 @@ public class CristinInstitution {
     private Map<String, String> institutionName;
     private String url;
 
+    public CristinInstitution() {
+    }
+
+    public CristinInstitution(String identifier) {
+        this.cristinInstitutionId = identifier;
+    }
+
     public String getCristinInstitutionId() {
         return cristinInstitutionId;
     }
@@ -72,4 +79,3 @@ public class CristinInstitution {
         return institution;
     }
 }
-

@@ -2,7 +2,11 @@ package no.unit.nva.utils;
 
 import nva.commons.core.paths.UriWrapper;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -128,4 +132,32 @@ public class UriUtils {
         return attempt(() -> new URI(positionBase.getScheme(), positionBase.getHost(), positionBase.getPath(), code))
                 .orElseThrow();
     }
+
+    /**
+     * Convenience method to decode a uri.
+     * @param uri string containing a uri.
+     * @return uri decoded from string
+     */
+    public static String decodeUri(String uri) {
+        return URLDecoder.decode(uri, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * verifies that a String contains a valid and dereferenceable URI.
+     * @param str  a String containing an URI
+     * @return true if str is a valid URI otherwise false
+     */
+    public static boolean isValidURI(String str) {
+        try {
+            URI organizationId = new URI(str);
+            organizationId.toURL();   // forcing URI to be dereferenceable
+        } catch (URISyntaxException | MalformedURLException e) {
+            return false;
+        }
+        return true;
+    }
+
+
+
+
 }

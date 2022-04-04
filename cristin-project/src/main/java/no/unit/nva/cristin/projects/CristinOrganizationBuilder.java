@@ -6,7 +6,6 @@ import no.unit.nva.model.Organization;
 
 import static no.unit.nva.cristin.model.CristinInstitution.fromOrganization;
 import static no.unit.nva.cristin.model.CristinUnit.extractUnitIdentifier;
-import static no.unit.nva.cristin.model.CristinUnit.fromCristinUnitIdentifier;
 
 public class CristinOrganizationBuilder {
 
@@ -27,13 +26,7 @@ public class CristinOrganizationBuilder {
      * @return valid Optional CristinOrganization containing data from CristinUnit or else empty
      */
     public static Optional<CristinOrganization> fromOrganizationContainingUnitIfPresent(Organization organization) {
-        return extractUnitIdentifier(organization)
-            .map(CristinOrganizationBuilder::mapUnitIdentifierToCristinOrganization);
+        return extractUnitIdentifier(organization).map(CristinOrganization::fromIdentifier);
     }
 
-    private static CristinOrganization mapUnitIdentifierToCristinOrganization(String unitIdentifier) {
-        CristinOrganization cristinOrganization = new CristinOrganization();
-        cristinOrganization.setInstitutionUnit(fromCristinUnitIdentifier(unitIdentifier));
-        return cristinOrganization;
-    }
 }

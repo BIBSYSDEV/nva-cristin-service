@@ -13,6 +13,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import no.unit.nva.cristin.common.client.PostApiClient;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.person.model.nva.Employment;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.paths.UriWrapper;
@@ -26,24 +27,25 @@ public class CreatePersonEmploymentClient extends PostApiClient {
     /**
      * Does a POST to upstream using parameters and returns response to client.
      *
-     * @param identifier        Identifier of Person to add employment to
-     * @param cristinEmployment Request object to serialize and send to upstream
+     * @param identifier Identifier of Person to add employment to
+     * @param employment Request object to serialize and send to upstream
      * @return the response from upstream deserialized to object
      * @throws ApiGatewayException if something went wrong and that can be returned to client
      */
-    public CristinPersonEmployment createEmploymentInCristin(String identifier,
-                                                             CristinPersonEmployment cristinEmployment)
+    public Employment createEmploymentInCristin(String identifier, Employment employment)
         throws ApiGatewayException {
 
-        String payload = generatePayloadFromRequest(cristinEmployment);
+        String payload = generatePayloadFromRequest(employment);
         URI uri = getCristinPostUri(identifier);
         HttpResponse<String> response = post(uri, payload);
         checkPostHttpStatusCode(getNvaPostUri(identifier), response.statusCode());
+        CristinPersonEmployment deserializedResponse = deserializeResponse(response);
 
-        return createPersonEmploymentFromResponse(response);
+        return deserializedResponse.toEmployment(identifier);
     }
 
-    private String generatePayloadFromRequest(CristinPersonEmployment cristinEmployment) {
+    private String generatePayloadFromRequest(Employment employment) {
+        CristinPersonEmployment cristinEmployment = employment.toCristinEmployment();
         return attempt(() -> OBJECT_MAPPER.writeValueAsString(cristinEmployment)).orElseThrow();
     }
 
@@ -55,9 +57,7 @@ public class CreatePersonEmploymentClient extends PostApiClient {
         return new UriWrapper(getNvaApiId(identifier, PERSON_PATH_NVA)).addChild(EMPLOYMENT_PATH).getUri();
     }
 
-    private CristinPersonEmployment createPersonEmploymentFromResponse(HttpResponse<String> response)
-        throws BadGatewayException {
-
+    private CristinPersonEmployment deserializeResponse(HttpResponse<String> response) throws BadGatewayException {
         return getDeserializedResponse(response, CristinPersonEmployment.class);
     }
 }
