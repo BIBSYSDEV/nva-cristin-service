@@ -184,6 +184,7 @@ Feature: API tests for Cristin projects query
     Then status 200
 
     Examples:
+      | SAMPLE_STATUS |
       | 'concluded' |
       | 'notstarted' |
       | 'active' |
