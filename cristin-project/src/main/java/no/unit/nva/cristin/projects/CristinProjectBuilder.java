@@ -31,6 +31,10 @@ public class CristinProjectBuilder {
         this.cristinProject = new CristinProject();
     }
 
+    private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
+        return contributors.stream().map(NvaContributor::toCristinPersonWithRoles).collect(Collectors.toList());
+    }
+
     /**
      * Build an CristinProject representation from given NvaProject.
      *
@@ -61,10 +65,6 @@ public class CristinProjectBuilder {
         return fromOrganizationContainingInstitution(organization);
     }
 
-    private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
-        return contributors.stream().map(NvaContributor::toCristinPersonWithRoles).collect(Collectors.toList());
-    }
-
     private List<CristinFundingSource> extractFundings(List<Funding> fundings) {
         return fundings.stream().map(this::getCristinFundingSource).collect(Collectors.toList());
     }
@@ -91,6 +91,8 @@ public class CristinProjectBuilder {
     }
 
     private String extractStatus(NvaProject project) {
-        return project.getStatus().getCristinStatus();
+        return nonNull(project.getStatus())
+                ? project.getStatus().getCristinStatus()
+                : null;
     }
 }

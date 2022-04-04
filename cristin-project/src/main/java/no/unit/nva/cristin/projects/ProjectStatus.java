@@ -34,7 +34,11 @@ public enum ProjectStatus {
     }
 
     public static boolean isValidStatus(String nameCandidate) {
-        return stream(values()).anyMatch(enumName -> enumName.getCristinStatus().equalsIgnoreCase(nameCandidate));
+        return stream(values()).anyMatch(enumName -> isValidAnyStatus(nameCandidate, enumName));
+    }
+
+    private static boolean isValidAnyStatus(String nameCandidate, ProjectStatus enumName) {
+        return enumName.getCristinStatus().equalsIgnoreCase(nameCandidate) || enumName.name().equalsIgnoreCase(nameCandidate);
     }
 
     @JacocoGenerated
