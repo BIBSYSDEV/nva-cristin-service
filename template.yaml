@@ -242,6 +242,22 @@ Resources:
               - method.request.querystring.page
               - method.request.querystring.results
 
+  NvaCristinListOrganizationProjectsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-project
+      Handler: no.unit.nva.cristin.projects.ListCristinOrganizationProjectsHandler::handleRequest
+      Events:
+        NvaListOrganizationProjectsEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /organization/{id}/projects
+            Method: get
+            RequestParameters:
+              - method.request.querystring.page
+              - method.request.querystring.results
+
   NvaCristinQueryPersonFunction:
     Type: AWS::Serverless::Function
     Properties:

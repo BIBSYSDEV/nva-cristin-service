@@ -392,6 +392,67 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /organization/{identifier}/projects:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListOrganizationProjectsFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Organization
+      summary: Fetch Projects associated with an given organization
+      description: Returns a list of projects belonging to specified organization
+      operationId: GetProjectsByOrganization
+      parameters:
+        - name: identifier
+          in: path
+          description: Identifier of Organization to return
+          required: true
+          schema:
+            type: string
+            pattern: '^(?:[0-9]+\.){3}[0-9]{1,3}$'
+            example: '20202.0.0.0'
+        - name: page
+          in: query
+          description: Current page requested
+          required: false
+          schema:
+            type: number
+            default: '1'
+          example: '3'
+        - name: results
+          in: query
+          description: Results per page
+          required: false
+          schema:
+            type: number
+            default: '5'
+          example: '10'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationProjects'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/OrganizationProjectsExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/OrganizationProjects'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/OrganizationProjectsExample'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 
   /person:
     get:
@@ -1664,8 +1725,38 @@ components:
           description: The list of persons returned by the query
           items:
             $ref: '#/components/schemas/Person'
-
-
+    OrganizationProjects:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of persons returned by the query
+          items:
+            $ref: '#/components/schemas/Project'
   examples:
     ProjectsExample:
       value:
@@ -2098,6 +2189,68 @@ components:
                   type: 'Role'
                   labels:
                     en: 'Consultant'
+    OrganizationProjectsExample:
+      value:
+        '@context': 'https://example.org/person-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0/projects?page=1&results=5'
+        size: 150
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0/projects?page=2&results=5'
+        previousResults: ''
+        hits:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
+            type: 'Project'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '359084'
+            title: 'Example Title'
+            language: 'http://lexvo.org/id/iso639-3/nno'
+            alternativeTitles:
+              - 'nb': 'Eksempel på tittel'
+            startDate: '2012-01-09T00:00:00Z'
+            endDate: '2017-12-31T00:00:00Z'
+            funding:
+              - type: 'Funding'
+                source:
+                  type: "FundingSource"
+                  names:
+                    nb: "Egen institusjon"
+                  code: "EI"
+                code: "134455"
+            coordinatingInstitution:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+              type: 'Organization'
+              name:
+                'nb': 'OsloMet - storbyuniversitetet'
+            contributors:
+              - type: 'ProjectManager'
+                identity:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+                  type: 'Person'
+                  firstName: 'Ola'
+                  lastName: 'Nordmann'
+                affiliation:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                  type: 'Organization'
+                  name:
+                    'nb': 'OsloMet - storbyuniversitetet'
+              - type: 'ProjectParticipant'
+                identity:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
+                  type: 'Person'
+                  firstName: 'Kari'
+                  lastName: 'Olsen'
+                affiliation:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                  type: 'Organization'
+                  name:
+                    'nb': 'OsloMet - storbyuniversitetet'
+            status: CONCLUDED
+            academicSummary:
+              en: "Summary in an academic manner"
+            popularScientificSummary:
+              en: "popularScientificSummary popularScientificSummary popularScientificSummary"
 
   securitySchemes:
     CognitoUserPool:
