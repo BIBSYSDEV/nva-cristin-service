@@ -182,3 +182,11 @@ Feature: API tests for Cristin projects query
     And param status = 'cOnClUdEd'
     When method GET
     Then status 200
+
+  Scenario: Query transforms status query parameter to valid cristin status
+    Given path '/project/'
+    And param query = queryString
+    And param organization = organizationId
+    And param status = 'notstarted'
+    When method GET
+    Then status 200

@@ -94,7 +94,7 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
         return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParameters);
     }
 
-    private Map<String, String> getQueryParameters(String language, String query, String page, String numberOfResults) throws ApiGatewayException {
+    private Map<String, String> getQueryParameters(String language, String query, String page, String numberOfResults) {
         Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
         requestQueryParameters.put(LANGUAGE, language);
         requestQueryParameters.put(QUERY, query);
@@ -105,13 +105,13 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
 
     private Optional<ProjectStatus> getValidProjectStatus(RequestInfo requestInfo) throws BadRequestException {
         if (requestInfo.getQueryParameters().containsKey(STATUS)) {
-            return Optional.ofNullable(attempt(() -> ProjectStatus.lookup(requestInfo.getQueryParameters().get(STATUS)))
-                    .orElseThrow(fail -> new BadRequestException(invalidQueryParametersMessageWithRange(STATUS, Arrays.toString(ProjectStatus.values())))));
-
+            return Optional.ofNullable(attempt(() ->
+                    ProjectStatus.getNvaStatus(requestInfo.getQueryParameters().get(STATUS)))
+                    .orElseThrow(fail -> new BadRequestException(
+                            invalidQueryParametersMessageWithRange(STATUS, Arrays.toString(ProjectStatus.values())))));
         } else {
             return Optional.empty();
         }
     }
-
 
 }

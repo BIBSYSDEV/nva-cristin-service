@@ -155,6 +155,6 @@ public class NvaProjectBuilder {
     }
 
     private ProjectStatus extractProjectStatus() {
-        return ProjectStatus.lookup(cristinProject.getStatus());
+        return ProjectStatus.fromCristinStatus(cristinProject.getStatus());
     }
 }
