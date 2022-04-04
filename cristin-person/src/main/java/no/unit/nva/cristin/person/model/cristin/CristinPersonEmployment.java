@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.model.cristin;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -123,8 +124,8 @@ public class CristinPersonEmployment {
     }
 
     private URI generateIdUriFromIdentifier(String personId) {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH_NVA)
-            .addChild(personId).addChild(EMPLOYMENT_PATH).addChild(getId()).getUri();
+        return nonNull(getId()) ? new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH_NVA)
+            .addChild(personId).addChild(EMPLOYMENT_PATH).addChild(getId()).getUri() : null;
     }
 
     private URI generateTypeUri() {

@@ -16,6 +16,13 @@ public class CristinPositionCode {
     private Map<String, String> name;
     private boolean enabled;
 
+    public CristinPositionCode() {
+    }
+
+    public CristinPositionCode(String code) {
+        this.code = code;
+    }
+
     public String getCode() {
         return code;
     }

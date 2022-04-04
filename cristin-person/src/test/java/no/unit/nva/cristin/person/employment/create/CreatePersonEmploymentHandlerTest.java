@@ -19,7 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.Map;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -53,15 +53,15 @@ public class CreatePersonEmploymentHandlerTest {
 
     @Test
     void shouldReturnStatusCreatedWhenSendingValidPayload() throws IOException {
-        CristinPersonEmployment employment = OBJECT_MAPPER.readValue(validJson, CristinPersonEmployment.class);
-        GatewayResponse<CristinPersonEmployment> gatewayResponse = sendQuery(validPath, employment);
+        Employment employment = OBJECT_MAPPER.readValue(validJson, Employment.class);
+        GatewayResponse<Employment> gatewayResponse = sendQuery(validPath, employment);
 
         assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
     }
 
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
-        GatewayResponse<CristinPersonEmployment> gatewayResponse = queryWithoutRequiredAccessRights();
+        GatewayResponse<Employment> gatewayResponse = queryWithoutRequiredAccessRights();
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -71,27 +71,24 @@ public class CreatePersonEmploymentHandlerTest {
         return String.valueOf(randomInteger());
     }
 
-    private GatewayResponse<CristinPersonEmployment> sendQuery(Map<String, String> pathParam,
-                                                               CristinPersonEmployment body)
-        throws IOException {
-
+    private GatewayResponse<Employment> sendQuery(Map<String, String> pathParam, Employment body) throws IOException {
         InputStream input = createRequest(pathParam, body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
     }
 
-    private InputStream createRequest(Map<String, String> pathParam, CristinPersonEmployment body)
+    private InputStream createRequest(Map<String, String> pathParam, Employment body)
         throws JsonProcessingException {
 
-        return new HandlerRequestBuilder<CristinPersonEmployment>(OBJECT_MAPPER)
+        return new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
             .withBody(body)
             .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
             .withPathParameters(pathParam)
             .build();
     }
 
-    private GatewayResponse<CristinPersonEmployment> queryWithoutRequiredAccessRights() throws IOException {
-        InputStream input = new HandlerRequestBuilder<CristinPersonEmployment>(OBJECT_MAPPER)
+    private GatewayResponse<Employment> queryWithoutRequiredAccessRights() throws IOException {
+        InputStream input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
             .withBody(null)
             .withPathParameters(validPath)
             .build();
