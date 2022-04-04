@@ -203,7 +203,7 @@ public class CristinApiClient extends ApiClient {
         }
 
         if (parameters.containsKey(STATUS)) {
-            query = query.withStatus(parameters.get(STATUS));
+            query = query.withStatus(URLEncoder.encode(parameters.get(STATUS),StandardCharsets.UTF_8));
         }
 
         return queryType == QUERY_USING_GRANT_ID ? query.withGrantId(parameters.get(QUERY)).toURI() :
