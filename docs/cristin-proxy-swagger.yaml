@@ -46,6 +46,14 @@ paths:
             type: string
             pattern: '.+'
           example: 'Helse'
+        - name: organization
+          in: query
+          description: Search projects by organization id.
+          required: false
+          schema:
+            type: string
+            pattern: '.+'
+          example: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
         - name: language
           in: query
           description: Preferred language for some fields
@@ -914,6 +922,48 @@ paths:
           $ref: '#/components/responses/403'
         404:
           $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+    patch:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinUpdatePersonEmploymentFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Update person employment by identifiers
+      description: Updates person employment data
+      operationId: UpdatePersonEmployment
+      security:
+        - CognitoUserPool: [ ]
+      requestBody:
+        description: Payload containing modifiable data for person employment
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonEmployment'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonEmploymentExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/PersonEmployment'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonEmploymentExample'
+      responses:
+        204:
+          description: Successful update of resource
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
         500:
           $ref: '#/components/responses/500'
         502:
