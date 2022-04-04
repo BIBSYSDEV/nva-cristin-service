@@ -7,7 +7,7 @@ import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -17,7 +17,7 @@ import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class CreatePersonEmploymentHandler extends ApiGatewayHandler<CristinPersonEmployment, CristinPersonEmployment> {
+public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment, Employment> {
 
     private final transient CreatePersonEmploymentClient apiClient;
 
@@ -29,13 +29,13 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<CristinPers
 
     @JacocoGenerated
     public CreatePersonEmploymentHandler(CreatePersonEmploymentClient apiClient, Environment environment) {
-        super(CristinPersonEmployment.class, environment);
+        super(Employment.class, environment);
         this.apiClient = apiClient;
     }
 
     @Override
-    protected CristinPersonEmployment processInput(CristinPersonEmployment input, RequestInfo requestInfo,
-                                                   Context context) throws ApiGatewayException {
+    protected Employment processInput(Employment input, RequestInfo requestInfo, Context context)
+        throws ApiGatewayException {
 
         validateHasAccessRights(requestInfo);
 
@@ -45,7 +45,7 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<CristinPers
     }
 
     @Override
-    protected Integer getSuccessStatusCode(CristinPersonEmployment input, CristinPersonEmployment output) {
+    protected Integer getSuccessStatusCode(Employment input, Employment output) {
         return HttpURLConnection.HTTP_CREATED;
     }
 

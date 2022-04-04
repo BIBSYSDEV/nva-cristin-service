@@ -20,15 +20,11 @@ Feature: API tests for Creation of Cristin Person Employments
     * def TestPersonEmployment =
     """
     {
-      'affiliation': {
-        'unit': {
-          'cristin_unit_id': '186.32.15.0'
-        }
-      },
-      'position': {
-        'code': '1087'
-      },
-      'start_date': '2022-03-29T00:00:00.000Z'
+      'type': 'https://api.dev.nva.aws.unit.no/position#1087',
+      'organization': 'https://api.dev.nva.aws.unit.no/organization/185.90.0.0',
+      'startDate': '2020-01-01T00:00:00.000Z',
+      'endDate': '2022-01-01T00:00:00.000Z',
+      'fullTimeEquivalentPercentage': 80.0
     }
     """
     Given url CRISTIN_BASE
@@ -59,3 +55,4 @@ Feature: API tests for Creation of Cristin Person Employments
     And request TestPersonEmployment
     When method POST
     Then status 201
+    And print response

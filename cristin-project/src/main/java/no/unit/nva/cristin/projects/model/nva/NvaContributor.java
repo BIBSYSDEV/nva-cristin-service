@@ -5,7 +5,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.AFFILIATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTITY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.model.CristinUnit.extractUnitIdentifier;
-import static no.unit.nva.cristin.model.CristinUnit.fromCristinUnitIdentifier;
 import static no.unit.nva.utils.ContributorRoleMapping.getCristinRole;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Collections;
@@ -97,8 +96,7 @@ public class NvaContributor {
     private void addOrganizationInformationToCristinRole(CristinRole cristinRole) {
         if (contributorHasValidUnitIdentifier()) {
             String unitIdentifier = extractUnitIdentifier(getAffiliation()).orElseThrow();
-            CristinUnit institutionUnit = fromCristinUnitIdentifier(unitIdentifier);
-            cristinRole.setInstitutionUnit(institutionUnit);
+            cristinRole.setInstitutionUnit(new CristinUnit(unitIdentifier));
         } else {
             CristinInstitution defaultOrganization = fromOrganization(getAffiliation());
             cristinRole.setInstitution(defaultOrganization);
