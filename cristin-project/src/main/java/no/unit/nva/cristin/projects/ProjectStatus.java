@@ -57,7 +57,7 @@ public enum ProjectStatus {
     public static ProjectStatus getNvaStatus(String name) {
         return stream(values())
                 .filter(nameType -> nameType.name().equalsIgnoreCase(name))
-                .findAny().get();
+                .findFirst().get();
     }
 
     public String getCristinStatus() {

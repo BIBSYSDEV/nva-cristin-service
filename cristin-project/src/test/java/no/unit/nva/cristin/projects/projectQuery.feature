@@ -175,18 +175,20 @@ Feature: API tests for Cristin projects query
     When method GET
     Then status 400
 
-  Scenario: Query accepts status parameter value case independent
+  Scenario Outline: Query accepts status parameter value case independent
     Given path '/project/'
     And param query = queryString
     And param organization = organizationId
-    And param status = 'cOnClUdEd'
+    And param status = <SAMPLE_STATUS>
     When method GET
     Then status 200
 
-  Scenario: Query transforms status query parameter to valid cristin status
-    Given path '/project/'
-    And param query = queryString
-    And param organization = organizationId
-    And param status = 'notstarted'
-    When method GET
-    Then status 200
+    Examples:
+      | 'concluded' |
+      | 'notstarted' |
+      | 'active' |
+      | 'CONCLUDED' |
+      | 'NOTSTARTED' |
+      | 'ACTIVE' |
+
+
