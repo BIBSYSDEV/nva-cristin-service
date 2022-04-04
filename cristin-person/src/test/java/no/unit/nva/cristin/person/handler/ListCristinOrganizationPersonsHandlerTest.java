@@ -1,28 +1,5 @@
 package no.unit.nva.cristin.person.handler;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
-import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.Environment;
-import nva.commons.core.JsonUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.zalando.problem.Problem;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.util.Collections;
-import java.util.Map;
-
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -43,6 +20,27 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.util.Collections;
+import java.util.Map;
+import no.unit.nva.commons.json.JsonUtils;
+import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
+import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.Environment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.zalando.problem.Problem;
 
 class ListCristinOrganizationPersonsHandlerTest {
 
@@ -73,7 +71,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     void shouldReturnBadRequestResponseOnMissingPathParam() throws IOException {
         InputStream inputStream = generateHandlerRequestWithoutOrganizationIdentifier();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS));
@@ -83,7 +81,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     void shouldReturnBadRequestResponseOnInvalidQueryParameters() throws IOException {
         InputStream inputStream = generateHandlerDummyRequestWithIllegalQueryParameters();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS)));
@@ -93,7 +91,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     void shouldReturnOKAndEmptyResponseOnValidDummyInput() throws IOException {
         InputStream inputStream = generateHandlerDummyRequest();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
@@ -101,7 +99,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     void shouldReturnOKAndIdInResponseOnValidDummyInput() throws IOException {
         InputStream inputStream = generateHandlerDummyRequest();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         final SearchResponse searchResponse = gatewayResponse.getBodyObject(SearchResponse.class);
         assertTrue(searchResponse.getId().toString().contains(DUMMY_ORGANIZATION_IDENTIFIER));
@@ -116,7 +114,7 @@ class ListCristinOrganizationPersonsHandlerTest {
         doReturn(Collections.emptyList()).when(apiClient).fetchQueryResultsOneByOne(any());
         handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
         handler.handleRequest(generateHandlerDummyRequest(), output, context);
-        GatewayResponse<SearchResponse> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> response = GatewayResponse.fromOutputStream(output,SearchResponse.class);
         SearchResponse<Person> searchResponse = response.getBodyObject(SearchResponse.class);
         assertThat(0, equalTo(searchResponse.getHits().size()));
     }

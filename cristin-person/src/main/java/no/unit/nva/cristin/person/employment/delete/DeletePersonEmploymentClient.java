@@ -43,7 +43,7 @@ public class DeletePersonEmploymentClient extends ApiClient {
     }
 
     private URI generateCristinUri(String personId, String employmentId) {
-        return new UriWrapper(CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
                 .addChild(PERSON_PATH)
                 .addChild(personId)
                 .addChild(EMPLOYMENT_PATH_CRISTIN)

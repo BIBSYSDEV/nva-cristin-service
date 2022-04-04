@@ -49,6 +49,6 @@ public class CreateCristinPersonApiClient extends PostApiClient {
     }
 
     private URI getCristinPersonPostUri() {
-        return new UriWrapper(CRISTIN_API_URL).addChild(PERSON_PATH).getUri();
+        return  UriWrapper.fromUri(CRISTIN_API_URL).addChild(PERSON_PATH).getUri();
     }
 }

@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -12,7 +13,6 @@ import nva.commons.apigateway.MediaTypes;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
-import nva.commons.core.JsonUtils;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -183,7 +183,7 @@ class FetchCristinOrganizationHandlerTest {
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
         final String identifier = "185.53.18.14";
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(identifier), output, context);
-        GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output,Organization.class);
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getHeaders(), hasKey(CONTENT_TYPE));
@@ -246,7 +246,7 @@ class FetchCristinOrganizationHandlerTest {
         final String identifier = "185.53.18.14";
         fetchCristinOrganizationHandler
                 .handleRequest(generateHandlerRequestWithAdditionalQueryParameters(identifier, NONE), output, context);
-        GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Organization> gatewayResponse = GatewayResponse.fromOutputStream(output,Organization.class);
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getHeaders(), hasKey(CONTENT_TYPE));

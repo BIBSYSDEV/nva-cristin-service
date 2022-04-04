@@ -8,11 +8,11 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
 import nva.commons.core.StringUtils;
 
 @JacocoGenerated
@@ -26,6 +26,13 @@ public class Employment implements JsonSerializable {
     private Instant startDate;
     private Instant endDate;
     private Double fullTimeEquivalentPercentage;
+
+    public static Optional<String> extractPositionCodeFromTypeUri(URI type) {
+        return Optional.ofNullable(type)
+            .map(URI::toString)
+            .map(str -> str.substring(str.lastIndexOf(HASHTAG) + 1))
+            .filter(StringUtils::isNotBlank);
+    }
 
     public String getContext() {
         return context;
@@ -84,8 +91,9 @@ public class Employment implements JsonSerializable {
     }
 
     @Override
-    public String toString() {
-        return toJsonString();
+    public int hashCode() {
+        return Objects.hash(getContext(), getId(), getType(), getOrganization(), getStartDate(), getEndDate(),
+                            getFullTimeEquivalentPercentage());
     }
 
     @JacocoGenerated
@@ -99,18 +107,39 @@ public class Employment implements JsonSerializable {
         }
         Employment that = (Employment) o;
         return Objects.equals(getContext(), that.getContext())
-            && Objects.equals(getId(), that.getId())
-            && Objects.equals(getType(), that.getType())
-            && Objects.equals(getOrganization(), that.getOrganization())
-            && Objects.equals(getStartDate(), that.getStartDate())
-            && Objects.equals(getEndDate(), that.getEndDate())
-            && Objects.equals(getFullTimeEquivalentPercentage(), that.getFullTimeEquivalentPercentage());
+               && Objects.equals(getId(), that.getId())
+               && Objects.equals(getType(), that.getType())
+               && Objects.equals(getOrganization(), that.getOrganization())
+               && Objects.equals(getStartDate(), that.getStartDate())
+               && Objects.equals(getEndDate(), that.getEndDate())
+               && Objects.equals(getFullTimeEquivalentPercentage(), that.getFullTimeEquivalentPercentage());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(getContext(), getId(), getType(), getOrganization(), getStartDate(), getEndDate(),
-            getFullTimeEquivalentPercentage());
+    public String toString() {
+        return toJsonString();
+    }
+
+    public CristinPersonEmployment toCristinEmployment() {
+        CristinPersonEmployment cristinEmployment = new CristinPersonEmployment();
+
+        cristinEmployment.setAffiliation(generateCristinAffiliation());
+        cristinEmployment.setPosition(generateCristinPositionCode());
+        cristinEmployment.setStartDate(getStartDate());
+        cristinEmployment.setEndDate(getEndDate());
+        cristinEmployment.setFtePercentage(getFullTimeEquivalentPercentage());
+
+        return cristinEmployment;
+    }
+
+    private CristinOrganization generateCristinAffiliation() {
+        String orgId = extractLastPathElement(getOrganization());
+        return CristinOrganization.fromIdentifier(orgId);
+    }
+
+    private CristinPositionCode generateCristinPositionCode() {
+        Optional<String> code = extractPositionCodeFromTypeUri(getType());
+        return code.map(CristinPositionCode::new).orElse(null);
     }
 
     public static final class Builder {
@@ -159,34 +188,5 @@ public class Employment implements JsonSerializable {
         public Employment build() {
             return employment;
         }
-    }
-
-    public static Optional<String> extractPositionCodeFromTypeUri(URI type) {
-        return Optional.ofNullable(type)
-            .map(URI::toString)
-            .map(str -> str.substring(str.lastIndexOf(HASHTAG) + 1))
-            .filter(StringUtils::isNotBlank);
-    }
-
-    public CristinPersonEmployment toCristinEmployment() {
-        CristinPersonEmployment cristinEmployment = new CristinPersonEmployment();
-
-        cristinEmployment.setAffiliation(generateCristinAffiliation());
-        cristinEmployment.setPosition(generateCristinPositionCode());
-        cristinEmployment.setStartDate(getStartDate());
-        cristinEmployment.setEndDate(getEndDate());
-        cristinEmployment.setFtePercentage(getFullTimeEquivalentPercentage());
-
-        return cristinEmployment;
-    }
-
-    private CristinOrganization generateCristinAffiliation() {
-        String orgId = extractLastPathElement(getOrganization());
-        return CristinOrganization.fromIdentifier(orgId);
-    }
-
-    private CristinPositionCode generateCristinPositionCode() {
-        Optional<String> code = extractPositionCodeFromTypeUri(getType());
-        return code.map(CristinPositionCode::new).orElse(null);
     }
 }
