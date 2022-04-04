@@ -47,6 +47,7 @@ public class ErrorMessages {
             "The requested resource '%s' was not found";
     public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Supplied payload is not valid";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER = "Invalid path parameter for '%s'";
+    public static final String ERROR_MESSAGE_INVALID_FIELD_VALUE = "Invalid value for field '%s'";
 
     /**
      * Formats and emits a message with valid parameter names.
@@ -67,9 +68,9 @@ public class ErrorMessages {
         return String.format(ERROR_MESSAGE_INVALID_VALUE + validValues, queryParameterName);
     }
 
-
     /**
      * Creates a error message containing which path parameter that has invalid value.
+     *
      * @param pathParameterName name of parameter with invalid value
      * @return formatted string containing a message with allowed values for this path parameter
      */
@@ -77,13 +78,22 @@ public class ErrorMessages {
         return String.format(ERROR_MESSAGE_INVALID_PATH_PARAMETER, pathParameterName);
     }
 
+    /**
+     * Creates an error message containing which field that has invalid value.
+     *
+     * @param fieldParameterName name of field with invalid value
+     * @return formatted string containing a message with the field name containing invalid value
+     */
+    public static String invalidFieldParameterMessage(String fieldParameterName) {
+        return String.format(ERROR_MESSAGE_INVALID_FIELD_VALUE, fieldParameterName);
+    }
 
     private static String prettifyList(Set<String> queryParameters) {
         return queryParameters.size() > 1
-                ? queryParameters.stream().sorted()
-                    .map(parameterName -> "'" + parameterName + "'")
-                    .collect(Collectors.joining(", ", "[", "]"))
-                : queryParameters.stream()
-                    .collect(Collectors.joining("", "'", "'"));
+            ? queryParameters.stream().sorted()
+            .map(parameterName -> "'" + parameterName + "'")
+            .collect(Collectors.joining(", ", "[", "]"))
+            : queryParameters.stream()
+                .collect(Collectors.joining("", "'", "'"));
     }
 }
