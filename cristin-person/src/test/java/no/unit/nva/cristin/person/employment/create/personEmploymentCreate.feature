@@ -79,7 +79,7 @@ Feature: API tests for Creation of Cristin Person Employments
     And request invalidTypePayload
     When method POST
     Then status 400
-    And match response.detail = "Invalid value for field 'type'"
+    And match response.detail == "Invalid value for field 'type'"
 
   Scenario: Create returns status 400 Bad Request when invalid organization
     Given path '/person/' + cristinTestPersonIdentifier + '/employment/'
@@ -87,4 +87,4 @@ Feature: API tests for Creation of Cristin Person Employments
     And request invalidOrganizationPayload
     When method POST
     Then status 400
-    And match response.detail = "Invalid value for field 'organization'"
+    And match response.detail == "Invalid value for field 'organization'"
