@@ -127,9 +127,11 @@ public class CristinApiClient extends ApiClient {
                 .toOptional(failure -> logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters),
                         failure.getException()))
                 .orElseThrow();
-
+        logger.info("calling cristin uri: {}", uri.toASCIIString());
         HttpResponse<String> response = fetchQueryResults(uri);
+        logger.info("createIdUriFromParams");
         URI id = createIdUriFromParams(parameters, PROJECT);
+        logger.info("createIdUriFromParams, id={}", id.toASCIIString());
         checkHttpStatusCode(id, response.statusCode());
         return response;
     }
