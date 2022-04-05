@@ -40,6 +40,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.projects.CristinQuery.CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -118,6 +119,29 @@ public class CristinApiClient extends ApiClient {
     }
 
 
+    public SearchResponse<NvaProject> listOrganizationProjects(Map<String, String> requestQueryParameters) throws ApiGatewayException {
+
+        long startRequestTime = System.currentTimeMillis();
+        URI cristinUri = new CristinQuery()
+                .withParentUnitId(requestQueryParameters.get(CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID))
+                .withFromPage(requestQueryParameters.get(PAGE))
+                .withLanguage(requestQueryParameters.get(LANGUAGE))
+                .withItemsPerPage(requestQueryParameters.get(NUMBER_OF_RESULTS))
+                .toURI();
+        HttpResponse<String> response = listProjects(cristinUri);
+        List<CristinProject> cristinProjects =
+                getEnrichedProjectsUsingQueryResponse(response, requestQueryParameters.get(LANGUAGE));
+        List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
+        long endRequestTime = System.currentTimeMillis();
+
+        URI id = cristinUri; // createIdUriFromParams(rewrapOrganizationUri(requestQueryParameters), PROJECT);
+
+        return new SearchResponse<NvaProject>(id)
+                .withContext(PROJECT_SEARCH_CONTEXT_URL)
+                .usingHeadersAndQueryParams(response.headers(), requestQueryParameters)
+                .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
+                .withHits(nvaProjects);
+    }
 
     protected HttpResponse<String> queryProjects(Map<String, String> parameters, QueryType queryType)
             throws ApiGatewayException {
@@ -132,6 +156,17 @@ public class CristinApiClient extends ApiClient {
         checkHttpStatusCode(id, response.statusCode());
         return response;
     }
+
+    protected HttpResponse<String> listProjects(URI uri)
+            throws ApiGatewayException {
+
+        HttpResponse<String> response = fetchQueryResults(uri);
+        checkHttpStatusCode(uri, response.statusCode());
+        return response;
+    }
+
+
+
 
     protected CristinProject getProject(String id, String language) throws ApiGatewayException {
         URI uri = attempt(() -> generateGetProjectUri(id, language))

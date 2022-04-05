@@ -11,8 +11,13 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
-import java.util.Collections;
 import java.util.Map;
+
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.projects.CristinQuery.CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID;
 
 @SuppressWarnings({"Unused", "UnusedPrivateField"})
 public class ListCristinOrganizationProjectsHandler extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
@@ -50,9 +55,13 @@ public class ListCristinOrganizationProjectsHandler extends CristinQueryHandler<
     @Override
     protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
-        Map<String, String> requestQueryParameters = Collections.emptyMap();
-        return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParameters);
+        Map<String, String> requestQueryParameters = Map.of(
+                CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, requestInfo.getPathParameter(ID),
+                LANGUAGE, getValidLanguage(requestInfo),
+                PAGE, getValidPage(requestInfo),
+                NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
 
+        return cristinApiClient.listOrganizationProjects(requestQueryParameters);
     }
 
     /**
