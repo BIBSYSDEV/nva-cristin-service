@@ -119,7 +119,8 @@ public class CristinApiClient extends ApiClient {
     }
 
 
-    public SearchResponse<NvaProject> listOrganizationProjects(Map<String, String> requestQueryParameters) throws ApiGatewayException {
+    public SearchResponse<NvaProject> listOrganizationProjects(Map<String, String> requestQueryParameters)
+            throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
         URI cristinUri = new CristinQuery()
@@ -157,16 +158,11 @@ public class CristinApiClient extends ApiClient {
         return response;
     }
 
-    protected HttpResponse<String> listProjects(URI uri)
-            throws ApiGatewayException {
-
+    protected HttpResponse<String> listProjects(URI uri) throws ApiGatewayException {
         HttpResponse<String> response = fetchQueryResults(uri);
         checkHttpStatusCode(uri, response.statusCode());
         return response;
     }
-
-
-
 
     protected CristinProject getProject(String id, String language) throws ApiGatewayException {
         URI uri = attempt(() -> generateGetProjectUri(id, language))
