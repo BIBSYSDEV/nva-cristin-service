@@ -67,10 +67,7 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
         if (requestInfo.getQueryParameters().containsKey(ORGANIZATION)) {
             requestQueryParameters.put(ORGANIZATION, getValidOrganizationUri(requestInfo));
         }
-        Optional<ProjectStatus> projectStatus = getValidProjectStatus(requestInfo);
-        if (projectStatus.isPresent()) {
-            requestQueryParameters.put(STATUS, projectStatus.get().name());
-        }
+        getValidProjectStatus(requestInfo).ifPresent(status -> requestQueryParameters.put(STATUS, status.name()));
         return getTransformedCristinProjectsUsingWrapperObject(requestQueryParameters);
 
 
@@ -104,14 +101,19 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
     }
 
     private Optional<ProjectStatus> getValidProjectStatus(RequestInfo requestInfo) throws BadRequestException {
-        if (requestInfo.getQueryParameters().containsKey(STATUS)) {
-            return Optional.ofNullable(attempt(() ->
-                    ProjectStatus.getNvaStatus(requestInfo.getQueryParameters().get(STATUS)))
-                    .orElseThrow(fail -> new BadRequestException(
-                            invalidQueryParametersMessageWithRange(STATUS, Arrays.toString(ProjectStatus.values())))));
-        } else {
-            return Optional.empty();
-        }
+        return requestInfo.getQueryParameters().containsKey(STATUS)
+                ? getOptionalProjectStatus(requestInfo)
+                : Optional.empty();
+    }
+
+    private Optional<ProjectStatus> getOptionalProjectStatus(RequestInfo requestInfo) throws BadRequestException {
+        return Optional.ofNullable(
+                attempt(() -> ProjectStatus.getNvaStatus(requestInfo.getQueryParameters().get(STATUS)))
+                .orElseThrow(fail -> new BadRequestException(getInvalidStatusMessage())));
+    }
+
+    private String getInvalidStatusMessage() {
+        return invalidQueryParametersMessageWithRange(STATUS, Arrays.toString(ProjectStatus.values()));
     }
 
 }

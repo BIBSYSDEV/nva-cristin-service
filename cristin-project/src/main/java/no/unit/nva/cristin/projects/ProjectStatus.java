@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.SingletonCollector;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
@@ -46,8 +47,7 @@ public enum ProjectStatus {
     public static ProjectStatus getNvaStatus(String name) {
         return stream(values())
                 .filter(nameType -> nameType.name().equalsIgnoreCase(name))
-                .findFirst()
-                .get();
+                .collect(SingletonCollector.collect());
     }
 
     private static boolean isValidAnyStatus(String nameCandidate, ProjectStatus enumName) {
