@@ -127,11 +127,8 @@ public class CristinApiClient extends ApiClient {
                 .toOptional(failure -> logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters),
                         failure.getException()))
                 .orElseThrow();
-        logger.info("calling cristin uri: {}", uri.toASCIIString());
         HttpResponse<String> response = fetchQueryResults(uri);
-        logger.info("createIdUriFromParams");
         URI id = createIdUriFromParams(parameters, PROJECT);
-        logger.info("createIdUriFromParams, id={}", id.toASCIIString());
         checkHttpStatusCode(id, response.statusCode());
         return response;
     }
@@ -205,11 +202,16 @@ public class CristinApiClient extends ApiClient {
         }
 
         if (parameters.containsKey(STATUS)) {
-            query = query.withStatus(URLEncoder.encode(ProjectStatus.getNvaStatus(parameters.get(STATUS)).getCristinStatus(),StandardCharsets.UTF_8));
+            query = query.withStatus(getEncodedStatusParameter(parameters));
         }
 
         return queryType == QUERY_USING_GRANT_ID ? query.withGrantId(parameters.get(QUERY)).toURI() :
                 query.withTitle(parameters.get(QUERY)).toURI();
+    }
+
+    private String getEncodedStatusParameter(Map<String, String> parameters) {
+        return URLEncoder.encode(ProjectStatus.getNvaStatus(parameters.get(STATUS)).getCristinStatus(),
+                StandardCharsets.UTF_8);
     }
 
     private String getUnitIdFromOrganization(String organizationId) {

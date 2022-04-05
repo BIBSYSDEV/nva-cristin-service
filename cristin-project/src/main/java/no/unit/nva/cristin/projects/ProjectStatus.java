@@ -37,17 +37,6 @@ public enum ProjectStatus {
         return stream(values()).anyMatch(enumName -> isValidAnyStatus(nameCandidate, enumName));
     }
 
-    private static boolean isValidAnyStatus(String nameCandidate, ProjectStatus enumName) {
-        return enumName.getCristinStatus().equalsIgnoreCase(nameCandidate) || enumName.name().equalsIgnoreCase(nameCandidate);
-    }
-
-    @JacocoGenerated
-    private static RuntimeException returnException(String name) {
-        return new IllegalArgumentException(
-                format(ERROR_MESSAGE_TEMPLATE, name, stream(ProjectStatus.values())
-                        .map(ProjectStatus::toString).collect(joining(DELIMITER))));
-    }
-
     /**
      * Maps to a ProjectStatus from given string.
      *
@@ -57,7 +46,20 @@ public enum ProjectStatus {
     public static ProjectStatus getNvaStatus(String name) {
         return stream(values())
                 .filter(nameType -> nameType.name().equalsIgnoreCase(name))
-                .findFirst().get();
+                .findFirst()
+                .get();
+    }
+
+    private static boolean isValidAnyStatus(String nameCandidate, ProjectStatus enumName) {
+        return enumName.getCristinStatus().equalsIgnoreCase(nameCandidate)
+                || enumName.name().equalsIgnoreCase(nameCandidate);
+    }
+
+    @JacocoGenerated
+    private static RuntimeException returnException(String name) {
+        return new IllegalArgumentException(
+                format(ERROR_MESSAGE_TEMPLATE, name, stream(ProjectStatus.values())
+                        .map(ProjectStatus::toString).collect(joining(DELIMITER))));
     }
 
     public String getCristinStatus() {
