@@ -161,13 +161,20 @@ public class Employment implements JsonSerializable {
         }
     }
 
+    /**
+     * Returns an Optional containing either extracted position code if valid type URI otherwise empty.
+     */
     public static Optional<String> extractPositionCodeFromTypeUri(URI type) {
         return Optional.ofNullable(type)
             .map(URI::toString)
+            .filter(str -> str.contains(HASHTAG))
             .map(str -> str.substring(str.lastIndexOf(HASHTAG) + 1))
             .filter(StringUtils::isNotBlank);
     }
 
+    /**
+     * Converts this object to a CristinEmployment.
+     */
     public CristinPersonEmployment toCristinEmployment() {
         CristinPersonEmployment cristinEmployment = new CristinPersonEmployment();
 
