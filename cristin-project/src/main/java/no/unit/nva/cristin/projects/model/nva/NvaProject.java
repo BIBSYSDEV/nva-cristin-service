@@ -1,22 +1,5 @@
 package no.unit.nva.cristin.projects.model.nva;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import no.unit.nva.cristin.model.Constants;
-import no.unit.nva.cristin.projects.CristinProjectBuilder;
-import no.unit.nva.cristin.projects.ProjectStatus;
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.model.Organization;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
-
-import java.net.URI;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
@@ -35,6 +18,21 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_POPULAR_SCIENTIFIC_SUMMARY;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.net.URI;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.model.Constants;
+import no.unit.nva.cristin.projects.CristinProjectBuilder;
+import no.unit.nva.cristin.projects.ProjectStatus;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.model.Organization;
+import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("PMD.ExcessivePublicCount")
 @JsonInclude(ALWAYS)

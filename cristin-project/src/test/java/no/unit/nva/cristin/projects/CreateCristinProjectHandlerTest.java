@@ -65,7 +65,7 @@ class CreateCristinProjectHandlerTest {
                 .withRoles(NO_ACCESS)
                 .build();
         handler.handleRequest(input, output, context);
-        GatewayResponse<Object> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Object> response = GatewayResponse.fromOutputStream(output,Object.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_FORBIDDEN));
     }
@@ -176,7 +176,7 @@ class CreateCristinProjectHandlerTest {
     private GatewayResponse<NvaProject> executeRequest(NvaProject request) throws IOException {
         InputStream input = requestWithBodyAndRole(request);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output,NvaProject.class);
     }
 
     private NvaProject nvaProjectUsingUnitIdentifiers() {

@@ -2,8 +2,8 @@ package no.unit.nva.cristin.person.model.cristin;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import no.unit.nva.commons.json.JsonSerializable;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
 
 @SuppressWarnings("unused")
 @JacocoGenerated

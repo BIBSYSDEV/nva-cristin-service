@@ -43,7 +43,7 @@ public class FetchPersonInstitutionInfoClient extends ApiClient {
     }
 
     private URI generateCristinUri(String personId, String orgId) {
-        return new UriWrapper(CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
             .addChild(PERSON_PATH).addChild(personId)
             .addChild(INSTITUTION_PATH).addChild(orgId)
             .getUri();

@@ -123,11 +123,10 @@ public class CristinOrganizationApiClient extends ApiClient {
     }
 
     private URI getCristinOrganizationByIdentifierUri(String identifier) {
-        URI cristinUri = new UriWrapper(CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
                 .addChild(UNITS_PATH)
                 .addQueryParameter(UNIT_ID, identifier)
                 .getUri();
-        return cristinUri;
     }
 
     /**
@@ -192,7 +191,7 @@ public class CristinOrganizationApiClient extends ApiClient {
     private URI getUri(Map<String, String> requestQueryParams, int firstPage, URI baseUri) {
         Map<String, String> nextMap = new ConcurrentHashMap<>(requestQueryParams);
         nextMap.put(PAGE, Integer.toString(firstPage));
-        return new UriWrapper(baseUri).addQueryParameters(nextMap).getUri();
+        return UriWrapper.fromUri(baseUri).addQueryParameters(nextMap).getUri();
     }
 
     protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {

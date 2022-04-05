@@ -1,12 +1,13 @@
 dependencies {
     implementation project(":cristin-commons")
+    implementation libs.nva.json
     implementation libs.google.guava
     implementation libs.aws.lambda.java.core
     implementation libs.nva.logutils
     implementation libs.nva.commons.apigateway
     implementation libs.bekkopen.nocommons
 
-    implementation libs.aws.sdk.cognitoidp
+    implementation libs.aws.sdk2.cognitoidp
 
     testImplementation project(":cristin-commons")
     testImplementation project(":cristin-testing")
@@ -34,3 +35,9 @@ sourceSets {
         }
     }
 }
+test{
+    environment "COGNITO_URI", "https://example.congito.org"
+}
+
+
+

@@ -55,10 +55,10 @@ public class UpdatePersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldReturnNoContentResponseWhenCallingHandlerWithValidData() throws IOException {
-        GatewayResponse<String> gatewayResponse = sendQuery(validPath, defaultBody());
+        GatewayResponse<Object> gatewayResponse = sendQuery(validPath, defaultBody());
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
-        assertEquals(EMPTY_JSON, gatewayResponse.getBodyObject(String.class));
+        assertEquals(EMPTY_JSON, gatewayResponse.getBody());
     }
 
     @Test
@@ -71,7 +71,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldThrowBadRequestIfNoSupportedFieldsIsPresentInRequest() throws IOException {
-        GatewayResponse<String> gatewayResponse = sendQuery(validPath, bodyWithUnsupportedFields());
+        GatewayResponse<Object> gatewayResponse = sendQuery(validPath, bodyWithUnsupportedFields());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -80,7 +80,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenSendingNullBody() throws IOException {
-        GatewayResponse<String> gatewayResponse = sendQuery(validPath, null);
+        GatewayResponse<Object> gatewayResponse = sendQuery(validPath, null);
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
     }
@@ -89,12 +89,12 @@ public class UpdatePersonInstitutionInfoHandlerTest {
         return String.valueOf(randomInteger());
     }
 
-    private GatewayResponse<String> sendQuery(Map<String, String> pathParam, PersonInstInfoPatch body)
+    private GatewayResponse<Object> sendQuery(Map<String, String> pathParam, PersonInstInfoPatch body)
         throws IOException {
 
         InputStream input = createRequest(pathParam, body);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output,Object.class);
     }
 
     private InputStream createRequest(Map<String, String> pathParam, PersonInstInfoPatch body)

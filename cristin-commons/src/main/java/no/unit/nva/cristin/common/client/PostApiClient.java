@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.common.client;
 
+import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
-import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import com.google.common.net.MediaType;
 import java.net.URI;
 import java.net.http.HttpClient;

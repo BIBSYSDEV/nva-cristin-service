@@ -35,7 +35,7 @@ public class UpdateCristinPersonApiClient extends PatchApiClient {
     }
 
     private URI generateCristinUri(String personId) {
-        return new UriWrapper(CRISTIN_API_URL).addChild(PERSON_PATH).addChild(personId).getUri();
+        return  UriWrapper.fromUri(CRISTIN_API_URL).addChild(PERSON_PATH).addChild(personId).getUri();
     }
 
     private URI generateIdUri(String personId) {

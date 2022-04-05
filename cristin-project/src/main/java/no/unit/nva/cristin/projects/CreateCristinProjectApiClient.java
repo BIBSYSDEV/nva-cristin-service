@@ -1,23 +1,21 @@
 package no.unit.nva.cristin.projects;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import no.unit.nva.cristin.common.client.PostApiClient;
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.BadGatewayException;
-import nva.commons.core.JsonUtils;
-import nva.commons.core.paths.UriWrapper;
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
-
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import no.unit.nva.commons.json.JsonUtils;
+import no.unit.nva.cristin.common.client.PostApiClient;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadGatewayException;
+import nva.commons.core.paths.UriWrapper;
 
 public class CreateCristinProjectApiClient extends PostApiClient {
 
@@ -44,7 +42,7 @@ public class CreateCristinProjectApiClient extends PostApiClient {
     }
 
     private URI getCristinProjectPostUri() {
-        return new UriWrapper(CRISTIN_API_URL).addChild(PROJECTS_PATH).getUri();
+        return UriWrapper.fromUri(CRISTIN_API_URL).addChild(PROJECTS_PATH).getUri();
     }
 
     private NvaProject createProjectFromResponse(HttpResponse<String> response) throws BadGatewayException {
