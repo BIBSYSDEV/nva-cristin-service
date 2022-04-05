@@ -1,16 +1,5 @@
 package no.unit.nva.utils;
 
-import nva.commons.core.paths.UriWrapper;
-
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.ALL_QUERY_PARAMETER_LANGUAGES;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
@@ -19,7 +8,15 @@ import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
 import static nva.commons.core.attempt.Try.attempt;
-
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import nva.commons.core.paths.UriWrapper;
 
 public class UriUtils {
 
@@ -34,7 +31,6 @@ public class UriUtils {
     private static final String PARAMETER_DELIMITER = "&";
     private static final String EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR = null;
 
-
     public static String escapeWhiteSpace(String text) {
         return text.replaceAll(WHITESPACE_REGEX, WHITESPACE_REPLACEMENT);
     }
@@ -47,15 +43,15 @@ public class UriUtils {
      */
     public static String queryParameters(Map<String, String> queryParameters) {
         return Optional.ofNullable(queryParameters)
-                .map(UriUtils::formatQueryParameters)
-                .orElse(EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR);
+            .map(UriUtils::formatQueryParameters)
+            .orElse(EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR);
     }
 
     private static String formatQueryParameters(Map<String, String> queryParams) {
         return queryParams.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .map(entry -> String.format(PARAMETER_KEY_VALUE_PAIR_TEMPLATE, entry.getKey(), entry.getValue()))
-                .collect(Collectors.joining(PARAMETER_DELIMITER));
+            .sorted(Map.Entry.comparingByKey())
+            .map(entry -> String.format(PARAMETER_KEY_VALUE_PAIR_TEMPLATE, entry.getKey(), entry.getValue()))
+            .collect(Collectors.joining(PARAMETER_DELIMITER));
     }
 
     /**
@@ -67,10 +63,10 @@ public class UriUtils {
      */
     public static URI getNvaApiId(String identifier, String path) {
         return new UriWrapper(HTTPS,
-                DOMAIN_NAME).addChild(BASE_PATH)
-                .addChild(path)
-                .addChild(identifier)
-                .getUri();
+                              DOMAIN_NAME).addChild(BASE_PATH)
+            .addChild(path)
+            .addChild(identifier)
+            .getUri();
     }
 
     /**
@@ -81,19 +77,21 @@ public class UriUtils {
      * @return valid URI for a cristin resource
      */
     public static URI getCristinUri(String identifier, String path) {
-        return new UriWrapper(CRISTIN_API_URL)
-                .addChild(path)
-                .addChild(identifier)
-                .getUri();
+        return UriWrapper.fromUri(CRISTIN_API_URL)
+            .addChild(path)
+            .addChild(identifier)
+            .getUri();
     }
 
     public static URI addLanguage(URI uri) {
-        return new UriWrapper(uri).addQueryParameter(QUERY_PARAMETER_LANGUAGE, ALL_QUERY_PARAMETER_LANGUAGES).getUri();
+        return UriWrapper.fromUri(uri)
+            .addQueryParameter(QUERY_PARAMETER_LANGUAGE, ALL_QUERY_PARAMETER_LANGUAGES)
+            .getUri();
     }
 
     public static URI createIdUriFromParams(Map<String, String> requestQueryParams, String type) {
         return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(type)
-                .addQueryParameters(requestQueryParams).getUri();
+            .addQueryParameters(requestQueryParams).getUri();
     }
 
     /**
@@ -104,10 +102,10 @@ public class UriUtils {
      * @return valid URI for query against cristin
      */
     public static URI createCristinQueryUri(Map<String, String> cristinRequestQueryParams, String path) {
-        return new UriWrapper(CRISTIN_API_URL)
-                .addChild(path)
-                .addQueryParameters(cristinRequestQueryParams)
-                .getUri();
+        return UriWrapper.fromUri(CRISTIN_API_URL)
+            .addChild(path)
+            .addQueryParameters(cristinRequestQueryParams)
+            .getUri();
     }
 
     public static URI getNvaApiUri(String path) {
@@ -116,11 +114,11 @@ public class UriUtils {
 
     public static URI createNvaProjectId(String identifier) {
         return new UriWrapper(HTTPS, DOMAIN_NAME)
-                .addChild(BASE_PATH).addChild(UriUtils.PROJECT).addChild(identifier).getUri();
+            .addChild(BASE_PATH).addChild(UriUtils.PROJECT).addChild(identifier).getUri();
     }
 
     public static String extractLastPathElement(URI uri) {
-        return nonNull(uri) ? new UriWrapper(uri).getFilename() : null;
+        return nonNull(uri) ? UriWrapper.fromUri(uri).getLastPathElement() : null;
     }
 
     public static URI nvaIdentifierToCristinIdentifier(URI nvaUri, String newPath) {
@@ -130,11 +128,12 @@ public class UriUtils {
     public static URI createNvaPositionId(String code) {
         URI positionBase = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(POSITION).getUri();
         return attempt(() -> new URI(positionBase.getScheme(), positionBase.getHost(), positionBase.getPath(), code))
-                .orElseThrow();
+            .orElseThrow();
     }
 
     /**
      * Convenience method to decode a uri.
+     *
      * @param uri string containing a uri.
      * @return uri decoded from string
      */
@@ -144,7 +143,8 @@ public class UriUtils {
 
     /**
      * verifies that a String contains a valid and dereferenceable URI.
-     * @param str  a String containing an URI
+     *
+     * @param str a String containing an URI
      * @return true if str is a valid URI otherwise false
      */
     public static boolean isValidURI(String str) {
@@ -156,8 +156,4 @@ public class UriUtils {
         }
         return true;
     }
-
-
-
-
 }

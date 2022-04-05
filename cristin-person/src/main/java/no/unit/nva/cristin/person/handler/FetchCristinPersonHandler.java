@@ -55,7 +55,7 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
             logger.info("requester is UserAdministrator");
             return apiClient.authorizedGenerateGetResponse(identifier);
         } else {
-            logger.info("requester is NOT authorized, requestInfo.getAccessRights()={}", requestInfo.getAccessRights());
+            logger.debug("requester is NOT authorized");
             return apiClient.generateGetResponse(identifier);
         }
     }

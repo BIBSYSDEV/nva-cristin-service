@@ -111,7 +111,7 @@ paths:
       description: Create and persist project in Cristin
       operationId: CreateProject
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: [ 'https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend' ]
       requestBody:
         description: Payload containing valid project data
         required: true
@@ -533,7 +533,7 @@ paths:
       description: Creates one person matching supplied payload
       operationId: PostPerson
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       requestBody:
         description: Payload containing names and identifier
         required: true
@@ -635,7 +635,7 @@ paths:
       description: Updates person data
       operationId: UpdatePerson
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: [ 'https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend' ]
       requestBody:
         description: Payload containing modifiable data for person
         required: true
@@ -687,7 +687,7 @@ paths:
       description: Returns a single person matching nin query parameter
       operationId: GetPersonByNIN
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       requestBody:
         required: true
         content:
@@ -755,7 +755,7 @@ paths:
       description: Returns person information at organization matching identifier parameters
       operationId: GetPersonOrganizationInfoByIdentifiers
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       responses:
         200:
           description: successful operation
@@ -796,7 +796,7 @@ paths:
       description: Updates person email and phone information at given organization
       operationId: UpdatePersonInstitutionInfo
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       requestBody:
         description: Payload containing one or more optional fields email and phone. Fields can be set to null to erase content
         required: true
@@ -857,7 +857,7 @@ paths:
       description: Returns all person employments
       operationId: GetPersonEmploymentsByIdentifier
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       responses:
         200:
           description: successful operation
@@ -898,7 +898,7 @@ paths:
       description: Creates one person employment matching supplied payload
       operationId: PostPersonEmployment
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       requestBody:
         description: Payload containing employment information
         required: true
@@ -971,7 +971,7 @@ paths:
       description: Delete person employment by identifier
       operationId: DeletePersonEmploymentsByIdentifier
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       responses:
         204:
           description: successful operation
@@ -999,7 +999,7 @@ paths:
       description: Updates person employment data
       operationId: UpdatePersonEmployment
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       requestBody:
         description: Payload containing modifiable data for person employment
         required: true

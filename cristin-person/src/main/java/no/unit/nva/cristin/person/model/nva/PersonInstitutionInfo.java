@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 import java.util.Objects;
+import no.unit.nva.commons.json.JsonSerializable;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
 
 @JacocoGenerated
 public class PersonInstitutionInfo implements JsonSerializable {

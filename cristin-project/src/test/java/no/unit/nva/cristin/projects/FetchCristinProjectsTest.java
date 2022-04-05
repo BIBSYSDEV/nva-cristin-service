@@ -74,7 +74,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-public class FetchCristinProjectsTest {
+class FetchCristinProjectsTest {
 
     public static final String LANGUAGE_NB = "nb";
     private static final String INVALID_LANGUAGE = "ru";
@@ -175,7 +175,7 @@ public class FetchCristinProjectsTest {
         InputStream input = requestWithQueryParameters(Map.of(LANGUAGE, LANGUAGE_NB));
 
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -188,7 +188,7 @@ public class FetchCristinProjectsTest {
         InputStream input = requestWithQueryParameters(Map.of(QUERY, RANDOM_TITLE));
 
         handler.handleRequest(input, output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,Object.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -205,7 +205,7 @@ public class FetchCristinProjectsTest {
         InputStream input = requestWithQueryParameters(Map.of(QUERY, EMPTY_STRING));
 
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -218,7 +218,7 @@ public class FetchCristinProjectsTest {
         InputStream input = requestWithQueryParameters(Map.of(QUERY, TITLE_ILLEGAL_CHARACTERS));
 
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -233,7 +233,7 @@ public class FetchCristinProjectsTest {
             LANGUAGE, INVALID_LANGUAGE));
 
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -307,7 +307,7 @@ public class FetchCristinProjectsTest {
             LANGUAGE, LANGUAGE_NB,
             PAGE, SECOND_PAGE));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(URI_WITH_PAGE_NUMBER_VALUE_OF_TWO));
@@ -320,7 +320,7 @@ public class FetchCristinProjectsTest {
             LANGUAGE, LANGUAGE_NB,
             PAGE, TITLE_ILLEGAL_CHARACTERS));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(String.format(ERROR_MESSAGE_INVALID_VALUE, PAGE)));
@@ -344,7 +344,7 @@ public class FetchCristinProjectsTest {
             NUMBER_OF_RESULTS, perPage
         ));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
         Integer actual = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
             .getFirstRecord();
         assertEquals(expected, actual);
@@ -359,7 +359,7 @@ public class FetchCristinProjectsTest {
             NUMBER_OF_RESULTS, TEN_RESULTS
         ));
         handler.handleRequest(input, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
@@ -379,7 +379,7 @@ public class FetchCristinProjectsTest {
             NUMBER_OF_RESULTS, TEN_RESULTS
         ));
         handler.handleRequest(input, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
@@ -399,7 +399,7 @@ public class FetchCristinProjectsTest {
             NUMBER_OF_RESULTS, perPage
         ));
         handler.handleRequest(input, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(), anyOf(
@@ -414,7 +414,7 @@ public class FetchCristinProjectsTest {
             LANGUAGE, LANGUAGE_NB,
             NUMBER_OF_RESULTS, TEN_RESULTS));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(URI_WITH_TEN_NUMBER_OF_RESULTS));
@@ -427,7 +427,7 @@ public class FetchCristinProjectsTest {
             LANGUAGE, LANGUAGE_NB,
             NUMBER_OF_RESULTS, TITLE_ILLEGAL_CHARACTERS));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(),
@@ -452,7 +452,7 @@ public class FetchCristinProjectsTest {
             NUMBER_OF_RESULTS, perPage
         ));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         String actualNext =
             Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
@@ -480,7 +480,7 @@ public class FetchCristinProjectsTest {
 
         InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -501,7 +501,7 @@ public class FetchCristinProjectsTest {
 
         InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE + RANDOM_TITLE));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -522,7 +522,7 @@ public class FetchCristinProjectsTest {
 
         InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         SearchResponse actual = gatewayResponse.getBodyObject(SearchResponse.class);
         assertEquals(5, actual.getHits().size());
@@ -536,7 +536,7 @@ public class FetchCristinProjectsTest {
             QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE,
             LANGUAGE, LANGUAGE_NB));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(URI_WITH_ESCAPED_WHITESPACE));
@@ -550,7 +550,7 @@ public class FetchCristinProjectsTest {
 
         handler.handleRequest(input, output, context);
 
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
         Problem body = gatewayResponse.getBodyObject(Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
@@ -566,7 +566,7 @@ public class FetchCristinProjectsTest {
                 ORGANIZATION, SAMPLE_NVA_ORGANIZATION_ENCODED,
                 LANGUAGE, LANGUAGE_NB));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(SAMPLE_NVA_ORGANIZATION_ENCODED));
@@ -579,7 +579,7 @@ public class FetchCristinProjectsTest {
                 ORGANIZATION, ILLEGAL_NVA_ORGANIZATION_ENCODED,
                 LANGUAGE, LANGUAGE_NB));
         handler.handleRequest(input, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -653,7 +653,7 @@ public class FetchCristinProjectsTest {
                 LANGUAGE,
                 LANGUAGE_NB));
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {

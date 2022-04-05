@@ -98,8 +98,8 @@ public class FetchFromIdentityNumberHandlerTest {
         handler = new FetchFromIdentityNumberHandler(apiClient, environment);
         sendQuery(defaultBody(), EMPTY_MAP);
 
-        verify(apiClient).fetchQueryResults(new UriWrapper(VALID_CRISTIN_NATIONAL_ID_URI).getUri());
-        verify(apiClient).fetchGetResult(new UriWrapper(URI_FIRST_HIT_FROM_CRISTIN).getUri());
+        verify(apiClient).fetchQueryResults(UriWrapper.fromUri(VALID_CRISTIN_NATIONAL_ID_URI).getUri());
+        verify(apiClient).fetchGetResult(UriWrapper.fromUri(URI_FIRST_HIT_FROM_CRISTIN).getUri());
     }
 
     @Test
@@ -168,7 +168,7 @@ public class FetchFromIdentityNumberHandlerTest {
         throws IOException {
         var request = requestWithBackendScope();
         handler.handleRequest(request, output, context);
-        GatewayResponse<Person> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Person> response = GatewayResponse.fromOutputStream(output,Person.class);
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
         Person person = response.getBodyObject(Person.class);
         assertThat(person, is(not(nullValue())));
@@ -192,7 +192,7 @@ public class FetchFromIdentityNumberHandlerTest {
 
         InputStream input = requestWithParams(body, queryParams);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output,Person.class);
     }
 
     private InputStream requestWithParams(TypedValue body, Map<String, String> queryParams)
@@ -212,7 +212,7 @@ public class FetchFromIdentityNumberHandlerTest {
     private GatewayResponse<Person> sendInvalidQuery() throws IOException {
         InputStream input = requestWithInvalidPayload();
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output,Person.class);
     }
 
     private InputStream requestWithInvalidPayload() throws JsonProcessingException {

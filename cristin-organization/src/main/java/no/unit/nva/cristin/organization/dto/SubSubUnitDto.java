@@ -1,16 +1,14 @@
 package no.unit.nva.cristin.organization.dto;
 
+import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonUtils;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-
-import static nva.commons.core.attempt.Try.attempt;
+import no.unit.nva.commons.json.JsonUtils;
+import nva.commons.core.JacocoGenerated;
 
 public class SubSubUnitDto {
 

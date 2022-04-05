@@ -18,6 +18,7 @@ Globals:
         CRISTIN_API_URL: !Ref CristinApiUrl
         DOMAIN_NAME: !Ref ApiDomain
         BASE_PATH: !Ref CustomDomainBasePath
+        COGNITO_URI: !Ref CognitoAuthorizationUri
         COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
         COGNITO_CLIENT_APP_ID: !Ref CognitoUserPoolAppClientId
   Api:
@@ -27,6 +28,9 @@ Globals:
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Parameters:
+  CognitoAuthorizationUri:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: '/NVA/CognitoUri'
   CognitoAuthorizerArn:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Description: Reference to Cognito UserPool for the stage
@@ -76,20 +80,6 @@ Resources:
         DefaultAuthorizer: NONE
       EndpointConfiguration: Regional
 
-  NvaCristinProxyInternalApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      DefinitionBody:
-        'Fn::Transform':
-          Name: AWS::Include
-          Parameters:
-            Location: ./docs/cristin-proxy-internal-apidoc.yaml
-      AccessLogSetting:
-        DestinationArn: !GetAtt ApiAccessLogGroup.Arn
-        Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
-      StageName: Prod
-
-      EndpointConfiguration: Regional
 
 
   ReadCristinAuthenticationRole:
@@ -307,12 +297,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/identityNumber/
             Method: post
-        NvaCristinFetchPersonUsingInternalRequest:
-          Type: Api
-          Properties:
-            RestApiId: !Ref NvaCristinProxyInternalApi
-            Path: /person/identityNumber/
-            Method: post
 
   NvaCristinFetchPersonUsingNinTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
@@ -378,12 +362,7 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/{id}/organization/{orgId}/
             Method: get
-        NvaCristinFetchPersonUsingInternalRequest:
-          Type: Api
-          Properties:
-            RestApiId: !Ref NvaCristinProxyInternalApi
-            Path: /person/{id}/organization/{orgId}/
-            Method: get
+
 
   NvaCristinUpdatePersonInstitutionInfoFunction:
     Type: AWS::Serverless::Function
@@ -475,14 +454,6 @@ Resources:
       DomainName: !Ref ApiDomain
       RestApiId: !Ref NvaCristinProxyApi
       Stage: !Ref NvaCristinProxyApi.Stage
-
-  InternalBasePathMapping:
-    Type: AWS::ApiGateway::BasePathMapping
-    Properties:
-      BasePath: !Sub '${CustomDomainBasePath}-internal'
-      DomainName: !Ref ApiDomain
-      RestApiId:  !Ref NvaCristinProxyInternalApi
-      Stage: !Ref NvaCristinProxyInternalApi.Stage
 
 
 

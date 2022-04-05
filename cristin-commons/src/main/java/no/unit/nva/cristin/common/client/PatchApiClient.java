@@ -1,8 +1,8 @@
 package no.unit.nva.cristin.common.client;
 
+import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
-import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
