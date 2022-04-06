@@ -40,6 +40,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -126,7 +127,6 @@ public class CristinApiClient extends ApiClient {
                 .toOptional(failure -> logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters),
                         failure.getException()))
                 .orElseThrow();
-
         HttpResponse<String> response = fetchQueryResults(uri);
         URI id = createIdUriFromParams(parameters, PROJECT);
         checkHttpStatusCode(id, response.statusCode());
@@ -201,8 +201,17 @@ public class CristinApiClient extends ApiClient {
             query = query.withParentUnitId(getUnitIdFromOrganization(parameters.get(ORGANIZATION)));
         }
 
+        if (parameters.containsKey(STATUS)) {
+            query = query.withStatus(getEncodedStatusParameter(parameters));
+        }
+
         return queryType == QUERY_USING_GRANT_ID ? query.withGrantId(parameters.get(QUERY)).toURI() :
                 query.withTitle(parameters.get(QUERY)).toURI();
+    }
+
+    private String getEncodedStatusParameter(Map<String, String> parameters) {
+        return URLEncoder.encode(ProjectStatus.getNvaStatus(parameters.get(STATUS)).getCristinStatus(),
+                StandardCharsets.UTF_8);
     }
 
     private String getUnitIdFromOrganization(String organizationId) {
