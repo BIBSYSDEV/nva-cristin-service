@@ -126,7 +126,6 @@ public class CristinApiClient extends ApiClient {
                 .withHits(nvaProjects);
     }
 
-
     public SearchResponse<NvaProject> listOrganizationProjects(Map<String, String> requestQueryParameters)
             throws ApiGatewayException {
 
@@ -143,7 +142,7 @@ public class CristinApiClient extends ApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        URI id = getServiceUri(new HashMap(requestQueryParameters)); // createIdUriFromParams(rewrapOrganizationUri(requestQueryParameters), PROJECT);
+        URI id = getServiceUri(new HashMap(requestQueryParameters));
 
         return new SearchResponse<NvaProject>(id)
                 .withContext(PROJECT_SEARCH_CONTEXT_URL)
@@ -298,5 +297,4 @@ public class CristinApiClient extends ApiClient {
                 .addQueryParameters(queryParameters)
                 .getUri();
     }
-
 }
