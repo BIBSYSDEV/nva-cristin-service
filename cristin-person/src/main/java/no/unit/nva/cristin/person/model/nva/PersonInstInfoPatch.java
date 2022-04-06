@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Objects;
 import java.util.Optional;
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.person.institution.update.PersonInstInfoPatchSerializer;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
 
 @JsonSerialize(using = PersonInstInfoPatchSerializer.class)
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

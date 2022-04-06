@@ -1,6 +1,6 @@
 dependencies {
     implementation project(":cristin-commons")
-    implementation libs.nva.logutils
+    implementation libs.nva.json
     implementation libs.nva.commons.apigateway
     implementation libs.google.guava
     implementation libs.aws.lambda.java.core
@@ -27,4 +27,8 @@ sourceSets {
             exclude '**/*.java'
         }
     }
+}
+
+test{
+    environment "COGNITO_URI", "https://example.cognito.org"
 }

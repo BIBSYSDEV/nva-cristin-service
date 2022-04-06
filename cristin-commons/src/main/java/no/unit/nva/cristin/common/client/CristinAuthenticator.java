@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.common.client;
 
-import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
 import nva.commons.secrets.SecretsReader;
 
 import java.net.Authenticator;
@@ -19,9 +18,7 @@ public class CristinAuthenticator {
     public static final String SECRET_NAME = "CristinClientBasicAuth";
     public static final String PASSWORD_KEY = "password";
     public static final String USERNAME_KEY = "username";
-    public static final String EU_WEST_1 = "eu-west-1";
-    public static final SecretsReader SECRETS_READER =
-            new SecretsReader(AWSSecretsManagerClientBuilder.standard().withRegion(EU_WEST_1).build());
+    public static final SecretsReader SECRETS_READER =new SecretsReader();
 
     /**
      * Creates an Authenticator from credentials stored in AWS SecretsManager.

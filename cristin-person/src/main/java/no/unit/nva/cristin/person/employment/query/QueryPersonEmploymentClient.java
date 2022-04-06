@@ -71,7 +71,7 @@ public class QueryPersonEmploymentClient extends ApiClient {
     }
 
     private URI generateCristinUri(String personId) {
-        return new UriWrapper(CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
             .addChild(PERSON_PATH).addChild(personId)
             .addChild(EMPLOYMENT_PATH_CRISTIN)
             .getUri();

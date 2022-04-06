@@ -192,7 +192,7 @@ public class CristinPerson {
     }
 
     private URI extractImage() {
-        return getPictureUrl().map(UriWrapper::new).map(UriWrapper::getUri).orElse(null);
+        return getPictureUrl().map(UriWrapper::fromUri).map(UriWrapper::getUri).orElse(null);
     }
 
     private Set<Affiliation> extractAffiliations() {

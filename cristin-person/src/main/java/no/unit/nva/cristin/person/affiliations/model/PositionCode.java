@@ -2,9 +2,10 @@ package no.unit.nva.cristin.person.affiliations.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.common.Utils;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
 
 import java.net.URI;
 import java.util.Map;
