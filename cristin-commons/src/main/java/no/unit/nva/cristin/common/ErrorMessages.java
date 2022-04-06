@@ -50,6 +50,7 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Supplied payload is not valid";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER = "Invalid path parameter for '%s'";
     public static final String INVALID_URI_MESSAGE = "Must be valid URI";
+    public static final String ERROR_MESSAGE_INVALID_FIELD_VALUE = "Invalid value for field '%s'";
 
     /**
      * Formats and emits a message with valid parameter names.
@@ -91,6 +92,15 @@ public class ErrorMessages {
         return String.format(ERROR_MESSAGE_INVALID_PATH_PARAMETER, pathParameterName);
     }
 
+    /**
+     * Creates an error message containing which field that has invalid value.
+     *
+     * @param fieldParameterName name of field with invalid value
+     * @return formatted string containing a message with the field name containing invalid value
+     */
+    public static String invalidFieldParameterMessage(String fieldParameterName) {
+        return String.format(ERROR_MESSAGE_INVALID_FIELD_VALUE, fieldParameterName);
+    }
 
     private static String prettifyList(Set<String> queryParameters) {
         return queryParameters.size() > 1
