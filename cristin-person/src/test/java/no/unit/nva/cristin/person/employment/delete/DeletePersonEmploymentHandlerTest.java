@@ -55,7 +55,7 @@ class DeletePersonEmploymentHandlerTest {
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
         handler.handleRequest(getInputStreamRequestWithoutAuthentication(), output, context);
-        GatewayResponse<Void> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Void> gatewayResponse = GatewayResponse.fromOutputStream(output, Void.class);
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
@@ -63,7 +63,7 @@ class DeletePersonEmploymentHandlerTest {
     @Test
     void shouldThrowBadRequestExceptionWhenInvalidPersonId() throws IOException {
         handler.handleRequest(getInputStreamRequestWithInvalidPersonId(), output, context);
-        GatewayResponse<Void> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Void> gatewayResponse = GatewayResponse.fromOutputStream(output, Void.class);
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
@@ -71,7 +71,7 @@ class DeletePersonEmploymentHandlerTest {
     @Test
     void shouldThrowBadRequestExceptionWhenInvalidEmploymentId() throws IOException {
         handler.handleRequest(getInputStreamRequestWithInvalidEmploymentId(), output, context);
-        GatewayResponse<Void> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Void> gatewayResponse = GatewayResponse.fromOutputStream(output, Void.class);
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }

@@ -1,5 +1,20 @@
 package no.unit.nva.cristin.person.employment.update;
 
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.HttpHeaders;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.core.Environment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.util.Map;
+
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.EMPLOYMENT_ID;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -9,19 +24,6 @@ import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.HttpHeaders;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.util.Map;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.core.Environment;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 public class UpdatePersonEmploymentHandlerTest {
 
@@ -62,7 +64,7 @@ public class UpdatePersonEmploymentHandlerTest {
     private GatewayResponse<Void> sendQuery(Map<String, String> pathParam, String body) throws IOException {
         InputStream input = createRequest(pathParam, body);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
     private InputStream createRequest(Map<String, String> pathParam, String body) throws JsonProcessingException {
@@ -80,6 +82,6 @@ public class UpdatePersonEmploymentHandlerTest {
             .build();
         handler.handleRequest(input, output, context);
 
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, Void.class);
     }
 }

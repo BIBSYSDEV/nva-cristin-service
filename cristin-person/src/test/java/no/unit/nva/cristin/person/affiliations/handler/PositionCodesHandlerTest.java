@@ -78,7 +78,7 @@ public class PositionCodesHandlerTest {
     private GatewayResponse<PositionCodes> sendQuery() throws IOException {
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER).build();
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, PositionCodes.class);
     }
 
     private String fakeJsonFromUpstream() throws JsonProcessingException {

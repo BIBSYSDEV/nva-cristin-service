@@ -72,7 +72,7 @@ class ListCristinOrganizationProjectsHandlerTest {
     void shouldReturnBadRequestResponseOnMissingPathParam() throws IOException {
         InputStream inputStream = generateHandlerRequestWithoutOrganizationIdentifier();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS));
@@ -82,7 +82,7 @@ class ListCristinOrganizationProjectsHandlerTest {
     void shouldReturnBadRequestResponseOnInvalidQueryParameters() throws IOException {
         InputStream inputStream = generateHandlerDummyRequestWithIllegalQueryParameters();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS)));
@@ -92,7 +92,7 @@ class ListCristinOrganizationProjectsHandlerTest {
     void shouldReturnOKAndEmptyResponseOnValidDummyInput() throws IOException {
         InputStream inputStream = generateHandlerDummyRequest();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
@@ -100,7 +100,7 @@ class ListCristinOrganizationProjectsHandlerTest {
     void shouldReturnOKAndIdInResponseOnValidDummyInput() throws IOException {
         InputStream inputStream = generateHandlerDummyRequest();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         final SearchResponse searchResponse = gatewayResponse.getBodyObject(SearchResponse.class);
         assertTrue(searchResponse.getId().toString().contains(DUMMY_ORGANIZATION_IDENTIFIER));
@@ -115,7 +115,7 @@ class ListCristinOrganizationProjectsHandlerTest {
         doReturn(Collections.emptyList()).when(apiClient).fetchQueryResultsOneByOne(any());
         handler = new ListCristinOrganizationProjectsHandler(apiClient, new Environment());
         handler.handleRequest(generateHandlerDummyRequest(), output, context);
-        GatewayResponse<SearchResponse> response = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> response = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         SearchResponse<NvaProject> searchResponse = response.getBodyObject(SearchResponse.class);
         assertThat(0, equalTo(searchResponse.getHits().size()));
     }
