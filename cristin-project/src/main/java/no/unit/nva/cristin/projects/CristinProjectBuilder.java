@@ -1,24 +1,25 @@
 package no.unit.nva.cristin.projects;
 
-import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
-import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
-import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.model.CristinOrganization;
+import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
+import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
+import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinProjectBuilder {
 
@@ -28,6 +29,10 @@ public class CristinProjectBuilder {
     public CristinProjectBuilder(NvaProject nvaProject) {
         this.nvaProject = nvaProject;
         this.cristinProject = new CristinProject();
+    }
+
+    private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
+        return contributors.stream().map(NvaContributor::toCristinPersonWithRoles).collect(Collectors.toList());
     }
 
     /**
@@ -60,10 +65,6 @@ public class CristinProjectBuilder {
         return fromOrganizationContainingInstitution(organization);
     }
 
-    private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
-        return contributors.stream().map(NvaContributor::toCristinPersonWithRoles).collect(Collectors.toList());
-    }
-
     private List<CristinFundingSource> extractFundings(List<Funding> fundings) {
         return fundings.stream().map(this::getCristinFundingSource).collect(Collectors.toList());
     }
@@ -90,9 +91,8 @@ public class CristinProjectBuilder {
     }
 
     private String extractStatus(NvaProject project) {
-        return Optional.ofNullable(project.getStatus())
-            .map(ProjectStatus::name)
-            .filter(ProjectStatus::isValidStatus)
-            .orElse(null);
+        return nonNull(project.getStatus())
+                ? project.getStatus().getCristinStatus()
+                : null;
     }
 }

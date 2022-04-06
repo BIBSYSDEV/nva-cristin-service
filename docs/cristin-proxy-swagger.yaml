@@ -54,6 +54,17 @@ paths:
             type: string
             pattern: '.+'
           example: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+        - name: status
+          in: query
+          description: Search for project with status
+          required: false
+          schema:
+            type: string
+            enum:
+            - ACTIVE
+            - CONCLUDED
+            - NOTSTARTED
+            example: 'active'
         - name: language
           in: query
           description: Preferred language for some fields

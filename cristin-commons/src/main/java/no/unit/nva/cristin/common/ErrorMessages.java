@@ -32,6 +32,8 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_DEPTH_INVALID = "Parameter 'depth' has invalid value. "
             + "Must be 'top' or 'full'";
     public static final String ERROR_MESSAGE_INVALID_VALUE = "Parameter '%s' has invalid value. ";
+    public static final String ERROR_MESSAGE_INVALID_VALUE_WITH_RANGE = "Parameter '%s' has invalid value. Supported values are: ";
+
     public static final String ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE =
             "Remote service responded with status: %s when client called uri: %s";
     public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
@@ -68,6 +70,17 @@ public class ErrorMessages {
     public static String invalidQueryParametersMessage(String queryParameterName, String validValues) {
         return String.format(ERROR_MESSAGE_INVALID_VALUE + validValues, queryParameterName);
     }
+
+    /**
+     * Creates a error message containing which parameter that has invalid value and what the value is supposed to be.
+     * @param queryParameterName name of parameter with invalid value
+     * @param validValues what values are allowed for this parameter
+     * @return formatted string containing a message with allowed values for this parameter
+     */
+    public static String invalidQueryParametersMessageWithRange(String queryParameterName, String validValues) {
+        return String.format(ERROR_MESSAGE_INVALID_VALUE_WITH_RANGE + validValues, queryParameterName);
+    }
+
 
 
     /**

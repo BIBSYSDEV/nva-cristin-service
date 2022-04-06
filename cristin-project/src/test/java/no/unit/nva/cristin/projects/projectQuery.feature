@@ -7,6 +7,8 @@ Feature: API tests for Cristin projects query
     * def queryString = 'covid'
     * def projectIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/project\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
+    * def organizationId = 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
 
@@ -98,7 +100,7 @@ Feature: API tests for Cristin projects query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['language', 'organization', 'page', 'query', 'results']"
+    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['language', 'organization', 'page', 'query', 'results', 'status']"
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
@@ -160,7 +162,6 @@ Feature: API tests for Cristin projects query
 
   Scenario: Query accepts organization uri as query parameter
     Given path '/project/'
-    * def organizationId = 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
     And param query = queryString
     And param organization = organizationId
     When method GET
@@ -168,8 +169,27 @@ Feature: API tests for Cristin projects query
 
   Scenario: Query with illegal organizationId  returns 400 Bad request
     Given path '/project/'
-    * def organizationId = 'htttps:/api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+    * def illegalOrganizationId = 'htttps:/api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
     And param query = queryString
-    And param organization = organizationId
+    And param organization = illegalOrganizationId
     When method GET
     Then status 400
+
+  Scenario Outline: Query accepts status parameter value case independent
+    Given path '/project/'
+    And param query = queryString
+    And param organization = organizationId
+    And param status = <SAMPLE_STATUS>
+    When method GET
+    Then status 200
+
+    Examples:
+      | SAMPLE_STATUS |
+      | 'concluded' |
+      | 'notstarted' |
+      | 'active' |
+      | 'CONCLUDED' |
+      | 'NOTSTARTED' |
+      | 'ACTIVE' |
+
+
