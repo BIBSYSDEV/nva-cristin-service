@@ -176,7 +176,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
             .build();
         handler.handleRequest(input, output, context);
 
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, PersonInstitutionInfo.class);
     }
 
     private GatewayResponse<PersonInstitutionInfo> queryWithUnsupportedQueryParams() throws IOException {
@@ -187,7 +187,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
             .build();
         handler.handleRequest(input, output, context);
 
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, PersonInstitutionInfo.class);
     }
 
     private URI getCristinUriFromIdentifiers() {
@@ -199,7 +199,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
         InputStream input = requestWithParams(pathParam);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, PersonInstitutionInfo.class);
     }
 
     private InputStream requestWithParams(Map<String, String> pathParams)

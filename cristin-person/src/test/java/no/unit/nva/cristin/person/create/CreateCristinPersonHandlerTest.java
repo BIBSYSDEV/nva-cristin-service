@@ -168,13 +168,13 @@ public class CreateCristinPersonHandlerTest {
                 .withBody(body)
                 .build();
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
     private GatewayResponse<Person> sendQuery(Person body) throws IOException {
         InputStream input = requestWithBody(body);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
     private InputStream requestWithBody(Person body) throws JsonProcessingException {
