@@ -1,18 +1,16 @@
 package no.unit.nva.cristin.person.affiliations.model;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import no.unit.nva.cristin.common.Utils;
-import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
-
 import java.net.URI;
 import java.util.Objects;
 import java.util.Set;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
+import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.common.Utils;
+import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
 public class PositionCodes implements JsonSerializable {

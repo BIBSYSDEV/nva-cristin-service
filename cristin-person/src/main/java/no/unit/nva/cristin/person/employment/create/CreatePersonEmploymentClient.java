@@ -50,11 +50,11 @@ public class CreatePersonEmploymentClient extends PostApiClient {
     }
 
     private URI getCristinPostUri(String identifier) {
-        return new UriWrapper(getCristinUri(identifier, PERSON_PATH)).addChild(EMPLOYMENT_PATH_CRISTIN).getUri();
+        return UriWrapper.fromUri(getCristinUri(identifier, PERSON_PATH)).addChild(EMPLOYMENT_PATH_CRISTIN).getUri();
     }
 
     private URI getNvaPostUri(String identifier) {
-        return new UriWrapper(getNvaApiId(identifier, PERSON_PATH_NVA)).addChild(EMPLOYMENT_PATH).getUri();
+        return UriWrapper.fromUri(getNvaApiId(identifier, PERSON_PATH_NVA)).addChild(EMPLOYMENT_PATH).getUri();
     }
 
     private CristinPersonEmployment deserializeResponse(HttpResponse<String> response) throws BadGatewayException {

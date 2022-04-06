@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
+import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
@@ -13,7 +14,6 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
-import nva.commons.core.JsonUtils;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
@@ -91,7 +91,7 @@ class QueryCristinOrganizationHandlerTest {
     void shouldReturnBadRequestResponseOnMissingQueryParam() throws IOException {
         InputStream inputStream = generateHandlerRequestWithMissingQueryParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(invalidQueryParametersMessage(
@@ -102,7 +102,7 @@ class QueryCristinOrganizationHandlerTest {
     void shouldReturnEmptyResponseOnStrangeQuery() throws IOException {
         InputStream inputStream = generateHandlerRequestWithStrangeQueryParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         SearchResponse<Organization> actual = gatewayResponse.getBodyObject(SearchResponse.class);
         assertEquals(0, actual.getHits().size());
@@ -142,7 +142,7 @@ class QueryCristinOrganizationHandlerTest {
                 .withQueryParameters(Map.of("query", "Department of Medical Biochemistry","depth","full"))
                 .build();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         SearchResponse<Organization> actual = gatewayResponse.getBodyObject(SearchResponse.class);
         assertEquals(2, actual.getHits().size());
@@ -154,7 +154,7 @@ class QueryCristinOrganizationHandlerTest {
     void shouldReturnBadRequestOnIllegalDepth() throws IOException {
         InputStream inputStream = generateHandlerRequestWithIllegalDepthParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(ERROR_MESSAGE_DEPTH_INVALID));

@@ -3,9 +3,9 @@ package no.unit.nva.cristin.projects;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import nva.commons.core.JsonUtils;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -13,7 +13,7 @@ import java.time.Instant;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SerializeInstantFieldsTest {
+class SerializeInstantFieldsTest {
 
     public static final ObjectMapper OBJECT_MAPPER_NON_EMPTY = JsonUtils.dynamoObjectMapper;
 

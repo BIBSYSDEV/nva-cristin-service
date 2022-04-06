@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.JsonSerializable;
 
 import java.net.URI;
 import java.util.Collections;

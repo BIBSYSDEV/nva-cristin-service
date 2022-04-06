@@ -46,7 +46,7 @@ public class CristinQuery {
      * @return an URI to Cristin Projects with ID and language parameters
      */
     public static URI fromIdAndLanguage(String id, String language) {
-        return new UriWrapper(CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
                 .addChild(CRISTIN_API_PROJECTS_PATH)
                 .addChild(id)
                 .addQueryParameters(Map.of(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language))
@@ -95,7 +95,7 @@ public class CristinQuery {
      * @return an URI to Cristin Projects with parameters
      */
     public URI toURI() {
-        return new UriWrapper(CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
                 .addChild(CRISTIN_API_PROJECTS_PATH)
                 .addQueryParameters(cristinQueryParameters)
                 .getUri();
