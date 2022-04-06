@@ -19,6 +19,8 @@ public class CristinQuery {
     public static final String CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID = "parent_unit_id";
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
     private static final String CRISTIN_API_PROJECTS_PATH = "projects";
+    private static final String CRISTIN_QUERY_PARAMETER_STATUS = "status";
+
 
 
     private final transient Map<String, String> cristinQueryParameters;
@@ -78,6 +80,11 @@ public class CristinQuery {
 
     public CristinQuery withParentUnitId(String parentUnitId) {
         cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, parentUnitId);
+        return this;
+    }
+
+    public CristinQuery withStatus(String status) {
+        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_STATUS, status);
         return this;
     }
 
