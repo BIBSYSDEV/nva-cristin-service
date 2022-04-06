@@ -126,6 +126,12 @@ public class CristinApiClient extends ApiClient {
                 .withHits(nvaProjects);
     }
 
+    /**
+     * Searches for an Organizations projects for a given parent_unit.
+     * @param requestQueryParameters parametes for search containg parent_unit_id
+     * @return a SearchResponse filled with transformed Cristin Projects and metadata
+     * @throws ApiGatewayException if some errors happen we should return this to client
+     */
     public SearchResponse<NvaProject> listOrganizationProjects(Map<String, String> requestQueryParameters)
             throws ApiGatewayException {
 

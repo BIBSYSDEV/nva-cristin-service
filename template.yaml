@@ -242,7 +242,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
-            Path: /organization/{id}/projects
+            Path: /organization/{identifier}/projects
             Method: get
             RequestParameters:
               - method.request.querystring.page
