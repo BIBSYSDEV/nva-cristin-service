@@ -65,6 +65,9 @@ aws-sdk2-core = { group = 'software.amazon.awssdk', name = 'sdk-core', version.r
 aws-sdk2-secrets = { group = 'software.amazon.awssdk', name = 'secretsmanager', version.ref = 'awsSdk2' }
 aws-sdk2-cognitoidp = { group = 'software.amazon.awssdk', name = 'cognitoidentityprovider', version.ref = 'awsSdk2' }
 
+aws-sdk2-auth = {group = 'software.amazon.awssdk', name = 'auth', version.ref = 'awsSdk2' }
+aws-sdk2-awscore = {group = 'software.amazon.awssdk', name = 'aws-core', version.ref = 'awsSdk2' }
+aws-sdk2-regions = {group = 'software.amazon.awssdk', name = 'regions', version.ref = 'awsSdk2' }
 
 log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4jApi' }
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
