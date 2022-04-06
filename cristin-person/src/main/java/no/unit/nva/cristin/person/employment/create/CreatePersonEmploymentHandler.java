@@ -39,6 +39,7 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
 
         validateHasAccessRights(requestInfo);
 
+        CreatePersonEmploymentValidator.validate(input);
         String identifier = getValidPersonId(requestInfo);
 
         return apiClient.createEmploymentInCristin(identifier, input);

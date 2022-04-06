@@ -1,5 +1,23 @@
 package no.unit.nva.cristin.person.institution.update;
 
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.HttpHeaders;
+import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.core.Environment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
+import java.util.Map;
+
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstitutionInfoClient.EMPTY_JSON;
@@ -13,22 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.HttpHeaders;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.http.HttpClient;
-import java.util.Map;
-import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
-import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.core.Environment;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 public class UpdatePersonInstitutionInfoHandlerTest {
 
@@ -114,7 +116,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
             .build();
         handler.handleRequest(input, output, context);
 
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, String.class);
     }
 
     private PersonInstInfoPatch defaultBody() throws JsonProcessingException {

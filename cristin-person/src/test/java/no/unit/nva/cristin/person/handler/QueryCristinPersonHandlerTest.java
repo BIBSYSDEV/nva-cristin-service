@@ -156,7 +156,7 @@ public class QueryCristinPersonHandlerTest {
         apiClient = spy(apiClient);
         handler = new QueryCristinPersonHandler(apiClient, environment);
         sendDefaultQuery();
-        verify(apiClient).fetchQueryResults(new UriWrapper(EXPECTED_CRISTIN_URI_WITH_PARAMS).getUri());
+        verify(apiClient).fetchQueryResults(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_PARAMS).getUri());
     }
 
     @Test
@@ -175,7 +175,7 @@ public class QueryCristinPersonHandlerTest {
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME));
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {

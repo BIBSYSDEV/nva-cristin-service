@@ -4,7 +4,6 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.net.HttpHeaders;
-import java.util.List;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
@@ -21,6 +20,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 import static no.unit.nva.cristin.common.ErrorMessages.invalidPathParameterMessage;
@@ -147,7 +147,7 @@ public class QueryPersonEmploymentHandlerTest {
             .build();
         handler.handleRequest(input, output, context);
 
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
     private GatewayResponse<SearchResponse> sendQuery(Map<String, String> pathParam)
@@ -155,7 +155,7 @@ public class QueryPersonEmploymentHandlerTest {
 
         InputStream input = requestWithParams(pathParam);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
     private InputStream requestWithParams(Map<String, String> pathParams)

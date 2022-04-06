@@ -194,7 +194,7 @@ public class UpdateCristinPersonHandlerTest {
     private GatewayResponse<Void> sendQuery(Map<String, String> pathParam, String body) throws IOException {
         InputStream input = createRequest(pathParam, body);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
     private InputStream createRequest(Map<String, String> pathParam, String body) throws JsonProcessingException {
@@ -212,6 +212,6 @@ public class UpdateCristinPersonHandlerTest {
             .build();
         handler.handleRequest(input, output, context);
 
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, Void.class);
     }
 }

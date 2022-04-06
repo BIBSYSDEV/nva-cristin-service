@@ -250,7 +250,7 @@ public class FetchOneCristinProjectTest {
             .build();
         handler.handleRequest(input, output, context);
 
-        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output, NvaProject.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(contentTypeRequested, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -265,7 +265,7 @@ public class FetchOneCristinProjectTest {
             .build();
         handler.handleRequest(input, output, context);
 
-        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output, NvaProject.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MediaType.JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -283,7 +283,7 @@ public class FetchOneCristinProjectTest {
             .build();
         handler.handleRequest(input, output, context);
 
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_UNSUPPORTED_TYPE, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
@@ -312,7 +312,7 @@ public class FetchOneCristinProjectTest {
                 .build();
         handler.handleRequest(input, output, context);
 
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
         Problem body = gatewayResponse.getBodyObject(Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
@@ -337,7 +337,7 @@ public class FetchOneCristinProjectTest {
         final InputStream input = requestWithLanguageAndId(of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(ID, DEFAULT_ID));
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         fetchHandler.handleRequest(input, outputStream, mock(Context.class));
-        final GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(outputStream);
+        final GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(outputStream, NvaProject.class);
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
     }
 
@@ -351,7 +351,8 @@ public class FetchOneCristinProjectTest {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         new FetchOneCristinProject(cristinApiClient, environment)
                 .handleRequest(input, outputStream, mock(Context.class));
-        final GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(outputStream);
+        final GatewayResponse<NvaProject> gatewayResponse =
+                GatewayResponse.fromOutputStream(outputStream, NvaProject.class);
         final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
         assertEquals(expectedSummary, actualNvaProject.getAcademicSummary());
     }
@@ -395,7 +396,7 @@ public class FetchOneCristinProjectTest {
             of(LANGUAGE, DEFAULT_LANGUAGE_CODE),
             of(ID, id));
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, NvaProject.class);
     }
 
     private InputStream requestWithLanguageAndId(Map<String, String> languageQueryParam,

@@ -151,7 +151,7 @@ public class FetchCristinPersonHandlerTest {
         apiClient = spy(apiClient);
         handler = new FetchCristinPersonHandler(apiClient, environment);
         sendQuery(null, VALID_PATH_PARAM);
-        verify(apiClient).fetchGetResult(new UriWrapper(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER).getUri());
+        verify(apiClient).fetchGetResult(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER).getUri());
     }
 
     @Test
@@ -168,7 +168,7 @@ public class FetchCristinPersonHandlerTest {
         apiClient = spy(apiClient);
         handler = new FetchCristinPersonHandler(apiClient, environment);
         sendQuery(null, VALID_ORCID_PATH_PARAM);
-        verify(apiClient).fetchGetResult(new UriWrapper(EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER).getUri());
+        verify(apiClient).fetchGetResult(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER).getUri());
     }
 
     @Test
@@ -189,7 +189,7 @@ public class FetchCristinPersonHandlerTest {
 
         InputStream input = requestWithParams(queryParams, pathParam);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output);
+        return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
     private InputStream requestWithParams(Map<String, String> queryParams, Map<String, String> pathParams)
