@@ -15,13 +15,14 @@ dependencies {
 
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
+    implementation libs.aws.sdk2.auth
+    implementation libs.aws.sdk2.awscore
+    implementation libs.aws.sdk2.regions
 
     implementation libs.aws.sdk2.auth
     implementation libs.aws.sdk2.awscore
     implementation libs.aws.sdk2.regions
 }
-
-
 tasks.named('test') {
     useJUnitPlatform {
         excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
