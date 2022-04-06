@@ -29,9 +29,10 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PERSON_QUERY_CONTEXT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.utils.UriUtils.PERSON;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static nva.commons.core.attempt.Try.attempt;
@@ -40,16 +41,16 @@ public class CristinPersonApiClient extends ApiClient {
 
     public static final String IDENTITY_NUMBER_PATH = "identityNumber";
     public static final String ERROR_MESSAGE_NO_MATCH_FOUND_FOR_SUPPLIED_PAYLOAD = "No match found for supplied "
-        + "payload";
+            + "payload";
 
     /**
      * Create CristinPersonApiClient with default HTTP client.
      */
     public CristinPersonApiClient() {
         this(HttpClient.newBuilder()
-            .followRedirects(HttpClient.Redirect.ALWAYS)
-            .connectTimeout(Duration.ofSeconds(30))
-            .build());
+                .followRedirects(HttpClient.Redirect.ALWAYS)
+                .connectTimeout(Duration.ofSeconds(30))
+                .build());
     }
 
     public CristinPersonApiClient(HttpClient client) {
@@ -64,7 +65,7 @@ public class CristinPersonApiClient extends ApiClient {
      * @throws ApiGatewayException if something went wrong
      */
     public SearchResponse<Person> generateQueryResponse(Map<String, String> requestQueryParams)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
         HttpResponse<String> response = queryPersons(requestQueryParams);
@@ -74,20 +75,21 @@ public class CristinPersonApiClient extends ApiClient {
         URI id = createIdUriFromParams(requestQueryParams, PERSON_PATH_NVA);
 
         return new SearchResponse<Person>(id)
-            .withContext(PERSON_QUERY_CONTEXT)
-            .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
-            .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
-            .withHits(persons);
+                .withContext(PERSON_QUERY_CONTEXT)
+                .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
+                .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
+                .withHits(persons);
     }
 
     /**
      * Create a list of CristinPersons from Cristin response.
+     *
      * @param response from Cristin API
      * @return List of valid CristinPersons from Response
      * @throws ApiGatewayException when transformation from response fails
      */
     public List<CristinPerson> getEnrichedPersonsUsingQueryResponse(HttpResponse<String> response)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         List<CristinPerson> personsFromQuery = asList(getDeserializedResponse(response, CristinPerson[].class));
         List<URI> cristinUris = extractCristinUrisFromPersons(personsFromQuery);
@@ -95,19 +97,19 @@ public class CristinPersonApiClient extends ApiClient {
         List<CristinPerson> enrichedCristinPersons = mapResponsesToCristinPersons(individualResponses);
 
         return allPersonsWereEnriched(personsFromQuery, enrichedCristinPersons)
-            ? enrichedCristinPersons
-            : combineResultsWithQueryInCaseEnrichmentFails(personsFromQuery, enrichedCristinPersons);
+                ? enrichedCristinPersons
+                : combineResultsWithQueryInCaseEnrichmentFails(personsFromQuery, enrichedCristinPersons);
     }
 
     protected List<CristinPerson> combineResultsWithQueryInCaseEnrichmentFails(List<CristinPerson> personsFromQuery,
                                                                                List<CristinPerson> enrichedPersons) {
         Set<String> enrichedPersonIds = enrichedPersons.stream()
-            .map(CristinPerson::getCristinPersonId)
-            .collect(Collectors.toSet());
+                .map(CristinPerson::getCristinPersonId)
+                .collect(Collectors.toSet());
 
         List<CristinPerson> missingPersons = personsFromQuery.stream()
-            .filter(queryPerson -> !enrichedPersonIds.contains(queryPerson.getCristinPersonId()))
-            .collect(Collectors.toList());
+                .filter(queryPerson -> !enrichedPersonIds.contains(queryPerson.getCristinPersonId()))
+                .collect(Collectors.toList());
 
         ArrayList<CristinPerson> result = new ArrayList<>();
         result.addAll(enrichedPersons);
@@ -117,6 +119,7 @@ public class CristinPersonApiClient extends ApiClient {
 
     /**
      * Perform a query for Persons matching criteria in parameters.
+     *
      * @param parameters containing search criteria for Cristin Person API
      * @return HttpResponse containing CristinPersons matching search criteria in parameters
      * @throws ApiGatewayException request fails or contains errors
@@ -131,25 +134,29 @@ public class CristinPersonApiClient extends ApiClient {
     }
 
     protected URI generateQueryPersonsUrl(Map<String, String> parameters) {
-        return new CristinPersonQuery()
-            .withFromPage(parameters.get(PAGE))
-            .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
-            .withName(parameters.get(QUERY)).toURI();
+        CristinPersonQuery cristinPersonQuery = new CristinPersonQuery()
+                .withFromPage(parameters.get(PAGE))
+                .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
+                .withName(parameters.get(NAME));
+        if (parameters.containsKey(ORGANIZATION)) {
+            cristinPersonQuery = cristinPersonQuery.withOrganization(parameters.get(ORGANIZATION));
+        }
+        return cristinPersonQuery.toURI();
     }
 
     private List<URI> extractCristinUrisFromPersons(List<CristinPerson> personsFromQuery) {
         return personsFromQuery.stream()
-            .map(CristinPerson::getCristinPersonId)
-            .map(CristinPersonQuery::fromId)
-            .collect(Collectors.toList());
+                .map(CristinPerson::getCristinPersonId)
+                .map(CristinPersonQuery::fromId)
+                .collect(Collectors.toList());
     }
 
     private List<CristinPerson> mapResponsesToCristinPersons(List<HttpResponse<String>> responses) {
         return responses.stream()
-            .map(attempt(response -> getDeserializedResponse(response, CristinPerson.class)))
-            .map(Try::orElseThrow)
-            //.filter(CristinPerson::hasValidContent) // TODO: What is minimum data needed for a Cristin Person?
-            .collect(Collectors.toList());
+                .map(attempt(response -> getDeserializedResponse(response, CristinPerson.class)))
+                .map(Try::orElseThrow)
+                //.filter(CristinPerson::hasValidContent) // TODO: What is minimum data needed for a Cristin Person?
+                .collect(Collectors.toList());
     }
 
     private boolean allPersonsWereEnriched(List<CristinPerson> personsFromQuery,
@@ -157,7 +164,7 @@ public class CristinPersonApiClient extends ApiClient {
         return personsFromQuery.size() == enrichedCristinPersons.size();
     }
 
-    private List<Person> mapCristinPersonsToNvaPersons(List<CristinPerson> cristinPersons) {
+    public List<Person> mapCristinPersonsToNvaPersons(List<CristinPerson> cristinPersons) {
         return cristinPersons.stream().map(CristinPerson::toPerson).collect(Collectors.toList());
     }
 
@@ -205,6 +212,7 @@ public class CristinPersonApiClient extends ApiClient {
 
     /**
      * Perform a query for Person matching National Identification Number in request body.
+     *
      * @param nationalIdentificationNumber National Identification Number uniquely identifying person
      * @return Person object with person data from upstream
      * @throws ApiGatewayException when request fails at some point
@@ -235,7 +243,7 @@ public class CristinPersonApiClient extends ApiClient {
     }
 
     protected CristinPerson enrichFirstMatchFromQueryResponse(List<CristinPerson> cristinPersons)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
         URI fetchUri = extractFirstUriFromListOfCristinPersons(cristinPersons);
         HttpResponse<String> fetchResponse = fetchGetResult(fetchUri);
@@ -246,8 +254,8 @@ public class CristinPersonApiClient extends ApiClient {
 
     private URI extractFirstUriFromListOfCristinPersons(List<CristinPerson> cristinPersons) {
         return cristinPersons.stream().findFirst()
-            .map(CristinPerson::getCristinPersonId)
-            .map(CristinPersonQuery::fromId).orElseThrow();
+                .map(CristinPerson::getCristinPersonId)
+                .map(CristinPersonQuery::fromId).orElseThrow();
     }
 
     private URI idUriForIdentityNumber() {

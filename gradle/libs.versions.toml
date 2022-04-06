@@ -1,6 +1,6 @@
 [versions]
 junit = {strictly = '5.8.2'}
-nva-commons = {strictly = '1.16.30'}
+nva-commons = {strictly = '1.21.0-alpha12'}
 jackson = {strictly = '2.13.0'}
 mockito = {strictly = '4.1.0'}
 hamcrest = {strictly = '2.2'}
@@ -16,8 +16,10 @@ log4jApi = { strictly = '2.17.1' }
 slf4j = { strictly = '1.8.0-beta4' }
 nva-language = { strictly = '1.0' }
 awsSdk = { strictly = '1.12.129' }
+awsSdk2 = { strictly = '2.17.152' }
 bekkopen-nocommons = { strictly = '0.12.0' }
-
+com-auth0-jwt = { strictly = '3.18.3' }
+com-auth0-jwks = { strictly = '0.20.2' }
 [libraries]
 
 #Test
@@ -30,6 +32,9 @@ mockito-core = { group = 'org.mockito', name = 'mockito-core', version.ref = 'mo
 hamcrest = { group = 'org.hamcrest', name = 'hamcrest', version.ref = 'hamcrest' }
 nva-testutils = { group = 'com.github.bibsysdev', name = 'nvatestutils', version.ref = 'nva-commons' }
 nva-logutils = { group = 'com.github.bibsysdev', name = 'logutils', version.ref = 'nva-commons' }
+nva-json = { group = 'com.github.bibsysdev', name = 'json', version.ref = 'nva-commons' }
+nva-core = { group = 'com.github.bibsysdev', name = 'core', version.ref = 'nva-commons' }
+
 zalando = { group = 'org.zalando', name = 'problem', version.ref = 'zalando' }
 karate-core = { group = 'com.intuit.karate', name = 'karate-core', version.ref = 'karate-core'}
 karate-apache = { group = 'com.intuit.karate', name = 'karate-apache', version.ref = 'karate-apache'}
@@ -56,13 +61,18 @@ aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core',
 google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'google-guava' }
 
 aws-sdk-core = { group = 'com.amazonaws', name = 'aws-java-sdk-core', version.ref = 'awsSdk' }
-aws-sdk-secrets = { group = 'com.amazonaws', name = 'aws-java-sdk-secretsmanager', version.ref = 'awsSdk' }
-aws-sdk-cognitoidp = { group ='com.amazonaws', name = 'aws-java-sdk-cognitoidp', version.ref ='awsSdk' }
+aws-sdk2-core = { group = 'software.amazon.awssdk', name = 'sdk-core', version.ref = 'awsSdk2' }
+aws-sdk2-secrets = { group = 'software.amazon.awssdk', name = 'secretsmanager', version.ref = 'awsSdk2' }
+aws-sdk2-cognitoidp = { group = 'software.amazon.awssdk', name = 'cognitoidentityprovider', version.ref = 'awsSdk2' }
+
 
 log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4jApi' }
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
 
 bekkopen-nocommons = { group = 'no.bekk.bekkopen', name =  'nocommons', version.ref =  'bekkopen-nocommons' }
+
+com-auth0-jwt = { group = 'com.auth0', name =  'java-jwt', version.ref = 'com-auth0-jwt' }
+com-auth0-jwks = { group = 'com.auth0', name =  'jwks-rsa', version.ref= 'com-auth0-jwks' }
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']

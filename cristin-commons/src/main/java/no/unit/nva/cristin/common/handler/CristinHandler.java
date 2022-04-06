@@ -1,17 +1,19 @@
 package no.unit.nva.cristin.common.handler;
 
-import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_LANGUAGE_INVALID;
-import static nva.commons.core.attempt.Try.attempt;
 import com.google.common.net.MediaType;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
+import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static nva.commons.core.attempt.Try.attempt;
 
 public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
 
@@ -28,13 +30,13 @@ public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
     }
 
     protected static String getValidLanguage(RequestInfo requestInfo) throws BadRequestException {
-        return Optional.of(getQueryParam(requestInfo, LANGUAGE)
+        return Optional.of(getQueryParameter(requestInfo, LANGUAGE)
             .orElse(DEFAULT_LANGUAGE_CODE))
             .filter(VALID_LANGUAGE_CODES::contains)
-            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_LANGUAGE_INVALID));
+            .orElseThrow(() -> new BadRequestException(String.format(ERROR_MESSAGE_INVALID_VALUE, LANGUAGE)));
     }
 
-    protected static Optional<String> getQueryParam(RequestInfo requestInfo, String queryParameter) {
+    protected static Optional<String> getQueryParameter(RequestInfo requestInfo, String queryParameter) {
         return attempt(() -> requestInfo.getQueryParameter(queryParameter)).toOptional();
     }
 

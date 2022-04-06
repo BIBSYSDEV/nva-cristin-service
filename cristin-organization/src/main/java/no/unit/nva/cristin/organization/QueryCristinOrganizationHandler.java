@@ -16,7 +16,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.FULL;
+import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.TOP;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
@@ -27,7 +29,7 @@ import static nva.commons.core.attempt.Try.attempt;
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
 
     private final transient CristinOrganizationApiClient cristinApiClient;
-    private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH);
+    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH);
 
 
     @JacocoGenerated
@@ -44,7 +46,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     protected SearchResponse<Organization> processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 
-        validateQueryParamKeys(requestInfo);
+        validateQueryParameterKeys(requestInfo);
         Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
         requestQueryParams.put(QUERY, getValidQuery(requestInfo));
         requestQueryParams.put(DEPTH, getValidDepth(requestInfo));
@@ -54,9 +56,9 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     }
 
     @Override
-    protected void validateQueryParamKeys(RequestInfo requestInfo) throws BadRequestException {
-        if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH);
+    protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
+        if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
+            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
         }
     }
 
@@ -65,7 +67,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         return HttpURLConnection.HTTP_OK;
     }
 
-    private String getValidDepth(RequestInfo requestInfo) throws BadRequestException {
+    protected static String getValidDepth(RequestInfo requestInfo) throws BadRequestException {
         if (isValidDepth(requestInfo)) {
             return requestInfo.getQueryParameters().containsKey(DEPTH)
                     ? requestInfo.getQueryParameter(DEPTH)
@@ -75,10 +77,10 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         }
     }
 
-    private boolean isValidDepth(RequestInfo requestInfo) throws BadRequestException {
+    private static boolean isValidDepth(RequestInfo requestInfo) throws BadRequestException {
         return !requestInfo.getQueryParameters().containsKey(DEPTH)
                 || requestInfo.getQueryParameters().containsKey(DEPTH)
-                && Set.of(TOP, FULL).contains(requestInfo.getQueryParameter(DEPTH));
+                && Set.of(TOP, FULL, NONE).contains(requestInfo.getQueryParameter(DEPTH));
     }
 
 

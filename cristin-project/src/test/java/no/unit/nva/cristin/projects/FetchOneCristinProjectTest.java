@@ -37,9 +37,9 @@ import static java.util.Map.of;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
@@ -73,7 +73,8 @@ public class FetchOneCristinProjectTest {
     private static final String DEFAULT_ID = "9999";
     private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
     private static final String ENGLISH_LANGUAGE = "en";
-    private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI = "https://api.cristin-test.uio.no/v2/projects/9999?lang=en";
+    private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI =
+            "https://api.cristin-test.uio.no/v2/projects/9999?lang=en";
     private static final String DEFAULT_ACCEPT_HEADER = "*/*";
     public static final String FIELD_STATUS = "status";
     public static final String NOT_LEGAL_STATUS = "not_legal_status";
@@ -316,7 +317,8 @@ public class FetchOneCristinProjectTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(body.getDetail(), containsString(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_LOOKUP));
+        assertThat(body.getDetail(), containsString(
+                validQueryParameterNamesMessage(FetchOneCristinProject.VALID_QUERY_PARAMETERS)));
     }
 
     @Test

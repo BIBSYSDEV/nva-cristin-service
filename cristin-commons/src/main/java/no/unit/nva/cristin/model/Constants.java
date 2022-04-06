@@ -2,9 +2,9 @@ package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
+import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.core.Environment;
-import nva.commons.core.JsonUtils;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -50,7 +50,13 @@ public class Constants {
     public static final Pattern ORCID_PATTERN = Pattern.compile("[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9|Xx]");
     public static final String TOP = "top";
     public static final String FULL = "full";
+    public static final String NONE = "none";
     public static final String PERSON_ID = "id";
+    public static final String PERSONS_PATH = "persons";
+    public static final String CRISTIN_QUERY_NAME_PARAM = "name";
+    public static final String UNIT_ID = "id";
+    public static final String EMPLOYMENT_ID = "employmentId";
+    public static final String ORG_ID = "orgId";
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,

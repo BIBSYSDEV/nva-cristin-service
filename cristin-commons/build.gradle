@@ -1,18 +1,20 @@
 dependencies {
-    implementation libs.nva.logutils
+    implementation libs.nva.json
+    implementation libs.nva.core
+
     implementation libs.google.guava
     implementation libs.aws.lambda.java.core
     implementation libs.nva.secrets
     implementation libs.nva.lambdaauthorizer
-    implementation libs.aws.sdk.core
-    implementation libs.aws.sdk.secrets
-    implementation libs.aws.sdk.core
-    implementation libs.aws.sdk.cognitoidp
+    implementation libs.aws.sdk2.core
+    implementation libs.aws.sdk2.secrets
 
-    testImplementation libs.karate.core
-    testImplementation libs.karate.junit5
+    implementation libs.aws.sdk2.cognitoidp
+    implementation libs.com.auth0.jwt
+    implementation libs.com.auth0.jwks
+
+
 }
-
 tasks.named('test') {
     useJUnitPlatform {
         excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
@@ -24,12 +26,4 @@ tasks.named('test') {
     finalizedBy jacocoTestReport
 }
 
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
-}
 

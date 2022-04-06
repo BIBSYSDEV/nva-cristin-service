@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.model;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
@@ -25,6 +26,13 @@ public class CristinUnit {
     private String cristinUnitId;
     private Map<String, String> unitName;
     private String url;
+
+    public CristinUnit() {
+    }
+
+    public CristinUnit(String identifier) {
+        this.cristinUnitId = identifier;
+    }
 
     public String getCristinUnitId() {
         return cristinUnitId;
@@ -84,7 +92,7 @@ public class CristinUnit {
     }
 
     public static boolean isCristinUnitIdentifier(String identifier) {
-        return CRISTIN_UNIT_IDENTIFIER.matcher(identifier).matches();
+        return nonNull(identifier) && CRISTIN_UNIT_IDENTIFIER.matcher(identifier).matches();
     }
 }
 

@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
+import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
@@ -13,7 +14,6 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
-import nva.commons.core.JsonUtils;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
@@ -38,14 +38,16 @@ import static com.google.common.net.MediaType.JSON_UTF_8;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Collections.emptyList;
+import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_DEPTH_INVALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -66,7 +68,7 @@ class QueryCristinOrganizationHandlerTest {
     private Context context;
 
     @BeforeEach
-    void setUp() throws NotFoundException, FailedHttpRequestException, InterruptedException {
+    void setUp() throws NotFoundException, FailedHttpRequestException {
         context = mock(Context.class);
         CristinOrganizationApiClient cristinApiClient = mock(CristinOrganizationApiClient.class);
         when(cristinApiClient.queryOrganizations(any())).thenReturn(emptySearchResponse());
@@ -89,17 +91,18 @@ class QueryCristinOrganizationHandlerTest {
     void shouldReturnBadRequestResponseOnMissingQueryParam() throws IOException {
         InputStream inputStream = generateHandlerRequestWithMissingQueryParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(ERROR_MESSAGE_QUERY_MISSING_OR_HAS_ILLEGAL_CHARACTERS));
+        assertThat(actualDetail, containsString(invalidQueryParametersMessage(
+                QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
     @Test
     void shouldReturnEmptyResponseOnStrangeQuery() throws IOException {
         InputStream inputStream = generateHandlerRequestWithStrangeQueryParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         SearchResponse<Organization> actual = gatewayResponse.getBodyObject(SearchResponse.class);
         assertEquals(0, actual.getHits().size());
@@ -108,7 +111,7 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseOnQuery() throws IOException, ApiGatewayException, InterruptedException {
+    void shouldReturnResponseOnQuery() throws IOException, ApiGatewayException {
 
         HttpClient httpClient = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
@@ -139,7 +142,7 @@ class QueryCristinOrganizationHandlerTest {
                 .withQueryParameters(Map.of("query", "Department of Medical Biochemistry","depth","full"))
                 .build();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
         SearchResponse<Organization> actual = gatewayResponse.getBodyObject(SearchResponse.class);
         assertEquals(2, actual.getHits().size());
@@ -151,7 +154,7 @@ class QueryCristinOrganizationHandlerTest {
     void shouldReturnBadRequestOnIllegalDepth() throws IOException {
         InputStream inputStream = generateHandlerRequestWithIllegalDepthParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(ERROR_MESSAGE_DEPTH_INVALID));

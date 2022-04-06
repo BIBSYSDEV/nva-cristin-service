@@ -1,0 +1,7 @@
+{
+  "type": "https://api.dev.nva.aws.unit.no/position#1087",
+  "organization": "https://api.dev.nva.aws.unit.no/organization/185.90.0.0",
+  "startDate": "2020-01-01T00:00:00.000Z",
+  "endDate": "2022-01-01T00:00:00.000Z",
+  "fullTimeEquivalentPercentage": 80.0
+}

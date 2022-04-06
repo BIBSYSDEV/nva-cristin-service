@@ -18,6 +18,9 @@ Globals:
         CRISTIN_API_URL: !Ref CristinApiUrl
         DOMAIN_NAME: !Ref ApiDomain
         BASE_PATH: !Ref CustomDomainBasePath
+        COGNITO_URI: !Ref CognitoAuthorizationUri
+        COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
+        COGNITO_CLIENT_APP_ID: !Ref CognitoUserPoolAppClientId
   Api:
     Cors:
       AllowOrigin: "'*'"
@@ -25,6 +28,9 @@ Globals:
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Parameters:
+  CognitoAuthorizationUri:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: '/NVA/CognitoUri'
   CognitoAuthorizerArn:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Description: Reference to Cognito UserPool for the stage
@@ -44,6 +50,15 @@ Parameters:
     AllowedValues:
       - https://api.cristin-test.uio.no/v2
       - https://api.cristin.no/v2
+  CognitoUserPoolId:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Cognito UserPoolId for the stage
+    Default: CognitoUserPoolId
+  CognitoUserPoolAppClientId:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Cognito UserPool AppClientId for the stage
+    Default: CognitoUserPoolAppClientId
+
 Resources:
 
   ApiAccessLogGroup:
@@ -65,20 +80,6 @@ Resources:
         DefaultAuthorizer: NONE
       EndpointConfiguration: Regional
 
-  NvaCristinProxyInternalApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      DefinitionBody:
-        'Fn::Transform':
-          Name: AWS::Include
-          Parameters:
-            Location: ./docs/cristin-proxy-internal-apidoc.yaml
-      AccessLogSetting:
-        DestinationArn: !GetAtt ApiAccessLogGroup.Arn
-        Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
-      StageName: Prod
-
-      EndpointConfiguration: Regional
 
 
   ReadCristinAuthenticationRole:
@@ -173,12 +174,16 @@ Resources:
               - method.request.querystring.query
               - method.request.querystring.page
               - method.request.querystring.results
-
-  NvaCristinFetchOrganizationFunction:
+              - method.request.querystring.depth
+  NvaCristinFetchOrganization:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-organization
       Handler: no.unit.nva.cristin.organization.FetchCristinOrganizationHandler::handleRequest
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Enabled: true
+        Type: AllAtOnce
       Events:
         NvaCristinOneProjectEvent:
           Type: Api
@@ -186,6 +191,46 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /organization/{id}
             Method: get
+            RequestParameters:
+              - method.request.querystring.depth
+
+  NvaCristinFetchOrganizationTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 10
+      MinCapacity: 1
+      ResourceId: !Sub function:${NvaCristinFetchOrganization}:live
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lambda.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_LambdaConcurrency
+      ScalableDimension: lambda:function:ProvisionedConcurrency
+      ServiceNamespace: lambda
+    DependsOn: NvaCristinFetchOrganizationAliaslive
+
+  NvaCristinFetchOrganizationScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: NvaCristinFetchOrganizationScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref NvaCristinFetchOrganizationTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 0.70
+        PredefinedMetricSpecification:
+          PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
+
+  NvaCristinListOrganizationPersonsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler::handleRequest
+      Events:
+        NvaListOrganizationPersonsEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /organization/{id}/persons
+            Method: get
+            RequestParameters:
+              - method.request.querystring.page
+              - method.request.querystring.results
 
   NvaCristinQueryPersonFunction:
     Type: AWS::Serverless::Function
@@ -200,7 +245,8 @@ Resources:
             Path: /person/
             Method: get
             RequestParameters:
-              - method.request.querystring.query
+              - method.request.querystring.name
+              - method.request.querystring.organization
               - method.request.querystring.page
               - method.request.querystring.results
 
@@ -233,12 +279,6 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
-            Path: /person/identityNumber/
-            Method: post
-        NvaCristinFetchPersonUsingInternalRequest:
-          Type: Api
-          Properties:
-            RestApiId: !Ref NvaCristinProxyInternalApi
             Path: /person/identityNumber/
             Method: post
 
@@ -284,7 +324,7 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.update.UpdateCristinPersonHandler::handleRequest
-      #Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinUpdatePersonEvent:
           Type: Api
@@ -306,6 +346,7 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/{id}/organization/{orgId}/
             Method: get
+
 
   NvaCristinUpdatePersonInstitutionInfoFunction:
     Type: AWS::Serverless::Function
@@ -339,8 +380,6 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.employment.query.QueryPersonEmploymentHandler::handleRequest
-
-
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinQueryPersonEmploymentEvent:
@@ -350,6 +389,48 @@ Resources:
             Path: /person/{id}/employment/
             Method: get
 
+  NvaCristinCreatePersonEmploymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.employment.create.CreatePersonEmploymentHandler::handleRequest
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinCreatePersonEmploymentEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}/employment/
+            Method: post
+
+  NvaCristinDeletePersonEmploymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.employment.delete.DeletePersonEmploymentHandler::handleRequest
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinDeletePersonEmploymentEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}/employment/{employmentId}
+            Method: delete
+
+  NvaCristinUpdatePersonEmploymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.employment.update.UpdatePersonEmploymentHandler::handleRequest
+      #Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinUpdatePersonEmploymentEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}/employment/{employmentId}/
+            Method: patch
+
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
@@ -357,14 +438,6 @@ Resources:
       DomainName: !Ref ApiDomain
       RestApiId: !Ref NvaCristinProxyApi
       Stage: !Ref NvaCristinProxyApi.Stage
-
-  InternalBasePathMapping:
-    Type: AWS::ApiGateway::BasePathMapping
-    Properties:
-      BasePath: !Sub '${CustomDomainBasePath}-internal'
-      DomainName: !Ref ApiDomain
-      RestApiId:  !Ref NvaCristinProxyInternalApi
-      Stage: !Ref NvaCristinProxyInternalApi.Stage
 
 
 

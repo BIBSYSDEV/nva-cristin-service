@@ -46,6 +46,25 @@ paths:
             type: string
             pattern: '.+'
           example: 'Helse'
+        - name: organization
+          in: query
+          description: Search projects by organization id.
+          required: false
+          schema:
+            type: string
+            pattern: '.+'
+          example: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+        - name: status
+          in: query
+          description: Search for project with status
+          required: false
+          schema:
+            type: string
+            enum:
+            - ACTIVE
+            - CONCLUDED
+            - NOTSTARTED
+            example: 'active'
         - name: language
           in: query
           description: Preferred language for some fields
@@ -103,7 +122,7 @@ paths:
       description: Create and persist project in Cristin
       operationId: CreateProject
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: [ 'https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend' ]
       requestBody:
         description: Payload containing valid project data
         required: true
@@ -273,7 +292,7 @@ paths:
     get:
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchOrganizationFunction.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchOrganization.Arn}:live/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
@@ -290,6 +309,14 @@ paths:
             type: string
             pattern: '^(?:[0-9]+\.){3}[0-9]{1,3}$'
             example: '20202.0.0.0'
+        - name: depth
+          in: query
+          description: Depth of sub-organizations included in response
+          required: false
+          schema:
+            type: string
+            enum:
+              - none
       responses:
         200:
           description: successful operation
@@ -314,6 +341,69 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+
+  /organization/{identifier}/persons:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListOrganizationPersonsFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Organization
+      summary: Fetch Persons associated with an given organization
+      description: Returns a list of persons belonging to specified organization
+      operationId: GetPersonsByOrganization
+      parameters:
+        - name: identifier
+          in: path
+          description: Identifier of Organization to return
+          required: true
+          schema:
+            type: string
+            pattern: '^(?:[0-9]+\.){3}[0-9]{1,3}$'
+            example: '20202.0.0.0'
+        - name: page
+          in: query
+          description: Current page requested
+          required: false
+          schema:
+            type: number
+            default: '1'
+          example: '3'
+        - name: results
+          in: query
+          description: Results per page
+          required: false
+          schema:
+            type: number
+            default: '5'
+          example: '10'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationPersons'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/OrganizationPersonsExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/OrganizationPersons'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/OrganizationPersonsExample'
+        400:
+          $ref: '#/components/responses/400'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+
   /person:
     get:
       x-amazon-apigateway-integration:
@@ -323,11 +413,11 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Person
-      summary: List persons matching query
+      summary: List persons matching query parameters
       description: Returns a list of persons based on query parameters
       operationId: ListPersons
       parameters:
-        - name: query
+        - name: name
           in: query
           description: Search string. First name and/or last name
           required: true
@@ -335,6 +425,14 @@ paths:
             type: string
             pattern: '.+'
           example: 'Ola Nordmann'
+        - name: organization
+          in: query
+          description: Search string. Parts of organization name or identifier
+          required: false
+          schema:
+            type: string
+            pattern: '.+'
+          example: 'Universitetet i Tromsø'
         - name: page
           in: query
           description: Current page requested
@@ -385,7 +483,7 @@ paths:
       description: Creates one person matching supplied payload
       operationId: PostPerson
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       requestBody:
         description: Payload containing names and identifier
         required: true
@@ -449,8 +547,6 @@ paths:
       summary: Find person by identifier
       description: Returns a single person matching id parameter
       operationId: GetPersonById
-      security:
-        - CognitoUserPool: [ ]
       responses:
         200:
           description: successful operation
@@ -469,6 +565,8 @@ paths:
                   $ref: '#/components/examples/PersonExample'
         400:
           $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
         404:
           $ref: '#/components/responses/404'
         500:
@@ -487,9 +585,9 @@ paths:
       description: Updates person data
       operationId: UpdatePerson
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: [ 'https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend' ]
       requestBody:
-        description: Payload containing one or more fields. Fields except reserved, FirstName and LastName can be set to null to erase content
+        description: Payload containing modifiable data for person
         required: true
         content:
           application/json:
@@ -539,7 +637,7 @@ paths:
       description: Returns a single person matching nin query parameter
       operationId: GetPersonByNIN
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       requestBody:
         required: true
         content:
@@ -607,7 +705,7 @@ paths:
       description: Returns person information at organization matching identifier parameters
       operationId: GetPersonOrganizationInfoByIdentifiers
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       responses:
         200:
           description: successful operation
@@ -648,7 +746,7 @@ paths:
       description: Updates person email and phone information at given organization
       operationId: UpdatePersonInstitutionInfo
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       requestBody:
         description: Payload containing one or more optional fields email and phone. Fields can be set to null to erase content
         required: true
@@ -709,7 +807,7 @@ paths:
       description: Returns all person employments
       operationId: GetPersonEmploymentsByIdentifier
       security:
-        - CognitoUserPool: [ ]
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
       responses:
         200:
           description: successful operation
@@ -738,6 +836,150 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinCreatePersonEmploymentFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Create one person employment
+      description: Creates one person employment matching supplied payload
+      operationId: PostPersonEmployment
+      security:
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
+      requestBody:
+        description: Payload containing employment information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonEmployment'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonEmploymentExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/PersonEmployment'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonEmploymentExample'
+      responses:
+        201:
+          description: Successful creation of resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonEmployment'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonEmploymentExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PersonEmployment'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonEmploymentExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+  /person/{id}/employment/{employmentId}:
+    parameters:
+      - name: id
+        in: path
+        description: Identifier of Person
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]+$'
+        example: '359084'
+      - name: employmentId
+        in: path
+        description: Identifier of employment
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]+$'
+        example: '49272'
+    delete:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinDeletePersonEmploymentFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Delete person employment by identifier
+      description: Delete person employment by identifier
+      operationId: DeletePersonEmploymentsByIdentifier
+      security:
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
+      responses:
+        204:
+          description: successful operation
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+    patch:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinUpdatePersonEmploymentFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Update person employment by identifiers
+      description: Updates person employment data
+      operationId: UpdatePersonEmployment
+      security:
+        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend']
+      requestBody:
+        description: Payload containing modifiable data for person employment
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonEmployment'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonEmploymentExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/PersonEmployment'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/PersonEmploymentExample'
+      responses:
+        204:
+          description: Successful update of resource
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+
   /position:
     get:
       x-amazon-apigateway-integration:
@@ -745,8 +987,8 @@ paths:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPositionFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
-        tags:
-          - Position
+      tags:
+        - Position
       summary: Fetch position codes
       description: Returns postion codes for affiliations
       operationId: GetPositionCodes
@@ -1298,26 +1540,25 @@ components:
                 type: string
                 pattern: '.+'
                 description: Value of identifier
-    PersonPatch: # Depends on future datamodel
+    PersonPatch:
       type: object
       properties:
-        names:
-          type: array
-          description: Names for this person.
-          items:
-            type: object
-            properties:
-              type:
-                type: string
-                pattern: 'PreferredFirstName|PreferredLastName|FirstName|LastName'
-                description: Name of identifier
-              value:
-                type: string
-                pattern: '.+'
-                description: Value of identifier
+        orcid:
+          type: string
+          nullable: true
+        firstName:
+          type: string
+        lastName:
+          type: string
+        preferredFirstName:
+          type: string
+          nullable: true
+        preferredLastName:
+          type: string
+          nullable: true
         reserved:
           type: boolean
-          description: If person should hidden from public view
+          description: If person should be hidden from public view
     PersonNIN:
       type: object
       properties:
@@ -1402,6 +1643,39 @@ components:
         identifier:
           type: string
           description: Person identifier
+    OrganizationPersons:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of persons returned by the query
+          items:
+            $ref: '#/components/schemas/Person'
+
 
   examples:
     ProjectsExample:
@@ -1588,12 +1862,12 @@ components:
     PersonsExample:
       value:
         '@context': 'https://example.org/person-search-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?query=Ola+Nordmann&page=1&results=5'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?name=Ola+Nordmann&page=1&results=5'
         size: 150
-        searchString: 'query=Ola+Nordmann&page=1&results=5'
+        searchString: 'name=Ola+Nordmann&page=1&results=5'
         processingTime: 800
         firstRecord: 1
-        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?query=Ola+Nordmann&page=2&results=5'
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?name=Ola+Nordmann&page=2&results=5'
         previousResults: ''
         hits:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
@@ -1700,16 +1974,10 @@ components:
                 nb: 'Overingeniør'
     PersonPatchExample:
       value:
-        names:
-          - type: 'PreferredFirstName'
-            value: 'Ola'
-          - type: 'PreferredLastName'
-            value: 'Nordmann'
-          - type: 'FirstName'
-            value: 'Kjell Ola'
-          - type: 'LastName'
-            value: 'Nordmann'
-        reserved: false
+        orcid: '1234-1234-1234-1234'
+        firstName: 'Kjell'
+        lastName: 'Hansen'
+        preferredFirstName: 'null'
     PersonPostExample:
       value:
         identifiers:
@@ -1770,6 +2038,78 @@ components:
     PersonEmploymentExample:
       value:
         identifier: '359084'
+
+    OrganizationPersonsExample:
+      value:
+        '@context': 'https://example.org/person-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0/persons?page=1&results=5'
+        size: 150
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0/persons?page=2&results=5'
+        previousResults: ''
+        hits:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
+            type: 'Person'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '359084'
+              - type: 'ORCID'
+                value: '1234-1234-1234-1234'
+            names:
+              - type: 'PreferredFirstName'
+                value: 'Ola'
+              - type: 'PreferredLastName'
+                value: 'Nordmann'
+              - type: 'FirstName'
+                value: 'Kjell Ola'
+              - type: 'LastName'
+                value: 'Nordmann'
+            contactDetails:
+              telephone: '+4799885566'
+            image: 'https://api.cristin.no/v2/persons/359084/picture'
+            affiliations:
+              - type: 'Affiliation'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+                active: true
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Researcher'
+                    nb: 'Forsker'
+                    nn: 'Forskar'
+              - type: 'Affiliation'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+                active: true
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Head Engineer'
+                    nb: 'Overingeniør'
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
+            type: 'Person'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '567987'
+            names:
+              - type: 'FirstName'
+                value: 'Kjetil'
+              - type: 'LastName'
+                value: 'Nordmann'
+            contactDetails:
+              telephone: '+4744335566'
+            affiliations:
+              - type: 'Affiliation'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+                active: true
+                role:
+                  id: 'https://example.org/link/to/ontology#1026'
+                  type: 'Role'
+                  labels:
+                    en: 'Consultant'
+
   securitySchemes:
     CognitoUserPool:
       type: apiKey

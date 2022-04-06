@@ -1,7 +1,6 @@
 package no.unit.nva.cristin.person.institution.fetch;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.institution.common.PersonInstitutionInfoHandler;
 import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
@@ -10,6 +9,11 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+
+import java.net.HttpURLConnection;
+
+import static no.unit.nva.cristin.common.Utils.getValidOrgId;
+import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 
 public class FetchPersonInstitutionInfoHandler extends PersonInstitutionInfoHandler<Void, PersonInstitutionInfo> {
 

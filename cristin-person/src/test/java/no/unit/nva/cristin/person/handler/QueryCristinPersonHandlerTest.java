@@ -35,7 +35,7 @@ import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.exception.GatewayTimeoutException.ERROR_MESSAGE_GATEWAY_TIMEOUT;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -55,17 +55,17 @@ import static org.mockito.Mockito.when;
 public class QueryCristinPersonHandlerTest {
 
     private static final String RANDOM_NAME = "John Smith";
-    private static final String RANDOM_NAME_WITH_SQL = "John Smith '';DROP DATABASE (DB Name) --' and password=''";
     private static final String NVA_API_QUERY_PERSON_JSON =
-            "nvaApiQueryPersonResponse.json";
+        "nvaApiQueryPersonResponse.json";
     private static final String PROBLEM_JSON = APPLICATION_PROBLEM_JSON.toString();
     private static final String ZERO_VALUE = "0";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String EXPECTED_CRISTIN_URI_WITH_PARAMS =
-            "https://api.cristin-test.uio.no/v2/persons?per_page=5&name=John+Smith&page=1&lang=en,nb,nn";
-    private final Environment environment = new Environment();
+        "https://api.cristin-test.uio.no/v2/persons?per_page=5&name=John+Smith&page=1&lang=en,nb,nn";
+
     private CristinPersonApiClient apiClient;
+    private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
     private QueryCristinPersonHandler handler;
@@ -85,10 +85,8 @@ public class QueryCristinPersonHandlerTest {
         SearchResponse<Person> expected = OBJECT_MAPPER.readValue(expectedString, SearchResponse.class);
 
         // Type casting problems when using generic types. Needed to convert. Was somehow converting to LinkedHashMap
-        List<Person> expectedPersons = OBJECT_MAPPER.convertValue(expected.getHits(), new TypeReference<>() {
-        });
-        List<Person> actualPersons = OBJECT_MAPPER.convertValue(actual.getHits(), new TypeReference<>() {
-        });
+        List<Person> expectedPersons = OBJECT_MAPPER.convertValue(expected.getHits(), new TypeReference<>() {});
+        List<Person> actualPersons = OBJECT_MAPPER.convertValue(actual.getHits(), new TypeReference<>() {});
         expected.setHits(expectedPersons);
         actual.setHits(actualPersons);
 
@@ -126,7 +124,7 @@ public class QueryCristinPersonHandlerTest {
     void shouldReturnResponseFromQueryInsteadOfEnrichedGetWhenEnrichingFails() throws IOException {
         apiClient = spy(apiClient);
         HttpResponse<String> response =
-                new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
+            new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(CompletableFuture.completedFuture(response)).when(apiClient).fetchGetResultAsync(any());
         handler = new QueryCristinPersonHandler(apiClient, environment);
         SearchResponse searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
@@ -145,7 +143,7 @@ public class QueryCristinPersonHandlerTest {
     void shouldReturnSearchResponseWithEmptyHitsWhenBackendFetchIsEmpty() throws ApiGatewayException, IOException {
         apiClient = spy(apiClient);
         doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
-                generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(apiClient).queryPersons(any());
+            generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(apiClient).queryPersons(any());
         doReturn(Collections.emptyList()).when(apiClient).fetchQueryResultsOneByOne(any());
         handler = new QueryCristinPersonHandler(apiClient, environment);
         SearchResponse<Person> searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
@@ -174,26 +172,17 @@ public class QueryCristinPersonHandlerTest {
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_GATEWAY_TIMEOUT));
     }
 
-    @Test
-    void shouldReturnBadRequestToClientWhenSQLisInjected() throws IOException {
-        InputStream input = requestWithQueryParameters(Map.of(QUERY, RANDOM_NAME_WITH_SQL));
-        handler.handleRequest(input, output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output);
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-    }
-
-
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
-        InputStream input = requestWithQueryParameters(Map.of(QUERY, RANDOM_NAME));
+        InputStream input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output);
     }
 
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-                .withBody(null)
-                .withQueryParameters(map)
-                .build();
+            .withBody(null)
+            .withQueryParameters(map)
+            .build();
     }
 
     private java.net.http.HttpHeaders generateHeaders(String totalCount, String link) {

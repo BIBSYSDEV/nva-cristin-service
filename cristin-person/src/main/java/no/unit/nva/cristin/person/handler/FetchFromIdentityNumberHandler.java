@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.handler;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
@@ -58,7 +58,7 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
 
     private void validateQueryParameters(RequestInfo requestInfo) throws BadRequestException {
         if (!requestInfo.getQueryParameters().keySet().isEmpty()) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_PERSON_LOOKUP);
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP);
         }
     }
 

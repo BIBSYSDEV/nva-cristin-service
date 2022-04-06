@@ -1,15 +1,6 @@
 package no.unit.nva.cristin.projects;
 
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH;
 import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -19,12 +10,30 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
+import java.net.HttpURLConnection;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessageWithRange;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
+import static nva.commons.core.attempt.Try.attempt;
+
 /**
  * Handler for requests to Lambda function.
  */
 public class FetchCristinProjects extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
 
-    private static final Set<String> VALID_QUERY_PARAMS = Set.of(QUERY, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
+    public static final Set<String> VALID_QUERY_PARAMETERS =
+            Set.of(QUERY, ORGANIZATION, STATUS, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
 
     private final transient CristinApiClient cristinApiClient;
 
@@ -46,22 +55,28 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
 
     @Override
     protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
+            throws ApiGatewayException {
 
-        validateQueryParamKeys(requestInfo);
+        validateQueryParameterKeys(requestInfo);
 
         String language = getValidLanguage(requestInfo);
         String query = getValidQuery(requestInfo);
         String page = getValidPage(requestInfo);
         String numberOfResults = getValidNumberOfResults(requestInfo);
+        Map<String, String> requestQueryParameters = getQueryParameters(language, query, page, numberOfResults);
+        if (requestInfo.getQueryParameters().containsKey(ORGANIZATION)) {
+            requestQueryParameters.put(ORGANIZATION, getValidOrganizationUri(requestInfo));
+        }
+        getValidProjectStatus(requestInfo).ifPresent(status -> requestQueryParameters.put(STATUS, status.name()));
+        return getTransformedCristinProjectsUsingWrapperObject(requestQueryParameters);
 
-        return getTransformedCristinProjectsUsingWrapperObject(language, query, page, numberOfResults);
+
     }
 
     @Override
-    protected void validateQueryParamKeys(RequestInfo requestInfo) throws BadRequestException {
-        if (!VALID_QUERY_PARAMS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_QUERY_PARAMS_ON_SEARCH);
+    protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
+        if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
+            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
         }
     }
 
@@ -70,19 +85,35 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
         return HttpURLConnection.HTTP_OK;
     }
 
-    private SearchResponse<NvaProject> getTransformedCristinProjectsUsingWrapperObject(String language,
-                                                                                       String query,
-                                                                                       String page,
-                                                                                       String numberOfResults)
+    private SearchResponse<NvaProject> getTransformedCristinProjectsUsingWrapperObject(
+            Map<String, String> requestQueryParameters)
             throws ApiGatewayException {
+        return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParameters);
+    }
 
-        Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
-        requestQueryParams.put(LANGUAGE, language);
-        requestQueryParams.put(QUERY, query);
-        requestQueryParams.put(PAGE, page);
-        requestQueryParams.put(NUMBER_OF_RESULTS, numberOfResults);
+    private Map<String, String> getQueryParameters(String language, String query, String page, String numberOfResults) {
+        Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
+        requestQueryParameters.put(LANGUAGE, language);
+        requestQueryParameters.put(QUERY, query);
+        requestQueryParameters.put(PAGE, page);
+        requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
+        return requestQueryParameters;
+    }
 
-        return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParams);
+    private Optional<ProjectStatus> getValidProjectStatus(RequestInfo requestInfo) throws BadRequestException {
+        return requestInfo.getQueryParameters().containsKey(STATUS)
+                ? getOptionalProjectStatus(requestInfo)
+                : Optional.empty();
+    }
+
+    private Optional<ProjectStatus> getOptionalProjectStatus(RequestInfo requestInfo) throws BadRequestException {
+        return Optional.ofNullable(
+                attempt(() -> ProjectStatus.getNvaStatus(requestInfo.getQueryParameters().get(STATUS)))
+                .orElseThrow(fail -> new BadRequestException(getInvalidStatusMessage())));
+    }
+
+    private String getInvalidStatusMessage() {
+        return invalidQueryParametersMessageWithRange(STATUS, Arrays.toString(ProjectStatus.values()));
     }
 
 }

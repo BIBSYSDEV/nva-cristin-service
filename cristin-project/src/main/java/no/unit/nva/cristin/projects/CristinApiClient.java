@@ -14,8 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +37,13 @@ import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -85,33 +90,35 @@ public class CristinApiClient extends ApiClient {
      * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
      * for serialization to the client.
      *
-     * @param requestQueryParams Request parameters from client containing title and language
+     * @param requestQueryParameters Request parameters from client containing title and language
      * @return a SearchResponse filled with transformed Cristin Projects and metadata
      * @throws ApiGatewayException if some errors happen we should return this to client
      */
     public SearchResponse<NvaProject> queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
-            Map<String, String> requestQueryParams) throws ApiGatewayException {
+            Map<String, String> requestQueryParameters) throws ApiGatewayException {
 
         long startRequestTime = System.currentTimeMillis();
-        QueryType queryType = getQueryTypeBasedOnParams(requestQueryParams);
-        HttpResponse<String> response = queryProjects(requestQueryParams, queryType);
+        QueryType queryType = getQueryTypeBasedOnParameters(requestQueryParameters);
+        HttpResponse<String> response = queryProjects(requestQueryParameters, queryType);
         List<CristinProject> cristinProjects =
-                getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
+                getEnrichedProjectsUsingQueryResponse(response, requestQueryParameters.get(LANGUAGE));
         if (cristinProjects.isEmpty() && queryType == QUERY_USING_GRANT_ID) {
-            response = queryProjects(requestQueryParams, QUERY_USING_TITLE);
-            cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParams.get(LANGUAGE));
+            response = queryProjects(requestQueryParameters, QUERY_USING_TITLE);
+            cristinProjects = getEnrichedProjectsUsingQueryResponse(response, requestQueryParameters.get(LANGUAGE));
         }
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        URI id = createIdUriFromParams(requestQueryParams, PROJECT);
+        URI id = createIdUriFromParams(rewrapOrganizationUri(requestQueryParameters), PROJECT);
 
         return new SearchResponse<NvaProject>(id)
                 .withContext(PROJECT_SEARCH_CONTEXT_URL)
-                .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
+                .usingHeadersAndQueryParams(response.headers(), requestQueryParameters)
                 .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
                 .withHits(nvaProjects);
     }
+
+
 
     protected HttpResponse<String> queryProjects(Map<String, String> parameters, QueryType queryType)
             throws ApiGatewayException {
@@ -120,7 +127,6 @@ public class CristinApiClient extends ApiClient {
                 .toOptional(failure -> logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters),
                         failure.getException()))
                 .orElseThrow();
-
         HttpResponse<String> response = fetchQueryResults(uri);
         URI id = createIdUriFromParams(parameters, PROJECT);
         checkHttpStatusCode(id, response.statusCode());
@@ -180,7 +186,7 @@ public class CristinApiClient extends ApiClient {
                 .collect(Collectors.toList());
     }
 
-    private QueryType getQueryTypeBasedOnParams(Map<String, String> requestQueryParams) {
+    private QueryType getQueryTypeBasedOnParameters(Map<String, String> requestQueryParams) {
         return Utils.isPositiveInteger(requestQueryParams.get(QUERY)) ? QUERY_USING_GRANT_ID : QUERY_USING_TITLE;
     }
 
@@ -191,9 +197,25 @@ public class CristinApiClient extends ApiClient {
                 .withLanguage(parameters.get(LANGUAGE))
                 .withFromPage(parameters.get(PAGE))
                 .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
+        if (parameters.containsKey(ORGANIZATION)) {
+            query = query.withParentUnitId(getUnitIdFromOrganization(parameters.get(ORGANIZATION)));
+        }
+
+        if (parameters.containsKey(STATUS)) {
+            query = query.withStatus(getEncodedStatusParameter(parameters));
+        }
 
         return queryType == QUERY_USING_GRANT_ID ? query.withGrantId(parameters.get(QUERY)).toURI() :
                 query.withTitle(parameters.get(QUERY)).toURI();
+    }
+
+    private String getEncodedStatusParameter(Map<String, String> parameters) {
+        return URLEncoder.encode(ProjectStatus.getNvaStatus(parameters.get(STATUS)).getCristinStatus(),
+                StandardCharsets.UTF_8);
+    }
+
+    private String getUnitIdFromOrganization(String organizationId) {
+        return extractLastPathElement(URI.create(organizationId));
     }
 
     protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {
@@ -219,5 +241,14 @@ public class CristinApiClient extends ApiClient {
                 .map(CristinProject::toNvaProject)
                 .collect(Collectors.toList());
     }
+
+    private Map<String, String> rewrapOrganizationUri(Map<String, String> requestQueryParameters) {
+        if (requestQueryParameters.containsKey(ORGANIZATION)) {
+            String organizationId = requestQueryParameters.get(ORGANIZATION);
+            requestQueryParameters.put(ORGANIZATION, URLEncoder.encode(organizationId, StandardCharsets.UTF_8));
+        }
+        return requestQueryParameters;
+    }
+
 
 }

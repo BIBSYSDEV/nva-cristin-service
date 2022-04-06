@@ -57,7 +57,7 @@ public class CristinPositionCodesClient extends ApiClient {
     }
 
     private static URI createUpstreamUri() {
-        URI uri = new UriWrapper(CRISTIN_API_URL)
+        URI uri = UriWrapper.fromUri(CRISTIN_API_URL)
             .addChild(PERSON_PATH)
             .addChild(AFFILIATIONS_POSITIONS)
             .getUri();
