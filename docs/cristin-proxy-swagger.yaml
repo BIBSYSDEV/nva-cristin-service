@@ -146,11 +146,9 @@ paths:
             application/json:
               schema:
                 type: string
-                example: '{}'
             application/ld+json:
               schema:
                 type: string
-                example: '{}'
         400:
           $ref: '#/components/responses/400'
         401:
@@ -1255,11 +1253,11 @@ components:
             $ref: '#/components/schemas/Languages'
         startDate:
           type: string
-          pattern: '.+'
+          format: date-time
           description: Project start date
         endDate:
           type: string
-          pattern: '.+'
+          format: date-time
           description: Project end date
         coordinatingInstitution:
           $ref: '#/components/schemas/Organization'
@@ -1335,12 +1333,12 @@ components:
             $ref: '#/components/schemas/Languages'
         startDate:
           type: string
-          pattern: '.+'
+          format: date-time
           description: Project start date
           example: '2012-01-09T00:00:00.001Z'
         endDate:
           type: string
-          pattern: '.+'
+          format: date-time
           description: Project end date
           example: '2018-01-09T00:00:00.001Z'
         coordinatingInstitution:
@@ -1398,12 +1396,12 @@ components:
             $ref: '#/components/schemas/Languages'
         startDate:
           type: string
-          pattern: '.+'
+          format: date-time
           description: Project start date
           example: '2012-01-09T00:00:00.001Z'
         endDate:
           type: string
-          pattern: '.+'
+          format: date-time
           description: Project end date
           example: '2018-01-09T00:00:00.001Z'
         coordinatingInstitution:
