@@ -630,7 +630,7 @@ class FetchCristinProjectsTest {
 
         handler.handleRequest(input, output, context);
 
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
         Problem body = gatewayResponse.getBodyObject(Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
@@ -650,7 +650,7 @@ class FetchCristinProjectsTest {
 
         handler.handleRequest(input, output, context);
 
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output);
+        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
     }

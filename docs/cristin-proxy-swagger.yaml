@@ -110,6 +110,56 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+    patch:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinUpdateProjectFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Project
+      summary: Update project matching identifier
+      description: Updates project data
+      operationId: UpdateProject
+      security:
+        - CognitoUserPool: [ 'https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend' ]
+      requestBody:
+        description: Payload containing modifiable data for project
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectPatch'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/ProjectPatchExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/ProjectPatch'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/ProjectPatchExample'
+      responses:
+        204:
+          description: Successful update of resource
+          content:
+            application/json:
+              schema:
+                type: string
+            application/ld+json:
+              schema:
+                type: string
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+
     post:
       x-amazon-apigateway-integration:
         uri:
@@ -1203,11 +1253,11 @@ components:
             $ref: '#/components/schemas/Languages'
         startDate:
           type: string
-          pattern: '.+'
+          format: date-time
           description: Project start date
         endDate:
           type: string
-          pattern: '.+'
+          format: date-time
           description: Project end date
         coordinatingInstitution:
           $ref: '#/components/schemas/Organization'
@@ -1283,12 +1333,75 @@ components:
             $ref: '#/components/schemas/Languages'
         startDate:
           type: string
-          pattern: '.+'
+          format: date-time
           description: Project start date
           example: '2012-01-09T00:00:00.001Z'
         endDate:
           type: string
+          format: date-time
+          description: Project end date
+          example: '2018-01-09T00:00:00.001Z'
+        coordinatingInstitution:
+          $ref: '#/components/schemas/Organization'
+        contributors:
+          type: array
+          description: List of contributors on the project
+          items:
+            type: object
+            description: One contributor
+            properties:
+              type:
+                type: string
+                enum:
+                  - ProjectManager
+                  - ProjectParticipant
+                description: Type of contributor. Can be ProjectManager or ProjectParticipant
+              identity:
+                type: object
+                properties:
+                  id:
+                    $ref: '#/components/schemas/Id'
+                  type:
+                    type: string
+                    pattern: 'Person'
+                    description: Type of identity. Always Person
+              affiliation:
+                $ref: '#/components/schemas/Organization'
+        status:
+          type: string
+          enum:
+            - NOTSTARTED
+            - ACTIVE
+            - CONCLUDED
+          description: Project status, based on start_date and end_date.
+        academicSummary:
+          $ref: '#/components/schemas/Languages'
+        popularScientificSummary:
+          $ref: '#/components/schemas/Languages'
+    ProjectPatch:
+      type: object
+      properties:
+        title:
+          type: string
           pattern: '.+'
+          description: Title of the project
+        language:
+          type: string
+          pattern: '^http:\/\/lexvo.org\/id\/iso639-3\/[a-z]{3}$'
+          description: The lexvo URI for the language of the Project
+        alternativeTitles:
+          type: array
+          description: Titles in alternative languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        startDate:
+          type: string
+          format: date-time
+          description: Project start date
+          example: '2012-01-09T00:00:00.001Z'
+        endDate:
+          type: string
+          format: date-time
           description: Project end date
           example: '2018-01-09T00:00:00.001Z'
         coordinatingInstitution:
@@ -1937,6 +2050,22 @@ components:
           en: "Summary in an academic manner"
         popularScientificSummary:
           en: "popularScientificSummary popularScientificSummary popularScientificSummary"
+    ProjectPatchExample:
+      value:
+        title: 'Updated Title'
+        alternativeTitles:
+          - 'en': 'Updated Title in english'
+        startDate: '2022-10-09T00:00:00.001Z'
+        endDate: '2030-12-31T00:00:00.001Z'
+        coordinatingInstitution:
+          type: 'Organization'
+          id: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+        contributors:
+          - type: 'ProjectManager'
+            identity:
+              type: 'Person'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/person/538786'
+        status: NOTSTARTED
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'

@@ -13,10 +13,12 @@ dependencies {
     implementation libs.com.auth0.jwt
     implementation libs.com.auth0.jwks
 
+    testImplementation libs.karate.core
+    testImplementation libs.karate.junit5
+
     implementation libs.aws.sdk2.auth
     implementation libs.aws.sdk2.awscore
     implementation libs.aws.sdk2.regions
-
 }
 tasks.named('test') {
     useJUnitPlatform {

@@ -158,6 +158,20 @@ Resources:
             Path: /project/{id}
             Method: get
 
+  NvaCristinUpdateProjectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-project
+      Handler: no.unit.nva.cristin.projects.UpdateCristinProjectHandler::handleRequest
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinUpdateProjectEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /project/{identifier}/
+            Method: patch
+
   NvaCristinQueryOrganizationFunction:
     Type: AWS::Serverless::Function
     Properties:

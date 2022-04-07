@@ -18,7 +18,7 @@ public class CristinAuthenticator {
     public static final String SECRET_NAME = "CristinClientBasicAuth";
     public static final String PASSWORD_KEY = "password";
     public static final String USERNAME_KEY = "username";
-    public static final SecretsReader SECRETS_READER =new SecretsReader();
+    public static final SecretsReader SECRETS_READER = new SecretsReader();
 
     /**
      * Creates an Authenticator from credentials stored in AWS SecretsManager.
