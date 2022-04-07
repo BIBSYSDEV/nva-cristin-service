@@ -64,14 +64,14 @@ public class UpdatePersonEmploymentValidator {
     }
 
     private static void validateDate(ObjectNode input, String fieldName) throws BadRequestException {
-        if (input.has(fieldName)) {
+        if (input.has(fieldName) && !input.get(fieldName).isNull()) {
             attempt(() -> Instant.parse(input.get(fieldName).asText()))
                 .orElseThrow(fail -> new BadRequestException(invalidFieldParameterMessage(fieldName)));
         }
     }
 
     private static void validateFullTimePercentage(ObjectNode input) throws BadRequestException {
-        if (input.has(FULL_TIME_PERCENTAGE)) {
+        if (input.has(FULL_TIME_PERCENTAGE) && !input.get(FULL_TIME_PERCENTAGE).isNull()) {
             attempt(() -> Double.parseDouble(input.get(FULL_TIME_PERCENTAGE).asText()))
                 .orElseThrow(fail -> new BadRequestException(invalidFieldParameterMessage(FULL_TIME_PERCENTAGE)));
         }

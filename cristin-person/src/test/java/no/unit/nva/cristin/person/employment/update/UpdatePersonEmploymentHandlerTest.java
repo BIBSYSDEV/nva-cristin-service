@@ -111,6 +111,13 @@ public class UpdatePersonEmploymentHandlerTest {
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(FULL_TIME_PERCENTAGE)));
     }
 
+    @Test
+    void testtest() throws JsonProcessingException {
+        ObjectNode node = (ObjectNode) OBJECT_MAPPER.readTree(validJson);
+        ObjectNode output = new UpdateCristinEmploymentJsonCreator(node).create().getOutput();
+        System.out.println(output.toPrettyString());
+    }
+
     private static String randomIntegerAsString() {
         return String.valueOf(randomInteger());
     }
