@@ -1383,12 +1383,6 @@ components:
     ProjectPatch:
       type: object
       properties:
-        '@context':
-          $ref: '#/components/schemas/Context'
-        type:
-          type: string
-          pattern: 'Project'
-          description: The type of the returned object, always Project
         title:
           type: string
           pattern: '.+'
@@ -2060,38 +2054,20 @@ components:
           en: "popularScientificSummary popularScientificSummary popularScientificSummary"
     ProjectPatchExample:
       value:
-        '@context': 'https://bibsysdev.github.io/src/project-context.json'
-        type: 'Project'
-        title: 'Example Title'
-        language: 'http://lexvo.org/id/iso639-3/nno'
+        title: 'Updated Title'
         alternativeTitles:
-          - 'nb': 'Eksempel på tittel'
-        startDate: '2012-01-09T00:00:00.001Z'
-        endDate: '2017-12-31T00:00:00.001Z'
+          - 'en': 'Updated Title in english'
+        startDate: '2022-10-09T00:00:00.001Z'
+        endDate: '2030-12-31T00:00:00.001Z'
         coordinatingInstitution:
           type: 'Organization'
-          id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+          id: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
         contributors:
           - type: 'ProjectManager'
             identity:
               type: 'Person'
-              id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
-            affiliation:
-              type: 'Organization'
-              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-          - type: 'ProjectParticipant'
-            identity:
-              type: 'Person'
-              id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
-            affiliation:
-              type: 'Organization'
-              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-        status: CONCLUDED
-        academicSummary:
-          en: "Summary in an academic manner"
-        popularScientificSummary:
-          en: "popularScientificSummary popularScientificSummary popularScientificSummary"
-
+              id: 'https://api.dev.nva.aws.unit.no/cristin/person/538786'
+        status: NOTSTARTED
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
