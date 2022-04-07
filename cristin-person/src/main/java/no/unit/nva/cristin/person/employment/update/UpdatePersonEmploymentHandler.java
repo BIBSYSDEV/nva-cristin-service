@@ -1,15 +1,19 @@
 package no.unit.nva.cristin.person.employment.update;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
-import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 
@@ -29,6 +33,9 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
 
         validateHasAccessRights(requestInfo);
 
+        ObjectNode objectNode = readJsonFromInput(input);
+        UpdatePersonEmploymentValidator.validate(objectNode);
+
         return null;
     }
 
@@ -42,9 +49,14 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
         return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
-    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException, UnauthorizedException {
+    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {
         if (!AccessUtils.requesterIsUserAdministrator(requestInfo)) {
             throw new ForbiddenException();
         }
+    }
+
+    private ObjectNode readJsonFromInput(String input) throws BadRequestException {
+        return attempt(() -> (ObjectNode) OBJECT_MAPPER.readTree(input))
+            .orElseThrow(fail -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 }
