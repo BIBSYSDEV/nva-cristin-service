@@ -27,6 +27,22 @@ Feature: API tests for Creation of Cristin Person Employments
       'fullTimeEquivalentPercentage': 80.0
     }
     """
+    * def invalidTypePayload =
+    """
+    {
+      'type': 'https://api.dev.nva.aws.unit.no/hello',
+      'organization': 'https://api.dev.nva.aws.unit.no/organization/185.90.0.0',
+      'startDate': '2020-01-01T00:00:00.000Z',
+    }
+    """
+    * def invalidOrganizationPayload =
+    """
+    {
+      'type': 'https://api.dev.nva.aws.unit.no/position#1087',
+      'organization': 'https://api.dev.nva.aws.unit.no/hello',
+      'startDate': '2020-01-01T00:00:00.000Z',
+    }
+    """
     Given url CRISTIN_BASE
 
   Scenario: Create returns status 401 Unauthorized when invalid token
@@ -56,3 +72,19 @@ Feature: API tests for Creation of Cristin Person Employments
     When method POST
     Then status 201
     And print response
+
+  Scenario: Create returns status 400 Bad Request when invalid type
+    Given path '/person/' + cristinTestPersonIdentifier + '/employment/'
+    And header Authorization = 'Bearer ' + token
+    And request invalidTypePayload
+    When method POST
+    Then status 400
+    And match response.detail == "Invalid value for field 'type'"
+
+  Scenario: Create returns status 400 Bad Request when invalid organization
+    Given path '/person/' + cristinTestPersonIdentifier + '/employment/'
+    And header Authorization = 'Bearer ' + token
+    And request invalidOrganizationPayload
+    When method POST
+    Then status 400
+    And match response.detail == "Invalid value for field 'organization'"
