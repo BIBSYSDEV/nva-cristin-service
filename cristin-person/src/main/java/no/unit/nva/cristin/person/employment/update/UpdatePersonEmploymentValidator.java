@@ -27,7 +27,7 @@ public class UpdatePersonEmploymentValidator {
         validateNotNull(input);
         validatePositionCode(input);
         validateAffiliation(input);
-        validateDate(input, START_DATE);
+        validateStartDate(input);
         validateDate(input, END_DATE);
         validateFullTimePercentage(input);
     }
@@ -61,6 +61,13 @@ public class UpdatePersonEmploymentValidator {
     private static URI parseUriField(ObjectNode input, String fieldName) throws BadRequestException {
         return attempt(() -> new URI(input.get(fieldName).asText()))
             .orElseThrow(fail -> new BadRequestException(invalidFieldParameterMessage(fieldName)));
+    }
+
+    private static void validateStartDate(ObjectNode input) throws BadRequestException {
+        if (input.has(START_DATE) && input.get(START_DATE).isNull()) {
+            throw new BadRequestException(invalidFieldParameterMessage(START_DATE));
+        }
+        validateDate(input, START_DATE);
     }
 
     private static void validateDate(ObjectNode input, String fieldName) throws BadRequestException {

@@ -102,6 +102,16 @@ public class UpdatePersonEmploymentHandlerTest {
     }
 
     @Test
+    void shouldThrowBadRequestWhenNonNullableIsNull() throws IOException {
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        input.putNull(START_DATE);
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(START_DATE)));
+    }
+
+    @Test
     void shouldThrowBadRequestWhenInvalidFullTimePercentage() throws IOException {
         ObjectNode input = OBJECT_MAPPER.createObjectNode();
         input.put(FULL_TIME_PERCENTAGE, INVALID_VALUE);
