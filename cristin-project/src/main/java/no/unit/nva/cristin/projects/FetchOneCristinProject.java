@@ -14,9 +14,9 @@ import nva.commons.core.JacocoGenerated;
 import java.net.HttpURLConnection;
 import java.util.Set;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
 import static nva.commons.core.attempt.Try.attempt;
@@ -50,7 +50,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
         validateThatSuppliedQueryParamsIsSupported(requestInfo);
 
         String language = getValidLanguage(requestInfo);
-        String id = getValidId(requestInfo);
+        String id = getValidIdentifier(requestInfo);
 
         try {
             return getTransformedProjectFromCristin(id, language);
@@ -71,11 +71,11 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
         return HttpURLConnection.HTTP_OK;
     }
 
-    private String getValidId(RequestInfo requestInfo) throws BadRequestException {
-        attempt(() -> Integer.parseInt(requestInfo.getPathParameter(ID)))
-                .orElseThrow(failure -> new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
+    public static String getValidIdentifier(RequestInfo requestInfo) throws BadRequestException {
+        attempt(() -> Integer.parseInt(requestInfo.getPathParameter(IDENTIFIER)))
+                .orElseThrow(failure -> new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER));
 
-        return requestInfo.getPathParameter(ID);
+        return requestInfo.getPathParameter(IDENTIFIER);
     }
 
     private NvaProject getTransformedProjectFromCristin(String id, String language) throws ApiGatewayException {

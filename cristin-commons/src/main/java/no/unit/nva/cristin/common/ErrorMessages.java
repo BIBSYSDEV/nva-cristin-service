@@ -20,7 +20,7 @@ public class ErrorMessages {
             "Error when reading response with body: %s, causing exception: %s";
     public static final String ERROR_MESSAGE_SERVER_ERROR =
             "Internal server error. Contact application administrator.";
-    public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID =
+    public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER =
             "Invalid path parameter for identifier, needs to be a number";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID =
             "Invalid path parameter for identifier, needs to be a number or an ORCID";

@@ -2,8 +2,10 @@ package no.unit.nva.cristin.projects;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.language.LanguageMapper;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,15 +15,34 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.http.HttpClient;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Map;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.projects.UpdateCristinProjectHandler.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributors;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomLanguage;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomListOfTitles;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomOrganization;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomStatus;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -62,9 +83,40 @@ class UpdateCristinProjectHandlerTest {
     void shouldReturnBadRequestWhenSendingNullBody() throws IOException {
         GatewayResponse<Void> gatewayResponse = sendQuery(validPath, null);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 
+    @Test
+    void shouldReturnNoContentResponseWhenCallingHandlerWithValidJson() throws IOException {
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+
+        jsonObject.put(ACADEMIC_SUMMARY, getSummaryAsString());
+        jsonObject.put(ALTERNATIVE_TITLES, getTitleAsString());
+        jsonObject.put(CONTRIBUTORS, OBJECT_MAPPER.writeValueAsString(randomContributors()));
+        jsonObject.put(COORDINATING_INSTITUTION, OBJECT_MAPPER.writeValueAsString(randomOrganization()));
+        jsonObject.put(END_DATE, randomInstantString());
+        jsonObject.put(LANGUAGE, LanguageMapper.getLanguageByIso6391Code(randomLanguage()).getLexvoUri().toString());
+        jsonObject.put(POPULAR_SCIENTIFIC_SUMMARY, getSummaryAsString());
+        jsonObject.put(START_DATE, randomInstantString());
+        jsonObject.put(STATUS, OBJECT_MAPPER.writeValueAsString(randomStatus()));
+        jsonObject.put(TITLE, randomString());
+
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+
+        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    private String getTitleAsString() throws JsonProcessingException {
+        return OBJECT_MAPPER.writeValueAsString(randomListOfTitles(URI.create(randomLanguage())));
+    }
+
+    private String getSummaryAsString() throws JsonProcessingException {
+        return OBJECT_MAPPER.writeValueAsString(randomListOfTitles(URI.create(randomLanguage())).get(0));
+    }
+
+    private String randomInstantString() {
+        return new DateTimeFormatterBuilder().appendInstant(3).toFormatter().format(randomInstant());
+    }
 
     private static String randomIntegerAsString() {
         return String.valueOf(randomInteger());
@@ -79,7 +131,7 @@ class UpdateCristinProjectHandlerTest {
     private InputStream createRequest(Map<String, String> pathParam, String body) throws JsonProcessingException {
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                 .withBody(body)
-                .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
+                .withAccessRight(EDIT_OWN_INSTITUTION_PROJECTS)
                 .withPathParameters(pathParam)
                 .build();
     }
@@ -92,4 +144,5 @@ class UpdateCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
+
 }
