@@ -16,12 +16,6 @@ Feature: API tests for Cristin Person Employment Update
     * def invalidToken = 'just-a-invalid-token-for-now'
     * def personIdentifier = '515114'
     * def employmentIdentifier = '206517'
-    * def updateFieldsRequest =
-    """
-    {
-      'test': 'test'
-    }
-    """
     Given url CRISTIN_BASE
 
   Scenario: Update returns status 401 Unauthorized when invalid token
@@ -44,9 +38,54 @@ Feature: API tests for Cristin Person Employment Update
     Then status 403
     And match response.title == 'Forbidden'
 
-  Scenario: Update returns status 204 when valid payload
+  Scenario: Update returns bad request when invalid position code
     Given path '/person/' + personIdentifier + '/employment/' + employmentIdentifier
     * header Authorization = 'Bearer ' + token
-    And request updateFieldsRequest
+    * def invalidPositionCodeRequest =
+    """
+    {
+      "type": "https://api.dev.nva.aws.unit.no/hello"
+    }
+    """
+    And request invalidPositionCodeRequest
     When method PATCH
-    Then status 204
+    Then status 400
+
+  Scenario: Update returns bad request when invalid affiliation
+    Given path '/person/' + personIdentifier + '/employment/' + employmentIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def invalidAffiliationRequest =
+    """
+    {
+      "organization": "https://api.dev.nva.aws.unit.no/hello"
+    }
+    """
+    And request invalidAffiliationRequest
+    When method PATCH
+    Then status 400
+
+  Scenario: Update returns bad request when invalid date
+    Given path '/person/' + personIdentifier + '/employment/' + employmentIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def invalidDateRequest =
+    """
+    {
+      "startDate": "hello"
+    }
+    """
+    And request invalidDateRequest
+    When method PATCH
+    Then status 400
+
+  Scenario: Update returns bad request when invalid full time percentage
+    Given path '/person/' + personIdentifier + '/employment/' + employmentIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def invalidFullTimeRequest =
+    """
+    {
+      "fullTimePercentage": "hello"
+    }
+    """
+    And request invalidFullTimeRequest
+    When method PATCH
+    Then status 400

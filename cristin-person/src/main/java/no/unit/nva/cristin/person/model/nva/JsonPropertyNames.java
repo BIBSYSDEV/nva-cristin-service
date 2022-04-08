@@ -17,4 +17,5 @@ public class JsonPropertyNames {
     public static final String LAST_NAME = "lastName";
     public static final String PREFERRED_FIRST_NAME = "preferredFirstName";
     public static final String PREFERRED_LAST_NAME = "preferredLastName";
+    public static final String FULL_TIME_PERCENTAGE = "fullTimeEquivalentPercentage";
 }
