@@ -22,7 +22,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.language.LanguageConstants.UNDEFINED_LANGUAGE;
 import static no.unit.nva.language.LanguageMapper.getLanguageByIso6391Code;
@@ -45,12 +44,12 @@ public class ProjectPatchValidator {
         validateRequiredFieldsNotNull(input);
 
         validateLanguageStringMap(input, ACADEMIC_SUMMARY);
-        validateListOfLanguageStringMap(input, ALTERNATIVE_TITLES);
+        validateAlternativeTitles(input);
         validateLanguageStringMap(input, POPULAR_SCIENTIFIC_SUMMARY);
         validateInstant(input, END_DATE);
         validateInstant(input, START_DATE);
         validateLanguage(input);
-        validateStatus(input, STATUS);
+        validateStatus(input);
         validateContributors(input);
     }
 
@@ -62,7 +61,7 @@ public class ProjectPatchValidator {
     }
 
     private static void validateContributors(ObjectNode input) throws BadRequestException {
-        TypeReference<List<NvaContributor>> typeRef = new TypeReference<List<NvaContributor>>() {
+        TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
         };
         try {
             final String content = input.get(CONTRIBUTORS).asText();
@@ -75,41 +74,40 @@ public class ProjectPatchValidator {
         }
     }
 
-    private static void validateStatus(ObjectNode input, String status) throws BadRequestException {
-        validateNotNullIfPresent(input, status);
-        ProjectStatus.isValidStatus(input.get(status).asText());
+    private static void validateStatus(ObjectNode input) throws BadRequestException {
+        validateNotNullIfPresent(input, no.unit.nva.cristin.model.JsonPropertyNames.STATUS);
+        ProjectStatus.isValidStatus(input.get(no.unit.nva.cristin.model.JsonPropertyNames.STATUS).asText());
     }
 
-    private static void validateListOfLanguageStringMap(ObjectNode input, String propertyName)
+    private static void validateAlternativeTitles(ObjectNode input)
             throws BadRequestException {
-        validateNotNullIfPresent(input, propertyName);
-        TypeReference<List<Map<String, String>>> typeRef = new TypeReference<List<Map<String, String>>>() {
+        validateNotNullIfPresent(input,ALTERNATIVE_TITLES);
+        TypeReference<List<Map<String, String>>> typeRef = new TypeReference<>() {
         };
-
-        attempt(() -> OBJECT_MAPPER.readValue(input.get(propertyName).asText(), typeRef))
-                .orElseThrow(fail -> new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, propertyName)));
-//        try {
-//            OBJECT_MAPPER.readValue(input.get(propertyName).asText(), typeRef);
-//        } catch (JsonProcessingException e) {
-//            throw new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, propertyName));
-//        }
+        attempt(() -> OBJECT_MAPPER.readValue(input.get(ALTERNATIVE_TITLES).asText(), typeRef))
+                .orElseThrow(fail ->
+                        new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, ALTERNATIVE_TITLES)));
     }
 
     private static void validateLanguageStringMap(ObjectNode input, String propertyName) throws BadRequestException {
         validateNotNullIfPresent(input, propertyName);
-        TypeReference<Map<String, String>> typeRef = new TypeReference<Map<String, String>>() {
+        TypeReference<Map<String, String>> typeRef = new TypeReference<>() {
         };
         try {
             Map<String, String> languageAndStringMap =
                     OBJECT_MAPPER.readValue(input.get(propertyName).asText(), typeRef);
             for (String languageCode : languageAndStringMap.keySet()) {
                 validateLanguageCode(languageCode);
-                if (StringUtils.isEmpty(languageAndStringMap.get(languageCode))) {
-                    throw new BadRequestException(String.format(FIELD_CAN_NOT_BE_ERASED, propertyName));
-                }
+                validateLanguageContent(languageAndStringMap.get(languageCode), propertyName);
             }
         } catch (JsonProcessingException e) {
             throw new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, propertyName));
+        }
+    }
+
+    private static void validateLanguageContent(String content, String propertyName) throws BadRequestException {
+        if (StringUtils.isEmpty(content)) {
+            throw new BadRequestException(String.format(FIELD_CAN_NOT_BE_ERASED, propertyName));
         }
     }
 
@@ -119,7 +117,7 @@ public class ProjectPatchValidator {
     }
 
     private static void validateLanguageCode(String languageCode) throws BadRequestException {
-        if (getLanguageByIso6391Code(languageCode).equals(UNDEFINED_LANGUAGE.getIso6391Code())) {
+        if (getLanguageByIso6391Code(languageCode).equals(UNDEFINED_LANGUAGE)) {
             throw new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, LANGUAGE));
         }
     }
