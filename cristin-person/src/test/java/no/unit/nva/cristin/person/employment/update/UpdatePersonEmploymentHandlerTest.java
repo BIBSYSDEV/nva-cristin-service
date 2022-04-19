@@ -7,6 +7,7 @@ import com.google.common.net.HttpHeaders;
 import java.nio.file.Path;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -122,8 +123,9 @@ public class UpdatePersonEmploymentHandlerTest {
     }
 
     @Test
-    void testtest() throws JsonProcessingException {
+    void testtest() throws JsonProcessingException, BadRequestException {
         ObjectNode node = (ObjectNode) OBJECT_MAPPER.readTree(validJson);
+        UpdatePersonEmploymentValidator.validate(node);
         ObjectNode output = new UpdateCristinEmploymentJsonCreator(node).create().getOutput();
         System.out.println(output.toPrettyString());
     }

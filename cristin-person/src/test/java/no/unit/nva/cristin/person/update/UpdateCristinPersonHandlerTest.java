@@ -25,7 +25,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAY
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
-import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.FIRST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;

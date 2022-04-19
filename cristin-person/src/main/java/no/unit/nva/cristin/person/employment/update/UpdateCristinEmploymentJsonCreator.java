@@ -2,14 +2,20 @@ package no.unit.nva.cristin.person.employment.update;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.AFFILIATION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_INSTITUTION_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_UNIT_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POSITION_CODE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.UNIT;
 import static no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment.POSITION;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CRISTIN_FULL_TIME_PERCENTAGE;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.FULL_TIME_PERCENTAGE;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
@@ -37,6 +43,9 @@ public class UpdateCristinEmploymentJsonCreator {
     public UpdateCristinEmploymentJsonCreator create() {
         addAffiliation();
         addPositionCode();
+        addStartDate();
+        addEndDate();
+        addFullTimePercentage();
 
         return this;
     }
@@ -84,5 +93,23 @@ public class UpdateCristinEmploymentJsonCreator {
 
     private URI parseUriField(String fieldName) {
         return UriWrapper.fromUri(input.get(fieldName).asText()).getUri();
+    }
+
+    private void addStartDate() {
+        if (input.has(START_DATE)) {
+            output.set(CRISTIN_START_DATE, input.get(START_DATE));
+        }
+    }
+
+    private void addEndDate() {
+        if (input.has(END_DATE)) {
+            output.set(CRISTIN_END_DATE, input.get(END_DATE));
+        }
+    }
+
+    private void addFullTimePercentage() {
+        if (input.has(FULL_TIME_PERCENTAGE)) {
+            output.set(CRISTIN_FULL_TIME_PERCENTAGE, input.get(FULL_TIME_PERCENTAGE));
+        }
     }
 }
