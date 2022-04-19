@@ -2,10 +2,13 @@ package no.unit.nva.cristin.person.employment.update;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
+import java.nio.file.Path;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,13 +18,20 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.Map;
 
+import static no.unit.nva.cristin.common.ErrorMessages.invalidFieldParameterMessage;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.EMPLOYMENT_ID;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.FULL_TIME_PERCENTAGE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -29,6 +39,10 @@ public class UpdatePersonEmploymentHandlerTest {
 
     private static final Map<String, String> validPath =
         Map.of(PERSON_ID, randomIntegerAsString(), EMPLOYMENT_ID, randomIntegerAsString());
+    private static final String validJson =
+        IoUtils.stringFromResources(Path.of("nvaApiCreateEmploymentRequest.json"));
+    private static final String INVALID_URI = "https://example.org/hello";
+    private static final String INVALID_VALUE = "hello";
 
     private final Environment environment = new Environment();
     private Context context;
@@ -43,8 +57,8 @@ public class UpdatePersonEmploymentHandlerTest {
     }
 
     @Test
-    void shouldReturnNoContentResponseWhenClientIsAuthenticated() throws IOException {
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, EMPTY_JSON);
+    void shouldReturnNoContentResponseWhenPayloadIsValid() throws IOException {
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, validJson);
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
@@ -55,6 +69,46 @@ public class UpdatePersonEmploymentHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenInvalidPositionCode() throws IOException {
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        input.put(TYPE, INVALID_URI);
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(TYPE)));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenInvalidAffiliation() throws IOException {
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        input.put(ORGANIZATION, INVALID_URI);
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(ORGANIZATION)));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenInvalidDate() throws IOException {
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        input.put(START_DATE, INVALID_VALUE);
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(START_DATE)));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenInvalidFullTimePercentage() throws IOException {
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        input.put(FULL_TIME_PERCENTAGE, INVALID_VALUE);
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(FULL_TIME_PERCENTAGE)));
     }
 
     private static String randomIntegerAsString() {
