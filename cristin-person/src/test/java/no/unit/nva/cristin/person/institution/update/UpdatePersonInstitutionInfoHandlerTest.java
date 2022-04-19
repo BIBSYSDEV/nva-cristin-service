@@ -19,9 +19,9 @@ import java.net.http.HttpClient;
 import java.util.Map;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstitutionInfoClient.EMPTY_JSON;
-import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstitutionInfoHandler.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;

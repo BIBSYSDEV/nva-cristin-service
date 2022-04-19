@@ -14,13 +14,11 @@ import nva.commons.core.JacocoGenerated;
 import java.net.HttpURLConnection;
 
 import static java.util.Objects.isNull;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.common.Utils.getValidOrgId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 
 public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHandler<PersonInstInfoPatch, String> {
-
-    public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
-        "No supported fields in payload, not doing anything";
 
     private final transient UpdatePersonInstitutionInfoClient apiClient;
 
