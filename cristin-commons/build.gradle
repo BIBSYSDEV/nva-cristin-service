@@ -8,6 +8,8 @@ dependencies {
     implementation libs.nva.lambdaauthorizer
     implementation libs.aws.sdk2.core
     implementation libs.aws.sdk2.secrets
+    implementation libs.nva.language
+
 
     implementation libs.aws.sdk2.cognitoidp
     implementation libs.com.auth0.jwt

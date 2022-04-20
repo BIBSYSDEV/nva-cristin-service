@@ -71,7 +71,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
         return HttpURLConnection.HTTP_OK;
     }
 
-    public static String getValidIdentifier(RequestInfo requestInfo) throws BadRequestException {
+    protected static String getValidIdentifier(RequestInfo requestInfo) throws BadRequestException {
         attempt(() -> Integer.parseInt(requestInfo.getPathParameter(IDENTIFIER)))
                 .orElseThrow(failure -> new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER));
 
