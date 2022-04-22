@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatterBuilder;
 
 public class CustomInstantSerializer extends StdSerializer<Instant> {
 
-    private static DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendInstant(3).toFormatter();
+    private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendInstant(3).toFormatter();
 
     public CustomInstantSerializer() {
         this(null);
@@ -24,6 +24,11 @@ public class CustomInstantSerializer extends StdSerializer<Instant> {
     @Override
     public void serialize(Instant value, JsonGenerator jsonGenerator, SerializerProvider arg2) throws IOException {
         jsonGenerator.writeString(formatter.format(value));
+    }
+
+    public static String addMillisToInstantString(String value) {
+        Instant instant = Instant.parse(value);
+        return formatter.format(instant);
     }
 }
 

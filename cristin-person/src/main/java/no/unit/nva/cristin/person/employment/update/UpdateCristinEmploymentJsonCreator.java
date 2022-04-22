@@ -17,11 +17,14 @@ import static no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment.P
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CRISTIN_FULL_TIME_PERCENTAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.FULL_TIME_PERCENTAGE;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.person.model.nva.Employment;
+import no.unit.nva.utils.CustomInstantSerializer;
 import nva.commons.core.paths.UriWrapper;
 
 public class UpdateCristinEmploymentJsonCreator {
@@ -97,14 +100,18 @@ public class UpdateCristinEmploymentJsonCreator {
 
     private void addStartDate() {
         if (input.has(START_DATE)) {
-            output.set(CRISTIN_START_DATE, input.get(START_DATE));
+            output.put(CRISTIN_START_DATE, parseInstantField(input.get(START_DATE)));
         }
     }
 
     private void addEndDate() {
         if (input.has(END_DATE)) {
-            output.set(CRISTIN_END_DATE, input.get(END_DATE));
+            output.put(CRISTIN_END_DATE, parseInstantField(input.get(END_DATE)));
         }
+    }
+
+    private String parseInstantField(JsonNode node) {
+        return CustomInstantSerializer.addMillisToInstantString(node.asText());
     }
 
     private void addFullTimePercentage() {
