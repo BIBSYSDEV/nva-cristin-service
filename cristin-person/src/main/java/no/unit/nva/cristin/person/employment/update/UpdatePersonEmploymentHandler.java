@@ -1,6 +1,9 @@
 package no.unit.nva.cristin.person.employment.update;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
+import static no.unit.nva.cristin.common.Utils.getValidEmploymentId;
+import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static nva.commons.core.attempt.Try.attempt;
@@ -9,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -19,13 +23,16 @@ import nva.commons.core.Environment;
 
 public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Void> {
 
+    private final transient UpdatePersonEmploymentClient apiClient;
+
     @SuppressWarnings("unused")
     public UpdatePersonEmploymentHandler() {
-        this(new Environment());
+        this(new UpdatePersonEmploymentClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
 
-    public UpdatePersonEmploymentHandler(Environment environment) {
+    public UpdatePersonEmploymentHandler(UpdatePersonEmploymentClient apiClient, Environment environment) {
         super(String.class, environment);
+        this.apiClient = apiClient;
     }
 
     @Override
@@ -35,8 +42,16 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
 
         ObjectNode objectNode = readJsonFromInput(input);
         UpdatePersonEmploymentValidator.validate(objectNode);
+        ObjectNode cristinJson = new UpdateCristinEmploymentJsonCreator(objectNode).create().getOutput();
 
-        return null;
+        if (cristinJson.isEmpty()) {
+            throw new BadRequestException(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD);
+        }
+
+        String personId = getValidPersonId(requestInfo);
+        String employmentId = getValidEmploymentId(requestInfo);
+
+        return apiClient.updatePersonEmploymentInCristin(personId, employmentId, cristinJson);
     }
 
     @Override

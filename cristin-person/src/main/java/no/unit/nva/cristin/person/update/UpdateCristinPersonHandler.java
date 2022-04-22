@@ -4,7 +4,6 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -18,15 +17,13 @@ import java.net.HttpURLConnection;
 import java.util.List;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> {
-
-    public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
-        "No supported fields in payload, not doing anything";
 
     private final transient UpdateCristinPersonApiClient apiClient;
 
@@ -50,7 +47,7 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
         PersonPatchValidator.validate(objectNode);
         ObjectNode cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
 
-        if (noSupportedValuesPresent(cristinJson)) {
+        if (cristinJson.isEmpty()) {
             throw new BadRequestException(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD);
         }
 
@@ -69,7 +66,7 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
         return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
-    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException, UnauthorizedException {
+    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {
         if (!AccessUtils.requesterIsUserAdministrator(requestInfo)) {
             throw new ForbiddenException();
         }
@@ -78,10 +75,6 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
     private ObjectNode readJsonFromInput(String input) throws BadRequestException {
         return attempt(() -> (ObjectNode) OBJECT_MAPPER.readTree(input))
             .orElseThrow(fail -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
-    }
-
-    private boolean noSupportedValuesPresent(ObjectNode cristinJson) {
-        return cristinJson.isEmpty();
     }
 
 }

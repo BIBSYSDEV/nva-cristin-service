@@ -1,9 +1,9 @@
 package no.unit.nva.cristin.person.update;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.FIRST_NAME;
-import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;

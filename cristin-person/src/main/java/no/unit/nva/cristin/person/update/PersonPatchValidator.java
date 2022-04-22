@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.update;
 
-import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.FIRST_NAME;
-import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import com.fasterxml.jackson.databind.node.ObjectNode;
