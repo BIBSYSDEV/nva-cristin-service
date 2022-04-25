@@ -4,7 +4,9 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
+import java.net.http.HttpClient;
 import java.nio.file.Path;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
@@ -18,6 +20,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.Map;
 
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidFieldParameterMessage;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.EMPLOYMENT_ID;
@@ -33,7 +36,9 @@ import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UpdatePersonEmploymentHandlerTest {
 
@@ -44,16 +49,20 @@ public class UpdatePersonEmploymentHandlerTest {
     private static final String INVALID_URI = "https://example.org/hello";
     private static final String INVALID_VALUE = "hello";
 
+    private final HttpClient httpClientMock = mock(HttpClient.class);
+    private UpdatePersonEmploymentClient apiClient;
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
     private UpdatePersonEmploymentHandler handler;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException, InterruptedException {
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
+        apiClient = new UpdatePersonEmploymentClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        handler = new UpdatePersonEmploymentHandler(environment);
+        handler = new UpdatePersonEmploymentHandler(apiClient, environment);
     }
 
     @Test
@@ -102,6 +111,16 @@ public class UpdatePersonEmploymentHandlerTest {
     }
 
     @Test
+    void shouldThrowBadRequestWhenNonNullableIsNull() throws IOException {
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        input.putNull(START_DATE);
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(START_DATE)));
+    }
+
+    @Test
     void shouldThrowBadRequestWhenInvalidFullTimePercentage() throws IOException {
         ObjectNode input = OBJECT_MAPPER.createObjectNode();
         input.put(FULL_TIME_PERCENTAGE, INVALID_VALUE);
@@ -109,6 +128,16 @@ public class UpdatePersonEmploymentHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(FULL_TIME_PERCENTAGE)));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenNoSupportedValuesPresentInJson() throws IOException {
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        input.put(INVALID_VALUE, INVALID_VALUE);
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));
     }
 
     private static String randomIntegerAsString() {

@@ -1,18 +1,19 @@
 package no.unit.nva.cristin.person.update;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import no.unit.nva.cristin.common.Utils;
-import no.unit.nva.utils.PatchValidator;
-import nva.commons.apigateway.exceptions.BadRequestException;
-
-import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.FIRST_NAME;
-import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import no.unit.nva.cristin.common.Utils;
+import nva.commons.apigateway.exceptions.BadRequestException;
 
-public class PersonPatchValidator extends PatchValidator  {
+public class PersonPatchValidator {
 
     public static final String ORCID_IS_NOT_VALID = "ORCID is not valid";
+    public static final String FIELD_CAN_NOT_BE_ERASED = "Field %s can not be erased";
+    public static final String RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE =
+        "Reserved field can only be set to true if present";
 
     /**
      * Validate according to rules of upstream json schema.
@@ -38,10 +39,15 @@ public class PersonPatchValidator extends PatchValidator  {
         validateNotNullIfPresent(input, LAST_NAME);
     }
 
-    public static void validateReservedIfPresent(ObjectNode input) throws BadRequestException {
+    private static void validateNotNullIfPresent(ObjectNode input, String fieldName) throws BadRequestException {
+        if (input.has(fieldName) && input.get(fieldName).isNull()) {
+            throw new BadRequestException(String.format(FIELD_CAN_NOT_BE_ERASED, fieldName));
+        }
+    }
+
+    private static void validateReservedIfPresent(ObjectNode input) throws BadRequestException {
         if (input.has(RESERVED) && !input.get(RESERVED).asBoolean()) {
             throw new BadRequestException(RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE);
         }
     }
-
 }

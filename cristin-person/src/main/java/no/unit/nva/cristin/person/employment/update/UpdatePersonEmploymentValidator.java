@@ -27,7 +27,7 @@ public class UpdatePersonEmploymentValidator {
         validateNotNull(input);
         validatePositionCode(input);
         validateAffiliation(input);
-        validateDate(input, START_DATE);
+        validateStartDate(input);
         validateDate(input, END_DATE);
         validateFullTimePercentage(input);
     }
@@ -63,15 +63,22 @@ public class UpdatePersonEmploymentValidator {
             .orElseThrow(fail -> new BadRequestException(invalidFieldParameterMessage(fieldName)));
     }
 
+    private static void validateStartDate(ObjectNode input) throws BadRequestException {
+        if (input.has(START_DATE) && input.get(START_DATE).isNull()) {
+            throw new BadRequestException(invalidFieldParameterMessage(START_DATE));
+        }
+        validateDate(input, START_DATE);
+    }
+
     private static void validateDate(ObjectNode input, String fieldName) throws BadRequestException {
-        if (input.has(fieldName)) {
+        if (input.has(fieldName) && !input.get(fieldName).isNull()) {
             attempt(() -> Instant.parse(input.get(fieldName).asText()))
                 .orElseThrow(fail -> new BadRequestException(invalidFieldParameterMessage(fieldName)));
         }
     }
 
     private static void validateFullTimePercentage(ObjectNode input) throws BadRequestException {
-        if (input.has(FULL_TIME_PERCENTAGE)) {
+        if (input.has(FULL_TIME_PERCENTAGE) && !input.get(FULL_TIME_PERCENTAGE).isNull()) {
             attempt(() -> Double.parseDouble(input.get(FULL_TIME_PERCENTAGE).asText()))
                 .orElseThrow(fail -> new BadRequestException(invalidFieldParameterMessage(FULL_TIME_PERCENTAGE)));
         }

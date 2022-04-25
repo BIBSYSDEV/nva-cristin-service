@@ -39,21 +39,24 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
             "Page requested is out of scope. Query contains %s results";
     public static final String ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE =
-            "%s contains no supported Accept header values. Supported values are: application/json; charset=utf-8, "
-                    + "application/ld+json";
+        "%s contains no supported Accept header values. Supported values are: application/json; charset=utf-8, "
+            + "application/ld+json";
     public static final String ERROR_MESSAGE_TEMPLATE_INVALID_QUERY_PARAMETERS =
-            "Invalid query parameter supplied. Valid parameters: %s";
+        "Invalid query parameter supplied. Valid parameters: %s";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP =
-            "This endpoint does not support query parameters";
+        "This endpoint does not support query parameters";
     public static final String ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI =
-            "The requested resource '%s' was not found";
+        "The requested resource '%s' was not found";
     public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Supplied payload is not valid";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER = "Invalid path parameter for '%s'";
     public static final String INVALID_URI_MESSAGE = "Must be valid URI";
     public static final String ERROR_MESSAGE_INVALID_FIELD_VALUE = "Invalid value for field '%s'";
+    public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
+        "No supported fields in payload, not doing anything";
 
     /**
      * Formats and emits a message with valid parameter names.
+     *
      * @param queryParameters list of valid parameter names
      * @return formatted string containing a list of valid parameters
      */
