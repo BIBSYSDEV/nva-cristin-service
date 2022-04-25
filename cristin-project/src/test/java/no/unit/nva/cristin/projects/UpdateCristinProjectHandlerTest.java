@@ -18,6 +18,8 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
@@ -34,6 +36,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUM
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
+import static no.unit.nva.cristin.projects.ProjectPatchValidator.UNSUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributors;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomLanguage;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomListOfTitles;
@@ -90,21 +93,37 @@ class UpdateCristinProjectHandlerTest {
     void shouldReturnNoContentResponseWhenCallingHandlerWithValidJson() throws IOException {
         ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
 
-        jsonObject.put(ACADEMIC_SUMMARY, getSummaryAsString());
-        jsonObject.put(ALTERNATIVE_TITLES, getTitleAsString());
         jsonObject.put(CONTRIBUTORS, OBJECT_MAPPER.writeValueAsString(randomContributors()));
         jsonObject.put(COORDINATING_INSTITUTION, OBJECT_MAPPER.writeValueAsString(randomOrganization()));
         jsonObject.put(END_DATE, randomInstantString());
         jsonObject.put(LANGUAGE, LanguageMapper.getLanguageByIso6391Code(randomLanguage()).getLexvoUri().toString());
-        jsonObject.put(POPULAR_SCIENTIFIC_SUMMARY, getSummaryAsString());
         jsonObject.put(START_DATE, randomInstantString());
-        jsonObject.put(STATUS, OBJECT_MAPPER.writeValueAsString(randomStatus()));
         jsonObject.put(TITLE, randomString());
 
         GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
+
+    @Test
+    void shouldReturnBadRequestWhenNoSupportedFieldsArePresent() throws IOException {
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+
+
+        jsonObject.put(ACADEMIC_SUMMARY, getSummaryAsString());
+        jsonObject.put(ALTERNATIVE_TITLES, getTitleAsString());
+        jsonObject.put(POPULAR_SCIENTIFIC_SUMMARY, getSummaryAsString());
+        jsonObject.put(STATUS, OBJECT_MAPPER.writeValueAsString(randomStatus()));
+
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+
+        List<String> keys = new ArrayList<>();
+        jsonObject.fieldNames().forEachRemaining(field -> keys.add(field));
+        assertThat(gatewayResponse.getBody(), containsString(String.format(UNSUPPORTED_FIELDS_IN_PAYLOAD, keys)));
+    }
+
 
     private String getTitleAsString() throws JsonProcessingException {
         return OBJECT_MAPPER.writeValueAsString(randomListOfTitles(URI.create(randomLanguage())));

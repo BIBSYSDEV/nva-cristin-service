@@ -6,17 +6,26 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.utils.PatchValidator;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static nva.commons.core.attempt.Try.attempt;
 
 
 public class ProjectPatchValidator extends PatchValidator {
+
+    private static final Set<String> SUPPORTED_PATCH_FIELDS =
+            Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE);
+    public static final String UNSUPPORTED_FIELDS_IN_PAYLOAD = "Unsupported fields in payload %s";
+
 
     /**
      * Validate changes to Project, both nullable fields and values.
@@ -25,11 +34,24 @@ public class ProjectPatchValidator extends PatchValidator {
      * @throws BadRequestException thrown when input has illegal or invalid values.
      */
     public static void validate(ObjectNode input) throws BadRequestException {
+        validateExtraPayload(input);
         validateNonNullableFieldsNotNull(input);
-        validateInstant(input, END_DATE);
-        validateInstant(input, START_DATE);
+        validateInstantIfPresent(input, END_DATE);
+        validateInstantIfPresent(input, START_DATE);
         validateLanguage(input);
         validateContributors(input);
+    }
+
+    private static void validateExtraPayload(ObjectNode input) throws BadRequestException {
+        List<String> keys = new ArrayList<>();
+        input.fieldNames().forEachRemaining(field -> {
+            if (!SUPPORTED_PATCH_FIELDS.contains(field)) {
+                keys.add(field);
+            }
+        });
+        if (!keys.isEmpty()) {
+            throw new BadRequestException(String.format(UNSUPPORTED_FIELDS_IN_PAYLOAD, keys));
+        }
     }
 
     private static void validateNonNullableFieldsNotNull(ObjectNode input) throws BadRequestException {
@@ -38,9 +60,11 @@ public class ProjectPatchValidator extends PatchValidator {
     }
 
     private static void validateContributors(ObjectNode input) throws BadRequestException {
-        TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
-        };
-        validateJsonReadable(typeRef, input.get(CONTRIBUTORS).asText(), CONTRIBUTORS);
+        if (propertyHasValue(input, CONTRIBUTORS)) {
+            TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
+            };
+            validateJsonReadable(typeRef, input.get(CONTRIBUTORS).asText(), CONTRIBUTORS);
+        }
     }
 
     private static void validateJsonReadable(TypeReference<?> typeRef, String content, String propertyName)

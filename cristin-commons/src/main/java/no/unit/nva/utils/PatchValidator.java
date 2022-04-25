@@ -10,13 +10,14 @@ import nva.commons.core.StringUtils;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static nva.commons.core.attempt.Try.attempt;
 import static no.unit.nva.language.LanguageConstants.UNDEFINED_LANGUAGE;
 import static no.unit.nva.language.LanguageMapper.getLanguageByIso6391Code;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class PatchValidator {
 
@@ -60,16 +61,20 @@ public class PatchValidator {
 
     /**
      * Verifies input contains a valid language property.
+     *
      * @param input ObjectNode containing language property
      * @throws BadRequestException thrown when language property is not valid
      */
     public static void validateLanguage(ObjectNode input) throws BadRequestException {
         validateNotNullIfPresent(input, LANGUAGE);
-        validateLanguageUri(input.get(LANGUAGE));
+        if (propertyHasValue(input, LANGUAGE)) {
+            validateLanguageUri(input.get(LANGUAGE));
+        }
     }
 
     /**
      * Check if languageCode is valid ISO 6391 code.
+     *
      * @param languageCode String whith language code
      * @throws BadRequestException thrown when language code is not valid
      */
@@ -81,6 +86,7 @@ public class PatchValidator {
 
     /**
      * Check if input contains a valid language URI.
+     *
      * @param jsonNode JsonNode containing language property
      * @throws BadRequestException thrown when language uri is not valid
      */
@@ -90,15 +96,19 @@ public class PatchValidator {
         }
     }
 
-    protected static void validateInstant(ObjectNode input, String propertyName) throws BadRequestException {
-        attempt(() -> Instant.parse(input.get(propertyName).asText()))
-                .orElseThrow(fail -> new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, propertyName)));
+    protected static void validateInstantIfPresent(ObjectNode input, String propertyName) throws BadRequestException {
+        if (propertyHasValue(input, propertyName)) {
+            attempt(() -> Instant.parse(input.get(propertyName).asText()))
+                    .orElseThrow(fail -> new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, propertyName)));
+        }
     }
+
 
 
     /**
      * Verify a field has value if present in input.
-     * @param input ObjectNode containing some properties
+     *
+     * @param input        ObjectNode containing some properties
      * @param propertyName property containing value tho be verified
      * @throws BadRequestException when property is invalid
      */
@@ -106,5 +116,9 @@ public class PatchValidator {
         if (input.has(propertyName) && input.get(propertyName).isNull()) {
             throw new BadRequestException(String.format(FIELD_CAN_NOT_BE_ERASED, propertyName));
         }
+    }
+
+    public static boolean propertyHasValue(ObjectNode input, String propertyName) {
+        return input.has(propertyName) && Objects.nonNull(input.get(propertyName));
     }
 }
