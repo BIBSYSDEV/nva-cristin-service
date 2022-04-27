@@ -79,9 +79,13 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
     }
 
     private void checkIdentifiersMatch(String personId, String personIdFromCognito) throws BadRequestException {
-        if (!Objects.equals(personId, personIdFromCognito)) {
+        if (notEqual(personId, personIdFromCognito)) {
             throw new BadRequestException(ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH);
         }
+    }
+
+    private boolean notEqual(String personId, String personIdFromCognito) {
+        return !Objects.equals(personId, personIdFromCognito);
     }
 
     private boolean clientCanUpdateOwnData(RequestInfo requestInfo) throws UnauthorizedException {

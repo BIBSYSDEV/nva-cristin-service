@@ -197,7 +197,7 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnNoContentResponseWhenCallingHandlerWithAllowedJsonValuesAndUserIsAuthenticatedAsHimself()
+    void shouldReturnNoContentResponseWhenUserIsUpdatingTheirOwnPersonDataThatTheyAreAllowedToUpdate()
         throws IOException {
         ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(ORCID, VALID_ORCID);
@@ -208,7 +208,7 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldThrowBadRequestWhenUserIsAuthenticatedAsHimselfButDoesNotSendAnyFieldsHeIsAllowedToUpdate()
+    void shouldThrowBadRequestWhenUsersWantToUpdateTheirOwnPersonDataButSendsFieldsTheyAreNotAllowedToUpdate()
         throws IOException {
         ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(FIRST_NAME, randomString());
