@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
@@ -302,5 +303,10 @@ public class CristinApiClient extends ApiClient {
                 .addChild(PROJECTS_PATH)
                 .addQueryParameters(queryParameters)
                 .getUri();
+    }
+
+    // Placeholder for implementation coming in next PR
+    public Void updateProjectInCristin(String projectId, ObjectNode cristinJson) {
+        return null;
     }
 }

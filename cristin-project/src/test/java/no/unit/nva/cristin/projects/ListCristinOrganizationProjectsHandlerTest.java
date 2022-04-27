@@ -99,7 +99,8 @@ class ListCristinOrganizationProjectsHandlerTest {
     void shouldReturnOKAndEmptyResponseOnValidDummyInput() throws IOException {
         InputStream inputStream = generateHandlerDummyRequest();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        GatewayResponse<SearchResponse> gatewayResponse =
+                GatewayResponse.fromOutputStream(output, SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
@@ -107,7 +108,8 @@ class ListCristinOrganizationProjectsHandlerTest {
     void shouldReturnOKAndIdInResponseOnValidDummyInput() throws IOException {
         InputStream inputStream = generateHandlerDummyRequest();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        GatewayResponse<SearchResponse> gatewayResponse =
+                GatewayResponse.fromOutputStream(output, SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         final SearchResponse searchResponse = gatewayResponse.getBodyObject(SearchResponse.class);
 

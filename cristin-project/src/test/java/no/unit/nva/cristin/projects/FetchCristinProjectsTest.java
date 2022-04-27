@@ -636,7 +636,8 @@ class FetchCristinProjectsTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(body.getDetail(),
-                containsString(invalidQueryParametersMessageWithRange(STATUS, Arrays.toString(ProjectStatus.values()))));
+                containsString(
+                        invalidQueryParametersMessageWithRange(STATUS, Arrays.toString(ProjectStatus.values()))));
     }
 
     @ParameterizedTest(
@@ -650,7 +651,8 @@ class FetchCristinProjectsTest {
 
         handler.handleRequest(input, output, context);
 
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        GatewayResponse<SearchResponse> gatewayResponse =
+                GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
     }
