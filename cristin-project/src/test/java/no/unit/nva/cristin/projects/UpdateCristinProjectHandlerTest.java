@@ -8,6 +8,7 @@ import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.language.LanguageMapper;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -63,6 +64,7 @@ class UpdateCristinProjectHandlerTest {
     private Context context;
     private ByteArrayOutputStream output;
     private UpdateCristinProjectHandler handler;
+    private final Environment environment = new Environment();
 
 
     @BeforeEach
@@ -70,7 +72,8 @@ class UpdateCristinProjectHandlerTest {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        handler = new UpdateCristinProjectHandler();
+        UpdateCristinApiClient updateCristinApiClient = new UpdateCristinApiClient(httpClientMock);
+        handler = new UpdateCristinProjectHandler(updateCristinApiClient, environment);
     }
 
 

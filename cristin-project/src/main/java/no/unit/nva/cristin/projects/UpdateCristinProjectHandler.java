@@ -25,7 +25,7 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
     public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
             "No supported fields in payload, not doing anything";
 
-    private final transient CristinApiClient cristinApiClient;
+    private final transient UpdateCristinApiClient cristinApiClient;
 
     @JacocoGenerated
     public UpdateCristinProjectHandler() {
@@ -34,10 +34,10 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
 
     @JacocoGenerated
     public UpdateCristinProjectHandler(Environment environment) {
-        this(new CristinApiClient(), environment);
+        this(new UpdateCristinApiClient(), environment);
     }
 
-    public UpdateCristinProjectHandler(CristinApiClient cristinApiClient, Environment environment) {
+    public UpdateCristinProjectHandler(UpdateCristinApiClient cristinApiClient, Environment environment) {
         super(String.class, environment);
         this.cristinApiClient = cristinApiClient;
     }
