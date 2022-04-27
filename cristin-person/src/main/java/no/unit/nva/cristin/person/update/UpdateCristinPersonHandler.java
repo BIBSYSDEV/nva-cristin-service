@@ -66,7 +66,7 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
                 new CristinPersonPatchJsonCreator(objectNode).createWithAllowedUserModifiableData().getOutput();
             checkHasFields(cristinJson);
 
-            return apiClient.updatePersonInCristin(personId, cristinJson);
+            return apiClient.updatePersonInCristin(personIdFromCognito, cristinJson);
         } else {
             throw new ForbiddenException();
         }
