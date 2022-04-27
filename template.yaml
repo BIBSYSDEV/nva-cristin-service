@@ -155,7 +155,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
-            Path: /project/{id}
+            Path: /project/{identifier}
             Method: get
 
   NvaCristinUpdateProjectFunction:

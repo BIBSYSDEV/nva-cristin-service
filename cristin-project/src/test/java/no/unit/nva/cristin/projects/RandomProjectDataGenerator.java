@@ -67,7 +67,7 @@ public class RandomProjectDataGenerator {
                 .withIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
                 .withTitle(randomString())
                 .withLanguage(language)
-                .withStatus(randomElement(ProjectStatus.values()))
+                .withStatus(randomStatus())
                 .withAlternativeTitles(randomListOfTitles(language))
                 .withStartDate(randomInstant())
                 .withEndDate(randomInstant())
@@ -94,11 +94,15 @@ public class RandomProjectDataGenerator {
                 .withType(PROJECT_TYPE)
                 .withTitle(randomString())
                 .withLanguage(LanguageMapper.toUri(randomElement(LANGUAGES)))
-                .withStatus(randomElement(ProjectStatus.values()))
+                .withStatus(randomStatus())
                 .withCoordinatingInstitution(randomOrganization())
                 .withContributors(randomContributors())
                 .withStartDate(randomInstant())
                 .build();
+    }
+
+    static ProjectStatus randomStatus() {
+        return randomElement(ProjectStatus.values());
     }
 
 
@@ -110,7 +114,7 @@ public class RandomProjectDataGenerator {
         return getNvaApiId(identifier, ORGANIZATION_PATH);
     }
 
-    private static List<NvaContributor> randomContributors() {
+    static List<NvaContributor> randomContributors() {
         return IntStream.rangeClosed(0, randomInteger(5))
                 .mapToObj(i -> randomContributor()).collect(Collectors.toList());
     }
@@ -149,18 +153,18 @@ public class RandomProjectDataGenerator {
                 .collect(Collectors.toMap(languageCode -> languageCode, languageCode -> randomString())));
     }
 
-    private static Organization randomOrganization() {
+    static Organization randomOrganization() {
         return new Organization.Builder()
                 .withId(semiRandomOrganizationId(randomString()))
                 .withName(randomNamesMap())
                 .build();
     }
 
-    private static List<Map<String, String>> randomListOfTitles(URI usedLanguage) {
+    static List<Map<String, String>> randomListOfTitles(URI usedLanguage) {
         return List.of(Map.of(randomLanguageCodeExcept(usedLanguage), randomString()));
     }
 
-    private static String randomLanguage() {
+    static String randomLanguage() {
         return randomElement(LANGUAGES);
     }
 

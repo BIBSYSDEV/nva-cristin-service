@@ -7,11 +7,10 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
-
-import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.BadGatewayException;
@@ -36,14 +35,14 @@ import java.util.Map;
 import static java.util.Map.of;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_KEY;
@@ -70,7 +69,7 @@ public class FetchOneCristinProjectTest {
     private static final String API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON =
         "api_response_get_project_with_missing_fields.json";
     private static final String NOT_AN_ID = "Not an ID";
-    private static final String DEFAULT_ID = "9999";
+    private static final String DEFAULT_IDENTIFIER = "9999";
     private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
     private static final String ENGLISH_LANGUAGE = "en";
     private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI =
@@ -100,7 +99,7 @@ public class FetchOneCristinProjectTest {
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
     }
@@ -112,7 +111,7 @@ public class FetchOneCristinProjectTest {
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
@@ -122,12 +121,12 @@ public class FetchOneCristinProjectTest {
     void handlerReturnsBadRequestWhenIdIsNotANumber() throws Exception {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(NOT_AN_ID);
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER));
     }
 
     @Test
     void handlerReturnsNvaProjectFromTransformedCristinProjectWhenIdIsFound() throws Exception {
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
         String expected = getBodyFromResource(API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON);
         assertEquals(OBJECT_MAPPER.readValue(expected, NvaProject.class),
                 gatewayResponse.getBodyObject(NvaProject.class));
@@ -140,7 +139,7 @@ public class FetchOneCristinProjectTest {
         doThrow(new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED)).when(cristinApiClientStub)
             .getProject(any(), any());
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -153,7 +152,7 @@ public class FetchOneCristinProjectTest {
 
         doThrow(RuntimeException.class).when(cristinApiClientStub).getProject(any(), any());
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -170,7 +169,7 @@ public class FetchOneCristinProjectTest {
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         String expected = getBodyFromResource(API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON);
         assertEquals(OBJECT_MAPPER.readValue(expected, NvaProject.class),
@@ -184,17 +183,17 @@ public class FetchOneCristinProjectTest {
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(
-            String.format(ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, DEFAULT_ID)));
+            String.format(ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, DEFAULT_IDENTIFIER)));
     }
 
     @Test
     void getsCorrectUriWhenCallingGetProjectUriBuilder() throws Exception {
         assertEquals(new URI(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI),
-            cristinApiClientStub.generateGetProjectUri(DEFAULT_ID, ENGLISH_LANGUAGE));
+            cristinApiClientStub.generateGetProjectUri(DEFAULT_IDENTIFIER, ENGLISH_LANGUAGE));
     }
 
     @Test
@@ -204,7 +203,7 @@ public class FetchOneCristinProjectTest {
         doReturn(new HttpResponseFaker(EMPTY_STRING))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -218,7 +217,7 @@ public class FetchOneCristinProjectTest {
         doThrow(URISyntaxException.class).when(cristinApiClientStub).generateGetProjectUri(any(), any());
 
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -232,7 +231,7 @@ public class FetchOneCristinProjectTest {
         doReturn(new HttpResponseFaker(EMPTY_STRING, 418))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -245,7 +244,7 @@ public class FetchOneCristinProjectTest {
 
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withPathParameters(of(ID, DEFAULT_ID))
+            .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
             .withHeaders(of(HttpHeaders.ACCEPT, contentTypeRequested))
             .build();
         handler.handleRequest(input, output, context);
@@ -260,7 +259,7 @@ public class FetchOneCristinProjectTest {
     void handlerReturnsDefaultContentTypeWhenAcceptHeaderSetToDefault() throws Exception {
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withPathParameters(of(ID, DEFAULT_ID))
+            .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
             .withHeaders(of(HttpHeaders.ACCEPT, DEFAULT_ACCEPT_HEADER))
             .build();
         handler.handleRequest(input, output, context);
@@ -278,7 +277,7 @@ public class FetchOneCristinProjectTest {
 
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withPathParameters(of(ID, DEFAULT_ID))
+            .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
             .withHeaders(of(HttpHeaders.ACCEPT, contentTypeRequested))
             .build();
         handler.handleRequest(input, output, context);
@@ -293,7 +292,7 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerReturnsNvaProjectContainingFundingFromCristinWhenFundingHasValuesInCristin() throws Exception {
 
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
         final NvaProject expectedNvaProject = OBJECT_MAPPER.readValue(
                 getBodyFromResource(API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON), NvaProject.class);
         final List<Funding> funding = notRandomFunding();
@@ -308,7 +307,7 @@ public class FetchOneCristinProjectTest {
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                 .withBody(null)
                 .withQueryParameters(of(INVALID_QUERY_PARAM_KEY, INVALID_QUERY_PARAM_VALUE))
-                .withPathParameters(of(ID, DEFAULT_ID))
+                .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
                 .build();
         handler.handleRequest(input, output, context);
 
@@ -324,7 +323,7 @@ public class FetchOneCristinProjectTest {
     @Test
     void handlerReturnsNvaProjectContainingStatusFromCristinWhenStatusIsValid() throws Exception {
 
-        final GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_ID);
+        final GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
         final NvaProject actualNvaProject = gatewayResponse.getBodyObject(NvaProject.class);
         final ProjectStatus expectedProjectStatus = ProjectStatus.ACTIVE;
         assertEquals(expectedProjectStatus, actualNvaProject.getStatus());
@@ -334,10 +333,12 @@ public class FetchOneCristinProjectTest {
     void handlerReturnsBadGatewayWhenCristinProjectHasInvalidStatusValue() throws Exception {
         final FetchOneCristinProject fetchHandler =
                 new FetchOneCristinProject(createCristinApiClientWithResponseContainingError(), environment);
-        final InputStream input = requestWithLanguageAndId(of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(ID, DEFAULT_ID));
+        final InputStream input = requestWithLanguageAndId(
+                of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(IDENTIFIER, DEFAULT_IDENTIFIER));
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         fetchHandler.handleRequest(input, outputStream, mock(Context.class));
-        final GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(outputStream, NvaProject.class);
+        final GatewayResponse<NvaProject> gatewayResponse =
+                GatewayResponse.fromOutputStream(outputStream, NvaProject.class);
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
     }
 
@@ -347,7 +348,8 @@ public class FetchOneCristinProjectTest {
         final String summary = randomSummary();
         final Map<String, String> expectedSummary = Map.of(summaryLanguage, summary);
         final CristinApiClient cristinApiClient = createCristinApiClientWithAcademicSummary(summaryLanguage, summary);
-        final InputStream input = requestWithLanguageAndId(of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(ID, DEFAULT_ID));
+        final InputStream input = requestWithLanguageAndId(
+                of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(IDENTIFIER, DEFAULT_IDENTIFIER));
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         new FetchOneCristinProject(cristinApiClient, environment)
                 .handleRequest(input, outputStream, mock(Context.class));
@@ -391,10 +393,10 @@ public class FetchOneCristinProjectTest {
         return List.of(new Funding(fundingSource,fundingCode));
     }
 
-    private GatewayResponse<NvaProject> sendQueryWithId(String id) throws IOException {
+    private GatewayResponse<NvaProject> sendQueryWithId(String identifier) throws IOException {
         InputStream input = requestWithLanguageAndId(
             of(LANGUAGE, DEFAULT_LANGUAGE_CODE),
-            of(ID, id));
+            of(IDENTIFIER, identifier));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, NvaProject.class);
     }
