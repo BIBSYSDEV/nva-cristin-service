@@ -25,7 +25,7 @@ public class PersonPatchValidator {
         validateReservedIfPresent(input);
     }
 
-    private static void validateOrcidIfPresent(ObjectNode input) throws BadRequestException {
+    protected static void validateOrcidIfPresent(ObjectNode input) throws BadRequestException {
         if (input.has(ORCID) && !input.get(ORCID).isNull() && !Utils.isOrcid(input.get(ORCID).asText())) {
             throw new BadRequestException(ORCID_IS_NOT_VALID);
         }

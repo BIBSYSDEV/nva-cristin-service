@@ -4,11 +4,13 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
+import java.net.URI;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +29,7 @@ import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
@@ -34,8 +37,10 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.FIELD_CAN_NOT_BE_ERASED;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.ORCID_IS_NOT_VALID;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE;
+import static no.unit.nva.cristin.person.update.UpdateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -47,12 +52,16 @@ import static org.mockito.Mockito.when;
 
 public class UpdateCristinPersonHandlerTest {
 
-    private static final Map<String, String> validPath = Map.of(PERSON_ID, randomIntegerAsString());
+    private static final String PERSON_CRISTIN_ID = "123456";
+    private static final URI PERSON_CRISTIN_ID_URI = UriWrapper.fromUri(randomUri()).addChild(PERSON_CRISTIN_ID)
+                                                         .getUri();
+    private static final Map<String, String> validPath = Map.of(PERSON_ID, PERSON_CRISTIN_ID);
     private static final String VALID_ORCID = "1234-1234-1234-1234";
     private static final String INVALID_ORCID = "1234";
     private static final String SOME_TEXT = "Hello";
     public static final String UNSUPPORTED_FIELD = "unsupportedField";
     public static final String INVALID_IDENTIFIER = "hello";
+    private static final String IDENTIFIER_NOT_MATCHING_COGNITO = "555666";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private UpdateCristinPersonApiClient apiClient;
@@ -84,10 +93,10 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
+    void shouldThrowUnauthorizedExceptionWhenClientIsNotAuthenticated() throws IOException {
         GatewayResponse<Void> gatewayResponse = queryWithoutRequiredAccessRights();
 
-        assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+        assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
@@ -187,8 +196,44 @@ public class UpdateCristinPersonHandlerTest {
         assertThat(gatewayResponse.getBody(), containsString(ErrorMessages.invalidPathParameterMessage(PERSON_ID)));
     }
 
-    private static String randomIntegerAsString() {
-        return String.valueOf(randomInteger());
+    @Test
+    void shouldReturnNoContentResponseWhenCallingHandlerWithAllowedJsonValuesAndUserIsAuthenticatedAsHimself()
+        throws IOException {
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.put(ORCID, VALID_ORCID);
+        GatewayResponse<Void> gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath,
+                                                                                          jsonObject.toString());
+
+        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenUserIsAuthenticatedAsHimselfButDoesNotSendAnyFieldsHeIsAllowedToUpdate()
+        throws IOException {
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.put(FIRST_NAME, randomString());
+        jsonObject.put(LAST_NAME, randomString());
+        jsonObject.put(PREFERRED_FIRST_NAME, randomString());
+        jsonObject.putNull(PREFERRED_LAST_NAME);
+        jsonObject.put(RESERVED, true);
+        GatewayResponse<Void> gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath,
+                                                                                          jsonObject.toString());
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenPathPersonIdentifierNotMatchingCognitoPersonIdentifier()
+        throws IOException {
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.put(ORCID, VALID_ORCID);
+        GatewayResponse<Void> gatewayResponse =
+            queryWithPersonCristinIdButNoAccessRights(Map.of(PERSON_ID, IDENTIFIER_NOT_MATCHING_COGNITO),
+                                                      jsonObject.toString());
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH));
     }
 
     private GatewayResponse<Void> sendQuery(Map<String, String> pathParam, String body) throws IOException {
@@ -210,6 +255,18 @@ public class UpdateCristinPersonHandlerTest {
             .withBody(EMPTY_JSON)
             .withPathParameters(validPath)
             .build();
+        handler.handleRequest(input, output, context);
+
+        return GatewayResponse.fromOutputStream(output, Void.class);
+    }
+
+    private GatewayResponse<Void> queryWithPersonCristinIdButNoAccessRights(Map<String, String> pathParameters,
+                                                                            String body) throws IOException {
+        InputStream input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+                                .withBody(body)
+                                .withPathParameters(pathParameters)
+                                .withPersonCristinId(PERSON_CRISTIN_ID_URI)
+                                .build();
         handler.handleRequest(input, output, context);
 
         return GatewayResponse.fromOutputStream(output, Void.class);

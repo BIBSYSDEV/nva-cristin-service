@@ -42,6 +42,15 @@ public class CristinPersonPatchJsonCreator {
         return this;
     }
 
+    /**
+     * Create Cristin json object from values allowed to be changed by the user himself.
+     */
+    public CristinPersonPatchJsonCreator createWithAllowedUserModifiableData() {
+        addOrcid();
+
+        return this;
+    }
+
     public ObjectNode getOutput() {
         return output;
     }
