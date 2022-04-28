@@ -1728,6 +1728,7 @@ components:
         orcid:
           type: string
           nullable: true
+          description: Users can update their own orcid when logged in, otherwise user administrator can do the update
         firstName:
           type: string
         lastName:
