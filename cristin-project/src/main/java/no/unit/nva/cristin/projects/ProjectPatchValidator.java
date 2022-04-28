@@ -35,11 +35,11 @@ public class ProjectPatchValidator extends PatchValidator {
      */
     public static void validate(ObjectNode input) throws BadRequestException {
         validateExtraPayload(input);
-        validateNonNullableFieldsNotNull(input);
+        validateContributors(input);
+        validateCoordinatingInstitution(input);
         validateInstantIfPresent(input, END_DATE);
         validateInstantIfPresent(input, START_DATE);
         validateLanguage(input);
-        validateContributors(input);
     }
 
     private static void validateExtraPayload(ObjectNode input) throws BadRequestException {
@@ -54,12 +54,12 @@ public class ProjectPatchValidator extends PatchValidator {
         }
     }
 
-    private static void validateNonNullableFieldsNotNull(ObjectNode input) throws BadRequestException {
-        validateNotNullIfPresent(input, CONTRIBUTORS);
+    private static void validateCoordinatingInstitution(ObjectNode input) throws BadRequestException {
         validateNotNullIfPresent(input, COORDINATING_INSTITUTION);
     }
 
     private static void validateContributors(ObjectNode input) throws BadRequestException {
+        validateNotNullIfPresent(input, CONTRIBUTORS);
         if (propertyHasValue(input, CONTRIBUTORS)) {
             TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
             };
