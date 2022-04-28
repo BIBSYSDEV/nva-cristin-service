@@ -3,13 +3,17 @@ package no.unit.nva.cristin.person.update;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
+import java.util.Objects;
+import java.util.Optional;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.utils.AccessUtils;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
+import nva.commons.apigateway.exceptions.UnauthorizedException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
@@ -25,6 +29,8 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> {
 
+    public static final String ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH = "Identifier from path does not match "
+                                                                        + "identifier from user info";
     private final transient UpdateCristinPersonApiClient apiClient;
 
     @SuppressWarnings("unused")
@@ -44,16 +50,55 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
         validateHasAccessRights(requestInfo);
 
         ObjectNode objectNode = readJsonFromInput(input);
-        PersonPatchValidator.validate(objectNode);
-        ObjectNode cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
+        String personId = getValidPersonId(requestInfo);
 
+        if (clientCanUpdateAllFields(requestInfo)) {
+            PersonPatchValidator.validate(objectNode);
+            ObjectNode cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
+            checkHasFields(cristinJson);
+
+            return apiClient.updatePersonInCristin(personId, cristinJson);
+        } else if (clientCanUpdateOwnData(requestInfo)) {
+            String personIdFromCognito = parseLastPartOfPersonCristinIdFromCognito(requestInfo).orElseThrow();
+            checkIdentifiersMatch(personId, personIdFromCognito);
+            PersonPatchValidator.validateOrcidIfPresent(objectNode);
+            ObjectNode cristinJson =
+                new CristinPersonPatchJsonCreator(objectNode).createWithAllowedUserModifiableData().getOutput();
+            checkHasFields(cristinJson);
+
+            return apiClient.updatePersonInCristin(personIdFromCognito, cristinJson);
+        } else {
+            throw new ForbiddenException();
+        }
+    }
+
+    private void checkHasFields(ObjectNode cristinJson) throws BadRequestException {
         if (cristinJson.isEmpty()) {
             throw new BadRequestException(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD);
         }
+    }
 
-        String personId = getValidPersonId(requestInfo);
+    private void checkIdentifiersMatch(String personId, String personIdFromCognito) throws BadRequestException {
+        if (notEqual(personId, personIdFromCognito)) {
+            throw new BadRequestException(ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH);
+        }
+    }
 
-        return apiClient.updatePersonInCristin(personId, cristinJson);
+    private boolean notEqual(String personId, String personIdFromCognito) {
+        return !Objects.equals(personId, personIdFromCognito);
+    }
+
+    private boolean clientCanUpdateOwnData(RequestInfo requestInfo) throws UnauthorizedException {
+        return parseLastPartOfPersonCristinIdFromCognito(requestInfo).isPresent();
+    }
+
+    private Optional<String> parseLastPartOfPersonCristinIdFromCognito(RequestInfo requestInfo)
+        throws UnauthorizedException {
+        return Optional.ofNullable(requestInfo.getPersonCristinId()).map(UriUtils::extractLastPathElement);
+    }
+
+    private boolean clientCanUpdateAllFields(RequestInfo requestInfo) {
+        return AccessUtils.requesterIsUserAdministrator(requestInfo);
     }
 
     @Override
@@ -66,8 +111,8 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
         return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
-    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {
-        if (!AccessUtils.requesterIsUserAdministrator(requestInfo)) {
+    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException, UnauthorizedException {
+        if (!AccessUtils.requesterIsUserAdministrator(requestInfo) && !clientCanUpdateOwnData(requestInfo)) {
             throw new ForbiddenException();
         }
     }
