@@ -80,8 +80,8 @@ public class CristinPositionCodesClient extends ApiClient {
     private List<CristinPositionCode> filterPositionCodeIfRequested(List<CristinPositionCode> cristinPositionCodes,
                                                                     Boolean positionStatus) {
         return cristinPositionCodes.stream()
-            .filter(position -> positionStatus == null ||
-                                positionStatus.equals(position.isEnabled()))
+            .filter(position -> positionStatus == null
+                                || positionStatus.equals(position.isEnabled()))
             .collect(Collectors.toList());
     }
 
