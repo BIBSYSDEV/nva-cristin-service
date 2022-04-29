@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.affiliations.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import java.util.Optional;
 import no.unit.nva.cristin.person.affiliations.client.CristinPositionCodesClient;
 import no.unit.nva.cristin.person.affiliations.model.PositionCodes;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -14,6 +15,7 @@ import java.net.HttpURLConnection;
 @SuppressWarnings("unused")
 public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes> {
 
+    public static final String ACTIVE_STATUS_QUERY_PARAM = "active";
     private final transient CristinPositionCodesClient apiClient;
 
     @JacocoGenerated
@@ -35,11 +37,16 @@ public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes>
     protected PositionCodes processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        return apiClient.generateQueryResponse();
+        return apiClient.generateQueryResponse(extractPositionCodeStatusLookingFor(requestInfo));
     }
 
     @Override
     protected Integer getSuccessStatusCode(Void input, PositionCodes output) {
         return HttpURLConnection.HTTP_OK;
+    }
+
+    private Boolean extractPositionCodeStatusLookingFor(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(ACTIVE_STATUS_QUERY_PARAM)
+            .map(Boolean::valueOf).orElse(null);
     }
 }

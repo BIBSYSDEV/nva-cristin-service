@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.affiliations.client;
 
+import java.util.Optional;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
 import no.unit.nva.cristin.person.affiliations.model.PositionCode;
@@ -34,9 +35,9 @@ public class CristinPositionCodesClient extends ApiClient {
      */
     public CristinPositionCodesClient() {
         this(HttpClient.newBuilder()
-            .followRedirects(HttpClient.Redirect.ALWAYS)
-            .connectTimeout(Duration.ofSeconds(30))
-            .build());
+                 .followRedirects(HttpClient.Redirect.ALWAYS)
+                 .connectTimeout(Duration.ofSeconds(30))
+                 .build());
     }
 
     public CristinPositionCodesClient(HttpClient client) {
@@ -45,12 +46,15 @@ public class CristinPositionCodesClient extends ApiClient {
 
     /**
      * Generates the response to be returned to client.
+     *
+     * @param positionStatus query param to indicate position status
      */
-    public PositionCodes generateQueryResponse() throws ApiGatewayException {
+    public PositionCodes generateQueryResponse(Boolean positionStatus) throws ApiGatewayException {
         HttpResponse<String> response = fetchQueryResults(createUpstreamUri());
         checkHttpStatusCode(createIdUri(), response.statusCode());
         List<CristinPositionCode> cristinPositionCodes =
             asList(getDeserializedResponse(response, CristinPositionCode[].class));
+        cristinPositionCodes = filterPositionCodeIfRequested(cristinPositionCodes, positionStatus);
         Set<PositionCode> positionCodes = mapPositionCodesToNva(cristinPositionCodes);
 
         return new PositionCodes(CONTEXT, positionCodes);
@@ -71,6 +75,14 @@ public class CristinPositionCodesClient extends ApiClient {
             .addChild(PERSON_PATH_NVA)
             .addChild(AFFILIATIONS_POSITIONS)
             .getUri();
+    }
+
+    private List<CristinPositionCode> filterPositionCodeIfRequested(List<CristinPositionCode> cristinPositionCodes,
+                                                                    Boolean positionStatus) {
+        return cristinPositionCodes.stream()
+            .filter(position -> positionStatus == null ||
+                                positionStatus.equals(position.isEnabled()))
+            .collect(Collectors.toList());
     }
 
     private Set<PositionCode> mapPositionCodesToNva(List<CristinPositionCode> cristinPositionCodes) {

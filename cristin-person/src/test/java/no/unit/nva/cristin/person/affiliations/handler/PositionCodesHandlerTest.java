@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.net.HttpHeaders;
 import no.unit.nva.cristin.common.ErrorMessages;
+import static no.unit.nva.cristin.person.affiliations.handler.PositionCodesHandler.ACTIVE_STATUS_QUERY_PARAM;
+import static no.unit.nva.testutils.RandomDataGenerator.randomBoolean;
 import no.unit.nva.cristin.person.affiliations.client.CristinPositionCodesClient;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
 import no.unit.nva.cristin.person.affiliations.model.PositionCode;
@@ -30,6 +32,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -59,7 +62,7 @@ public class PositionCodesHandlerTest {
         when(mockHttpClient.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_STRING, 200));
         apiClient = new CristinPositionCodesClient(mockHttpClient);
         handler = new PositionCodesHandler(apiClient, environment);
-        GatewayResponse<PositionCodes> gatewayResponse = sendQuery();
+        GatewayResponse<PositionCodes> gatewayResponse = sendQuery(null);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -67,18 +70,46 @@ public class PositionCodesHandlerTest {
     }
 
     @Test
-    void shouldReturnPositionCodesWhenCallingEndpointWithNoParams() throws IOException {
-        PositionCodes actual = sendQuery().getBodyObject(PositionCodes.class);
-        List<PositionCode> actualHits = OBJECT_MAPPER.convertValue(actual.getPositions(), new TypeReference<>() {});
+    void shouldReturnAllPositionCodesWhenCallingEndpointWithNoParams() throws IOException {
+        PositionCodes actual = sendQuery(null).getBodyObject(PositionCodes.class);
+        List<PositionCode> actualHits = OBJECT_MAPPER.convertValue(actual.getPositions(), new TypeReference<>() {
+        });
 
         assertThat(actualHits.contains(getOneCode().toPositionCode()), equalTo(true));
         assertThat(actualHits.contains(getAnotherCode().toPositionCode()), equalTo(true));
     }
 
-    private GatewayResponse<PositionCodes> sendQuery() throws IOException {
-        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER).build();
+    @Test
+    void shouldReturnRequestedStatusPositionCodesOnlyWhenCallingWithActiveQueryParams() throws IOException {
+        var expectedPositionStatus = randomBoolean();
+        var queryParamMap = Map.of(ACTIVE_STATUS_QUERY_PARAM, String.valueOf(expectedPositionStatus));
+        PositionCodes actual = sendQuery(queryParamMap).getBodyObject(PositionCodes.class);
+        List<PositionCode> actualHits = OBJECT_MAPPER.convertValue(actual.getPositions(), new TypeReference<>() {
+        });
+
+        var allPositionCodesShouldBeInRequestedStatus =
+            isAllPositionCodesShouldBeInRequestedStatus(expectedPositionStatus, actualHits);
+        assertTrue(allPositionCodesShouldBeInRequestedStatus, "All position codes should be in requested status");
+    }
+
+    private boolean isAllPositionCodesShouldBeInRequestedStatus(boolean expectedPositionStatus,
+                                                                List<PositionCode> actualHits) {
+        return actualHits.stream().allMatch(position -> position.isEnabled() == expectedPositionStatus);
+    }
+
+    private GatewayResponse<PositionCodes> sendQuery(Map<String, String> queryParams) throws IOException {
+        InputStream input = requestWithParams(queryParams);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, PositionCodes.class);
+    }
+
+    private InputStream requestWithParams(Map<String, String> queryParams)
+        throws JsonProcessingException {
+
+        return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+            .withBody(null)
+            .withQueryParameters(queryParams)
+            .build();
     }
 
     private String fakeJsonFromUpstream() throws JsonProcessingException {
