@@ -1,21 +1,5 @@
 package no.unit.nva.cristin.person.affiliations.client;
 
-import java.util.Optional;
-import no.unit.nva.cristin.common.client.ApiClient;
-import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
-import no.unit.nva.cristin.person.affiliations.model.PositionCode;
-import no.unit.nva.cristin.person.affiliations.model.PositionCodes;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.paths.UriWrapper;
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
@@ -24,6 +8,19 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.utils.UriUtils.addLanguage;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
+import no.unit.nva.cristin.person.affiliations.model.PositionCode;
+import no.unit.nva.cristin.person.affiliations.model.PositionCodes;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.paths.UriWrapper;
 
 public class CristinPositionCodesClient extends ApiClient {
 
