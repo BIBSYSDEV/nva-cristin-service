@@ -56,7 +56,7 @@ public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes>
 
     private Boolean validateAndGetPositionCodeStatusBooleanQueryParam(String activeStatusQueryParam)
         throws BadRequestException {
-        if (activeStatusQueryParam.equalsIgnoreCase("true") || activeStatusQueryParam.equalsIgnoreCase("false")) {
+        if ("true".equalsIgnoreCase(activeStatusQueryParam) || "false".equalsIgnoreCase(activeStatusQueryParam)) {
             return Boolean.valueOf(activeStatusQueryParam);
         } else {
             throw new BadRequestException(invalidQueryParametersMessage(
