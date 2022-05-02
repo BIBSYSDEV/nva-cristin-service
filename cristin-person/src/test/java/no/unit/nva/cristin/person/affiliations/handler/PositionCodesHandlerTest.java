@@ -1,12 +1,33 @@
 package no.unit.nva.cristin.person.affiliations.handler;
 
+import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static no.unit.nva.cristin.common.ErrorMessages.ONLY_SUPPORT_BOOLEAN_VALUES;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.person.affiliations.handler.PositionCodesHandler.ACTIVE_STATUS_QUERY_PARAM;
+import static no.unit.nva.testutils.RandomDataGenerator.randomBoolean;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.net.HttpHeaders;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
+import java.util.List;
+import java.util.Map;
 import no.unit.nva.cristin.common.ErrorMessages;
-import static no.unit.nva.cristin.person.affiliations.handler.PositionCodesHandler.ACTIVE_STATUS_QUERY_PARAM;
-import static no.unit.nva.testutils.RandomDataGenerator.randomBoolean;
 import no.unit.nva.cristin.person.affiliations.client.CristinPositionCodesClient;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
 import no.unit.nva.cristin.person.affiliations.model.PositionCode;
@@ -17,25 +38,7 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.http.HttpClient;
-import java.util.List;
-import java.util.Map;
-
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.zalando.problem.Problem;
 
 public class PositionCodesHandlerTest {
 
@@ -92,6 +95,20 @@ public class PositionCodesHandlerTest {
         assertTrue(allPositionCodesShouldBeInRequestedStatus, "All position codes should be in requested status");
     }
 
+    @Test
+    void shouldReturnBadRequestResponseWhenCallingWithInvalidActiveQueryParams() throws IOException {
+        var queryParamMap = Map.of(ACTIVE_STATUS_QUERY_PARAM, randomString());
+        InputStream input = requestWithParams(queryParamMap);
+        handler.handleRequest(input, output, context);
+        GatewayResponse<Problem> gatewayResponseForIvalidQueryParam = GatewayResponse.fromOutputStream(output,
+                                                                                                       Problem.class);
+        String actualErrorDetailInResponse = getProblemDetail(gatewayResponseForIvalidQueryParam);
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponseForIvalidQueryParam.getStatusCode());
+        assertThat(actualErrorDetailInResponse, containsString(invalidQueryParametersMessage(
+            ACTIVE_STATUS_QUERY_PARAM, ONLY_SUPPORT_BOOLEAN_VALUES)));
+    }
+
     private boolean isAllPositionCodesShouldBeInRequestedStatus(boolean expectedPositionStatus,
                                                                 List<PositionCode> actualHits) {
         return actualHits.stream().allMatch(position -> position.isEnabled() == expectedPositionStatus);
@@ -130,5 +147,9 @@ public class PositionCodesHandlerTest {
         anotherCode.setName(Map.of("en", "Janitor", "nb", "Vaktmester"));
         anotherCode.setEnabled(false);
         return anotherCode;
+    }
+
+    private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
+        return gatewayResponse.getBodyObject(Problem.class).getDetail();
     }
 }
