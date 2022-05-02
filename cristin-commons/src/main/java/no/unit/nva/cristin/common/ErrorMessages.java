@@ -32,7 +32,8 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_DEPTH_INVALID = "Parameter 'depth' has invalid value. "
             + "Must be 'top' or 'full'";
     public static final String ERROR_MESSAGE_INVALID_VALUE = "Parameter '%s' has invalid value. ";
-    public static final String ERROR_MESSAGE_INVALID_VALUE_WITH_RANGE = "Parameter '%s' has invalid value. Supported values are: ";
+    public static final String ERROR_MESSAGE_INVALID_VALUE_WITH_RANGE =
+        "Parameter '%s' has invalid value. Supported values are: ";
 
     public static final String ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE =
             "Remote service responded with status: %s when client called uri: %s";
