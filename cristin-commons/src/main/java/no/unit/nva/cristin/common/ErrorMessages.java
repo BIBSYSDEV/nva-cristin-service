@@ -55,6 +55,7 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
         "No supported fields in payload, not doing anything";
     public static final String ONLY_SUPPORT_BOOLEAN_VALUES = "Valid values are true or false";
+
     /**
      * Formats and emits a message with valid parameter names.
      *
