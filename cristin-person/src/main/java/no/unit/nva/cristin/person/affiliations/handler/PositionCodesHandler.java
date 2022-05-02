@@ -50,8 +50,7 @@ public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes>
     }
 
     private Boolean extractPositionCodeStatusQueryParam(RequestInfo requestInfo) throws BadRequestException {
-        var activeStatusQueryParam = requestInfo.getQueryParameterOpt(ACTIVE_STATUS_QUERY_PARAM)
-            .map(String::valueOf).orElse(null);
+        var activeStatusQueryParam = requestInfo.getQueryParameterOpt(ACTIVE_STATUS_QUERY_PARAM).orElse(null);
         return StringUtils.isEmpty(activeStatusQueryParam) ? null
                    : validateAndGetPositionCodeStatusBooleanQueryParam(activeStatusQueryParam);
     }
