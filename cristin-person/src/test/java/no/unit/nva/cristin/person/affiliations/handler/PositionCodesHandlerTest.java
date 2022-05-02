@@ -86,7 +86,7 @@ public class PositionCodesHandlerTest {
     void shouldReturnRequestedStatusPositionCodesOnlyWhenCallingWithActiveQueryParams() throws IOException {
         var expectedPositionStatus = randomBoolean();
         var queryParamMap = Map.of(ACTIVE_STATUS_QUERY_PARAM, String.valueOf(expectedPositionStatus));
-        PositionCodes actual = sendQuery(queryParamMap).getBodyObject(PositionCodes.class);
+        var actual = sendQuery(queryParamMap).getBodyObject(PositionCodes.class);
         List<PositionCode> actualHits = OBJECT_MAPPER.convertValue(actual.getPositions(), new TypeReference<>() {
         });
 
@@ -98,13 +98,13 @@ public class PositionCodesHandlerTest {
     @Test
     void shouldReturnBadRequestResponseWhenCallingWithInvalidActiveQueryParams() throws IOException {
         var queryParamMap = Map.of(ACTIVE_STATUS_QUERY_PARAM, randomString());
-        InputStream input = requestWithParams(queryParamMap);
-        handler.handleRequest(input, output, context);
-        GatewayResponse<Problem> gatewayResponseForIvalidQueryParam = GatewayResponse.fromOutputStream(output,
-                                                                                                       Problem.class);
-        String actualErrorDetailInResponse = getProblemDetail(gatewayResponseForIvalidQueryParam);
+        var inputStream = requestWithParams(queryParamMap);
+        handler.handleRequest(inputStream, output, context);
+        var gatewayResponseForInvalidQueryParam = GatewayResponse.fromOutputStream(output,
+                                                                                   Problem.class);
+        var actualErrorDetailInResponse = getProblemDetail(gatewayResponseForInvalidQueryParam);
 
-        assertEquals(HTTP_BAD_REQUEST, gatewayResponseForIvalidQueryParam.getStatusCode());
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponseForInvalidQueryParam.getStatusCode());
         assertThat(actualErrorDetailInResponse, containsString(invalidQueryParametersMessage(
             ACTIVE_STATUS_QUERY_PARAM, ONLY_SUPPORT_BOOLEAN_VALUES)));
     }

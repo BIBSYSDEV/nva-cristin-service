@@ -10,7 +10,6 @@ import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.utils.UriUtils.addLanguage;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
@@ -47,18 +46,18 @@ public class CristinPositionCodesClient extends ApiClient {
      * @param positionStatus query param to indicate position status
      */
     public PositionCodes generateQueryResponse(Boolean positionStatus) throws ApiGatewayException {
-        HttpResponse<String> response = fetchQueryResults(createUpstreamUri());
+        var response = fetchQueryResults(createUpstreamUri());
         checkHttpStatusCode(createIdUri(), response.statusCode());
-        List<CristinPositionCode> cristinPositionCodes =
+        var cristinPositionCodes =
             asList(getDeserializedResponse(response, CristinPositionCode[].class));
         cristinPositionCodes = filterPositionCodeIfRequested(cristinPositionCodes, positionStatus);
-        Set<PositionCode> positionCodes = mapPositionCodesToNva(cristinPositionCodes);
+        var positionCodes = mapPositionCodesToNva(cristinPositionCodes);
 
         return new PositionCodes(CONTEXT, positionCodes);
     }
 
     private static URI createUpstreamUri() {
-        URI uri = UriWrapper.fromUri(CRISTIN_API_URL)
+        var uri = UriWrapper.fromUri(CRISTIN_API_URL)
             .addChild(PERSON_PATH)
             .addChild(AFFILIATIONS_POSITIONS)
             .getUri();
