@@ -18,6 +18,8 @@ import nva.commons.core.StringUtils;
 public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes> {
 
     public static final String ACTIVE_STATUS_QUERY_PARAM = "active";
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
     private final transient CristinPositionCodesClient apiClient;
 
     @JacocoGenerated
@@ -56,7 +58,7 @@ public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes>
 
     private Boolean validateAndGetPositionCodeStatusBooleanQueryParam(String activeStatusQueryParam)
         throws BadRequestException {
-        if ("true".equalsIgnoreCase(activeStatusQueryParam) || "false".equalsIgnoreCase(activeStatusQueryParam)) {
+        if (TRUE.equalsIgnoreCase(activeStatusQueryParam) || FALSE.equalsIgnoreCase(activeStatusQueryParam)) {
             return Boolean.valueOf(activeStatusQueryParam);
         } else {
             throw new BadRequestException(invalidQueryParametersMessage(
