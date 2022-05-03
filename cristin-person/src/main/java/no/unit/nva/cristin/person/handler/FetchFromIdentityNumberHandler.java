@@ -51,7 +51,9 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        logger.info("requestInfo={}", Try.attempt( () ->  JsonUtils.dtoObjectMapper.writeValueAsString(requestInfo)));
+        var requestInfoString = Try.attempt(() -> JsonUtils.dtoObjectMapper.writeValueAsString(requestInfo))
+                                      .orElseThrow();
+        logger.info("requestInfo={}", requestInfoString);
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
         validateQueryParameters(requestInfo);
