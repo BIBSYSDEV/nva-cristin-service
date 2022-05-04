@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
+import no.unit.nva.model.Organization;
 import no.unit.nva.utils.PatchValidator;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
@@ -25,6 +26,7 @@ public class ProjectPatchValidator extends PatchValidator {
     private static final Set<String> SUPPORTED_PATCH_FIELDS =
             Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE);
     public static final String UNSUPPORTED_FIELDS_IN_PAYLOAD = "Unsupported fields in payload %s";
+    public static final String TITLE_MUST_HAVE_A_LANGUAGE = "Title must have a language associated";
 
 
     /**
@@ -35,11 +37,20 @@ public class ProjectPatchValidator extends PatchValidator {
      */
     public static void validate(ObjectNode input) throws BadRequestException {
         validateExtraPayload(input);
-        validateNonNullableFieldsNotNull(input);
+        validateTitleAndLanguage(input);
+        validateContributors(input);
+        validateCoordinatingInstitution(input);
         validateInstantIfPresent(input, END_DATE);
         validateInstantIfPresent(input, START_DATE);
         validateLanguage(input);
-        validateContributors(input);
+    }
+
+    private static void validateTitleAndLanguage(ObjectNode input) throws BadRequestException {
+        // Language must have value if present, title can be 'nulled'
+        validateNotNullIfPresent(input, LANGUAGE);
+        if (propertyHasValue(input, TITLE) && !propertyHasValue(input, LANGUAGE)) {
+            throw new BadRequestException(TITLE_MUST_HAVE_A_LANGUAGE);
+        }
     }
 
     private static void validateExtraPayload(ObjectNode input) throws BadRequestException {
@@ -54,12 +65,18 @@ public class ProjectPatchValidator extends PatchValidator {
         }
     }
 
-    private static void validateNonNullableFieldsNotNull(ObjectNode input) throws BadRequestException {
-        validateNotNullIfPresent(input, CONTRIBUTORS);
+    private static void validateCoordinatingInstitution(ObjectNode input) throws BadRequestException {
         validateNotNullIfPresent(input, COORDINATING_INSTITUTION);
+        if (propertyHasValue(input, COORDINATING_INSTITUTION)) {
+            attempt(() -> OBJECT_MAPPER.readValue(input.get(COORDINATING_INSTITUTION).asText(), Organization.class))
+                    .orElseThrow(fail ->
+                        new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, COORDINATING_INSTITUTION)));
+        }
+
     }
 
     private static void validateContributors(ObjectNode input) throws BadRequestException {
+        validateNotNullIfPresent(input, CONTRIBUTORS);
         if (propertyHasValue(input, CONTRIBUTORS)) {
             TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
             };

@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -25,7 +26,7 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
     public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
             "No supported fields in payload, not doing anything";
 
-    private final transient CristinApiClient cristinApiClient;
+    private final transient UpdateCristinApiClient cristinApiClient;
 
     @JacocoGenerated
     public UpdateCristinProjectHandler() {
@@ -34,10 +35,10 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
 
     @JacocoGenerated
     public UpdateCristinProjectHandler(Environment environment) {
-        this(new CristinApiClient(), environment);
+        this(new UpdateCristinApiClient(CristinAuthenticator.getHttpClient()), environment);
     }
 
-    public UpdateCristinProjectHandler(CristinApiClient cristinApiClient, Environment environment) {
+    public UpdateCristinProjectHandler(UpdateCristinApiClient cristinApiClient, Environment environment) {
         super(String.class, environment);
         this.cristinApiClient = cristinApiClient;
     }
