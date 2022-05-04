@@ -2,7 +2,6 @@ package no.unit.nva.cristin.projects;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.language.LanguageMapper;
@@ -20,7 +19,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
@@ -81,30 +79,27 @@ class UpdateCristinProjectHandlerTest {
 
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
-        GatewayResponse<Void> gatewayResponse = queryWithoutRequiredAccessRights();
-
+        var gatewayResponse = queryWithoutRequiredAccessRights();
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @Test
     void shouldReturnBadRequestWhenSendingNullBody() throws IOException {
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, null);
+        var gatewayResponse = sendQuery(validPath, null);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 
     @Test
     void shouldReturnNoContentResponseWhenCallingHandlerWithValidJson() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
-
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(CONTRIBUTORS, OBJECT_MAPPER.writeValueAsString(randomContributors()));
         jsonObject.put(COORDINATING_INSTITUTION, OBJECT_MAPPER.writeValueAsString(randomOrganization()));
         jsonObject.put(END_DATE, randomInstantString());
         jsonObject.put(LANGUAGE, LanguageMapper.getLanguageByIso6391Code(randomLanguage()).getLexvoUri().toString());
         jsonObject.put(START_DATE, randomInstantString());
         jsonObject.put(TITLE, randomString());
-
         GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
@@ -112,26 +107,23 @@ class UpdateCristinProjectHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenNoSupportedFieldsArePresent() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
-
-
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(ACADEMIC_SUMMARY, getSummaryAsString());
         jsonObject.put(ALTERNATIVE_TITLES, getTitleAsString());
         jsonObject.put(POPULAR_SCIENTIFIC_SUMMARY, getSummaryAsString());
         jsonObject.put(STATUS, OBJECT_MAPPER.writeValueAsString(randomStatus()));
-
         GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
 
-        List<String> keys = new ArrayList<>();
+        var keys = new ArrayList<>();
         jsonObject.fieldNames().forEachRemaining(field -> keys.add(field));
         assertThat(gatewayResponse.getBody(), containsString(String.format(UNSUPPORTED_FIELDS_IN_PAYLOAD, keys)));
     }
 
     @Test
     void shouldReturnBadRequestWhenTitleHasNoLanguageFieldPresent() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(TITLE, randomString());
         GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
@@ -139,7 +131,7 @@ class UpdateCristinProjectHandlerTest {
 
     @Test
     void shouldReturnOKNoContentWhenRequestHasTitleAndLanguagePresent() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(TITLE, randomString());
         jsonObject.put(LANGUAGE, toUri(randomLanguage()).toString());
         GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());

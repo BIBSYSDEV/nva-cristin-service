@@ -2,7 +2,6 @@ package no.unit.nva.cristin.projects;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.model.Organization;
@@ -10,7 +9,6 @@ import no.unit.nva.model.Organization;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
@@ -54,20 +52,18 @@ public class CristinProjectPatchJsonCreator {
 
     private void addTitleAndLanguageIfBothPresent() {
         var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
-        var title = input.get(TITLE).asText();
-        Map<String, String> titles = new ConcurrentHashMap<>();
         if (nonNull(language)) {
-            titles.put(language.getIso6391Code(), title);
-            output.set(TITLE, OBJECT_MAPPER.valueToTree(titles));
+            output.set(TITLE, OBJECT_MAPPER.valueToTree(Map.of(language.getIso6391Code(), input.get(TITLE).asText())));
         }
     }
 
     private void addCoordinatingInstitutionIfPresent() {
         if (input.has(COORDINATING_INSTITUTION)) {
-            final String content = input.get(COORDINATING_INSTITUTION).asText();
-            Organization coordinatingInstitution =
-                    attempt(() -> OBJECT_MAPPER.readValue(content, Organization.class)).orElseThrow();
-            CristinOrganization cristinOrganization = fromOrganizationContainingInstitution(coordinatingInstitution);
+            var coordinatingInstitution =
+                    attempt(() -> OBJECT_MAPPER.readValue(input.get(COORDINATING_INSTITUTION).asText(),
+                            Organization.class))
+                            .orElseThrow();
+            var cristinOrganization = fromOrganizationContainingInstitution(coordinatingInstitution);
             output.set(CRISTIN_COORDINATING_INSTITUTION, OBJECT_MAPPER.valueToTree(cristinOrganization));
         }
     }
@@ -76,10 +72,9 @@ public class CristinProjectPatchJsonCreator {
         if (input.has(CONTRIBUTORS)) {
             TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
             };
-            List<NvaContributor> contributors =
+            var contributors =
                     attempt(() -> OBJECT_MAPPER.readValue(input.get(CONTRIBUTORS).asText(), typeRef)).orElseThrow();
-            List<CristinPerson> participants = extractContributors(contributors);
-            output.set(PARTICIPANTS, OBJECT_MAPPER.valueToTree(participants));
+            output.set(PARTICIPANTS, OBJECT_MAPPER.valueToTree(extractContributors(contributors)));
         }
     }
 
