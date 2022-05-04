@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -48,6 +49,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static nva.commons.core.language.LanguageMapper.*;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -135,6 +137,14 @@ class UpdateCristinProjectHandlerTest {
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
     }
 
+    @Test
+    void shouldReturnOKNoContentWhenRequestHasTitleAndLanguagePresent() throws IOException {
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.put(TITLE, randomString());
+        jsonObject.put(LANGUAGE, toUri(randomLanguage()).toString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
 
     private String getTitleAsString() throws JsonProcessingException {
         return OBJECT_MAPPER.writeValueAsString(randomListOfTitles(URI.create(randomLanguage())));
