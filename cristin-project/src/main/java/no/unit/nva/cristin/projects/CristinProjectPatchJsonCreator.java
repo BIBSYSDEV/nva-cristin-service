@@ -23,6 +23,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
+import static no.unit.nva.utils.CustomInstantSerializer.addMillisToInstantString;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class CristinProjectPatchJsonCreator {
@@ -84,13 +85,13 @@ public class CristinProjectPatchJsonCreator {
 
     private void addStartDateIfPresent() {
         if (input.has(START_DATE)) {
-            output.set(START_DATE, input.get(START_DATE));
+            output.put(START_DATE, addMillisToInstantString(input.get(START_DATE).asText()));
         }
     }
 
     private void addEndDateIfPresent() {
         if (input.has(END_DATE)) {
-            output.set(END_DATE, input.get(END_DATE));
+            output.put(END_DATE, addMillisToInstantString(input.get(END_DATE).asText()));
         }
     }
 

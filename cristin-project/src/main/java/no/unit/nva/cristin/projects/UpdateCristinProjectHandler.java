@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -34,7 +35,7 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
 
     @JacocoGenerated
     public UpdateCristinProjectHandler(Environment environment) {
-        this(new UpdateCristinApiClient(), environment);
+        this(new UpdateCristinApiClient(CristinAuthenticator.getHttpClient()), environment);
     }
 
     public UpdateCristinProjectHandler(UpdateCristinApiClient cristinApiClient, Environment environment) {
