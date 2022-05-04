@@ -7,15 +7,22 @@ import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.model.Organization;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
+import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class CristinProjectPatchJsonCreator {
@@ -36,11 +43,22 @@ public class CristinProjectPatchJsonCreator {
      * title coordinating_institution institutions_responsible_for_research start_date end_date participants
      */
     public CristinProjectPatchJsonCreator create() {
+        addTitleAndLanguageIfBothPresent();
         addCoordinatingInstitutionIfPresent();
         addContributorsIfPresent();
         addStartDateIfPresent();
         addEndDateIfPresent();
         return this;
+    }
+
+    private void addTitleAndLanguageIfBothPresent() {
+        var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
+        var title = input.get(TITLE).asText();
+        Map<String, String> titles = new ConcurrentHashMap<>();
+        if (nonNull(language)) {
+            titles.put(language.getIso6391Code(), title);
+            output.set(TITLE, OBJECT_MAPPER.valueToTree(titles));
+        }
     }
 
     private void addCoordinatingInstitutionIfPresent() {

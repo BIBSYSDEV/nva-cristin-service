@@ -127,6 +127,14 @@ class UpdateCristinProjectHandlerTest {
         assertThat(gatewayResponse.getBody(), containsString(String.format(UNSUPPORTED_FIELDS_IN_PAYLOAD, keys)));
     }
 
+    @Test
+    void shouldReturnBadRequestWhenTitleHasNoLanguageFieldPresent() throws IOException {
+        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.put(TITLE, randomString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    }
+
 
     private String getTitleAsString() throws JsonProcessingException {
         return OBJECT_MAPPER.writeValueAsString(randomListOfTitles(URI.create(randomLanguage())));

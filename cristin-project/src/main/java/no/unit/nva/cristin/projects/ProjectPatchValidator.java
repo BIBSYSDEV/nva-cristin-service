@@ -25,6 +25,7 @@ public class ProjectPatchValidator extends PatchValidator {
     private static final Set<String> SUPPORTED_PATCH_FIELDS =
             Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE);
     public static final String UNSUPPORTED_FIELDS_IN_PAYLOAD = "Unsupported fields in payload %s";
+    public static final String TITLE_MUST_HAVE_A_LANGUAGE = "Title must have a language associated";
 
 
     /**
@@ -35,11 +36,20 @@ public class ProjectPatchValidator extends PatchValidator {
      */
     public static void validate(ObjectNode input) throws BadRequestException {
         validateExtraPayload(input);
+        ValidateTitleAndLanguage(input);
         validateContributors(input);
         validateCoordinatingInstitution(input);
         validateInstantIfPresent(input, END_DATE);
         validateInstantIfPresent(input, START_DATE);
         validateLanguage(input);
+    }
+
+    private static void ValidateTitleAndLanguage(ObjectNode input) throws BadRequestException {
+        // Language must have value if present, title can be 'nulled'
+        validateNotNullIfPresent(input, LANGUAGE);
+        if (propertyHasValue(input, TITLE) && !propertyHasValue(input, LANGUAGE)) {
+            throw new BadRequestException(TITLE_MUST_HAVE_A_LANGUAGE);
+        }
     }
 
     private static void validateExtraPayload(ObjectNode input) throws BadRequestException {
