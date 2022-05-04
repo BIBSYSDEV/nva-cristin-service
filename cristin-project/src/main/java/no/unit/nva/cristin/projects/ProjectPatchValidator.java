@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
+import no.unit.nva.model.Organization;
 import no.unit.nva.utils.PatchValidator;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
@@ -66,6 +67,12 @@ public class ProjectPatchValidator extends PatchValidator {
 
     private static void validateCoordinatingInstitution(ObjectNode input) throws BadRequestException {
         validateNotNullIfPresent(input, COORDINATING_INSTITUTION);
+        if (propertyHasValue(input, COORDINATING_INSTITUTION)) {
+            attempt(() -> OBJECT_MAPPER.readValue(input.get(COORDINATING_INSTITUTION).asText(), Organization.class))
+                    .orElseThrow(fail ->
+                        new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, COORDINATING_INSTITUTION)));
+        }
+
     }
 
     private static void validateContributors(ObjectNode input) throws BadRequestException {
