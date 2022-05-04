@@ -49,7 +49,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
-import static nva.commons.core.language.LanguageMapper.*;
+import static nva.commons.core.language.LanguageMapper.toUri;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

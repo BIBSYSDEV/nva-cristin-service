@@ -36,7 +36,7 @@ public class ProjectPatchValidator extends PatchValidator {
      */
     public static void validate(ObjectNode input) throws BadRequestException {
         validateExtraPayload(input);
-        ValidateTitleAndLanguage(input);
+        validateTitleAndLanguage(input);
         validateContributors(input);
         validateCoordinatingInstitution(input);
         validateInstantIfPresent(input, END_DATE);
@@ -44,7 +44,7 @@ public class ProjectPatchValidator extends PatchValidator {
         validateLanguage(input);
     }
 
-    private static void ValidateTitleAndLanguage(ObjectNode input) throws BadRequestException {
+    private static void validateTitleAndLanguage(ObjectNode input) throws BadRequestException {
         // Language must have value if present, title can be 'nulled'
         validateNotNullIfPresent(input, LANGUAGE);
         if (propertyHasValue(input, TITLE) && !propertyHasValue(input, LANGUAGE)) {
