@@ -1,32 +1,10 @@
 package no.unit.nva.cristin.person.employment.query;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.net.HttpHeaders;
-import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.model.nva.Employment;
-import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.core.Environment;
-import nva.commons.core.ioutils.IoUtils;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.http.HttpClient;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-
 import static no.unit.nva.cristin.common.ErrorMessages.invalidPathParameterMessage;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.person.employment.query.QueryPersonEmploymentClient.BAD_REQUEST_FROM_UPSTREAM;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -36,6 +14,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.net.HttpHeaders;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.person.model.nva.Employment;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class QueryPersonEmploymentHandlerTest {
 
@@ -134,7 +133,8 @@ public class QueryPersonEmploymentHandlerTest {
     }
 
     private List<Employment> extractHitsFromSearchResponse(SearchResponse response) {
-        return OBJECT_MAPPER.convertValue(response.getHits(), new TypeReference<>() {});
+        return OBJECT_MAPPER.convertValue(response.getHits(), new TypeReference<>() {
+        });
     }
 
     private SearchResponse readExpectedResponse() throws JsonProcessingException {
@@ -160,10 +160,11 @@ public class QueryPersonEmploymentHandlerTest {
 
     private InputStream requestWithParams(Map<String, String> pathParams)
         throws JsonProcessingException {
-
+        var customerId = randomUri();
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
+            .withCustomerId(customerId)
+            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .withPathParameters(pathParams)
             .build();
     }
