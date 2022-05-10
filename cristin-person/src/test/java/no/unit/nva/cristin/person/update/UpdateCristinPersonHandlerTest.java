@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import java.net.URI;
 import no.unit.nva.cristin.common.ErrorMessages;
+import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -243,10 +244,12 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     private InputStream createRequest(Map<String, String> pathParam, String body) throws JsonProcessingException {
+        var customerId = randomUri();
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
             .withBody(body)
-            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
             .withPathParameters(pathParam)
+            .withCustomerId(customerId)
+            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .build();
     }
 

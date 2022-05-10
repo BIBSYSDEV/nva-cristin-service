@@ -1,28 +1,11 @@
 package no.unit.nva.cristin.person.institution.update;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.HttpHeaders;
-import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
-import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.core.Environment;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.http.HttpClient;
-import java.util.Map;
-
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstitutionInfoClient.EMPTY_JSON;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -31,6 +14,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.HttpHeaders;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
+import java.util.Map;
+import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.core.Environment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class UpdatePersonInstitutionInfoHandlerTest {
 
@@ -96,15 +95,16 @@ public class UpdatePersonInstitutionInfoHandlerTest {
 
         InputStream input = createRequest(pathParam, body);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output,Object.class);
+        return GatewayResponse.fromOutputStream(output, Object.class);
     }
 
     private InputStream createRequest(Map<String, String> pathParam, PersonInstInfoPatch body)
         throws JsonProcessingException {
-
+        var customerId = randomUri();
         return new HandlerRequestBuilder<PersonInstInfoPatch>(OBJECT_MAPPER)
             .withBody(body)
-            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
+            .withCustomerId(customerId)
+            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .withPathParameters(pathParam)
             .build();
     }
