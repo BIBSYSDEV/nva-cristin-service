@@ -55,7 +55,7 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
         return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
-    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException, UnauthorizedException {
+    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {
         if (!AccessUtils.requesterIsUserAdministrator(requestInfo)) {
             throw new ForbiddenException();
         }
