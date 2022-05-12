@@ -1,27 +1,5 @@
 package no.unit.nva.cristin.person.institution.fetch;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.HttpHeaders;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonInstitutionInfo;
-import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
-import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.Environment;
-import nva.commons.core.paths.UriWrapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.util.Map;
-
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidPathParameterMessage;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
@@ -33,6 +11,7 @@ import static no.unit.nva.cristin.model.Constants.ORG_ID;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -44,6 +23,26 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.HttpHeaders;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.util.Map;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonInstitutionInfo;
+import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.Environment;
+import nva.commons.core.paths.UriWrapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class FetchPersonInstitutionInfoHandlerTest {
 
@@ -130,7 +129,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-            containsString(invalidPathParameterMessage(ORG_ID)));
+                   containsString(invalidPathParameterMessage(ORG_ID)));
     }
 
     @Test
@@ -170,6 +169,13 @@ public class FetchPersonInstitutionInfoHandlerTest {
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
+    private static URI getExpectedId() {
+        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH)
+            .addChild(PERSON_PATH_NVA).addChild(VALID_PERSON_ID)
+            .addChild(ORGANIZATION_PATH).addChild(VALID_INSTITUTION_ID)
+            .getUri();
+    }
+
     private GatewayResponse<PersonInstitutionInfo> queryWithoutRequiredAccessRights() throws IOException {
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID))
@@ -180,8 +186,10 @@ public class FetchPersonInstitutionInfoHandlerTest {
     }
 
     private GatewayResponse<PersonInstitutionInfo> queryWithUnsupportedQueryParams() throws IOException {
+        var customerId = randomUri();
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
+            .withCustomerId(customerId)
+            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .withQueryParameters(Map.of(randomString(), randomString()))
             .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID))
             .build();
@@ -204,18 +212,12 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
     private InputStream requestWithParams(Map<String, String> pathParams)
         throws JsonProcessingException {
-
+        var customerId = randomUri();
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
+            .withCustomerId(customerId)
+            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .withPathParameters(pathParams)
             .build();
-    }
-
-    private static URI getExpectedId() {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH)
-            .addChild(PERSON_PATH_NVA).addChild(VALID_PERSON_ID)
-            .addChild(ORGANIZATION_PATH).addChild(VALID_INSTITUTION_ID)
-            .getUri();
     }
 }

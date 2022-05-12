@@ -18,7 +18,7 @@ Globals:
         CRISTIN_API_URL: !Ref CristinApiUrl
         DOMAIN_NAME: !Ref ApiDomain
         BASE_PATH: !Ref CustomDomainBasePath
-        COGNITO_URI: !Ref CognitoAuthorizationUri
+        COGNITO_HOST: !Ref CognitoAuthorizationUri
         COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
         COGNITO_CLIENT_APP_ID: !Ref CognitoUserPoolAppClientId
   Api:

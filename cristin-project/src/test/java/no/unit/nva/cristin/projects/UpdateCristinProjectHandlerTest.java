@@ -1,26 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.HttpHeaders;
-import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.language.LanguageMapper;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.core.Environment;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
-import java.util.Map;
-
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
@@ -45,6 +24,7 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomStat
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.language.LanguageMapper.toUri;
@@ -54,6 +34,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.HttpHeaders;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.ArrayList;
+import java.util.Map;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.language.LanguageMapper;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.core.Environment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class UpdateCristinProjectHandlerTest {
 
@@ -66,7 +65,6 @@ class UpdateCristinProjectHandlerTest {
     private UpdateCristinProjectHandler handler;
     private final Environment environment = new Environment();
 
-
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
@@ -75,7 +73,6 @@ class UpdateCristinProjectHandlerTest {
         UpdateCristinApiClient updateCristinApiClient = new UpdateCristinApiClient(httpClientMock);
         handler = new UpdateCristinProjectHandler(updateCristinApiClient, environment);
     }
-
 
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
@@ -161,20 +158,21 @@ class UpdateCristinProjectHandlerTest {
     }
 
     private InputStream createRequest(Map<String, String> pathParam, String body) throws JsonProcessingException {
+        var customerId = randomUri();
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
-                .withBody(body)
-                .withAccessRight(EDIT_OWN_INSTITUTION_PROJECTS)
-                .withPathParameters(pathParam)
-                .build();
+            .withBody(body)
+            .withCustomerId(customerId)
+            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
+            .withPathParameters(pathParam)
+            .build();
     }
 
     private GatewayResponse<Void> queryWithoutRequiredAccessRights() throws IOException {
         InputStream input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
-                .withBody(EMPTY_JSON)
-                .withPathParameters(validPath)
-                .build();
+            .withBody(EMPTY_JSON)
+            .withPathParameters(validPath)
+            .build();
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
-
 }

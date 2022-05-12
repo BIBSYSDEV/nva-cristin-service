@@ -1,24 +1,5 @@
 package no.unit.nva.cristin.projects;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.IOException;
-import java.util.List;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.model.Organization;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.core.Environment;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
-
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithUnitAffiliation;
@@ -35,6 +16,23 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.util.List;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.model.Organization;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.core.Environment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class CreateCristinProjectHandlerTest {
 
@@ -61,11 +59,11 @@ class CreateCristinProjectHandlerTest {
     void shouldReturn403ForbiddenWhenRequestIsMissingRole() throws Exception {
         NvaProject randomNvaProject = randomNvaProject();
         InputStream input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
-                .withBody(randomNvaProject)
-                .withRoles(NO_ACCESS)
-                .build();
+            .withBody(randomNvaProject)
+            .withRoles(NO_ACCESS)
+            .build();
         handler.handleRequest(input, output, context);
-        GatewayResponse<Object> response = GatewayResponse.fromOutputStream(output,Object.class);
+        GatewayResponse<Object> response = GatewayResponse.fromOutputStream(output, Object.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_FORBIDDEN));
     }
@@ -176,7 +174,7 @@ class CreateCristinProjectHandlerTest {
     private GatewayResponse<NvaProject> executeRequest(NvaProject request) throws IOException {
         InputStream input = requestWithBodyAndRole(request);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output,NvaProject.class);
+        return GatewayResponse.fromOutputStream(output, NvaProject.class);
     }
 
     private NvaProject nvaProjectUsingUnitIdentifiers() {
@@ -196,9 +194,11 @@ class CreateCristinProjectHandlerTest {
     }
 
     private InputStream requestWithBodyAndRole(NvaProject body) throws JsonProcessingException {
+        var customerId = randomUri();
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
             .withBody(body)
-            .withAccessRight(EDIT_OWN_INSTITUTION_PROJECTS)
+            .withCustomerId(customerId)
+            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
             .build();
     }
 }
