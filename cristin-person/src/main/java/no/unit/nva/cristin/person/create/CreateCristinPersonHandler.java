@@ -121,8 +121,7 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     private void validateNoDuplicateNationalIdentifiers(Set<TypedValue> identifiers) throws BadRequestException {
         if (identifiers.stream().map(TypedValue::getType)
                 .filter(NATIONAL_IDENTITY_NUMBER::equals)
-                .collect(Collectors.toList())
-                .size() > MAX_NATIONAL_IDENTITY_NUMBER_COUNT) {
+                .count() > MAX_NATIONAL_IDENTITY_NUMBER_COUNT) {
             throw new BadRequestException(ERROR_MESSAGE_IDENTIFIERS_REPEATED);
         }
     }
