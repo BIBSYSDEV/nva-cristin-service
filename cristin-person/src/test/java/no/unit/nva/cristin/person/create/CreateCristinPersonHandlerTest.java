@@ -151,21 +151,60 @@ public class CreateCristinPersonHandlerTest {
                    containsString(CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_REPEATED));
     }
 
+    @Test
+    void shouldAllowUsersToCreateThemselvesInCristin() throws IOException, InterruptedException {
+        String responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
+        apiClient = new CreateCristinPersonApiClient(httpClientMock);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+        String personsOwnNin = ANOTHER_IDENTITY_NUMBER;
+        Person input = injectPersonNinIntoInput(personsOwnNin);
+        GatewayResponse<Person> gatewayResponse = sendQueryWithoutAccessRightsButWithPersonNin(input, personsOwnNin);
+
+        assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldThrowForbiddenIfUserTryingToCreateWithAnotherPersonNinThatDoesNotBelongToThemAndIsNotAuthorized()
+        throws IOException {
+        Person input = injectPersonNinIntoInput(DEFAULT_IDENTITY_NUMBER);
+        GatewayResponse<Person> gatewayResponse =
+            sendQueryWithoutAccessRightsButWithPersonNin(input, ANOTHER_IDENTITY_NUMBER);
+
+        assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+    }
+
+    private Person injectPersonNinIntoInput(String personNin) {
+        Person input = dummyPerson();
+        input.setIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, personNin)));
+        return input;
+    }
+
     private Person getPersonWithRepeatedIdentityNumber() {
         return new Person.Builder()
-            .withNames(Set.of(
-                new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
-                new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
-            .withIdentifiers(Set.of(
-                new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER),
-                new TypedValue(NATIONAL_IDENTITY_NUMBER, ANOTHER_IDENTITY_NUMBER)))
-            .build();
+                   .withNames(Set.of(
+                       new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
+                       new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
+                   .withIdentifiers(Set.of(
+                       new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER),
+                       new TypedValue(NATIONAL_IDENTITY_NUMBER, ANOTHER_IDENTITY_NUMBER)))
+                   .build();
     }
 
     private GatewayResponse<Person> sendQueryWithoutAccessRights(Person body) throws IOException {
         InputStream input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
-            .withBody(body)
-            .build();
+                                .withBody(body)
+                                .build();
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Person.class);
+    }
+
+    private GatewayResponse<Person> sendQueryWithoutAccessRightsButWithPersonNin(Person body, String personNin)
+        throws IOException {
+        InputStream input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
+                                .withBody(body)
+                                .withPersonNin(personNin)
+                                .build();
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
