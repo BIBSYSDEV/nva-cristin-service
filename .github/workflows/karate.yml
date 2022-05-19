@@ -6,13 +6,16 @@ env:
   BASE_PATH: cristin-$GITHUB_REF_NAME
   DOMAIN_NAME:  "api.dev.nva.aws.unit.no"
   CRISTIN_API_URL: "https://api.cristin-test.uio.no/v2"
-  COGNITO_USER_POOL_ID:  "eu-west-1_DNRmDPtxY"
-  COGNITO_CLIENT_APP_ID:  "4qfhv3kl9qcr2knsfb8lhu1u40"
-  TESTUSER_FEIDE_ID: "karate-user-administrator@sikt.no"
-  TESTUSER_PASSWORD: ${{ secrets.COGNITO_TESTUSER_PASSWORD }}
-  SIMPLE_TESTUSER_FEIDE_ID: "karate-simple-user@sikt.no"
+  COGNITO_USER_POOL_ID:  "eu-west-1_nLV9i5X5D"
+  COGNITO_CLIENT_APP_ID:  "5qo1p8hv58o6f4ke2p72h69pjm"
+  ADMIN_TESTUSER_ID: "karate-admin-user"
+  ADMIN_TESTUSER_NIN: ${{ secrets.COGNITO_ADMIN_TESTUSER_NIN }}
+  ADMIN_TESTUSER_PASSWORD: ${{ secrets.COGNITO_ADMIN_TESTUSER_PASSWORD }}
+  SIMPLE_TESTUSER_ID: "karate-simple-user"
   SIMPLE_TESTUSER_PASSWORD: ${{ secrets.COGNITO_SIMPLE_TESTUSER_PASSWORD }}
-  CRISTIN_EMPLOYMENT_TEST_PERSON_IDENTIFIER: "538786"
+  SIMPLE_TESTUSER_NIN: ${{ secrets.COGNITO_SIMPLE_TESTUSER_NIN }}
+  BACKEND_CLIENT_ID: "7vt27od1nkei5mepcv3df98c5k"
+  BACKEND_CLIENT_ID_SECRET: ${{ secrets.COGNITO_BACKEND_CLIENT_ID_SECRET }}
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -36,13 +39,15 @@ jobs:
         run: sam build
       # Prevent prompts and failure when the stack is unchanged
       - name: Deploy
-        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${{env.STACK_NAME}} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${{env.BASE_PATH}} ParameterKey=CristinApiUrl,ParameterValue=${CRISTIN_API_URL}
+        run: sam deploy  --resolve-s3 --no-confirm-changeset --no-fail-on-empty-changeset  --stack-name ${{env.STACK_NAME}} --parameter-overrides ParameterKey=CustomDomain,ParameterValue=${DOMAIN_NAME} ParameterKey=CustomDomainBasePath,ParameterValue=${{env.BASE_PATH}} ParameterKey=CristinApiUrl,ParameterValue=${CRISTIN_API_URL}
         # Delete existing tests users
       - name: Delete karate test users
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew deleteTestUsers --info
       # Create test users in cognito
       - name: Create karate test users
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew createTestUsers --info
+      - name: Sleep to let user settle
+        run: sleep 10
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest --info

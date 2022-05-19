@@ -9,10 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static no.unit.nva.cognito.CognitoUtil.COGNITO_CLIENT_APP_ID_KEY;
-import static no.unit.nva.cognito.CognitoUtil.COGNITO_USER_POOL_ID_KEY;
-import static no.unit.nva.cognito.CognitoUtil.TESTUSER_FEIDE_ID_KEY;
-import static no.unit.nva.cognito.CognitoUtil.TESTUSER_PASSWORD_KEY;
+import static no.unit.nva.cognito.CognitoUtil.ADMIN_TESTUSER_ID_KEY;
+import static no.unit.nva.cognito.CognitoUtil.ADMIN_TESTUSER_PASSWORD_KEY;
 import static no.unit.nva.cristin.common.client.ApiClient.AUTHORIZATION;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,10 +29,11 @@ class AccessUtilsTest {
     }
 
     @Test
-    void validateIdentificationNumberAccessForNewUser() throws UnauthorizedException {
+    void validateIdentificationNumberAccessForAdminUser() {
         RequestInfo requestInfo = new RequestInfo();
-        final String token = loginTestUser();
+        final String token = loginAdminTestUser();
         assertNotNull(token);
+        System.out.println(token);
         requestInfo.setHeaders(Map.of(AUTHORIZATION, getBearerToken(token)));
         assertTrue(AccessUtils.requesterIsUserAdministrator(requestInfo));
     }
@@ -43,21 +42,18 @@ class AccessUtilsTest {
         return "Bearer " + token;
     }
 
-    String loginTestUser() {
+    private String loginAdminTestUser() {
         final Environment environment = new Environment();
-        String feideUserName = environment.readEnv(TESTUSER_FEIDE_ID_KEY);
+        String feideUserName = environment.readEnv(ADMIN_TESTUSER_ID_KEY);
         assertNotNull(feideUserName);
-        String password = environment.readEnv(TESTUSER_PASSWORD_KEY);
+        String password = environment.readEnv(ADMIN_TESTUSER_PASSWORD_KEY);
         assertNotNull(password);
-        String clientAppId = environment.readEnv(COGNITO_CLIENT_APP_ID_KEY);
+        String clientAppId = AccessUtils.getTestClientAppId();
         assertNotNull(clientAppId);
-        String userpoolId = environment.readEnv(COGNITO_USER_POOL_ID_KEY);
+        String userpoolId = AccessUtils.getUserPoolId();
         assertNotNull(userpoolId);
-        return CognitoUtil.loginUser(feideUserName, password, userpoolId, clientAppId);
+
+        return CognitoUtil.loginUser(feideUserName, password, clientAppId);
     }
-
-
-
-
 
 }

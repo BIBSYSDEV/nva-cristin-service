@@ -5,12 +5,12 @@ Feature: API tests for Cristin Person creation
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     * def token = 'just-a-invalid-token-for-now'
-    * def username = java.lang.System.getenv('TESTUSER_FEIDE_ID')
-    * def password = java.lang.System.getenv('TESTUSER_PASSWORD')
+    * def username = java.lang.System.getenv('ADMIN_TESTUSER_ID')
+    * def password = java.lang.System.getenv('ADMIN_TESTUSER_PASSWORD')
     * def cognitoClientAppId = java.lang.System.getenv('COGNITO_CLIENT_APP_ID')
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
-    * def administratorToken = tokenGenerator.loginUser(username, password, cognitoUserpoolId, cognitoClientAppId)
+    * def administratorToken = tokenGenerator.loginUser(username, password, cognitoClientAppId)
     * def sampleSimplePerson =
      """
     {

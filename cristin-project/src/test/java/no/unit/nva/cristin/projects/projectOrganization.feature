@@ -45,7 +45,7 @@ Feature: API tests for list Project pr Organization
   Scenario: Get returns status OK and context, next and prev in real organization query response
     Given path '/organization/'+realOrganizationIdentifier+'/projects'
     And param page = '2'
-    And param results = '10'
+    And param results = '2'
     When method GET
     Then status 200
     And match response == '#object'
