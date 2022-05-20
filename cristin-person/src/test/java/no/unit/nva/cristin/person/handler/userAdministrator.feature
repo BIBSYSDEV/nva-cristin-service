@@ -24,27 +24,27 @@ Feature: API tests for Cristin Person fetch
     And request
     When method GET
     Then status 200
-    And response.NationalIdentificationNumber == '#present'
+    And match response.NationalIdentificationNumber == '#present'
 
   Scenario: Fetch returns unclassified person data when authenticated but not authorized
     Given path '/person/' + samplePersonIdentifier
     * header Authorization = 'Bearer ' + simpleUserToken
     When method GET
     Then status 200
-    And response.NationalIdentificationNumber != '#present'
+    And match response.NationalIdentificationNumber != '#present'
 
   Scenario: Fetch returns unclassified person data when not authenticated nor authorized
     Given path '/person/' + samplePersonIdentifier
     When method GET
     Then status 200
-    And response.NationalIdentificationNumber != '#present'
+    And match response.NationalIdentificationNumber != '#present'
 
   Scenario: Fetch returns 200 OK and no NationalIdentificationNumber when token is invalid
     Given path '/person/' + samplePersonIdentifier
     * header Authorization = 'Bearer and.just-a.silly-text-for-token'
     When method GET
     Then status 200
-    And response.NationalIdentificationNumber == '#present'
+    And match response.NationalIdentificationNumber != '#present'
 
   Scenario: Fetch returns status Not found when requesting unknown person identifier
     Given path '/person/identityNumber'
