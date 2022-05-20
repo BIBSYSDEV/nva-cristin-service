@@ -16,7 +16,7 @@ Feature: API tests for Creation of Cristin Person Employments
     * def invalidToken = 'just-a-invalid-token-for-now'
     * def personIdentifier = '515114'
      # 'Test Testesen' has id 538786:
-    * def cristinTestPersonIdentifier = '538786'
+    * def cristinTestPersonIdentifier = java.lang.System.getenv('CRISTIN_EMPLOYMENT_TEST_PERSON_IDENTIFIER')
     * def TestPersonEmployment =
     """
     {
