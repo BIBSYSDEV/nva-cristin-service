@@ -17,6 +17,7 @@ Feature: API tests for Cristin Person fetch
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
+    * print 'token= ' + token
 
   Scenario: Fetch returns classified person data when authenticated and authorized
     Given path '/person/' + samplePersonIdentifier

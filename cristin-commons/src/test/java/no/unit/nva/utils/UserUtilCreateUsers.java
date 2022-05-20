@@ -2,7 +2,6 @@ package no.unit.nva.utils;
 
 import no.unit.nva.cognito.CognitoUtil;
 import nva.commons.core.Environment;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +19,8 @@ import static no.unit.nva.cognito.CognitoUtil.SIMPLE_TESTUSER_PASSWORD_KEY;
 import static no.unit.nva.utils.AccessUtils.getTestClientAppId;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@Tag("integrationTest")
-@Tag("createTestUsers")
+//@Tag("integrationTest")
+//@Tag("createTestUsers")
 public class UserUtilCreateUsers {
 
     private static final Logger logger = LoggerFactory.getLogger(UserUtilCreateUsers.class);
