@@ -56,13 +56,13 @@ Feature: API tests for Cristin Person creation
 
 # Handler validates NIN after access check -> requester i allowed to create person
 # NIN must be unique so test cannot create new user each time as we have no 'delete-user'-function
-  Scenario: Create person returns status 400 Bad Request when user is authenticated but NIN is invalid
-    Given path '/person/'
-    * header Authorization = 'Bearer ' + administratorToken
-    And request sampleSimplePerson
-    When method POST
-    Then status 400
-    And response.detail = 'NationalIdentificationNumber is not valid'
+#  Scenario: Create person returns status 400 Bad Request when user is authenticated but NIN is invalid
+#    Given path '/person/'
+#    * header Authorization = 'Bearer ' + administratorToken
+#    And request sampleSimplePerson
+#    When method POST
+#    Then status 400
+#    And response.detail = 'NationalIdentificationNumber is not valid'
 
   Scenario: Create person returns status 401 Unauthorized for valid payload but unauthorized user
     Given path '/person/'

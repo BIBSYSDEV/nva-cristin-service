@@ -39,13 +39,12 @@ Feature: API tests for Cristin Person fetch
     Then status 200
     And response.NationalIdentificationNumber != '#present'
 
-  Scenario: Fetch returns 401 Unauthorized when token is invalid token
+  Scenario: Fetch returns 200 OK when token is invalid token
     Given path '/person/' + samplePersonIdentifier
     * header Authorization = 'Bearer and.just-a.silly-text-for-token'
     When method GET
-    Then status 401
-    And match response.title == 'Unauthorized'
-#    And match responseHeaders['WWW-Authenticate'][0] == 'WWW-Authenticate'
+    Then status 200
+    And response.NationalIdentificationNumber == '#present'
 
   Scenario: Fetch returns status Not found when requesting unknown person identifier
     Given path '/person/identityNumber'

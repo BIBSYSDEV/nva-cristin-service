@@ -41,12 +41,13 @@ Feature: API tests for Cristin Person Update
     Then status 401
     And match response.message == 'Unauthorized'
 
-  Scenario: Update returns status 403 Forbidden when not authorized
+#  Scenario: Update returns status 403 Forbidden when not authorized
+  Scenario: Update returns status 401 Unauthorized when not authorized because of getPersonCristinId
     Given path '/person/' + personIdentifier
     And header Authorization = 'Bearer ' + simpleUserToken
     When method PATCH
-    Then status 403
-    And match response.title == 'Forbidden'
+    Then status 401
+    And match response.title == 'Unauthorized'
 
   Scenario: Update returns status 204 when valid payload
     Given path '/person/' + personIdentifier
