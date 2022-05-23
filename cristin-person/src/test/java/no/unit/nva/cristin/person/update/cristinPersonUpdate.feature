@@ -15,7 +15,6 @@ Feature: API tests for Cristin Person Update
     * def simpleUserToken = tokenGenerator.loginUser(simple_user_name, simple_user_password, cognitoClientAppId)
     * def invalidToken = 'just-a-invalid-token-for-now'
     * def personIdentifier = '1135903'
-#    * def personIdentifier = '515114'
 
     * def updateFieldsRequest =
     """
@@ -41,7 +40,6 @@ Feature: API tests for Cristin Person Update
     Then status 401
     And match response.message == 'Unauthorized'
 
-#  Scenario: Update returns status 403 Forbidden when not authorized
   Scenario: Update returns status 401 Unauthorized when not authorized because of getPersonCristinId
     Given path '/person/' + personIdentifier
     And header Authorization = 'Bearer ' + simpleUserToken

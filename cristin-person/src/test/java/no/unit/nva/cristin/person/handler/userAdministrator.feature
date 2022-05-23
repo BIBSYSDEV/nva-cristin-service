@@ -18,14 +18,14 @@ Feature: API tests for Cristin Person fetch
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
 
-  Scenario: Fetch returns classified person data when authenticated and authorized
+  Scenario: Fetch does not return classified person data when authenticated and authorized
     Given path '/person/' + samplePersonIdentifier
     And header Authorization = 'Bearer ' + token
     And request
     When method GET
     Then status 200
     And print 'Response=' ,response
-    And match response.NationalIdentificationNumber == '#present'
+    And match response.NationalIdentificationNumber != '#present'
 
   Scenario: Fetch returns unclassified person data when authenticated but not authorized
     Given path '/person/' + samplePersonIdentifier

@@ -95,7 +95,7 @@ public class AccessUtils {
 
     public static String getBackendAccessToken() throws IOException, InterruptedException {
         var cognitoTokenUrl = getCognitoTokenUrl();
-        logger.info("cognitoTokenUrl={}", cognitoTokenUrl);
+        logger.debug("cognitoTokenUrl={}", cognitoTokenUrl);
         var payload = GRANT_TYPE_PAYLOAD;
 
         var request = newBuilder(cognitoTokenUrl)
@@ -109,7 +109,7 @@ public class AccessUtils {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        logger.info("Response from Cognito: statusCode={}, body:{}", response.statusCode(), response.body());
+        logger.debug("Response from Cognito: statusCode={}, body:{}", response.statusCode(), response.body());
         var jsonTree = JsonUtils.dtoObjectMapper.readTree(response.body());
         return jsonTree.get(ACCESS_TOKEN).textValue();
     }
