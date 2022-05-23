@@ -21,6 +21,7 @@ Globals:
         COGNITO_HOST: !Ref CognitoAuthorizationUri
         COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
         COGNITO_CLIENT_APP_ID: !Ref CognitoUserPoolAppClientId
+        COGNITO_AUTHENTICATION_DOMAIN: !Ref CognitoAuthenticationDomain
   Api:
     Cors:
       AllowOrigin: "'*'"
@@ -62,6 +63,10 @@ Parameters:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Description: Cognito UserPool ARN for the stage
     Default: CognitoAuthorizerArn
+  CognitoAuthenticationDomain:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Cognito UserPool ARN for the stage
+    Default: CognitoAuthenticationDomain
 
 Resources:
 

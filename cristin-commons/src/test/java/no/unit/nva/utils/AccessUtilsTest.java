@@ -33,7 +33,6 @@ class AccessUtilsTest {
         RequestInfo requestInfo = new RequestInfo();
         final String token = loginAdminTestUser();
         assertNotNull(token);
-        System.out.println(token);
         requestInfo.setHeaders(Map.of(AUTHORIZATION, getBearerToken(token)));
         assertTrue(AccessUtils.requesterIsUserAdministrator(requestInfo));
     }
@@ -55,5 +54,4 @@ class AccessUtilsTest {
 
         return CognitoUtil.loginUser(feideUserName, password, clientAppId);
     }
-
 }

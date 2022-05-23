@@ -664,10 +664,8 @@ paths:
       tags:
         - Person
       summary: Find person by identifier
-      description: Returns a single person matching id parameter
+      description: Returns a single person matching id parameter without NIN
       operationId: GetPersonById
-#      security:
-#        - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend','aws.cognito.signin.user.admin']
       responses:
         200:
           description: successful operation

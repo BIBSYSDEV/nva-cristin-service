@@ -24,6 +24,7 @@ Feature: API tests for Cristin Person fetch
     And request
     When method GET
     Then status 200
+    And print 'Response=' ,response
     And match response.NationalIdentificationNumber == '#present'
 
   Scenario: Fetch returns unclassified person data when authenticated but not authorized

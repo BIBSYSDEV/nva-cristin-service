@@ -62,12 +62,16 @@ public class CognitoUtil {
      * @param poolId      Identifier for Cognito userpool
      * @return username in cognito for user created from parameters.
      */
-    public static String adminCreateUser(String username, String password, String nvaUserNin, String poolId, String clientId) {
+    public static String adminCreateUser(String username,
+                                         String password,
+                                         String nvaUserNin,
+                                         String poolId,
+                                         String clientId) {
 
         List<AttributeType> list = new ArrayList<>();
-        list.add(newAttribute(CURRENT_CUSTOMER_CLAIM_VALUE.toString(), CURRENT_CUSTOMER_CLAIM_NAME));
-        list.add(newAttribute(ACCESS_RIGHTS_CLAIM_VALUE, ACCESS_RIGHTS_CLAIM_NAME));
-        list.add(newAttribute(nvaUserNin, NVA_NIN_ATTRIBUTE));
+        list.add(newAttribute(CURRENT_CUSTOMER_CLAIM_NAME, CURRENT_CUSTOMER_CLAIM_VALUE.toString()));
+        list.add(newAttribute(ACCESS_RIGHTS_CLAIM_NAME, ACCESS_RIGHTS_CLAIM_VALUE));
+        list.add(newAttribute(NVA_NIN_ATTRIBUTE, nvaUserNin));
 
         var createUserRequest = AdminCreateUserRequest
             .builder()
@@ -139,8 +143,8 @@ public class CognitoUtil {
             .collect(Collectors.joining(MULTI_VALUE_DELIMITER));
     }
 
-    private static AttributeType newAttribute(String nvaUsername, String nvaUsernameAttribute) {
-        return AttributeType.builder().name(nvaUsernameAttribute).value(nvaUsername).build();
+    private static AttributeType newAttribute(String atributeName, String attributeValue) {
+        return AttributeType.builder().name(atributeName).value(attributeValue).build();
     }
 
     /**

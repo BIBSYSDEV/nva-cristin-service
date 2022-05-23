@@ -31,7 +31,7 @@ public class UserUtils {
         final String poolId = AccessUtils.getUserPoolId();
         final String appClientClientId = AccessUtils.getTestClientAppId();
 
-        createUserWithRoles(nationalIdentityNumber, customerId, roles);
+        createNvaUserWithRoles(nationalIdentityNumber, customerId, roles);
 
         CognitoUtil.deleteUser(username, poolId);
         CognitoUtil.adminCreateUser(username, password, nationalIdentityNumber, poolId, appClientClientId);
@@ -40,7 +40,7 @@ public class UserUtils {
 
     }
 
-    private static void createUserWithRoles(String nationalIdentityNumber, URI customerId, Set<String> roles) throws IOException, InterruptedException {
+    private static void createNvaUserWithRoles(String nationalIdentityNumber, URI customerId, Set<String> roles) throws IOException, InterruptedException {
         final var userRoles = new UserRoles(nationalIdentityNumber, customerId, roles);
         final var body = JsonUtils.dtoObjectMapper.writeValueAsString(userRoles);
         final var request = newBuilder(createUserServiceUri())
