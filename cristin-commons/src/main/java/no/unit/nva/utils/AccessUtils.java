@@ -19,7 +19,6 @@ import java.util.Base64;
 
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
-import static com.google.common.net.MediaType.FORM_DATA;
 import static java.net.http.HttpRequest.newBuilder;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -45,6 +44,7 @@ public class AccessUtils {
     public static final String BASIC = "Basic ";
     public static final String COGNITO_AUTHENTICATION_DOMAIN = "COGNITO_AUTHENTICATION_DOMAIN";
     public static final String COGNITO_TOKEN_ENDPOINT = "oauth2/token";
+    public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
 
 
     /**
@@ -100,7 +100,7 @@ public class AccessUtils {
 
         var request = newBuilder(cognitoTokenUrl)
                 .POST(HttpRequest.BodyPublishers.ofString(payload))
-                .header(CONTENT_TYPE, FORM_DATA.type())
+                .header(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
                 .header(AUTHORIZATION, basicAuthHeader())
                 .build();
         HttpClient client = HttpClient.newBuilder()
