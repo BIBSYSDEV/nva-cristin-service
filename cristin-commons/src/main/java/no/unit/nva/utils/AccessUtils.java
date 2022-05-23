@@ -114,7 +114,7 @@ public class AccessUtils {
 
     private static URI getCognitoTokenUrl() {
         String cognitoAuthenticationDomain = new Environment().readEnv(COGNITO_AUTHENTICATION_DOMAIN);
-        return UriWrapper.fromUri(cognitoAuthenticationDomain).addChild(COGNITO_TOKEN_ENDPOINT).getUri();
+        return UriWrapper.fromHost(cognitoAuthenticationDomain).addChild(COGNITO_TOKEN_ENDPOINT).getUri();
     }
 
     private static String basicAuthHeader() {

@@ -17,13 +17,17 @@ import java.time.Duration;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpRequest.newBuilder;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.utils.AccessUtils.BASIC;
 
 public class UserUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(UserUtils.class);
+    public static final String RESPONSE_FROM_USER_CREATE = "Response from user create={}";
+    public static final String USER_CREATED_WITH_ROLES = "User {} created with role(s) '{}'";
 
 
     public static void createUserWithRoles(String username, String password, String nationalIdentityNumber, URI customerId, Set<String> roles) throws IOException, InterruptedException {
@@ -36,7 +40,7 @@ public class UserUtils {
         CognitoUtil.deleteUser(username, poolId);
         CognitoUtil.adminCreateUser(username, password, nationalIdentityNumber, poolId, appClientClientId);
 
-        logger.info("User {} created with role(s) '{}'", username, roles);
+        logger.info(USER_CREATED_WITH_ROLES, username, roles);
 
     }
 
@@ -44,7 +48,7 @@ public class UserUtils {
         final var userRoles = new UserRoles(nationalIdentityNumber, customerId, roles);
         final var body = JsonUtils.dtoObjectMapper.writeValueAsString(userRoles);
         final var request = newBuilder(createUserServiceUri())
-                .header("Authorization", "Bearer " + AccessUtils.getBackendAccessToken())
+                .header(AUTHORIZATION, BASIC + AccessUtils.getBackendAccessToken())
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
         final var client = HttpClient.newBuilder()
@@ -53,7 +57,7 @@ public class UserUtils {
                 .build();
 
         final var response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        logger.info("Response from user create={}", response);
+        logger.info(RESPONSE_FROM_USER_CREATE, response);
     }
 
 
