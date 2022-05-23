@@ -664,7 +664,7 @@ paths:
       tags:
         - Person
       summary: Find person by identifier
-      description: Returns a single person matching id parameter
+      description: Returns a single person matching id parameter without NIN
       operationId: GetPersonById
       responses:
         200:

@@ -1,18 +1,7 @@
 package no.unit.nva.cristin.person.create;
 
-import static java.util.Objects.isNull;
-import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
-import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
-import java.net.HttpURLConnection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -25,6 +14,19 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+
+import java.net.HttpURLConnection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
+import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person> {
 
@@ -121,7 +123,8 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     private void validateNoDuplicateNationalIdentifiers(Set<TypedValue> identifiers) throws BadRequestException {
         if (identifiers.stream().map(TypedValue::getType)
                 .filter(NATIONAL_IDENTITY_NUMBER::equals)
-                .count() > MAX_NATIONAL_IDENTITY_NUMBER_COUNT) {
+                .collect(Collectors.toList())
+                .size() > MAX_NATIONAL_IDENTITY_NUMBER_COUNT) {
             throw new BadRequestException(ERROR_MESSAGE_IDENTIFIERS_REPEATED);
         }
     }

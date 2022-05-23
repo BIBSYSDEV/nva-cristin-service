@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static no.unit.nva.cognito.CognitoUtil.COGNITO_USER_POOL_ID_KEY;
-import static no.unit.nva.cognito.CognitoUtil.TESTUSER_FEIDE_ID_KEY;
+import static no.unit.nva.cognito.CognitoUtil.ADMIN_TESTUSER_ID_KEY;
+import static no.unit.nva.cognito.CognitoUtil.SIMPLE_TESTUSER_ID_KEY;
 
 @Tag("integrationTest")
 @Tag("deleteTestUsers")
@@ -18,12 +18,20 @@ public class CognitoUtilDeleteUsers {
     public static final String USER_DELETED_MSG = "User {} deleted!";
 
     @Test
-    void deleteTestUser() {
+    void deleteAdminUser() {
         final Environment environment = new Environment();
-        String feideUserName = environment.readEnv(TESTUSER_FEIDE_ID_KEY);
-        String userpoolId = environment.readEnv(COGNITO_USER_POOL_ID_KEY);
-        CognitoUtil.deleteUser(feideUserName, userpoolId);
+        String feideUserName = environment.readEnv(ADMIN_TESTUSER_ID_KEY);
+        CognitoUtil.deleteUser(feideUserName, AccessUtils.getUserPoolId());
         logger.info(USER_DELETED_MSG, feideUserName);
     }
+
+    @Test
+    void deleteSimpleTestUser() {
+        final Environment environment = new Environment();
+        String feideUserName = environment.readEnv(SIMPLE_TESTUSER_ID_KEY);
+        CognitoUtil.deleteUser(feideUserName, AccessUtils.getUserPoolId());
+        logger.info(USER_DELETED_MSG, feideUserName);
+    }
+
 
 }

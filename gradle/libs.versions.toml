@@ -1,6 +1,6 @@
 [versions]
 junit = { strictly = '5.8.2' }
-nva-commons = { strictly = '1.24.10' }
+nva-commons = {strictly = '1.24.11'}
 jackson = { strictly = '2.13.3' }
 mockito = { strictly = '4.5.1' }
 hamcrest = { strictly = '2.2' }
@@ -68,6 +68,7 @@ aws-sdk2-cognitoidp = { group = 'software.amazon.awssdk', name = 'cognitoidentit
 aws-sdk2-auth = {group = 'software.amazon.awssdk', name = 'auth', version.ref = 'awsSdk2' }
 aws-sdk2-awscore = {group = 'software.amazon.awssdk', name = 'aws-core', version.ref = 'awsSdk2' }
 aws-sdk2-regions = {group = 'software.amazon.awssdk', name = 'regions', version.ref = 'awsSdk2' }
+aws-sdk2-spi = {group =  'software.amazon.awssdk', name='http-client-spi', version.ref='awsSdk2' }
 
 log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4jApi' }
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
@@ -76,6 +77,8 @@ bekkopen-nocommons = { group = 'no.bekk.bekkopen', name =  'nocommons', version.
 
 com-auth0-jwt = { group = 'com.auth0', name =  'java-jwt', version.ref = 'com-auth0-jwt' }
 com-auth0-jwks = { group = 'com.auth0', name =  'jwks-rsa', version.ref= 'com-auth0-jwks' }
+
+aws-sdk2-urlconnection = { group = 'software.amazon.awssdk', name = 'url-connection-client', version.ref = 'awsSdk2' }
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
