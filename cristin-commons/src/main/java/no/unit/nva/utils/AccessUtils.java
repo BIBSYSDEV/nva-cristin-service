@@ -109,7 +109,7 @@ public class AccessUtils {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        logger.info("Response from Cognito: {}", JsonUtils.dtoObjectMapper.writeValueAsString(response));
+        logger.info("Response from Cognito: statusCode={}, body:{}", response.statusCode(), response.body());
         var jsonTree = JsonUtils.dtoObjectMapper.readTree(response.body());
         return jsonTree.get(ACCESS_TOKEN).textValue();
     }
