@@ -1,17 +1,5 @@
 package no.unit.nva.cristin.person.client;
 
-import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.model.cristin.CristinPerson;
-import no.unit.nva.cristin.person.model.nva.Person;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.paths.UriWrapper;
-
-import java.net.URI;
-import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -21,6 +9,16 @@ import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import java.net.URI;
+import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.person.model.cristin.CristinPerson;
+import no.unit.nva.cristin.person.model.nva.Person;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.paths.UriWrapper;
 
 public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
 
@@ -57,7 +55,7 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
      * @throws ApiGatewayException request fails or contains errors
      */
     private HttpResponse<String> queryOrganizationPersons(Map<String, String> parameters) throws ApiGatewayException {
-        URI uri = generateOragnizationPersonsUrl(parameters);
+        URI uri = generateOrganizationPersonsUrl(parameters);
         HttpResponse<String> response = fetchQueryResults(uri);
         URI id = getServiceUri(parameters);
         checkHttpStatusCode(id, response.statusCode());
@@ -65,11 +63,11 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
         return response;
     }
 
-    private URI generateOragnizationPersonsUrl(Map<String, String> parameters) {
+    private URI generateOrganizationPersonsUrl(Map<String, String> parameters) {
         return new CristinPersonQuery()
-                .withFromPage(parameters.get(PAGE))
-                .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
-                .withParentUnitId(parameters.get(IDENTIFIER)).toURI();
+                   .withFromPage(parameters.get(PAGE))
+                   .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
+                   .withParentUnitId(parameters.get(IDENTIFIER)).toURI();
     }
 
     private URI getServiceUri(Map<String, String> queryParameters) {
