@@ -59,7 +59,7 @@ Feature: API tests for Cristin Person fetch
     When method GET
     Then status 200
     And match response == '#object'
-    * def firstHit = response['hits'][0]
-    * def secondHit = response['hits'][1]
-    And match string firstHit contains 'Daniel'
-    And match string secondHit contains 'Daniel'
+    * string firstHit = response['hits'][0]
+    * string secondHit = response['hits'][1]
+    And match firstHit.toLowerCase() contains 'daniel'
+    And match secondHit.toLowerCase() contains 'daniel'
