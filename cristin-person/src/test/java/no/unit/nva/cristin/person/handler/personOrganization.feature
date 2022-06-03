@@ -26,7 +26,7 @@ Feature: API tests for Cristin Person fetch
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'page\', \'results\']'
+    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'name\', \'page\', \'results\']'
 
   Scenario: Get returns status OK and context in dummy response
     Given path '/organization/'+dummyOrganizationIdentifier+'/persons'
@@ -59,5 +59,7 @@ Feature: API tests for Cristin Person fetch
     When method GET
     Then status 200
     And match response == '#object'
-    And match response['hits'][0] contains 'Daniel'
-    And match response['hits'][1] contains 'Daniel'
+    * def firstHit = response['hits'][0]
+    * def secondHit = response['hits'][1]
+    And match string firstHit contains 'Daniel'
+    And match string secondHit contains 'Daniel'
