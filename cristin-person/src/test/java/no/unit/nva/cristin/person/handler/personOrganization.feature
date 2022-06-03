@@ -52,3 +52,12 @@ Feature: API tests for Cristin Person fetch
     And match response['@context'] == '#present'
     And match response['nextResults'] == '#present'
     And match response['previousResults'] == '#present'
+
+  Scenario: Get returns OK and results based on name parameter
+    Given path '/organization/185.90.0.0/persons'
+    And param name = 'daniel'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['hits'][0] contains 'Daniel'
+    And match response['hits'][1] contains 'Daniel'
