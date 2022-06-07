@@ -4,12 +4,17 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.SORT;
+import static no.unit.nva.cristin.model.Constants.SORT_ASC;
+import static no.unit.nva.cristin.model.Constants.SORT_DESC;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler.INVALID_SORT_PARAM;
 import static no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler.VALID_QUERY_PARAMETERS;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
@@ -154,33 +159,58 @@ class ListCristinOrganizationPersonsHandlerTest {
     }
 
     @Test
-    void shouldSortResultsBasedOnPersonIdentifier() throws IOException, ApiGatewayException {
+    void shouldSortResultsBasedOnPersonIdentifierWhenUsingSortedParamDesc() throws IOException, ApiGatewayException {
         var fakeHttpResponse = generateCristinResponseWithDifferentIdentifiers();
         cristinApiClient = spy(cristinApiClient);
         doReturn(fakeHttpResponse).when(cristinApiClient).fetchQueryResults(any());
         handler = new ListCristinOrganizationPersonsHandler(cristinApiClient, new Environment());
-        var input = generateHandlerDummyRequest();
+        var input = queryWithSortParam(SORT_DESC);
         handler.handleRequest(input, output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output,
-                                                               SearchResponse.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         var responseBody = gatewayResponse.getBodyObject(SearchResponse.class);
         var hits = extractHitsFromSearchResponse(responseBody);
-        var isOrdered = Comparators.isInOrder(hits, compareCristinIdentifiersDesc());
+        var isOrdered = Comparators.isInOrder(hits, compareCristinIdentifiers().reversed());
 
         assertThat(isOrdered, equalTo(true));
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
+    @Test
+    void shouldSortResultsBasedOnPersonIdentifierWhenUsingSortedParamAsc() throws IOException, ApiGatewayException {
+        var fakeHttpResponse = generateCristinResponseWithDifferentIdentifiers();
+        cristinApiClient = spy(cristinApiClient);
+        doReturn(fakeHttpResponse).when(cristinApiClient).fetchQueryResults(any());
+        handler = new ListCristinOrganizationPersonsHandler(cristinApiClient, new Environment());
+        var input = queryWithSortParam(SORT_ASC);
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        var responseBody = gatewayResponse.getBodyObject(SearchResponse.class);
+        var hits = extractHitsFromSearchResponse(responseBody);
+        var isOrdered = Comparators.isInOrder(hits, compareCristinIdentifiers());
+
+        assertThat(isOrdered, equalTo(true));
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenProvidingUnsupportedSortParam() throws IOException {
+        var input = queryWithSortParam(INVALID_VALUE);
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(invalidQueryParametersMessage(SORT, INVALID_SORT_PARAM)));
+    }
+
     private HttpResponseFaker generateCristinResponseWithDifferentIdentifiers() throws JsonProcessingException {
         var cristinResponse = restApiMapper.createArrayNode();
-        cristinResponse.addPOJO(generateCristinPerson(20, randomString()));
-        cristinResponse.addPOJO(generateCristinPerson(30, randomString()));
-        cristinResponse.addPOJO(generateCristinPerson(10, randomString()));
+        cristinResponse.addPOJO(generateCristinPerson("20", randomString()));
+        cristinResponse.addPOJO(generateCristinPerson("30", randomString()));
+        cristinResponse.addPOJO(generateCristinPerson("10", randomString()));
         return new HttpResponseFaker(restApiMapper.writeValueAsString(cristinResponse), 200);
     }
 
-    private Comparator<Person> compareCristinIdentifiersDesc() {
-        return Comparator.comparing(this::extractCristinIdentifierFromPerson).reversed();
+    private Comparator<Person> compareCristinIdentifiers() {
+        return Comparator.comparing(this::extractCristinIdentifierFromPerson);
     }
 
     private Integer extractCristinIdentifierFromPerson(Person person) {
@@ -191,9 +221,9 @@ class ListCristinOrganizationPersonsHandlerTest {
                    .orElseThrow();
     }
 
-    private CristinPerson generateCristinPerson(int identifier, String name) {
+    private CristinPerson generateCristinPerson(String identifier, String name) {
         var cristinPerson = new CristinPerson();
-        cristinPerson.setCristinPersonId(String.valueOf(identifier));
+        cristinPerson.setCristinPersonId(identifier);
         cristinPerson.setFirstName(name);
         return cristinPerson;
     }
@@ -207,6 +237,13 @@ class ListCristinOrganizationPersonsHandlerTest {
         return new HandlerRequestBuilder<Void>(restApiMapper)
                    .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                    .withQueryParameters(Map.of(NAME, name))
+                   .build();
+    }
+
+    private InputStream queryWithSortParam(String sortParam) throws JsonProcessingException {
+        return new HandlerRequestBuilder<Void>(restApiMapper)
+                   .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                   .withQueryParameters(Map.of(SORT, sortParam))
                    .build();
     }
 

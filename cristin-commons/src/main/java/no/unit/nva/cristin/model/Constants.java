@@ -2,12 +2,11 @@ package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
+import java.util.List;
+import java.util.regex.Pattern;
 import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.core.Environment;
-
-import java.util.List;
-import java.util.regex.Pattern;
 
 public class Constants {
 
@@ -57,10 +56,12 @@ public class Constants {
     public static final String UNIT_ID = "id";
     public static final String EMPLOYMENT_ID = "employmentId";
     public static final String ORG_ID = "orgId";
+    public static final String SORT = "sort";
+    public static final String SORT_ASC = "asc";
+    public static final String SORT_DESC = "desc";
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,
         QUERY_USING_TITLE
     }
-
 }

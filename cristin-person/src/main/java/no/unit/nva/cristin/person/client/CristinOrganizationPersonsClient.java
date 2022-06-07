@@ -6,15 +6,20 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSONS_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
+import static no.unit.nva.cristin.model.Constants.SORT;
+import static no.unit.nva.cristin.model.Constants.SORT_ASC;
+import static no.unit.nva.cristin.model.Constants.SORT_DESC;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import java.net.URI;
 import java.net.http.HttpResponse;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -38,14 +43,31 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
         long startRequestTime = System.currentTimeMillis();
         HttpResponse<String> response = queryOrganizationPersons(new HashMap(requestQueryParams));
         List<CristinPerson> cristinPersons = getEnrichedPersonsUsingQueryResponse(response);
+        if (requestQueryParams.containsKey(SORT)) {
+            cristinPersons = sortCristinPersons(cristinPersons, requestQueryParams.get(SORT));
+        }
         List<Person> persons = mapCristinPersonsToNvaPersons(cristinPersons);
         long endRequestTime = System.currentTimeMillis();
         URI id = getServiceUri(requestQueryParams);
         return new SearchResponse<Person>(id)
-                .withContext(PERSON_CONTEXT)
-                .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
-                .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
-                .withHits(persons);
+                   .withContext(PERSON_CONTEXT)
+                   .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
+                   .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
+                   .withHits(persons);
+    }
+
+    private List<CristinPerson> sortCristinPersons(List<CristinPerson> cristinPersons, String sortOrder) {
+        if (SORT_ASC.equals(sortOrder)) {
+            return cristinPersons.stream().sorted(compareCristinIdentifiers()).collect(Collectors.toList());
+        } else if (SORT_DESC.equals(sortOrder)) {
+            return cristinPersons.stream().sorted(compareCristinIdentifiers().reversed()).collect(Collectors.toList());
+        } else {
+            return cristinPersons;
+        }
+    }
+
+    private Comparator<CristinPerson> compareCristinIdentifiers() {
+        return Comparator.comparing(cristinPerson -> Integer.valueOf(cristinPerson.getCristinPersonId()));
     }
 
     /**

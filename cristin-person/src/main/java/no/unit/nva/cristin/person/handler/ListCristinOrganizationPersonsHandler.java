@@ -2,7 +2,11 @@ package no.unit.nva.cristin.person.handler;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.model.Constants.SORT;
+import static no.unit.nva.cristin.model.Constants.SORT_ASC;
+import static no.unit.nva.cristin.model.Constants.SORT_DESC;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
@@ -30,7 +34,8 @@ import nva.commons.core.JacocoGenerated;
 public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
-    public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(PAGE, NUMBER_OF_RESULTS, NAME);
+    public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(PAGE, NUMBER_OF_RESULTS, NAME, SORT);
+    public static final String INVALID_SORT_PARAM = String.format("May only contain %s, %s", SORT_ASC, SORT_DESC);
     private final transient CristinOrganizationPersonsClient apiClient;
 
     @JacocoGenerated
@@ -70,10 +75,29 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
         String page = getValidPage(requestInfo);
         String numberOfResults = getValidNumberOfResults(requestInfo);
         Optional<String> name = getNameIfPresent(requestInfo);
+        Optional<String> sort = getValidSortIfPresent(requestInfo);
         Map<String, String> requestQueryParams = buildParamMap(identifier, page, numberOfResults,
-                                                               name.orElse(null));
+                                                               name.orElse(null), sort.orElse(null));
 
         return apiClient.generateQueryResponse(requestQueryParams);
+    }
+
+    private Optional<String> getValidSortIfPresent(RequestInfo requestInfo) throws BadRequestException {
+        Optional<String> sortParam = getQueryParameter(requestInfo, SORT);
+        if (sortParam.isPresent()) {
+            validateSortParam(sortParam.get());
+        }
+        return sortParam;
+    }
+
+    private void validateSortParam(String sortParam) throws BadRequestException {
+        if (sortParamValueIsUnsupported(sortParam)) {
+            throw new BadRequestException(invalidQueryParametersMessage(SORT, INVALID_SORT_PARAM));
+        }
+    }
+
+    private boolean sortParamValueIsUnsupported(String sortParam) {
+        return !Set.of(SORT_ASC, SORT_DESC).contains(sortParam);
     }
 
     private Optional<String> getNameIfPresent(RequestInfo requestInfo) {
@@ -113,13 +137,17 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
         throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
     }
 
-    private Map<String, String> buildParamMap(String identifier, String page, String numberOfResults, String name) {
+    private Map<String, String> buildParamMap(String identifier, String page, String numberOfResults, String name,
+                                              String sort) {
         Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
         requestQueryParameters.put(IDENTIFIER, identifier);
         requestQueryParameters.put(PAGE, page);
         requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
         if (nonNull(name)) {
             requestQueryParameters.put(NAME, name);
+        }
+        if (nonNull(sort)) {
+            requestQueryParameters.put(SORT, sort);
         }
         return requestQueryParameters;
     }
