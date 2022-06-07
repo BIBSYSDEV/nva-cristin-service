@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSONS_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import java.net.URI;
@@ -64,10 +65,14 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
     }
 
     private URI generateOrganizationPersonsUrl(Map<String, String> parameters) {
-        return new CristinPersonQuery()
-                   .withFromPage(parameters.get(PAGE))
-                   .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
-                   .withParentUnitId(parameters.get(IDENTIFIER)).toURI();
+        CristinPersonQuery query = new CristinPersonQuery()
+                                       .withFromPage(parameters.get(PAGE))
+                                       .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
+                                       .withParentUnitId(parameters.get(IDENTIFIER));
+        if (parameters.containsKey(NAME)) {
+            query.withName(parameters.get(NAME));
+        }
+        return query.toURI();
     }
 
     private URI getServiceUri(Map<String, String> queryParameters) {

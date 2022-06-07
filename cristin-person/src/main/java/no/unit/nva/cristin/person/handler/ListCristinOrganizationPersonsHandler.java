@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.handler;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
@@ -10,6 +11,7 @@ import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
@@ -17,6 +19,7 @@ import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -66,9 +69,15 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
         String identifier = getValidId(requestInfo);
         String page = getValidPage(requestInfo);
         String numberOfResults = getValidNumberOfResults(requestInfo);
-        Map<String, String> requestQueryParams = buildParamMap(identifier, page, numberOfResults);
+        Optional<String> name = getNameIfPresent(requestInfo);
+        Map<String, String> requestQueryParams = buildParamMap(identifier, page, numberOfResults,
+                                                               name.orElse(null));
 
         return apiClient.generateQueryResponse(requestQueryParams);
+    }
+
+    private Optional<String> getNameIfPresent(RequestInfo requestInfo) {
+        return getQueryParameter(requestInfo, NAME).map(UriUtils::escapeWhiteSpace);
     }
 
     /**
@@ -104,11 +113,14 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
         throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
     }
 
-    private Map<String, String> buildParamMap(String identifier, String page, String numberOfResults) {
+    private Map<String, String> buildParamMap(String identifier, String page, String numberOfResults, String name) {
         Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
         requestQueryParameters.put(IDENTIFIER, identifier);
         requestQueryParameters.put(PAGE, page);
         requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
+        if (nonNull(name)) {
+            requestQueryParameters.put(NAME, name);
+        }
         return requestQueryParameters;
     }
 }
