@@ -19,7 +19,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -44,7 +43,7 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
         HttpResponse<String> response = queryOrganizationPersons(new HashMap(requestQueryParams));
         List<CristinPerson> cristinPersons = getEnrichedPersonsUsingQueryResponse(response);
         if (requestQueryParams.containsKey(SORT)) {
-            cristinPersons = sortCristinPersons(cristinPersons, requestQueryParams.get(SORT));
+            sortCristinPersons(cristinPersons, requestQueryParams.get(SORT));
         }
         List<Person> persons = mapCristinPersonsToNvaPersons(cristinPersons);
         long endRequestTime = System.currentTimeMillis();
@@ -56,13 +55,11 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
                    .withHits(persons);
     }
 
-    private List<CristinPerson> sortCristinPersons(List<CristinPerson> cristinPersons, String sortOrder) {
+    private void sortCristinPersons(List<CristinPerson> cristinPersons, String sortOrder) {
         if (SORT_ASC.equals(sortOrder)) {
-            return cristinPersons.stream().sorted(compareCristinIdentifiers()).collect(Collectors.toList());
+            cristinPersons.sort(compareCristinIdentifiers());
         } else if (SORT_DESC.equals(sortOrder)) {
-            return cristinPersons.stream().sorted(compareCristinIdentifiers().reversed()).collect(Collectors.toList());
-        } else {
-            return cristinPersons;
+            cristinPersons.sort(compareCristinIdentifiers().reversed());
         }
     }
 
