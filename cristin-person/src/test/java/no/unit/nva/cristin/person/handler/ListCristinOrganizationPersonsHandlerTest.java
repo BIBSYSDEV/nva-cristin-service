@@ -6,10 +6,12 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler.VALID_QUERY_PARAMETERS;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,8 +30,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
@@ -40,6 +45,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
 class ListCristinOrganizationPersonsHandlerTest {
@@ -52,7 +58,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     public static final String INVALID_VALUE = "value";
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String ZERO_VALUE = "0";
-
+    public static final String EQUAL_OPERATOR = "=";
 
     private ListCristinOrganizationPersonsHandler handler;
     private ByteArrayOutputStream output;
@@ -110,21 +116,49 @@ class ListCristinOrganizationPersonsHandlerTest {
 
         CristinOrganizationPersonsClient apiClient = spy(cristinApiClient);
         doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
-                generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(apiClient).queryPersons(any());
+                                       generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(apiClient)
+            .queryPersons(any());
         doReturn(Collections.emptyList()).when(apiClient).fetchQueryResultsOneByOne(any());
         handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
         handler.handleRequest(generateHandlerDummyRequest(), output, context);
-        GatewayResponse<SearchResponse> response = GatewayResponse.fromOutputStream(output,SearchResponse.class);
+        GatewayResponse<SearchResponse> response = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         SearchResponse<Person> searchResponse = response.getBodyObject(SearchResponse.class);
         assertThat(0, equalTo(searchResponse.getHits().size()));
     }
 
+    @Test
+    void shouldAddNameParamToCristinQueryForFilteringOnNameAndReturnOk() throws IOException, ApiGatewayException {
+        cristinApiClient = spy(cristinApiClient);
+        handler = new ListCristinOrganizationPersonsHandler(cristinApiClient, new Environment());
+        var name = randomString();
+        var input = queryWithNameParam(name);
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                                                               SearchResponse.class);
+        var responseBody = gatewayResponse.getBodyObject(SearchResponse.class);
+        var captor = ArgumentCaptor.forClass(URI.class);
+
+        verify(cristinApiClient).fetchQueryResults(captor.capture());
+        assertThat(Optional.ofNullable(captor.getValue()).toString(),
+                   containsString(NAME + EQUAL_OPERATOR + name));
+        assertThat(Optional.ofNullable(responseBody.getId()).toString(),
+                   containsString(NAME + EQUAL_OPERATOR + name));
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
+    private InputStream queryWithNameParam(String name) throws JsonProcessingException {
+        return new HandlerRequestBuilder<Void>(restApiMapper)
+                   .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                   .withQueryParameters(Map.of(NAME, name))
+                   .build();
+    }
+
     private InputStream generateHandlerDummyRequestWithIllegalQueryParameters() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
-                .withQueryParameters(Map.of(INVALID_KEY, INVALID_VALUE))
-                .build();
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                   .withQueryParameters(Map.of(INVALID_KEY, INVALID_VALUE))
+                   .build();
     }
 
     private InputStream generateHandlerDummyRequest() throws JsonProcessingException {
