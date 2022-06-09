@@ -2,7 +2,6 @@ package no.unit.nva.cristin.person.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
-import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
@@ -13,9 +12,6 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.attempt.Try;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.HttpURLConnection;
 import java.util.Objects;
@@ -28,7 +24,6 @@ import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClie
 public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
 
     public static final String NIN_TYPE = "NationalIdentificationNumber";
-    private static final Logger logger = LoggerFactory.getLogger(FetchFromIdentityNumberHandler.class);
 
     private final transient CristinPersonApiClient apiClient;
 
@@ -50,10 +45,6 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     @Override
     protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
-
-        var requestInfoString = Try.attempt(() -> JsonUtils.dtoObjectMapper.writeValueAsString(requestInfo))
-                                      .orElseThrow();
-        logger.info("requestInfo={}", requestInfoString);
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
         validateQueryParameters(requestInfo);
