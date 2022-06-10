@@ -437,6 +437,28 @@ paths:
             type: number
             default: '5'
           example: '10'
+        - name: name
+          in: query
+          description: filter on given name
+          required: false
+          schema:
+            type: string
+          example: 'daniel'
+        - name: sort
+          in: query
+          description: Sort results based on parameters
+          required: false
+          schema:
+            type: string
+          examples:
+            identifierDesc:
+              value: 'id desc'
+            identifierAsc:
+              value: 'id asc'
+            nameDesc:
+              value: 'name desc'
+            nameAsc:
+              value: 'name asc'
       responses:
         200:
           description: successful operation

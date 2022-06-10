@@ -6,6 +6,7 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSONS_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
+import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
@@ -71,6 +72,9 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
                                        .withParentUnitId(parameters.get(IDENTIFIER));
         if (parameters.containsKey(NAME)) {
             query.withName(parameters.get(NAME));
+        }
+        if (parameters.containsKey(SORT)) {
+            query.withSort(parameters.get(SORT));
         }
         return query.toURI();
     }
