@@ -26,7 +26,7 @@ Feature: API tests for Cristin Person fetch
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'name\', \'page\', \'results\']'
+    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'name\', \'page\', \'results\', \'sort\']'
 
   Scenario: Get returns status OK and context in dummy response
     Given path '/organization/'+dummyOrganizationIdentifier+'/persons'
@@ -63,3 +63,9 @@ Feature: API tests for Cristin Person fetch
     * string secondHit = response['hits'][1]
     And match firstHit.toLowerCase() contains 'daniel'
     And match secondHit.toLowerCase() contains 'daniel'
+
+  Scenario: Get returns OK and results based on sort parameter
+    Given path '/organization/185.90.0.0/persons'
+    And param sort = 'id desc'
+    When method GET
+    Then status 200

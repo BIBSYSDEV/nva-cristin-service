@@ -57,6 +57,7 @@ public class Constants {
     public static final String UNIT_ID = "id";
     public static final String EMPLOYMENT_ID = "employmentId";
     public static final String ORG_ID = "orgId";
+    public static final String SORT = "sort";
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,

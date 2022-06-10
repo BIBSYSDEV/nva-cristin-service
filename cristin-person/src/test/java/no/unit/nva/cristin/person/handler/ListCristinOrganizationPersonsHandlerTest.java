@@ -5,6 +5,7 @@ import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
@@ -40,6 +41,7 @@ import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
@@ -59,6 +61,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String ZERO_VALUE = "0";
     public static final String EQUAL_OPERATOR = "=";
+    public static final String SORT_VALUE = "id desc";
 
     private ListCristinOrganizationPersonsHandler handler;
     private ByteArrayOutputStream output;
@@ -146,10 +149,36 @@ class ListCristinOrganizationPersonsHandlerTest {
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
+    @Test
+    void shouldAddSortParamToCristinQueryForSortingHitsAndReturnOk() throws IOException, ApiGatewayException {
+        cristinApiClient = spy(cristinApiClient);
+        handler = new ListCristinOrganizationPersonsHandler(cristinApiClient, new Environment());
+        var input = queryWithSortParam();
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                                                               SearchResponse.class);
+        var responseBody = gatewayResponse.getBodyObject(SearchResponse.class);
+        var captor = ArgumentCaptor.forClass(URI.class);
+
+        verify(cristinApiClient).fetchQueryResults(captor.capture());
+        assertThat(Optional.ofNullable(captor.getValue()).toString(),
+                   containsString(SORT + EQUAL_OPERATOR + UriUtils.escapeWhiteSpace(SORT_VALUE)));
+        assertThat(Optional.ofNullable(responseBody.getId()).toString(),
+                   containsString(SORT + EQUAL_OPERATOR + UriUtils.escapeWhiteSpace(SORT_VALUE)));
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
     private InputStream queryWithNameParam(String name) throws JsonProcessingException {
         return new HandlerRequestBuilder<Void>(restApiMapper)
                    .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                    .withQueryParameters(Map.of(NAME, name))
+                   .build();
+    }
+
+    private InputStream queryWithSortParam() throws JsonProcessingException {
+        return new HandlerRequestBuilder<Void>(restApiMapper)
+                   .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                   .withQueryParameters(Map.of(SORT, SORT_VALUE))
                    .build();
     }
 
