@@ -1,5 +1,36 @@
 package no.unit.nva.cristin.person.handler;
 
+import com.amazonaws.services.lambda.runtime.Context;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import no.unit.nva.commons.json.JsonUtils;
+import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
+import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.testutils.HandlerRequestBuilder;
+import no.unit.nva.utils.UriUtils;
+import nva.commons.apigateway.AccessRight;
+import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.core.Environment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.zalando.problem.Problem;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.IntStream;
+
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -11,10 +42,14 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler.VALID_QUERY_PARAMETERS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
+import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,31 +59,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import no.unit.nva.commons.json.JsonUtils;
-import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
-import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.testutils.HandlerRequestBuilder;
-import no.unit.nva.utils.UriUtils;
-import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.core.Environment;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.zalando.problem.Problem;
 
 class ListCristinOrganizationPersonsHandlerTest {
 
@@ -58,6 +68,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     public static final String SAMPLE_RESULTS_SIZE = "10";
     public static final String INVALID_KEY = "invalid";
     public static final String INVALID_VALUE = "value";
+    public static final int PERSON_COUNT = 5;
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String ZERO_VALUE = "0";
     public static final String EQUAL_OPERATOR = "=";
@@ -67,6 +78,11 @@ class ListCristinOrganizationPersonsHandlerTest {
     private ByteArrayOutputStream output;
     private Context context;
     private CristinOrganizationPersonsClient cristinApiClient;
+    private List<String> generatedNINs = List.of("04031839594",
+            "23047748038",
+            "07021702867",
+            "04011679604",
+            "20106514977");
 
     @BeforeEach
     void setUp() {
@@ -167,6 +183,79 @@ class ListCristinOrganizationPersonsHandlerTest {
                    containsString(SORT + EQUAL_OPERATOR + UriUtils.escapeWhiteSpace(SORT_VALUE)));
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
+
+
+    @Test
+    void shouldIncludeNationalIdentificationNumberInResponseForAuthenticatedUser()
+            throws IOException, ApiGatewayException {
+        CristinOrganizationPersonsClient apiClient = mock(CristinOrganizationPersonsClient.class);
+        SearchResponse<Person> searchResponse = randomPersonsWithNIN(PERSON_COUNT);
+        doReturn(searchResponse).when(apiClient).authorizedGenerateQueryResponse(any());
+
+        handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
+        var input = queryWithAccessRightToReadNIN();
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                SearchResponse.class);
+        assertThat(gatewayResponse.getBody(), containsString(NATIONAL_IDENTITY_NUMBER));
+    }
+
+    @Test
+    void shouldNotIncludeNationalIdentificationNumberInResponseForUserWithoutAuthentication()
+            throws IOException, ApiGatewayException {
+        CristinOrganizationPersonsClient apiClient = mock(CristinOrganizationPersonsClient.class);
+        SearchResponse<Person> searchResponse = randomPersons(PERSON_COUNT);
+        doReturn(searchResponse).when(apiClient).generateQueryResponse(any());
+        handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
+        var input = queryMissingAccessRightToReadNIN();
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                SearchResponse.class);
+        assertThat(gatewayResponse.getBody(), not(containsString(NATIONAL_IDENTITY_NUMBER)));
+    }
+
+    private SearchResponse<Person> randomPersonsWithNIN(int personCount) {
+        List<Person> persons = new ArrayList<>();
+        IntStream.range(0, personCount).mapToObj(i -> randomPersonWithNin()).forEach(persons::add);
+        return new SearchResponse<Person>(randomUri()).withHits(persons);
+    }
+
+    private SearchResponse<Person> randomPersons(int personCount) {
+        List<Person> persons = new ArrayList<>();
+        IntStream.range(0, personCount).mapToObj(i -> randomPerson()).forEach(persons::add);
+        return new SearchResponse<Person>(randomUri()).withHits(persons);
+    }
+
+    private Person randomPerson() {
+        return new Person.Builder()
+                .withId(randomUri())
+                .build();
+    }
+
+
+    private Person randomPersonWithNin() {
+        return new Person.Builder()
+                .withId(randomUri())
+                .withNorwegianNationalId(randomElement(generatedNINs))
+                .build();
+    }
+
+    private InputStream queryWithAccessRightToReadNIN() throws JsonProcessingException {
+        final URI customerId = randomUri();
+        return new HandlerRequestBuilder<Void>(restApiMapper)
+                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                .withCustomerId(customerId)
+                .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS.toString())
+                .build();
+    }
+
+    private InputStream queryMissingAccessRightToReadNIN() throws JsonProcessingException {
+        return new HandlerRequestBuilder<Void>(restApiMapper)
+                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                .build();
+    }
+
+
 
     private InputStream queryWithNameParam(String name) throws JsonProcessingException {
         return new HandlerRequestBuilder<Void>(restApiMapper)

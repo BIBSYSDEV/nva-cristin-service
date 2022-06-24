@@ -37,6 +37,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 
+@SuppressWarnings("PMD.GodClass")
 public class ApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiClient.class);
@@ -66,6 +67,15 @@ public class ApiClient {
             BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
+    public CompletableFuture<HttpResponse<String>> authenticatedFetchGetResultAsync(URI uri) {
+        return client.sendAsync(
+                HttpRequest.newBuilder(uri).GET()
+                        .headers(AUTHORIZATION, basicAuthHeader())
+                        .build(),
+                BodyHandlers.ofString(StandardCharsets.UTF_8));
+    }
+
+
     public HttpResponse<String> fetchGetResult(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
         return getSuccessfulResponseOrThrowException(httpRequest);
@@ -77,7 +87,6 @@ public class ApiClient {
                 .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
-
 
     public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
@@ -128,6 +137,13 @@ public class ApiClient {
     public List<HttpResponse<String>> fetchQueryResultsOneByOne(List<URI> uris) {
         List<CompletableFuture<HttpResponse<String>>> responsesContainer =
             uris.stream().map(this::fetchGetResultAsync).collect(Collectors.toList());
+
+        return collectSuccessfulResponses(responsesContainer);
+    }
+
+    public List<HttpResponse<String>> authorizedFetchQueryResultsOneByOne(List<URI> uris) {
+        List<CompletableFuture<HttpResponse<String>>> responsesContainer =
+                uris.stream().map(this::authenticatedFetchGetResultAsync).collect(Collectors.toList());
 
         return collectSuccessfulResponses(responsesContainer);
     }

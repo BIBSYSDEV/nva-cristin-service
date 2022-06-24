@@ -101,6 +101,26 @@ public class CristinPersonApiClient extends ApiClient {
                 : combineResultsWithQueryInCaseEnrichmentFails(personsFromQuery, enrichedCristinPersons);
     }
 
+    /**
+     * Create a list of CristinPersons from Cristin response for authorized user.
+     *
+     * @param response from Cristin API
+     * @return List of valid CristinPersons from Response
+     * @throws ApiGatewayException when transformation from response fails
+     */
+    public List<CristinPerson> getEnrichedPersonsWithNINUsingQueryResponse(HttpResponse<String> response)
+            throws ApiGatewayException {
+
+        List<CristinPerson> personsFromQuery = asList(getDeserializedResponse(response, CristinPerson[].class));
+        List<URI> cristinUris = extractCristinUrisFromPersons(personsFromQuery);
+        List<HttpResponse<String>> individualResponses = authorizedFetchQueryResultsOneByOne(cristinUris);
+        List<CristinPerson> enrichedCristinPersons = mapResponsesToCristinPersons(individualResponses);
+
+        return allPersonsWereEnriched(personsFromQuery, enrichedCristinPersons)
+                ? enrichedCristinPersons
+                : combineResultsWithQueryInCaseEnrichmentFails(personsFromQuery, enrichedCristinPersons);
+    }
+
     protected List<CristinPerson> combineResultsWithQueryInCaseEnrichmentFails(List<CristinPerson> personsFromQuery,
                                                                                List<CristinPerson> enrichedPersons) {
         Set<String> enrichedPersonIds = enrichedPersons.stream()
