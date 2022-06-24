@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
@@ -67,12 +66,12 @@ public class CristinPersonApiClient extends ApiClient {
     public SearchResponse<Person> generateQueryResponse(Map<String, String> requestQueryParams)
             throws ApiGatewayException {
 
-        long startRequestTime = System.currentTimeMillis();
-        HttpResponse<String> response = queryPersons(requestQueryParams);
-        List<CristinPerson> cristinPersons = getEnrichedPersonsUsingQueryResponse(response);
-        List<Person> persons = mapCristinPersonsToNvaPersons(cristinPersons);
-        long endRequestTime = System.currentTimeMillis();
-        URI id = createIdUriFromParams(requestQueryParams, PERSON_PATH_NVA);
+        var startRequestTime = System.currentTimeMillis();
+        var response = queryPersons(requestQueryParams);
+        var cristinPersons = getEnrichedPersonsUsingQueryResponse(response);
+        var persons = mapCristinPersonsToNvaPersons(cristinPersons);
+        var endRequestTime = System.currentTimeMillis();
+        var id = createIdUriFromParams(requestQueryParams, PERSON_PATH_NVA);
 
         return new SearchResponse<Person>(id)
                 .withContext(PERSON_QUERY_CONTEXT)
@@ -91,10 +90,30 @@ public class CristinPersonApiClient extends ApiClient {
     public List<CristinPerson> getEnrichedPersonsUsingQueryResponse(HttpResponse<String> response)
             throws ApiGatewayException {
 
-        List<CristinPerson> personsFromQuery = asList(getDeserializedResponse(response, CristinPerson[].class));
-        List<URI> cristinUris = extractCristinUrisFromPersons(personsFromQuery);
-        List<HttpResponse<String>> individualResponses = fetchQueryResultsOneByOne(cristinUris);
-        List<CristinPerson> enrichedCristinPersons = mapResponsesToCristinPersons(individualResponses);
+        var personsFromQuery = asList(getDeserializedResponse(response, CristinPerson[].class));
+        var cristinUris = extractCristinUrisFromPersons(personsFromQuery);
+        var individualResponses = fetchQueryResultsOneByOne(cristinUris);
+        var enrichedCristinPersons = mapResponsesToCristinPersons(individualResponses);
+
+        return allPersonsWereEnriched(personsFromQuery, enrichedCristinPersons)
+                ? enrichedCristinPersons
+                : combineResultsWithQueryInCaseEnrichmentFails(personsFromQuery, enrichedCristinPersons);
+    }
+
+    /**
+     * Create a list of CristinPersons from Cristin response for authorized user.
+     *
+     * @param response from Cristin API
+     * @return List of valid CristinPersons from Response
+     * @throws ApiGatewayException when transformation from response fails
+     */
+    public List<CristinPerson> getEnrichedPersonsWithNINUsingQueryResponse(HttpResponse<String> response)
+            throws ApiGatewayException {
+
+        var personsFromQuery = asList(getDeserializedResponse(response, CristinPerson[].class));
+        var cristinUris = extractCristinUrisFromPersons(personsFromQuery);
+        var individualResponses = authorizedFetchQueryResultsOneByOne(cristinUris);
+        var enrichedCristinPersons = mapResponsesToCristinPersons(individualResponses);
 
         return allPersonsWereEnriched(personsFromQuery, enrichedCristinPersons)
                 ? enrichedCristinPersons
@@ -103,11 +122,11 @@ public class CristinPersonApiClient extends ApiClient {
 
     protected List<CristinPerson> combineResultsWithQueryInCaseEnrichmentFails(List<CristinPerson> personsFromQuery,
                                                                                List<CristinPerson> enrichedPersons) {
-        Set<String> enrichedPersonIds = enrichedPersons.stream()
+        var enrichedPersonIds = enrichedPersons.stream()
                 .map(CristinPerson::getCristinPersonId)
                 .collect(Collectors.toSet());
 
-        List<CristinPerson> missingPersons = personsFromQuery.stream()
+        var missingPersons = personsFromQuery.stream()
                 .filter(queryPerson -> !enrichedPersonIds.contains(queryPerson.getCristinPersonId()))
                 .collect(Collectors.toList());
 
@@ -125,16 +144,15 @@ public class CristinPersonApiClient extends ApiClient {
      * @throws ApiGatewayException request fails or contains errors
      */
     public HttpResponse<String> queryPersons(Map<String, String> parameters) throws ApiGatewayException {
-        URI uri = generateQueryPersonsUrl(parameters);
-        HttpResponse<String> response = fetchQueryResults(uri);
-        URI id = createIdUriFromParams(parameters, PERSON_PATH_NVA);
+        var uri = generateQueryPersonsUrl(parameters);
+        var response = fetchQueryResults(uri);
+        var id = createIdUriFromParams(parameters, PERSON_PATH_NVA);
         checkHttpStatusCode(id, response.statusCode());
-
         return response;
     }
 
     protected URI generateQueryPersonsUrl(Map<String, String> parameters) {
-        CristinPersonQuery cristinPersonQuery = new CristinPersonQuery()
+        var cristinPersonQuery = new CristinPersonQuery()
                 .withFromPage(parameters.get(PAGE))
                 .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
                 .withName(parameters.get(NAME));
@@ -175,7 +193,7 @@ public class CristinPersonApiClient extends ApiClient {
      * @return Person object with person data from upstream
      */
     public Person generateGetResponse(String identifier) throws ApiGatewayException {
-        Person person = getCristinPerson(identifier).toPerson();
+        var person = getCristinPerson(identifier).toPerson();
         person.setContext(PERSON_CONTEXT);
         return person;
     }
@@ -187,21 +205,21 @@ public class CristinPersonApiClient extends ApiClient {
      * @return Person object with person data from upstream
      */
     public Person authorizedGenerateGetResponse(String identifier) throws ApiGatewayException {
-        Person person = getCristinPersonWithAuthentication(identifier).toPerson();
+        var person = getCristinPersonWithAuthentication(identifier).toPerson();
         person.setContext(PERSON_CONTEXT);
         return person;
     }
 
     protected CristinPerson getCristinPersonWithAuthentication(String identifier) throws ApiGatewayException {
-        URI uri = getCorrectUriForIdentifier(identifier);
-        HttpResponse<String> response = fetchGetResultWithAuthentication(uri);
+        var uri = getCorrectUriForIdentifier(identifier);
+        var response = fetchGetResultWithAuthentication(uri);
         checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode());
         return getDeserializedResponse(response, CristinPerson.class);
     }
 
     protected CristinPerson getCristinPerson(String identifier) throws ApiGatewayException {
-        URI uri = getCorrectUriForIdentifier(identifier);
-        HttpResponse<String> response = fetchGetResult(uri);
+        var uri = getCorrectUriForIdentifier(identifier);
+        var response = fetchGetResult(uri);
         checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode());
         return getDeserializedResponse(response, CristinPerson.class);
     }
@@ -219,20 +237,17 @@ public class CristinPersonApiClient extends ApiClient {
      */
     public Person getPersonFromNationalIdentityNumber(String nationalIdentificationNumber) throws ApiGatewayException {
         // Upstream uses a query for national id even though it only returns 1 hit
-        List<CristinPerson> cristinPersons = queryUpstreamUsingIdentityNumber(nationalIdentificationNumber);
+        var cristinPersons = queryUpstreamUsingIdentityNumber(nationalIdentificationNumber);
         throwNotFoundIfNoMatches(cristinPersons);
-        CristinPerson enrichedCristinPerson = enrichFirstMatchFromQueryResponse(cristinPersons);
-        Person person = enrichedCristinPerson.toPerson();
+        var person = enrichFirstMatchFromQueryResponse(cristinPersons).toPerson();
         person.setContext(PERSON_CONTEXT);
-
         return person;
     }
 
     private List<CristinPerson> queryUpstreamUsingIdentityNumber(String identifier) throws ApiGatewayException {
-        URI queryUri = CristinPersonQuery.fromNationalIdentityNumber(identifier);
-        HttpResponse<String> queryResponse = fetchQueryResults(queryUri);
+        var queryUri = CristinPersonQuery.fromNationalIdentityNumber(identifier);
+        var queryResponse = fetchQueryResults(queryUri);
         checkHttpStatusCode(idUriForIdentityNumber(), queryResponse.statusCode());
-
         return asList(getDeserializedResponse(queryResponse, CristinPerson[].class));
     }
 
@@ -245,10 +260,9 @@ public class CristinPersonApiClient extends ApiClient {
     protected CristinPerson enrichFirstMatchFromQueryResponse(List<CristinPerson> cristinPersons)
             throws ApiGatewayException {
 
-        URI fetchUri = extractFirstUriFromListOfCristinPersons(cristinPersons);
-        HttpResponse<String> fetchResponse = fetchGetResult(fetchUri);
+        var fetchUri = extractFirstUriFromListOfCristinPersons(cristinPersons);
+        var fetchResponse = fetchGetResult(fetchUri);
         checkHttpStatusCode(idUriForIdentityNumber(), fetchResponse.statusCode());
-
         return getDeserializedResponse(fetchResponse, CristinPerson.class);
     }
 

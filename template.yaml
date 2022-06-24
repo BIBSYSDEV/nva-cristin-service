@@ -244,6 +244,7 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler::handleRequest
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaListOrganizationPersonsEvent:
           Type: Api

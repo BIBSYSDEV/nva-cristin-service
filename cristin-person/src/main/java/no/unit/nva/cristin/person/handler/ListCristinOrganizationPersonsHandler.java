@@ -1,5 +1,26 @@
 package no.unit.nva.cristin.person.handler;
 
+import com.amazonaws.services.lambda.runtime.Context;
+import no.unit.nva.cristin.common.handler.CristinQueryHandler;
+import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
+import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.utils.AccessUtils;
+import no.unit.nva.utils.UriUtils;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.RestRequestHandler;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
+
+import java.net.HttpURLConnection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
@@ -9,24 +30,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
-import com.amazonaws.services.lambda.runtime.Context;
-import java.net.HttpURLConnection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
-import no.unit.nva.cristin.common.handler.CristinQueryHandler;
-import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
-import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.utils.UriUtils;
-import nva.commons.apigateway.RequestInfo;
-import nva.commons.apigateway.RestRequestHandler;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.BadRequestException;
-import nva.commons.core.Environment;
-import nva.commons.core.JacocoGenerated;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
@@ -73,9 +77,17 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
         Optional<String> name = getNameIfPresent(requestInfo);
         Optional<String> sort = getSortIfPresent(requestInfo);
         Map<String, String> requestQueryParams = buildParamMap(identifier, page, numberOfResults,
-                                                               name.orElse(null), sort.orElse(null));
+                name.orElse(null), sort.orElse(null));
 
-        return apiClient.generateQueryResponse(requestQueryParams);
+        return attempt(() -> getAuthorizedSearchResponse(requestInfo, requestQueryParams))
+                .orElse(list -> apiClient.generateQueryResponse(requestQueryParams));
+    }
+
+    private SearchResponse<Person> getAuthorizedSearchResponse(RequestInfo requestInfo,
+                                                               Map<String, String> requestQueryParams)
+            throws ApiGatewayException {
+        AccessUtils.validateIdentificationNumberAccess(requestInfo);
+        return apiClient.authorizedGenerateQueryResponse(requestQueryParams);
     }
 
     private Optional<String> getNameIfPresent(RequestInfo requestInfo) {
