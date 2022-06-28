@@ -255,12 +255,6 @@ public class QueryCristinPersonHandlerTest {
         assertThat(gatewayResponse.getBody(), not(containsString(NATIONAL_IDENTITY_NUMBER)));
     }
 
-    private SearchResponse<Person> randomPersonsWithNIN() {
-        List<Person> persons = new ArrayList<>();
-        IntStream.range(0, 5).mapToObj(i -> randomPersonWithNin()).forEach(persons::add);
-        return new SearchResponse<Person>(randomUri()).withHits(persons);
-    }
-
     private SearchResponse<Person> randomPersons() {
         var persons = new ArrayList<Person>();
         IntStream.range(0, 5).mapToObj(i -> randomPerson()).forEach(persons::add);
@@ -272,14 +266,7 @@ public class QueryCristinPersonHandlerTest {
                    .withId(randomUri())
                    .build();
     }
-
-    private Person randomPersonWithNin() {
-        return new Person.Builder()
-                   .withId(randomUri())
-                   .withNorwegianNationalId(randomElement(generatedNINs))
-                   .build();
-    }
-
+    
     private HttpResponse<String> generateDummyQueryResponseWithNin() throws JsonProcessingException {
         var cristinPersons = List.of(randomCristinPerson(randomElement(generatedNINs)));
         return new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(cristinPersons), 200);
