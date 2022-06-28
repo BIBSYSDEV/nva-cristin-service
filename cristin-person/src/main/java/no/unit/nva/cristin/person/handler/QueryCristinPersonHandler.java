@@ -5,6 +5,7 @@ import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -13,7 +14,6 @@ import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,8 +22,8 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static nva.commons.core.attempt.Try.attempt;
 
-@SuppressWarnings("unused")
 public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
 
@@ -31,6 +31,7 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     private final transient CristinPersonApiClient apiClient;
 
     @JacocoGenerated
+    @SuppressWarnings("unused")
     public QueryCristinPersonHandler() {
         this(new Environment());
     }
@@ -51,15 +52,16 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
         validateQueryParameterKeys(requestInfo);
 
-        String name = getValidName(requestInfo);
-        Optional<String> organization = getValidOrganization(requestInfo);
-        String page = getValidPage(requestInfo);
-        String numberOfResults = getValidNumberOfResults(requestInfo);
+        var name = getValidName(requestInfo);
+        var organization = getValidOrganization(requestInfo);
+        var page = getValidPage(requestInfo);
+        var numberOfResults = getValidNumberOfResults(requestInfo);
 
-        Map<String, String> requestQueryParameters = buildParametersMap(name, page, numberOfResults);
-        organization.ifPresent(s -> requestQueryParameters.put(ORGANIZATION, s));
+        var requestQueryParameters = buildParametersMap(name, page, numberOfResults);
+        organization.ifPresent(presentOrganization -> requestQueryParameters.put(ORGANIZATION, presentOrganization));
 
-        return apiClient.generateQueryResponse(requestQueryParameters);
+        return attempt(() -> getAuthorizedSearchResponse(requestInfo, requestQueryParameters))
+                   .orElse(list -> apiClient.generateQueryResponse(requestQueryParameters));
     }
 
     @Override
@@ -76,10 +78,18 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
 
     private Map<String, String> buildParametersMap(String name, String page, String numberOfResults) {
-        Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
+        var requestQueryParameters = new ConcurrentHashMap<String, String>();
         requestQueryParameters.put(NAME, name);
         requestQueryParameters.put(PAGE, page);
         requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
         return requestQueryParameters;
     }
+
+    private SearchResponse<Person> getAuthorizedSearchResponse(RequestInfo requestInfo,
+                                                               Map<String, String> requestQueryParams)
+        throws ApiGatewayException {
+        AccessUtils.validateIdentificationNumberAccess(requestInfo);
+        return apiClient.authorizedGenerateQueryResponse(requestQueryParams);
+    }
+
 }

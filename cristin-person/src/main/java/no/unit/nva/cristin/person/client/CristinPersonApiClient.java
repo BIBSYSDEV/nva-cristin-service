@@ -162,6 +162,39 @@ public class CristinPersonApiClient extends ApiClient {
         return cristinPersonQuery.toURI();
     }
 
+    /**
+     * Creates a SearchResponse based on fetch from Cristin upstream for authorized User.
+     *
+     * @param requestQueryParameters the query params from the request
+     * @return SearchResponse object with hits from upstream and metadata containing NIN
+     * @throws ApiGatewayException if something went wrong
+     */
+    public SearchResponse<Person> authorizedGenerateQueryResponse(Map<String, String> requestQueryParameters)
+        throws ApiGatewayException {
+
+        var startRequestTime = System.currentTimeMillis();
+        var response = authorizedQueryPersons(requestQueryParameters);
+        var cristinPersons = getEnrichedPersonsWithNINUsingQueryResponse(response);
+        var persons = mapCristinPersonsToNvaPersons(cristinPersons);
+        var endRequestTime = System.currentTimeMillis();
+        var id = createIdUriFromParams(requestQueryParameters, PERSON_PATH_NVA);
+
+        return new SearchResponse<Person>(id)
+                   .withContext(PERSON_QUERY_CONTEXT)
+                   .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
+                   .usingHeadersAndQueryParams(response.headers(), requestQueryParameters)
+                   .withHits(persons);
+    }
+
+    private HttpResponse<String> authorizedQueryPersons(Map<String, String> parameters)
+        throws ApiGatewayException {
+        var uri = generateQueryPersonsUrl(parameters);
+        var response = fetchGetResultWithAuthentication(uri);
+        var id = createIdUriFromParams(parameters, PERSON_PATH_NVA);
+        checkHttpStatusCode(id, response.statusCode());
+        return response;
+    }
+
     private List<URI> extractCristinUrisFromPersons(List<CristinPerson> personsFromQuery) {
         return personsFromQuery.stream()
                 .map(CristinPerson::getCristinPersonId)
