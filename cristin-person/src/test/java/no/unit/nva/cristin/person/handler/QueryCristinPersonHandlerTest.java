@@ -268,29 +268,34 @@ public class QueryCristinPersonHandlerTest {
     }
     
     private HttpResponse<String> generateDummyQueryResponseWithNin() throws JsonProcessingException {
-        var cristinPersons = List.of(randomCristinPerson(randomElement(generatedNINs)));
+        var cristinPersons = List.of(randomCristinPersonWithNin(randomElement(generatedNINs)));
         return new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(cristinPersons), 200);
     }
 
     private HttpResponse<String> generateDummyGetResponseWithNin() throws JsonProcessingException {
-        var cristinPerson = randomCristinPerson(randomElement(generatedNINs));
+        var cristinPerson = randomCristinPersonWithNin(randomElement(generatedNINs));
         return new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(cristinPerson), 200);
     }
 
     private HttpResponse<String> generateDummyQueryResponseWithoutNin() throws JsonProcessingException {
-        var cristinPersons = List.of(randomCristinPerson(null));
+        var cristinPersons = List.of(randomCristinPerson());
         return new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(cristinPersons), 200);
     }
 
     private HttpResponse<String> generateDummyGetResponseWithoutNin() throws JsonProcessingException {
-        var cristinPerson = randomCristinPerson(null);
+        var cristinPerson = randomCristinPerson();
         return new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(cristinPerson), 200);
     }
 
-    private CristinPerson randomCristinPerson(String nin) {
+    private CristinPerson randomCristinPerson() {
         var cristinPerson = new CristinPerson();
         cristinPerson.setCristinPersonId(randomString());
         cristinPerson.setFirstName(randomString());
+        return cristinPerson;
+    }
+
+    private CristinPerson randomCristinPersonWithNin(String nin) {
+        var cristinPerson = randomCristinPerson();
         cristinPerson.setNorwegianNationalId(nin);
         return cristinPerson;
     }

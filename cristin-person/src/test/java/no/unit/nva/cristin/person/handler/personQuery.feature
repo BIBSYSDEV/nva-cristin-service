@@ -170,3 +170,6 @@ Feature: API tests for Cristin persons query
     And match response.hits[0].type == 'Person'
     And match response.hits[0].id == '#present'
     And match response.hits[0].NationalIdentificationNumber != '#present'
+    * string identifiers = response['hits'][0].identifiers
+    And match identifiers contains 'CristinIdentifier'
+    And match identifiers !contains 'NationalIdentificationNumber'
