@@ -160,4 +160,13 @@ Feature: API tests for Cristin persons query
     And match response.hits == '#present'
     And match response.hits[0].type == 'Person'
 
-
+  Scenario: Get does not return national identification number when not authorized
+    Given path '/person/'
+    And param name = queryString
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.hits[0].type == 'Person'
+    And match response.hits[0].id == '#present'
+    And match response.hits[0].NationalIdentificationNumber != '#present'
