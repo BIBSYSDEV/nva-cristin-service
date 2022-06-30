@@ -69,3 +69,16 @@ Feature: API tests for Cristin Person fetch
     And param sort = 'id desc'
     When method GET
     Then status 200
+
+  Scenario: Get does not return national identification number when not authorized
+    Given path '/organization/'+realOrganizationIdentifier+'/persons'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.hits[0].type == 'Person'
+    And match response.hits[0].id == '#present'
+    And match response.hits[0].NationalIdentificationNumber != '#present'
+    * string identifiers = response['hits'][0].identifiers
+    And match identifiers contains 'CristinIdentifier'
+    And match identifiers !contains 'NationalIdentificationNumber'

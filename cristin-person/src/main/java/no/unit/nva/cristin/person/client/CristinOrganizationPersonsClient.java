@@ -51,6 +51,7 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
      * @return SearchResponse object with hits from upstream and metadata containing NIN
      * @throws ApiGatewayException if something went wrong
      */
+    @Override
     public SearchResponse<Person> authorizedGenerateQueryResponse(Map<String, String> requestQueryParams)
             throws ApiGatewayException {
 
