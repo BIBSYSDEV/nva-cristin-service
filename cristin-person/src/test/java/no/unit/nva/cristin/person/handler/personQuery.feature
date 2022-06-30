@@ -173,4 +173,3 @@ Feature: API tests for Cristin persons query
     * string identifiers = response['hits'][0].identifiers
     And match identifiers contains 'CristinIdentifier'
     And match identifiers !contains 'NationalIdentificationNumber'
-    And print response
