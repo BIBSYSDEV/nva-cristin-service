@@ -1,8 +1,24 @@
 package no.unit.nva.cristin.person.employment.delete;
 
+import static no.unit.nva.cristin.model.Constants.EMPLOYMENT_ID;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.PERSON_ID;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.http.HttpClient;
+import java.util.Map;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -10,23 +26,6 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.http.HttpClient;
-import java.util.Map;
-
-import static no.unit.nva.cristin.model.Constants.EMPLOYMENT_ID;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.model.Constants.PERSON_ID;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
-import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class DeletePersonEmploymentHandlerTest {
 
@@ -50,7 +49,6 @@ class DeletePersonEmploymentHandlerTest {
         output = new ByteArrayOutputStream();
         handler = new DeletePersonEmploymentHandler(apiClient, environment);
     }
-
 
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
@@ -76,27 +74,32 @@ class DeletePersonEmploymentHandlerTest {
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
-
     private InputStream getInputStreamRequestWithoutAuthentication() throws JsonProcessingException {
         return new HandlerRequestBuilder<CristinPersonEmployment>(OBJECT_MAPPER)
-                .withBody(null)
-                .withPathParameters(null)
-                .build();
+            .withBody(null)
+            .withPathParameters(null)
+            .build();
     }
 
     private InputStream getInputStreamRequestWithInvalidPersonId() throws JsonProcessingException {
+        var customerId = randomUri();
+
         return new HandlerRequestBuilder<CristinPersonEmployment>(OBJECT_MAPPER)
-                .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
-                .withBody(null)
-                .withPathParameters(Map.of(PERSON_ID, INVALID_PERSON_ID, EMPLOYMENT_ID, VALID_EMPLOYMENT_ID))
-                .build();
+            .withCustomerId(customerId)
+            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+            .withBody(null)
+            .withPathParameters(Map.of(PERSON_ID, INVALID_PERSON_ID, EMPLOYMENT_ID, VALID_EMPLOYMENT_ID))
+            .build();
     }
 
     private InputStream getInputStreamRequestWithInvalidEmploymentId() throws JsonProcessingException {
+        var customerId = randomUri();
+
         return new HandlerRequestBuilder<CristinPersonEmployment>(OBJECT_MAPPER)
-                .withAccessRight(EDIT_OWN_INSTITUTION_USERS)
-                .withBody(null)
-                .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, EMPLOYMENT_ID, INVALID_EMPLOYMENT_ID))
-                .build();
+            .withCustomerId(customerId)
+            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+            .withBody(null)
+            .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, EMPLOYMENT_ID, INVALID_EMPLOYMENT_ID))
+            .build();
     }
 }

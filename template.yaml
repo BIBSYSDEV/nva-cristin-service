@@ -18,9 +18,10 @@ Globals:
         CRISTIN_API_URL: !Ref CristinApiUrl
         DOMAIN_NAME: !Ref ApiDomain
         BASE_PATH: !Ref CustomDomainBasePath
-        COGNITO_URI: !Ref CognitoAuthorizationUri
+        COGNITO_HOST: !Ref CognitoAuthorizationUri
         COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
         COGNITO_CLIENT_APP_ID: !Ref CognitoUserPoolAppClientId
+        COGNITO_AUTHENTICATION_DOMAIN: !Ref CognitoAuthenticationDomain
   Api:
     Cors:
       AllowOrigin: "'*'"
@@ -58,6 +59,14 @@ Parameters:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Description: Cognito UserPool AppClientId for the stage
     Default: CognitoUserPoolAppClientId
+  CognitoUserPoolArn:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Cognito UserPool ARN for the stage
+    Default: CognitoAuthorizerArn
+  CognitoAuthenticationDomain:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Description: Cognito UserPool ARN for the stage
+    Default: CognitoAuthenticationDomain
 
 Resources:
 
@@ -235,6 +244,7 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler::handleRequest
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaListOrganizationPersonsEvent:
           Type: Api
@@ -267,6 +277,7 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.handler.QueryCristinPersonHandler::handleRequest
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinQueryPersonEvent:
           Type: Api

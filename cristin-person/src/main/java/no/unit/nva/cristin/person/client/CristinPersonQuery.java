@@ -2,6 +2,7 @@ package no.unit.nva.cristin.person.client;
 
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
+import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import java.net.URI;
@@ -103,6 +104,11 @@ public class CristinPersonQuery {
         return this;
     }
 
+    public CristinPersonQuery withSort(String sort) {
+        cristinQueryParameters.put(SORT, sort);
+        return this;
+    }
+
     /**
      * Builds URI to search Cristin persons based on parameters supplied to the builder methods.
      *
@@ -116,4 +122,5 @@ public class CristinPersonQuery {
 
         return addLanguage(uri);
     }
+
 }

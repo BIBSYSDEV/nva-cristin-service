@@ -11,12 +11,12 @@ Feature: API tests for Cristin Person fetch
     * def nonExistingOrcid = '1111-1111-1111-1111'
     * def personIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/person\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
-    * def username = java.lang.System.getenv('SIMPLE_TESTUSER_FEIDE_ID')
+    * def username = java.lang.System.getenv('SIMPLE_TESTUSER_ID')
     * def password = java.lang.System.getenv('SIMPLE_TESTUSER_PASSWORD')
     * def cognitoClientAppId = java.lang.System.getenv('COGNITO_CLIENT_APP_ID')
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
-    * def token = tokenGenerator.loginUser(username, password, cognitoUserpoolId, cognitoClientAppId)
+    * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
 
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE

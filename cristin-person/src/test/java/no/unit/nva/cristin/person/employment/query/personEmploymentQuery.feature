@@ -4,12 +4,12 @@ Feature: API tests for Cristin Person Employments
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
-    * def username = java.lang.System.getenv('TESTUSER_FEIDE_ID')
-    * def password = java.lang.System.getenv('TESTUSER_PASSWORD')
+    * def username = java.lang.System.getenv('ADMIN_TESTUSER_ID')
+    * def password = java.lang.System.getenv('ADMIN_TESTUSER_PASSWORD')
     * def cognitoClientAppId = java.lang.System.getenv('COGNITO_CLIENT_APP_ID')
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
-    * def token = tokenGenerator.loginUser(username, password, cognitoUserpoolId, cognitoClientAppId)
+    * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
     * def invalidToken = 'just-a-invalid-token-for-now'
     * def personIdentifier = '515114'
     * def invalidIdentifier = 'hello'

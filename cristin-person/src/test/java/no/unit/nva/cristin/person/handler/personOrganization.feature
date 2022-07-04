@@ -26,7 +26,7 @@ Feature: API tests for Cristin Person fetch
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'page\', \'results\']'
+    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'name\', \'page\', \'results\', \'sort\']'
 
   Scenario: Get returns status OK and context in dummy response
     Given path '/organization/'+dummyOrganizationIdentifier+'/persons'
@@ -52,3 +52,33 @@ Feature: API tests for Cristin Person fetch
     And match response['@context'] == '#present'
     And match response['nextResults'] == '#present'
     And match response['previousResults'] == '#present'
+
+  Scenario: Get returns OK and results based on name parameter
+    Given path '/organization/185.90.0.0/persons'
+    And param name = 'daniel'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    * string firstHit = response['hits'][0]
+    * string secondHit = response['hits'][1]
+    And match firstHit.toLowerCase() contains 'daniel'
+    And match secondHit.toLowerCase() contains 'daniel'
+
+  Scenario: Get returns OK and results based on sort parameter
+    Given path '/organization/185.90.0.0/persons'
+    And param sort = 'id desc'
+    When method GET
+    Then status 200
+
+  Scenario: Get does not return national identification number when not authorized
+    Given path '/organization/'+realOrganizationIdentifier+'/persons'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.hits[0].type == 'Person'
+    And match response.hits[0].id == '#present'
+    And match response.hits[0].NationalIdentificationNumber != '#present'
+    * string identifiers = response['hits'][0].identifiers
+    And match identifiers contains 'CristinIdentifier'
+    And match identifiers !contains 'NationalIdentificationNumber'
