@@ -8,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.util.List;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.nva.Employment;
-import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
