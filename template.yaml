@@ -277,6 +277,7 @@ Resources:
     Properties:
       CodeUri: cristin-person
       Handler: no.unit.nva.cristin.person.handler.QueryCristinPersonHandler::handleRequest
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinQueryPersonEvent:
           Type: Api
