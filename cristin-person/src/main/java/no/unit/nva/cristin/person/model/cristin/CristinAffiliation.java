@@ -67,6 +67,7 @@ public class CristinAffiliation {
     }
 
     private Role extractAffiliationRole() {
+        // TODO: Set uri to actual value
         URI uri = attempt(() -> new URI("https://example.org/link/to/ontology#1026")).orElseThrow();
         return new Role(uri, getRoleLabel());
     }

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.model.Organization;
@@ -143,5 +144,30 @@ public class CristinPersonEmployment {
             .map(CristinOrganization::extractPreferredTypeOfOrganization)
             .map(Organization::getId)
             .orElse(null);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CristinPersonEmployment)) {
+            return false;
+        }
+        CristinPersonEmployment that = (CristinPersonEmployment) o;
+        return Objects.equals(getId(), that.getId())
+               && Objects.equals(getAffiliation(), that.getAffiliation())
+               && Objects.equals(getActive(), that.getActive())
+               && Objects.equals(getPosition(), that.getPosition())
+               && Objects.equals(getStartDate(), that.getStartDate())
+               && Objects.equals(getEndDate(), that.getEndDate())
+               && Objects.equals(getFtePercentage(), that.getFtePercentage())
+               && Objects.equals(getUrl(), that.getUrl());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getAffiliation(), getActive(), getPosition(), getStartDate(), getEndDate(),
+                            getFtePercentage(), getUrl());
     }
 }

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import no.unit.nva.model.Organization;
@@ -93,6 +94,24 @@ public class CristinUnit {
 
     public static boolean isCristinUnitIdentifier(String identifier) {
         return nonNull(identifier) && CRISTIN_UNIT_IDENTIFIER.matcher(identifier).matches();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CristinUnit)) {
+            return false;
+        }
+        CristinUnit that = (CristinUnit) o;
+        return Objects.equals(getCristinUnitId(), that.getCristinUnitId()) && Objects.equals(
+            getUnitName(), that.getUnitName()) && Objects.equals(getUrl(), that.getUrl());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCristinUnitId(), getUnitName(), getUrl());
     }
 }
 

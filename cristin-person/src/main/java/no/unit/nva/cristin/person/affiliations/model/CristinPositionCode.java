@@ -2,6 +2,7 @@ package no.unit.nva.cristin.person.affiliations.model;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.util.Objects;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.core.JacocoGenerated;
 
@@ -49,5 +50,24 @@ public class CristinPositionCode {
 
     public PositionCode toPositionCode() {
         return new PositionCode(UriUtils.createNvaPositionId(getCode()), getName(), isEnabled());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CristinPositionCode)) {
+            return false;
+        }
+        CristinPositionCode that = (CristinPositionCode) o;
+        return isEnabled() == that.isEnabled()
+               && Objects.equals(getCode(), that.getCode())
+               && Objects.equals(getName(), that.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCode(), getName(), isEnabled());
     }
 }
