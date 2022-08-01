@@ -36,6 +36,12 @@ public class PersonTest {
     private static final Set<TypedValue> validIdentifiers =
         Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DUMMY_NATIONAL_IDENTITY_NUMBER));
     private static final String EMPTY_STRING = "";
+    private static final String NVA_API_CREATE_PERSON_REQUEST_JSON_FILE = "nvaApiCreatePersonRequest.json";
+    private static final String POSITION_CODE_MATCHING_JSON = "1087";
+    private static final String UNIT_IDENTIFIER_MATCHING_JSON = "20202.0.0.0";
+    private static final String START_DATE_MATCHING_JSON = "2008-01-01T00:00:00Z";
+    private static final String END_DATE_MATCHING_JSON = "2023-12-31T00:00:00Z";
+    private static final double FTE_PERCENTAGE_MATCHING_JSON = 80.0;
 
     @Test
     void shouldProduceCorrectValuesWhenTransformingPersonToCristinPersonPost() {
@@ -50,7 +56,7 @@ public class PersonTest {
 
     @Test
     void shouldDeserializePersonWithEmploymentsCorrectly() throws IOException {
-        var payload = IoUtils.stringFromResources(Path.of("nvaApiCreatePersonRequest.json"));
+        var payload = IoUtils.stringFromResources(Path.of(NVA_API_CREATE_PERSON_REQUEST_JSON_FILE));
         var person = OBJECT_MAPPER.readValue(payload, Person.class);
         var actualEmployments =
             mapEmploymentsToCristinEmployments(person.getEmployments());
@@ -62,16 +68,16 @@ public class PersonTest {
     private List<CristinPersonEmployment> generateExpectedEmploymentsMatchingJson() {
         var cristinEmployment = new CristinPersonEmployment();
         var position = new CristinPositionCode();
-        position.setCode("1087");
+        position.setCode(POSITION_CODE_MATCHING_JSON);
         cristinEmployment.setPosition(position);
         var organization = new CristinOrganization();
         var unit = new CristinUnit();
-        unit.setCristinUnitId("20202.0.0.0");
+        unit.setCristinUnitId(UNIT_IDENTIFIER_MATCHING_JSON);
         organization.setInstitutionUnit(unit);
         cristinEmployment.setAffiliation(organization);
-        cristinEmployment.setStartDate(Instant.parse("2008-01-01T00:00:00Z"));
-        cristinEmployment.setEndDate(Instant.parse("2023-12-31T00:00:00Z"));
-        cristinEmployment.setFtePercentage(80.0);
+        cristinEmployment.setStartDate(Instant.parse(START_DATE_MATCHING_JSON));
+        cristinEmployment.setEndDate(Instant.parse(END_DATE_MATCHING_JSON));
+        cristinEmployment.setFtePercentage(FTE_PERCENTAGE_MATCHING_JSON);
 
         return List.of(cristinEmployment);
     }
