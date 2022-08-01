@@ -1,6 +1,11 @@
 package no.unit.nva.cristin.person.create;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_REPEATED;
+import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIER_NOT_VALID;
+import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_IDENTIFIER;
+import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_REQUIRED_NAMES;
+import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_PAYLOAD_EMPTY;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.FIRST_NAME;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.LAST_NAME;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PREFERRED_FIRST_NAME;
@@ -87,13 +92,12 @@ public class CreateCristinPersonHandlerTest {
 
     @Test
     void shouldCreateAndReturnPersonWhenClientSendsValidPayload() throws IOException, InterruptedException {
-        String responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
+        var responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
         apiClient = new CreateCristinPersonApiClient(httpClientMock);
         handler = new CreateCristinPersonHandler(apiClient, environment);
-
-        GatewayResponse<Person> gatewayResponse = sendQuery(dummyPerson());
-        Person actual = gatewayResponse.getBodyObject(Person.class);
+        var gatewayResponse = sendQuery(dummyPerson());
+        var actual = gatewayResponse.getBodyObject(Person.class);
 
         assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
         assertThat(actual.getNames().containsAll(dummyPerson().getNames()), equalTo(true));
@@ -101,38 +105,37 @@ public class CreateCristinPersonHandlerTest {
 
     @Test
     void shouldAcceptAdditionalNamesAndReturnCreated() throws IOException {
-        Person input = dummyPersonWithAdditionalNames();
-        GatewayResponse<Person> response = sendQuery(input);
+        var input = dummyPersonWithAdditionalNames();
+        var response = sendQuery(input);
 
         assertEquals(HttpURLConnection.HTTP_CREATED, response.getStatusCode());
     }
 
     @Test
     void shouldReturnBadRequestWhenClientPayloadIsMissingRequiredIdentifier() throws Exception {
-        Person personWithMissingIdentity = new Person.Builder()
-            .withNames(Set.of(new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
-                              new TypedValue(LAST_NAME, DUMMY_LAST_NAME))).build();
-
-        GatewayResponse<Person> gatewayResponse = sendQuery(personWithMissingIdentity);
+        var personWithMissingIdentity = new Person.Builder()
+                                            .withNames(Set.of(new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
+                                                              new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
+                                            .build();
+        var gatewayResponse = sendQuery(personWithMissingIdentity);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(),
-                   containsString(CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_IDENTIFIER));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_MISSING_IDENTIFIER));
     }
 
     @Test
     void shouldReturnBadRequestWhenClientPayloadIsEmpty() throws IOException {
-        GatewayResponse<Person> gatewayResponse = sendQuery(null);
+        var gatewayResponse = sendQuery(null);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(CreateCristinPersonHandler.ERROR_MESSAGE_PAYLOAD_EMPTY));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_PAYLOAD_EMPTY));
     }
 
     @Test
     void shouldReturnForbiddenWhenClientIsMissingCredentials() throws IOException {
-        GatewayResponse<Person> gatewayResponse = sendQueryWithoutAccessRights(dummyPerson());
+        var gatewayResponse = sendQueryWithoutAccessRights(dummyPerson());
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -140,49 +143,46 @@ public class CreateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenIdentityNumberNotValid() throws IOException {
-        GatewayResponse<Person> gatewayResponse = sendQuery(dummyPersonWithInvalidIdentityNumber());
+        var gatewayResponse = sendQuery(dummyPersonWithInvalidIdentityNumber());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(),
-                   containsString(CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIER_NOT_VALID));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_IDENTIFIER_NOT_VALID));
     }
 
     @Test
     void shouldReturnBadRequestWhenMissingRequiredNames() throws IOException {
-        Person personWithMissingNames = new Person.Builder()
-            .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER))).build();
-
-        GatewayResponse<Person> gatewayResponse = sendQuery(personWithMissingNames);
+        var personWithMissingNames =
+            new Person.Builder()
+                .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER)))
+                .build();
+        var gatewayResponse = sendQuery(personWithMissingNames);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(),
-                   containsString(CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_REQUIRED_NAMES));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_MISSING_REQUIRED_NAMES));
     }
 
     @Test
     void shouldReturnBadRequestWhenRepeatedIdentityNumber() throws IOException {
-
-        Person dummyPersonWithRepeatedIdentityNumber = getPersonWithRepeatedIdentityNumber();
-
-        GatewayResponse<Person> gatewayResponse = sendQuery(dummyPersonWithRepeatedIdentityNumber);
+        var dummyPersonWithRepeatedIdentityNumber = getPersonWithRepeatedIdentityNumber();
+        var gatewayResponse = sendQuery(dummyPersonWithRepeatedIdentityNumber);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(),
-                   containsString(CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_REPEATED));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_IDENTIFIERS_REPEATED));
     }
 
     @Test
     void shouldAllowUsersToCreateThemselvesInCristin() throws IOException, InterruptedException {
-        String responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
+        var responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
         apiClient = new CreateCristinPersonApiClient(httpClientMock);
         handler = new CreateCristinPersonHandler(apiClient, environment);
-        String personsOwnNin = ANOTHER_IDENTITY_NUMBER;
-        Person input = injectPersonNinIntoInput(personsOwnNin);
-        GatewayResponse<Person> gatewayResponse = sendQueryWithoutAccessRightsButWithPersonNin(input, personsOwnNin);
+        var personsOwnNin = ANOTHER_IDENTITY_NUMBER;
+        var input = injectPersonNinIntoInput(personsOwnNin);
+        var gatewayResponse =
+            sendQueryWithoutAccessRightsButWithPersonNin(input, personsOwnNin);
 
         assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
     }
@@ -190,8 +190,8 @@ public class CreateCristinPersonHandlerTest {
     @Test
     void shouldThrowForbiddenIfUserTryingToCreateWithAnotherPersonNinThatDoesNotBelongToThemAndIsNotAuthorized()
         throws IOException {
-        Person input = injectPersonNinIntoInput(DEFAULT_IDENTITY_NUMBER);
-        GatewayResponse<Person> gatewayResponse =
+        var input = injectPersonNinIntoInput(DEFAULT_IDENTITY_NUMBER);
+        var gatewayResponse =
             sendQueryWithoutAccessRightsButWithPersonNin(input, ANOTHER_IDENTITY_NUMBER);
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
@@ -261,7 +261,7 @@ public class CreateCristinPersonHandlerTest {
     }
 
     private Person injectPersonNinIntoInput(String personNin) {
-        Person input = dummyPerson();
+        var input = dummyPerson();
         input.setIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, personNin)));
         return input;
     }
@@ -278,8 +278,7 @@ public class CreateCristinPersonHandlerTest {
     }
 
     private GatewayResponse<Person> sendQueryWithoutAccessRights(Person body) throws IOException {
-        InputStream input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
-                                .withBody(body)
+        var input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER).withBody(body)
                                 .build();
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Person.class);
@@ -287,7 +286,7 @@ public class CreateCristinPersonHandlerTest {
 
     private GatewayResponse<Person> sendQueryWithoutAccessRightsButWithPersonNin(Person body, String personNin)
         throws IOException {
-        InputStream input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
+        var input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
                                 .withBody(body)
                                 .withPersonNin(personNin)
                                 .build();
@@ -296,7 +295,7 @@ public class CreateCristinPersonHandlerTest {
     }
 
     private GatewayResponse<Person> sendQuery(Person body) throws IOException {
-        InputStream input = requestWithBody(body);
+        var input = requestWithBody(body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
@@ -329,7 +328,7 @@ public class CreateCristinPersonHandlerTest {
     }
 
     private CristinPerson dummyCristinPerson() {
-        CristinPerson cristinPerson = new CristinPerson();
+        var cristinPerson = new CristinPerson();
         cristinPerson.setCristinPersonId(DUMMY_CRISTIN_ID);
         cristinPerson.setFirstName(DUMMY_FIRST_NAME);
         cristinPerson.setSurname(DUMMY_LAST_NAME);
