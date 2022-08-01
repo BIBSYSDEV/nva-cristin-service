@@ -236,6 +236,17 @@ public class CreateCristinPersonHandlerTest {
                    equalTo(true));
     }
 
+    @Test
+    void shouldThrowBadRequestOnInvalidEmploymentDataForPerson() throws IOException {
+        var dummyPerson = dummyPerson();
+        var dummyEmployment = randomEmployment();
+        dummyEmployment.setType(null);
+        dummyPerson.setEmployments(Set.of(dummyEmployment));
+        final var gatewayResponse = sendQuery(dummyPerson);
+
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    }
+
     private Set<Employment> randomEmployments() {
         var employments = new HashSet<Employment>();
         IntStream.range(0, 3).mapToObj(i -> randomEmployment()).forEach(employments::add);

@@ -203,6 +203,9 @@ public class Person implements JsonSerializable {
             .collect(Collectors.toMap(TypedValue::getType, TypedValue::getValue));
     }
 
+    /**
+     * Converts NVA formatted employments to Cristin formatted employments.
+     */
     public static List<CristinPersonEmployment> mapEmploymentsToCristinEmployments(Set<Employment> employments) {
         return new ArrayList<>(employments).stream()
                    .map(Employment::toCristinEmployment)
