@@ -70,7 +70,10 @@ public class QueryPersonEmploymentClient extends ApiClient {
         }
     }
 
-    private URI generateCristinUri(String personId) {
+    /**
+     * Generates Cristin uri for fetching employment data for given person identifier.
+     */
+    public static URI generateCristinUri(String personId) {
         return UriWrapper.fromUri(CRISTIN_API_URL)
             .addChild(PERSON_PATH).addChild(personId)
             .addChild(EMPLOYMENT_PATH_CRISTIN)

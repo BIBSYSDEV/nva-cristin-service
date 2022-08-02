@@ -10,6 +10,7 @@ import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
@@ -35,6 +36,8 @@ import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.exception.GatewayTimeoutException.ERROR_MESSAGE_GATEWAY_TIMEOUT;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,6 +48,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,6 +66,13 @@ public class FetchCristinPersonHandlerTest {
     private static final Map<String, String> VALID_ORCID_PATH_PARAM = Map.of(ID, "1234-1234-1234-1234");
     private static final String EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER =
         String.format("%s/persons/ORCID:1234-1234-1234-1234?lang=en,nb,nn", CRISTIN_API_URL);
+    private static final String CRISTIN_API_GET_PERSON_RESPONSE_JSON =
+        "cristinGetPersonResponse.json";
+    private static final int EXPECTED_EMPLOYMENT_SIZE_WHEN_AUTHORIZED = 2;
+    private static final String CRISTIN_API_QUERY_EMPLOYMENTS_RESPONSE_JSON =
+        "cristinQueryEmploymentResponse.json";
+    private static final String EXPECTED_CRISTIN_EMPLOYMENTS_URI_WITH_IDENTIFIER =
+        "https://api.cristin-test.uio.no/v2/persons/12345/affiliations";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -182,6 +193,71 @@ public class FetchCristinPersonHandlerTest {
         assertEquals(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_GATEWAY_TIMEOUT));
+    }
+
+    @Test
+    void shouldNotReturnEmploymentsWhenNotAuthorized() throws IOException, ApiGatewayException {
+        apiClient = spy(apiClient);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var actual = sendQuery(EMPTY_MAP, VALID_PATH_PARAM).getBodyObject(Person.class);
+
+        verify(apiClient, times(0)).fetchGetResultWithAuthentication(any());
+        assertThat(actual.getEmployments().size(), equalTo(0));
+    }
+
+    @Test
+    void shouldReturnEmploymentsWhenAuthorized() throws IOException, ApiGatewayException {
+        apiClient = spy(apiClient);
+        var cristinPersonUri = URI.create(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER);
+        doReturn(getResponseWithoutEmployment()).when(apiClient).fetchGetResultWithAuthentication(cristinPersonUri);
+        var cristinPersonEmploymentsUri = URI.create(EXPECTED_CRISTIN_EMPLOYMENTS_URI_WITH_IDENTIFIER);
+        doReturn(getResponseWithOnlyEmployments()).when(apiClient)
+            .fetchGetResultWithAuthentication(cristinPersonEmploymentsUri);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var actual = sendAuthorizedQuery().getBodyObject(Person.class);
+
+        assertThat(actual.getEmployments().size(), equalTo(EXPECTED_EMPLOYMENT_SIZE_WHEN_AUTHORIZED));
+    }
+
+    @Test
+    void shouldIgnoreErrorsAndReturnEmptySetOfEmploymentsWhenEmploymentQueryFails() throws IOException,
+                                                                                           ApiGatewayException {
+        apiClient = spy(apiClient);
+        var cristinPersonUri = URI.create(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER);
+        doReturn(getResponseWithoutEmployment()).when(apiClient).fetchGetResultWithAuthentication(cristinPersonUri);
+        var cristinPersonEmploymentsUri = URI.create(EXPECTED_CRISTIN_EMPLOYMENTS_URI_WITH_IDENTIFIER);
+        doThrow(new BadRequestException(EMPTY_STRING)).when(apiClient)
+            .fetchGetResultWithAuthentication(cristinPersonEmploymentsUri);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var actual = sendAuthorizedQuery().getBodyObject(Person.class);
+
+        assertThat(actual.getNames().isEmpty(), equalTo(false));
+        assertThat(actual.getEmployments().size(), equalTo(0));
+    }
+
+    private HttpResponseFaker getResponseWithOnlyEmployments() {
+        var dummyJsonWithEmployments =
+            IoUtils.stringFromResources(Path.of(CRISTIN_API_QUERY_EMPLOYMENTS_RESPONSE_JSON));
+        return new HttpResponseFaker(dummyJsonWithEmployments, 200);
+    }
+
+    private HttpResponseFaker getResponseWithoutEmployment() {
+        var dummyJsonWithoutEmployment =
+            IoUtils.stringFromResources(Path.of(CRISTIN_API_GET_PERSON_RESPONSE_JSON));
+        return new HttpResponseFaker(dummyJsonWithoutEmployment, 200);
+    }
+
+    private GatewayResponse<Person> sendAuthorizedQuery() throws IOException {
+        var customerId = randomUri();
+        var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                        .withBody(null)
+                        .withQueryParameters(EMPTY_MAP)
+                        .withPathParameters(VALID_PATH_PARAM)
+                        .withCustomerId(customerId)
+                        .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                        .build();
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
     private GatewayResponse<Person> sendQuery(Map<String, String> queryParams, Map<String, String> pathParam)

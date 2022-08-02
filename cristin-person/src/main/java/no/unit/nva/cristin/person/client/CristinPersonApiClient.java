@@ -1,8 +1,13 @@
 package no.unit.nva.cristin.person.client;
 
+import java.util.Collections;
+import java.util.Set;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.person.employment.query.QueryPersonEmploymentClient;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -239,8 +244,29 @@ public class CristinPersonApiClient extends ApiClient {
      */
     public Person authorizedGenerateGetResponse(String identifier) throws ApiGatewayException {
         var person = getCristinPersonWithAuthentication(identifier).toPerson();
+        var personEmployments =
+            attempt(() -> getCristinPersonEmploymentsWithAuthentication(identifier))
+                .orElse(fail -> Collections.checkedSet(Collections.emptySet(), Employment.class));
         person.setContext(PERSON_CONTEXT);
+        person.setEmployments(personEmployments);
         return person;
+    }
+
+    private Set<Employment> getCristinPersonEmploymentsWithAuthentication(String identifier)
+        throws ApiGatewayException {
+        var cristinUri = QueryPersonEmploymentClient.generateCristinUri(identifier);
+        var response = fetchGetResultWithAuthentication(cristinUri);
+        checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode());
+        var cristinEmployments =
+            asList(getDeserializedResponse(response, CristinPersonEmployment[].class));
+        return cristinEmploymentsMappedToNvaFormat(identifier, cristinEmployments);
+    }
+
+    private Set<Employment> cristinEmploymentsMappedToNvaFormat(String identifier,
+                                                                List<CristinPersonEmployment> cristinEmployments) {
+        return cristinEmployments.stream()
+                   .map(cristinEmployment -> cristinEmployment.toEmployment(identifier))
+                   .collect(Collectors.toSet());
     }
 
     protected CristinPerson getCristinPersonWithAuthentication(String identifier) throws ApiGatewayException {
