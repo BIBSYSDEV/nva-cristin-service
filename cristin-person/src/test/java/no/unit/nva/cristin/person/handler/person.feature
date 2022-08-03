@@ -17,6 +17,7 @@ Feature: API tests for Cristin Person fetch
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
     * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
+    * def samplePersonIdentifier = '515114'
 
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
@@ -134,3 +135,15 @@ Feature: API tests for Cristin Person fetch
     And match response.status == 404
     * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingOrcid
     And match response.detail == "The requested resource '" + uri + "' was not found"
+
+  Scenario: Fetch returns employments for given person
+    Given path '/person/' + samplePersonIdentifier
+    * header Authorization = 'Bearer ' + token
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.id == '#regex ' + personIdRegex
+    And match response.type == 'Person'
+    And match response.employments == '#present'
+    And assert response.employments.length > 0
