@@ -1681,6 +1681,11 @@ components:
           description: The list of person affiliations
           items:
             $ref: '#/components/schemas/Affiliation'
+        employments:
+          type: array
+          description: Employments for this person
+          items:
+            $ref: '#/components/schemas/PersonEmployment'
     PersonPost:
       type: object
       required: [ identifiers, names ]
@@ -2283,6 +2288,12 @@ components:
               labels:
                 en: 'Head Engineer'
                 nb: 'Overingeniør'
+        employments:
+          - type: 'https://api.dev.nva.aws.unit.no/cristin/position#1087'
+            organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+            startDate: '2008-01-01T00:00:00Z'
+            endDate: '2019-12-31T00:00:00Z'
+            fullTimeEquivalentPercentage: 100.0
     PersonPatchExample:
       value:
         orcid: '1234-1234-1234-1234'
