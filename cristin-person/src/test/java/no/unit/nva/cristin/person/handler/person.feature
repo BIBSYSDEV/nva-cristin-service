@@ -13,14 +13,14 @@ Feature: API tests for Cristin Person fetch
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
     * def username = java.lang.System.getenv('SIMPLE_TESTUSER_ID')
     * def password = java.lang.System.getenv('SIMPLE_TESTUSER_PASSWORD')
+    * def admin_user_name = java.lang.System.getenv('ADMIN_TESTUSER_ID')
+    * def admin_user_password = java.lang.System.getenv('ADMIN_TESTUSER_PASSWORD')
     * def cognitoClientAppId = java.lang.System.getenv('COGNITO_CLIENT_APP_ID')
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
     * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
+    * def adminToken = tokenGenerator.loginUser(admin_user_name, admin_user_password, cognitoClientAppId)
     * def samplePersonIdentifier = '515114'
-    * def adminUsername = java.lang.System.getenv('ADMIN_TESTUSER_ID')
-    * def adminPassword = java.lang.System.getenv('ADMIN_TESTUSER_PASSWORD')
-    * def adminToken = tokenGenerator.loginUser(adminUsername, adminPassword, cognitoClientAppId)
 
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
