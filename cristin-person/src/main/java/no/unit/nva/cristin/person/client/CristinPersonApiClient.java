@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.person.client;
 
-import java.util.Collections;
 import java.util.Set;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
@@ -244,9 +243,7 @@ public class CristinPersonApiClient extends ApiClient {
      */
     public Person authorizedGenerateGetResponse(String identifier) throws ApiGatewayException {
         var person = getCristinPersonWithAuthentication(identifier).toPerson();
-        var personEmployments =
-            attempt(() -> getCristinPersonEmploymentsWithAuthentication(identifier))
-                .orElse(fail -> Collections.checkedSet(Collections.emptySet(), Employment.class));
+        var personEmployments = getCristinPersonEmploymentsWithAuthentication(identifier);
         person.setContext(PERSON_CONTEXT);
         person.setEmployments(personEmployments);
         return person;

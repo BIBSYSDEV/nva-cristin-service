@@ -10,7 +10,6 @@ import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
@@ -217,22 +216,6 @@ public class FetchCristinPersonHandlerTest {
         var actual = sendAuthorizedQuery().getBodyObject(Person.class);
 
         assertThat(actual.getEmployments().size(), equalTo(EXPECTED_EMPLOYMENT_SIZE_WHEN_AUTHORIZED));
-    }
-
-    @Test
-    void shouldIgnoreErrorsAndReturnEmptySetOfEmploymentsWhenEmploymentQueryFails() throws IOException,
-                                                                                           ApiGatewayException {
-        apiClient = spy(apiClient);
-        var cristinPersonUri = URI.create(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER);
-        doReturn(getResponseWithoutEmployment()).when(apiClient).fetchGetResultWithAuthentication(cristinPersonUri);
-        var cristinPersonEmploymentsUri = URI.create(EXPECTED_CRISTIN_EMPLOYMENTS_URI_WITH_IDENTIFIER);
-        doThrow(new BadRequestException(EMPTY_STRING)).when(apiClient)
-            .fetchGetResultWithAuthentication(cristinPersonEmploymentsUri);
-        handler = new FetchCristinPersonHandler(apiClient, environment);
-        var actual = sendAuthorizedQuery().getBodyObject(Person.class);
-
-        assertThat(actual.getNames().isEmpty(), equalTo(false));
-        assertThat(actual.getEmployments().size(), equalTo(0));
     }
 
     private HttpResponseFaker getResponseWithOnlyEmployments() {
