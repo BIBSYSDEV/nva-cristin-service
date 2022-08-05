@@ -35,6 +35,7 @@ import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.exception.GatewayTimeoutException.ERROR_MESSAGE_GATEWAY_TIMEOUT;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -235,6 +236,21 @@ public class FetchCristinPersonHandlerTest {
         assertThat(employments.size(), equalTo(0));
     }
 
+    @Test
+    void shouldNotReturnEmploymentsWhenNotHavingRequiredAccessRight() throws IOException, ApiGatewayException {
+        apiClient = spy(apiClient);
+        var cristinPersonUri = URI.create(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER);
+        doReturn(getResponseWithoutEmployment()).when(apiClient).fetchGetResultWithAuthentication(cristinPersonUri);
+        var cristinPersonEmploymentsUri = URI.create(EXPECTED_CRISTIN_EMPLOYMENTS_URI_WITH_IDENTIFIER);
+        doReturn(getResponseWithOnlyEmployments()).when(apiClient)
+            .fetchGetResultWithAuthentication(cristinPersonEmploymentsUri);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var actual = sendQueryWithInvalidAccessRight().getBodyObject(Person.class);
+
+        verify(apiClient, times(0)).fetchGetResultWithAuthentication(any());
+        assertThat(actual.getEmployments().size(), equalTo(0));
+    }
+
     private HttpResponseFaker getResponseWithOnlyEmployments() {
         var dummyJsonWithEmployments =
             IoUtils.stringFromResources(Path.of(CRISTIN_API_QUERY_EMPLOYMENTS_RESPONSE_JSON));
@@ -255,6 +271,19 @@ public class FetchCristinPersonHandlerTest {
                         .withPathParameters(VALID_PATH_PARAM)
                         .withCustomerId(customerId)
                         .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                        .build();
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Person.class);
+    }
+
+    private GatewayResponse<Person> sendQueryWithInvalidAccessRight() throws IOException {
+        var customerId = randomUri();
+        var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                        .withBody(null)
+                        .withQueryParameters(EMPTY_MAP)
+                        .withPathParameters(VALID_PATH_PARAM)
+                        .withCustomerId(customerId)
+                        .withAccessRights(customerId, randomString())
                         .build();
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Person.class);
