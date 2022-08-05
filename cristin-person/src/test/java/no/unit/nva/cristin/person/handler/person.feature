@@ -144,6 +144,7 @@ Feature: API tests for Cristin Person fetch
     * header Authorization = 'Bearer ' + adminToken
     When method GET
     Then status 200
+    And print response
     And match response == '#object'
     And match response['@context'] == '#present'
     And match response.id == '#regex ' + personIdRegex
