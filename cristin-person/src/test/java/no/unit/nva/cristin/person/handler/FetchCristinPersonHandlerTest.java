@@ -72,6 +72,7 @@ public class FetchCristinPersonHandlerTest {
         "cristinQueryEmploymentResponse.json";
     private static final String EXPECTED_CRISTIN_EMPLOYMENTS_URI_WITH_IDENTIFIER =
         "https://api.cristin-test.uio.no/v2/persons/12345/affiliations";
+    private static final String EMPTY_JSON_ARRAY = "[]";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -216,6 +217,22 @@ public class FetchCristinPersonHandlerTest {
         var actual = sendAuthorizedQuery().getBodyObject(Person.class);
 
         assertThat(actual.getEmployments().size(), equalTo(EXPECTED_EMPLOYMENT_SIZE_WHEN_AUTHORIZED));
+    }
+
+    @Test
+    void shouldReturnOkEvenWhenEmploymentsAreEmpty() throws ApiGatewayException, IOException {
+        apiClient = spy(apiClient);
+        var cristinPersonUri = URI.create(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER);
+        doReturn(getResponseWithoutEmployment()).when(apiClient).fetchGetResultWithAuthentication(cristinPersonUri);
+        var cristinPersonEmploymentsUri = URI.create(EXPECTED_CRISTIN_EMPLOYMENTS_URI_WITH_IDENTIFIER);
+        doReturn(new HttpResponseFaker(EMPTY_JSON_ARRAY, 200)).when(apiClient)
+            .fetchGetResultWithAuthentication(cristinPersonEmploymentsUri);
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var actual = sendAuthorizedQuery();
+        var employments = actual.getBodyObject(Person.class).getEmployments();
+
+        assertThat(actual.getStatusCode(), equalTo(HttpURLConnection.HTTP_OK));
+        assertThat(employments.size(), equalTo(0));
     }
 
     private HttpResponseFaker getResponseWithOnlyEmployments() {
