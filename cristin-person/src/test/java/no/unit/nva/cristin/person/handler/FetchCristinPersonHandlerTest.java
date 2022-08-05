@@ -215,7 +215,7 @@ public class FetchCristinPersonHandlerTest {
         doReturn(getResponseWithOnlyEmployments()).when(apiClient)
             .fetchGetResultWithAuthentication(cristinPersonEmploymentsUri);
         handler = new FetchCristinPersonHandler(apiClient, environment);
-        var actual = sendAuthorizedQuery().getBodyObject(Person.class);
+        var actual = sendAuthorizedQuery(EDIT_OWN_INSTITUTION_USERS).getBodyObject(Person.class);
 
         assertThat(actual.getEmployments().size(), equalTo(EXPECTED_EMPLOYMENT_SIZE_WHEN_AUTHORIZED));
     }
@@ -229,7 +229,7 @@ public class FetchCristinPersonHandlerTest {
         doReturn(new HttpResponseFaker(EMPTY_JSON_ARRAY, 200)).when(apiClient)
             .fetchGetResultWithAuthentication(cristinPersonEmploymentsUri);
         handler = new FetchCristinPersonHandler(apiClient, environment);
-        var actual = sendAuthorizedQuery();
+        var actual = sendAuthorizedQuery(EDIT_OWN_INSTITUTION_USERS);
         var employments = actual.getBodyObject(Person.class).getEmployments();
 
         assertThat(actual.getStatusCode(), equalTo(HttpURLConnection.HTTP_OK));
@@ -245,7 +245,7 @@ public class FetchCristinPersonHandlerTest {
         doReturn(getResponseWithOnlyEmployments()).when(apiClient)
             .fetchGetResultWithAuthentication(cristinPersonEmploymentsUri);
         handler = new FetchCristinPersonHandler(apiClient, environment);
-        var actual = sendQueryWithInvalidAccessRight().getBodyObject(Person.class);
+        var actual = sendAuthorizedQuery(randomString()).getBodyObject(Person.class);
 
         verify(apiClient, times(0)).fetchGetResultWithAuthentication(any());
         assertThat(actual.getEmployments().size(), equalTo(0));
@@ -263,27 +263,14 @@ public class FetchCristinPersonHandlerTest {
         return new HttpResponseFaker(dummyJsonWithoutEmployment, 200);
     }
 
-    private GatewayResponse<Person> sendAuthorizedQuery() throws IOException {
+    private GatewayResponse<Person> sendAuthorizedQuery(String accessRight) throws IOException {
         var customerId = randomUri();
         var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                         .withBody(null)
                         .withQueryParameters(EMPTY_MAP)
                         .withPathParameters(VALID_PATH_PARAM)
                         .withCustomerId(customerId)
-                        .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
-                        .build();
-        handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output, Person.class);
-    }
-
-    private GatewayResponse<Person> sendQueryWithInvalidAccessRight() throws IOException {
-        var customerId = randomUri();
-        var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-                        .withBody(null)
-                        .withQueryParameters(EMPTY_MAP)
-                        .withPathParameters(VALID_PATH_PARAM)
-                        .withCustomerId(customerId)
-                        .withAccessRights(customerId, randomString())
+                        .withAccessRights(customerId, accessRight)
                         .build();
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Person.class);
