@@ -13,13 +13,10 @@ Feature: API tests for Cristin Person fetch
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
     * def username = java.lang.System.getenv('SIMPLE_TESTUSER_ID')
     * def password = java.lang.System.getenv('SIMPLE_TESTUSER_PASSWORD')
-    * def admin_user_name = java.lang.System.getenv('ADMIN_TESTUSER_ID')
-    * def admin_user_password = java.lang.System.getenv('ADMIN_TESTUSER_PASSWORD')
     * def cognitoClientAppId = java.lang.System.getenv('COGNITO_CLIENT_APP_ID')
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
     * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
-    * def adminToken = tokenGenerator.loginUser(admin_user_name, admin_user_password, cognitoClientAppId)
     * def samplePersonIdentifier = '515114'
 
     Given url CRISTIN_BASE
@@ -139,18 +136,9 @@ Feature: API tests for Cristin Person fetch
     * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingOrcid
     And match response.detail == "The requested resource '" + uri + "' was not found"
 
-  Scenario: Fetch returns employments for given person when having required rights
-    Given path '/person/' + samplePersonIdentifier
-    * header Authorization = 'Bearer ' + adminToken
-    When method GET
-    Then status 200
-    And print response
-    And match response == '#object'
-    And match response['@context'] == '#present'
-    And match response.id == '#regex ' + personIdRegex
-    And match response.type == 'Person'
-    And match response.employments == '#present'
-    And assert response.employments.length > 0
+  # TODO: Scenario: Fetch returns employments for given person when having required rights
+  # * header Authorization = 'Bearer ' + adminToken
+  # And assert response.employments.length > 0
 
   Scenario: Fetch does not return employments for person when missing required rights
     Given path '/person/' + samplePersonIdentifier
@@ -163,14 +151,4 @@ Feature: API tests for Cristin Person fetch
     And match response.employments == '#present'
     And assert response.employments.length == 0
 
-  Scenario: Fetch does not return employments for person when logged in but missing required rights
-    Given path '/person/' + samplePersonIdentifier
-    * header Authorization = 'Bearer ' + token
-    When method GET
-    Then status 200
-    And match response == '#object'
-    And match response['@context'] == '#present'
-    And match response.id == '#regex ' + personIdRegex
-    And match response.type == 'Person'
-    And match response.employments == '#present'
-    And assert response.employments.length == 0
+  # TODO: Scenario: Fetch does not return employments for person when logged in but missing required rights
