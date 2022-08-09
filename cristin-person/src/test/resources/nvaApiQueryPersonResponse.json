@@ -50,7 +50,6 @@
           "active": true,
           "role": {
             "type": "Role",
-            "id": "https://example.org/link/to/ontology#1026",
             "labels": {
               "en": "Researcher",
               "nb": "Forsker",
@@ -64,7 +63,6 @@
           "active": true,
           "role": {
             "type": "Role",
-            "id": "https://example.org/link/to/ontology#1026",
             "labels": {
               "en": "Head Engineer",
               "nb": "Overingeniør"
@@ -115,7 +113,6 @@
           "active": true,
           "role": {
             "type": "Role",
-            "id": "https://example.org/link/to/ontology#1026",
             "labels": {
               "en": "Researcher",
               "nb": "Forsker",
@@ -129,7 +126,6 @@
           "active": true,
           "role": {
             "type": "Role",
-            "id": "https://example.org/link/to/ontology#1026",
             "labels": {
               "en": "Head Engineer",
               "nb": "Overingeniør"

@@ -2195,7 +2195,6 @@ components:
                 organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
                 active: true
                 role:
-                  id: 'https://example.org/link/to/ontology#1026'
                   type: 'Role'
                   labels:
                     en: 'Researcher'
@@ -2205,7 +2204,6 @@ components:
                 organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
                 active: true
                 role:
-                  id: 'https://example.org/link/to/ontology#1026'
                   type: 'Role'
                   labels:
                     en: 'Head Engineer'
@@ -2227,7 +2225,6 @@ components:
                 organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
                 active: true
                 role:
-                  id: 'https://example.org/link/to/ontology#1026'
                   type: 'Role'
                   labels:
                     en: 'Consultant'
@@ -2258,7 +2255,6 @@ components:
             organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
             active: true
             role:
-              id: 'https://example.org/link/to/ontology#1026'
               type: 'Role'
               labels:
                 en: 'Researcher'
@@ -2268,7 +2264,6 @@ components:
             organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
             active: true
             role:
-              id: 'https://example.org/link/to/ontology#1026'
               type: 'Role'
               labels:
                 en: 'Head Engineer'
@@ -2399,7 +2394,6 @@ components:
                 organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
                 active: true
                 role:
-                  id: 'https://example.org/link/to/ontology#1026'
                   type: 'Role'
                   labels:
                     en: 'Researcher'
@@ -2409,7 +2403,6 @@ components:
                 organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
                 active: true
                 role:
-                  id: 'https://example.org/link/to/ontology#1026'
                   type: 'Role'
                   labels:
                     en: 'Head Engineer'
@@ -2431,7 +2424,6 @@ components:
                 organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
                 active: true
                 role:
-                  id: 'https://example.org/link/to/ontology#1026'
                   type: 'Role'
                   labels:
                     en: 'Consultant'
