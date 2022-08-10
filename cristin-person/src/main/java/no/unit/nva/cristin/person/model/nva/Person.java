@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.ArrayList;
+import java.util.List;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
 import nva.commons.core.JacocoGenerated;
 
@@ -17,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.distinctByKey;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
@@ -24,6 +28,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AFFILIATIONS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
@@ -54,6 +59,8 @@ public class Person implements JsonSerializable {
     private String norwegianNationalId;
     @JsonProperty(RESERVED)
     private Boolean reserved;
+    @JsonProperty(EMPLOYMENTS)
+    private Set<Employment> employments;
 
     private Person() {
 
@@ -68,18 +75,21 @@ public class Person implements JsonSerializable {
      * @param contactDetails How to contact this Person.
      * @param image          URI to picture of this Person.
      * @param affiliations   This person's organization affiliations.
+     * @param employments    This person's detailed employment data at each organization.
      */
     @JsonCreator
-    public Person(@JsonProperty("id") URI id, @JsonProperty("identifiers") Set<TypedValue> identifiers,
-                  @JsonProperty("names") Set<TypedValue> names,
-                  @JsonProperty("contactDetails") ContactDetails contactDetails, @JsonProperty("image") URI image,
-                  @JsonProperty("affiliations") Set<Affiliation> affiliations) {
+    public Person(@JsonProperty(ID) URI id, @JsonProperty(IDENTIFIERS) Set<TypedValue> identifiers,
+                  @JsonProperty(NAMES) Set<TypedValue> names,
+                  @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails, @JsonProperty(IMAGE) URI image,
+                  @JsonProperty(AFFILIATIONS) Set<Affiliation> affiliations,
+                  @JsonProperty(EMPLOYMENTS) Set<Employment> employments) {
         this.id = id;
         this.identifiers = identifiers;
         this.names = names;
         this.contactDetails = contactDetails;
         this.image = image;
         this.affiliations = affiliations;
+        this.employments = employments;
     }
 
     public String getContext() {
@@ -91,7 +101,7 @@ public class Person implements JsonSerializable {
     }
 
     public Set<TypedValue> getIdentifiers() {
-        return Objects.nonNull(identifiers) ? identifiers : Collections.emptySet();
+        return nonNull(identifiers) ? identifiers : Collections.emptySet();
     }
 
     public URI getId() {
@@ -107,7 +117,7 @@ public class Person implements JsonSerializable {
     }
 
     public Set<Affiliation> getAffiliations() {
-        return Objects.nonNull(affiliations) ? affiliations : Collections.emptySet();
+        return nonNull(affiliations) ? affiliations : Collections.emptySet();
     }
 
     public ContactDetails getContactDetails() {
@@ -127,7 +137,7 @@ public class Person implements JsonSerializable {
     }
 
     public Set<TypedValue> getNames() {
-        return Objects.nonNull(names) ? names : Collections.emptySet();
+        return nonNull(names) ? names : Collections.emptySet();
     }
 
     public void setContactDetails(ContactDetails contactDetails) {
@@ -158,6 +168,14 @@ public class Person implements JsonSerializable {
         this.reserved = reserved;
     }
 
+    public Set<Employment> getEmployments() {
+        return nonNull(employments) ? employments : Collections.emptySet();
+    }
+
+    public void setEmployments(Set<Employment> employments) {
+        this.employments = employments;
+    }
+
     /**
      * Converts this object to an appropriate format for POST to Cristin.
      */
@@ -173,6 +191,8 @@ public class Person implements JsonSerializable {
         Map<String, String> identifierMap = convertTypedValuesToMap(getIdentifiers());
         cristinPersonPost.setNorwegianNationalId(identifierMap.get(NATIONAL_IDENTITY_NUMBER));
 
+        cristinPersonPost.setDetailedAffiliations(mapEmploymentsToCristinEmployments(getEmployments()));
+
         return cristinPersonPost;
     }
 
@@ -181,6 +201,15 @@ public class Person implements JsonSerializable {
             .filter(TypedValue::hasData)
             .filter(distinctByKey(TypedValue::getType))
             .collect(Collectors.toMap(TypedValue::getType, TypedValue::getValue));
+    }
+
+    /**
+     * Converts NVA formatted employments to Cristin formatted employments.
+     */
+    public static List<CristinPersonEmployment> mapEmploymentsToCristinEmployments(Set<Employment> employments) {
+        return new ArrayList<>(employments).stream()
+                   .map(Employment::toCristinEmployment)
+                   .collect(Collectors.toList());
     }
 
     @JacocoGenerated
@@ -199,7 +228,8 @@ public class Person implements JsonSerializable {
             && getNames().equals(that.getNames())
             && Objects.equals(getContactDetails(), that.getContactDetails())
             && Objects.equals(getImage(), that.getImage())
-            && getAffiliations().equals(that.getAffiliations());
+            && getAffiliations().equals(that.getAffiliations())
+            && getEmployments().equals(that.getEmployments());
     }
 
     @Override
@@ -211,7 +241,7 @@ public class Person implements JsonSerializable {
     @Override
     public int hashCode() {
         return Objects.hash(getContext(), getId(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
-            getAffiliations());
+            getAffiliations(), getEmployments());
     }
 
     @JacocoGenerated
@@ -265,6 +295,11 @@ public class Person implements JsonSerializable {
 
         public Builder withReserved(Boolean reserved) {
             person.setReserved(reserved);
+            return this;
+        }
+
+        public Builder withEmployments(Set<Employment> employments) {
+            person.setEmployments(employments);
             return this;
         }
 

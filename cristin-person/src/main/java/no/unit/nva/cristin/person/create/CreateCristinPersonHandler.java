@@ -4,7 +4,9 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
+import no.unit.nva.cristin.person.employment.create.CreatePersonEmploymentValidator;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
+import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.utils.AccessUtils;
@@ -63,6 +65,10 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
         validateNoDuplicateNationalIdentifiers(input.getIdentifiers());
         validateContainsRequiredIdentifiers(extractIdentifiers(input.getIdentifiers()));
         validateValidIdentificationNumber(extractIdentificationNumber(input.getIdentifiers()));
+
+        for (Employment employment : input.getEmployments()) {
+            CreatePersonEmploymentValidator.validate(employment);
+        }
 
         if (suppliedInputPersonNinDoesNotMatchClientOwn(input, requestInfo)) {
             AccessUtils.validateIdentificationNumberAccess(requestInfo);

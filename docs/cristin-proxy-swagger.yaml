@@ -671,11 +671,11 @@ paths:
     parameters:
       - name: id
         in: path
-        description: ID of person
+        description: Identifier of person. Can either be Cristin identifier or Orcid
         required: true
         schema:
           type: string
-          pattern: '^[0-9]+$'
+          pattern: '^[0-9]+$|[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9|Xx]'
         example: '359084'
     get:
       x-amazon-apigateway-integration:
@@ -1713,6 +1713,11 @@ components:
                 type: string
                 pattern: '.+'
                 description: Value of identifier
+        employments:
+          type: array
+          description: Employments for this person
+          items:
+            $ref: '#/components/schemas/PersonEmployment'
     PersonPostResponse:
       type: object
       properties:
@@ -1744,6 +1749,11 @@ components:
                 type: string
                 pattern: '.+'
                 description: Value of identifier
+        affiliations:
+          type: array
+          description: The list of person affiliations
+          items:
+            $ref: '#/components/schemas/Affiliation'
     PersonPatch:
       type: object
       properties:
@@ -2293,6 +2303,12 @@ components:
             value: 'Kjell Ola'
           - type: 'LastName'
             value: 'Nordmann'
+        employments:
+          - type: 'https://api.dev.nva.aws.unit.no/cristin/position#1087'
+            organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+            startDate: '2008-01-01T00:00:00Z'
+            endDate: '2019-12-31T00:00:00Z'
+            fullTimeEquivalentPercentage: 100.0
     PersonPostResponseExample:
       value:
         '@context': 'https://example.org/person-context.json'
@@ -2310,6 +2326,16 @@ components:
             value: 'Kjell Ola'
           - type: 'LastName'
             value: 'Nordmann'
+        affiliations:
+          - type: 'Affiliation'
+            organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+            active: true
+            role:
+              id: 'https://example.org/link/to/ontology#1087'
+              type: 'Role'
+              labels:
+                en: 'Head Engineer'
+                nb: 'Overingeniør'
     PersonOrganizationInfoExample:
       value:
         '@context': 'https://ontology.org'

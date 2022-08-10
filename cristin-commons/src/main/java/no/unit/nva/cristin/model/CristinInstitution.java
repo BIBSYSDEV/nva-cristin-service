@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
 import java.util.Map;
+import java.util.Objects;
 import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
 
@@ -77,5 +78,24 @@ public class CristinInstitution {
         institution.setUrl(nvaIdentifierToCristinIdentifier(organization.getId(), INSTITUTION_PATH).toString());
         institution.setCristinInstitutionId(extractLastPathElement(organization.getId()));
         return institution;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CristinInstitution)) {
+            return false;
+        }
+        CristinInstitution that = (CristinInstitution) o;
+        return Objects.equals(getCristinInstitutionId(), that.getCristinInstitutionId())
+               && Objects.equals(getInstitutionName(), that.getInstitutionName())
+               && Objects.equals(getUrl(), that.getUrl());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCristinInstitutionId(), getInstitutionName(), getUrl());
     }
 }
