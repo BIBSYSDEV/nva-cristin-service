@@ -23,6 +23,7 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 
 @SuppressWarnings("unused")
 @JacocoGenerated
@@ -127,8 +128,8 @@ public class CristinPerson {
     }
 
 
-    public String getNorwegianNationalId() {
-        return norwegianNationalId;
+    public Optional<String> getNorwegianNationalId() {
+        return Optional.ofNullable(norwegianNationalId);
     }
 
     public void setNorwegianNationalId(String norwegianNationalId) {
@@ -157,7 +158,7 @@ public class CristinPerson {
             .withContactDetails(extractContactDetails())
             .withImage(extractImage())
             .withAffiliations(extractAffiliations())
-            .withNorwegianNationalId(getNorwegianNationalId())
+            .withNorwegianNationalId(getNorwegianNationalId().orElse(null))
             .withReserved(getReserved())
             .build();
     }
@@ -176,6 +177,7 @@ public class CristinPerson {
 
         identifiers.add(new TypedValue(CRISTIN_IDENTIFIER, getCristinPersonId()));
         getOrcid().flatMap(CristinOrcid::getId).ifPresent(orcid -> identifiers.add(new TypedValue(ORCID, orcid)));
+        getNorwegianNationalId().ifPresent(nin -> identifiers.add(new TypedValue(NATIONAL_IDENTITY_NUMBER, nin)));
 
         return identifiers;
     }
