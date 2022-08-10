@@ -134,3 +134,16 @@ Feature: API tests for Cristin Person fetch
     And match response.status == 404
     * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingOrcid
     And match response.detail == "The requested resource '" + uri + "' was not found"
+
+  Scenario: Get does not return national identification number when not authorized
+    * def samplePersonIdentifier = '515114'
+    Given path '/person/' + samplePersonIdentifier
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.type == 'Person'
+    And match response.id == '#present'
+    And match response.NationalIdentificationNumber != '#present'
+    * string identifiers = response.identifiers
+    And match identifiers contains 'CristinIdentifier'
+    And match identifiers !contains 'NationalIdentificationNumber'

@@ -13,18 +13,7 @@ import nva.commons.core.JacocoGenerated;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPersonPost extends CristinPerson implements JsonSerializable {
 
-    private String norwegianNationalId;
     private List<CristinPersonEmployment> detailedAffiliations;
-
-    @Override
-    public String getNorwegianNationalId() {
-        return norwegianNationalId;
-    }
-
-    @Override
-    public void setNorwegianNationalId(String norwegianNationalId) {
-        this.norwegianNationalId = norwegianNationalId;
-    }
 
     @JsonProperty(AFFILIATIONS)
     public List<CristinPersonEmployment> getDetailedAffiliations() {
