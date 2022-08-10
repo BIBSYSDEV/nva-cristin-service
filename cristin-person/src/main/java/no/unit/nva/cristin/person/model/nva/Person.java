@@ -78,10 +78,10 @@ public class Person implements JsonSerializable {
      * @param employments    This person's detailed employment data at each organization.
      */
     @JsonCreator
-    public Person(@JsonProperty("id") URI id, @JsonProperty("identifiers") Set<TypedValue> identifiers,
-                  @JsonProperty("names") Set<TypedValue> names,
-                  @JsonProperty("contactDetails") ContactDetails contactDetails, @JsonProperty("image") URI image,
-                  @JsonProperty("affiliations") Set<Affiliation> affiliations,
+    public Person(@JsonProperty(ID) URI id, @JsonProperty(IDENTIFIERS) Set<TypedValue> identifiers,
+                  @JsonProperty(NAMES) Set<TypedValue> names,
+                  @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails, @JsonProperty(IMAGE) URI image,
+                  @JsonProperty(AFFILIATIONS) Set<Affiliation> affiliations,
                   @JsonProperty(EMPLOYMENTS) Set<Employment> employments) {
         this.id = id;
         this.identifiers = identifiers;
