@@ -4,6 +4,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAY
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler.NIN_TYPE;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_FIELD;
 import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_SCOPE_FIELD;
@@ -175,6 +176,13 @@ public class FetchFromIdentityNumberHandlerTest {
         assertThat(person, is(not(nullValue())));
     }
 
+    @Test
+    void shouldThrowForbiddenWhenUnauthorizedAccessRight() throws IOException {
+        var gatewayResponse = sendQueryWithUnauthorizedAccessRight();
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HttpURLConnection.HTTP_FORBIDDEN));
+    }
+
     private InputStream requestWithBackendScope() throws JsonProcessingException {
         ObjectNode requestContext = OBJECT_MAPPER.createObjectNode();
         ObjectNode authorizerNode = OBJECT_MAPPER.createObjectNode();
@@ -188,20 +196,26 @@ public class FetchFromIdentityNumberHandlerTest {
             .build();
     }
 
-    private GatewayResponse<Person> sendQuery(TypedValue body, Map<String, String> queryParams)
-        throws IOException {
-
-        InputStream input = requestWithParams(body, queryParams);
+    private GatewayResponse<Person> sendQueryWithUnauthorizedAccessRight() throws IOException {
+        InputStream input = requestWithParams(defaultBody(), EMPTY_MAP, randomString());
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
-    private InputStream requestWithParams(TypedValue body, Map<String, String> queryParams)
+    private GatewayResponse<Person> sendQuery(TypedValue body, Map<String, String> queryParams)
+        throws IOException {
+
+        InputStream input = requestWithParams(body, queryParams, EDIT_OWN_INSTITUTION_USERS);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Person.class);
+    }
+
+    private InputStream requestWithParams(TypedValue body, Map<String, String> queryParams, String accessRight)
         throws JsonProcessingException {
         var customerId = randomUri();
         return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
             .withCustomerId(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+            .withAccessRights(customerId, accessRight)
             .withBody(body)
             .withQueryParameters(queryParams)
             .build();
