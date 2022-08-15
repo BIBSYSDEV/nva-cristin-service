@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 import java.util.Optional;
 import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
@@ -59,6 +60,24 @@ public class CristinOrganization {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CristinOrganization)) {
+            return false;
+        }
+        CristinOrganization that = (CristinOrganization) o;
+        return Objects.equals(getInstitution(), that.getInstitution()) && Objects.equals(
+            getInstitutionUnit(), that.getInstitutionUnit());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getInstitution(), getInstitutionUnit());
     }
 }
 
