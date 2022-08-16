@@ -179,15 +179,15 @@ public class Person implements JsonSerializable {
      * Converts this object to an appropriate format for POST to Cristin.
      */
     public CristinPerson toCristinPerson() {
-        CristinPerson cristinPerson = new CristinPerson();
+        var cristinPerson = new CristinPerson();
 
-        Map<String, String> namesMap = convertTypedValuesToMap(getNames());
+        var namesMap = convertTypedValuesToMap(getNames());
         cristinPerson.setFirstName(namesMap.get(CristinPerson.FIRST_NAME));
         cristinPerson.setSurname(namesMap.get(CristinPerson.LAST_NAME));
         cristinPerson.setFirstNamePreferred(namesMap.get(CristinPerson.PREFERRED_FIRST_NAME));
         cristinPerson.setSurnamePreferred(namesMap.get(CristinPerson.PREFERRED_LAST_NAME));
 
-        Map<String, String> identifierMap = convertTypedValuesToMap(getIdentifiers());
+        var identifierMap = convertTypedValuesToMap(getIdentifiers());
         cristinPerson.setNorwegianNationalId(identifierMap.get(NATIONAL_IDENTITY_NUMBER));
 
         cristinPerson.setDetailedAffiliations(mapEmploymentsToCristinEmployments(getEmployments()));
