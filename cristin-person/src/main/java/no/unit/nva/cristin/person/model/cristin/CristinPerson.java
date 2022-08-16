@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person.model.cristin;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
 import no.unit.nva.cristin.person.model.nva.ContactDetails;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -27,7 +28,7 @@ import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 @SuppressWarnings("unused")
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CristinPerson {
+public class CristinPerson implements JsonSerializable {
 
     @JsonIgnore
     public static final String CRISTIN_IDENTIFIER = "CristinIdentifier";
@@ -53,6 +54,7 @@ public class CristinPerson {
     private List<CristinAffiliation> affiliations;
     private Boolean reserved;
     private String norwegianNationalId;
+    private List<CristinPersonEmployment> detailedAffiliations;
 
     public String getCristinPersonId() {
         return cristinPersonId;
@@ -143,6 +145,14 @@ public class CristinPerson {
         this.reserved = reserved;
     }
 
+    public List<CristinPersonEmployment> getDetailedAffiliations() {
+        return detailedAffiliations;
+    }
+
+    public void setDetailedAffiliations(List<CristinPersonEmployment> detailedAffiliations) {
+        this.detailedAffiliations = detailedAffiliations;
+    }
+
 
     /**
      * Creates a Nva person model from a Cristin person model.
@@ -199,4 +209,10 @@ public class CristinPerson {
         return getAffiliations().stream().map(CristinAffiliation::toAffiliation).collect(
             Collectors.toSet());
     }
+
+    @Override
+    public String toString() {
+        return toJsonString();
+    }
+
 }

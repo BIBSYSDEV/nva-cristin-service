@@ -9,7 +9,6 @@ import java.util.List;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.URI;
@@ -179,21 +178,21 @@ public class Person implements JsonSerializable {
     /**
      * Converts this object to an appropriate format for POST to Cristin.
      */
-    public CristinPersonPost toCristinPersonPost() {
-        CristinPersonPost cristinPersonPost = new CristinPersonPost();
+    public CristinPerson toCristinPerson() {
+        CristinPerson cristinPerson = new CristinPerson();
 
         Map<String, String> namesMap = convertTypedValuesToMap(getNames());
-        cristinPersonPost.setFirstName(namesMap.get(CristinPerson.FIRST_NAME));
-        cristinPersonPost.setSurname(namesMap.get(CristinPerson.LAST_NAME));
-        cristinPersonPost.setFirstNamePreferred(namesMap.get(CristinPerson.PREFERRED_FIRST_NAME));
-        cristinPersonPost.setSurnamePreferred(namesMap.get(CristinPerson.PREFERRED_LAST_NAME));
+        cristinPerson.setFirstName(namesMap.get(CristinPerson.FIRST_NAME));
+        cristinPerson.setSurname(namesMap.get(CristinPerson.LAST_NAME));
+        cristinPerson.setFirstNamePreferred(namesMap.get(CristinPerson.PREFERRED_FIRST_NAME));
+        cristinPerson.setSurnamePreferred(namesMap.get(CristinPerson.PREFERRED_LAST_NAME));
 
         Map<String, String> identifierMap = convertTypedValuesToMap(getIdentifiers());
-        cristinPersonPost.setNorwegianNationalId(identifierMap.get(NATIONAL_IDENTITY_NUMBER));
+        cristinPerson.setNorwegianNationalId(identifierMap.get(NATIONAL_IDENTITY_NUMBER));
 
-        cristinPersonPost.setDetailedAffiliations(mapEmploymentsToCristinEmployments(getEmployments()));
+        cristinPerson.setDetailedAffiliations(mapEmploymentsToCristinEmployments(getEmployments()));
 
-        return cristinPersonPost;
+        return cristinPerson;
     }
 
     private Map<String, String> convertTypedValuesToMap(Set<TypedValue> typedValueSet) {
