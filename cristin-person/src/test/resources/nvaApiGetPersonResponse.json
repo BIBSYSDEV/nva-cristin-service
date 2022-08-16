@@ -40,7 +40,6 @@
       "organization": "https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0",
       "active": true,
       "role": {
-        "id": "https://example.org/link/to/ontology#1026",
         "type": "Role",
         "labels": {
           "en": "Researcher",
@@ -54,7 +53,6 @@
       "organization": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
       "active": true,
       "role": {
-        "id": "https://example.org/link/to/ontology#1026",
         "type": "Role",
         "labels": {
           "en": "Head Engineer",
