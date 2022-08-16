@@ -85,16 +85,16 @@ public class FetchCristinPersonHandlerTest {
 
     @Test
     void shouldReturnResponseWhenCallingEndpointWithValidIdentifier() throws IOException {
-        Person actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
-        String expectedString = stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
-        Person expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
+        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
+        var expectedString = stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
+        var expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
 
         assertThat(actual, equalTo(expected));
     }
 
     @Test
     void shouldThrowBadRequestWhenCallingEndpointWithAnyQueryParameters() throws IOException {
-        GatewayResponse<Person> gatewayResponse = sendQuery(ILLEGAL_QUERY_PARAMS, VALID_PATH_PARAM);
+        var gatewayResponse = sendQuery(ILLEGAL_QUERY_PARAMS, VALID_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -104,7 +104,7 @@ public class FetchCristinPersonHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenPathParamIsNotANumberOrOrcid() throws IOException {
-        GatewayResponse<Person> gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, ILLEGAL_PATH_PARAM);
+        var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, ILLEGAL_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -119,7 +119,7 @@ public class FetchCristinPersonHandlerTest {
             .when(apiClient).fetchGetResult(any(URI.class));
 
         handler = new FetchCristinPersonHandler(apiClient, environment);
-        GatewayResponse<Person> gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
+        var gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
     }
@@ -131,7 +131,7 @@ public class FetchCristinPersonHandlerTest {
             .when(apiClient).fetchGetResult(any(URI.class));
 
         handler = new FetchCristinPersonHandler(apiClient, environment);
-        GatewayResponse<Person> gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
+        var gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -145,7 +145,7 @@ public class FetchCristinPersonHandlerTest {
 
         doThrow(RuntimeException.class).when(apiClient).generateGetResponse(any());
         handler = new FetchCristinPersonHandler(apiClient, environment);
-        GatewayResponse<Person> gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
+        var gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -162,9 +162,9 @@ public class FetchCristinPersonHandlerTest {
 
     @Test
     void shouldReturnResponseWhenCallingEndpointWithValidOrcidIdentifier() throws IOException {
-        Person actual = sendQuery(ZERO_QUERY_PARAMS, VALID_ORCID_PATH_PARAM).getBodyObject(Person.class);
-        String expectedString = stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
-        Person expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
+        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_ORCID_PATH_PARAM).getBodyObject(Person.class);
+        var expectedString = stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
+        var expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
 
         assertThat(actual, equalTo(expected));
     }
@@ -179,11 +179,11 @@ public class FetchCristinPersonHandlerTest {
 
     @Test
     void shouldReturnGatewayTimeoutWhenFetchFromUpstreamServerTimesOut() throws Exception {
-        HttpClient clientMock = mock(HttpClient.class);
+        var clientMock = mock(HttpClient.class);
         when(clientMock.<String>send(any(), any())).thenThrow(new HttpConnectTimeoutException(EMPTY_STRING));
-        CristinPersonApiClient apiClient = new CristinPersonApiClient(clientMock);
+        var apiClient = new CristinPersonApiClient(clientMock);
         handler = new FetchCristinPersonHandler(apiClient, environment);
-        GatewayResponse<Person> gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
+        var gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -214,7 +214,7 @@ public class FetchCristinPersonHandlerTest {
     private GatewayResponse<Person> sendQuery(Map<String, String> queryParams, Map<String, String> pathParam)
         throws IOException {
 
-        InputStream input = requestWithParams(queryParams, pathParam);
+        var input = requestWithParams(queryParams, pathParam);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
