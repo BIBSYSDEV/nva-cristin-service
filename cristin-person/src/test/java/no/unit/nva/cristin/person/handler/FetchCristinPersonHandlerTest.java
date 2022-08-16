@@ -65,7 +65,7 @@ public class FetchCristinPersonHandlerTest {
     private static final Map<String, String> VALID_ORCID_PATH_PARAM = Map.of(ID, "1234-1234-1234-1234");
     private static final String EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER =
         String.format("%s/persons/ORCID:1234-1234-1234-1234?lang=en,nb,nn", CRISTIN_API_URL);
-    private static final int EXPECTED_HITS_SIZE = 2;
+    private static final int EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS = 2;
     private static final String CRISTIN_GET_PERSON_RESPONSE_JSON = "cristinGetPersonResponse.json";
     private static final String CRISTIN_QUERY_EMPLOYMENT_RESPONSE_JSON = "cristinQueryEmploymentResponse.json";
 
@@ -191,7 +191,7 @@ public class FetchCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseWithEmploymentDataWhenCallingEndpointWithValidIdentifier()
+    void shouldReturnEmploymentDataInResponseToClientWhenUpstreamHasEmploymentDataInPayload()
         throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
         doReturn(new HttpResponseFaker(cristinPersonWithEmploymentsAsJson()))
@@ -199,7 +199,7 @@ public class FetchCristinPersonHandlerTest {
         handler = new FetchCristinPersonHandler(apiClient, environment);
         var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
 
-        assertThat(actual.getEmployments().size(), equalTo(EXPECTED_HITS_SIZE));
+        assertThat(actual.getEmployments().size(), equalTo(EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS));
     }
 
     private String cristinPersonWithEmploymentsAsJson() throws JsonProcessingException {
