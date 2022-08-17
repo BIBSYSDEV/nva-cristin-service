@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import java.net.URI;
+import java.util.List;
 import no.unit.nva.cristin.common.ErrorMessages;
-import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -31,15 +31,17 @@ import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
+import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_EMPLOYMENT_FIELD;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.FIELD_CAN_NOT_BE_ERASED;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.ORCID_IS_NOT_VALID;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE;
 import static no.unit.nva.cristin.person.update.UpdateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH;
-import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
@@ -63,6 +65,7 @@ public class UpdateCristinPersonHandlerTest {
     public static final String UNSUPPORTED_FIELD = "unsupportedField";
     public static final String INVALID_IDENTIFIER = "hello";
     private static final String IDENTIFIER_NOT_MATCHING_COGNITO = "555666";
+    private static final String EMPTY_LIST = "[]";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private UpdateCristinPersonApiClient apiClient;
@@ -90,7 +93,7 @@ public class UpdateCristinPersonHandlerTest {
 
         GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
-        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
     @Test
@@ -205,7 +208,7 @@ public class UpdateCristinPersonHandlerTest {
         GatewayResponse<Void> gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath,
                                                                                           jsonObject.toString());
 
-        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
     @Test
@@ -235,6 +238,36 @@ public class UpdateCristinPersonHandlerTest {
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenPersonEmploymentDataNotValid() throws IOException {
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
+        var invalidData = randomString();
+        jsonObject.put(EMPLOYMENTS, invalidData);
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(COULD_NOT_PARSE_EMPLOYMENT_FIELD));
+    }
+
+    @Test
+    void shouldAllowEmptyListOfEmployments() throws IOException {
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.put(EMPLOYMENTS, EMPTY_LIST);
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
+
+        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldAllowValidEmploymentData() throws IOException {
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
+        var employments = List.of(randomEmployment());
+        jsonObject.put(EMPLOYMENTS, OBJECT_MAPPER.writeValueAsString(employments));
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
+
+        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
     private GatewayResponse<Void> sendQuery(Map<String, String> pathParam, String body) throws IOException {
@@ -274,4 +307,5 @@ public class UpdateCristinPersonHandlerTest {
 
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
+
 }

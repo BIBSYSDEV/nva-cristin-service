@@ -1,9 +1,13 @@
 package no.unit.nva.cristin.person.update;
 
+import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_EMPLOYMENTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
@@ -16,7 +20,10 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import org.junit.jupiter.api.Test;
 
 public class CristinPersonPatchJsonCreatorTest {
@@ -63,5 +70,18 @@ public class CristinPersonPatchJsonCreatorTest {
         ObjectNode result = new CristinPersonPatchJsonCreator(emptyJson).create().getOutput();
 
         assertThat(result.isEmpty(), equalTo(true));
+    }
+
+    @Test
+    void shouldCreateValidCristinEmploymentOutputWhenInputHasEmploymentData() throws JsonProcessingException {
+        var employments = List.of(randomEmployment());
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.put(EMPLOYMENTS, OBJECT_MAPPER.writeValueAsString(employments));
+        var output = new CristinPersonPatchJsonCreator(input).create().getOutput();
+        var actualEmploymentsNode = output.get(CRISTIN_EMPLOYMENTS);
+        var cristinEmploymentsFromNode =
+            asList(OBJECT_MAPPER.readValue(actualEmploymentsNode.asText(), CristinPersonEmployment[].class));
+
+        assertThat(cristinEmploymentsFromNode.get(0), equalTo(employments.get(0).toCristinEmployment()));
     }
 }
