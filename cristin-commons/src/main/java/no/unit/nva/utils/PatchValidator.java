@@ -48,7 +48,7 @@ public class PatchValidator {
     protected static void validateInstantIfPresent(ObjectNode input, String propertyName) throws BadRequestException {
         if (propertyHasValue(input, propertyName)) {
             attempt(() -> Instant.parse(input.get(propertyName).asText()))
-                    .orElseThrow(fail -> new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, propertyName)));
+                .orElseThrow(fail -> new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, propertyName)));
         }
     }
 

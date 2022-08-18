@@ -48,7 +48,7 @@ public class AccessUtils {
 
 
     /**
-     * Validate if Requester is authorized to use IdentificationNumber to a access a user.
+     * Validate if Requester is authorized to use IdentificationNumber to access a user.
      *
      * @param requestInfo information from request
      * @throws ForbiddenException thrown when user is not authorized to access a user with IdentificationNumber
@@ -76,23 +76,28 @@ public class AccessUtils {
         }
     }
 
+    /**
+     * Checks if the requester is permitted to act as a user administrator, either by having that specific role, or if
+     * the client is internal backend.
+     *
+     * @param requestInfo information from request used to verify allowed permissions
+     * @return true if user administrator otherwise false
+     */
     public static boolean requesterIsUserAdministrator(RequestInfo requestInfo) {
-        return requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS)
-               || requestInfo.clientIsInternalBackend();
+        return requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS) || requestInfo.clientIsInternalBackend();
     }
 
     private static boolean requesterHasNoAccessRightToUseNationalIdentificationNumber(RequestInfo requestInfo) {
-
-        return !(
-            requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS)
-            || requestInfo.clientIsInternalBackend()
-        );
+        return !(requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS) || requestInfo.clientIsInternalBackend());
     }
 
     private static boolean requesterHasNoAccessRightToEditProjects(RequestInfo requestInfo) {
         return !requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_PROJECTS);
     }
 
+    /**
+     * Fetches an internal backend token from Cognito
+     */
     public static String getBackendAccessToken() throws IOException, InterruptedException {
         var cognitoTokenUrl = getCognitoTokenUrl();
         logger.debug("cognitoTokenUrl={}", cognitoTokenUrl);
@@ -108,7 +113,8 @@ public class AccessUtils {
                 .connectTimeout(Duration.ofSeconds(30))
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        HttpResponse<String> response = client.send(request,
+                                                    HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
         logger.debug("Response from Cognito: statusCode={}, body:{}", response.statusCode(), response.body());
         var jsonTree = JsonUtils.dtoObjectMapper.readTree(response.body());
         return jsonTree.get(ACCESS_TOKEN).textValue();

@@ -57,7 +57,7 @@ public class ApiClient {
     }
 
     /**
-     * Build and perform GET request for given URI.
+     * Build and perform asynchronous GET request for given URI.
      * @param uri to fetch from
      * @return response containing data from requested URI or error
      */
@@ -67,6 +67,11 @@ public class ApiClient {
             BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Build and perform asynchronous GET request for given URI with authentication header.
+     * @param uri to fetch from
+     * @return response containing data from requested URI or error
+     */
     public CompletableFuture<HttpResponse<String>> authenticatedFetchGetResultAsync(URI uri) {
         return client.sendAsync(
                 HttpRequest.newBuilder(uri).GET()
@@ -75,12 +80,21 @@ public class ApiClient {
                 BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
-
+    /**
+     * Build and perform blocking synchronous GET request for given URI.
+     * @param uri to fetch from
+     * @return response containing data from requested URI or error
+     */
     public HttpResponse<String> fetchGetResult(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
+    /**
+     * Build and perform blocking synchronous GET request for given URI with authentication header.
+     * @param uri to fetch from
+     * @return response containing data from requested URI or error
+     */
     public HttpResponse<String> fetchGetResultWithAuthentication(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
                 .headers(AUTHORIZATION, basicAuthHeader())
@@ -88,6 +102,11 @@ public class ApiClient {
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
+    /**
+     * Build and perform blocking synchronous GET request for given URI.
+     * @param uri to fetch from
+     * @return response containing data from requested URI or error
+     */
     public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
         return getSuccessfulResponseOrThrowException(httpRequest);
@@ -105,10 +124,16 @@ public class ApiClient {
         }
     }
 
+    /**
+     * Parse json string into model class.
+     */
     public static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
         return OBJECT_MAPPER.readValue(body, classOfT);
     }
 
+    /**
+     * Calculates processing time in milliseconds between two inputs based on System.currentTimeMillis()
+     */
     public long calculateProcessingTime(long startRequestTime, long endRequestTime) {
         return endRequestTime - startRequestTime;
     }
@@ -141,6 +166,11 @@ public class ApiClient {
         return collectSuccessfulResponses(responsesContainer);
     }
 
+    /**
+     * Get results for a list of URIs with authentication.
+     * @param uris list containing URIs
+     * @return responses for given URIs
+     */
     public List<HttpResponse<String>> authorizedFetchQueryResultsOneByOne(List<URI> uris) {
         List<CompletableFuture<HttpResponse<String>>> responsesContainer =
                 uris.stream().map(this::authenticatedFetchGetResultAsync).collect(Collectors.toList());

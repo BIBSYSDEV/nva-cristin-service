@@ -83,6 +83,9 @@ public class UriUtils {
             .getUri();
     }
 
+    /**
+     * Add all supported Cristin languages as query param for request to Cristin.
+     */
     public static URI addLanguage(URI uri) {
         return UriWrapper.fromUri(uri)
             .addQueryParameter(QUERY_PARAMETER_LANGUAGE, ALL_QUERY_PARAMETER_LANGUAGES)
@@ -125,6 +128,9 @@ public class UriUtils {
         return getCristinUri(extractLastPathElement(nvaUri), newPath);
     }
 
+    /**
+     * Create position code uri where the position code is the code for an employment title in Cristin.
+     */
     public static URI createNvaPositionId(String code) {
         URI positionBase = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(POSITION).getUri();
         return attempt(() -> new URI(positionBase.getScheme(), positionBase.getHost(), positionBase.getPath(), code))
