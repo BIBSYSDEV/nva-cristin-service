@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person;
 
-import static no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment.HASHTAG;
-import static no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment.SLASH_DELIMITER;
+import static no.unit.nva.cristin.model.Constants.HASHTAG;
+import static no.unit.nva.cristin.model.Constants.SLASH_DELIMITER;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;

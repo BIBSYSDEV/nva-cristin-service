@@ -84,4 +84,12 @@ public class CristinPersonPatchJsonCreatorTest {
 
         assertThat(cristinEmploymentsFromNode.get(0), equalTo(employments.get(0).toCristinEmployment()));
     }
+
+    @Test
+    void shouldNotAddEmploymentFieldToOutputIfMissingFromInput() {
+        var input = OBJECT_MAPPER.createObjectNode();
+        var output = new CristinPersonPatchJsonCreator(input).create().getOutput();
+
+        assertThat(output.has(CRISTIN_EMPLOYMENTS), equalTo(false));
+    }
 }

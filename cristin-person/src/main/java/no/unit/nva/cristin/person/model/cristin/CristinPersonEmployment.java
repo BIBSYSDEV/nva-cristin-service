@@ -3,11 +3,13 @@ package no.unit.nva.cristin.person.model.cristin;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HASHTAG;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+import static no.unit.nva.cristin.model.Constants.POSITION;
+import static no.unit.nva.cristin.model.Constants.SLASH_DELIMITER;
 import static no.unit.nva.cristin.person.employment.Constants.EMPLOYMENT_PATH;
 import static nva.commons.core.attempt.Try.attempt;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
@@ -27,13 +29,6 @@ import nva.commons.core.paths.UriWrapper;
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPersonEmployment {
-
-    @JsonIgnore
-    public static final String POSITION = "position";
-    @JsonIgnore
-    public static final String HASHTAG = "#";
-    @JsonIgnore
-    public static final String SLASH_DELIMITER = "/";
 
     private String id;
     private CristinOrganization affiliation;

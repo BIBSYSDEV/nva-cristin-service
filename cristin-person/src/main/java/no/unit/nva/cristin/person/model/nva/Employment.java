@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.model.nva;
 
+import static no.unit.nva.cristin.model.Constants.HASHTAG;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
-import static no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment.HASHTAG;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
