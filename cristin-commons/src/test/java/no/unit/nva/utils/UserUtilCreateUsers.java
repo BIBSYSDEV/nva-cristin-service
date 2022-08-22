@@ -26,7 +26,8 @@ public class UserUtilCreateUsers {
 
     private static final Logger logger = LoggerFactory.getLogger(UserUtilCreateUsers.class);
     public static final String CREATE_TEST_USER_WITH_USER_NAME = "createTestUser with UserName {}";
-    public static final URI CUSTOMER = URI.create("https://api.dev.nva.aws.unit.no/customer/bb3d0c0c-5065-4623-9b98-5810983c2478");
+    public static final URI CUSTOMER =
+        URI.create("https://api.dev.nva.aws.unit.no/customer/bb3d0c0c-5065-4623-9b98-5810983c2478");
     private Environment environment = new Environment();
 
     @Test
@@ -59,7 +60,8 @@ public class UserUtilCreateUsers {
     }
 
 
-    private void createUser(String userName, String password, String nvaUserNin, Set<String> roles, URI customerId) throws IOException, InterruptedException {
+    private void createUser(String userName, String password, String nvaUserNin, Set<String> roles, URI customerId)
+        throws IOException, InterruptedException {
         logger.info(CREATE_TEST_USER_WITH_USER_NAME, userName);
         UserUtils.createUserWithRoles(userName, password, nvaUserNin, customerId, roles);
         assertNotNull(userName);  // user is created
