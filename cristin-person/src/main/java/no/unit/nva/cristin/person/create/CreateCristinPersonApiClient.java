@@ -12,7 +12,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import no.unit.nva.cristin.common.client.PostApiClient;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
@@ -44,7 +43,7 @@ public class CreateCristinPersonApiClient extends PostApiClient {
     }
 
     private String generatePayloadFromRequest(Person person) {
-        CristinPersonPost requestCristinPerson = person.toCristinPersonPost();
+        CristinPerson requestCristinPerson = person.toCristinPerson();
         return attempt(() -> OBJECT_MAPPER.writeValueAsString(requestCristinPerson)).orElseThrow();
     }
 
