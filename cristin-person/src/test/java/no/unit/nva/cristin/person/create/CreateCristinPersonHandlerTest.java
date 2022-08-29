@@ -44,7 +44,6 @@ import java.util.Set;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.person.model.cristin.CristinAffiliation;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonPost;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
@@ -201,7 +200,7 @@ public class CreateCristinPersonHandlerTest {
         final var gatewayResponse = sendQuery(dummyPerson);
         var captor = ArgumentCaptor.forClass(String.class);
         verify(apiClient).post(any(), captor.capture());
-        var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPersonPost.class);
+        var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
         var expectedCristinEmployments =
             mapEmploymentsToCristinEmployments(dummyEmployments);
 

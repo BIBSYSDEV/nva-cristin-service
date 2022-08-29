@@ -28,7 +28,8 @@ public class CristinPersonTest {
 
         ObjectNode bodyNode = removeIgnoredFields(body);
         String cristinPersonAsString = OBJECT_MAPPER.writeValueAsString(cristinPerson);
-        JsonNode cristinPersonAsNode = OBJECT_MAPPER.readTree(cristinPersonAsString);
+        ObjectNode cristinPersonAsNode = (ObjectNode) OBJECT_MAPPER.readTree(cristinPersonAsString);
+        removeFieldNotPresentInRawJsonTestData(cristinPersonAsNode);
 
         assertEquals(bodyNode, cristinPersonAsNode);
     }
@@ -71,5 +72,9 @@ public class CristinPersonTest {
     private void removeInstitution(JsonNode node) {
         ObjectNode objectNode = (ObjectNode) node;
         objectNode.remove("institution");
+    }
+
+    private void removeFieldNotPresentInRawJsonTestData(ObjectNode node) {
+        node.remove("detailed_affiliations");
     }
 }

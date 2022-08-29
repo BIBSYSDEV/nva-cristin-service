@@ -57,7 +57,7 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
 
         var startRequestTime = System.currentTimeMillis();
         var response = authorizedQueryOrganizationPersons(new HashMap(requestQueryParams));
-        var cristinPersons = getEnrichedPersonsWithNINUsingQueryResponse(response);
+        var cristinPersons = getEnrichedPersonsWithNinUsingQueryResponse(response);
         return getPersonSearchResponse(requestQueryParams, startRequestTime, response, cristinPersons);
     }
 
