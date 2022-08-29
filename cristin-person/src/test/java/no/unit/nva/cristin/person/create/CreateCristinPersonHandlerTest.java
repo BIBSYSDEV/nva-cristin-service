@@ -40,6 +40,7 @@ import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.person.model.cristin.CristinAffiliation;
@@ -203,6 +204,7 @@ public class CreateCristinPersonHandlerTest {
         var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
         var expectedCristinEmployments =
             mapEmploymentsToCristinEmployments(dummyEmployments);
+        Objects.requireNonNull(expectedCristinEmployments);
 
         assertNotNull(capturedCristinPerson.getDetailedAffiliations());
         assertThat(capturedCristinPerson.getDetailedAffiliations().containsAll(expectedCristinEmployments),
@@ -237,6 +239,19 @@ public class CreateCristinPersonHandlerTest {
         final var gatewayResponse = sendQuery(dummyPerson);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldNotHaveEmploymentFieldInResponseWhenNotInUpstreamPayload() throws IOException, InterruptedException {
+        var responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
+        apiClient = new CreateCristinPersonApiClient(httpClientMock);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+        var gatewayResponse = sendQuery(dummyPerson());
+        var actual = gatewayResponse.getBodyObject(Person.class);
+
+        assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
+        assertThat(actual.getEmployments(), equalTo(null));
     }
 
     private CristinAffiliation randomCristinAffiliation() {

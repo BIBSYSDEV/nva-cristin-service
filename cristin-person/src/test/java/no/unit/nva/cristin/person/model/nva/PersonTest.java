@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.model.nva;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.cristin.person.model.nva.Person.mapEmploymentsToCristinEmployments;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -63,6 +65,16 @@ public class PersonTest {
         var expectedEmployments = generateExpectedEmploymentsMatchingJson();
 
         assertThat(actualEmployments, equalTo(expectedEmployments));
+    }
+
+    @Test
+    void shouldNotHaveEmploymentFieldInJsonWhenNotSettingItExplicitly() throws JsonProcessingException {
+        var json = OBJECT_MAPPER.valueToTree(dummyPerson());
+        var jsonString = OBJECT_MAPPER.writeValueAsString(dummyPerson());
+
+        assertThat(json.has(EMPLOYMENTS), equalTo(false));
+        assertThat(json.toString().contains(EMPLOYMENTS), equalTo(false));
+        assertThat(jsonString.contains(EMPLOYMENTS), equalTo(false));
     }
 
     private List<CristinPersonEmployment> generateExpectedEmploymentsMatchingJson() {

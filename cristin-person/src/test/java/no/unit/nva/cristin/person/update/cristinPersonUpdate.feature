@@ -136,3 +136,24 @@ Feature: API tests for Cristin Person Update
     When method PATCH
     Then status 400
     And match response.detail == 'No supported fields in payload, not doing anything'
+
+  Scenario: Update returns status 204 when valid payload containing employments
+    Given path '/person/' + personIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def employmentRequest =
+    """
+    {
+      'employments': [
+        {
+          'type': 'https://api.dev.nva.aws.unit.no/cristin/position#1087',
+          'organization': 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0',
+          'startDate': '2008-01-01T00:00:00Z',
+          'endDate': '2025-12-31T00:00:00Z',
+          'fullTimeEquivalentPercentage': 100
+        }
+      ]
+    }
+    """
+    And request employmentRequest
+    When method PATCH
+    Then status 204
