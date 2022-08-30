@@ -22,6 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Collections;
 import java.util.List;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import org.junit.jupiter.api.Test;
@@ -91,5 +92,26 @@ public class CristinPersonPatchJsonCreatorTest {
         var output = new CristinPersonPatchJsonCreator(input).create().getOutput();
 
         assertThat(output.has(CRISTIN_EMPLOYMENTS), equalTo(false));
+    }
+
+    @Test
+    void shouldNotAddEmploymentFieldToOutputWhenEmploymentFieldInInputIsNull() {
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.putNull(EMPLOYMENTS);
+        var output = new CristinPersonPatchJsonCreator(input).create().getOutput();
+
+        assertThat(output.has(CRISTIN_EMPLOYMENTS), equalTo(false));
+    }
+
+    @Test
+    void shouldAddEmploymentFieldContainingEmptyListToOutputWhenEmploymentFieldInInputIsEmptyList()
+        throws JsonProcessingException {
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.putPOJO(EMPLOYMENTS, Collections.emptyList());
+        var output = new CristinPersonPatchJsonCreator(input).create().getOutput();
+        var outputList = OBJECT_MAPPER.readValue(output.get(CRISTIN_EMPLOYMENTS).asText(), List.class);
+
+        assertThat(output.has(CRISTIN_EMPLOYMENTS), equalTo(true));
+        assertThat(outputList.isEmpty(), equalTo(true));
     }
 }

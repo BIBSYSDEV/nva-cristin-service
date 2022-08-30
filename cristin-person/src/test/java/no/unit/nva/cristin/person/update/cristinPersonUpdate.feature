@@ -149,7 +149,7 @@ Feature: API tests for Cristin Person Update
           'organization': 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0',
           'startDate': '2008-01-01T00:00:00Z',
           'endDate': '2025-12-31T00:00:00Z',
-          'fullTimeEquivalentPercentage': 100
+          'fullTimeEquivalentPercentage': '100'
         }
       ]
     }

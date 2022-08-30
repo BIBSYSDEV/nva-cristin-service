@@ -103,12 +103,8 @@ public class CristinPersonPatchJsonCreator {
     }
 
     private void addEmployments() {
-        if (input.has(EMPLOYMENTS)) {
-            if (input.get(EMPLOYMENTS).isNull()) {
-                output.putNull(CRISTIN_EMPLOYMENTS);
-            } else {
-                output.put(CRISTIN_EMPLOYMENTS, createCristinEmploymentsString());
-            }
+        if (input.has(EMPLOYMENTS) && !input.get(EMPLOYMENTS).isNull()) {
+            output.put(CRISTIN_EMPLOYMENTS, createCristinEmploymentsString());
         }
     }
 
