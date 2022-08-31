@@ -104,19 +104,18 @@ public class CristinPersonPatchJsonCreator {
 
     private void addEmployments() {
         if (input.has(EMPLOYMENTS) && !input.get(EMPLOYMENTS).isNull()) {
-            output.put(CRISTIN_EMPLOYMENTS, createCristinEmploymentsString());
+            var inputEmployments = input.get(EMPLOYMENTS).toString();
+            var employmentsInCristinFormat =
+                attempt(() -> {
+                    var parsedInput =
+                        asList(OBJECT_MAPPER.readValue(inputEmployments, Employment[].class));
+                    return OBJECT_MAPPER.readTree(employmentsToCristinFormat(parsedInput).toString());
+                }).orElseThrow();
+            output.set(CRISTIN_EMPLOYMENTS, employmentsInCristinFormat);
         }
     }
 
-    private String createCristinEmploymentsString() {
-        return attempt(() -> OBJECT_MAPPER.writeValueAsString(parseEmployments())).orElseThrow();
-    }
-
-    private List<CristinPersonEmployment> parseEmployments() {
-        return attempt(() -> asList(OBJECT_MAPPER.readValue(input.get(EMPLOYMENTS).asText(), Employment[].class)))
-                   .orElseThrow()
-                   .stream()
-                   .map(Employment::toCristinEmployment)
-                   .collect(Collectors.toList());
+    private List<CristinPersonEmployment> employmentsToCristinFormat(List<Employment> employments) {
+        return employments.stream().map(Employment::toCristinEmployment).collect(Collectors.toList());
     }
 }

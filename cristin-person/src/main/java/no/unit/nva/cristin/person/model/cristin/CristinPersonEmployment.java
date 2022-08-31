@@ -16,6 +16,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.model.Organization;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -28,7 +29,7 @@ import nva.commons.core.paths.UriWrapper;
 @SuppressWarnings("unused")
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CristinPersonEmployment {
+public class CristinPersonEmployment implements JsonSerializable {
 
     private String id;
     private CristinOrganization affiliation;
@@ -164,5 +165,10 @@ public class CristinPersonEmployment {
     public int hashCode() {
         return Objects.hash(getId(), getAffiliation(), getActive(), getPosition(), getStartDate(), getEndDate(),
                             getFtePercentage(), getUrl());
+    }
+
+    @Override
+    public String toString() {
+        return toJsonString();
     }
 }

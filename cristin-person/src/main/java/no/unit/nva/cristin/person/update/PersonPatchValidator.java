@@ -1,15 +1,15 @@
 package no.unit.nva.cristin.person.update;
 
-import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
-import static nva.commons.core.attempt.Try.attempt;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.person.employment.create.CreatePersonEmploymentValidator;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import org.slf4j.Logger;
@@ -66,11 +66,16 @@ public class PersonPatchValidator {
 
     private static void validateEmploymentsIfPresent(ObjectNode input) throws BadRequestException {
         if (input.has(EMPLOYMENTS) && !input.get(EMPLOYMENTS).isNull()) {
-            attempt(() -> asList(OBJECT_MAPPER.readValue(input.get(EMPLOYMENTS).asText(), Employment[].class)))
-                .orElseThrow(fail -> {
-                    logger.warn(EXCEPTION_WHEN_VALIDATING_EMPLOYMENTS, fail.getException());
-                    return new BadRequestException(COULD_NOT_PARSE_EMPLOYMENT_FIELD);
-                });
+            try {
+                var employments =
+                    OBJECT_MAPPER.readValue(input.get(EMPLOYMENTS).toString(), Employment[].class);
+                for (Employment employment : employments) {
+                    CreatePersonEmploymentValidator.validate(employment);
+                }
+            } catch (JsonProcessingException e) {
+                logger.warn(EXCEPTION_WHEN_VALIDATING_EMPLOYMENTS + e.getMessage());
+                throw new BadRequestException(COULD_NOT_PARSE_EMPLOYMENT_FIELD);
+            }
         }
     }
 }

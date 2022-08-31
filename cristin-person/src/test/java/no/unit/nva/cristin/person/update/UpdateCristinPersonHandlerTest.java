@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import java.net.URI;
-import java.util.List;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -65,10 +64,8 @@ public class UpdateCristinPersonHandlerTest {
     public static final String UNSUPPORTED_FIELD = "unsupportedField";
     public static final String INVALID_IDENTIFIER = "hello";
     private static final String IDENTIFIER_NOT_MATCHING_COGNITO = "555666";
-    private static final String EMPTY_LIST = "[]";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
-    private UpdateCristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
@@ -77,7 +74,7 @@ public class UpdateCristinPersonHandlerTest {
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
-        apiClient = new UpdateCristinPersonApiClient(httpClientMock);
+        UpdateCristinPersonApiClient apiClient = new UpdateCristinPersonApiClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new UpdateCristinPersonHandler(apiClient, environment);
@@ -254,7 +251,7 @@ public class UpdateCristinPersonHandlerTest {
     @Test
     void shouldAllowEmptyListOfEmployments() throws IOException {
         var jsonObject = OBJECT_MAPPER.createObjectNode();
-        jsonObject.put(EMPLOYMENTS, EMPTY_LIST);
+        jsonObject.putArray(EMPLOYMENTS);
         var gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
@@ -262,9 +259,9 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldAllowValidEmploymentData() throws IOException {
+        var node = OBJECT_MAPPER.readTree(randomEmployment().toString());
         var jsonObject = OBJECT_MAPPER.createObjectNode();
-        var employments = List.of(randomEmployment());
-        jsonObject.put(EMPLOYMENTS, OBJECT_MAPPER.writeValueAsString(employments));
+        jsonObject.putArray(EMPLOYMENTS).add(node);
         var gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
