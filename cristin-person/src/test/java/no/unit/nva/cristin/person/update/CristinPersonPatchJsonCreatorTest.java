@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.update;
 
 import static java.util.Arrays.asList;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_EMPLOYMENTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
@@ -17,9 +17,7 @@ import static no.unit.nva.cristin.person.update.CristinPersonPatchJsonCreator.CR
 import static no.unit.nva.cristin.person.update.CristinPersonPatchJsonCreator.CRISTIN_FIRST_NAME_PREFERRED;
 import static no.unit.nva.cristin.person.update.CristinPersonPatchJsonCreator.CRISTIN_SURNAME;
 import static no.unit.nva.cristin.person.update.CristinPersonPatchJsonCreator.CRISTIN_SURNAME_PREFERRED;
-import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
-import static nva.commons.core.attempt.Try.attempt;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,7 +25,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import org.junit.jupiter.api.Test;
@@ -141,10 +138,5 @@ public class CristinPersonPatchJsonCreatorTest {
                                .orElseThrow();
 
         assertThat(deserialized, equalTo(cristinEmployment));
-    }
-
-    private ObjectNode readJsonFromInput(String input) throws BadRequestException {
-        return attempt(() -> (ObjectNode) OBJECT_MAPPER.readTree(input))
-                   .orElseThrow(fail -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 }
