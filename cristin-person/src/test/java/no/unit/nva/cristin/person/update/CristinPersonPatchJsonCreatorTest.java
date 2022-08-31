@@ -122,27 +122,25 @@ public class CristinPersonPatchJsonCreatorTest {
 
     @Test
     void shouldParseRawJsonIntoCristinEmployments() throws BadRequestException, JsonProcessingException {
-        var type = "https://api.dev.nva.aws.unit.no/cristin/position#1087";
-        var organization = "https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0";
-        var startDate = randomInstant().toString();
-        var percentage = 80.0;
-        var rawJson = "{ \"employments\": [ { \"type\": \"" + type + "\" , \"organization\": \"" + organization + "\""
-                      + " , \"startDate\": \"" + startDate + "\" , \"fullTimeEquivalentPercentage\": " + percentage
-                      + " } ] }";
+        var employment = randomEmployment();
+        var cristinEmployment = employment.toCristinEmployment();
+        var rawJson =
+            "{ \"employments\": [ { "
+            + "\"type\": \"" + employment.getType() + "\" , "
+            + "\"organization\": \"" + employment.getOrganization() + "\" , "
+            + "\"startDate\": \"" + employment.getStartDate().toString() + "\" , "
+            + "\"endDate\": \"" + employment.getEndDate().toString() + "\" , "
+            + "\"fullTimeEquivalentPercentage\": \"" + employment.getFullTimeEquivalentPercentage() + "\""
+            + " } ] }";
         var json = readJsonFromInput(rawJson);
         var output = new CristinPersonPatchJsonCreator(json).create().getOutput();
-
         var deserialized = Arrays
                                .stream(OBJECT_MAPPER.readValue(output.get(CRISTIN_EMPLOYMENTS).toString(),
                                                                CristinPersonEmployment[].class))
                                .findFirst()
                                .orElseThrow();
 
-        assertThat(deserialized.getPosition().getCode(), equalTo("1087"));
-        assertThat(deserialized.getAffiliation().getInstitutionUnit().getCristinUnitId(),
-                   equalTo("20202.0.0.0"));
-        assertThat(deserialized.getStartDate().toString(), equalTo(startDate));
-        assertThat(deserialized.getFtePercentage(), equalTo(percentage));
+        assertThat(deserialized, equalTo(cristinEmployment));
     }
 
     private ObjectNode readJsonFromInput(String input) throws BadRequestException {
