@@ -2,7 +2,6 @@ package no.unit.nva.cristin.person.model.cristin;
 
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
-import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -67,8 +66,6 @@ public class CristinAffiliation {
     }
 
     private Role extractAffiliationRole() {
-        // TODO: Set uri to actual value
-        URI uri = attempt(() -> new URI("https://example.org/link/to/ontology#1026")).orElseThrow();
-        return new Role(uri, getRoleLabel());
+        return new Role(getRoleLabel());
     }
 }

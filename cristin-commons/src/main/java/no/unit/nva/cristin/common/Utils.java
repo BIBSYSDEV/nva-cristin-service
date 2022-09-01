@@ -75,6 +75,9 @@ public class Utils {
         return identifier;
     }
 
+    /**
+     * Validates if person identifier path parameter exists and is valid format.
+     */
     public static String getValidPersonId(RequestInfo requestInfo) throws BadRequestException {
         String identifier = attempt(() -> requestInfo.getPathParameter(PERSON_ID)).orElse(fail -> EMPTY_STRING);
         if (isValidIdentifier(identifier)) {
@@ -83,6 +86,9 @@ public class Utils {
         throw new BadRequestException(invalidPathParameterMessage(PERSON_ID));
     }
 
+    /**
+     * Validates if person employment identifier path parameter exists and is valid format.
+     */
     public static String getValidEmploymentId(RequestInfo requestInfo) throws BadRequestException {
         String identifier = attempt(() -> requestInfo.getPathParameter(EMPLOYMENT_ID)).orElse(fail -> EMPTY_STRING);
         if (isValidIdentifier(identifier)) {
@@ -91,6 +97,12 @@ public class Utils {
         throw new BadRequestException(invalidPathParameterMessage(EMPLOYMENT_ID));
     }
 
+    /**
+     * Validates if organization identifier path parameter exists and is valid format. If supplied parameter is unit
+     * identifier, the method strips it down to top level institution identifier as defined in Cristin format.
+     *
+     * @return top level institution identifier if input is valid identifier
+     */
     public static String getValidOrgId(RequestInfo requestInfo) throws BadRequestException {
         String identifier = attempt(() -> requestInfo.getPathParameter(ORG_ID)).orElse(fail -> EMPTY_STRING);
         String cristinInstitutionId = removeUnitPartFromIdentifierIfPresent(identifier);

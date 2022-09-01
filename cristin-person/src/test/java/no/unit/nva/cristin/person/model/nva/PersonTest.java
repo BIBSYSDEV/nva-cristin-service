@@ -45,7 +45,7 @@ public class PersonTest {
 
     @Test
     void shouldProduceCorrectValuesWhenTransformingPersonToCristinPersonPost() {
-        var cristinPersonPost = dummyPerson().toCristinPersonPost();
+        var cristinPersonPost = dummyPerson().toCristinPerson();
 
         assertEquals(DUMMY_FIRST_NAME, cristinPersonPost.getFirstName());
         assertEquals(DUMMY_LAST_NAME, cristinPersonPost.getSurname());

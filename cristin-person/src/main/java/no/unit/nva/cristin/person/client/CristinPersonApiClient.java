@@ -107,7 +107,7 @@ public class CristinPersonApiClient extends ApiClient {
      * @return List of valid CristinPersons from Response
      * @throws ApiGatewayException when transformation from response fails
      */
-    public List<CristinPerson> getEnrichedPersonsWithNINUsingQueryResponse(HttpResponse<String> response)
+    public List<CristinPerson> getEnrichedPersonsWithNinUsingQueryResponse(HttpResponse<String> response)
             throws ApiGatewayException {
 
         var personsFromQuery = asList(getDeserializedResponse(response, CristinPerson[].class));
@@ -174,7 +174,7 @@ public class CristinPersonApiClient extends ApiClient {
 
         var startRequestTime = System.currentTimeMillis();
         var response = authorizedQueryPersons(requestQueryParameters);
-        var cristinPersons = getEnrichedPersonsWithNINUsingQueryResponse(response);
+        var cristinPersons = getEnrichedPersonsWithNinUsingQueryResponse(response);
         var persons = mapCristinPersonsToNvaPersons(cristinPersons);
         var endRequestTime = System.currentTimeMillis();
         var id = createIdUriFromParams(requestQueryParameters, PERSON_PATH_NVA);

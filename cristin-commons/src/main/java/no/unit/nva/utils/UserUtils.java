@@ -1,6 +1,7 @@
 package no.unit.nva.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.net.http.HttpResponse;
 import no.unit.nva.cognito.CognitoUtil;
 import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.core.paths.UriWrapper;
@@ -11,7 +12,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Set;
@@ -30,7 +30,11 @@ public class UserUtils {
     public static final String USER_CREATED_WITH_ROLES = "User {} created with role(s) '{}'";
 
 
-    public static void createUserWithRoles(String username, String password, String nationalIdentityNumber, URI customerId, Set<String> roles) throws IOException, InterruptedException {
+    /**
+     * Creates user in Cognito used for Karate tests.
+     */
+    public static void createUserWithRoles(String username, String password, String nationalIdentityNumber,
+                                           URI customerId, Set<String> roles) throws IOException, InterruptedException {
 
         final String poolId = AccessUtils.getUserPoolId();
         final String appClientClientId = AccessUtils.getTestClientAppId();
@@ -44,7 +48,8 @@ public class UserUtils {
 
     }
 
-    private static void createNvaUserWithRoles(String nationalIdentityNumber, URI customerId, Set<String> roles) throws IOException, InterruptedException {
+    private static void createNvaUserWithRoles(String nationalIdentityNumber, URI customerId, Set<String> roles)
+        throws IOException, InterruptedException {
         final var userRoles = new UserRoles(nationalIdentityNumber, customerId, roles);
         final var body = JsonUtils.dtoObjectMapper.writeValueAsString(userRoles);
         final var request = newBuilder(createUserServiceUri())
@@ -56,7 +61,8 @@ public class UserUtils {
                 .connectTimeout(Duration.ofSeconds(30))
                 .build();
 
-        final var response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        final var response =
+            client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
         logger.info(RESPONSE_FROM_USER_CREATE, response);
     }
 

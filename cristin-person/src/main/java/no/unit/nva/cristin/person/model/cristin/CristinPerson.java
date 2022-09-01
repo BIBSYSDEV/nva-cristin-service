@@ -3,8 +3,10 @@ package no.unit.nva.cristin.person.model.cristin;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
 import no.unit.nva.cristin.person.model.nva.ContactDetails;
+import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import nva.commons.core.JacocoGenerated;
@@ -14,11 +16,11 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -28,7 +30,7 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_ID
 @SuppressWarnings("unused")
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CristinPerson {
+public class CristinPerson implements JsonSerializable {
 
     @JsonIgnore
     public static final String CRISTIN_IDENTIFIER = "CristinIdentifier";
@@ -54,6 +56,7 @@ public class CristinPerson {
     private List<CristinAffiliation> affiliations;
     private Boolean reserved;
     private String norwegianNationalId;
+    private List<CristinPersonEmployment> detailedAffiliations;
 
     public String getCristinPersonId() {
         return cristinPersonId;
@@ -120,7 +123,7 @@ public class CristinPerson {
     }
 
     public List<CristinAffiliation> getAffiliations() {
-        return Objects.nonNull(affiliations) ? affiliations : Collections.emptyList();
+        return nonNull(affiliations) ? affiliations : Collections.emptyList();
     }
 
     public void setAffiliations(List<CristinAffiliation> affiliations) {
@@ -144,6 +147,14 @@ public class CristinPerson {
         this.reserved = reserved;
     }
 
+    public List<CristinPersonEmployment> getDetailedAffiliations() {
+        return nonNull(detailedAffiliations) ? detailedAffiliations : Collections.emptyList();
+    }
+
+    public void setDetailedAffiliations(List<CristinPersonEmployment> detailedAffiliations) {
+        this.detailedAffiliations = detailedAffiliations;
+    }
+
 
     /**
      * Creates a Nva person model from a Cristin person model.
@@ -152,15 +163,16 @@ public class CristinPerson {
      */
     public Person toPerson() {
         return new Person.Builder()
-            .withId(extractIdUri())
-            .withIdentifiers(extractIdentifiers())
-            .withNames(extractNames())
-            .withContactDetails(extractContactDetails())
-            .withImage(extractImage())
-            .withAffiliations(extractAffiliations())
-            .withNorwegianNationalId(getNorwegianNationalId().orElse(null))
-            .withReserved(getReserved())
-            .build();
+                   .withId(extractIdUri())
+                   .withIdentifiers(extractIdentifiers())
+                   .withNames(extractNames())
+                   .withContactDetails(extractContactDetails())
+                   .withImage(extractImage())
+                   .withAffiliations(extractAffiliations())
+                   .withNorwegianNationalId(getNorwegianNationalId().orElse(null))
+                   .withReserved(getReserved())
+                   .withEmployments(extractEmployments())
+                   .build();
     }
 
     private ContactDetails extractContactDetails() {
@@ -201,4 +213,16 @@ public class CristinPerson {
         return getAffiliations().stream().map(CristinAffiliation::toAffiliation).collect(
             Collectors.toSet());
     }
+
+    private Set<Employment> extractEmployments() {
+        return getDetailedAffiliations().stream()
+                   .map(cristinEmployment -> cristinEmployment.toEmployment(getCristinPersonId()))
+                   .collect(Collectors.toSet());
+    }
+
+    @Override
+    public String toString() {
+        return toJsonString();
+    }
+
 }
