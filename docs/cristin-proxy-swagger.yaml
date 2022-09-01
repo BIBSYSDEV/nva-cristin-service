@@ -1647,7 +1647,7 @@ components:
             properties:
               type:
                 type: string
-                pattern: 'CristinIdentifier|ORCID'
+                pattern: 'CristinIdentifier|ORCID|NationalIdentificationNumber'
                 description: Name of identifier
               value:
                 type: string
@@ -1759,6 +1759,11 @@ components:
           description: The list of person affiliations
           items:
             $ref: '#/components/schemas/Affiliation'
+        employments:
+          type: array
+          description: Employments for this person
+          items:
+            $ref: '#/components/schemas/PersonEmployment'
     PersonPatch:
       type: object
       properties:
@@ -2147,7 +2152,6 @@ components:
           en: "popularScientificSummary popularScientificSummary popularScientificSummary"
     OrganizationsExample:
       value:
-        # TODO: Change context in code. Below is what it currently is now
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
         id: 'https://api.dev.nva.aws.unit.no/cristin/organization?depth=top&query=storby&page=1&results=5'
         size: 150
@@ -2157,17 +2161,27 @@ components:
         nextResults: 'https://api.dev.nva.aws.unit.no/cristin/organization?depth=top&query=storby&page=2&results=5'
         previousResults: ''
         hits:
-          # TODO: Add hasPart, partOf
-          organization:
-            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             type: 'Organization'
             name:
               'nb': 'OsloMet - storbyuniversitetet'
               'en': 'Oslomet - Oslo Metropolitan University'
             acronym: 'OSLOMET'
+            partOf:
+              - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                type: 'Organization'
+                name:
+                  'nb': 'OsloMet - storbyuniversitetet'
+                  'en': 'Oslomet - Oslo Metropolitan University'
+            hasPart:
+              - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.16.2.0'
+                type: 'Organization'
+                name:
+                  'en': 'Norwegian Social Research'
+                  'nb': 'Velferdsforskningsinstituttet NOVA'
+
     OrganizationExample:
       value:
-        # TODO: Change context in code. Below is what it currently is now
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
         id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
         type: 'Organization'
@@ -2175,6 +2189,18 @@ components:
           'nb': 'OsloMet - storbyuniversitetet'
           'en': 'Oslomet - Oslo Metropolitan University'
         acronym: 'OSLOMET'
+        partOf:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+            type: 'Organization'
+            name:
+              'nb': 'OsloMet - storbyuniversitetet'
+              'en': 'Oslomet - Oslo Metropolitan University'
+        hasPart:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.16.2.0'
+            type: 'Organization'
+            name:
+              'en': 'Norwegian Social Research'
+              'nb': 'Velferdsforskningsinstituttet NOVA'
     PersonsExample:
       value:
         '@context': 'https://example.org/person-search-context.json'
@@ -2253,6 +2279,8 @@ components:
             value: '359084'
           - type: 'ORCID'
             value: '1234-1234-1234-1234'
+          - type: 'NationalIdentificationNumber'
+            value: '12345612345'
         names:
           - type: 'PreferredFirstName'
             value: 'Ola'
@@ -2342,6 +2370,12 @@ components:
               labels:
                 en: 'Head Engineer'
                 nb: 'Overingeniør'
+        employments:
+          - type: 'https://api.dev.nva.aws.unit.no/cristin/position#1087'
+            organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+            startDate: '2008-01-01T00:00:00Z'
+            endDate: '2019-12-31T00:00:00Z'
+            fullTimeEquivalentPercentage: 100.0
     PersonOrganizationInfoExample:
       value:
         '@context': 'https://ontology.org'
