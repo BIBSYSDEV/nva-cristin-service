@@ -220,7 +220,6 @@ public class FetchCristinPersonHandlerTest {
         var ninObject = extractNinObjectFromIdentifiers(responseBody).orElseThrow();
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-        assertThat(responseBody.getNorwegianNationalId(), equalTo(NORWEGIAN_NATIONAL_ID));
         assertThat(ninObject.getValue(), equalTo(NORWEGIAN_NATIONAL_ID));
     }
 

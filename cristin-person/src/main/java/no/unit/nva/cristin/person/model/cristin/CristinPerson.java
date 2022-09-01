@@ -169,7 +169,6 @@ public class CristinPerson implements JsonSerializable {
                    .withContactDetails(extractContactDetails())
                    .withImage(extractImage())
                    .withAffiliations(extractAffiliations())
-                   .withNorwegianNationalId(getNorwegianNationalId().orElse(null))
                    .withReserved(getReserved())
                    .withEmployments(extractEmployments())
                    .build();
