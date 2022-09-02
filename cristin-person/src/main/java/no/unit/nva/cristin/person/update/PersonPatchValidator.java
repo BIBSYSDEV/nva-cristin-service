@@ -12,10 +12,11 @@ import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.person.employment.create.CreatePersonEmploymentValidator;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.core.JacocoGenerated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PersonPatchValidator {
+public final class PersonPatchValidator {
 
     private static final Logger logger = LoggerFactory.getLogger(PersonPatchValidator.class);
 
@@ -25,7 +26,12 @@ public class PersonPatchValidator {
         "Reserved field can only be set to true if present";
     public static final String COULD_NOT_PARSE_EMPLOYMENT_FIELD = "Could not parse employment field because of "
                                                                   + "invalid data";
-    private static final String EXCEPTION_WHEN_VALIDATING_EMPLOYMENTS = "Exception when validating employments: ";
+    private static final String EXCEPTION_WHEN_VALIDATING_EMPLOYMENTS = "Exception when validating employments: {}";
+
+    @JacocoGenerated
+    private PersonPatchValidator() {
+        // NO-OP
+    }
 
     /**
      * Validate according to rules of upstream json schema.
@@ -38,7 +44,10 @@ public class PersonPatchValidator {
         validateEmploymentsIfPresent(input);
     }
 
-    protected static void validateOrcidIfPresent(ObjectNode input) throws BadRequestException {
+    /**
+     * Validate an orcid if present in input node.
+     */
+    public static void validateOrcidIfPresent(ObjectNode input) throws BadRequestException {
         if (input.has(ORCID) && !input.get(ORCID).isNull() && !Utils.isOrcid(input.get(ORCID).asText())) {
             throw new BadRequestException(ORCID_IS_NOT_VALID);
         }
@@ -66,16 +75,19 @@ public class PersonPatchValidator {
 
     private static void validateEmploymentsIfPresent(ObjectNode input) throws BadRequestException {
         if (input.has(EMPLOYMENTS) && !input.get(EMPLOYMENTS).isNull()) {
-            try {
-                var employments =
-                    OBJECT_MAPPER.readValue(input.get(EMPLOYMENTS).toString(), Employment[].class);
-                for (Employment employment : employments) {
-                    CreatePersonEmploymentValidator.validate(employment);
-                }
-            } catch (JsonProcessingException e) {
-                logger.warn(EXCEPTION_WHEN_VALIDATING_EMPLOYMENTS + e.getMessage());
-                throw new BadRequestException(COULD_NOT_PARSE_EMPLOYMENT_FIELD);
+            var employments = parseEmployments(input);
+            for (Employment employment : employments) {
+                CreatePersonEmploymentValidator.validate(employment);
             }
+        }
+    }
+
+    private static Employment[] parseEmployments(ObjectNode input) throws BadRequestException {
+        try {
+            return OBJECT_MAPPER.readValue(input.get(EMPLOYMENTS).toString(), Employment[].class);
+        } catch (JsonProcessingException e) {
+            logger.warn(EXCEPTION_WHEN_VALIDATING_EMPLOYMENTS, e.getMessage());
+            throw new BadRequestException(COULD_NOT_PARSE_EMPLOYMENT_FIELD);
         }
     }
 }
