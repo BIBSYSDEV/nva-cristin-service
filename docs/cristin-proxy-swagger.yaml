@@ -1779,6 +1779,11 @@ components:
         reserved:
           type: boolean
           description: If person should be hidden from public view
+        employments:
+          type: array
+          description: Employments for this person. Only for authorized users
+          items:
+            $ref: '#/components/schemas/PersonEmployment'
     PersonNIN:
       type: object
       properties:
@@ -2295,6 +2300,12 @@ components:
         firstName: 'Kjell'
         lastName: 'Hansen'
         preferredFirstName: 'null'
+        employments:
+          - type: 'https://api.dev.nva.aws.unit.no/cristin/position#1087'
+            organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+            startDate: '2008-01-01T00:00:00Z'
+            endDate: '2019-12-31T00:00:00Z'
+            fullTimeEquivalentPercentage: 100.0
     PersonPostExample:
       value:
         identifiers:

@@ -248,6 +248,13 @@ public class FetchCristinPersonHandlerTest {
         return OBJECT_MAPPER.writeValueAsString(cristinPerson);
     }
 
+    @Test
+    void shouldNotHaveEmploymentFieldInResponseWhenNotInUpstreamPayload() throws IOException {
+        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
+
+        assertThat(actual.getEmployments(), equalTo(null));
+    }
+
     private GatewayResponse<Person> sendQuery(Map<String, String> queryParams, Map<String, String> pathParam)
         throws IOException {
 

@@ -3,17 +3,20 @@ package no.unit.nva.cristin.person.model.cristin;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HASHTAG;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+import static no.unit.nva.cristin.model.Constants.POSITION;
+import static no.unit.nva.cristin.model.Constants.SLASH_DELIMITER;
 import static no.unit.nva.cristin.person.employment.Constants.EMPLOYMENT_PATH;
 import static nva.commons.core.attempt.Try.attempt;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.model.Organization;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -26,14 +29,7 @@ import nva.commons.core.paths.UriWrapper;
 @SuppressWarnings("unused")
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CristinPersonEmployment {
-
-    @JsonIgnore
-    public static final String POSITION = "position";
-    @JsonIgnore
-    public static final String HASHTAG = "#";
-    @JsonIgnore
-    public static final String SLASH_DELIMITER = "/";
+public class CristinPersonEmployment implements JsonSerializable {
 
     private String id;
     private CristinOrganization affiliation;
@@ -169,5 +165,10 @@ public class CristinPersonEmployment {
     public int hashCode() {
         return Objects.hash(getId(), getAffiliation(), getActive(), getPosition(), getStartDate(), getEndDate(),
                             getFtePercentage(), getUrl());
+    }
+
+    @Override
+    public String toString() {
+        return toJsonString();
     }
 }
