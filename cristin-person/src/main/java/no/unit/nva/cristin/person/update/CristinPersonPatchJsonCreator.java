@@ -1,14 +1,22 @@
 package no.unit.nva.cristin.person.update;
 
+import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_EMPLOYMENTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
+import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
+import java.util.stream.Collectors;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.person.model.nva.Employment;
 
 public class CristinPersonPatchJsonCreator {
 
@@ -38,6 +46,7 @@ public class CristinPersonPatchJsonCreator {
         addPreferredFirstName();
         addPreferredLastName();
         addReserved();
+        addEmployments();
 
         return this;
     }
@@ -91,5 +100,22 @@ public class CristinPersonPatchJsonCreator {
         if (input.has(RESERVED)) {
             output.set(RESERVED, input.get(RESERVED));
         }
+    }
+
+    private void addEmployments() {
+        if (input.has(EMPLOYMENTS) && !input.get(EMPLOYMENTS).isNull()) {
+            var inputEmployments = input.get(EMPLOYMENTS).toString();
+            var employmentsInCristinFormat =
+                attempt(() -> {
+                    var parsedInput =
+                        asList(OBJECT_MAPPER.readValue(inputEmployments, Employment[].class));
+                    return OBJECT_MAPPER.readTree(employmentsToCristinFormat(parsedInput).toString());
+                }).orElseThrow();
+            output.set(CRISTIN_EMPLOYMENTS, employmentsInCristinFormat);
+        }
+    }
+
+    private List<CristinPersonEmployment> employmentsToCristinFormat(List<Employment> employments) {
+        return employments.stream().map(Employment::toCristinEmployment).collect(Collectors.toList());
     }
 }

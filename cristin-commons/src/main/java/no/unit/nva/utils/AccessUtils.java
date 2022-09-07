@@ -96,7 +96,7 @@ public class AccessUtils {
     }
 
     /**
-     * Fetches an internal backend token from Cognito
+     * Fetches an internal backend token from Cognito.
      */
     public static String getBackendAccessToken() throws IOException, InterruptedException {
         var cognitoTokenUrl = getCognitoTokenUrl();

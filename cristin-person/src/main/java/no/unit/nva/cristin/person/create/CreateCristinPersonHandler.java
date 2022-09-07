@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static nva.commons.core.attempt.Try.attempt;
@@ -66,8 +67,10 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
         validateContainsRequiredIdentifiers(extractIdentifiers(input.getIdentifiers()));
         validateValidIdentificationNumber(extractIdentificationNumber(input.getIdentifiers()));
 
-        for (Employment employment : input.getEmployments()) {
-            CreatePersonEmploymentValidator.validate(employment);
+        if (nonNull(input.getEmployments())) {
+            for (Employment employment : input.getEmployments()) {
+                CreatePersonEmploymentValidator.validate(employment);
+            }
         }
 
         if (suppliedInputPersonNinDoesNotMatchClientOwn(input, requestInfo)) {

@@ -20,12 +20,10 @@ import nva.commons.core.JacocoGenerated;
 import java.net.HttpURLConnection;
 import java.util.List;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
+import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static nva.commons.core.attempt.Try.attempt;
 
 public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> {
 
@@ -115,11 +113,6 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
         if (!AccessUtils.requesterIsUserAdministrator(requestInfo) && !clientCanUpdateOwnData(requestInfo)) {
             throw new ForbiddenException();
         }
-    }
-
-    private ObjectNode readJsonFromInput(String input) throws BadRequestException {
-        return attempt(() -> (ObjectNode) OBJECT_MAPPER.readTree(input))
-            .orElseThrow(fail -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 
 }
