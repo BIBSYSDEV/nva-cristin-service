@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.employment.update;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.POSITION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.AFFILIATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_INSTITUTION_ID;
@@ -13,7 +14,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.POSITION_CODE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.UNIT;
-import static no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment.POSITION;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CRISTIN_FULL_TIME_PERCENTAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.FULL_TIME_PERCENTAGE;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;

@@ -17,8 +17,6 @@ public class PatchValidator {
 
     public static final String FIELD_CAN_NOT_BE_ERASED = "Field %s can not be erased";
     public static final String ILLEGAL_VALUE_FOR_PROPERTY = "Illegal value for '%s'";
-    public static final String RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE =
-            "Reserved field can only be set to true if present";
 
     /**
      * Verifies input contains a valid language property.

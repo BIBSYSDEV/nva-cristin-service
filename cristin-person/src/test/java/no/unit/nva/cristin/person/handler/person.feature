@@ -136,12 +136,6 @@ Feature: API tests for Cristin Person fetch
     * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/person/' + nonExistingOrcid
     And match response.detail == "The requested resource '" + uri + "' was not found"
 
-  # TODO: Scenario: Fetch returns employments for given person when having required rights
-  # * header Authorization = 'Bearer ' + adminToken
-  # And assert response.employments.length > 0
-
-  # TODO: Scenario: Fetch does not return employments for person when logged in but missing required rights
-
   Scenario: Fetch does not return employments for person when missing required rights
     Given path '/person/' + samplePersonIdentifier
     When method GET
@@ -150,5 +144,4 @@ Feature: API tests for Cristin Person fetch
     And match response['@context'] == '#present'
     And match response.id == '#regex ' + personIdRegex
     And match response.type == 'Person'
-    And match response.employments == '#present'
-    And assert response.employments.length == 0
+    And match response.employments != '#present'

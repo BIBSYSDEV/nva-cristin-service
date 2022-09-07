@@ -1,12 +1,10 @@
 package no.unit.nva.cristin.person.employment.update;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.common.Utils.getValidEmploymentId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
+import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
@@ -70,8 +68,4 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
         }
     }
 
-    private ObjectNode readJsonFromInput(String input) throws BadRequestException {
-        return attempt(() -> (ObjectNode) OBJECT_MAPPER.readTree(input))
-            .orElseThrow(fail -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
-    }
 }
