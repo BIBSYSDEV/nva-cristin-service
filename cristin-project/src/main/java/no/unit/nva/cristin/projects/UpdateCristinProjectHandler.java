@@ -15,11 +15,9 @@ import nva.commons.core.JacocoGenerated;
 import java.net.HttpURLConnection;
 import java.util.List;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.FetchOneCristinProject.getValidIdentifier;
-import static nva.commons.core.attempt.Try.attempt;
 
 public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void> {
 
@@ -67,11 +65,6 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
     @Override
     protected List<MediaType> listSupportedMediaTypes() {
         return DEFAULT_RESPONSE_MEDIA_TYPES;
-    }
-
-    private ObjectNode readJsonFromInput(String input) throws BadRequestException {
-        return attempt(() -> (ObjectNode) OBJECT_MAPPER.readTree(input))
-                .orElseThrow(fail -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 
     private boolean noSupportedValuesPresent(ObjectNode cristinJson) {

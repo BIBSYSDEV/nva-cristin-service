@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.distinctByKey;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
@@ -168,7 +169,7 @@ public class Person implements JsonSerializable {
     }
 
     public Set<Employment> getEmployments() {
-        return nonNull(employments) ? employments : Collections.emptySet();
+        return employments;
     }
 
     public void setEmployments(Set<Employment> employments) {
@@ -206,6 +207,9 @@ public class Person implements JsonSerializable {
      * Converts NVA formatted employments to Cristin formatted employments.
      */
     public static List<CristinPersonEmployment> mapEmploymentsToCristinEmployments(Set<Employment> employments) {
+        if (isNull(employments)) {
+            return null;
+        }
         return new ArrayList<>(employments).stream()
                    .map(Employment::toCristinEmployment)
                    .collect(Collectors.toList());
@@ -228,7 +232,7 @@ public class Person implements JsonSerializable {
             && Objects.equals(getContactDetails(), that.getContactDetails())
             && Objects.equals(getImage(), that.getImage())
             && getAffiliations().equals(that.getAffiliations())
-            && getEmployments().equals(that.getEmployments());
+            && Objects.equals(getEmployments(), that.getEmployments());
     }
 
     @Override

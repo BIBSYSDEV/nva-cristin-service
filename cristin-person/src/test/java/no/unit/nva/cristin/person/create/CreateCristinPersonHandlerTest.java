@@ -1,6 +1,9 @@
 package no.unit.nva.cristin.person.create;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.person.RandomPersonData.SOME_UNIT_IDENTIFIER;
+import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
+import static no.unit.nva.cristin.person.RandomPersonData.randomEmployments;
 import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_REPEATED;
 import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIER_NOT_VALID;
 import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_IDENTIFIER;
@@ -10,13 +13,9 @@ import static no.unit.nva.cristin.person.model.cristin.CristinPerson.FIRST_NAME;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.LAST_NAME;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PREFERRED_LAST_NAME;
-import static no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment.HASHTAG;
-import static no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment.SLASH_DELIMITER;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.cristin.person.model.nva.Person.mapEmploymentsToCristinEmployments;
 import static no.unit.nva.testutils.RandomDataGenerator.randomBoolean;
-import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
-import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
@@ -38,17 +37,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.stream.IntStream;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.person.model.cristin.CristinAffiliation;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
-import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
@@ -70,8 +66,6 @@ public class CreateCristinPersonHandlerTest {
     private static final String DUMMY_FIRST_NAME = randomString();
     private static final String DUMMY_LAST_NAME = randomString();
     private static final String DUMMY_CRISTIN_ID = "123456";
-    private static final String SOME_UNIT_IDENTIFIER = "185.90.0.0";
-    private static final String HEAD_ENGINEER_CODE = HASHTAG + "1087";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -210,6 +204,7 @@ public class CreateCristinPersonHandlerTest {
         var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
         var expectedCristinEmployments =
             mapEmploymentsToCristinEmployments(dummyEmployments);
+        Objects.requireNonNull(expectedCristinEmployments);
 
         assertNotNull(capturedCristinPerson.getDetailedAffiliations());
         assertThat(capturedCristinPerson.getDetailedAffiliations().containsAll(expectedCristinEmployments),
@@ -246,20 +241,17 @@ public class CreateCristinPersonHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
     }
 
-    private Set<Employment> randomEmployments() {
-        var employments = new HashSet<Employment>();
-        IntStream.range(0, 3).mapToObj(i -> randomEmployment()).forEach(employments::add);
-        return employments;
-    }
+    @Test
+    void shouldNotHaveEmploymentFieldInResponseWhenNotInUpstreamPayload() throws IOException, InterruptedException {
+        var responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
+        apiClient = new CreateCristinPersonApiClient(httpClientMock);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+        var gatewayResponse = sendQuery(dummyPerson());
+        var actual = gatewayResponse.getBodyObject(Person.class);
 
-    private Employment randomEmployment() {
-        return new Employment.Builder()
-                   .withOrganization(URI.create(randomUri() + SLASH_DELIMITER + SOME_UNIT_IDENTIFIER))
-                   .withType(URI.create(randomUri() + HEAD_ENGINEER_CODE))
-                   .withStartDate(randomInstant())
-                   .withEndDate(randomInstant())
-                   .withFullTimeEquivalentPercentage(randomInteger(100).doubleValue())
-                   .build();
+        assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
+        assertThat(actual.getEmployments(), equalTo(null));
     }
 
     private CristinAffiliation randomCristinAffiliation() {
