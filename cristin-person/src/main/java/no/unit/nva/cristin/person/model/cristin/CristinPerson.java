@@ -208,9 +208,8 @@ public class CristinPerson implements JsonSerializable {
         return getPictureUrl().map(UriWrapper::fromUri).map(UriWrapper::getUri).orElse(null);
     }
 
-    private Set<Affiliation> extractAffiliations() {
-        return getAffiliations().stream().map(CristinAffiliation::toAffiliation).collect(
-            Collectors.toSet());
+    private List<Affiliation> extractAffiliations() {
+        return getAffiliations().stream().map(CristinAffiliation::toAffiliation).collect(Collectors.toList());
     }
 
     private Set<Employment> extractEmployments() {

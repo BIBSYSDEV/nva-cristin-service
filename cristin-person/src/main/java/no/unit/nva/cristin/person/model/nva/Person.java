@@ -54,7 +54,7 @@ public class Person implements JsonSerializable {
     @JsonProperty(IMAGE)
     private URI image;
     @JsonProperty(AFFILIATIONS)
-    private Set<Affiliation> affiliations;
+    private List<Affiliation> affiliations;
     @JsonProperty(NATIONAL_IDENTITY_NUMBER)
     private String norwegianNationalId;
     @JsonProperty(RESERVED)
@@ -81,7 +81,7 @@ public class Person implements JsonSerializable {
     public Person(@JsonProperty(ID) URI id, @JsonProperty(IDENTIFIERS) Set<TypedValue> identifiers,
                   @JsonProperty(NAMES) Set<TypedValue> names,
                   @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails, @JsonProperty(IMAGE) URI image,
-                  @JsonProperty(AFFILIATIONS) Set<Affiliation> affiliations,
+                  @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations,
                   @JsonProperty(EMPLOYMENTS) Set<Employment> employments) {
         this.id = id;
         this.identifiers = identifiers;
@@ -116,8 +116,8 @@ public class Person implements JsonSerializable {
         this.identifiers = identifiers;
     }
 
-    public Set<Affiliation> getAffiliations() {
-        return nonNull(affiliations) ? affiliations : Collections.emptySet();
+    public List<Affiliation> getAffiliations() {
+        return nonNull(affiliations) ? affiliations : Collections.emptyList();
     }
 
     public ContactDetails getContactDetails() {
@@ -132,7 +132,7 @@ public class Person implements JsonSerializable {
         this.id = id;
     }
 
-    public void setAffiliations(Set<Affiliation> affiliations) {
+    public void setAffiliations(List<Affiliation> affiliations) {
         this.affiliations = affiliations;
     }
 
@@ -286,7 +286,7 @@ public class Person implements JsonSerializable {
             return this;
         }
 
-        public Builder withAffiliations(Set<Affiliation> affiliations) {
+        public Builder withAffiliations(List<Affiliation> affiliations) {
             person.setAffiliations(affiliations);
             return this;
         }
