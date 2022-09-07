@@ -210,7 +210,7 @@ public class FetchCristinPersonHandlerTest {
 
     @Test
     void shouldHaveNinInResponseWhenNinIsPresentInUpstream() throws Exception {
-        CristinPerson cristinPerson = randomCristinPerson();
+        var cristinPerson = randomCristinPerson();
         apiClient = spy(apiClient);
         doReturn(new HttpResponseFaker(cristinPerson.toString(), 200))
             .when(apiClient).fetchGetResult(any(URI.class));
