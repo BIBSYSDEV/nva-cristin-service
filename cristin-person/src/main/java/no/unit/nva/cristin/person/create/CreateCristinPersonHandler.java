@@ -68,6 +68,7 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
         validateValidIdentificationNumber(extractIdentificationNumber(input.getIdentifiers()));
 
         if (nonNull(input.getEmployments())) {
+            AccessUtils.validateIdentificationNumberAccess(requestInfo);
             for (Employment employment : input.getEmployments()) {
                 CreatePersonEmploymentValidator.validate(employment);
             }

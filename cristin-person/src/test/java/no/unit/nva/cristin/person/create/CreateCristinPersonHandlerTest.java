@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.create;
 
+import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.RandomPersonData.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
@@ -130,7 +131,7 @@ public class CreateCristinPersonHandlerTest {
     void shouldReturnForbiddenWhenClientIsMissingCredentials() throws IOException {
         var gatewayResponse = sendQueryWithoutAccessRights(dummyPerson());
 
-        assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
@@ -187,7 +188,7 @@ public class CreateCristinPersonHandlerTest {
         var gatewayResponse =
             sendQueryWithoutAccessRightsButWithPersonNin(input, ANOTHER_IDENTITY_NUMBER);
 
-        assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
     }
 
     @Test
@@ -252,6 +253,17 @@ public class CreateCristinPersonHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
         assertThat(actual.getEmployments(), equalTo(null));
+    }
+
+    @Test
+    void shouldReturnForbiddenWhenUserActingAsThemselvesAndNotAdminTryToCreateTheirOwnEmployments() throws IOException {
+        var dummyEmployments = randomEmployments();
+        var personsOwnNin = ANOTHER_IDENTITY_NUMBER;
+        var input = injectPersonNinIntoInput(personsOwnNin);
+        input.setEmployments(dummyEmployments);
+        var gatewayResponse = sendQueryWithoutAccessRightsButWithPersonNin(input, personsOwnNin);
+
+        assertEquals(HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
     }
 
     private CristinAffiliation randomCristinAffiliation() {
