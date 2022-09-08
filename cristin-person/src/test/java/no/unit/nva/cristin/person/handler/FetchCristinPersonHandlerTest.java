@@ -3,11 +3,13 @@ package no.unit.nva.cristin.person.handler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
+import java.util.Optional;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -28,6 +30,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 
+import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
@@ -36,7 +39,9 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERRO
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.exception.GatewayTimeoutException.ERROR_MESSAGE_GATEWAY_TIMEOUT;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.ioutils.IoUtils.stringFromResources;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -68,6 +73,7 @@ public class FetchCristinPersonHandlerTest {
     private static final int EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS = 2;
     private static final String CRISTIN_GET_PERSON_RESPONSE_JSON = "cristinGetPersonResponse.json";
     private static final String CRISTIN_QUERY_EMPLOYMENT_RESPONSE_JSON = "cristinQueryEmploymentResponse.json";
+    public static final String NORWEGIAN_NATIONAL_ID = "12345612345";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -200,6 +206,37 @@ public class FetchCristinPersonHandlerTest {
         var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
 
         assertThat(actual.getEmployments().size(), equalTo(EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS));
+    }
+
+    @Test
+    void shouldHaveNinInResponseWhenNinIsPresentInUpstream() throws Exception {
+        var cristinPerson = randomCristinPerson();
+        apiClient = spy(apiClient);
+        doReturn(new HttpResponseFaker(cristinPerson.toString(), 200))
+            .when(apiClient).fetchGetResult(any(URI.class));
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
+        var responseBody = gatewayResponse.getBodyObject(Person.class);
+        var ninObject = extractNinObjectFromIdentifiers(responseBody).orElseThrow();
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(responseBody.getNorwegianNationalId(), equalTo(NORWEGIAN_NATIONAL_ID));
+        assertThat(ninObject.getValue(), equalTo(NORWEGIAN_NATIONAL_ID));
+    }
+
+    private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {
+        return responseBody.getIdentifiers().stream()
+                   .filter(typedValue -> typedValue.getType().equals(NATIONAL_IDENTITY_NUMBER))
+                   .findAny();
+    }
+
+    private CristinPerson randomCristinPerson() {
+        var cristinPerson = new CristinPerson();
+        cristinPerson.setCristinPersonId(VALID_PATH_PARAM.get(ID));
+        cristinPerson.setFirstName(randomString());
+        cristinPerson.setSurname(randomString());
+        cristinPerson.setNorwegianNationalId(NORWEGIAN_NATIONAL_ID);
+        return cristinPerson;
     }
 
     private String cristinPersonWithEmploymentsAsJson() throws JsonProcessingException {

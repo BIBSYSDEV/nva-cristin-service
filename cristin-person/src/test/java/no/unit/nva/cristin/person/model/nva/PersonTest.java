@@ -53,7 +53,7 @@ public class PersonTest {
         assertEquals(DUMMY_LAST_NAME, cristinPersonPost.getSurname());
         assertEquals(DUMMY_FIRST_NAME_PREFERRED, cristinPersonPost.getFirstNamePreferred().orElse(EMPTY_STRING));
         assertEquals(DUMMY_LAST_NAME_PREFERRED, cristinPersonPost.getSurnamePreferred().orElse(EMPTY_STRING));
-        assertEquals(DUMMY_NATIONAL_IDENTITY_NUMBER, cristinPersonPost.getNorwegianNationalId());
+        assertEquals(DUMMY_NATIONAL_IDENTITY_NUMBER, cristinPersonPost.getNorwegianNationalId().orElseThrow());
     }
 
     @Test
