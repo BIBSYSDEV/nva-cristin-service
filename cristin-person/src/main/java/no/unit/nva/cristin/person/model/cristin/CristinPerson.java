@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
@@ -148,7 +149,7 @@ public class CristinPerson implements JsonSerializable {
     }
 
     public List<CristinPersonEmployment> getDetailedAffiliations() {
-        return nonNull(detailedAffiliations) ? detailedAffiliations : Collections.emptyList();
+        return detailedAffiliations;
     }
 
     public void setDetailedAffiliations(List<CristinPersonEmployment> detailedAffiliations) {
@@ -208,12 +209,14 @@ public class CristinPerson implements JsonSerializable {
         return getPictureUrl().map(UriWrapper::fromUri).map(UriWrapper::getUri).orElse(null);
     }
 
-    private Set<Affiliation> extractAffiliations() {
-        return getAffiliations().stream().map(CristinAffiliation::toAffiliation).collect(
-            Collectors.toSet());
+    private List<Affiliation> extractAffiliations() {
+        return getAffiliations().stream().map(CristinAffiliation::toAffiliation).collect(Collectors.toList());
     }
 
     private Set<Employment> extractEmployments() {
+        if (isNull(getDetailedAffiliations())) {
+            return null;
+        }
         return getDetailedAffiliations().stream()
                    .map(cristinEmployment -> cristinEmployment.toEmployment(getCristinPersonId()))
                    .collect(Collectors.toSet());

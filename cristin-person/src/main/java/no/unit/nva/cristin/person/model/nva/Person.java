@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.distinctByKey;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
@@ -53,7 +54,7 @@ public class Person implements JsonSerializable {
     @JsonProperty(IMAGE)
     private URI image;
     @JsonProperty(AFFILIATIONS)
-    private Set<Affiliation> affiliations;
+    private List<Affiliation> affiliations;
     @JsonProperty(RESERVED)
     private Boolean reserved;
     @JsonProperty(EMPLOYMENTS)
@@ -79,7 +80,7 @@ public class Person implements JsonSerializable {
     public Person(@JsonProperty(ID) URI id, @JsonProperty(IDENTIFIERS) Set<TypedValue> identifiers,
                   @JsonProperty(NAMES) Set<TypedValue> names,
                   @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails, @JsonProperty(IMAGE) URI image,
-                  @JsonProperty(AFFILIATIONS) Set<Affiliation> affiliations, @JsonProperty(RESERVED) Boolean reserved,
+                  @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations, @JsonProperty(RESERVED) Boolean reserved,
                   @JsonProperty(EMPLOYMENTS) Set<Employment> employments) {
         this.id = id;
         this.identifiers = identifiers;
@@ -115,8 +116,8 @@ public class Person implements JsonSerializable {
         this.identifiers = identifiers;
     }
 
-    public Set<Affiliation> getAffiliations() {
-        return nonNull(affiliations) ? affiliations : Collections.emptySet();
+    public List<Affiliation> getAffiliations() {
+        return nonNull(affiliations) ? affiliations : Collections.emptyList();
     }
 
     public ContactDetails getContactDetails() {
@@ -131,7 +132,7 @@ public class Person implements JsonSerializable {
         this.id = id;
     }
 
-    public void setAffiliations(Set<Affiliation> affiliations) {
+    public void setAffiliations(List<Affiliation> affiliations) {
         this.affiliations = affiliations;
     }
 
@@ -160,7 +161,7 @@ public class Person implements JsonSerializable {
     }
 
     public Set<Employment> getEmployments() {
-        return nonNull(employments) ? employments : Collections.emptySet();
+        return employments;
     }
 
     public void setEmployments(Set<Employment> employments) {
@@ -199,6 +200,9 @@ public class Person implements JsonSerializable {
      * Converts NVA formatted employments to Cristin formatted employments.
      */
     public static List<CristinPersonEmployment> mapEmploymentsToCristinEmployments(Set<Employment> employments) {
+        if (isNull(employments)) {
+            return null;
+        }
         return new ArrayList<>(employments).stream()
                    .map(Employment::toCristinEmployment)
                    .collect(Collectors.toList());
@@ -276,7 +280,7 @@ public class Person implements JsonSerializable {
             return this;
         }
 
-        public Builder withAffiliations(Set<Affiliation> affiliations) {
+        public Builder withAffiliations(List<Affiliation> affiliations) {
             person.setAffiliations(affiliations);
             return this;
         }

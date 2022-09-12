@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.common;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.unit.nva.cristin.model.Constants;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -13,8 +14,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidPathParameterMessage;
 import static no.unit.nva.cristin.model.Constants.EMPLOYMENT_ID;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORG_ID;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
@@ -115,6 +118,14 @@ public class Utils {
 
     private static boolean isValidIdentifier(String identifier) {
         return Utils.isPositiveInteger(identifier);
+    }
+
+    /**
+     * Tries to parse an input String into a json formatted ObjectNode.
+     */
+    public static ObjectNode readJsonFromInput(String input) throws BadRequestException {
+        return attempt(() -> (ObjectNode) OBJECT_MAPPER.readTree(input))
+                   .orElseThrow(fail -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 
 }
