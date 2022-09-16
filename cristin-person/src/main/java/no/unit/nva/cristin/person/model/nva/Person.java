@@ -55,8 +55,6 @@ public class Person implements JsonSerializable {
     private URI image;
     @JsonProperty(AFFILIATIONS)
     private List<Affiliation> affiliations;
-    @JsonProperty(NATIONAL_IDENTITY_NUMBER)
-    private String norwegianNationalId;
     @JsonProperty(RESERVED)
     private Boolean reserved;
     @JsonProperty(EMPLOYMENTS)
@@ -75,13 +73,14 @@ public class Person implements JsonSerializable {
      * @param contactDetails How to contact this Person.
      * @param image          URI to picture of this Person.
      * @param affiliations   This person's organization affiliations.
+     * @param reserved       If person is a reserved person, meaning not publicly viewable.
      * @param employments    This person's detailed employment data at each organization.
      */
     @JsonCreator
     public Person(@JsonProperty(ID) URI id, @JsonProperty(IDENTIFIERS) Set<TypedValue> identifiers,
                   @JsonProperty(NAMES) Set<TypedValue> names,
                   @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails, @JsonProperty(IMAGE) URI image,
-                  @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations,
+                  @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations, @JsonProperty(RESERVED) Boolean reserved,
                   @JsonProperty(EMPLOYMENTS) Set<Employment> employments) {
         this.id = id;
         this.identifiers = identifiers;
@@ -89,6 +88,7 @@ public class Person implements JsonSerializable {
         this.contactDetails = contactDetails;
         this.image = image;
         this.affiliations = affiliations;
+        this.reserved = reserved;
         this.employments = employments;
     }
 
@@ -152,14 +152,6 @@ public class Person implements JsonSerializable {
         this.names = names;
     }
 
-    public String getNorwegianNationalId() {
-        return norwegianNationalId;
-    }
-
-    public void setNorwegianNationalId(String norwegianNationalId) {
-        this.norwegianNationalId = norwegianNationalId;
-    }
-
     public Boolean getReserved() {
         return reserved;
     }
@@ -192,6 +184,7 @@ public class Person implements JsonSerializable {
         cristinPerson.setNorwegianNationalId(identifierMap.get(NATIONAL_IDENTITY_NUMBER));
 
         cristinPerson.setDetailedAffiliations(mapEmploymentsToCristinEmployments(getEmployments()));
+        cristinPerson.setReserved(getReserved());
 
         return cristinPerson;
     }
@@ -224,27 +217,28 @@ public class Person implements JsonSerializable {
         if (!(o instanceof Person)) {
             return false;
         }
-        Person that = (Person) o;
-        return Objects.equals(getContext(), that.getContext())
-            && Objects.equals(getId(), that.getId())
-            && getIdentifiers().equals(that.getIdentifiers())
-            && getNames().equals(that.getNames())
-            && Objects.equals(getContactDetails(), that.getContactDetails())
-            && Objects.equals(getImage(), that.getImage())
-            && getAffiliations().equals(that.getAffiliations())
-            && Objects.equals(getEmployments(), that.getEmployments());
-    }
-
-    @Override
-    public String toString() {
-        return toJsonString();
+        Person person = (Person) o;
+        return Objects.equals(getId(), person.getId())
+               && Objects.equals(getContext(), person.getContext())
+               && Objects.equals(getIdentifiers(), person.getIdentifiers())
+               && Objects.equals(getNames(), person.getNames())
+               && Objects.equals(getContactDetails(), person.getContactDetails())
+               && Objects.equals(getImage(), person.getImage())
+               && Objects.equals(getAffiliations(), person.getAffiliations())
+               && Objects.equals(getReserved(), person.getReserved())
+               && Objects.equals(getEmployments(), person.getEmployments());
     }
 
     @JacocoGenerated
     @Override
     public int hashCode() {
-        return Objects.hash(getContext(), getId(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
-            getAffiliations(), getEmployments());
+        return Objects.hash(getId(), getContext(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
+                            getAffiliations(), getReserved(), getEmployments());
+    }
+
+    @Override
+    public String toString() {
+        return toJsonString();
     }
 
     @JacocoGenerated
@@ -288,11 +282,6 @@ public class Person implements JsonSerializable {
 
         public Builder withAffiliations(List<Affiliation> affiliations) {
             person.setAffiliations(affiliations);
-            return this;
-        }
-
-        public Builder withNorwegianNationalId(String norwegianNationalId) {
-            person.setNorwegianNationalId(norwegianNationalId);
             return this;
         }
 

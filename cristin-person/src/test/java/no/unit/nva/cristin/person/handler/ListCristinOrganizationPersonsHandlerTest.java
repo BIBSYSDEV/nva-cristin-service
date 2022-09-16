@@ -3,10 +3,12 @@ package no.unit.nva.cristin.person.handler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.UriUtils;
@@ -235,9 +237,9 @@ class ListCristinOrganizationPersonsHandlerTest {
 
     private Person randomPersonWithNin() {
         return new Person.Builder()
-                .withId(randomUri())
-                .withNorwegianNationalId(randomElement(generatedNINs))
-                .build();
+                   .withId(randomUri())
+                   .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, randomElement(generatedNINs))))
+                   .build();
     }
 
     private InputStream queryWithAccessRightToReadNIN() throws JsonProcessingException {
