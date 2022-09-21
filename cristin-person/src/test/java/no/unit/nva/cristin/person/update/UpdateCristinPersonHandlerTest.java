@@ -39,7 +39,7 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_EMPLOYMENT_FIELD;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.FIELD_CAN_NOT_BE_ERASED;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.ORCID_IS_NOT_VALID;
-import static no.unit.nva.cristin.person.update.PersonPatchValidator.RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE;
+import static no.unit.nva.cristin.person.update.PersonPatchValidator.RESERVED_MUST_BE_BOOLEAN;
 import static no.unit.nva.cristin.person.update.UpdateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
@@ -142,17 +142,6 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenReservedIsNull() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
-        jsonObject.putNull(RESERVED);
-
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
-
-        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE));
-    }
-
-    @Test
     void shouldReturnBadRequestWhenReservedIsNotBoolean() throws IOException {
         ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(RESERVED, SOME_TEXT);
@@ -160,18 +149,7 @@ public class UpdateCristinPersonHandlerTest {
         GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenReservedIsFalse() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
-        jsonObject.put(RESERVED, false);
-
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
-
-        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE));
+        assertThat(gatewayResponse.getBody(), containsString(RESERVED_MUST_BE_BOOLEAN));
     }
 
     @Test

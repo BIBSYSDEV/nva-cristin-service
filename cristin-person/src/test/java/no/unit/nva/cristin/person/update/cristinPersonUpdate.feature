@@ -95,33 +95,19 @@ Feature: API tests for Cristin Person Update
     Then status 400
     And match response.detail == 'Field firstName can not be erased'
 
-  Scenario: Update returns status 400 when trying to erase non nullable reserved
-    Given path '/person/' + personIdentifier
-    * header Authorization = 'Bearer ' + token
-    * def invalidRequest =
-    """
-    {
-      'reserved': null
-    }
-    """
-    And request invalidRequest
-    When method PATCH
-    Then status 400
-    And match response.detail == 'Reserved field can only be set to true if present'
-
   Scenario: Update returns status 400 when trying to set reserved to unsupported value
     Given path '/person/' + personIdentifier
     * header Authorization = 'Bearer ' + token
     * def invalidRequest =
     """
     {
-      'reserved': false
+      'reserved': 'Hello'
     }
     """
     And request invalidRequest
     When method PATCH
     Then status 400
-    And match response.detail == 'Reserved field can only be set to true if present'
+    And match response.detail == 'Reserved field can only be set to boolean value'
 
   Scenario: Update returns status 400 when no supported values present
     Given path '/person/' + personIdentifier

@@ -139,4 +139,22 @@ public class CristinPersonPatchJsonCreatorTest {
 
         assertThat(deserialized, equalTo(cristinEmployment));
     }
+
+    @Test
+    void shouldNotAddReservedFieldIfSetToFalse() {
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        input.put(RESERVED, false);
+        ObjectNode result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+
+        assertThat(result.has(RESERVED), equalTo(false));
+    }
+
+    @Test
+    void shouldNotAddReservedFieldWhenNotABoolean() {
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        input.put(RESERVED, randomString());
+        ObjectNode result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+
+        assertThat(result.has(RESERVED), equalTo(false));
+    }
 }

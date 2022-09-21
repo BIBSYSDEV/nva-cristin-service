@@ -97,7 +97,7 @@ public class CristinPersonPatchJsonCreator {
     }
 
     private void addReserved() {
-        if (input.has(RESERVED)) {
+        if (input.has(RESERVED) && input.get(RESERVED).asBoolean()) {
             output.set(RESERVED, input.get(RESERVED));
         }
     }

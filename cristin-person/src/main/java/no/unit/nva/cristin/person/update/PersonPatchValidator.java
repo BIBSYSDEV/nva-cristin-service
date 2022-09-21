@@ -22,8 +22,8 @@ public final class PersonPatchValidator {
 
     public static final String ORCID_IS_NOT_VALID = "ORCID is not valid";
     public static final String FIELD_CAN_NOT_BE_ERASED = "Field %s can not be erased";
-    public static final String RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE =
-        "Reserved field can only be set to true if present";
+    public static final String RESERVED_MUST_BE_BOOLEAN =
+        "Reserved field can only be set to boolean value";
     public static final String COULD_NOT_PARSE_EMPLOYMENT_FIELD = "Could not parse employment field because of "
                                                                   + "invalid data";
     private static final String EXCEPTION_WHEN_VALIDATING_EMPLOYMENTS = "Exception when validating employments: {}";
@@ -68,8 +68,8 @@ public final class PersonPatchValidator {
     }
 
     private static void validateReservedIfPresent(ObjectNode input) throws BadRequestException {
-        if (input.has(RESERVED) && !input.get(RESERVED).asBoolean()) {
-            throw new BadRequestException(RESERVED_FIELD_CAN_ONLY_BE_SET_TO_TRUE);
+        if (input.has(RESERVED) && !input.get(RESERVED).isBoolean()) {
+            throw new BadRequestException(RESERVED_MUST_BE_BOOLEAN);
         }
     }
 
