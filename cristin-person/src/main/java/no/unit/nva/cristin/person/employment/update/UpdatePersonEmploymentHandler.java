@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
+import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -49,7 +50,8 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
         String personId = getValidPersonId(requestInfo);
         String employmentId = getValidEmploymentId(requestInfo);
 
-        return apiClient.updatePersonEmploymentInCristin(personId, employmentId, cristinJson);
+        return apiClient.updatePersonEmploymentInCristin(personId, employmentId, cristinJson,
+                                                         Utils.generateInstNrHeader(requestInfo));
     }
 
     @Override

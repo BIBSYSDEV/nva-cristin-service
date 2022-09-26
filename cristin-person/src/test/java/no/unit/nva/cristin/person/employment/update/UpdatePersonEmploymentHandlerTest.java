@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.Map;
@@ -36,6 +37,7 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
+import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -47,9 +49,9 @@ public class UpdatePersonEmploymentHandlerTest {
         IoUtils.stringFromResources(Path.of("nvaApiCreateEmploymentRequest.json"));
     private static final String INVALID_URI = "https://example.org/hello";
     private static final String INVALID_VALUE = "hello";
+    private static final URI TOP_ORG_ID = UriWrapper.fromUri(randomUri()).addChild("185.90.0.0").getUri();
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
-    private UpdatePersonEmploymentClient apiClient;
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
@@ -58,7 +60,7 @@ public class UpdatePersonEmploymentHandlerTest {
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
-        apiClient = new UpdatePersonEmploymentClient(httpClientMock);
+        UpdatePersonEmploymentClient apiClient = new UpdatePersonEmploymentClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new UpdatePersonEmploymentHandler(apiClient, environment);
@@ -66,7 +68,7 @@ public class UpdatePersonEmploymentHandlerTest {
 
     @Test
     void shouldReturnNoContentResponseWhenPayloadIsValid() throws IOException {
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, validJson);
+        GatewayResponse<Void> gatewayResponse = sendQuery(validJson);
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
@@ -83,7 +85,7 @@ public class UpdatePersonEmploymentHandlerTest {
     void shouldThrowBadRequestWhenInvalidPositionCode() throws IOException {
         ObjectNode input = OBJECT_MAPPER.createObjectNode();
         input.put(TYPE, INVALID_URI);
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(TYPE)));
@@ -93,7 +95,7 @@ public class UpdatePersonEmploymentHandlerTest {
     void shouldThrowBadRequestWhenInvalidAffiliation() throws IOException {
         ObjectNode input = OBJECT_MAPPER.createObjectNode();
         input.put(ORGANIZATION, INVALID_URI);
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(ORGANIZATION)));
@@ -103,7 +105,7 @@ public class UpdatePersonEmploymentHandlerTest {
     void shouldThrowBadRequestWhenInvalidDate() throws IOException {
         ObjectNode input = OBJECT_MAPPER.createObjectNode();
         input.put(START_DATE, INVALID_VALUE);
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(START_DATE)));
@@ -113,7 +115,7 @@ public class UpdatePersonEmploymentHandlerTest {
     void shouldThrowBadRequestWhenNonNullableIsNull() throws IOException {
         ObjectNode input = OBJECT_MAPPER.createObjectNode();
         input.putNull(START_DATE);
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(START_DATE)));
@@ -123,7 +125,7 @@ public class UpdatePersonEmploymentHandlerTest {
     void shouldThrowBadRequestWhenInvalidFullTimePercentage() throws IOException {
         ObjectNode input = OBJECT_MAPPER.createObjectNode();
         input.put(FULL_TIME_PERCENTAGE, INVALID_VALUE);
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(FULL_TIME_PERCENTAGE)));
@@ -133,7 +135,7 @@ public class UpdatePersonEmploymentHandlerTest {
     void shouldThrowBadRequestWhenNoSupportedValuesPresentInJson() throws IOException {
         ObjectNode input = OBJECT_MAPPER.createObjectNode();
         input.put(INVALID_VALUE, INVALID_VALUE);
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, input.toString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));
@@ -143,21 +145,22 @@ public class UpdatePersonEmploymentHandlerTest {
         return String.valueOf(randomInteger());
     }
 
-    private GatewayResponse<Void> sendQuery(Map<String, String> pathParam, String body) throws IOException {
-        InputStream input = createRequest(pathParam, body);
+    private GatewayResponse<Void> sendQuery(String body) throws IOException {
+        InputStream input = createRequest(body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
-    private InputStream createRequest(Map<String, String> pathParam, String body) throws JsonProcessingException {
+    private InputStream createRequest(String body) throws JsonProcessingException {
         var customerId = randomUri();
 
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
-            .withBody(body)
-            .withCustomerId(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
-            .withPathParameters(pathParam)
-            .build();
+                   .withBody(body)
+                   .withCustomerId(customerId)
+                   .withTopLevelCristinOrgId(TOP_ORG_ID)
+                   .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                   .withPathParameters(validPath)
+                   .build();
     }
 
     private GatewayResponse<Void> queryWithoutRequiredAccessRights() throws IOException {
