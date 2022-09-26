@@ -65,13 +65,13 @@ Feature: API tests for Creation of Cristin Person Employments
     Then status 403
     And match response.title == 'Forbidden'
 
-  Scenario: Create returns status 201 Created for timestamp with zero millis
+  Scenario: Create returns status 400 when missing person org identifier
     Given path '/person/' + cristinTestPersonIdentifier + '/employment/'
     And header Authorization = 'Bearer ' + token
     And request TestPersonEmployment
     When method POST
-    Then status 201
-    And print response
+    Then status 400
+    And match response.detail == "Could not retrieve user's cristin organization identifier"
 
   Scenario: Create returns status 400 Bad Request when invalid type
     Given path '/person/' + cristinTestPersonIdentifier + '/employment/'
