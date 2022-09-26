@@ -68,21 +68,19 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
         validateContainsRequiredIdentifiers(extractIdentifiers(input.getIdentifiers()));
         validateValidIdentificationNumber(extractIdentificationNumber(input.getIdentifiers()));
 
-        String instNr = EMPTY_STRING;
-
         if (nonNull(input.getEmployments())) {
             AccessUtils.validateIdentificationNumberAccess(requestInfo);
-            instNr = generateInstNrHeader(requestInfo);
             for (Employment employment : input.getEmployments()) {
                 CreatePersonEmploymentValidator.validate(employment);
             }
+            return apiClient.createPersonInCristin(input, generateInstNrHeader(requestInfo));
         }
 
         if (suppliedInputPersonNinDoesNotMatchClientOwn(input, requestInfo)) {
             AccessUtils.validateIdentificationNumberAccess(requestInfo);
         }
 
-        return apiClient.createPersonInCristin(input, instNr);
+        return apiClient.createPersonInCristin(input);
     }
 
     @Override
