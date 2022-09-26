@@ -26,10 +26,10 @@ public class CreateCristinPersonApiClient extends PostApiClient {
     /**
      * Used for creating a person in Cristin from the supplied Person object.
      */
-    public Person createPersonInCristin(Person person) throws ApiGatewayException {
+    public Person createPersonInCristin(Person person, String instNr) throws ApiGatewayException {
         String payload = generatePayloadFromRequest(person);
         URI uri = getCristinPersonPostUri();
-        HttpResponse<String> response = post(uri, payload);
+        HttpResponse<String> response = post(uri, payload, instNr);
         checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode());
 
         return createPersonFromResponse(response);

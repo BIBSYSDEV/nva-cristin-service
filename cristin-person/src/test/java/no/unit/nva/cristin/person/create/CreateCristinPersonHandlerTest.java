@@ -1,6 +1,9 @@
 package no.unit.nva.cristin.person.create;
 
+import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
+import static no.unit.nva.cristin.common.Utils.COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.RandomPersonData.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
@@ -19,8 +22,11 @@ import static no.unit.nva.cristin.person.model.nva.Person.mapEmploymentsToCristi
 import static no.unit.nva.testutils.RandomDataGenerator.randomBoolean;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static no.unit.nva.utils.AccessUtils.ADMINISTRATE_APPLICATION;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static nva.commons.apigateway.RequestInfoConstants.BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -37,7 +43,7 @@ import com.google.common.net.HttpHeaders;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +73,9 @@ public class CreateCristinPersonHandlerTest {
     private static final String DUMMY_FIRST_NAME = randomString();
     private static final String DUMMY_LAST_NAME = randomString();
     private static final String DUMMY_CRISTIN_ID = "123456";
+    private static final String ANOTHER_ORGANIZATION = "https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0"
+                                                      + ".0";
+    private static final String ONE_ORGANIZATION = "https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -93,7 +102,7 @@ public class CreateCristinPersonHandlerTest {
         var gatewayResponse = sendQuery(dummyPerson());
         var actual = gatewayResponse.getBodyObject(Person.class);
 
-        assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
         assertThat(actual.getNames().containsAll(dummyPerson().getNames()), equalTo(true));
     }
 
@@ -102,7 +111,7 @@ public class CreateCristinPersonHandlerTest {
         var input = dummyPersonWithAdditionalNames();
         var response = sendQuery(input);
 
-        assertEquals(HttpURLConnection.HTTP_CREATED, response.getStatusCode());
+        assertEquals(HTTP_CREATED, response.getStatusCode());
     }
 
     @Test
@@ -113,7 +122,7 @@ public class CreateCristinPersonHandlerTest {
                                             .build();
         var gatewayResponse = sendQuery(personWithMissingIdentity);
 
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_MISSING_IDENTIFIER));
     }
@@ -122,7 +131,7 @@ public class CreateCristinPersonHandlerTest {
     void shouldReturnBadRequestWhenClientPayloadIsEmpty() throws IOException {
         var gatewayResponse = sendQuery(null);
 
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_PAYLOAD_EMPTY));
     }
@@ -139,7 +148,7 @@ public class CreateCristinPersonHandlerTest {
     void shouldReturnBadRequestWhenIdentityNumberNotValid() throws IOException {
         var gatewayResponse = sendQuery(dummyPersonWithInvalidIdentityNumber());
 
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_IDENTIFIER_NOT_VALID));
     }
@@ -152,7 +161,7 @@ public class CreateCristinPersonHandlerTest {
                 .build();
         var gatewayResponse = sendQuery(personWithMissingNames);
 
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_MISSING_REQUIRED_NAMES));
     }
@@ -162,7 +171,7 @@ public class CreateCristinPersonHandlerTest {
         var dummyPersonWithRepeatedIdentityNumber = getPersonWithRepeatedIdentityNumber();
         var gatewayResponse = sendQuery(dummyPersonWithRepeatedIdentityNumber);
 
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_IDENTIFIERS_REPEATED));
     }
@@ -178,7 +187,7 @@ public class CreateCristinPersonHandlerTest {
         var gatewayResponse =
             sendQueryWithoutAccessRightsButWithPersonNin(input, personsOwnNin);
 
-        assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
     }
 
     @Test
@@ -199,9 +208,10 @@ public class CreateCristinPersonHandlerTest {
         var dummyPerson = dummyPerson();
         var dummyEmployments = randomEmployments();
         dummyPerson.setEmployments(dummyEmployments);
-        final var gatewayResponse = sendQuery(dummyPerson);
+        final var gatewayResponse =
+            sendQueryWhileMockingCristinOrgIdOfClient(dummyPerson, URI.create(ONE_ORGANIZATION));
         var captor = ArgumentCaptor.forClass(String.class);
-        verify(apiClient).post(any(), captor.capture());
+        verify(apiClient).post(any(), captor.capture(), any());
         var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
         var expectedCristinEmployments =
             mapEmploymentsToCristinEmployments(dummyEmployments);
@@ -210,7 +220,7 @@ public class CreateCristinPersonHandlerTest {
         assertNotNull(capturedCristinPerson.getDetailedAffiliations());
         assertThat(capturedCristinPerson.getDetailedAffiliations().containsAll(expectedCristinEmployments),
                    equalTo(true));
-        assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
     }
 
     @Test
@@ -226,7 +236,7 @@ public class CreateCristinPersonHandlerTest {
         var gatewayResponse = sendQuery(dummyPerson());
         var actual = gatewayResponse.getBodyObject(Person.class);
 
-        assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
         assertThat(actual.getAffiliations().contains(dummyCristinPersonAffiliation.toAffiliation()),
                    equalTo(true));
     }
@@ -239,7 +249,7 @@ public class CreateCristinPersonHandlerTest {
         dummyPerson.setEmployments(Set.of(dummyEmployment));
         final var gatewayResponse = sendQuery(dummyPerson);
 
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
     }
 
     @Test
@@ -251,7 +261,7 @@ public class CreateCristinPersonHandlerTest {
         var gatewayResponse = sendQuery(dummyPerson());
         var actual = gatewayResponse.getBodyObject(Person.class);
 
-        assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
         assertThat(actual.getEmployments(), equalTo(null));
     }
 
@@ -264,6 +274,42 @@ public class CreateCristinPersonHandlerTest {
         var gatewayResponse = sendQueryWithoutAccessRightsButWithPersonNin(input, personsOwnNin);
 
         assertEquals(HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenMissingTopLevelCristinOrgIdFromRequestInfo() throws IOException {
+        var dummyPerson = dummyPerson();
+        var dummyEmployment = randomEmployment();
+        dummyEmployment.setOrganization(URI.create(ANOTHER_ORGANIZATION));
+        dummyPerson.setEmployments(Set.of(dummyEmployment));
+        final var gatewayResponse =
+            sendQueryWhileMockingCristinOrgIdOfClient(dummyPerson, URI.create(EMPTY_STRING));
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(),
+                   containsString(COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER));
+    }
+
+    @Test
+    void shouldBeAllowedToCreateEmploymentsAtAllInstitutionsWhenIsInternalBackend() throws IOException {
+        var dummyPerson = dummyPerson();
+        var dummyEmployment = randomEmployment();
+        dummyEmployment.setOrganization(URI.create(ANOTHER_ORGANIZATION));
+        dummyPerson.setEmployments(Set.of(dummyEmployment));
+        final var gatewayResponse = sendQueryWhileActingAsInternalBackend(dummyPerson);
+
+        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldBeAllowedToCreateEmploymentsAtAllInstitutionsWhenIsApplicationAdministrator() throws IOException {
+        var dummyPerson = dummyPerson();
+        var dummyEmployment = randomEmployment();
+        dummyEmployment.setOrganization(URI.create(ANOTHER_ORGANIZATION));
+        dummyPerson.setEmployments(Set.of(dummyEmployment));
+        final var gatewayResponse = sendQueryWhileActingAsApplicationAdministrator(dummyPerson);
+
+        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
     }
 
     private CristinAffiliation randomCristinAffiliation() {
@@ -358,5 +404,57 @@ public class CreateCristinPersonHandlerTest {
                 new TypedValue(PREFERRED_LAST_NAME, randomString())))
             .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER)))
             .build();
+    }
+
+    private GatewayResponse<Person> sendQueryWhileMockingCristinOrgIdOfClient(Person body, URI cristinOrgId)
+        throws IOException {
+        var input = requestWithBodyAndMockedCristinOrgId(body, cristinOrgId);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Person.class);
+    }
+
+    private InputStream requestWithBodyAndMockedCristinOrgId(Person body, URI cristinOrgId)
+        throws JsonProcessingException {
+        var customerId = randomUri();
+        return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
+                   .withBody(body)
+                   .withCustomerId(customerId)
+                   .withTopLevelCristinOrgId(cristinOrgId)
+                   .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                   .build();
+    }
+
+    private GatewayResponse<Person> sendQueryWhileActingAsInternalBackend(Person body)
+        throws IOException {
+        var input = requestWithBodyActingAsInternalBackend(body);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Person.class);
+    }
+
+    private InputStream requestWithBodyActingAsInternalBackend(Person body)
+        throws JsonProcessingException {
+        var customerId = randomUri();
+        return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
+                   .withBody(body)
+                   .withCustomerId(customerId)
+                   .withScope(BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE)
+                   .build();
+    }
+
+    private GatewayResponse<Person> sendQueryWhileActingAsApplicationAdministrator(Person body)
+        throws IOException {
+        var input = requestWithBodyActingAsApplicationAdministrator(body);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Person.class);
+    }
+
+    private InputStream requestWithBodyActingAsApplicationAdministrator(Person body)
+        throws JsonProcessingException {
+        var customerId = randomUri();
+        return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
+                   .withBody(body)
+                   .withCustomerId(customerId)
+                   .withAccessRights(customerId, ADMINISTRATE_APPLICATION, EDIT_OWN_INSTITUTION_USERS)
+                   .build();
     }
 }

@@ -18,6 +18,7 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 public class PostApiClient extends ApiClient {
 
     public static final String APPLICATION_JSON = MediaType.JSON_UTF_8.toString();
+    public static final String CRISTIN_INSTITUTION = "Cristin-Institution";
 
     private final transient HttpClient client;
 
@@ -37,6 +38,22 @@ public class PostApiClient extends ApiClient {
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .build();
+        return getSuccessfulResponseOrThrowException(httpRequest);
+    }
+
+    /**
+     * Initiate a synchronous POST to uri with supplied payload. Returns response from upstream.
+     * Accepts header for Cristin Institution allowed to update.
+     */
+    public HttpResponse<String> post(URI uri, String body, String instNr)
+        throws GatewayTimeoutException, FailedHttpRequestException {
+
+        var httpRequest = HttpRequest.newBuilder()
+                              .uri(uri)
+                              .header(CONTENT_TYPE, APPLICATION_JSON)
+                              .header(CRISTIN_INSTITUTION, instNr)
+                              .POST(HttpRequest.BodyPublishers.ofString(body))
+                              .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
