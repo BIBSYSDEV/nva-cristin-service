@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.employment;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.Utils.CAN_UPDATE_ANY_INSTITUTION;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import java.util.Collections;
 import no.unit.nva.cristin.common.Utils;
@@ -43,7 +44,7 @@ public class ClearCristinTestPersonEmployment {
         }
         try {
             new DeletePersonEmploymentClient(CristinAuthenticator.getHttpClient())
-                .deletePersonEmployment(personId, employmentId);
+                .deletePersonEmployment(personId, employmentId, CAN_UPDATE_ANY_INSTITUTION);
             logger.info("Deleted employment {}", employment.getId());
         } catch (ApiGatewayException e) {
             logger.error("Exception deleting employment for person with id '{}'", personId, e);
