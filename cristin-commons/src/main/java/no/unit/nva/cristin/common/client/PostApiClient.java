@@ -2,6 +2,7 @@ package no.unit.nva.cristin.common.client;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_INSTITUTION_HEADER;
 import com.google.common.net.MediaType;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,7 +19,6 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 public class PostApiClient extends ApiClient {
 
     public static final String APPLICATION_JSON = MediaType.JSON_UTF_8.toString();
-    public static final String CRISTIN_INSTITUTION = "Cristin-Institution";
 
     private final transient HttpClient client;
 
@@ -51,7 +51,7 @@ public class PostApiClient extends ApiClient {
         var httpRequest = HttpRequest.newBuilder()
                               .uri(uri)
                               .header(CONTENT_TYPE, APPLICATION_JSON)
-                              .header(CRISTIN_INSTITUTION, instNr)
+                              .header(CRISTIN_INSTITUTION_HEADER, instNr)
                               .POST(HttpRequest.BodyPublishers.ofString(body))
                               .build();
         return getSuccessfulResponseOrThrowException(httpRequest);

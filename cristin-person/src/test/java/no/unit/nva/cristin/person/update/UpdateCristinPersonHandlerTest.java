@@ -5,7 +5,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import java.net.URI;
+import java.util.Optional;
 import no.unit.nva.cristin.common.ErrorMessages;
+import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -43,8 +45,11 @@ import static no.unit.nva.cristin.person.update.PersonPatchValidator.RESERVED_MU
 import static no.unit.nva.cristin.person.update.UpdateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static no.unit.nva.utils.AccessUtils.ADMINISTRATE_APPLICATION;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static nva.commons.apigateway.RequestInfoConstants.BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE;
+import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -64,6 +69,7 @@ public class UpdateCristinPersonHandlerTest {
     public static final String UNSUPPORTED_FIELD = "unsupportedField";
     public static final String INVALID_IDENTIFIER = "hello";
     private static final String IDENTIFIER_NOT_MATCHING_COGNITO = "555666";
+    private static final String SOME_ORGANIZATION = "185.90.0.0";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -230,25 +236,90 @@ public class UpdateCristinPersonHandlerTest {
     void shouldAllowEmptyListOfEmployments() throws IOException {
         var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.putArray(EMPLOYMENTS);
-        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        var gatewayResponse =
+            sendQueryAsInstAdminWithSomeOrgId(jsonObject.toString(), getDummyOrgUri());
 
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
     @Test
-    void shouldAllowValidEmploymentData() throws IOException {
-        var node = OBJECT_MAPPER.readTree(randomEmployment().toString());
+    void shouldAllowValidEmploymentDataWhenInstAdminAndHasAnyCristinOrgIdAsValidationIsDoneUpstream()
+        throws IOException {
+        Employment employment = randomEmployment();
+        var node = OBJECT_MAPPER.readTree(employment.toString());
         var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.putArray(EMPLOYMENTS).add(node);
-        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        var gatewayResponse =
+            sendQueryAsInstAdminWithSomeOrgId(jsonObject.toString(), employment.getOrganization());
 
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldAllowAnyEmploymentsWhenInternalBackend() throws IOException {
+        Employment employment = randomEmployment();
+        var node = OBJECT_MAPPER.readTree(employment.toString());
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.putArray(EMPLOYMENTS).add(node);
+        var gatewayResponse = sendQueryAsInternalBackend(jsonObject.toString());
+
+        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldAllowAnyEmploymentWhenBothAppAdminAndInstAdmin() throws IOException {
+        Employment employment = randomEmployment();
+        var node = OBJECT_MAPPER.readTree(employment.toString());
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.putArray(EMPLOYMENTS).add(node);
+        var gatewayResponse = sendQueryWithAppAndInstAdminRights(jsonObject.toString());
+
+        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    private URI getDummyOrgUri() {
+        return UriWrapper.fromUri(randomUri()).addChild(SOME_ORGANIZATION).getUri();
+    }
+
+    private GatewayResponse<Void> sendQueryAsInstAdminWithSomeOrgId(String body, URI orgId) throws IOException {
+        InputStream input = createRequest(body, null, orgId, EDIT_OWN_INSTITUTION_USERS,
+                                          ADMINISTRATE_APPLICATION);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Void.class);
+    }
+
+    private GatewayResponse<Void> sendQueryWithAppAndInstAdminRights(String body) throws IOException {
+        InputStream input = createRequest(body, null, null, ADMINISTRATE_APPLICATION,
+                                          EDIT_OWN_INSTITUTION_USERS);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Void.class);
+    }
+
+    private GatewayResponse<Void> sendQueryAsInternalBackend(String body) throws IOException {
+        InputStream input = createRequest(body, BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE, null);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
     private GatewayResponse<Void> sendQuery(Map<String, String> pathParam, String body) throws IOException {
         InputStream input = createRequest(pathParam, body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
+    }
+
+    private InputStream createRequest(String body, String scope, URI orgId,
+                                      String... accessRight)
+        throws JsonProcessingException {
+
+        var customerId = randomUri();
+        return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+                   .withBody(body)
+                   .withPathParameters(validPath)
+                   .withCustomerId(customerId)
+                   .withTopLevelCristinOrgId(Optional.ofNullable(orgId).orElse(URI.create(EMPTY_STRING)))
+                   .withScope(scope)
+                   .withAccessRights(customerId, accessRight)
+                   .build();
     }
 
     private InputStream createRequest(Map<String, String> pathParam, String body) throws JsonProcessingException {
