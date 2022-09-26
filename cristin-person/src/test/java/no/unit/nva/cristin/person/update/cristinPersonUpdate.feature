@@ -123,7 +123,7 @@ Feature: API tests for Cristin Person Update
     Then status 400
     And match response.detail == 'No supported fields in payload, not doing anything'
 
-  Scenario: Update returns status 204 when sending valid payload containing employments
+  Scenario: Update returns status 400 when sending valid employments but missing cristin organization
     Given path '/person/' + personIdentifier
     * header Authorization = 'Bearer ' + token
     * def employmentRequest =
@@ -142,9 +142,9 @@ Feature: API tests for Cristin Person Update
     """
     And request employmentRequest
     When method PATCH
-    Then status 204
+    Then status 400
 
-  Scenario: Update returns status 204 when removing all employments
+  Scenario: Update returns status 400 when removing all employments but missing cristin organization
     Given path '/person/' + personIdentifier
     * header Authorization = 'Bearer ' + token
     * def employmentRequest =
@@ -155,7 +155,7 @@ Feature: API tests for Cristin Person Update
     """
     And request employmentRequest
     When method PATCH
-    Then status 204
+    Then status 400
 
   Scenario: Update returns status 400 when sending invalid employments payload
     Given path '/person/' + personIdentifier
