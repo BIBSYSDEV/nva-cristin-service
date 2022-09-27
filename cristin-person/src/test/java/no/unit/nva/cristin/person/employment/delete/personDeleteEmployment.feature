@@ -44,22 +44,3 @@ Feature: API tests for Cristin Person fetch
     And match response.title == 'Bad Request'
     And match response.status == 400
     And match response.detail == 'Invalid path parameter for \'employmentId\''
-
-  Scenario: Delete returns status Not found when requesting unknown person identifier
-    Given path '/person/' + nonExistingPersonId +'/employment/' + nonExistingEmploymentId
-    * header Authorization = 'Bearer ' + token
-    When method DELETE
-    Then status 404
-    And match response.title == 'Not Found'
-    And match response.status == 404
-    And match response.detail == 'Upstream returned Not Found. This might occur if person identifier or employment identifier are not found in upstream'
-
-  Scenario: Delete returns status Not found when requesting unknown employmentId
-    Given path '/person/' + existingPersonId +'/employment/' + nonExistingEmploymentId
-    * header Authorization = 'Bearer ' + token
-    When method DELETE
-    Then status 404
-    And match response.title == 'Not Found'
-    And match response.status == 404
-    And match response.detail == 'Upstream returned Not Found. This might occur if person identifier or employment identifier are not found in upstream'
-
