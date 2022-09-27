@@ -1,7 +1,6 @@
 package no.unit.nva.cristin.person.client;
 
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.paths.UriWrapper;
@@ -39,9 +38,10 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
             throws ApiGatewayException {
 
         var startRequestTime = System.currentTimeMillis();
-        var response = queryOrganizationPersons(new HashMap(requestQueryParams));
+        var response = queryOrganizationPersons(new HashMap<>(requestQueryParams));
         var cristinPersons = getEnrichedPersonsUsingQueryResponse(response);
-        return getPersonSearchResponse(requestQueryParams, startRequestTime, response, cristinPersons);
+        var persons = mapCristinPersonsToNvaPersons(cristinPersons);
+        return getPersonSearchResponse(requestQueryParams, startRequestTime, response, persons);
     }
 
     /**
@@ -56,17 +56,17 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
             throws ApiGatewayException {
 
         var startRequestTime = System.currentTimeMillis();
-        var response = authorizedQueryOrganizationPersons(new HashMap(requestQueryParams));
+        var response = authorizedQueryOrganizationPersons(new HashMap<>(requestQueryParams));
         var cristinPersons = getEnrichedPersonsWithNinUsingQueryResponse(response);
-        return getPersonSearchResponse(requestQueryParams, startRequestTime, response, cristinPersons);
+        var personsWithAuthorizedFields = authorizedMappingCristinPersonsToNvaPersons(cristinPersons);
+        return getPersonSearchResponse(requestQueryParams, startRequestTime, response, personsWithAuthorizedFields);
     }
 
     private SearchResponse<Person> getPersonSearchResponse(Map<String, String> requestQueryParams,
                                                            long startRequestTime,
                                                            HttpResponse<String> response,
-                                                           List<CristinPerson> cristinPersons)
+                                                           List<Person> persons)
             throws nva.commons.apigateway.exceptions.BadRequestException {
-        var persons = mapCristinPersonsToNvaPersons(cristinPersons);
         var endRequestTime = System.currentTimeMillis();
         var id = getServiceUri(requestQueryParams);
         return new SearchResponse<Person>(id)

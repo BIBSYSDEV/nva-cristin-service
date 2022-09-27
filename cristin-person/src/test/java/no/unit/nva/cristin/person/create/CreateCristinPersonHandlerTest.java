@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -243,7 +244,9 @@ public class CreateCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldNotHaveEmploymentFieldInResponseWhenNotInUpstreamPayload() throws IOException, InterruptedException {
+    void shouldDefaultToEmptyEmploymentSetToAuthorizedClientWhenFieldNotPresentInUpstreamIndicatingNoEmployments()
+        throws IOException, InterruptedException {
+
         var responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
         apiClient = new CreateCristinPersonApiClient(httpClientMock);
@@ -252,7 +255,7 @@ public class CreateCristinPersonHandlerTest {
         var actual = gatewayResponse.getBodyObject(Person.class);
 
         assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
-        assertThat(actual.getEmployments(), equalTo(null));
+        assertThat(actual.getEmployments(), equalTo(Collections.emptySet()));
     }
 
     @Test

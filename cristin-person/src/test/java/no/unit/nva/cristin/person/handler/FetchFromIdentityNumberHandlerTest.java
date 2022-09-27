@@ -90,6 +90,7 @@ public class FetchFromIdentityNumberHandlerTest {
         Person actual = sendQuery(defaultBody(), EMPTY_MAP).getBodyObject(Person.class);
         String expectedString = IoUtils.stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
         Person expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
+        expected.setEmployments(Collections.emptySet());
 
         assertThat(actual, equalTo(expected));
     }
