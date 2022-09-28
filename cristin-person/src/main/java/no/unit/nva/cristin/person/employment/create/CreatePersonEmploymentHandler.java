@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.person.employment.create;
 
-import static no.unit.nva.cristin.common.Utils.generateInstNrHeader;
+import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -42,7 +42,7 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
         CreatePersonEmploymentValidator.validate(input);
         String identifier = getValidPersonId(requestInfo);
 
-        return apiClient.createEmploymentInCristin(identifier, input, generateInstNrHeader(requestInfo));
+        return apiClient.createEmploymentInCristin(identifier, input, extractCristinInstitutionIdentifier(requestInfo));
     }
 
     @Override

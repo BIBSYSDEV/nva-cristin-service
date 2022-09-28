@@ -21,7 +21,7 @@ import java.net.HttpURLConnection;
 import java.util.List;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
-import static no.unit.nva.cristin.common.Utils.generateInstNrHeader;
+import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
@@ -58,7 +58,8 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
             checkHasFields(cristinJson);
 
             if (cristinJson.has(CRISTIN_EMPLOYMENTS)) {
-                return apiClient.updatePersonInCristin(personId, cristinJson, generateInstNrHeader(requestInfo));
+                return apiClient.updatePersonInCristin(personId, cristinJson,
+                                                       extractCristinInstitutionIdentifier(requestInfo));
             } else {
                 return apiClient.updatePersonInCristin(personId, cristinJson);
             }

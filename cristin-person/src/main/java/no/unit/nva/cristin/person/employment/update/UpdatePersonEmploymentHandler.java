@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.employment.update;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
+import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.common.Utils.getValidEmploymentId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
@@ -10,7 +11,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
-import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -51,7 +51,7 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
         String employmentId = getValidEmploymentId(requestInfo);
 
         return apiClient.updatePersonEmploymentInCristin(personId, employmentId, cristinJson,
-                                                         Utils.generateInstNrHeader(requestInfo));
+                                                         extractCristinInstitutionIdentifier(requestInfo));
     }
 
     @Override

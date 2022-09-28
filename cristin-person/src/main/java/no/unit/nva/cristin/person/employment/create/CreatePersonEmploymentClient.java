@@ -29,16 +29,17 @@ public class CreatePersonEmploymentClient extends PostApiClient {
      *
      * @param identifier Identifier of Person to add employment to
      * @param employment Request object to serialize and send to upstream
-     * @param instNr First number sequence of a Cristin organization identifier
+     * @param cristinInstitutionNumber First number sequence of a Cristin organization identifier
      * @return the response from upstream deserialized to object
      * @throws ApiGatewayException if something went wrong and that can be returned to client
      */
-    public Employment createEmploymentInCristin(String identifier, Employment employment, String instNr)
+    public Employment createEmploymentInCristin(String identifier, Employment employment,
+                                                String cristinInstitutionNumber)
         throws ApiGatewayException {
 
         String payload = generatePayloadFromRequest(employment);
         URI uri = getCristinPostUri(identifier);
-        HttpResponse<String> response = post(uri, payload, instNr);
+        HttpResponse<String> response = post(uri, payload, cristinInstitutionNumber);
         checkPostHttpStatusCode(getNvaPostUri(identifier), response.statusCode());
         CristinPersonEmployment deserializedResponse = deserializeResponse(response);
 

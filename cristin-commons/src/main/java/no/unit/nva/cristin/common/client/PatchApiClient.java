@@ -41,13 +41,13 @@ public class PatchApiClient extends ApiClient {
      * Initiate a synchronous PATCH to uri with supplied payload. Returns response from upstream.
      * Accepts header for Cristin Institution allowed to update.
      */
-    public HttpResponse<String> patch(URI uri, String body, String instNr)
+    public HttpResponse<String> patch(URI uri, String body, String cristinInstitutionNumber)
         throws GatewayTimeoutException, FailedHttpRequestException {
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
                                       .uri(uri)
                                       .header(CONTENT_TYPE, APPLICATION_MERGE_PATCH_JSON)
-                                      .header(CRISTIN_INSTITUTION_HEADER, instNr)
+                                      .header(CRISTIN_INSTITUTION_HEADER, cristinInstitutionNumber)
                                       .method(HTTP_METHOD_PATCH, HttpRequest.BodyPublishers.ofString(body))
                                       .build();
         return getSuccessfulResponseOrThrowException(httpRequest);

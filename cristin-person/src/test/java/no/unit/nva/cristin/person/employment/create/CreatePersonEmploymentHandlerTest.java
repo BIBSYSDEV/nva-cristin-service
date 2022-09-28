@@ -56,7 +56,7 @@ public class CreatePersonEmploymentHandlerTest {
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 201));
-        CreatePersonEmploymentClient apiClient = new CreatePersonEmploymentClient(httpClientMock);
+        var apiClient = new CreatePersonEmploymentClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new CreatePersonEmploymentHandler(apiClient, environment);
@@ -64,8 +64,8 @@ public class CreatePersonEmploymentHandlerTest {
 
     @Test
     void shouldReturnStatusCreatedWhenSendingValidPayload() throws IOException {
-        Employment employment = sampleEmployment();
-        GatewayResponse<Employment> gatewayResponse = sendQueryWithCristinOrgId(employment);
+        var employment = sampleEmployment();
+        var gatewayResponse = sendQueryWithCristinOrgId(employment);
 
         assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
     }
@@ -76,7 +76,7 @@ public class CreatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
-        GatewayResponse<Employment> gatewayResponse = queryWithoutRequiredAccessRights();
+        var gatewayResponse = queryWithoutRequiredAccessRights();
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -102,9 +102,9 @@ public class CreatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenInvalidPositionCode() throws IOException, URISyntaxException {
-        Employment employment = OBJECT_MAPPER.readValue(validJson, Employment.class);
+        var employment = OBJECT_MAPPER.readValue(validJson, Employment.class);
         employment.setType(new URI(INVALID_URI));
-        GatewayResponse<Employment> gatewayResponse = sendQuery(employment);
+        var gatewayResponse = sendQuery(employment);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -113,9 +113,9 @@ public class CreatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenInvalidAffiliation() throws IOException, URISyntaxException {
-        Employment employment = OBJECT_MAPPER.readValue(validJson, Employment.class);
+        var employment = OBJECT_MAPPER.readValue(validJson, Employment.class);
         employment.setOrganization(new URI(INVALID_URI));
-        GatewayResponse<Employment> gatewayResponse = sendQuery(employment);
+        var gatewayResponse = sendQuery(employment);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -127,7 +127,7 @@ public class CreatePersonEmploymentHandlerTest {
     }
 
     private GatewayResponse<Employment> sendQuery(Employment body) throws IOException {
-        InputStream input = createRequest(body);
+        var input = createRequest(body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Employment.class);
     }
@@ -145,7 +145,7 @@ public class CreatePersonEmploymentHandlerTest {
     }
 
     private GatewayResponse<Employment> queryWithoutRequiredAccessRights() throws IOException {
-        InputStream input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
+        var input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
             .withBody(null)
             .withPathParameters(validPath)
             .build();
@@ -156,7 +156,7 @@ public class CreatePersonEmploymentHandlerTest {
 
     private GatewayResponse<Employment> sendQueryWithCristinOrgId(Employment body) throws IOException {
         var customerId = randomUri();
-        InputStream input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
+        var input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
                                 .withBody(body)
                                 .withCustomerId(customerId)
                                 .withTopLevelCristinOrgId(TOP_ORG_ID)

@@ -33,13 +33,14 @@ public class DeletePersonEmploymentClient extends ApiClient {
      * Deletes a identified persons specified employment.
      * @param personId identification of person
      * @param employmentId identification of employment
-     * @param instNr first number sequence of a Cristin organization identifier
+     * @param cristinInstitutionNumber first number sequence of a Cristin organization identifier
      * @return empty response if successful
      * @throws ApiGatewayException when service encounters problems or user is not authorized.
      */
-    public Void deletePersonEmployment(String personId, String employmentId, String instNr) throws ApiGatewayException {
+    public Void deletePersonEmployment(String personId, String employmentId, String cristinInstitutionNumber)
+        throws ApiGatewayException {
         URI cristinUri = generateCristinUri(personId, employmentId);
-        HttpResponse<String> response = deleteResults(cristinUri, instNr);
+        HttpResponse<String> response = deleteResults(cristinUri, cristinInstitutionNumber);
         checkResponse(response.statusCode());
         return null;
     }
@@ -62,9 +63,9 @@ public class DeletePersonEmploymentClient extends ApiClient {
         }
     }
 
-    private HttpResponse<String> deleteResults(URI uri, String instNr) throws ApiGatewayException {
+    private HttpResponse<String> deleteResults(URI uri, String cristinInstitutionNumber) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(uri)
-                                      .header(CRISTIN_INSTITUTION_HEADER, instNr)
+                                      .header(CRISTIN_INSTITUTION_HEADER, cristinInstitutionNumber)
                                       .DELETE()
                                       .build();
         return getSuccessfulResponseOrThrowException(httpRequest);

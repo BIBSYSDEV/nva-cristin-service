@@ -12,7 +12,7 @@ import nva.commons.core.Environment;
 
 import java.net.HttpURLConnection;
 
-import static no.unit.nva.cristin.common.Utils.generateInstNrHeader;
+import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.common.Utils.getValidEmploymentId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 
@@ -46,7 +46,8 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
         validateHasAccessRights(requestInfo);
         String personId = getValidPersonId(requestInfo);
         String employmentId = getValidEmploymentId(requestInfo);
-        return apiClient.deletePersonEmployment(personId, employmentId, generateInstNrHeader(requestInfo));
+        return apiClient.deletePersonEmployment(personId, employmentId,
+                                                extractCristinInstitutionIdentifier(requestInfo));
     }
 
     /**

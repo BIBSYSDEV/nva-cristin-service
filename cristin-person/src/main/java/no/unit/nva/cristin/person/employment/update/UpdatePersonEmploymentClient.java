@@ -28,11 +28,12 @@ public class UpdatePersonEmploymentClient extends PatchApiClient {
      * @return null if update was successful
      * @throws ApiGatewayException if something went wrong that can be mapped to a client response
      */
-    public Void updatePersonEmploymentInCristin(String personId, String employmentId, ObjectNode request, String instNr)
+    public Void updatePersonEmploymentInCristin(String personId, String employmentId, ObjectNode request,
+                                                String cristinInstitutionNumber)
         throws ApiGatewayException {
 
         URI uri = generateCristinUri(personId, employmentId);
-        HttpResponse<String> response = patch(uri, request.toString(), instNr);
+        HttpResponse<String> response = patch(uri, request.toString(), cristinInstitutionNumber);
         checkPatchHttpStatusCode(generateIdUri(personId, employmentId), response.statusCode());
 
         return null;

@@ -136,15 +136,16 @@ public class Utils {
     }
 
     /**
-     * Extracts institution number from data stored in RequestInfo to be used as value in a header sent to
-     * upstream which describes which institution the user is allowed to change employments at.
+     * Extracts institution string composed of digits from data stored in RequestInfo to be used as value in a header
+     * sent to upstream which describes which institution the user is allowed to change employments at.
      *
      * @param requestInfo information from request used to verify allowed permissions
      * @return String with allowed institution to change. Or constant 'any' if application administrator
      * @throws ForbiddenException if user it neither user administrator nor application administrator
      * @throws BadRequestException if incapable of extracting institution number
      */
-    public static String generateInstNrHeader(RequestInfo requestInfo) throws BadRequestException, ForbiddenException {
+    public static String extractCristinInstitutionIdentifier(RequestInfo requestInfo)
+        throws BadRequestException, ForbiddenException {
         if (requestInfo.clientIsInternalBackend() || AccessUtils.requesterIsApplicationAdministrator(requestInfo)) {
             return CAN_UPDATE_ANY_INSTITUTION;
         }

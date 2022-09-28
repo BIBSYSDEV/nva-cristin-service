@@ -73,8 +73,8 @@ public class CreateCristinPersonHandlerTest {
     private static final String DUMMY_FIRST_NAME = randomString();
     private static final String DUMMY_LAST_NAME = randomString();
     private static final String DUMMY_CRISTIN_ID = "123456";
-    private static final String ANOTHER_ORGANIZATION = "https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0"
-                                                      + ".0";
+    private static final String ANOTHER_ORGANIZATION =
+        "https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0";
     private static final String ONE_ORGANIZATION = "https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);

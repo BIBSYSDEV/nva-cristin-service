@@ -45,13 +45,13 @@ public class PostApiClient extends ApiClient {
      * Initiate a synchronous POST to uri with supplied payload. Returns response from upstream.
      * Accepts header for Cristin Institution allowed to update.
      */
-    public HttpResponse<String> post(URI uri, String body, String instNr)
+    public HttpResponse<String> post(URI uri, String body, String cristinInstitutionNumber)
         throws GatewayTimeoutException, FailedHttpRequestException {
 
         var httpRequest = HttpRequest.newBuilder()
                               .uri(uri)
                               .header(CONTENT_TYPE, APPLICATION_JSON)
-                              .header(CRISTIN_INSTITUTION_HEADER, instNr)
+                              .header(CRISTIN_INSTITUTION_HEADER, cristinInstitutionNumber)
                               .POST(HttpRequest.BodyPublishers.ofString(body))
                               .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
