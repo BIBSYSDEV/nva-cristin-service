@@ -68,7 +68,7 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
         validateContainsRequiredIdentifiers(extractIdentifiers(input.getIdentifiers()));
         validateValidIdentificationNumber(extractIdentificationNumber(input.getIdentifiers()));
 
-        if (nonNull(input.getEmployments())) {
+        if (employmentsHasContent(input)) {
             AccessUtils.validateIdentificationNumberAccess(requestInfo);
             for (Employment employment : input.getEmployments()) {
                 CreatePersonEmploymentValidator.validate(employment);
@@ -148,5 +148,10 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
             return !Objects.equals(extractIdentificationNumber(input.getIdentifiers()), clientOwnPersonNin.get());
         }
         return true;
+    }
+
+    private boolean employmentsHasContent(Person input) {
+        var employments = input.getEmployments();
+        return nonNull(employments) && !employments.isEmpty();
     }
 }

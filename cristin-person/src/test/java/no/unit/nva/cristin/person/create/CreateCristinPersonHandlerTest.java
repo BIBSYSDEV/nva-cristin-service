@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -309,6 +310,18 @@ public class CreateCristinPersonHandlerTest {
         dummyPerson.setEmployments(Set.of(dummyEmployment));
         final var gatewayResponse = sendQueryWhileActingAsApplicationAdministrator(dummyPerson);
 
+        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldAllowEmptyListOfEmploymentsWhenUserActingAsThemselvesTryToCreateTheirOwnUser() throws IOException {
+        var personsOwnNin = ANOTHER_IDENTITY_NUMBER;
+        var input = injectPersonNinIntoInput(personsOwnNin);
+        input.setEmployments(Collections.emptySet());
+        var gatewayResponse = sendQueryWithoutAccessRightsButWithPersonNin(input, personsOwnNin);
+
+        assertThat(input.getEmployments(), equalTo(Collections.emptySet()));
+        assertThat(input.getEmployments().size(), equalTo(0));
         assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
     }
 
