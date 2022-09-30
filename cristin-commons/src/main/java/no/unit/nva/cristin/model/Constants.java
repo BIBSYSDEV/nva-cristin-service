@@ -61,7 +61,7 @@ public class Constants {
     public static final String POSITION = "position";
     public static final String HASHTAG = "#";
     public static final String SLASH_DELIMITER = "/";
-    public static final String CRISTIN_INSTITUTION_HEADER = "Cristin-Institution";
+    public static final String CRISTIN_INSTITUTION_HEADER = "Cristin-Representing-Institution";
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,
