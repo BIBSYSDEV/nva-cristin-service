@@ -42,6 +42,8 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.exception.GatewayTimeoutException.ERROR_MESSAGE_GATEWAY_TIMEOUT;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.ioutils.IoUtils.stringFromResources;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -197,7 +199,19 @@ public class FetchCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnEmploymentDataInResponseToClientWhenUpstreamHasEmploymentDataInPayload()
+    void shouldReturnEmploymentDataInResponseToClientWhenUpstreamHasEmploymentDataInPayloadAndUserAuthorized()
+        throws IOException, ApiGatewayException {
+        apiClient = spy(apiClient);
+        doReturn(new HttpResponseFaker(cristinPersonWithEmploymentsAsJson()))
+            .when(apiClient).fetchGetResultWithAuthentication(any(URI.class));
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var actual = sendAuthorizedQuery().getBodyObject(Person.class);
+
+        assertThat(actual.getEmployments().size(), equalTo(EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS));
+    }
+
+    @Test
+    void shouldNotReturnEmploymentFieldWhenUserNotAuthorizedToSeeItEvenIfInUpstreamPayload()
         throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
         doReturn(new HttpResponseFaker(cristinPersonWithEmploymentsAsJson()))
@@ -205,22 +219,38 @@ public class FetchCristinPersonHandlerTest {
         handler = new FetchCristinPersonHandler(apiClient, environment);
         var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
 
-        assertThat(actual.getEmployments().size(), equalTo(EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS));
+        assertThat(actual.getEmployments(), equalTo(null));
     }
 
     @Test
-    void shouldHaveNinInResponseWhenNinIsPresentInUpstream() throws Exception {
+    void shouldHaveNinInResponseWhenNinIsPresentInUpstreamAndClientIsAuthenticated() throws Exception {
         var cristinPerson = randomCristinPerson();
         apiClient = spy(apiClient);
         doReturn(new HttpResponseFaker(cristinPerson.toString(), 200))
-            .when(apiClient).fetchGetResult(any(URI.class));
+            .when(apiClient).fetchGetResultWithAuthentication(any(URI.class));
         handler = new FetchCristinPersonHandler(apiClient, environment);
-        var gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
+        var gatewayResponse = sendAuthorizedQuery();
         var responseBody = gatewayResponse.getBodyObject(Person.class);
         var ninObject = extractNinObjectFromIdentifiers(responseBody).orElseThrow();
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(ninObject.getValue(), equalTo(NORWEGIAN_NATIONAL_ID));
+    }
+
+    @Test
+    void shouldNotHaveNinInResponseWhenClientIsNotAuthenticatedButNinIsPresentInUpstream() throws Exception {
+        var cristinPerson = randomCristinPerson();
+        apiClient = spy(apiClient);
+        doReturn(new HttpResponseFaker(cristinPerson.toString(), 200))
+            .when(apiClient).fetchGetResult(any(URI.class));
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
+        var responseBody = gatewayResponse.getBodyObject(Person.class);
+        var ninObject = extractNinObjectFromIdentifiers(responseBody).orElse(null);
+        verify(apiClient).fetchGetResult(any());
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(ninObject, equalTo(null));
     }
 
     private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {
@@ -270,6 +300,18 @@ public class FetchCristinPersonHandlerTest {
             .withQueryParameters(queryParams)
             .withPathParameters(pathParams)
             .build();
+    }
+
+    private GatewayResponse<Person> sendAuthorizedQuery() throws IOException {
+        var customerId = randomUri();
+        var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                        .withBody(null)
+                        .withPathParameters(VALID_PATH_PARAM)
+                        .withCustomerId(customerId)
+                        .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                        .build();
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
 }

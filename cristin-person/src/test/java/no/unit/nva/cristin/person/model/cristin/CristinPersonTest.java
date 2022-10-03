@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.model.cristin;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,7 +11,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.TypedValue;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +23,7 @@ public class CristinPersonTest {
         "cristinGetPersonResponse.json";
     private static final String NVA_API_GET_PERSON_JSON =
         "nvaApiGetPersonResponse.json";
+    private static final String SOME_NIN = "12345612345";
 
     @Test
     void shouldBuildCristinModelCorrectlyWhenParsingFromCristinJson() throws IOException {
@@ -44,6 +48,29 @@ public class CristinPersonTest {
         expectedNvaPerson.setContext(null);
 
         Person actualNvaPerson = cristinPerson.toPerson();
+
+        assertThat(actualNvaPerson, equalTo(expectedNvaPerson));
+    }
+
+    @Test
+    void shouldBuildNvaModelCorrectlyWhenConvertingCristinPersonToNvaPersonWithAuthorizedFields() throws IOException {
+        var cristinBody = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
+        var cristinPerson = fromJson(cristinBody, CristinPerson.class);
+        var nin = SOME_NIN;
+        cristinPerson.setNorwegianNationalId(nin);
+        cristinPerson.setReserved(true);
+        cristinPerson.setDetailedAffiliations(Collections.emptyList());
+
+        var nvaBody = getBodyFromResource(NVA_API_GET_PERSON_JSON);
+        var expectedNvaPerson = fromJson(nvaBody, Person.class);
+        var identifiers = expectedNvaPerson.getIdentifiers();
+        identifiers.add(new TypedValue(NATIONAL_IDENTITY_NUMBER, nin));
+        expectedNvaPerson.setIdentifiers(identifiers);
+        expectedNvaPerson.setReserved(true);
+        expectedNvaPerson.setEmployments(Collections.emptySet());
+        expectedNvaPerson.setContext(null);
+
+        var actualNvaPerson = cristinPerson.toPersonWithAuthorizedFields();
 
         assertThat(actualNvaPerson, equalTo(expectedNvaPerson));
     }

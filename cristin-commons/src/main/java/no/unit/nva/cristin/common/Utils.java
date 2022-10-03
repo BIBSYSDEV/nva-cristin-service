@@ -16,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import nva.commons.apigateway.exceptions.ForbiddenException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
@@ -29,10 +31,15 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public class Utils {
 
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+
     public static final String PUNCTUATION = ".";
     public static final String CAN_UPDATE_ANY_INSTITUTION = "any";
     public static final String COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER =
         "Could not retrieve user's cristin organization identifier";
+    public static final String INTERNAL_BACKEND_OR_APPLICATION_ADMINISTRATOR = "User is internal backend or "
+                                                                               + "application administrator";
+    public static final String USER_TOP_LEVEL_CRISTIN_ORGANIZATION = "User has top level cristin organization {}";
 
     /**
      * Check if a string supplied is a positive integer.
@@ -147,12 +154,14 @@ public class Utils {
     public static String extractCristinInstitutionIdentifier(RequestInfo requestInfo)
         throws BadRequestException, ForbiddenException {
         if (requestInfo.clientIsInternalBackend() || AccessUtils.requesterIsApplicationAdministrator(requestInfo)) {
+            logger.info(INTERNAL_BACKEND_OR_APPLICATION_ADMINISTRATOR);
             return CAN_UPDATE_ANY_INSTITUTION;
         }
         var institution = extractInstitution(requestInfo
                                                     .getTopLevelOrgCristinId()
                                                     .orElseThrow(Utils::failedToRetrieveTopLevelOrgCristinId));
         attempt(() -> Integer.valueOf(institution)).orElseThrow(fail -> failedToRetrieveTopLevelOrgCristinId());
+        logger.info(USER_TOP_LEVEL_CRISTIN_ORGANIZATION, institution);
         if (AccessUtils.requesterIsUserAdministrator(requestInfo)) {
             return institution;
         }

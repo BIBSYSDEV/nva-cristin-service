@@ -175,7 +175,7 @@ public class CristinPersonApiClient extends ApiClient {
         var startRequestTime = System.currentTimeMillis();
         var response = authorizedQueryPersons(requestQueryParameters);
         var cristinPersons = getEnrichedPersonsWithNinUsingQueryResponse(response);
-        var persons = mapCristinPersonsToNvaPersons(cristinPersons);
+        var persons = authorizedMappingCristinPersonsToNvaPersons(cristinPersons);
         var endRequestTime = System.currentTimeMillis();
         var id = createIdUriFromParams(requestQueryParameters, PERSON_PATH_NVA);
 
@@ -219,6 +219,10 @@ public class CristinPersonApiClient extends ApiClient {
         return cristinPersons.stream().map(CristinPerson::toPerson).collect(Collectors.toList());
     }
 
+    public List<Person> authorizedMappingCristinPersonsToNvaPersons(List<CristinPerson> cristinPersons) {
+        return cristinPersons.stream().map(CristinPerson::toPersonWithAuthorizedFields).collect(Collectors.toList());
+    }
+
     /**
      * Creates a Person object based on what is fetched from Cristin upstream.
      *
@@ -238,7 +242,7 @@ public class CristinPersonApiClient extends ApiClient {
      * @return Person object with person data from upstream
      */
     public Person authorizedGenerateGetResponse(String identifier) throws ApiGatewayException {
-        var person = getCristinPersonWithAuthentication(identifier).toPerson();
+        var person = getCristinPersonWithAuthentication(identifier).toPersonWithAuthorizedFields();
         person.setContext(PERSON_CONTEXT);
         return person;
     }
@@ -272,7 +276,7 @@ public class CristinPersonApiClient extends ApiClient {
         // Upstream uses a query for national id even though it only returns 1 hit
         var cristinPersons = queryUpstreamUsingIdentityNumber(nationalIdentificationNumber);
         throwNotFoundIfNoMatches(cristinPersons);
-        var person = enrichFirstMatchFromQueryResponse(cristinPersons).toPerson();
+        var person = enrichFirstMatchFromQueryResponse(cristinPersons).toPersonWithAuthorizedFields();
         person.setContext(PERSON_CONTEXT);
         return person;
     }

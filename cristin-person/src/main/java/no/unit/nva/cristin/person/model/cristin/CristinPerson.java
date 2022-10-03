@@ -165,7 +165,24 @@ public class CristinPerson implements JsonSerializable {
     public Person toPerson() {
         return new Person.Builder()
                    .withId(extractIdUri())
-                   .withIdentifiers(extractIdentifiers())
+                   .withIdentifiers(extractNonAuthorizedIdentifiers())
+                   .withNames(extractNames())
+                   .withContactDetails(extractContactDetails())
+                   .withImage(extractImage())
+                   .withAffiliations(extractAffiliations())
+                   .build();
+    }
+
+    /**
+     * Creates a Nva person model from a Cristin person model.
+     * This model has additional fields only available to authorized users.
+     *
+     * @return Nva person model.
+     */
+    public Person toPersonWithAuthorizedFields() {
+        return new Person.Builder()
+                   .withId(extractIdUri())
+                   .withIdentifiers(extractAuthorizedIdentifiers())
                    .withNames(extractNames())
                    .withContactDetails(extractContactDetails())
                    .withImage(extractImage())
@@ -173,6 +190,10 @@ public class CristinPerson implements JsonSerializable {
                    .withReserved(getReserved())
                    .withEmployments(extractEmployments())
                    .build();
+    }
+
+    private Set<TypedValue> extractAuthorizedIdentifiers() {
+        return addNinIfPresent(extractNonAuthorizedIdentifiers());
     }
 
     private ContactDetails extractContactDetails() {
@@ -184,13 +205,17 @@ public class CristinPerson implements JsonSerializable {
             .addChild(getCristinPersonId()).getUri();
     }
 
-    private Set<TypedValue> extractIdentifiers() {
+    private Set<TypedValue> extractNonAuthorizedIdentifiers() {
         Set<TypedValue> identifiers = new HashSet<>();
 
         identifiers.add(new TypedValue(CRISTIN_IDENTIFIER, getCristinPersonId()));
         getOrcid().flatMap(CristinOrcid::getId).ifPresent(orcid -> identifiers.add(new TypedValue(ORCID, orcid)));
-        getNorwegianNationalId().ifPresent(nin -> identifiers.add(new TypedValue(NATIONAL_IDENTITY_NUMBER, nin)));
 
+        return identifiers;
+    }
+
+    private Set<TypedValue> addNinIfPresent(Set<TypedValue> identifiers) {
+        getNorwegianNationalId().ifPresent(nin -> identifiers.add(new TypedValue(NATIONAL_IDENTITY_NUMBER, nin)));
         return identifiers;
     }
 
@@ -215,7 +240,7 @@ public class CristinPerson implements JsonSerializable {
 
     private Set<Employment> extractEmployments() {
         if (isNull(getDetailedAffiliations())) {
-            return null;
+            return Collections.emptySet();
         }
         return getDetailedAffiliations().stream()
                    .map(cristinEmployment -> cristinEmployment.toEmployment(getCristinPersonId()))
