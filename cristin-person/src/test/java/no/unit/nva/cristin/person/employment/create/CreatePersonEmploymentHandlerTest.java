@@ -34,6 +34,7 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.RequestInfoConstants;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
+import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,10 +45,10 @@ public class CreatePersonEmploymentHandlerTest {
     private static final String validJson =
         IoUtils.stringFromResources(Path.of("nvaApiCreateEmploymentRequest.json"));
     private static final String INVALID_URI = "https://example.org/hello";
+    private static final URI TOP_ORG_ID = UriWrapper.fromUri(randomUri()).addChild("185.90.0.0").getUri();
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
-    private CreatePersonEmploymentClient apiClient;
     private Context context;
     private ByteArrayOutputStream output;
     private CreatePersonEmploymentHandler handler;
@@ -55,7 +56,7 @@ public class CreatePersonEmploymentHandlerTest {
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 201));
-        apiClient = new CreatePersonEmploymentClient(httpClientMock);
+        var apiClient = new CreatePersonEmploymentClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new CreatePersonEmploymentHandler(apiClient, environment);
@@ -63,8 +64,8 @@ public class CreatePersonEmploymentHandlerTest {
 
     @Test
     void shouldReturnStatusCreatedWhenSendingValidPayload() throws IOException {
-        Employment employment = sampleEmployment();
-        GatewayResponse<Employment> gatewayResponse = sendQuery(validPath, employment);
+        var employment = sampleEmployment();
+        var gatewayResponse = sendQueryWithCristinOrgId(employment);
 
         assertEquals(HttpURLConnection.HTTP_CREATED, gatewayResponse.getStatusCode());
     }
@@ -75,7 +76,7 @@ public class CreatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
-        GatewayResponse<Employment> gatewayResponse = queryWithoutRequiredAccessRights();
+        var gatewayResponse = queryWithoutRequiredAccessRights();
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -101,9 +102,9 @@ public class CreatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenInvalidPositionCode() throws IOException, URISyntaxException {
-        Employment employment = OBJECT_MAPPER.readValue(validJson, Employment.class);
+        var employment = OBJECT_MAPPER.readValue(validJson, Employment.class);
         employment.setType(new URI(INVALID_URI));
-        GatewayResponse<Employment> gatewayResponse = sendQuery(validPath, employment);
+        var gatewayResponse = sendQuery(employment);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -112,9 +113,9 @@ public class CreatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenInvalidAffiliation() throws IOException, URISyntaxException {
-        Employment employment = OBJECT_MAPPER.readValue(validJson, Employment.class);
+        var employment = OBJECT_MAPPER.readValue(validJson, Employment.class);
         employment.setOrganization(new URI(INVALID_URI));
-        GatewayResponse<Employment> gatewayResponse = sendQuery(validPath, employment);
+        var gatewayResponse = sendQuery(employment);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -125,13 +126,13 @@ public class CreatePersonEmploymentHandlerTest {
         return String.valueOf(randomInteger());
     }
 
-    private GatewayResponse<Employment> sendQuery(Map<String, String> pathParam, Employment body) throws IOException {
-        InputStream input = createRequest(pathParam, body);
+    private GatewayResponse<Employment> sendQuery(Employment body) throws IOException {
+        var input = createRequest(body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Employment.class);
     }
 
-    private InputStream createRequest(Map<String, String> pathParam, Employment body)
+    private InputStream createRequest(Employment body)
         throws JsonProcessingException {
         var customerId = randomUri();
 
@@ -139,17 +140,30 @@ public class CreatePersonEmploymentHandlerTest {
             .withBody(body)
             .withCustomerId(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
-            .withPathParameters(pathParam)
+            .withPathParameters(validPath)
             .build();
     }
 
     private GatewayResponse<Employment> queryWithoutRequiredAccessRights() throws IOException {
-        InputStream input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
+        var input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
             .withBody(null)
             .withPathParameters(validPath)
             .build();
         handler.handleRequest(input, output, context);
 
+        return GatewayResponse.fromOutputStream(output, Employment.class);
+    }
+
+    private GatewayResponse<Employment> sendQueryWithCristinOrgId(Employment body) throws IOException {
+        var customerId = randomUri();
+        var input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
+                                .withBody(body)
+                                .withCustomerId(customerId)
+                                .withTopLevelCristinOrgId(TOP_ORG_ID)
+                                .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                                .withPathParameters(validPath)
+                                .build();
+        handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Employment.class);
     }
 }

@@ -34,6 +34,22 @@ public class UpdateCristinPersonApiClient extends PatchApiClient {
         return null;
     }
 
+    /**
+     * Updates a person in Cristin. Specifies client's Cristin organization consisting of first number sequence as
+     * param.
+     *
+     * @return An empty json if update was successful
+     * @throws ApiGatewayException if something went wrong that can be mapped to a client response
+     */
+    public Void updatePersonInCristin(String personId, ObjectNode request, String cristinInstitutionNumber)
+        throws ApiGatewayException {
+        URI uri = generateCristinUri(personId);
+        HttpResponse<String> response = patch(uri, request.toString(), cristinInstitutionNumber);
+        checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode());
+
+        return null;
+    }
+
     private URI generateCristinUri(String personId) {
         return  UriWrapper.fromUri(CRISTIN_API_URL).addChild(PERSON_PATH).addChild(personId).getUri();
     }

@@ -1,7 +1,10 @@
 package no.unit.nva.cristin.common;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.URI;
 import no.unit.nva.cristin.model.Constants;
+import no.unit.nva.utils.AccessUtils;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
@@ -12,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import nva.commons.apigateway.exceptions.ForbiddenException;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
@@ -26,6 +30,9 @@ import static nva.commons.core.attempt.Try.attempt;
 public class Utils {
 
     public static final String PUNCTUATION = ".";
+    public static final String CAN_UPDATE_ANY_INSTITUTION = "any";
+    public static final String COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER =
+        "Could not retrieve user's cristin organization identifier";
 
     /**
      * Check if a string supplied is a positive integer.
@@ -126,6 +133,39 @@ public class Utils {
     public static ObjectNode readJsonFromInput(String input) throws BadRequestException {
         return attempt(() -> (ObjectNode) OBJECT_MAPPER.readTree(input))
                    .orElseThrow(fail -> new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD));
+    }
+
+    /**
+     * Extracts institution string composed of digits from data stored in RequestInfo to be used as value in a header
+     * sent to upstream which describes which institution the user is allowed to change employments at.
+     *
+     * @param requestInfo information from request used to verify allowed permissions
+     * @return String with allowed institution to change. Or constant 'any' if application administrator
+     * @throws ForbiddenException if user it neither user administrator nor application administrator
+     * @throws BadRequestException if incapable of extracting institution number
+     */
+    public static String extractCristinInstitutionIdentifier(RequestInfo requestInfo)
+        throws BadRequestException, ForbiddenException {
+        if (requestInfo.clientIsInternalBackend() || AccessUtils.requesterIsApplicationAdministrator(requestInfo)) {
+            return CAN_UPDATE_ANY_INSTITUTION;
+        }
+        var institution = extractInstitution(requestInfo
+                                                    .getTopLevelOrgCristinId()
+                                                    .orElseThrow(Utils::failedToRetrieveTopLevelOrgCristinId));
+        attempt(() -> Integer.valueOf(institution)).orElseThrow(fail -> failedToRetrieveTopLevelOrgCristinId());
+        if (AccessUtils.requesterIsUserAdministrator(requestInfo)) {
+            return institution;
+        }
+        throw new ForbiddenException();
+    }
+
+    private static String extractInstitution(URI organization) {
+        var organizationIdentifier = UriUtils.extractLastPathElement(organization);
+        return Utils.removeUnitPartFromIdentifierIfPresent(organizationIdentifier);
+    }
+
+    private static BadRequestException failedToRetrieveTopLevelOrgCristinId() {
+        return new BadRequestException(COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER);
     }
 
 }

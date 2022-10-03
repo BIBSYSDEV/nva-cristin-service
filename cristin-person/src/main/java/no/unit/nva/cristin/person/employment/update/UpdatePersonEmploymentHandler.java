@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.employment.update;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
+import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.common.Utils.getValidEmploymentId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
@@ -49,7 +50,8 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
         String personId = getValidPersonId(requestInfo);
         String employmentId = getValidEmploymentId(requestInfo);
 
-        return apiClient.updatePersonEmploymentInCristin(personId, employmentId, cristinJson);
+        return apiClient.updatePersonEmploymentInCristin(personId, employmentId, cristinJson,
+                                                         extractCristinInstitutionIdentifier(requestInfo));
     }
 
     @Override

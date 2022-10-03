@@ -21,9 +21,11 @@ import java.net.HttpURLConnection;
 import java.util.List;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
+import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_EMPLOYMENTS;
 
 public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> {
 
@@ -55,7 +57,12 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
             ObjectNode cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
             checkHasFields(cristinJson);
 
-            return apiClient.updatePersonInCristin(personId, cristinJson);
+            if (cristinJson.has(CRISTIN_EMPLOYMENTS)) {
+                return apiClient.updatePersonInCristin(personId, cristinJson,
+                                                       extractCristinInstitutionIdentifier(requestInfo));
+            } else {
+                return apiClient.updatePersonInCristin(personId, cristinJson);
+            }
         } else if (clientCanUpdateOwnData(requestInfo)) {
             String personIdFromCognito = parseLastPartOfPersonCristinIdFromCognito(requestInfo).orElseThrow();
             checkIdentifiersMatch(personId, personIdFromCognito);

@@ -2,7 +2,6 @@ package no.unit.nva.cristin.person.employment.delete;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -13,6 +12,7 @@ import nva.commons.core.Environment;
 
 import java.net.HttpURLConnection;
 
+import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.common.Utils.getValidEmploymentId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 
@@ -20,6 +20,7 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
 
     private final transient DeletePersonEmploymentClient apiClient;
 
+    @SuppressWarnings("unused")
     public DeletePersonEmploymentHandler() {
         this(new DeletePersonEmploymentClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
@@ -45,7 +46,8 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
         validateHasAccessRights(requestInfo);
         String personId = getValidPersonId(requestInfo);
         String employmentId = getValidEmploymentId(requestInfo);
-        return apiClient.deletePersonEmployment(personId, employmentId);
+        return apiClient.deletePersonEmployment(personId, employmentId,
+                                                extractCristinInstitutionIdentifier(requestInfo));
     }
 
     /**
@@ -60,7 +62,7 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
         return HttpURLConnection.HTTP_NO_CONTENT;
     }
 
-    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException, UnauthorizedException {
+    private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {
         if (!AccessUtils.requesterIsUserAdministrator(requestInfo)) {
             throw new ForbiddenException();
         }
