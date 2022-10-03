@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static nva.commons.core.attempt.Try.attempt;
@@ -67,11 +68,12 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
         validateContainsRequiredIdentifiers(extractIdentifiers(input.getIdentifiers()));
         validateValidIdentificationNumber(extractIdentificationNumber(input.getIdentifiers()));
 
-        if (nonNull(input.getEmployments())) {
+        if (employmentsHasContent(input)) {
             AccessUtils.validateIdentificationNumberAccess(requestInfo);
             for (Employment employment : input.getEmployments()) {
                 CreatePersonEmploymentValidator.validate(employment);
             }
+            return apiClient.createPersonInCristin(input, extractCristinInstitutionIdentifier(requestInfo));
         }
 
         if (suppliedInputPersonNinDoesNotMatchClientOwn(input, requestInfo)) {
@@ -146,5 +148,10 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
             return !Objects.equals(extractIdentificationNumber(input.getIdentifiers()), clientOwnPersonNin.get());
         }
         return true;
+    }
+
+    private boolean employmentsHasContent(Person input) {
+        var employments = input.getEmployments();
+        return nonNull(employments) && !employments.isEmpty();
     }
 }

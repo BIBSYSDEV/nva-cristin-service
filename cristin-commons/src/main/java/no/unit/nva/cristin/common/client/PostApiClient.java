@@ -2,6 +2,7 @@ package no.unit.nva.cristin.common.client;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_INSTITUTION_HEADER;
 import com.google.common.net.MediaType;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -37,6 +38,22 @@ public class PostApiClient extends ApiClient {
             .header(CONTENT_TYPE, APPLICATION_JSON)
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .build();
+        return getSuccessfulResponseOrThrowException(httpRequest);
+    }
+
+    /**
+     * Initiate a synchronous POST to uri with supplied payload. Returns response from upstream.
+     * Accepts header for Cristin Institution allowed to update.
+     */
+    public HttpResponse<String> post(URI uri, String body, String cristinInstitutionNumber)
+        throws GatewayTimeoutException, FailedHttpRequestException {
+
+        var httpRequest = HttpRequest.newBuilder()
+                              .uri(uri)
+                              .header(CONTENT_TYPE, APPLICATION_JSON)
+                              .header(CRISTIN_INSTITUTION_HEADER, cristinInstitutionNumber)
+                              .POST(HttpRequest.BodyPublishers.ofString(body))
+                              .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 

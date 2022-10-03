@@ -3,6 +3,7 @@ package no.unit.nva.cristin.common.client;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_INSTITUTION_HEADER;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -33,6 +34,22 @@ public class PatchApiClient extends ApiClient {
             .header(CONTENT_TYPE, APPLICATION_MERGE_PATCH_JSON)
             .method(HTTP_METHOD_PATCH, HttpRequest.BodyPublishers.ofString(body))
             .build();
+        return getSuccessfulResponseOrThrowException(httpRequest);
+    }
+
+    /**
+     * Initiate a synchronous PATCH to uri with supplied payload. Returns response from upstream.
+     * Accepts header for Cristin Institution allowed to update.
+     */
+    public HttpResponse<String> patch(URI uri, String body, String cristinInstitutionNumber)
+        throws GatewayTimeoutException, FailedHttpRequestException {
+
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                                      .uri(uri)
+                                      .header(CONTENT_TYPE, APPLICATION_MERGE_PATCH_JSON)
+                                      .header(CRISTIN_INSTITUTION_HEADER, cristinInstitutionNumber)
+                                      .method(HTTP_METHOD_PATCH, HttpRequest.BodyPublishers.ofString(body))
+                                      .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 

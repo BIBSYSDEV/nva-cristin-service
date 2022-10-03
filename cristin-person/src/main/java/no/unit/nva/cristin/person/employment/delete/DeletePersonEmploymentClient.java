@@ -13,6 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_INSTITUTION_HEADER;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.person.employment.Constants.EMPLOYMENT_PATH_CRISTIN;
 
@@ -32,12 +33,14 @@ public class DeletePersonEmploymentClient extends ApiClient {
      * Deletes a identified persons specified employment.
      * @param personId identification of person
      * @param employmentId identification of employment
+     * @param cristinInstitutionNumber first number sequence of a Cristin organization identifier
      * @return empty response if successful
      * @throws ApiGatewayException when service encounters problems or user is not authorized.
      */
-    public Void deletePersonEmployment(String personId, String employmentId) throws ApiGatewayException {
+    public Void deletePersonEmployment(String personId, String employmentId, String cristinInstitutionNumber)
+        throws ApiGatewayException {
         URI cristinUri = generateCristinUri(personId, employmentId);
-        HttpResponse<String> response = deleteResults(cristinUri);
+        HttpResponse<String> response = deleteResults(cristinUri, cristinInstitutionNumber);
         checkResponse(response.statusCode());
         return null;
     }
@@ -60,8 +63,11 @@ public class DeletePersonEmploymentClient extends ApiClient {
         }
     }
 
-    private HttpResponse<String> deleteResults(URI uri) throws ApiGatewayException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(uri).DELETE().build();
+    private HttpResponse<String> deleteResults(URI uri, String cristinInstitutionNumber) throws ApiGatewayException {
+        HttpRequest httpRequest = HttpRequest.newBuilder(uri)
+                                      .header(CRISTIN_INSTITUTION_HEADER, cristinInstitutionNumber)
+                                      .DELETE()
+                                      .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 }

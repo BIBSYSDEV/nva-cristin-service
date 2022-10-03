@@ -45,7 +45,7 @@ public class AccessUtils {
     public static final String COGNITO_AUTHENTICATION_DOMAIN = "COGNITO_AUTHENTICATION_DOMAIN";
     public static final String COGNITO_TOKEN_ENDPOINT = "oauth2/token";
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
-
+    public static final String ADMINISTRATE_APPLICATION = "ADMINISTRATE_APPLICATION";
 
     /**
      * Validate if Requester is authorized to use IdentificationNumber to access a user.
@@ -85,6 +85,16 @@ public class AccessUtils {
      */
     public static boolean requesterIsUserAdministrator(RequestInfo requestInfo) {
         return requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS) || requestInfo.clientIsInternalBackend();
+    }
+
+    /**
+     * Checks if the requester is permitted to act as an application administrator.
+     *
+     * @param requestInfo information from request used to verify allowed permissions
+     * @return true if application administrator otherwise false
+     */
+    public static boolean requesterIsApplicationAdministrator(RequestInfo requestInfo) {
+        return requestInfo.userIsAuthorized(ADMINISTRATE_APPLICATION);
     }
 
     private static boolean requesterHasNoAccessRightToUseNationalIdentificationNumber(RequestInfo requestInfo) {
