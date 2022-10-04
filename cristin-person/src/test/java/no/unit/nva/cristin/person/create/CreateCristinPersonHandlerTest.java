@@ -22,7 +22,6 @@ import static no.unit.nva.cristin.person.model.nva.Person.mapEmploymentsToCristi
 import static no.unit.nva.testutils.RandomDataGenerator.randomBoolean;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.ADMINISTRATE_APPLICATION;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.apigateway.RequestInfoConstants.BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE;
@@ -305,17 +304,6 @@ public class CreateCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldBeAllowedToCreateEmploymentsAtAllInstitutionsWhenIsApplicationAdministrator() throws IOException {
-        var dummyPerson = dummyPerson();
-        var dummyEmployment = randomEmployment();
-        dummyEmployment.setOrganization(URI.create(ANOTHER_ORGANIZATION));
-        dummyPerson.setEmployments(Set.of(dummyEmployment));
-        final var gatewayResponse = sendQueryWhileActingAsApplicationAdministrator(dummyPerson);
-
-        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
-    }
-
-    @Test
     void shouldAllowEmptyListOfEmploymentsWhenUserActingAsThemselvesTryToCreateTheirOwnUser() throws IOException {
         var personsOwnNin = ANOTHER_IDENTITY_NUMBER;
         var input = injectPersonNinIntoInput(personsOwnNin);
@@ -453,23 +441,6 @@ public class CreateCristinPersonHandlerTest {
                    .withBody(body)
                    .withCustomerId(customerId)
                    .withScope(BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE)
-                   .build();
-    }
-
-    private GatewayResponse<Person> sendQueryWhileActingAsApplicationAdministrator(Person body)
-        throws IOException {
-        var input = requestWithBodyActingAsApplicationAdministrator(body);
-        handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output, Person.class);
-    }
-
-    private InputStream requestWithBodyActingAsApplicationAdministrator(Person body)
-        throws JsonProcessingException {
-        var customerId = randomUri();
-        return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
-                   .withBody(body)
-                   .withCustomerId(customerId)
-                   .withAccessRights(customerId, ADMINISTRATE_APPLICATION, EDIT_OWN_INSTITUTION_USERS)
                    .build();
     }
 }

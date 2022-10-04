@@ -87,16 +87,6 @@ public class AccessUtils {
         return requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS) || requestInfo.clientIsInternalBackend();
     }
 
-    /**
-     * Checks if the requester is permitted to act as an application administrator.
-     *
-     * @param requestInfo information from request used to verify allowed permissions
-     * @return true if application administrator otherwise false
-     */
-    public static boolean requesterIsApplicationAdministrator(RequestInfo requestInfo) {
-        return requestInfo.userIsAuthorized(ADMINISTRATE_APPLICATION);
-    }
-
     private static boolean requesterHasNoAccessRightToUseNationalIdentificationNumber(RequestInfo requestInfo) {
         return !(requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS) || requestInfo.clientIsInternalBackend());
     }

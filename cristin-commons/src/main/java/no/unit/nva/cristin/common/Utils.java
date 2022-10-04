@@ -37,8 +37,7 @@ public class Utils {
     public static final String CAN_UPDATE_ANY_INSTITUTION = "any";
     public static final String COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER =
         "Could not retrieve user's cristin organization identifier";
-    public static final String INTERNAL_BACKEND_OR_APPLICATION_ADMINISTRATOR = "User is internal backend or "
-                                                                               + "application administrator";
+    public static final String USER_IS_INTERNAL_BACKEND = "User is internal backend";
     public static final String USER_TOP_LEVEL_CRISTIN_ORGANIZATION = "User has top level cristin organization {}";
 
     /**
@@ -147,14 +146,14 @@ public class Utils {
      * sent to upstream which describes which institution the user is allowed to change employments at.
      *
      * @param requestInfo information from request used to verify allowed permissions
-     * @return String with allowed institution to change. Or constant 'any' if application administrator
-     * @throws ForbiddenException if user it neither user administrator nor application administrator
+     * @return String with allowed institution to change. Or constant 'any' if internal backend with full access
+     * @throws ForbiddenException if user it neither user administrator nor internal backend
      * @throws BadRequestException if incapable of extracting institution number
      */
     public static String extractCristinInstitutionIdentifier(RequestInfo requestInfo)
         throws BadRequestException, ForbiddenException {
-        if (requestInfo.clientIsInternalBackend() || AccessUtils.requesterIsApplicationAdministrator(requestInfo)) {
-            logger.info(INTERNAL_BACKEND_OR_APPLICATION_ADMINISTRATOR);
+        if (requestInfo.clientIsInternalBackend()) {
+            logger.info(USER_IS_INTERNAL_BACKEND);
             return CAN_UPDATE_ANY_INSTITUTION;
         }
         var institution = extractInstitution(requestInfo

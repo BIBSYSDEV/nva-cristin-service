@@ -266,17 +266,6 @@ public class UpdateCristinPersonHandlerTest {
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
-    @Test
-    void shouldAllowAnyEmploymentWhenBothAppAdminAndInstAdmin() throws IOException {
-        Employment employment = randomEmployment();
-        var node = OBJECT_MAPPER.readTree(employment.toString());
-        var jsonObject = OBJECT_MAPPER.createObjectNode();
-        jsonObject.putArray(EMPLOYMENTS).add(node);
-        var gatewayResponse = sendQueryWithAppAndInstAdminRights(jsonObject.toString());
-
-        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
-    }
-
     private URI getDummyOrgUri() {
         return UriWrapper.fromUri(randomUri()).addChild(SOME_ORGANIZATION).getUri();
     }
@@ -284,13 +273,6 @@ public class UpdateCristinPersonHandlerTest {
     private GatewayResponse<Void> sendQueryAsInstAdminWithSomeOrgId(String body, URI orgId) throws IOException {
         InputStream input = createRequest(body, null, orgId, EDIT_OWN_INSTITUTION_USERS,
                                           ADMINISTRATE_APPLICATION);
-        handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output, Void.class);
-    }
-
-    private GatewayResponse<Void> sendQueryWithAppAndInstAdminRights(String body) throws IOException {
-        InputStream input = createRequest(body, null, null, ADMINISTRATE_APPLICATION,
-                                          EDIT_OWN_INSTITUTION_USERS);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
