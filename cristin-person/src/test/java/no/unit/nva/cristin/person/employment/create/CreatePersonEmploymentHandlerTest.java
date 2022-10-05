@@ -1,11 +1,14 @@
 package no.unit.nva.cristin.person.employment.create;
 
+import static java.net.HttpURLConnection.HTTP_CREATED;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static no.unit.nva.utils.AccessUtils.ADMINISTRATE_APPLICATION;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -122,6 +125,14 @@ public class CreatePersonEmploymentHandlerTest {
         assertThat(gatewayResponse.getBody(), containsString(ErrorMessages.invalidFieldParameterMessage(ORGANIZATION)));
     }
 
+    @Test
+    void shouldBeAllowedToCreateEmploymentAtAllInstitutionsWhenIsApplicationAdministrator() throws IOException {
+        var dummyEmployment = randomEmployment();
+        var gatewayResponse = queryAsAppAdmin(dummyEmployment);
+
+        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
+    }
+
     private static String randomIntegerAsString() {
         return String.valueOf(randomInteger());
     }
@@ -163,6 +174,19 @@ public class CreatePersonEmploymentHandlerTest {
                                 .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
                                 .withPathParameters(validPath)
                                 .build();
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Employment.class);
+    }
+
+    private GatewayResponse<Employment> queryAsAppAdmin(Employment body)
+        throws IOException {
+        var customerId = randomUri();
+        var input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
+                        .withBody(body)
+                        .withCustomerId(customerId)
+                        .withAccessRights(customerId, ADMINISTRATE_APPLICATION)
+                        .withPathParameters(validPath)
+                        .build();
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Employment.class);
     }
