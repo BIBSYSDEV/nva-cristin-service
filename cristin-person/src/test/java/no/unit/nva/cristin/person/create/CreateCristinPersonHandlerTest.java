@@ -42,6 +42,7 @@ import com.google.common.net.HttpHeaders;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.Collections;
@@ -61,6 +62,7 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.paths.UriWrapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -77,6 +79,8 @@ public class CreateCristinPersonHandlerTest {
     private static final String ANOTHER_ORGANIZATION =
         "https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0";
     private static final String ONE_ORGANIZATION = "https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0";
+    private static final String LOG_MESSAGE_FOR_IDENTIFIERS = "Client has Cristin identifier 123456 from organization "
+                                                             + "20754.0.0.0";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -318,8 +322,13 @@ public class CreateCristinPersonHandlerTest {
 
     @Test
     void shouldLogClientSpecificIdentifiersWhenDoingAuthorizedRequests() throws IOException {
+        final var standardOut = System.out;
+        final var outputStreamCaptor = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStreamCaptor));
         var response = sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
+        System.setOut(standardOut);
 
+        assertThat(outputStreamCaptor.toString(), Matchers.containsString(LOG_MESSAGE_FOR_IDENTIFIERS));
         assertEquals(HTTP_CREATED, response.getStatusCode());
     }
 
