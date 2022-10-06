@@ -60,6 +60,7 @@ import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -315,6 +316,13 @@ public class CreateCristinPersonHandlerTest {
         assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
     }
 
+    @Test
+    void shouldLogClientSpecificIdentifiersWhenDoingAuthorizedRequests() throws IOException {
+        var response = sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
+
+        assertEquals(HTTP_CREATED, response.getStatusCode());
+    }
+
     private CristinAffiliation randomCristinAffiliation() {
         var cristinAffiliation = new CristinAffiliation();
         cristinAffiliation.setActive(randomBoolean());
@@ -442,5 +450,19 @@ public class CreateCristinPersonHandlerTest {
                    .withCustomerId(customerId)
                    .withScope(BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE)
                    .build();
+    }
+
+    private GatewayResponse<Person> sendQueryWhileMockingIdentifiersUsedForLogging(Person body)
+        throws IOException {
+        var customerId = randomUri();
+        var input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
+                        .withBody(body)
+                        .withCustomerId(customerId)
+                        .withPersonCristinId(UriWrapper.fromUri(randomUri()).addChild(DUMMY_CRISTIN_ID).getUri())
+                        .withTopLevelCristinOrgId(UriWrapper.fromUri(ONE_ORGANIZATION).getUri())
+                        .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                        .build();
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Person.class);
     }
 }
