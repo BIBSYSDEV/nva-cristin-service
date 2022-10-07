@@ -16,16 +16,22 @@ import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
+    private static final Logger logger = LoggerFactory.getLogger(QueryCristinPersonHandler.class);
 
     private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(NAME, ORGANIZATION,  PAGE, NUMBER_OF_RESULTS);
     private final transient CristinPersonApiClient apiClient;
@@ -89,6 +95,7 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
                                                                Map<String, String> requestQueryParams)
         throws ApiGatewayException {
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
         return apiClient.authorizedGenerateQueryResponse(requestQueryParams);
     }
 

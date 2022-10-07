@@ -15,13 +15,20 @@ import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 
 @JacocoGenerated
 public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
+
+    private static final Logger logger = LoggerFactory.getLogger(FetchFromIdentityNumberHandler.class);
 
     public static final String NIN_TYPE = "NationalIdentificationNumber";
 
@@ -49,6 +56,8 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
         validateQueryParameters(requestInfo);
         validateInput(input);
+
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
         return apiClient.getPersonFromNationalIdentityNumber(input.getValue());
     }
