@@ -2,12 +2,10 @@ package no.unit.nva.cristin.person.update;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import java.net.URI;
 import java.util.Optional;
 import no.unit.nva.cristin.common.ErrorMessages;
-import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -92,20 +90,20 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnNoContentResponseWhenCallingHandlerWithValidJson() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(ORCID, VALID_ORCID);
         jsonObject.put(FIRST_NAME, randomString());
         jsonObject.put(PREFERRED_FIRST_NAME, randomString());
         jsonObject.putNull(PREFERRED_LAST_NAME);
 
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
     @Test
     void shouldThrowUnauthorizedExceptionWhenClientIsNotAuthenticated() throws IOException {
-        GatewayResponse<Void> gatewayResponse = queryWithoutRequiredAccessRights();
+        var gatewayResponse = queryWithoutRequiredAccessRights();
 
         assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -113,7 +111,7 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenSendingNullBody() throws IOException {
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, null);
+        var gatewayResponse = sendQuery(validPath, null);
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PAYLOAD));
@@ -121,20 +119,20 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnOkNoContentWhenOrcidIsPresentAndNull() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.putNull(ORCID);
 
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
     @Test
     void shouldReturnBadRequestWhenOrcidHasInvalidValue() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(ORCID, INVALID_ORCID);
 
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ORCID_IS_NOT_VALID));
@@ -142,10 +140,10 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenPrimaryNameIsNull() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.putNull(FIRST_NAME);
 
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(String.format(FIELD_CAN_NOT_BE_ERASED, FIRST_NAME)));
@@ -153,10 +151,10 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenReservedIsNotBoolean() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(RESERVED, SOME_TEXT);
 
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(RESERVED_MUST_BE_BOOLEAN));
@@ -164,10 +162,10 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenNoSupportedFieldsArePresent() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(UNSUPPORTED_FIELD, randomString());
 
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));
@@ -175,11 +173,11 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenInvalidIdentifier() throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(ORCID, VALID_ORCID);
 
-        GatewayResponse<Void> gatewayResponse = sendQuery(Map.of(PERSON_ID, INVALID_IDENTIFIER),
-            jsonObject.toString());
+        var gatewayResponse = sendQuery(Map.of(PERSON_ID, INVALID_IDENTIFIER),
+                                        jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ErrorMessages.invalidPathParameterMessage(PERSON_ID)));
@@ -188,9 +186,9 @@ public class UpdateCristinPersonHandlerTest {
     @Test
     void shouldReturnNoContentResponseWhenUserIsUpdatingTheirOwnPersonDataThatTheyAreAllowedToUpdate()
         throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(ORCID, VALID_ORCID);
-        GatewayResponse<Void> gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath,
+        var gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath,
                                                                                           jsonObject.toString());
 
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
@@ -199,13 +197,13 @@ public class UpdateCristinPersonHandlerTest {
     @Test
     void shouldThrowBadRequestWhenUsersWantToUpdateTheirOwnPersonDataButSendsFieldsTheyAreNotAllowedToUpdate()
         throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(FIRST_NAME, randomString());
         jsonObject.put(LAST_NAME, randomString());
         jsonObject.put(PREFERRED_FIRST_NAME, randomString());
         jsonObject.putNull(PREFERRED_LAST_NAME);
         jsonObject.put(RESERVED, true);
-        GatewayResponse<Void> gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath,
+        var gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath,
                                                                                           jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
@@ -215,9 +213,9 @@ public class UpdateCristinPersonHandlerTest {
     @Test
     void shouldThrowBadRequestWhenPathPersonIdentifierNotMatchingCognitoPersonIdentifier()
         throws IOException {
-        ObjectNode jsonObject = OBJECT_MAPPER.createObjectNode();
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(ORCID, VALID_ORCID);
-        GatewayResponse<Void> gatewayResponse =
+        var gatewayResponse =
             queryWithPersonCristinIdButNoAccessRights(Map.of(PERSON_ID, IDENTIFIER_NOT_MATCHING_COGNITO),
                                                       jsonObject.toString());
 
@@ -249,7 +247,7 @@ public class UpdateCristinPersonHandlerTest {
     @Test
     void shouldAllowValidEmploymentDataWhenInstAdminAndHasAnyCristinOrgIdAsValidationIsDoneUpstream()
         throws IOException {
-        Employment employment = randomEmployment();
+        var employment = randomEmployment();
         var node = OBJECT_MAPPER.readTree(employment.toString());
         var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.putArray(EMPLOYMENTS).add(node);
@@ -261,7 +259,7 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldAllowAnyEmploymentsWhenInternalBackend() throws IOException {
-        Employment employment = randomEmployment();
+        var employment = randomEmployment();
         var node = OBJECT_MAPPER.readTree(employment.toString());
         var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.putArray(EMPLOYMENTS).add(node);
@@ -278,7 +276,7 @@ public class UpdateCristinPersonHandlerTest {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseBody, 400));
         apiClient = new UpdateCristinPersonApiClient(httpClientMock);
         handler = new UpdateCristinPersonHandler(apiClient, environment);
-        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        var input = OBJECT_MAPPER.createObjectNode();
         input.put(FIRST_NAME, randomString());
         var gatewayResponse = sendQueryReturningProblemJson(input.toString());
         var actual = gatewayResponse.getBodyObject(Problem.class).getDetail();
@@ -291,26 +289,26 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     private GatewayResponse<Void> sendQueryAsInstAdminWithSomeOrgId(String body, URI orgId) throws IOException {
-        InputStream input = createRequest(body, null, orgId, EDIT_OWN_INSTITUTION_USERS,
+        var input = createRequest(body, null, orgId, EDIT_OWN_INSTITUTION_USERS,
                                           ADMINISTRATE_APPLICATION);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
     private GatewayResponse<Void> sendQueryAsInternalBackend(String body) throws IOException {
-        InputStream input = createRequest(body, BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE, null);
+        var input = createRequest(body, BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE, null);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
     private GatewayResponse<Void> sendQuery(Map<String, String> pathParam, String body) throws IOException {
-        InputStream input = createRequest(pathParam, body);
+        var input = createRequest(pathParam, body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
     private GatewayResponse<Problem> sendQueryReturningProblemJson(String body) throws IOException {
-        InputStream input = createRequest(validPath, body);
+        var input = createRequest(validPath, body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Problem.class);
     }
@@ -341,7 +339,7 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     private GatewayResponse<Void> queryWithoutRequiredAccessRights() throws IOException {
-        InputStream input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+        var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
             .withBody(EMPTY_JSON)
             .withPathParameters(validPath)
             .build();
@@ -352,7 +350,7 @@ public class UpdateCristinPersonHandlerTest {
 
     private GatewayResponse<Void> queryWithPersonCristinIdButNoAccessRights(Map<String, String> pathParameters,
                                                                             String body) throws IOException {
-        InputStream input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+        var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                                 .withBody(body)
                                 .withPathParameters(pathParameters)
                                 .withPersonCristinId(PERSON_CRISTIN_ID_URI)
