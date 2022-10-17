@@ -22,12 +22,14 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.util.Map;
+import org.zalando.problem.Problem;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
+import static no.unit.nva.cristin.common.client.PatchApiClient.UPSTREAM_BAD_REQUEST_RESPONSE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
@@ -51,6 +53,7 @@ import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.apigateway.RequestInfoConstants.BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -76,11 +79,12 @@ public class UpdateCristinPersonHandlerTest {
     private Context context;
     private ByteArrayOutputStream output;
     private UpdateCristinPersonHandler handler;
+    private UpdateCristinPersonApiClient apiClient;
 
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
-        UpdateCristinPersonApiClient apiClient = new UpdateCristinPersonApiClient(httpClientMock);
+        apiClient = new UpdateCristinPersonApiClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new UpdateCristinPersonHandler(apiClient, environment);
@@ -266,6 +270,22 @@ public class UpdateCristinPersonHandlerTest {
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
+    @Test
+    void shouldReturnResponseBodyFromUpstreamToClientWhenUpstreamReturnsBadRequest()
+        throws IOException, InterruptedException {
+
+        var responseBody = "This is a bad request";
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseBody, 400));
+        apiClient = new UpdateCristinPersonApiClient(httpClientMock);
+        handler = new UpdateCristinPersonHandler(apiClient, environment);
+        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        input.put(FIRST_NAME, randomString());
+        var gatewayResponse = sendQueryReturningProblemJson(input.toString());
+        var actual = gatewayResponse.getBodyObject(Problem.class).getDetail();
+
+        assertThat(actual, equalTo(UPSTREAM_BAD_REQUEST_RESPONSE + responseBody));
+    }
+
     private URI getDummyOrgUri() {
         return UriWrapper.fromUri(randomUri()).addChild(SOME_ORGANIZATION).getUri();
     }
@@ -287,6 +307,12 @@ public class UpdateCristinPersonHandlerTest {
         InputStream input = createRequest(pathParam, body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
+    }
+
+    private GatewayResponse<Problem> sendQueryReturningProblemJson(String body) throws IOException {
+        InputStream input = createRequest(validPath, body);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Problem.class);
     }
 
     private InputStream createRequest(String body, String scope, URI orgId,

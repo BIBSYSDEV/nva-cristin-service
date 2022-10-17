@@ -43,7 +43,7 @@ public class UpdateCristinApiClient extends PatchApiClient {
     public Void updateProjectInCristin(String projectId, ObjectNode cristinJson) throws ApiGatewayException {
         URI uri = generateCristinUri(projectId);
         HttpResponse<String> response = patch(uri, cristinJson.toString());
-        checkPatchHttpStatusCode(generateIdUri(projectId), response.statusCode());
+        checkPatchHttpStatusCode(generateIdUri(projectId), response.statusCode(), response.body());
         return null;
     }
 
