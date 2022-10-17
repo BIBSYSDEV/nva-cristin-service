@@ -2,6 +2,7 @@ package no.unit.nva.cristin.common.client;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_BAD_REQUEST_RESPONSE;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_INSTITUTION_HEADER;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -17,7 +18,6 @@ public class PatchApiClient extends ApiClient {
     public static final String EMPTY_JSON = "{}";
     public static final String HTTP_METHOD_PATCH = "PATCH";
     public static final String APPLICATION_MERGE_PATCH_JSON = "application/merge-patch+json";
-    public static final String UPSTREAM_BAD_REQUEST_RESPONSE = "Upstream returned 400 with response body: ";
 
     public PatchApiClient(HttpClient client) {
         super(client);
