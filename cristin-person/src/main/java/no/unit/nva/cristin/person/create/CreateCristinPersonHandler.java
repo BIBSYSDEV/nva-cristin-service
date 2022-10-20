@@ -24,15 +24,22 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person> {
+
+    private static final Logger logger = LoggerFactory.getLogger(CreateCristinPersonHandler.class);
 
     public static final String ERROR_MESSAGE_IDENTIFIER_NOT_VALID =
         String.format("%s is not valid", NATIONAL_IDENTITY_NUMBER);
@@ -67,6 +74,8 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
         validateNoDuplicateNationalIdentifiers(input.getIdentifiers());
         validateContainsRequiredIdentifiers(extractIdentifiers(input.getIdentifiers()));
         validateValidIdentificationNumber(extractIdentificationNumber(input.getIdentifiers()));
+
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
         if (employmentsHasContent(input)) {
             AccessUtils.validateIdentificationNumberAccess(requestInfo);

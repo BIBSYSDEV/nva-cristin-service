@@ -32,7 +32,7 @@ public class CreateCristinProjectApiClient extends PostApiClient {
         var payload = generatePayloadFromRequest(nvaProject);
         var uri = getCristinProjectPostUri();
         var response = post(uri, payload);
-        checkPostHttpStatusCode(getNvaApiUri(PROJECT_PATH_NVA), response.statusCode());
+        checkPostHttpStatusCode(getNvaApiUri(PROJECT_PATH_NVA), response.statusCode(), response.body());
         return createProjectFromResponse(response);
     }
 

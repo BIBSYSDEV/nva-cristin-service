@@ -2,7 +2,7 @@ package no.unit.nva.cristin.common.client;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
+import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_BAD_REQUEST_RESPONSE;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_INSTITUTION_HEADER;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -56,12 +56,12 @@ public class PatchApiClient extends ApiClient {
     /**
      * Checks for PATCH http error codes and also the regular error codes. Throws exception on error
      */
-    protected void checkPatchHttpStatusCode(URI uri, int statusCode) throws ApiGatewayException {
+    protected void checkPatchHttpStatusCode(URI uri, int statusCode, String body) throws ApiGatewayException {
         if (isSuccessful(statusCode)) {
             return;
         }
         if (statusCode == HTTP_BAD_REQUEST) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
+            throw new BadRequestException(UPSTREAM_BAD_REQUEST_RESPONSE + body);
         }
         checkHttpStatusCode(uri, statusCode);
     }

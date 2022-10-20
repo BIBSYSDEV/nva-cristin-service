@@ -30,7 +30,7 @@ public class CreateCristinPersonApiClient extends PostApiClient {
         String payload = generatePayloadFromRequest(person);
         URI uri = getCristinPersonPostUri();
         HttpResponse<String> response = post(uri, payload);
-        checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode());
+        checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode(), response.body());
 
         return createPersonFromResponse(response);
     }
@@ -42,7 +42,7 @@ public class CreateCristinPersonApiClient extends PostApiClient {
         String payload = generatePayloadFromRequest(person);
         URI uri = getCristinPersonPostUri();
         HttpResponse<String> response = post(uri, payload, cristinInstitutionNumber);
-        checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode());
+        checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode(), response.body());
 
         return createPersonFromResponse(response);
     }

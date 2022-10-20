@@ -4,6 +4,9 @@ import static no.unit.nva.cristin.common.Utils.CAN_UPDATE_ANY_INSTITUTION;
 import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
@@ -18,8 +21,12 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment, Employment> {
+
+    private static final Logger logger = LoggerFactory.getLogger(CreatePersonEmploymentHandler.class);
 
     private final transient CreatePersonEmploymentClient apiClient;
 
@@ -40,6 +47,8 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
         throws ApiGatewayException {
 
         validateHasAccessRights(requestInfo);
+
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
         CreatePersonEmploymentValidator.validate(input);
         var identifier = getValidPersonId(requestInfo);

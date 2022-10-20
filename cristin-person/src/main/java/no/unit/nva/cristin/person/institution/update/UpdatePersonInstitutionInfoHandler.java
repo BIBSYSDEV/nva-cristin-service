@@ -12,13 +12,20 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.common.Utils.getValidOrgId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 
 public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHandler<PersonInstInfoPatch, String> {
+
+    private static final Logger logger = LoggerFactory.getLogger(UpdatePersonInstitutionInfoHandler.class);
 
     private final transient UpdatePersonInstitutionInfoClient apiClient;
 
@@ -39,6 +46,8 @@ public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHan
         throws ApiGatewayException {
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
+
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
         validateNotEmpty(input);
         validateQueryParameters(requestInfo);

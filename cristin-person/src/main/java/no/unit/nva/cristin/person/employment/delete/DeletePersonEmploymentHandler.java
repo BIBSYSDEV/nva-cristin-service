@@ -11,12 +11,19 @@ import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 
 import java.net.HttpURLConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.common.Utils.getValidEmploymentId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 
 public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void> {
+
+    private static final Logger logger = LoggerFactory.getLogger(DeletePersonEmploymentHandler.class);
 
     private final transient DeletePersonEmploymentClient apiClient;
 
@@ -44,6 +51,7 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
     @Override
     protected Void processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         validateHasAccessRights(requestInfo);
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
         String personId = getValidPersonId(requestInfo);
         String employmentId = getValidEmploymentId(requestInfo);
         return apiClient.deletePersonEmployment(personId, employmentId,

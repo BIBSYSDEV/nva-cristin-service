@@ -29,7 +29,7 @@ public class UpdateCristinPersonApiClient extends PatchApiClient {
     public Void updatePersonInCristin(String personId, ObjectNode request) throws ApiGatewayException {
         URI uri = generateCristinUri(personId);
         HttpResponse<String> response = patch(uri, request.toString());
-        checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode());
+        checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode(), response.body());
 
         return null;
     }
@@ -45,7 +45,7 @@ public class UpdateCristinPersonApiClient extends PatchApiClient {
         throws ApiGatewayException {
         URI uri = generateCristinUri(personId);
         HttpResponse<String> response = patch(uri, request.toString(), cristinInstitutionNumber);
-        checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode());
+        checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode(), response.body());
 
         return null;
     }

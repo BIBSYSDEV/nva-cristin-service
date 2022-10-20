@@ -19,6 +19,8 @@ import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
@@ -26,8 +28,13 @@ import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_EMPLOYMENTS;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 
 public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> {
+
+    private static final Logger logger = LoggerFactory.getLogger(UpdateCristinPersonHandler.class);
 
     public static final String ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH = "Identifier from path does not match "
                                                                         + "identifier from user info";
@@ -48,6 +55,8 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
     protected Void processInput(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
 
         validateHasAccessRights(requestInfo);
+
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
         ObjectNode objectNode = readJsonFromInput(input);
         String personId = getValidPersonId(requestInfo);

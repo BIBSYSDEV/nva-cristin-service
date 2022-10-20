@@ -6,6 +6,9 @@ import static no.unit.nva.cristin.common.Utils.getValidEmploymentId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
@@ -19,8 +22,12 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Void> {
+
+    private static final Logger logger = LoggerFactory.getLogger(UpdatePersonEmploymentHandler.class);
 
     private final transient UpdatePersonEmploymentClient apiClient;
 
@@ -49,6 +56,8 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
 
         String personId = getValidPersonId(requestInfo);
         String employmentId = getValidEmploymentId(requestInfo);
+
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
         return apiClient.updatePersonEmploymentInCristin(personId, employmentId, cristinJson,
                                                          extractCristinInstitutionIdentifier(requestInfo));

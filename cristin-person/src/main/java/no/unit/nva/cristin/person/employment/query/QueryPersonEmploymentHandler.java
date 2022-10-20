@@ -14,11 +14,18 @@ import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 
 public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, SearchResponse<Employment>> {
+
+    private static final Logger logger = LoggerFactory.getLogger(QueryPersonEmploymentHandler.class);
 
     private final transient QueryPersonEmploymentClient apiClient;
 
@@ -38,7 +45,7 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Search
         throws ApiGatewayException {
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
-
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
         String identifier = getValidPersonId(requestInfo);
 
         return apiClient.generateQueryResponse(identifier);

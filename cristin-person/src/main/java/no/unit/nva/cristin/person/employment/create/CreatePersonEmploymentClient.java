@@ -40,7 +40,7 @@ public class CreatePersonEmploymentClient extends PostApiClient {
         String payload = generatePayloadFromRequest(employment);
         URI uri = getCristinPostUri(identifier);
         HttpResponse<String> response = post(uri, payload, cristinInstitutionNumber);
-        checkPostHttpStatusCode(getNvaPostUri(identifier), response.statusCode());
+        checkPostHttpStatusCode(getNvaPostUri(identifier), response.statusCode(), response.body());
         CristinPersonEmployment deserializedResponse = deserializeResponse(response);
 
         return deserializedResponse.toEmployment(identifier);

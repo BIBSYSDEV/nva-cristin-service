@@ -11,11 +11,18 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static no.unit.nva.cristin.common.Utils.getValidOrgId;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 
 public class FetchPersonInstitutionInfoHandler extends PersonInstitutionInfoHandler<Void, PersonInstitutionInfo> {
+
+    private static final Logger logger = LoggerFactory.getLogger(FetchPersonInstitutionInfoHandler.class);
 
     private final transient FetchPersonInstitutionInfoClient apiClient;
 
@@ -35,6 +42,8 @@ public class FetchPersonInstitutionInfoHandler extends PersonInstitutionInfoHand
         throws ApiGatewayException {
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
+
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
         validateQueryParameters(requestInfo);
         String personId = getValidPersonId(requestInfo);

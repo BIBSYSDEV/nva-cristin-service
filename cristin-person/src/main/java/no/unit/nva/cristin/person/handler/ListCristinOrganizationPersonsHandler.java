@@ -20,6 +20,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
@@ -30,9 +32,14 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ListCristinOrganizationPersonsHandler.class);
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
     public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(PAGE, NUMBER_OF_RESULTS, NAME, SORT);
@@ -87,6 +94,7 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
                                                                Map<String, String> requestQueryParams)
             throws ApiGatewayException {
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
         return apiClient.authorizedGenerateQueryResponse(requestQueryParams);
     }
 

@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person.create;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
+import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_BAD_REQUEST_RESPONSE;
 import static no.unit.nva.cristin.common.Utils.COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.RandomPersonData.SOME_UNIT_IDENTIFIER;
@@ -42,6 +43,7 @@ import com.google.common.net.HttpHeaders;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.Collections;
@@ -60,9 +62,13 @@ import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.paths.UriWrapper;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.zalando.problem.Problem;
 
 public class CreateCristinPersonHandlerTest {
 
@@ -76,6 +82,8 @@ public class CreateCristinPersonHandlerTest {
     private static final String ANOTHER_ORGANIZATION =
         "https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0";
     private static final String ONE_ORGANIZATION = "https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0";
+    private static final String LOG_MESSAGE_FOR_IDENTIFIERS = "Client has Cristin identifier 123456 from organization "
+                                                             + "20754.0.0.0";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -315,6 +323,31 @@ public class CreateCristinPersonHandlerTest {
         assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
     }
 
+    @Test
+    void shouldLogClientSpecificIdentifiersWhenDoingAuthorizedRequests() throws IOException {
+        final var standardOut = System.out;
+        final var outputStreamCaptor = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStreamCaptor));
+        var response = sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
+        System.setOut(standardOut);
+
+        assertThat(outputStreamCaptor.toString(), Matchers.containsString(LOG_MESSAGE_FOR_IDENTIFIERS));
+        assertEquals(HTTP_CREATED, response.getStatusCode());
+    }
+
+    @Test
+    void shouldReturnResponseBodyFromUpstreamToClientWhenUpstreamReturnsBadRequest()
+        throws IOException, InterruptedException {
+        var responseBody = "This is a bad request";
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseBody, 400));
+        apiClient = new CreateCristinPersonApiClient(httpClientMock);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+        var gatewayResponse = sendQueryReturningProblemJson(dummyPerson());
+        var actual = gatewayResponse.getBodyObject(Problem.class).getDetail();
+
+        assertThat(actual, CoreMatchers.equalTo(UPSTREAM_BAD_REQUEST_RESPONSE + responseBody));
+    }
+
     private CristinAffiliation randomCristinAffiliation() {
         var cristinAffiliation = new CristinAffiliation();
         cristinAffiliation.setActive(randomBoolean());
@@ -361,6 +394,12 @@ public class CreateCristinPersonHandlerTest {
         var input = requestWithBody(body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Person.class);
+    }
+
+    private GatewayResponse<Problem> sendQueryReturningProblemJson(Person body) throws IOException {
+        var input = requestWithBody(body);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Problem.class);
     }
 
     private InputStream requestWithBody(Person body) throws JsonProcessingException {
@@ -442,5 +481,19 @@ public class CreateCristinPersonHandlerTest {
                    .withCustomerId(customerId)
                    .withScope(BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE)
                    .build();
+    }
+
+    private GatewayResponse<Person> sendQueryWhileMockingIdentifiersUsedForLogging(Person body)
+        throws IOException {
+        var customerId = randomUri();
+        var input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
+                        .withBody(body)
+                        .withCustomerId(customerId)
+                        .withPersonCristinId(UriWrapper.fromUri(randomUri()).addChild(DUMMY_CRISTIN_ID).getUri())
+                        .withTopLevelCristinOrgId(UriWrapper.fromUri(ONE_ORGANIZATION).getUri())
+                        .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                        .build();
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, Person.class);
     }
 }

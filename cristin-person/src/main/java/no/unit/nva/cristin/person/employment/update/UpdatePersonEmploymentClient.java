@@ -34,7 +34,7 @@ public class UpdatePersonEmploymentClient extends PatchApiClient {
 
         URI uri = generateCristinUri(personId, employmentId);
         HttpResponse<String> response = patch(uri, request.toString(), cristinInstitutionNumber);
-        checkPatchHttpStatusCode(generateIdUri(personId, employmentId), response.statusCode());
+        checkPatchHttpStatusCode(generateIdUri(personId, employmentId), response.statusCode(), response.body());
 
         return null;
     }

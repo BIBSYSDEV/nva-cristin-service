@@ -36,7 +36,7 @@ public class UpdatePersonInstitutionInfoClient extends PatchApiClient {
         String payload = generatePayloadFromRequest(request);
         URI uri = generateCristinUri(personId, orgId);
         HttpResponse<String> response = patch(uri, payload);
-        checkPatchHttpStatusCode(generateIdUri(personId, orgId), response.statusCode());
+        checkPatchHttpStatusCode(generateIdUri(personId, orgId), response.statusCode(), response.body());
 
         return EMPTY_JSON;
     }

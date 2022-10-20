@@ -2,6 +2,7 @@ package no.unit.nva.cristin.common.client;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_BAD_REQUEST_RESPONSE;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_INSTITUTION_HEADER;
 import com.google.common.net.MediaType;
 import java.net.URI;
@@ -10,7 +11,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.concurrent.CompletableFuture;
-import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -72,12 +72,12 @@ public class PostApiClient extends ApiClient {
     /**
      * Checks for POST http error codes and also the regular error codes. Throws exception on error
      */
-    protected void checkPostHttpStatusCode(URI uri, int statusCode) throws ApiGatewayException {
+    protected void checkPostHttpStatusCode(URI uri, int statusCode, String body) throws ApiGatewayException {
         if (isSuccessful(statusCode)) {
             return;
         }
         if (statusCode == HTTP_BAD_REQUEST) {
-            throw new BadRequestException(ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD);
+            throw new BadRequestException(UPSTREAM_BAD_REQUEST_RESPONSE + body);
         }
         checkHttpStatusCode(uri, statusCode);
     }
