@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.zalando.problem.Problem;
@@ -113,6 +112,9 @@ class FetchCristinProjectsTest {
             "hps:/api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0";
     private static final String ILLEGAL_NVA_ORGANIZATION_ENCODED =
             URLEncoder.encode(ILLEGAL_NVA_ORGANIZATION, StandardCharsets.UTF_8);
+    private static final String API_QUERY_RESPONSE_WITH_FUNDING_JSON =
+        IoUtils.stringFromResources(Path.of("api_query_response_with_funding.json"));
+
     private final Environment environment = new Environment();
     private CristinApiClient cristinApiClientStub;
     private Context context;
@@ -162,7 +164,7 @@ class FetchCristinProjectsTest {
     }
 
     @ParameterizedTest
-    @ArgumentsSource(TestPairProvider.class)
+    @MethodSource("queryResponseWithFundingFileReader")
     void handlerReturnsExpectedBodyWhenRequestInputIsValid(String expected) throws IOException {
         String actual = sendDefaultQuery().getBody();
         final var expectedSearchResponse = OBJECT_MAPPER.readValue(expected, SearchResponse.class);
@@ -681,4 +683,9 @@ class FetchCristinProjectsTest {
     private String getBodyFromResource(String resource) {
         return IoUtils.stringFromResources(Path.of(resource));
     }
+
+    private static Stream<? extends Arguments> queryResponseWithFundingFileReader() {
+        return Stream.of(Arguments.of(API_QUERY_RESPONSE_WITH_FUNDING_JSON));
+    }
+
 }
