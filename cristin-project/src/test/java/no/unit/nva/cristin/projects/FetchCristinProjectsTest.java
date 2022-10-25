@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -320,21 +319,6 @@ class FetchCristinProjectsTest {
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
-    }
-
-    @Test
-    void handlerReturnsInternalErrorWhenUriCreationFails() throws Exception {
-        cristinApiClientStub = spy(cristinApiClientStub);
-
-        doThrow(URISyntaxException.class).when(cristinApiClientStub)
-                .generateQueryProjectsUrl(any(), any(QueryType.class));
-
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
-        GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
-
-        assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
-        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
     }
 
     @Test
