@@ -158,11 +158,15 @@ public class CristinPerson implements JsonSerializable {
 
 
     /**
-     * Creates a Nva person model from a Cristin person model.
+     * Creates a Nva person model from a Cristin person model. If the person is not publicly viewable, only returns
+     * identifier.
      *
      * @return Nva person model.
      */
     public Person toPerson() {
+        if (Boolean.TRUE.equals(getReserved())) {
+            return new Person.Builder().withId(extractIdUri()).build(); // Also preserving size of hits from upstream
+        }
         return new Person.Builder()
                    .withId(extractIdUri())
                    .withIdentifiers(extractNonAuthorizedIdentifiers())
@@ -175,7 +179,8 @@ public class CristinPerson implements JsonSerializable {
 
     /**
      * Creates a Nva person model from a Cristin person model.
-     * This model has additional fields only available to authorized users.
+     * This model has additional fields only available to authorized users. It will also show persons not publicly
+     * viewable.
      *
      * @return Nva person model.
      */
