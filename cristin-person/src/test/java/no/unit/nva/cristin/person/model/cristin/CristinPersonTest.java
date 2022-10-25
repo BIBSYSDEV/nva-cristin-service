@@ -2,7 +2,10 @@ package no.unit.nva.cristin.person.model.cristin;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -73,6 +76,19 @@ public class CristinPersonTest {
         var actualNvaPerson = cristinPerson.toPersonWithAuthorizedFields();
 
         assertThat(actualNvaPerson, equalTo(expectedNvaPerson));
+    }
+
+    @Test
+    void shouldOnlyShowIdentifierAndNotNameWhenDoingOpenQueryAndSomehowAReservedPersonGetsReturned() {
+        var cristinPerson = new CristinPerson();
+        var identifier = randomInteger(99999).toString();
+        cristinPerson.setCristinPersonId(identifier);
+        cristinPerson.setFirstName(randomString());
+        cristinPerson.setReserved(true);
+        var person = cristinPerson.toPerson();
+
+        assertThat(person.getId().toString(), containsString(identifier));
+        assertThat(person.getNames().size(), equalTo(0));
     }
 
     private static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
