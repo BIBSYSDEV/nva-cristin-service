@@ -83,6 +83,12 @@ public class NvaProject implements JsonSerializable {
     @JsonProperty
     @JsonInclude(NON_NULL)
     private Boolean publishable;
+    @JsonProperty
+    @JsonInclude(NON_NULL)
+    private DateInfo created;
+    @JsonProperty
+    @JsonInclude(NON_NULL)
+    private DateInfo lastModified;
 
     private NvaProject() {
     }
@@ -221,6 +227,22 @@ public class NvaProject implements JsonSerializable {
 
     public void setPublishable(Boolean publishable) {
         this.publishable = publishable;
+    }
+
+    public DateInfo getCreated() {
+        return created;
+    }
+
+    public void setCreated(DateInfo created) {
+        this.created = created;
+    }
+
+    public DateInfo getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(DateInfo lastModified) {
+        this.lastModified = lastModified;
     }
 
     @JacocoGenerated
@@ -364,6 +386,16 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withPublishable(Boolean publishable) {
             nvaProject.setPublishable(publishable);
+            return this;
+        }
+
+        public Builder withCreated(DateInfo created) {
+            nvaProject.setCreated(created);
+            return this;
+        }
+
+        public Builder withLastModified(DateInfo lastModified) {
+            nvaProject.setLastModified(lastModified);
             return this;
         }
 

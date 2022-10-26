@@ -19,6 +19,9 @@ public class NvaProjectBuilderTest {
     private static final String API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_WITH_FUNDING_JSON =
         "api_response_one_cristin_project_to_nva_project_with_funding.json";
     private static final String cristinGetProject = stringFromResources(Path.of("cristinGetProjectResponse.json"));
+    private static final String CREATED_DATE = "2019-12-31T09:45:17Z";
+    private static final String MODIFIED_DATE = "2019-12-31T09:48:20Z";
+    private static final String CREATED_BY = "REK";
 
     @Test
     void shouldReturnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
@@ -41,5 +44,8 @@ public class NvaProjectBuilderTest {
 
         assertThat(nvaProject.getPublished(), equalTo(true));
         assertThat(nvaProject.getPublishable(), equalTo(true));
+        assertThat(nvaProject.getCreated().getSourceShortName(), equalTo(CREATED_BY));
+        assertThat(nvaProject.getCreated().getDate().toString(), equalTo(CREATED_DATE));
+        assertThat(nvaProject.getLastModified().getDate().toString(), equalTo(MODIFIED_DATE));
     }
 }

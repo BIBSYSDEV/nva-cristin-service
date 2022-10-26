@@ -66,7 +66,14 @@
         "en": "<p>Some popular scientific summary</p>\r\n"
       },
       "publishable" : true,
-      "published" : true
+      "published" : true,
+      "created": {
+        "sourceShortName":"REK",
+        "date": "2019-12-31T09:45:17Z"
+      },
+      "lastModified": {
+        "date": "2019-12-31T09:48:20Z"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -126,7 +133,14 @@
         "en": "<p>Some popular scientific summary</p>\r\n"
       },
       "publishable" : true,
-      "published" : true
+      "published" : true,
+      "created": {
+        "sourceShortName":"REK",
+        "date": "2019-12-31T09:45:17Z"
+      },
+      "lastModified": {
+        "date": "2019-12-31T09:48:20Z"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -186,7 +200,14 @@
         "en": "<p>Some popular scientific summary</p>\r\n"
       },
       "publishable" : true,
-      "published" : true
+      "published" : true,
+      "created": {
+        "sourceShortName":"REK",
+        "date": "2019-12-31T09:45:17Z"
+      },
+      "lastModified": {
+        "date": "2019-12-31T09:48:20Z"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -246,7 +267,14 @@
         "en": "<p>Some popular scientific summary</p>\r\n"
       },
       "publishable" : true,
-      "published" : true
+      "published" : true,
+      "created": {
+        "sourceShortName":"REK",
+        "date": "2019-12-31T09:45:17Z"
+      },
+      "lastModified": {
+        "date": "2019-12-31T09:48:20Z"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -306,7 +334,14 @@
         "en": "<p>Some popular scientific summary</p>\r\n"
       },
       "publishable" : true,
-      "published" : true
+      "published" : true,
+      "created": {
+        "sourceShortName":"REK",
+        "date": "2019-12-31T09:45:17Z"
+      },
+      "lastModified": {
+        "date": "2019-12-31T09:48:20Z"
+      }
     }
   ]
 }

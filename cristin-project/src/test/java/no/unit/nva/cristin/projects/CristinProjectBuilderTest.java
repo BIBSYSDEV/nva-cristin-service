@@ -1,5 +1,7 @@
 package no.unit.nva.cristin.projects;
 
+import java.util.HashSet;
+import java.util.Set;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import org.junit.jupiter.api.Test;
@@ -22,8 +24,21 @@ class CristinProjectBuilderTest {
         assertNotNull(cristinProject);
         assertTrue(cristinProject.hasValidContent());
         NvaProject actual = cristinProject.toNvaProject();
-        assertThat(actual, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
+        var ignored = addFieldsToIgnoreListNotSupportedByCristinPost();
+        assertThat(actual, doesNotHaveEmptyValuesIgnoringFields(ignored));
         assertEquals(expected, actual);
     }
 
+    private Set<String> addFieldsToIgnoreListNotSupportedByCristinPost() {
+        var ignoreList = new HashSet<>(IGNORE_LIST);
+
+        ignoreList.add(".created.sourceShortName");
+        ignoreList.add(".created.date");
+        ignoreList.add(".lastModified.sourceShortName");
+        ignoreList.add(".lastModified.date");
+        ignoreList.add("lastModified");
+        ignoreList.add("created");
+
+        return ignoreList;
+    }
 }
