@@ -83,21 +83,23 @@ public class NvaProjectBuilder {
      */
     public NvaProject build() {
         return new NvaProject.Builder()
-            .withId(getNvaApiId(cristinProject.getCristinProjectId(), PROJECT))
-                .withContext(getContext())
-                .withType(PROJECT_TYPE)
-                .withIdentifiers(createCristinIdentifier())
-                .withTitle(extractMainTitle())
-                .withAlternativeTitles(extractAlternativeTitles())
-                .withLanguage(LanguageMapper.toUri(cristinProject.getMainLanguage()))
-                .withStartDate(cristinProject.getStartDate())
-                .withEndDate(cristinProject.getEndDate())
-                .withFunding(extractFunding())
-                .withCoordinatingInstitution(extractCoordinatingInstitution())
-                .withContributors(extractContributors())
-                .withStatus(extractProjectStatus())
-                .withAcademicSummary(cristinProject.getAcademicSummary())
-                .withPopularScientificSummary(cristinProject.getPopularScientificSummary()).build();
+                   .withId(getNvaApiId(cristinProject.getCristinProjectId(), PROJECT))
+                   .withContext(getContext())
+                   .withType(PROJECT_TYPE)
+                   .withIdentifiers(createCristinIdentifier())
+                   .withTitle(extractMainTitle())
+                   .withAlternativeTitles(extractAlternativeTitles())
+                   .withLanguage(LanguageMapper.toUri(cristinProject.getMainLanguage()))
+                   .withStartDate(cristinProject.getStartDate())
+                   .withEndDate(cristinProject.getEndDate())
+                   .withFunding(extractFunding())
+                   .withCoordinatingInstitution(extractCoordinatingInstitution())
+                   .withContributors(extractContributors())
+                   .withStatus(extractProjectStatus())
+                   .withAcademicSummary(cristinProject.getAcademicSummary())
+                   .withPopularScientificSummary(cristinProject.getPopularScientificSummary())
+                   .withPublished(cristinProject.getPublished())
+                   .withPublishable(cristinProject.getPublishable()).build();
     }
 
     private String getContext() {

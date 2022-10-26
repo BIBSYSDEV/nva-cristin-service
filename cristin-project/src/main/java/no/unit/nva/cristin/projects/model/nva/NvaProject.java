@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.model.nva;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
+import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
@@ -27,14 +28,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
-import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.projects.CristinProjectBuilder;
 import no.unit.nva.cristin.projects.ProjectStatus;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
 
-@SuppressWarnings("PMD.ExcessivePublicCount")
+@SuppressWarnings({"PMD.ExcessivePublicCount","PMD.TooManyFields"})
 @JsonInclude(ALWAYS)
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
         FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS, NVA_ACADEMIC_SUMMARY, NVA_POPULAR_SCIENTIFIC_SUMMARY})
@@ -42,7 +42,7 @@ public class NvaProject implements JsonSerializable {
 
     public static final String NVA_ACADEMIC_SUMMARY = "academicSummary";
     public static final String NVA_POPULAR_SCIENTIFIC_SUMMARY = "popularScientificSummary";
-    public static final String PROJECT_CONTEXT = Constants.PROJECT_LOOKUP_CONTEXT_URL; // Until decided
+    public static final String PROJECT_CONTEXT = PROJECT_LOOKUP_CONTEXT_URL;
 
     @JsonProperty(CONTEXT)
     @JsonInclude(NON_NULL)
@@ -77,6 +77,12 @@ public class NvaProject implements JsonSerializable {
     private Map<String, String> academicSummary;
     @JsonProperty
     private Map<String, String> popularScientificSummary;
+    @JsonProperty
+    @JsonInclude(NON_NULL)
+    private Boolean published;
+    @JsonProperty
+    @JsonInclude(NON_NULL)
+    private Boolean publishable;
 
     private NvaProject() {
     }
@@ -201,6 +207,21 @@ public class NvaProject implements JsonSerializable {
         this.popularScientificSummary = popularScientificSummary;
     }
 
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
+    }
+
+    public Boolean getPublishable() {
+        return publishable;
+    }
+
+    public void setPublishable(Boolean publishable) {
+        this.publishable = publishable;
+    }
 
     @JacocoGenerated
     @Override
@@ -333,6 +354,16 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withPopularScientificSummary(Map<String, String> popularScientificSummary) {
             nvaProject.setPopularScientificSummary(popularScientificSummary);
+            return this;
+        }
+
+        public Builder withPublished(Boolean published) {
+            nvaProject.setPublished(published);
+            return this;
+        }
+
+        public Builder withPublishable(Boolean publishable) {
+            nvaProject.setPublishable(publishable);
             return this;
         }
 

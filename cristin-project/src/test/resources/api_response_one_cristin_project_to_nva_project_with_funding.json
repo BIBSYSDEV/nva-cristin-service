@@ -55,5 +55,7 @@
   "academicSummary": { },
   "popularScientificSummary": {
     "en": "<p>Some popular scientific summary</p>\r\n"
-  }
+  },
+  "publishable" : true,
+  "published" : true
 }

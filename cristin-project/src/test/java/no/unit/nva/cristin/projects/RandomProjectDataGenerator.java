@@ -46,7 +46,9 @@ public class RandomProjectDataGenerator {
             "contributors.affiliation.partOf",
             "contributors.affiliation.hasPart",
             ".contributors.affiliation.context",
-            ".contributors.affiliation.acronym"
+            ".contributors.affiliation.acronym",
+            "published",
+            "publishable"
     );
     private static final String NORWEGIAN = "nb";
     private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
