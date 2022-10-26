@@ -211,20 +211,6 @@ public class FetchOneCristinProjectTest {
     }
 
     @Test
-    void handlerReturnsInternalErrorWhenUriCreationFails() throws Exception {
-        cristinApiClientStub = spy(cristinApiClientStub);
-
-        doThrow(URISyntaxException.class).when(cristinApiClientStub).generateGetProjectUri(any(), any());
-
-        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
-
-        assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
-    }
-
-    @Test
     void handlerThrowsInternalErrorWhenHttpStatusCodeIsSomeUnexpectedValue() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 

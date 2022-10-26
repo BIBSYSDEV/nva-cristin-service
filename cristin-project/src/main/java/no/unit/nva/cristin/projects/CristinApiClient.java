@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -47,11 +46,9 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.projects.CristinQuery.CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.queryParameters;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -148,7 +145,7 @@ public class CristinApiClient extends ApiClient {
         List<NvaProject> nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         long endRequestTime = System.currentTimeMillis();
 
-        URI id = getServiceUri(new HashMap(requestQueryParameters));
+        URI id = getServiceUri(new HashMap<>(requestQueryParameters));
 
         return new SearchResponse<NvaProject>(id)
                 .withContext(PROJECT_SEARCH_CONTEXT_URL)
@@ -233,35 +230,14 @@ public class CristinApiClient extends ApiClient {
         return Utils.isPositiveInteger(requestQueryParams.get(QUERY)) ? QUERY_USING_GRANT_ID : QUERY_USING_TITLE;
     }
 
-    protected URI generateQueryProjectsUrl(Map<String, String> parameters, QueryType queryType)
-            throws URISyntaxException {
-
-        CristinQuery query = new CristinQuery()
-                .withLanguage(parameters.get(LANGUAGE))
-                .withFromPage(parameters.get(PAGE))
-                .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
-        if (parameters.containsKey(ORGANIZATION)) {
-            query = query.withParentUnitId(getUnitIdFromOrganization(parameters.get(ORGANIZATION)));
-        }
-
-        if (parameters.containsKey(STATUS)) {
-            query = query.withStatus(getEncodedStatusParameter(parameters));
-        }
+    protected URI generateQueryProjectsUrl(Map<String, String> parameters, QueryType queryType) {
+        CristinQuery query = new CristinQuery().generateQueryParameters(parameters);
 
         return queryType == QUERY_USING_GRANT_ID ? query.withGrantId(parameters.get(QUERY)).toURI() :
                 query.withTitle(parameters.get(QUERY)).toURI();
     }
 
-    private String getEncodedStatusParameter(Map<String, String> parameters) {
-        return URLEncoder.encode(ProjectStatus.getNvaStatus(parameters.get(STATUS)).getCristinStatus(),
-                StandardCharsets.UTF_8);
-    }
-
-    private String getUnitIdFromOrganization(String organizationId) {
-        return extractLastPathElement(URI.create(organizationId));
-    }
-
-    protected URI generateGetProjectUri(String id, String language) throws URISyntaxException {
+    protected URI generateGetProjectUri(String id, String language) {
         return CristinQuery.fromIdAndLanguage(id, language);
     }
 

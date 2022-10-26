@@ -1,12 +1,21 @@
 package no.unit.nva.cristin.projects;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinQuery {
 
@@ -63,29 +72,62 @@ public class CristinQuery {
         return this;
     }
 
+    /**
+     * Preferred language.
+     */
     public CristinQuery withLanguage(String language) {
-        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language);
+        if (nonNull(language)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language);
+        }
         return this;
     }
 
+    /**
+     * Start of pagination.
+     */
     public CristinQuery withFromPage(String page) {
-        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PAGE_KEY, page);
+        if (nonNull(page)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PAGE_KEY, page);
+        }
         return this;
     }
 
+    /**
+     * Items per page.
+     */
     public CristinQuery withItemsPerPage(String itemsPerPage) {
-        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY, itemsPerPage);
+        if (nonNull(itemsPerPage)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY, itemsPerPage);
+        }
         return this;
     }
 
+    /**
+     * Organization to start searching from. Includes sublevels if requested.
+     */
     public CristinQuery withParentUnitId(String parentUnitId) {
-        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, parentUnitId);
+        if (nonNull(parentUnitId)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, getUnitIdFromOrganization(parentUnitId));
+        }
         return this;
     }
 
+    private String getUnitIdFromOrganization(String organizationId) {
+        return extractLastPathElement(URI.create(organizationId));
+    }
+
+    /**
+     * Requested status of projects.
+     */
     public CristinQuery withStatus(String status) {
-        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_STATUS, status);
+        if (nonNull(status)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_STATUS, getEncodedStatusParameter(status));
+        }
         return this;
+    }
+
+    private String getEncodedStatusParameter(String status) {
+        return URLEncoder.encode(ProjectStatus.getNvaStatus(status).getCristinStatus(), StandardCharsets.UTF_8);
     }
 
 
@@ -100,5 +142,18 @@ public class CristinQuery {
                 .addQueryParameters(cristinQueryParameters)
                 .getUri();
 
+    }
+
+    /**
+     * Builds Cristin query parameters using builder methods and NVA input parameters.
+     */
+    public CristinQuery generateQueryParameters(Map<String, String> parameters) {
+        withLanguage(parameters.get(LANGUAGE));
+        withFromPage(parameters.get(PAGE));
+        withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
+        withParentUnitId(parameters.get(ORGANIZATION));
+        withStatus(parameters.get(STATUS));
+
+        return this;
     }
 }
