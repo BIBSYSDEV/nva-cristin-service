@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
@@ -12,18 +13,18 @@ import nva.commons.core.JacocoGenerated;
 @JacocoGenerated
 public class DateInfo implements JsonSerializable {
 
+    public static final String DATE = "date";
+    public static final String SOURCE_SHORT_NAME = "sourceShortName";
+
     @JsonProperty
     @JsonInclude(NON_NULL)
-    private String sourceShortName;
+    private final transient String sourceShortName;
     @JsonProperty
     @JsonInclude(NON_NULL)
-    private Instant date;
+    private final transient Instant date;
 
-    public DateInfo() {
-
-    }
-
-    public DateInfo(String sourceShortName, Instant date) {
+    @JsonCreator
+    public DateInfo(@JsonProperty(SOURCE_SHORT_NAME) String sourceShortName, @JsonProperty(DATE) Instant date) {
         this.sourceShortName = sourceShortName;
         this.date = date;
     }
@@ -32,16 +33,8 @@ public class DateInfo implements JsonSerializable {
         return sourceShortName;
     }
 
-    public void setSourceShortName(String sourceShortName) {
-        this.sourceShortName = sourceShortName;
-    }
-
     public Instant getDate() {
         return date;
-    }
-
-    public void setDate(Instant date) {
-        this.date = date;
     }
 
     @Override
