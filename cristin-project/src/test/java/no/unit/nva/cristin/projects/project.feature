@@ -98,3 +98,17 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.status == 404
     * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/project/0'
     And match response.detail == "The requested resource '" + uri + "' was not found"
+
+  Scenario: Fetch returns all supported fields
+    Given path '/project/6720765'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.id == '#regex ' + projectIdRegex
+    And match response.type == 'Project'
+    And match response.published == '#present'
+    And match response.publishable == '#present'
+    And match response.created.date == '#present'
+    And match response.created.sourceShortName == '#present'
+    And match response.lastModified.date == '#present'
