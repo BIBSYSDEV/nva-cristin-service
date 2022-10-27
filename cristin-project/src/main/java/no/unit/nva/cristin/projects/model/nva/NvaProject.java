@@ -32,7 +32,6 @@ import no.unit.nva.cristin.projects.CristinProjectBuilder;
 import no.unit.nva.cristin.projects.ProjectStatus;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.model.Organization;
-import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings({"PMD.ExcessivePublicCount","PMD.TooManyFields"})
 @JsonInclude(ALWAYS)
@@ -245,7 +244,6 @@ public class NvaProject implements JsonSerializable {
         this.lastModified = lastModified;
     }
 
-    @JacocoGenerated
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -256,34 +254,33 @@ public class NvaProject implements JsonSerializable {
         }
         NvaProject that = (NvaProject) o;
         return Objects.equals(getContext(), that.getContext())
-                && Objects.equals(getId(), that.getId())
-                && Objects.equals(getType(), that.getType())
-                && Objects.equals(getIdentifiers(), that.getIdentifiers())
-                && Objects.equals(getTitle(), that.getTitle())
-                && Objects.equals(getLanguage(), that.getLanguage())
-                && Objects.equals(getAlternativeTitles(), that.getAlternativeTitles())
-                && Objects.equals(getStartDate(), that.getStartDate())
-                && Objects.equals(getEndDate(), that.getEndDate())
-                && Objects.equals(getFunding(), that.getFunding())
-                && Objects.equals(getCoordinatingInstitution(), that.getCoordinatingInstitution())
-                && Objects.equals(getContributors(), that.getContributors());
+               && Objects.equals(getId(), that.getId())
+               && Objects.equals(getType(), that.getType())
+               && Objects.equals(getIdentifiers(), that.getIdentifiers())
+               && Objects.equals(getTitle(), that.getTitle())
+               && Objects.equals(getLanguage(), that.getLanguage())
+               && Objects.equals(getAlternativeTitles(), that.getAlternativeTitles())
+               && Objects.equals(getStartDate(), that.getStartDate())
+               && Objects.equals(getEndDate(), that.getEndDate())
+               && Objects.equals(getFunding(), that.getFunding())
+               && Objects.equals(getCoordinatingInstitution(), that.getCoordinatingInstitution())
+               && Objects.equals(getContributors(), that.getContributors())
+               && getStatus() == that.getStatus()
+               && Objects.equals(getAcademicSummary(), that.getAcademicSummary())
+               && Objects.equals(getPopularScientificSummary(), that.getPopularScientificSummary())
+               && Objects.equals(getPublished(), that.getPublished())
+               && Objects.equals(getPublishable(), that.getPublishable())
+               && Objects.equals(getCreated(), that.getCreated())
+               && Objects.equals(getLastModified(), that.getLastModified());
     }
 
-    @JacocoGenerated
     @Override
     public int hashCode() {
-        return Objects.hash(getContext(),
-                getId(),
-                getType(),
-                getIdentifiers(),
-                getTitle(),
-                getLanguage(),
-                getAlternativeTitles(),
-                getStartDate(),
-                getEndDate(),
-                getFunding(),
-                getCoordinatingInstitution(),
-                getContributors());
+        return Objects.hash(getContext(), getId(), getType(), getIdentifiers(), getTitle(), getLanguage(),
+                            getAlternativeTitles(), getStartDate(), getEndDate(), getFunding(),
+                            getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
+                            getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
+                            getLastModified());
     }
 
     @Override

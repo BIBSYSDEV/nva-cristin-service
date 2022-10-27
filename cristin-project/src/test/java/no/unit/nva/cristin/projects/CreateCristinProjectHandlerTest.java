@@ -25,6 +25,10 @@ import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Objects;
+import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
@@ -97,9 +101,10 @@ class CreateCristinProjectHandlerTest {
         expected.setContext(NvaProject.PROJECT_CONTEXT);
         mockUpstreamUsingRequest(expected);
 
-        NvaProject requestProject = expected.toCristinProject().toNvaProject();
-        requestProject.setId(null);  // Cannot create with Id
-        GatewayResponse<NvaProject> response = executeRequest(requestProject);
+        var identifier = expected.getId(); // We need to put this back after request
+        expected.setId(null); // Cannot create with Id
+        GatewayResponse<NvaProject> response = executeRequest(expected);
+        expected.setId(identifier);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
         NvaProject actual = response.getBodyObject(NvaProject.class);
@@ -166,9 +171,26 @@ class CreateCristinProjectHandlerTest {
     }
 
     private void mockUpstreamUsingRequest(NvaProject request) throws IOException, InterruptedException {
+        var cristinProject = request.toCristinProject();
+        addMockedResponseFieldsToCristinProject(cristinProject, request);
         HttpResponse<String> httpResponse =
-            new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(request.toCristinProject()), 201);
+            new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(cristinProject), 201);
         when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+    }
+
+    private void addMockedResponseFieldsToCristinProject(CristinProject cristinProject, NvaProject request) {
+        cristinProject.setCreated(fromDateInfo(request.getCreated()));
+        cristinProject.setLastModified(fromDateInfo(request.getLastModified()));
+    }
+
+    private CristinDateInfo fromDateInfo(DateInfo dateInfo) {
+        if (Objects.isNull(dateInfo)) {
+            return null;
+        }
+        var cristinDateInfo = new CristinDateInfo();
+        cristinDateInfo.setDate(dateInfo.getDate());
+        cristinDateInfo.setSourceShortName(dateInfo.getSourceShortName());
+        return cristinDateInfo;
     }
 
     private GatewayResponse<NvaProject> executeRequest(NvaProject request) throws IOException {
