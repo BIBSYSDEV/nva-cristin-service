@@ -187,10 +187,7 @@ class CreateCristinProjectHandlerTest {
         if (Objects.isNull(dateInfo)) {
             return null;
         }
-        var cristinDateInfo = new CristinDateInfo();
-        cristinDateInfo.setDate(dateInfo.getDate());
-        cristinDateInfo.setSourceShortName(dateInfo.getSourceShortName());
-        return cristinDateInfo;
+        return new CristinDateInfo(dateInfo.getSourceShortName(), dateInfo.getDate());
     }
 
     private GatewayResponse<NvaProject> executeRequest(NvaProject request) throws IOException {

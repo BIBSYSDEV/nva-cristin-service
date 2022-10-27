@@ -7,10 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
-import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
-@JacocoGenerated
 public class DateInfo implements JsonSerializable {
 
     public static final String DATE = "date";
