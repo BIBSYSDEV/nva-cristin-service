@@ -33,8 +33,8 @@ public class CristinProject {
     @JsonSerialize(using = CustomInstantSerializer.class)
     private Instant endDate;
     private String status;
-    private Map<String, String> created;
-    private Map<String, String> lastModified;
+    private CristinDateInfo created;
+    private CristinDateInfo lastModified;
     private CristinOrganization coordinatingInstitution;
     private List<CristinFundingSource> projectFundingSources;
     private List<CristinPerson> participants;
@@ -107,19 +107,19 @@ public class CristinProject {
         this.status = status;
     }
 
-    public Map<String, String> getCreated() {
-        return nonEmptyOrDefault(created);
+    public CristinDateInfo getCreated() {
+        return created;
     }
 
-    public void setCreated(Map<String, String> created) {
+    public void setCreated(CristinDateInfo created) {
         this.created = created;
     }
 
-    public Map<String, String> getLastModified() {
-        return nonEmptyOrDefault(lastModified);
+    public CristinDateInfo getLastModified() {
+        return lastModified;
     }
 
-    public void setLastModified(Map<String, String> lastModified) {
+    public void setLastModified(CristinDateInfo lastModified) {
         this.lastModified = lastModified;
     }
 

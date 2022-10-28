@@ -1,12 +1,14 @@
 package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.model.CristinInstitution;
+import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
+import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
@@ -83,21 +85,33 @@ public class NvaProjectBuilder {
      */
     public NvaProject build() {
         return new NvaProject.Builder()
-            .withId(getNvaApiId(cristinProject.getCristinProjectId(), PROJECT))
-                .withContext(getContext())
-                .withType(PROJECT_TYPE)
-                .withIdentifiers(createCristinIdentifier())
-                .withTitle(extractMainTitle())
-                .withAlternativeTitles(extractAlternativeTitles())
-                .withLanguage(LanguageMapper.toUri(cristinProject.getMainLanguage()))
-                .withStartDate(cristinProject.getStartDate())
-                .withEndDate(cristinProject.getEndDate())
-                .withFunding(extractFunding())
-                .withCoordinatingInstitution(extractCoordinatingInstitution())
-                .withContributors(extractContributors())
-                .withStatus(extractProjectStatus())
-                .withAcademicSummary(cristinProject.getAcademicSummary())
-                .withPopularScientificSummary(cristinProject.getPopularScientificSummary()).build();
+                   .withId(getNvaApiId(cristinProject.getCristinProjectId(), PROJECT))
+                   .withContext(getContext())
+                   .withType(PROJECT_TYPE)
+                   .withIdentifiers(createCristinIdentifier())
+                   .withTitle(extractMainTitle())
+                   .withAlternativeTitles(extractAlternativeTitles())
+                   .withLanguage(LanguageMapper.toUri(cristinProject.getMainLanguage()))
+                   .withStartDate(cristinProject.getStartDate())
+                   .withEndDate(cristinProject.getEndDate())
+                   .withFunding(extractFunding())
+                   .withCoordinatingInstitution(extractCoordinatingInstitution())
+                   .withContributors(extractContributors())
+                   .withStatus(extractProjectStatus())
+                   .withAcademicSummary(cristinProject.getAcademicSummary())
+                   .withPopularScientificSummary(cristinProject.getPopularScientificSummary())
+                   .withPublished(cristinProject.getPublished())
+                   .withPublishable(cristinProject.getPublishable())
+                   .withCreated(generateDateInfo(cristinProject.getCreated()))
+                   .withLastModified(generateDateInfo(cristinProject.getLastModified()))
+                   .build();
+    }
+
+    private DateInfo generateDateInfo(CristinDateInfo cristinDateInfo) {
+        if (nonNull(cristinDateInfo)) {
+            return new DateInfo(cristinDateInfo.getSourceShortName(), cristinDateInfo.getDate());
+        }
+        return null;
     }
 
     private String getContext() {

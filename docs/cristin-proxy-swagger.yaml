@@ -1339,6 +1339,32 @@ components:
           $ref: '#/components/schemas/Languages'
         popularScientificSummary:
           $ref: '#/components/schemas/Languages'
+        published:
+          type: boolean
+          description: If the project is published in Cristin
+        publishable:
+          type: boolean
+          description: If the project has all fields mandatory for being published
+        created:
+          type: object
+          properties:
+            sourceShortName:
+              type: string
+              description: Short name of the source that created the project
+            date:
+              type: string
+              format: date-time
+              description: Date the project was created
+        lastModified:
+          type: object
+          properties:
+            sourceShortName:
+              type: string
+              description: Short name of the source that last modified the project
+            date:
+              type: string
+              format: date-time
+              description: Date the project was modified
     ProjectPost:
       type: object
       properties:
@@ -2051,6 +2077,13 @@ components:
               no: "Jeg arbeider med å skrive en bok, med foreløpig tittel, Digitale bilder. "
             popularScientificSummary:
               no: "<p>FoU-prosjektet skal fremme forskningsbasert undervisning i digitale medier knyttet til Faglærerutdanningen i formgiving, kunst og håndverk på Institutt for estetiske fag."
+            published: true
+            publishable: true
+            created:
+              sourceShortName: "REK"
+              date: "2019-12-31T09:45:17Z"
+            lastModified:
+              date: "2020-12-31T09:45:17Z"
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2106,6 +2139,13 @@ components:
           en: "Summary in an academic manner"
         popularScientificSummary:
           en: "popularScientificSummary popularScientificSummary popularScientificSummary"
+        published: true
+        publishable: true
+        created:
+          sourceShortName: "REK"
+          date: "2019-12-31T09:45:17Z"
+        lastModified:
+          date: "2020-12-31T09:45:17Z"
     ProjectPatchExample:
       value:
         title: 'Updated Title'

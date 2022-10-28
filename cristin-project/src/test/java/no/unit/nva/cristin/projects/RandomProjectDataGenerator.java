@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
@@ -46,7 +47,9 @@ public class RandomProjectDataGenerator {
             "contributors.affiliation.partOf",
             "contributors.affiliation.hasPart",
             ".contributors.affiliation.context",
-            ".contributors.affiliation.acronym"
+            ".contributors.affiliation.acronym",
+            "published",
+            "publishable"
     );
     private static final String NORWEGIAN = "nb";
     private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
@@ -61,22 +64,25 @@ public class RandomProjectDataGenerator {
         final String identifier = randomInteger().toString();
         final URI language = LanguageMapper.toUri(NORWEGIAN);
         final NvaProject nvaProject = new NvaProject.Builder()
-                // .withContext(PROJECT_CONTEXT)
-                .withType(PROJECT_TYPE)
-                .withId(UriUtils.createNvaProjectId(identifier))
-                .withIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
-                .withTitle(randomString())
-                .withLanguage(language)
-                .withStatus(randomStatus())
-                .withAlternativeTitles(randomListOfTitles(language))
-                .withStartDate(randomInstant())
-                .withEndDate(randomInstant())
-                .withAcademicSummary(randomSummary())
-                .withPopularScientificSummary(randomSummary())
-                .withFunding(randomFundings())
-                .withContributors(randomContributors())
-                .withCoordinatingInstitution(randomOrganization())
-                .build();
+                                          // .withContext(PROJECT_CONTEXT)
+                                          .withType(PROJECT_TYPE)
+                                          .withId(UriUtils.createNvaProjectId(identifier))
+                                          .withIdentifiers(Collections.singletonList(
+                                              Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
+                                          .withTitle(randomString())
+                                          .withLanguage(language)
+                                          .withStatus(randomStatus())
+                                          .withAlternativeTitles(randomListOfTitles(language))
+                                          .withStartDate(randomInstant())
+                                          .withEndDate(randomInstant())
+                                          .withAcademicSummary(randomSummary())
+                                          .withPopularScientificSummary(randomSummary())
+                                          .withFunding(randomFundings())
+                                          .withContributors(randomContributors())
+                                          .withCoordinatingInstitution(randomOrganization())
+                                          .withCreated(randomDateInfo())
+                                          .withLastModified(randomDateInfo())
+                                          .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
     }
@@ -194,5 +200,9 @@ public class RandomProjectDataGenerator {
 
     protected static Organization someOrganizationFromUnitIdentifier() {
         return new Organization.Builder().withId(getNvaApiId(SOME_UNIT_IDENTIFIER, ORGANIZATION_PATH)).build();
+    }
+
+    private static DateInfo randomDateInfo() {
+        return new DateInfo(randomString(), randomInstant());
     }
 }

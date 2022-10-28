@@ -64,6 +64,15 @@
       "academicSummary": {},
       "popularScientificSummary": {
         "en": "<p>Some popular scientific summary</p>\r\n"
+      },
+      "publishable" : true,
+      "published" : true,
+      "created": {
+        "sourceShortName":"REK",
+        "date": "2019-12-31T09:45:17Z"
+      },
+      "lastModified": {
+        "date": "2019-12-31T09:48:20Z"
       }
     },
     {
@@ -122,6 +131,15 @@
       "academicSummary": {},
       "popularScientificSummary": {
         "en": "<p>Some popular scientific summary</p>\r\n"
+      },
+      "publishable" : true,
+      "published" : true,
+      "created": {
+        "sourceShortName":"REK",
+        "date": "2019-12-31T09:45:17Z"
+      },
+      "lastModified": {
+        "date": "2019-12-31T09:48:20Z"
       }
     },
     {
@@ -180,6 +198,15 @@
       "academicSummary": {},
       "popularScientificSummary": {
         "en": "<p>Some popular scientific summary</p>\r\n"
+      },
+      "publishable" : true,
+      "published" : true,
+      "created": {
+        "sourceShortName":"REK",
+        "date": "2019-12-31T09:45:17Z"
+      },
+      "lastModified": {
+        "date": "2019-12-31T09:48:20Z"
       }
     },
     {
@@ -238,6 +265,15 @@
       "academicSummary": {},
       "popularScientificSummary": {
         "en": "<p>Some popular scientific summary</p>\r\n"
+      },
+      "publishable" : true,
+      "published" : true,
+      "created": {
+        "sourceShortName":"REK",
+        "date": "2019-12-31T09:45:17Z"
+      },
+      "lastModified": {
+        "date": "2019-12-31T09:48:20Z"
       }
     },
     {
@@ -296,6 +332,15 @@
       "academicSummary": {},
       "popularScientificSummary": {
         "en": "<p>Some popular scientific summary</p>\r\n"
+      },
+      "publishable" : true,
+      "published" : true,
+      "created": {
+        "sourceShortName":"REK",
+        "date": "2019-12-31T09:45:17Z"
+      },
+      "lastModified": {
+        "date": "2019-12-31T09:48:20Z"
       }
     }
   ]
