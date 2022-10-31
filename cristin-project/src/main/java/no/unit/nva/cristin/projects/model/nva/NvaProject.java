@@ -88,6 +88,9 @@ public class NvaProject implements JsonSerializable {
     @JsonProperty
     @JsonInclude(NON_NULL)
     private DateInfo lastModified;
+    @JsonProperty
+    @JsonInclude(NON_NULL)
+    private ContactInfo contactInfo;
 
     private NvaProject() {
     }
@@ -244,6 +247,14 @@ public class NvaProject implements JsonSerializable {
         this.lastModified = lastModified;
     }
 
+    public ContactInfo getContactInfo() {
+        return contactInfo;
+    }
+
+    public void setContactInfo(ContactInfo contactInfo) {
+        this.contactInfo = contactInfo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -271,7 +282,8 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getPublished(), that.getPublished())
                && Objects.equals(getPublishable(), that.getPublishable())
                && Objects.equals(getCreated(), that.getCreated())
-               && Objects.equals(getLastModified(), that.getLastModified());
+               && Objects.equals(getLastModified(), that.getLastModified())
+               && Objects.equals(getContactInfo(), that.getContactInfo());
     }
 
     @Override
@@ -280,7 +292,7 @@ public class NvaProject implements JsonSerializable {
                             getAlternativeTitles(), getStartDate(), getEndDate(), getFunding(),
                             getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
-                            getLastModified());
+                            getLastModified(), getContactInfo());
     }
 
     @Override
@@ -393,6 +405,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withLastModified(DateInfo lastModified) {
             nvaProject.setLastModified(lastModified);
+            return this;
+        }
+
+        public Builder withContactInfo(ContactInfo contactInfo) {
+            nvaProject.setContactInfo(contactInfo);
             return this;
         }
 
