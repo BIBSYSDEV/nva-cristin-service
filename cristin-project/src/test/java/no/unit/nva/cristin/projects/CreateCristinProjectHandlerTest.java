@@ -105,6 +105,7 @@ class CreateCristinProjectHandlerTest {
         expected.setId(null); // Cannot create with Id
         GatewayResponse<NvaProject> response = executeRequest(expected);
         expected.setId(identifier);
+        removeFieldsNotSupportedByPost(expected);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
         NvaProject actual = response.getBodyObject(NvaProject.class);
@@ -220,4 +221,9 @@ class CreateCristinProjectHandlerTest {
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
             .build();
     }
+
+    private void removeFieldsNotSupportedByPost(NvaProject expected) {
+        expected.setFundingAmount(null);
+    }
+
 }

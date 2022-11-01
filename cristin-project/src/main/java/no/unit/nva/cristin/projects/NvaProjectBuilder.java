@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
+import no.unit.nva.cristin.projects.model.cristin.CristinFundingAmount;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
@@ -10,6 +11,7 @@ import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.Funding;
+import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -104,7 +106,15 @@ public class NvaProjectBuilder {
                    .withPublishable(cristinProject.getPublishable())
                    .withCreated(generateDateInfo(cristinProject.getCreated()))
                    .withLastModified(generateDateInfo(cristinProject.getLastModified()))
+                   .withFundingAmount(extractFundingAmount(cristinProject.getTotalFundingAmount()))
                    .build();
+    }
+
+    private FundingAmount extractFundingAmount(CristinFundingAmount cristinFundingAmount) {
+        if (nonNull(cristinFundingAmount)) {
+            return new FundingAmount(cristinFundingAmount.getCurrencyCode(), cristinFundingAmount.getAmount());
+        }
+        return null;
     }
 
     private DateInfo generateDateInfo(CristinDateInfo cristinDateInfo) {

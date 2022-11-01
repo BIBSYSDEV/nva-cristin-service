@@ -73,6 +73,11 @@
       },
       "lastModified": {
         "date": "2019-12-31T09:48:20Z"
+      },
+      "fundingAmount": {
+        "type": "FundingAmount",
+        "currencyCode": "NOK",
+        "amount": 5660000.0
       }
     },
     {
@@ -140,6 +145,11 @@
       },
       "lastModified": {
         "date": "2019-12-31T09:48:20Z"
+      },
+      "fundingAmount": {
+        "type": "FundingAmount",
+        "currencyCode": "NOK",
+        "amount": 5660000.0
       }
     },
     {
@@ -207,6 +217,11 @@
       },
       "lastModified": {
         "date": "2019-12-31T09:48:20Z"
+      },
+      "fundingAmount": {
+        "type": "FundingAmount",
+        "currencyCode": "NOK",
+        "amount": 5660000.0
       }
     },
     {
@@ -274,6 +289,11 @@
       },
       "lastModified": {
         "date": "2019-12-31T09:48:20Z"
+      },
+      "fundingAmount": {
+        "type": "FundingAmount",
+        "currencyCode": "NOK",
+        "amount": 5660000.0
       }
     },
     {
@@ -341,6 +361,11 @@
       },
       "lastModified": {
         "date": "2019-12-31T09:48:20Z"
+      },
+      "fundingAmount": {
+        "type": "FundingAmount",
+        "currencyCode": "NOK",
+        "amount": 5660000.0
       }
     }
   ]

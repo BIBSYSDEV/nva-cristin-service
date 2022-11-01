@@ -22,6 +22,8 @@ public class NvaProjectBuilderTest {
     private static final String CREATED_DATE = "2019-12-31T09:45:17Z";
     private static final String MODIFIED_DATE = "2019-12-31T09:48:20Z";
     private static final String CREATED_BY = "REK";
+    public static final String CURRENCY_CODE_NOK = "NOK";
+    public static final double FUNDING_AMOUNT_EXAMPLE = 5660000.0;
 
     @Test
     void shouldReturnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
@@ -47,5 +49,7 @@ public class NvaProjectBuilderTest {
         assertThat(nvaProject.getCreated().getSourceShortName(), equalTo(CREATED_BY));
         assertThat(nvaProject.getCreated().getDate().toString(), equalTo(CREATED_DATE));
         assertThat(nvaProject.getLastModified().getDate().toString(), equalTo(MODIFIED_DATE));
+        assertThat(nvaProject.getFundingAmount().getCurrencyCode(), equalTo(CURRENCY_CODE_NOK));
+        assertThat(nvaProject.getFundingAmount().getAmount(), equalTo(FUNDING_AMOUNT_EXAMPLE));
     }
 }

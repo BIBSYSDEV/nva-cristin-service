@@ -35,6 +35,7 @@ class CristinProjectBuilderTest {
     private void addFieldsNotSupportedByToCristinProject(NvaProject expected, NvaProject actual) {
         actual.setCreated(expected.getCreated());
         actual.setLastModified(expected.getLastModified());
+        actual.setFundingAmount(expected.getFundingAmount());
     }
 
     private Set<String> addFieldsToIgnoreListNotSupportedByCristinPost() {

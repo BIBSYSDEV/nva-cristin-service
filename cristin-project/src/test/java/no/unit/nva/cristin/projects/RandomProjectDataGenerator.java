@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.Funding;
+import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -82,9 +83,14 @@ public class RandomProjectDataGenerator {
                                           .withCoordinatingInstitution(randomOrganization())
                                           .withCreated(randomDateInfo())
                                           .withLastModified(randomDateInfo())
+                                          .withFundingAmount(randomFundingAmount())
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
+    }
+
+    private static FundingAmount randomFundingAmount() {
+        return new FundingAmount(randomString(), randomInteger().doubleValue());
     }
 
     /**
