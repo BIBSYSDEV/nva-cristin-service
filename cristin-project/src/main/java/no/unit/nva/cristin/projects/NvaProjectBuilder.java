@@ -111,11 +111,10 @@ public class NvaProjectBuilder {
     }
 
     private ContactInfo extractContactInfo(CristinContactInfo cristinContactInfo) {
-        if (nonNull(cristinContactInfo)) {
-            return new ContactInfo(cristinContactInfo.getContactPerson(), cristinContactInfo.getInstitution(),
-                                   cristinContactInfo.getEmail(), cristinContactInfo.getPhone());
-        }
-        return null;
+        return nonNull(cristinContactInfo) ? new ContactInfo(cristinContactInfo.getContactPerson(),
+                                                             cristinContactInfo.getInstitution(),
+                                                             cristinContactInfo.getEmail(),
+                                                             cristinContactInfo.getPhone()) : null;
     }
 
     private DateInfo generateDateInfo(CristinDateInfo cristinDateInfo) {

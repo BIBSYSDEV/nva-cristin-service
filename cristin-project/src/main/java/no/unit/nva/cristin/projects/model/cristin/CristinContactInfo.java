@@ -14,9 +14,13 @@ public class CristinContactInfo {
 
     public static final String CRISTIN_CONTACT_PERSON = "contact_person";
 
+    @JsonProperty(CRISTIN_CONTACT_PERSON)
     private final transient String contactPerson;
+    @JsonProperty(INSTITUTION)
     private final transient String institution;
+    @JsonProperty(EMAIL)
     private final transient String email;
+    @JsonProperty(PHONE)
     private final transient String phone;
 
     /**

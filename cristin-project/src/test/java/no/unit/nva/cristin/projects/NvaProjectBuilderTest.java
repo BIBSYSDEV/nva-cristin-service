@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +9,7 @@ import java.nio.file.Path;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.ioutils.IoUtils.stringFromResources;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -55,5 +57,15 @@ public class NvaProjectBuilderTest {
         assertThat(nvaProject.getContactInfo().getOrganization(), equalTo(CONTACT_ORGANIZATION));
         assertThat(nvaProject.getContactInfo().getEmail(), equalTo(CONTACT_EMAIL));
         assertThat(nvaProject.getContactInfo().getPhone(), equalTo(CONTACT_PHONE));
+    }
+
+    @Test
+    void shouldSerializeAndDeserializeContactInfoIntoSameObject() {
+        var contactInfo = new ContactInfo(randomString(), randomString(), CONTACT_EMAIL, randomString());
+        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(contactInfo)).orElseThrow();
+        var deserialized =
+            attempt(() -> OBJECT_MAPPER.readValue(serialized, ContactInfo.class)).orElseThrow();
+
+        assertThat(deserialized, equalTo(contactInfo));
     }
 }

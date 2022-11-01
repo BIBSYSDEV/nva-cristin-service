@@ -17,9 +17,13 @@ public class ContactInfo implements JsonSerializable {
 
     public static final String CONTACT_PERSON = "contactPerson";
 
+    @JsonProperty(CONTACT_PERSON)
     private final transient String contactPerson;
+    @JsonProperty(ORGANIZATION)
     private final transient String organization;
+    @JsonProperty(EMAIL)
     private final transient String email;
+    @JsonProperty(PHONE)
     private final transient String phone;
 
     /**
