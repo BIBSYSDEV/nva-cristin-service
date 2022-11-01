@@ -65,13 +65,13 @@ Feature: API tests for Creation of Cristin Person Employments
     Then status 403
     And match response.title == 'Forbidden'
 
-  Scenario: Create returns status 400 when missing person org identifier
+  Scenario: User not allowed to create employments at other institutions
     Given path '/person/' + cristinTestPersonIdentifier + '/employment/'
     And header Authorization = 'Bearer ' + token
     And request TestPersonEmployment
     When method POST
     Then status 400
-    And match response.detail == "Could not retrieve user's cristin organization identifier"
+    And match response.detail contains "User not allowed to create employment at this institution"
 
   Scenario: Create returns status 400 Bad Request when invalid type
     Given path '/person/' + cristinTestPersonIdentifier + '/employment/'
