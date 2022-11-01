@@ -1365,6 +1365,18 @@ components:
               type: string
               format: date-time
               description: Date the project was modified
+        fundingAmount:
+          type: object
+          properties:
+            type:
+              type: string
+              pattern: 'FundingAmount'
+              description: Type of object
+            currencyCode:
+              type: string
+              description: Currency code. Currently only in NOK (Norwegian Kroner)
+            amount:
+              type: number
     ProjectPost:
       type: object
       properties:
@@ -2084,6 +2096,10 @@ components:
               date: "2019-12-31T09:45:17Z"
             lastModified:
               date: "2020-12-31T09:45:17Z"
+            fundingAmount:
+              type: 'FundingAmount'
+              currencyCode: 'NOK'
+              amount: 5660000.0
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2146,6 +2162,10 @@ components:
           date: "2019-12-31T09:45:17Z"
         lastModified:
           date: "2020-12-31T09:45:17Z"
+        fundingAmount:
+          type: 'FundingAmount'
+          currencyCode: 'NOK'
+          amount: 5660000.0
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2611,6 +2631,15 @@ components:
               en: "Summary in an academic manner"
             popularScientificSummary:
               en: "popularScientificSummary popularScientificSummary popularScientificSummary"
+            created:
+              sourceShortName: "REK"
+              date: "2019-12-31T09:45:17Z"
+            lastModified:
+              date: "2020-12-31T09:45:17Z"
+            fundingAmount:
+              type: 'FundingAmount'
+              currencyCode: 'NOK'
+              amount: 5660000.0
 
   securitySchemes:
     CognitoUserPool:
