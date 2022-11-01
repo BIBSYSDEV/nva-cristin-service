@@ -112,3 +112,15 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.created.date == '#present'
     And match response.created.sourceShortName == '#present'
     And match response.lastModified.date == '#present'
+
+  Scenario: Fetch returns total funding amount
+    Given path '/project/550767'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.fundingAmount == '#present'
+    And match response.fundingAmount.type == '#present'
+    And match response.fundingAmount.type == 'FundingAmount'
+    And match response.fundingAmount.currencyCode == '#present'
+    And match response.fundingAmount.amount == '#present'
