@@ -12,7 +12,9 @@ public class CristinFundingAmount {
 
     public static final String CRISTIN_CURRENCY_CODE = "currency_code";
 
+    @JsonProperty(CRISTIN_CURRENCY_CODE)
     private final transient String currencyCode;
+    @JsonProperty(AMOUNT)
     private final transient Double amount;
 
     @JsonCreator

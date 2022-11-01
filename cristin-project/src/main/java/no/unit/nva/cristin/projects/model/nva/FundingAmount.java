@@ -14,7 +14,9 @@ import no.unit.nva.commons.json.JsonSerializable;
 public class FundingAmount implements JsonSerializable {
 
     public static final String CURRENCY_CODE = "currencyCode";
+    @JsonProperty(CURRENCY_CODE)
     private final transient String currencyCode;
+    @JsonProperty(AMOUNT)
     private final transient Double amount;
 
     @JsonCreator
