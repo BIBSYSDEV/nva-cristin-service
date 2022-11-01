@@ -1365,6 +1365,21 @@ components:
               type: string
               format: date-time
               description: Date the project was modified
+        contactInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              pattern: 'ContactInfo'
+              description: Type of object
+            contactPerson:
+              type: string
+            organization:
+              type: string
+            email:
+              type: string
+            phone:
+              type: string
     ProjectPost:
       type: object
       properties:
@@ -2084,6 +2099,12 @@ components:
               date: "2019-12-31T09:45:17Z"
             lastModified:
               date: "2020-12-31T09:45:17Z"
+            contactInfo:
+              type: 'ContactInfo'
+              contactPerson: 'Helge Testesen'
+              organization: 'Agricultural University of Iceland'
+              email: 'helge@test.no'
+              phone: '44223355'
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2146,6 +2167,12 @@ components:
           date: "2019-12-31T09:45:17Z"
         lastModified:
           date: "2020-12-31T09:45:17Z"
+        contactInfo:
+          type: 'ContactInfo'
+          contactPerson: 'Helge Testesen'
+          organization: 'Agricultural University of Iceland'
+          email: 'helge@test.no'
+          phone: '44223355'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2611,6 +2638,12 @@ components:
               en: "Summary in an academic manner"
             popularScientificSummary:
               en: "popularScientificSummary popularScientificSummary popularScientificSummary"
+            contactInfo:
+              type: 'ContactInfo'
+              contactPerson: 'Helge Testesen'
+              organization: 'Agricultural University of Iceland'
+              email: 'helge@test.no'
+              phone: '44223355'
 
   securitySchemes:
     CognitoUserPool:
