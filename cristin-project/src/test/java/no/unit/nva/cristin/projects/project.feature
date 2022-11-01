@@ -112,3 +112,16 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.created.date == '#present'
     And match response.created.sourceShortName == '#present'
     And match response.lastModified.date == '#present'
+
+  Scenario: Fetch returns contact info
+    Given path '/project/550767'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.contactInfo.type == '#present'
+    And match response.contactInfo.type == 'ContactInfo'
+    And match response.contactInfo.contactPerson == '#present'
+    And match response.contactInfo.organization == '#present'
+    And match response.contactInfo.email == '#present'
+    And match response.contactInfo.phone == '#present'
