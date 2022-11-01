@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.model.CristinInstitution;
+import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.model.CristinOrganization;
@@ -8,6 +9,7 @@ import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
+import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
@@ -104,7 +106,16 @@ public class NvaProjectBuilder {
                    .withPublishable(cristinProject.getPublishable())
                    .withCreated(generateDateInfo(cristinProject.getCreated()))
                    .withLastModified(generateDateInfo(cristinProject.getLastModified()))
+                   .withContactInfo(extractContactInfo(cristinProject.getContactInfo()))
                    .build();
+    }
+
+    private ContactInfo extractContactInfo(CristinContactInfo cristinContactInfo) {
+        if (nonNull(cristinContactInfo)) {
+            return new ContactInfo(cristinContactInfo.getContactPerson(), cristinContactInfo.getInstitution(),
+                                   cristinContactInfo.getEmail(), cristinContactInfo.getPhone());
+        }
+        return null;
     }
 
     private DateInfo generateDateInfo(CristinDateInfo cristinDateInfo) {

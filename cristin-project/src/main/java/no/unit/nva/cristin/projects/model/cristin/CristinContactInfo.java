@@ -19,6 +19,9 @@ public class CristinContactInfo {
     private final transient String email;
     private final transient String phone;
 
+    /**
+     * Cristin model for a project's contact info.
+     */
     @JsonCreator
     public CristinContactInfo(@JsonProperty(CRISTIN_CONTACT_PERSON) String contactPerson,
                               @JsonProperty(INSTITUTION) String institution,

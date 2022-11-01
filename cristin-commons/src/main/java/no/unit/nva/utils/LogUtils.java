@@ -8,7 +8,7 @@ public class LogUtils {
     public static final String NOT_PRESENT = "not present";
 
     /**
-     * Extracts organization identifier from requestInfo or else default value
+     * Extracts organization identifier from requestInfo or else default value.
      */
     public static String extractOrgIdentifier(RequestInfo requestInfo) {
         try {
@@ -22,7 +22,7 @@ public class LogUtils {
     }
 
     /**
-     * Extracts cristin identifier from requestInfo or else default value
+     * Extracts cristin identifier from requestInfo or else default value.
      */
     public static String extractCristinIdentifier(RequestInfo requestInfo) {
         try {

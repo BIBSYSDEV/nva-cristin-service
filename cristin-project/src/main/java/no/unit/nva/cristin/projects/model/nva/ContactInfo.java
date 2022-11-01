@@ -4,6 +4,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.EMAIL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PHONE;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -21,6 +22,10 @@ public class ContactInfo implements JsonSerializable {
     private final transient String email;
     private final transient String phone;
 
+    /**
+     * Nva model for a project's contact info.
+     */
+    @JsonCreator
     public ContactInfo(@JsonProperty(CONTACT_PERSON) String contactPerson,
                        @JsonProperty(ORGANIZATION) String organization,
                        @JsonProperty(EMAIL) String email,
