@@ -104,24 +104,20 @@ public class NvaProjectBuilder {
                    .withPopularScientificSummary(cristinProject.getPopularScientificSummary())
                    .withPublished(cristinProject.getPublished())
                    .withPublishable(cristinProject.getPublishable())
-                   .withCreated(generateDateInfo(cristinProject.getCreated()))
-                   .withLastModified(generateDateInfo(cristinProject.getLastModified()))
+                   .withCreated(extractDateInfo(cristinProject.getCreated()))
+                   .withLastModified(extractDateInfo(cristinProject.getLastModified()))
                    .withFundingAmount(extractFundingAmount(cristinProject.getTotalFundingAmount()))
                    .build();
     }
 
     private FundingAmount extractFundingAmount(CristinFundingAmount cristinFundingAmount) {
-        if (nonNull(cristinFundingAmount)) {
-            return new FundingAmount(cristinFundingAmount.getCurrencyCode(), cristinFundingAmount.getAmount());
-        }
-        return null;
+        return nonNull(cristinFundingAmount) ? new FundingAmount(cristinFundingAmount.getCurrencyCode(),
+                                                                 cristinFundingAmount.getAmount()) : null;
     }
 
-    private DateInfo generateDateInfo(CristinDateInfo cristinDateInfo) {
-        if (nonNull(cristinDateInfo)) {
-            return new DateInfo(cristinDateInfo.getSourceShortName(), cristinDateInfo.getDate());
-        }
-        return null;
+    private DateInfo extractDateInfo(CristinDateInfo cristinDateInfo) {
+        return nonNull(cristinDateInfo) ? new DateInfo(cristinDateInfo.getSourceShortName(),
+                                                       cristinDateInfo.getDate()) : null;
     }
 
     private String getContext() {
