@@ -2,13 +2,20 @@ package no.unit.nva.cristin.projects;
 
 import java.util.HashSet;
 import java.util.Set;
+import no.unit.nva.cristin.projects.model.cristin.CristinFundingAmount;
+import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import org.junit.jupiter.api.Test;
 
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.IGNORE_LIST;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringFields;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static nva.commons.core.attempt.Try.attempt;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,6 +37,16 @@ class CristinProjectBuilderTest {
 
         assertThat(actual, doesNotHaveEmptyValuesIgnoringFields(ignored));
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldSerializeAndDeserializeCristinFundingAmountIntoSameObject() {
+        var cristinFundingAmount = new CristinFundingAmount(randomString(), randomInteger().doubleValue());
+        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(cristinFundingAmount)).orElseThrow();
+        var deserialized =
+            attempt(() -> OBJECT_MAPPER.readValue(serialized, CristinFundingAmount.class)).orElseThrow();
+
+        assertThat(deserialized, equalTo(cristinFundingAmount));
     }
 
     private void addFieldsNotSupportedByToCristinProject(NvaProject expected, NvaProject actual) {
