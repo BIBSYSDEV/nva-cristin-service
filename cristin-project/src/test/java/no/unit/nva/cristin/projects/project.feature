@@ -119,6 +119,7 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 200
     And match response == '#object'
     And match response['@context'] == '#present'
+    And match response.contactInfo == '#present'
     And match response.contactInfo.type == '#present'
     And match response.contactInfo.type == 'ContactInfo'
     And match response.contactInfo.contactPerson == '#present'
@@ -135,5 +136,5 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.fundingAmount == '#present'
     And match response.fundingAmount.type == '#present'
     And match response.fundingAmount.type == 'FundingAmount'
-    And match response.fundingAmount.currencyCode == '#present'
-    And match response.fundingAmount.amount == '#present'
+    And match response.fundingAmount.currency == '#present'
+    And match response.fundingAmount.value == '#present'

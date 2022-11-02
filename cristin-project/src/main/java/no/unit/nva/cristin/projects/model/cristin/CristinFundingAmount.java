@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
-import static no.unit.nva.cristin.model.JsonPropertyNames.AMOUNT;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -11,6 +10,7 @@ import java.util.Objects;
 public class CristinFundingAmount {
 
     public static final String CRISTIN_CURRENCY_CODE = "currency_code";
+    public static final String AMOUNT = "amount";
 
     @JsonProperty(CRISTIN_CURRENCY_CODE)
     private final transient String currencyCode;

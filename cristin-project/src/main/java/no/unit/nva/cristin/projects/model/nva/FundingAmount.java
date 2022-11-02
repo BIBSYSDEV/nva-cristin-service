@@ -1,7 +1,6 @@
 package no.unit.nva.cristin.projects.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static no.unit.nva.cristin.model.JsonPropertyNames.AMOUNT;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,24 +12,25 @@ import no.unit.nva.commons.json.JsonSerializable;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class FundingAmount implements JsonSerializable {
 
-    public static final String CURRENCY_CODE = "currencyCode";
-    @JsonProperty(CURRENCY_CODE)
-    private final transient String currencyCode;
-    @JsonProperty(AMOUNT)
-    private final transient Double amount;
+    public static final String CURRENCY = "currency";
+    public static final String VALUE = "value";
+    @JsonProperty(CURRENCY)
+    private final transient String currency;
+    @JsonProperty(VALUE)
+    private final transient Double value;
 
     @JsonCreator
-    public FundingAmount(@JsonProperty(CURRENCY_CODE) String currencyCode, @JsonProperty(AMOUNT) Double amount) {
-        this.currencyCode = currencyCode;
-        this.amount = amount;
+    public FundingAmount(@JsonProperty(CURRENCY) String currency, @JsonProperty(VALUE) Double value) {
+        this.currency = currency;
+        this.value = value;
     }
 
-    public String getCurrencyCode() {
-        return currencyCode;
+    public String getCurrency() {
+        return currency;
     }
 
-    public Double getAmount() {
-        return amount;
+    public Double getValue() {
+        return value;
     }
 
     @Override
@@ -42,13 +42,12 @@ public class FundingAmount implements JsonSerializable {
             return false;
         }
         FundingAmount that = (FundingAmount) o;
-        return Objects.equals(getCurrencyCode(), that.getCurrencyCode()) && Objects.equals(getAmount(),
-                                                                                           that.getAmount());
+        return Objects.equals(getCurrency(), that.getCurrency()) && Objects.equals(getValue(), that.getValue());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCurrencyCode(), getAmount());
+        return Objects.hash(getCurrency(), getValue());
     }
 
     @Override

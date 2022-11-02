@@ -61,8 +61,8 @@ public class NvaProjectBuilderTest {
         assertThat(nvaProject.getContactInfo().getOrganization(), equalTo(CONTACT_ORGANIZATION));
         assertThat(nvaProject.getContactInfo().getEmail(), equalTo(CONTACT_EMAIL));
         assertThat(nvaProject.getContactInfo().getPhone(), equalTo(CONTACT_PHONE));
-        assertThat(nvaProject.getFundingAmount().getCurrencyCode(), equalTo(CURRENCY_CODE_NOK));
-        assertThat(nvaProject.getFundingAmount().getAmount(), equalTo(FUNDING_AMOUNT_EXAMPLE));
+        assertThat(nvaProject.getFundingAmount().getCurrency(), equalTo(CURRENCY_CODE_NOK));
+        assertThat(nvaProject.getFundingAmount().getValue(), equalTo(FUNDING_AMOUNT_EXAMPLE));
     }
 
     @Test

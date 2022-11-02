@@ -1387,10 +1387,10 @@ components:
               type: string
               pattern: 'FundingAmount'
               description: Type of object
-            currencyCode:
+            currency:
               type: string
               description: Currency code. Currently only in NOK (Norwegian Kroner)
-            amount:
+            value:
               type: number
     ProjectPost:
       type: object
@@ -2119,8 +2119,8 @@ components:
               phone: '44223355'
             fundingAmount:
               type: 'FundingAmount'
-              currencyCode: 'NOK'
-              amount: 5660000.0
+              currency: 'NOK'
+              value: 5660000.0
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2191,8 +2191,8 @@ components:
           phone: '44223355'
         fundingAmount:
           type: 'FundingAmount'
-          currencyCode: 'NOK'
-          amount: 5660000.0
+          currency: 'NOK'
+          value: 5660000.0
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2671,8 +2671,8 @@ components:
               phone: '44223355'
             fundingAmount:
               type: 'FundingAmount'
-              currencyCode: 'NOK'
-              amount: 5660000.0
+              currency: 'NOK'
+              value: 5660000.0
 
   securitySchemes:
     CognitoUserPool:
