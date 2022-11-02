@@ -94,6 +94,8 @@ public class NvaProject implements JsonSerializable {
     @JsonProperty
     @JsonInclude(NON_NULL)
     private FundingAmount fundingAmount;
+    @JsonProperty
+    private Map<String, String> method;
 
     private NvaProject() {
     }
@@ -266,6 +268,14 @@ public class NvaProject implements JsonSerializable {
         this.fundingAmount = fundingAmount;
     }
 
+    public Map<String, String> getMethod() {
+        return nonEmptyOrDefault(method);
+    }
+
+    public void setMethod(Map<String, String> method) {
+        this.method = method;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -295,7 +305,8 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getCreated(), that.getCreated())
                && Objects.equals(getLastModified(), that.getLastModified())
                && Objects.equals(getContactInfo(), that.getContactInfo())
-               && Objects.equals(getFundingAmount(), that.getFundingAmount());
+               && Objects.equals(getFundingAmount(), that.getFundingAmount())
+               && Objects.equals(getMethod(), that.getMethod());
     }
 
     @Override
@@ -304,7 +315,7 @@ public class NvaProject implements JsonSerializable {
                             getAlternativeTitles(), getStartDate(), getEndDate(), getFunding(),
                             getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
-                            getLastModified(), getContactInfo(), getFundingAmount());
+                            getLastModified(), getContactInfo(), getFundingAmount(), getMethod());
     }
 
     @Override
@@ -427,6 +438,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withFundingAmount(FundingAmount fundingAmount) {
             nvaProject.setFundingAmount(fundingAmount);
+            return this;
+        }
+
+        public Builder withMethod(Map<String, String> method) {
+            nvaProject.setMethod(method);
             return this;
         }
 

@@ -85,6 +85,9 @@
         "type": "FundingAmount",
         "currency": "NOK",
         "value": 5660000.0
+      },
+      "method": {
+        "en": "<p>\r\nSome method</p>\r\n"
       }
     },
     {
@@ -164,6 +167,9 @@
         "type": "FundingAmount",
         "currency": "NOK",
         "value": 5660000.0
+      },
+      "method": {
+        "en": "<p>\r\nSome method</p>\r\n"
       }
     },
     {
@@ -243,6 +249,9 @@
         "type": "FundingAmount",
         "currency": "NOK",
         "value": 5660000.0
+      },
+      "method": {
+        "en": "<p>\r\nSome method</p>\r\n"
       }
     },
     {
@@ -322,6 +331,9 @@
         "type": "FundingAmount",
         "currency": "NOK",
         "value": 5660000.0
+      },
+      "method": {
+        "en": "<p>\r\nSome method</p>\r\n"
       }
     },
     {
@@ -401,6 +413,9 @@
         "type": "FundingAmount",
         "currency": "NOK",
         "value": 5660000.0
+      },
+      "method": {
+        "en": "<p>\r\nSome method</p>\r\n"
       }
     }
   ]

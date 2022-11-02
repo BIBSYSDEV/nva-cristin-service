@@ -87,6 +87,7 @@ public class RandomProjectDataGenerator {
                                           .withLastModified(randomDateInfo())
                                           .withContactInfo(randomContactInfo())
                                           .withFundingAmount(randomFundingAmount())
+                                          .withMethod(randomSummary())
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;

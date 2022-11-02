@@ -78,5 +78,8 @@
   ],
   "popular_scientific_summary": {
     "en": "<p>Some popular scientific summary</p>\r\n"
+  },
+  "method": {
+    "en": "<p>\r\nSome method</p>\r\n"
   }
 }
