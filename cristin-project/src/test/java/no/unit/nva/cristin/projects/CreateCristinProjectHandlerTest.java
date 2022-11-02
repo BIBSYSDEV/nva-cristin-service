@@ -227,6 +227,7 @@ class CreateCristinProjectHandlerTest {
         expected.setContactInfo(null);
         expected.setFundingAmount(null);
         expected.setMethod(Collections.emptyMap());
+        expected.setEquipment(Collections.emptyMap());
     }
 
 }

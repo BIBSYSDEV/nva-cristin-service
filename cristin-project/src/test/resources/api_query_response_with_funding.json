@@ -88,6 +88,9 @@
       },
       "method": {
         "en": "<p>\r\nSome method</p>\r\n"
+      },
+      "equipment": {
+        "en": "<p>\r\nSome equipment</p>\r\n"
       }
     },
     {
@@ -170,6 +173,9 @@
       },
       "method": {
         "en": "<p>\r\nSome method</p>\r\n"
+      },
+      "equipment": {
+        "en": "<p>\r\nSome equipment</p>\r\n"
       }
     },
     {
@@ -252,6 +258,9 @@
       },
       "method": {
         "en": "<p>\r\nSome method</p>\r\n"
+      },
+      "equipment": {
+        "en": "<p>\r\nSome equipment</p>\r\n"
       }
     },
     {
@@ -334,6 +343,9 @@
       },
       "method": {
         "en": "<p>\r\nSome method</p>\r\n"
+      },
+      "equipment": {
+        "en": "<p>\r\nSome equipment</p>\r\n"
       }
     },
     {
@@ -416,6 +428,9 @@
       },
       "method": {
         "en": "<p>\r\nSome method</p>\r\n"
+      },
+      "equipment": {
+        "en": "<p>\r\nSome equipment</p>\r\n"
       }
     }
   ]

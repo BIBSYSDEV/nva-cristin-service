@@ -24,6 +24,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUM
 public class CristinProject {
 
     public static final String METHOD = "method";
+    public static final String EQUIPMENT = "equipment";
 
     private String cristinProjectId;
     private Boolean publishable;
@@ -48,6 +49,8 @@ public class CristinProject {
     private Map<String, String> popularScientificSummary;
     @JsonProperty(METHOD)
     private Map<String, String> method;
+    @JsonProperty(EQUIPMENT)
+    private Map<String, String> equipment;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -191,6 +194,14 @@ public class CristinProject {
 
     public void setMethod(Map<String, String> method) {
         this.method = method;
+    }
+
+    public Map<String, String> getEquipment() {
+        return nonEmptyOrDefault(equipment);
+    }
+
+    public void setEquipment(Map<String, String> equipment) {
+        this.equipment = equipment;
     }
 
     /**

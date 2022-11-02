@@ -67,6 +67,7 @@ public class NvaProjectBuilderTest {
         assertThat(nvaProject.getFundingAmount().getCurrency(), equalTo(CURRENCY_CODE_NOK));
         assertThat(nvaProject.getFundingAmount().getValue(), equalTo(FUNDING_AMOUNT_EXAMPLE));
         assertThat(nvaProject.getMethod().get(ENGLISH_LANGUAGE_KEY), not(emptyString()));
+        assertThat(nvaProject.getEquipment().get(ENGLISH_LANGUAGE_KEY), not(emptyString()));
     }
 
     @Test
