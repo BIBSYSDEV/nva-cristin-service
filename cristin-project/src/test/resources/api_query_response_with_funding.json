@@ -73,6 +73,13 @@
       },
       "lastModified": {
         "date": "2019-12-31T09:48:20Z"
+      },
+      "contactInfo": {
+        "type": "ContactInfo",
+        "contactPerson": "Helge Testesen",
+        "organization": "Agricultural University of Iceland",
+        "email": "helge@test.no",
+        "phone": "44223355"
       }
     },
     {
@@ -140,6 +147,13 @@
       },
       "lastModified": {
         "date": "2019-12-31T09:48:20Z"
+      },
+      "contactInfo": {
+        "type": "ContactInfo",
+        "contactPerson": "Helge Testesen",
+        "organization": "Agricultural University of Iceland",
+        "email": "helge@test.no",
+        "phone": "44223355"
       }
     },
     {
@@ -207,6 +221,13 @@
       },
       "lastModified": {
         "date": "2019-12-31T09:48:20Z"
+      },
+      "contactInfo": {
+        "type": "ContactInfo",
+        "contactPerson": "Helge Testesen",
+        "organization": "Agricultural University of Iceland",
+        "email": "helge@test.no",
+        "phone": "44223355"
       }
     },
     {
@@ -274,6 +295,13 @@
       },
       "lastModified": {
         "date": "2019-12-31T09:48:20Z"
+      },
+      "contactInfo": {
+        "type": "ContactInfo",
+        "contactPerson": "Helge Testesen",
+        "organization": "Agricultural University of Iceland",
+        "email": "helge@test.no",
+        "phone": "44223355"
       }
     },
     {
@@ -341,6 +369,13 @@
       },
       "lastModified": {
         "date": "2019-12-31T09:48:20Z"
+      },
+      "contactInfo": {
+        "type": "ContactInfo",
+        "contactPerson": "Helge Testesen",
+        "organization": "Agricultural University of Iceland",
+        "email": "helge@test.no",
+        "phone": "44223355"
       }
     }
   ]

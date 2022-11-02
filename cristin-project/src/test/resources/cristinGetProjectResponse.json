@@ -41,6 +41,12 @@
       }
     }
   ],
+  "contact_info" : {
+    "contact_person" : "Helge Testesen",
+    "institution" : "Agricultural University of Iceland",
+    "email" : "helge@test.no",
+    "phone" : "44223355"
+  },
   "participants": [
     {
       "cristin_person_id": "123456",
