@@ -1365,6 +1365,21 @@ components:
               type: string
               format: date-time
               description: Date the project was modified
+        contactInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              pattern: 'ContactInfo'
+              description: Type of object
+            contactPerson:
+              type: string
+            organization:
+              type: string
+            email:
+              type: string
+            phone:
+              type: string
         fundingAmount:
           type: object
           properties:
@@ -2096,6 +2111,12 @@ components:
               date: "2019-12-31T09:45:17Z"
             lastModified:
               date: "2020-12-31T09:45:17Z"
+            contactInfo:
+              type: 'ContactInfo'
+              contactPerson: 'Helge Testesen'
+              organization: 'Agricultural University of Iceland'
+              email: 'helge@test.no'
+              phone: '44223355'
             fundingAmount:
               type: 'FundingAmount'
               currencyCode: 'NOK'
@@ -2162,6 +2183,12 @@ components:
           date: "2019-12-31T09:45:17Z"
         lastModified:
           date: "2020-12-31T09:45:17Z"
+        contactInfo:
+          type: 'ContactInfo'
+          contactPerson: 'Helge Testesen'
+          organization: 'Agricultural University of Iceland'
+          email: 'helge@test.no'
+          phone: '44223355'
         fundingAmount:
           type: 'FundingAmount'
           currencyCode: 'NOK'
@@ -2636,6 +2663,12 @@ components:
               date: "2019-12-31T09:45:17Z"
             lastModified:
               date: "2020-12-31T09:45:17Z"
+            contactInfo:
+              type: 'ContactInfo'
+              contactPerson: 'Helge Testesen'
+              organization: 'Agricultural University of Iceland'
+              email: 'helge@test.no'
+              phone: '44223355'
             fundingAmount:
               type: 'FundingAmount'
               currencyCode: 'NOK'

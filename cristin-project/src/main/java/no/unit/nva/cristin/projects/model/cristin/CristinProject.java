@@ -37,6 +37,7 @@ public class CristinProject {
     private CristinDateInfo lastModified;
     private CristinOrganization coordinatingInstitution;
     private List<CristinFundingSource> projectFundingSources;
+    private CristinContactInfo contactInfo;
     private CristinFundingAmount totalFundingAmount;
     private List<CristinPerson> participants;
     @JsonProperty(ACADEMIC_SUMMARY)
@@ -138,6 +139,14 @@ public class CristinProject {
 
     public void setProjectFundingSources(List<CristinFundingSource> projectFundingSources) {
         this.projectFundingSources = projectFundingSources;
+    }
+
+    public CristinContactInfo getContactInfo() {
+        return contactInfo;
+    }
+
+    public void setContactInfo(CristinContactInfo contactInfo) {
+        this.contactInfo = contactInfo;
     }
 
     public CristinFundingAmount getTotalFundingAmount() {

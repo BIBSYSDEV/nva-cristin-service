@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,10 @@ public class NvaProjectBuilderTest {
     private static final String CREATED_DATE = "2019-12-31T09:45:17Z";
     private static final String MODIFIED_DATE = "2019-12-31T09:48:20Z";
     private static final String CREATED_BY = "REK";
+    public static final String CONTACT_PERSON_NAME = "Helge Testesen";
+    public static final String CONTACT_ORGANIZATION = "Agricultural University of Iceland";
+    public static final String CONTACT_EMAIL = "helge@test.no";
+    public static final String CONTACT_PHONE = "44223355";
     public static final String CURRENCY_CODE_NOK = "NOK";
     public static final double FUNDING_AMOUNT_EXAMPLE = 5660000.0;
 
@@ -52,8 +57,22 @@ public class NvaProjectBuilderTest {
         assertThat(nvaProject.getCreated().getSourceShortName(), equalTo(CREATED_BY));
         assertThat(nvaProject.getCreated().getDate().toString(), equalTo(CREATED_DATE));
         assertThat(nvaProject.getLastModified().getDate().toString(), equalTo(MODIFIED_DATE));
+        assertThat(nvaProject.getContactInfo().getContactPerson(), equalTo(CONTACT_PERSON_NAME));
+        assertThat(nvaProject.getContactInfo().getOrganization(), equalTo(CONTACT_ORGANIZATION));
+        assertThat(nvaProject.getContactInfo().getEmail(), equalTo(CONTACT_EMAIL));
+        assertThat(nvaProject.getContactInfo().getPhone(), equalTo(CONTACT_PHONE));
         assertThat(nvaProject.getFundingAmount().getCurrencyCode(), equalTo(CURRENCY_CODE_NOK));
         assertThat(nvaProject.getFundingAmount().getAmount(), equalTo(FUNDING_AMOUNT_EXAMPLE));
+    }
+
+    @Test
+    void shouldSerializeAndDeserializeContactInfoIntoSameObject() {
+        var contactInfo = new ContactInfo(randomString(), randomString(), CONTACT_EMAIL, randomString());
+        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(contactInfo)).orElseThrow();
+        var deserialized =
+            attempt(() -> OBJECT_MAPPER.readValue(serialized, ContactInfo.class)).orElseThrow();
+
+        assertThat(deserialized, equalTo(contactInfo));
     }
 
     @Test
@@ -65,4 +84,5 @@ public class NvaProjectBuilderTest {
 
         assertThat(deserialized, equalTo(fundingAmount));
     }
+
 }

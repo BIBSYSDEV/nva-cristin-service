@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.model.CristinInstitution;
+import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingAmount;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
@@ -9,6 +10,7 @@ import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
+import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingAmount;
@@ -106,8 +108,16 @@ public class NvaProjectBuilder {
                    .withPublishable(cristinProject.getPublishable())
                    .withCreated(extractDateInfo(cristinProject.getCreated()))
                    .withLastModified(extractDateInfo(cristinProject.getLastModified()))
+                   .withContactInfo(extractContactInfo(cristinProject.getContactInfo()))
                    .withFundingAmount(extractFundingAmount(cristinProject.getTotalFundingAmount()))
                    .build();
+    }
+
+    private ContactInfo extractContactInfo(CristinContactInfo cristinContactInfo) {
+        return nonNull(cristinContactInfo) ? new ContactInfo(cristinContactInfo.getContactPerson(),
+                                                             cristinContactInfo.getInstitution(),
+                                                             cristinContactInfo.getEmail(),
+                                                             cristinContactInfo.getPhone()) : null;
     }
 
     private FundingAmount extractFundingAmount(CristinFundingAmount cristinFundingAmount) {

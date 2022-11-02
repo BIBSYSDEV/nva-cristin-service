@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingAmount;
@@ -55,6 +56,7 @@ public class RandomProjectDataGenerator {
     private static final String NORWEGIAN = "nb";
     private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
     public static final String SOME_UNIT_IDENTIFIER = "185.90.0.0";
+    public static final String EMAIL_DOMAIN = "@email.no";
 
     /**
      * Create a NvaProject containing random data.
@@ -83,10 +85,15 @@ public class RandomProjectDataGenerator {
                                           .withCoordinatingInstitution(randomOrganization())
                                           .withCreated(randomDateInfo())
                                           .withLastModified(randomDateInfo())
+                                          .withContactInfo(randomContactInfo())
                                           .withFundingAmount(randomFundingAmount())
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
+    }
+
+    private static ContactInfo randomContactInfo() {
+        return new ContactInfo(randomString(), randomString(), randomString() + EMAIL_DOMAIN, randomString());
     }
 
     private static FundingAmount randomFundingAmount() {
