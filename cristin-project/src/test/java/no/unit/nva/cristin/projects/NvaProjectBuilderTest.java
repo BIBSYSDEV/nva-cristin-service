@@ -15,7 +15,9 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.ioutils.IoUtils.stringFromResources;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NvaProjectBuilderTest {
@@ -32,6 +34,7 @@ public class NvaProjectBuilderTest {
     public static final String CONTACT_PHONE = "44223355";
     public static final String CURRENCY_CODE_NOK = "NOK";
     public static final double FUNDING_AMOUNT_EXAMPLE = 5660000.0;
+    public static final String ENGLISH_LANGUAGE_KEY = "en";
 
     @Test
     void shouldReturnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
@@ -63,6 +66,8 @@ public class NvaProjectBuilderTest {
         assertThat(nvaProject.getContactInfo().getPhone(), equalTo(CONTACT_PHONE));
         assertThat(nvaProject.getFundingAmount().getCurrency(), equalTo(CURRENCY_CODE_NOK));
         assertThat(nvaProject.getFundingAmount().getValue(), equalTo(FUNDING_AMOUNT_EXAMPLE));
+        assertThat(nvaProject.getMethod().get(ENGLISH_LANGUAGE_KEY), not(emptyString()));
+        assertThat(nvaProject.getEquipment().get(ENGLISH_LANGUAGE_KEY), not(emptyString()));
     }
 
     @Test

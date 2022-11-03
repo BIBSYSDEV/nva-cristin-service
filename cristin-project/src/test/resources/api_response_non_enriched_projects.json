@@ -27,7 +27,9 @@
       "contributors": [],
       "status": "ACTIVE",
       "academicSummary": {},
-      "popularScientificSummary": {}
+      "popularScientificSummary": {},
+      "method": {},
+      "equipment": {}
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/999888",
@@ -52,7 +54,9 @@
       "contributors": [],
       "status": "ACTIVE",
       "academicSummary": {},
-      "popularScientificSummary": {}
+      "popularScientificSummary": {},
+      "method": {},
+      "equipment": {}
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/111333",
@@ -77,7 +81,9 @@
       "contributors": [],
       "status": "ACTIVE",
       "academicSummary": {},
-      "popularScientificSummary": {}
+      "popularScientificSummary": {},
+      "method": {},
+      "equipment": {}
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/222444",
@@ -98,7 +104,9 @@
       "contributors": [],
       "status": "ACTIVE",
       "academicSummary": {},
-      "popularScientificSummary": {}
+      "popularScientificSummary": {},
+      "method": {},
+      "equipment": {}
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/444222",
@@ -119,7 +127,9 @@
       "contributors": [],
       "status": "ACTIVE",
       "academicSummary": {},
-      "popularScientificSummary": {}
+      "popularScientificSummary": {},
+      "method": {},
+      "equipment": {}
     }
   ]
 }

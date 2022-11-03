@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
@@ -225,6 +226,8 @@ class CreateCristinProjectHandlerTest {
     private void removeFieldsNotSupportedByPost(NvaProject expected) {
         expected.setContactInfo(null);
         expected.setFundingAmount(null);
+        expected.setMethod(Collections.emptyMap());
+        expected.setEquipment(Collections.emptyMap());
     }
 
 }

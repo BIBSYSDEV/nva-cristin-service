@@ -110,6 +110,8 @@ public class NvaProjectBuilder {
                    .withLastModified(extractDateInfo(cristinProject.getLastModified()))
                    .withContactInfo(extractContactInfo(cristinProject.getContactInfo()))
                    .withFundingAmount(extractFundingAmount(cristinProject.getTotalFundingAmount()))
+                   .withMethod(cristinProject.getMethod())
+                   .withEquipment(cristinProject.getEquipment())
                    .build();
     }
 

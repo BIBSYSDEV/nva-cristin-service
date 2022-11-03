@@ -138,3 +138,14 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.fundingAmount.type == 'FundingAmount'
     And match response.fundingAmount.currency == '#present'
     And match response.fundingAmount.value == '#present'
+
+  Scenario: Fetch returns method and equipment
+    Given path '/project/284612'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.method == '#present'
+    And match response.method['no'] == '#present'
+    And match response.equipment == '#present'
+    And match response.equipment['no'] == '#present'

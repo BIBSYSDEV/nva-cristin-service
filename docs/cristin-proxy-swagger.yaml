@@ -1392,6 +1392,10 @@ components:
               description: Currency code. Currently only in NOK (Norwegian Kroner)
             value:
               type: number
+        method:
+          $ref: '#/components/schemas/Languages'
+        equipment:
+          $ref: '#/components/schemas/Languages'
     ProjectPost:
       type: object
       properties:
@@ -2121,6 +2125,10 @@ components:
               type: 'FundingAmount'
               currency: 'NOK'
               value: 5660000.0
+            method:
+              no: "Dette er metoden"
+            equipment:
+              no: "Dette er utstyret"
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2193,6 +2201,10 @@ components:
           type: 'FundingAmount'
           currency: 'NOK'
           value: 5660000.0
+        method:
+          no: "Dette er metoden"
+        equipment:
+          no: "Dette er utstyret"
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2673,6 +2685,10 @@ components:
               type: 'FundingAmount'
               currency: 'NOK'
               value: 5660000.0
+            method:
+              no: "Dette er metoden"
+            equipment:
+              no: "Dette er utstyret"
 
   securitySchemes:
     CognitoUserPool:
