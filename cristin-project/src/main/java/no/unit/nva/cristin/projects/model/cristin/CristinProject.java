@@ -25,6 +25,7 @@ public class CristinProject {
 
     public static final String METHOD = "method";
     public static final String EQUIPMENT = "equipment";
+    public static final String CRISTIN_PROJECT_CATEGORIES = "project_categories";
 
     private String cristinProjectId;
     private Boolean publishable;
@@ -51,6 +52,8 @@ public class CristinProject {
     private Map<String, String> method;
     @JsonProperty(EQUIPMENT)
     private Map<String, String> equipment;
+    @JsonProperty(CRISTIN_PROJECT_CATEGORIES)
+    private List<CristinTypedLabel> projectCategories;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -202,6 +205,14 @@ public class CristinProject {
 
     public void setEquipment(Map<String, String> equipment) {
         this.equipment = equipment;
+    }
+
+    public List<CristinTypedLabel> getProjectCategories() {
+        return projectCategories;
+    }
+
+    public void setProjectCategories(List<CristinTypedLabel> projectCategories) {
+        this.projectCategories = projectCategories;
     }
 
     /**

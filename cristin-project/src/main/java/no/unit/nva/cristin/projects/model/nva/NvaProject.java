@@ -98,6 +98,8 @@ public class NvaProject implements JsonSerializable {
     private Map<String, String> method;
     @JsonProperty
     private Map<String, String> equipment;
+    @JsonProperty
+    private List<TypedLabel> projectCategories;
 
     private NvaProject() {
     }
@@ -286,6 +288,14 @@ public class NvaProject implements JsonSerializable {
         this.equipment = equipment;
     }
 
+    public List<TypedLabel> getProjectCategories() {
+        return nonEmptyOrDefault(projectCategories);
+    }
+
+    public void setProjectCategories(List<TypedLabel> projectCategories) {
+        this.projectCategories = projectCategories;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -317,7 +327,8 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getContactInfo(), that.getContactInfo())
                && Objects.equals(getFundingAmount(), that.getFundingAmount())
                && Objects.equals(getMethod(), that.getMethod())
-               && Objects.equals(getEquipment(), that.getEquipment());
+               && Objects.equals(getEquipment(), that.getEquipment())
+               && Objects.equals(getProjectCategories(), that.getProjectCategories());
     }
 
     @Override
@@ -326,7 +337,8 @@ public class NvaProject implements JsonSerializable {
                             getAlternativeTitles(), getStartDate(), getEndDate(), getFunding(),
                             getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
-                            getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment());
+                            getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
+                            getProjectCategories());
     }
 
     @Override
@@ -459,6 +471,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withEquipment(Map<String, String> equipment) {
             nvaProject.setEquipment(equipment);
+            return this;
+        }
+
+        public Builder withProjectCategories(List<TypedLabel> projectCategories) {
+            nvaProject.setProjectCategories(projectCategories);
             return this;
         }
 

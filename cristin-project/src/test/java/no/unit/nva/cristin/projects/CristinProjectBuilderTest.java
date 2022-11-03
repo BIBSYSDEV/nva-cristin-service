@@ -4,13 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingAmount;
-import no.unit.nva.cristin.projects.model.nva.FundingAmount;
+import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import org.junit.jupiter.api.Test;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.NvaProjectBuilderTest.CONTACT_EMAIL;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.IGNORE_LIST;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNamesMap;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringFields;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
@@ -61,6 +62,16 @@ class CristinProjectBuilderTest {
         assertThat(deserialized, equalTo(cristinFundingAmount));
     }
 
+    @Test
+    void shouldSerializeAndDeserializeCristinTypedLabelIntoSameObject() {
+        var cristinTypedLabel = new CristinTypedLabel(randomString(), randomNamesMap());
+        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(cristinTypedLabel)).orElseThrow();
+        var deserialized =
+            attempt(() -> OBJECT_MAPPER.readValue(serialized, CristinTypedLabel.class)).orElseThrow();
+
+        assertThat(deserialized, equalTo(cristinTypedLabel));
+    }
+
     // TODO: Remove fields from this method when they are POSTable to Cristin
     private void addFieldsNotSupportedByToCristinProject(NvaProject expected, NvaProject actual) {
         actual.setCreated(expected.getCreated());
@@ -69,6 +80,7 @@ class CristinProjectBuilderTest {
         actual.setFundingAmount(expected.getFundingAmount());
         actual.setMethod(expected.getMethod());
         actual.setEquipment(expected.getEquipment());
+        actual.setProjectCategories(expected.getProjectCategories());
     }
 
     private Set<String> addFieldsToIgnoreListNotSupportedByCristinPost() {

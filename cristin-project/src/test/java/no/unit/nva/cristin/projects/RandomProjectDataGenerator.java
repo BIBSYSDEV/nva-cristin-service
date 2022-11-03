@@ -8,6 +8,7 @@ import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
+import no.unit.nva.cristin.projects.model.nva.TypedLabel;
 import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.core.language.LanguageMapper;
@@ -89,9 +90,14 @@ public class RandomProjectDataGenerator {
                                           .withFundingAmount(randomFundingAmount())
                                           .withMethod(randomSummary())
                                           .withEquipment(randomSummary())
+                                          .withProjectCategories(List.of(randomTypedLabel()))
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
+    }
+
+    private static TypedLabel randomTypedLabel() {
+        return new TypedLabel(randomString(), randomNamesMap());
     }
 
     private static ContactInfo randomContactInfo() {
@@ -122,10 +128,13 @@ public class RandomProjectDataGenerator {
                 .build();
     }
 
+    public static Map<String, String> randomNamesMap() {
+        return Map.of(randomLanguage(), randomString());
+    }
+
     static ProjectStatus randomStatus() {
         return randomElement(ProjectStatus.values());
     }
-
 
     private static URI semiRandomPersonId(String identifier) {
         return getNvaApiId(identifier, PERSON_PATH_NVA);
@@ -163,10 +172,6 @@ public class RandomProjectDataGenerator {
 
     private static Funding randomFunding() {
         return new Funding(new FundingSource(randomNamesMap(), randomString()), randomString());
-    }
-
-    private static Map<String, String> randomNamesMap() {
-        return Map.of(randomLanguage(), randomString());
     }
 
     private static Map<String, String> randomSummary() {

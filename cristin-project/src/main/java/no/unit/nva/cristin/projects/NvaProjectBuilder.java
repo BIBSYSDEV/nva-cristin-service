@@ -10,6 +10,7 @@ import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
+import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.Funding;
@@ -18,6 +19,7 @@ import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
+import no.unit.nva.cristin.projects.model.nva.TypedLabel;
 import no.unit.nva.model.Organization;
 import nva.commons.core.language.LanguageMapper;
 
@@ -112,7 +114,18 @@ public class NvaProjectBuilder {
                    .withFundingAmount(extractFundingAmount(cristinProject.getTotalFundingAmount()))
                    .withMethod(cristinProject.getMethod())
                    .withEquipment(cristinProject.getEquipment())
+                   .withProjectCategories(extractTypedLabels(cristinProject.getProjectCategories()))
                    .build();
+    }
+
+    private List<TypedLabel> extractTypedLabels(List<CristinTypedLabel> cristinTypedLabels) {
+        return nonNull(cristinTypedLabels)
+                   ? cristinTypedLabels.stream().map(NvaProjectBuilder::toTypedLabel).collect(Collectors.toList())
+                   : null;
+    }
+
+    private static TypedLabel toTypedLabel(CristinTypedLabel cristinTypedLabel) {
+        return new TypedLabel(cristinTypedLabel.getCode(), cristinTypedLabel.getName());
     }
 
     private ContactInfo extractContactInfo(CristinContactInfo cristinContactInfo) {

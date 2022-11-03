@@ -84,5 +84,11 @@
   },
   "equipment": {
     "en": "<p>\r\nSome equipment</p>\r\n"
-  }
+  },
+  "project_categories" : [ {
+    "code" : "APPLIEDRESEARCH",
+    "name" : {
+      "en" : "Applied Research"
+    }
+  } ]
 }
