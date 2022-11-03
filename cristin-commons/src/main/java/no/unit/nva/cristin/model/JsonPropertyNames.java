@@ -51,4 +51,5 @@ public class JsonPropertyNames {
     public static final String CRISTIN_EMPLOYMENTS = "detailed_affiliations";
     public static final String EMAIL = "email";
     public static final String PHONE = "phone";
+
 }

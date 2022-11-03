@@ -47,6 +47,10 @@
     "email" : "helge@test.no",
     "phone" : "44223355"
   },
+  "total_funding_amount" : {
+    "currency_code" : "NOK",
+    "amount" : 5660000.0
+  },
   "participants": [
     {
       "cristin_person_id": "123456",

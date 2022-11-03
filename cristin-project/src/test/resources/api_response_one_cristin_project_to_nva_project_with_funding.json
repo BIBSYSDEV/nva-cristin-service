@@ -71,5 +71,10 @@
     "organization": "Agricultural University of Iceland",
     "email": "helge@test.no",
     "phone": "44223355"
+  },
+  "fundingAmount": {
+    "type": "FundingAmount",
+    "currency": "NOK",
+    "value": 5660000.0
   }
 }

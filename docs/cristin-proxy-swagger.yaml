@@ -1380,6 +1380,18 @@ components:
               type: string
             phone:
               type: string
+        fundingAmount:
+          type: object
+          properties:
+            type:
+              type: string
+              pattern: 'FundingAmount'
+              description: Type of object
+            currency:
+              type: string
+              description: Currency code. Currently only in NOK (Norwegian Kroner)
+            value:
+              type: number
     ProjectPost:
       type: object
       properties:
@@ -2105,6 +2117,10 @@ components:
               organization: 'Agricultural University of Iceland'
               email: 'helge@test.no'
               phone: '44223355'
+            fundingAmount:
+              type: 'FundingAmount'
+              currency: 'NOK'
+              value: 5660000.0
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2173,6 +2189,10 @@ components:
           organization: 'Agricultural University of Iceland'
           email: 'helge@test.no'
           phone: '44223355'
+        fundingAmount:
+          type: 'FundingAmount'
+          currency: 'NOK'
+          value: 5660000.0
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2638,12 +2658,21 @@ components:
               en: "Summary in an academic manner"
             popularScientificSummary:
               en: "popularScientificSummary popularScientificSummary popularScientificSummary"
+            created:
+              sourceShortName: "REK"
+              date: "2019-12-31T09:45:17Z"
+            lastModified:
+              date: "2020-12-31T09:45:17Z"
             contactInfo:
               type: 'ContactInfo'
               contactPerson: 'Helge Testesen'
               organization: 'Agricultural University of Iceland'
               email: 'helge@test.no'
               phone: '44223355'
+            fundingAmount:
+              type: 'FundingAmount'
+              currency: 'NOK'
+              value: 5660000.0
 
   securitySchemes:
     CognitoUserPool:

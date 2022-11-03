@@ -38,6 +38,7 @@ public class CristinProject {
     private CristinOrganization coordinatingInstitution;
     private List<CristinFundingSource> projectFundingSources;
     private CristinContactInfo contactInfo;
+    private CristinFundingAmount totalFundingAmount;
     private List<CristinPerson> participants;
     @JsonProperty(ACADEMIC_SUMMARY)
     private Map<String, String> academicSummary;
@@ -146,6 +147,14 @@ public class CristinProject {
 
     public void setContactInfo(CristinContactInfo contactInfo) {
         this.contactInfo = contactInfo;
+    }
+
+    public CristinFundingAmount getTotalFundingAmount() {
+        return totalFundingAmount;
+    }
+
+    public void setTotalFundingAmount(CristinFundingAmount totalFundingAmount) {
+        this.totalFundingAmount = totalFundingAmount;
     }
 
     public List<CristinPerson> getParticipants() {

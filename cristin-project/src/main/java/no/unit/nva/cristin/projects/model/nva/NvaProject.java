@@ -91,6 +91,9 @@ public class NvaProject implements JsonSerializable {
     @JsonProperty
     @JsonInclude(NON_NULL)
     private ContactInfo contactInfo;
+    @JsonProperty
+    @JsonInclude(NON_NULL)
+    private FundingAmount fundingAmount;
 
     private NvaProject() {
     }
@@ -255,6 +258,14 @@ public class NvaProject implements JsonSerializable {
         this.contactInfo = contactInfo;
     }
 
+    public FundingAmount getFundingAmount() {
+        return fundingAmount;
+    }
+
+    public void setFundingAmount(FundingAmount fundingAmount) {
+        this.fundingAmount = fundingAmount;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -283,7 +294,8 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getPublishable(), that.getPublishable())
                && Objects.equals(getCreated(), that.getCreated())
                && Objects.equals(getLastModified(), that.getLastModified())
-               && Objects.equals(getContactInfo(), that.getContactInfo());
+               && Objects.equals(getContactInfo(), that.getContactInfo())
+               && Objects.equals(getFundingAmount(), that.getFundingAmount());
     }
 
     @Override
@@ -292,7 +304,7 @@ public class NvaProject implements JsonSerializable {
                             getAlternativeTitles(), getStartDate(), getEndDate(), getFunding(),
                             getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
-                            getLastModified(), getContactInfo());
+                            getLastModified(), getContactInfo(), getFundingAmount());
     }
 
     @Override
@@ -410,6 +422,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withContactInfo(ContactInfo contactInfo) {
             nvaProject.setContactInfo(contactInfo);
+            return this;
+        }
+
+        public Builder withFundingAmount(FundingAmount fundingAmount) {
+            nvaProject.setFundingAmount(fundingAmount);
             return this;
         }
 

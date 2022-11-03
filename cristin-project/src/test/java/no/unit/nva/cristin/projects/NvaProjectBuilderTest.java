@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
+import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +10,7 @@ import java.nio.file.Path;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.ioutils.IoUtils.stringFromResources;
@@ -28,6 +30,8 @@ public class NvaProjectBuilderTest {
     public static final String CONTACT_ORGANIZATION = "Agricultural University of Iceland";
     public static final String CONTACT_EMAIL = "helge@test.no";
     public static final String CONTACT_PHONE = "44223355";
+    public static final String CURRENCY_CODE_NOK = "NOK";
+    public static final double FUNDING_AMOUNT_EXAMPLE = 5660000.0;
 
     @Test
     void shouldReturnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
@@ -57,6 +61,8 @@ public class NvaProjectBuilderTest {
         assertThat(nvaProject.getContactInfo().getOrganization(), equalTo(CONTACT_ORGANIZATION));
         assertThat(nvaProject.getContactInfo().getEmail(), equalTo(CONTACT_EMAIL));
         assertThat(nvaProject.getContactInfo().getPhone(), equalTo(CONTACT_PHONE));
+        assertThat(nvaProject.getFundingAmount().getCurrency(), equalTo(CURRENCY_CODE_NOK));
+        assertThat(nvaProject.getFundingAmount().getValue(), equalTo(FUNDING_AMOUNT_EXAMPLE));
     }
 
     @Test
@@ -68,4 +74,15 @@ public class NvaProjectBuilderTest {
 
         assertThat(deserialized, equalTo(contactInfo));
     }
+
+    @Test
+    void shouldSerializeAndDeserializeFundingAmountIntoSameObject() {
+        var fundingAmount = new FundingAmount(randomString(), randomInteger().doubleValue());
+        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(fundingAmount)).orElseThrow();
+        var deserialized =
+            attempt(() -> OBJECT_MAPPER.readValue(serialized, FundingAmount.class)).orElseThrow();
+
+        assertThat(deserialized, equalTo(fundingAmount));
+    }
+
 }

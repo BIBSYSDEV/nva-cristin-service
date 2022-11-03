@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
+import no.unit.nva.cristin.projects.model.cristin.CristinFundingAmount;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
@@ -12,6 +13,7 @@ import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.Funding;
+import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -104,9 +106,10 @@ public class NvaProjectBuilder {
                    .withPopularScientificSummary(cristinProject.getPopularScientificSummary())
                    .withPublished(cristinProject.getPublished())
                    .withPublishable(cristinProject.getPublishable())
-                   .withCreated(generateDateInfo(cristinProject.getCreated()))
-                   .withLastModified(generateDateInfo(cristinProject.getLastModified()))
+                   .withCreated(extractDateInfo(cristinProject.getCreated()))
+                   .withLastModified(extractDateInfo(cristinProject.getLastModified()))
                    .withContactInfo(extractContactInfo(cristinProject.getContactInfo()))
+                   .withFundingAmount(extractFundingAmount(cristinProject.getTotalFundingAmount()))
                    .build();
     }
 
@@ -117,11 +120,14 @@ public class NvaProjectBuilder {
                                                              cristinContactInfo.getPhone()) : null;
     }
 
-    private DateInfo generateDateInfo(CristinDateInfo cristinDateInfo) {
-        if (nonNull(cristinDateInfo)) {
-            return new DateInfo(cristinDateInfo.getSourceShortName(), cristinDateInfo.getDate());
-        }
-        return null;
+    private FundingAmount extractFundingAmount(CristinFundingAmount cristinFundingAmount) {
+        return nonNull(cristinFundingAmount) ? new FundingAmount(cristinFundingAmount.getCurrencyCode(),
+                                                                 cristinFundingAmount.getAmount()) : null;
+    }
+
+    private DateInfo extractDateInfo(CristinDateInfo cristinDateInfo) {
+        return nonNull(cristinDateInfo) ? new DateInfo(cristinDateInfo.getSourceShortName(),
+                                                       cristinDateInfo.getDate()) : null;
     }
 
     private String getContext() {
