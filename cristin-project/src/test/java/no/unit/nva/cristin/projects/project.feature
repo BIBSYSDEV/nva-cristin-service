@@ -160,4 +160,3 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.projectCategories[0] == '#present'
     And match response.projectCategories[0].type == 'APPLIEDRESEARCH'
     And match response.projectCategories[0].labels == '#present'
-    And match response.projectCategories[0].labels['en'] == 'Applied Research'
