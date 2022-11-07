@@ -1406,6 +1406,16 @@ components:
                 description: The type of project category
               label:
                 $ref: '#/components/schemas/Languages'
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
+              label:
+                $ref: '#/components/schemas/Languages'
     ProjectPost:
       type: object
       properties:
@@ -2143,6 +2153,10 @@ components:
               - type: 'APPLIEDRESEARCH'
                 label:
                   'en': 'Applied Research'
+            keywords:
+              - type: '4837'
+                label:
+                  'en': 'Supply Chain'
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2223,6 +2237,10 @@ components:
           - type: 'APPLIEDRESEARCH'
             label:
               'en': 'Applied Research'
+        keywords:
+          - type: '4837'
+            label:
+              'en': 'Supply Chain'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2711,6 +2729,10 @@ components:
               - type: 'APPLIEDRESEARCH'
                 label:
                   'en': 'Applied Research'
+            keywords:
+              - type: '4837'
+                label:
+                  'en': 'Supply Chain'
 
   securitySchemes:
     CognitoUserPool:

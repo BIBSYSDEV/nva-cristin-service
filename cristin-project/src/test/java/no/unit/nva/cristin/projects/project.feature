@@ -150,7 +150,7 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.equipment == '#present'
     And match response.equipment['no'] == '#present'
 
-  Scenario: Fetch returns project categories
+  Scenario: Fetch returns project categories and keywords
     Given path '/project/616221'
     When method GET
     Then status 200
@@ -160,3 +160,7 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.projectCategories[0] == '#present'
     And match response.projectCategories[0].type == 'APPLIEDRESEARCH'
     And match response.projectCategories[0].label == '#present'
+    And match response.keywords == '#present'
+    And match response.keywords[0] == '#present'
+    And match response.keywords[0].type == '#present'
+    And match response.keywords[0].label == '#present'
