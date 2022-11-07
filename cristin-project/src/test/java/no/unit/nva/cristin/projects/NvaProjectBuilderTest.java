@@ -1,19 +1,13 @@
 package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.nva.ContactInfo;
-import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.cristin.projects.model.nva.TypedLabel;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
-import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNamesMap;
-import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
-import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.ioutils.IoUtils.stringFromResources;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -75,36 +69,6 @@ public class NvaProjectBuilderTest {
         assertThat(nvaProject.getProjectCategories().get(0).getType(), equalTo(APPLIEDRESEARCH_TYPE));
         assertThat(nvaProject.getProjectCategories().get(0).getLabel().get(ENGLISH_LANGUAGE_KEY),
                    equalTo(APPLIEDRESEARCH_LABEL));
-    }
-
-    @Test
-    void shouldSerializeAndDeserializeContactInfoIntoSameObject() {
-        var contactInfo = new ContactInfo(randomString(), randomString(), CONTACT_EMAIL, randomString());
-        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(contactInfo)).orElseThrow();
-        var deserialized =
-            attempt(() -> OBJECT_MAPPER.readValue(serialized, ContactInfo.class)).orElseThrow();
-
-        assertThat(deserialized, equalTo(contactInfo));
-    }
-
-    @Test
-    void shouldSerializeAndDeserializeFundingAmountIntoSameObject() {
-        var fundingAmount = new FundingAmount(randomString(), randomInteger().doubleValue());
-        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(fundingAmount)).orElseThrow();
-        var deserialized =
-            attempt(() -> OBJECT_MAPPER.readValue(serialized, FundingAmount.class)).orElseThrow();
-
-        assertThat(deserialized, equalTo(fundingAmount));
-    }
-
-    @Test
-    void shouldSerializeAndDeserializeTypedLabelIntoSameObject() {
-        var typedLabel = new TypedLabel(randomString(), randomNamesMap());
-        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(typedLabel)).orElseThrow();
-        var deserialized =
-            attempt(() -> OBJECT_MAPPER.readValue(serialized, TypedLabel.class)).orElseThrow();
-
-        assertThat(deserialized, equalTo(typedLabel));
     }
 
     @Test
