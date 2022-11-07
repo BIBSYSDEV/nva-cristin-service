@@ -1404,7 +1404,7 @@ components:
               type:
                 type: string
                 description: The type of project category
-              labels:
+              label:
                 $ref: '#/components/schemas/Languages'
     ProjectPost:
       type: object
@@ -2141,7 +2141,7 @@ components:
               no: "Dette er utstyret"
             projectCategories:
               - type: 'APPLIEDRESEARCH'
-                labels:
+                label:
                   'en': 'Applied Research'
     ProjectExample:
       value:
@@ -2221,7 +2221,7 @@ components:
           no: "Dette er utstyret"
         projectCategories:
           - type: 'APPLIEDRESEARCH'
-            labels:
+            label:
               'en': 'Applied Research'
     ProjectPatchExample:
       value:
@@ -2709,7 +2709,7 @@ components:
               no: "Dette er utstyret"
             projectCategories:
               - type: 'APPLIEDRESEARCH'
-                labels:
+                label:
                   'en': 'Applied Research'
 
   securitySchemes:

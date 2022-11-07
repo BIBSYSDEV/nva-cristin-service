@@ -12,24 +12,24 @@ import no.unit.nva.commons.json.JsonSerializable;
 @JsonInclude(NON_NULL)
 public class TypedLabel implements JsonSerializable {
 
-    public static final String LABELS = "labels";
+    public static final String LABELS = "label";
 
     @JsonProperty(TYPE)
     private final transient String type;
     @JsonProperty(LABELS)
-    private final transient Map<String, String> labels;
+    private final transient Map<String, String> label;
 
-    public TypedLabel(@JsonProperty(TYPE) String type, @JsonProperty(LABELS) Map<String, String> labels) {
+    public TypedLabel(@JsonProperty(TYPE) String type, @JsonProperty(LABELS) Map<String, String> label) {
         this.type = type;
-        this.labels = labels;
+        this.label = label;
     }
 
     public String getType() {
         return type;
     }
 
-    public Map<String, String> getLabels() {
-        return nonEmptyOrDefault(labels);
+    public Map<String, String> getLabel() {
+        return nonEmptyOrDefault(label);
     }
 
     @Override
@@ -41,13 +41,12 @@ public class TypedLabel implements JsonSerializable {
             return false;
         }
         TypedLabel that = (TypedLabel) o;
-        return Objects.equals(getType(), that.getType()) && Objects.equals(getLabels(),
-                                                                           that.getLabels());
+        return Objects.equals(getType(), that.getType()) && Objects.equals(getLabel(), that.getLabel());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getType(), getLabels());
+        return Objects.hash(getType(), getLabel());
     }
 
     @Override

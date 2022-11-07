@@ -85,7 +85,7 @@
   },
   "projectCategories": [ {
     "type": "APPLIEDRESEARCH",
-    "labels": {
+    "label": {
       "en": "Applied Research"
     }
   } ]

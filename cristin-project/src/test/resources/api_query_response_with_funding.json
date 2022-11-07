@@ -94,7 +94,7 @@
       },
       "projectCategories": [ {
         "type": "APPLIEDRESEARCH",
-        "labels": {
+        "label": {
           "en": "Applied Research"
         }
       } ]
@@ -185,7 +185,7 @@
       },
       "projectCategories": [ {
         "type": "APPLIEDRESEARCH",
-        "labels": {
+        "label": {
           "en": "Applied Research"
         }
       } ]
@@ -276,7 +276,7 @@
       },
       "projectCategories": [ {
         "type": "APPLIEDRESEARCH",
-        "labels": {
+        "label": {
           "en": "Applied Research"
         }
       } ]
@@ -367,7 +367,7 @@
       },
       "projectCategories": [ {
         "type": "APPLIEDRESEARCH",
-        "labels": {
+        "label": {
           "en": "Applied Research"
         }
       } ]
@@ -458,7 +458,7 @@
       },
       "projectCategories": [ {
         "type": "APPLIEDRESEARCH",
-        "labels": {
+        "label": {
           "en": "Applied Research"
         }
       } ]

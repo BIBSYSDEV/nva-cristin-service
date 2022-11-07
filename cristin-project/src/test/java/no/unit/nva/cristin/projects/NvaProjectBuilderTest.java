@@ -73,7 +73,7 @@ public class NvaProjectBuilderTest {
         assertThat(nvaProject.getMethod().get(ENGLISH_LANGUAGE_KEY), not(emptyString()));
         assertThat(nvaProject.getEquipment().get(ENGLISH_LANGUAGE_KEY), not(emptyString()));
         assertThat(nvaProject.getProjectCategories().get(0).getType(), equalTo(APPLIEDRESEARCH_TYPE));
-        assertThat(nvaProject.getProjectCategories().get(0).getLabels().get(ENGLISH_LANGUAGE_KEY),
+        assertThat(nvaProject.getProjectCategories().get(0).getLabel().get(ENGLISH_LANGUAGE_KEY),
                    equalTo(APPLIEDRESEARCH_LABEL));
     }
 
