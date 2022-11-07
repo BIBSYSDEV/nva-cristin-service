@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.model.cristin;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.List;
+import java.util.Objects;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings("unused")
@@ -54,6 +55,27 @@ public class CristinPerson {
 
     public void setRoles(List<CristinRole> roles) {
         this.roles = roles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CristinPerson)) {
+            return false;
+        }
+        CristinPerson that = (CristinPerson) o;
+        return Objects.equals(getCristinPersonId(), that.getCristinPersonId())
+               && Objects.equals(getFirstName(), that.getFirstName())
+               && Objects.equals(getSurname(), that.getSurname())
+               && Objects.equals(getUrl(), that.getUrl())
+               && Objects.equals(getRoles(), that.getRoles());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCristinPersonId(), getFirstName(), getSurname(), getUrl(), getRoles());
     }
 }
 

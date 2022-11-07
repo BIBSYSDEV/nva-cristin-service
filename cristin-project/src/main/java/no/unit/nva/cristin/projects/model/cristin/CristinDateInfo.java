@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.time.Instant;
+import java.util.Objects;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinDateInfo {
@@ -31,6 +32,24 @@ public class CristinDateInfo {
 
     public Instant getDate() {
         return date;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CristinDateInfo)) {
+            return false;
+        }
+        CristinDateInfo that = (CristinDateInfo) o;
+        return Objects.equals(getSourceShortName(), that.getSourceShortName()) && Objects.equals(
+            getDate(), that.getDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getSourceShortName(), getDate());
     }
 
 }

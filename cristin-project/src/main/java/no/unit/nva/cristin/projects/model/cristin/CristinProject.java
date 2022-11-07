@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.Objects;
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.NvaProjectBuilder;
 import no.unit.nva.cristin.projects.ProjectStatus;
@@ -19,9 +21,9 @@ import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 
-@SuppressWarnings({"PMD.TooManyFields", "unused"})
+@SuppressWarnings({"PMD.TooManyFields", "unused", "PMD.ExcessivePublicCount"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CristinProject {
+public class CristinProject implements JsonSerializable {
 
     public static final String METHOD = "method";
     public static final String EQUIPMENT = "equipment";
@@ -229,5 +231,52 @@ public class CristinProject {
     public NvaProject toNvaProject() {
         return new NvaProjectBuilder(this).build();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CristinProject)) {
+            return false;
+        }
+        CristinProject that = (CristinProject) o;
+        return Objects.equals(getCristinProjectId(), that.getCristinProjectId())
+               && Objects.equals(getPublishable(), that.getPublishable())
+               && Objects.equals(getPublished(), that.getPublished())
+               && Objects.equals(getTitle(), that.getTitle())
+               && Objects.equals(getMainLanguage(), that.getMainLanguage())
+               && Objects.equals(getStartDate(), that.getStartDate())
+               && Objects.equals(getEndDate(), that.getEndDate())
+               && Objects.equals(getStatus(), that.getStatus())
+               && Objects.equals(getCreated(), that.getCreated())
+               && Objects.equals(getLastModified(), that.getLastModified())
+               && Objects.equals(getCoordinatingInstitution(), that.getCoordinatingInstitution())
+               && Objects.equals(getProjectFundingSources(), that.getProjectFundingSources())
+               && Objects.equals(getContactInfo(), that.getContactInfo())
+               && Objects.equals(getTotalFundingAmount(), that.getTotalFundingAmount())
+               && Objects.equals(getParticipants(), that.getParticipants())
+               && Objects.equals(getAcademicSummary(), that.getAcademicSummary())
+               && Objects.equals(getPopularScientificSummary(), that.getPopularScientificSummary())
+               && Objects.equals(getMethod(), that.getMethod())
+               && Objects.equals(getEquipment(), that.getEquipment())
+               && Objects.equals(getProjectCategories(), that.getProjectCategories());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCristinProjectId(), getPublishable(), getPublished(), getTitle(), getMainLanguage(),
+                            getStartDate(), getEndDate(), getStatus(), getCreated(), getLastModified(),
+                            getCoordinatingInstitution(), getProjectFundingSources(), getContactInfo(),
+                            getTotalFundingAmount(), getParticipants(), getAcademicSummary(),
+                            getPopularScientificSummary(),
+                            getMethod(), getEquipment(), getProjectCategories());
+    }
+
+    @Override
+    public String toString() {
+        return toJsonString();
+    }
+
 }
 
