@@ -107,4 +107,16 @@ public class NvaProjectBuilderTest {
         assertThat(deserialized, equalTo(typedLabel));
     }
 
+    @Test
+    void shouldSerializeAndDeserializeNvaProjectIntoSameObject() {
+        var nvaJson =
+            stringFromResources(Path.of(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_WITH_FUNDING_JSON));
+        var nvaProject =
+            attempt(() -> OBJECT_MAPPER.readValue(nvaJson, NvaProject.class)).get();
+        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(nvaProject)).orElseThrow();
+        var deserialized = attempt(() -> OBJECT_MAPPER.readValue(serialized, NvaProject.class)).get();
+
+        assertThat(deserialized, equalTo(nvaProject));
+    }
+
 }
