@@ -91,7 +91,13 @@
       },
       "equipment": {
         "en": "<p>\r\nSome equipment</p>\r\n"
-      }
+      },
+      "projectCategories": [ {
+        "type": "APPLIEDRESEARCH",
+        "label": {
+          "en": "Applied Research"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -176,7 +182,13 @@
       },
       "equipment": {
         "en": "<p>\r\nSome equipment</p>\r\n"
-      }
+      },
+      "projectCategories": [ {
+        "type": "APPLIEDRESEARCH",
+        "label": {
+          "en": "Applied Research"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -261,7 +273,13 @@
       },
       "equipment": {
         "en": "<p>\r\nSome equipment</p>\r\n"
-      }
+      },
+      "projectCategories": [ {
+        "type": "APPLIEDRESEARCH",
+        "label": {
+          "en": "Applied Research"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -346,7 +364,13 @@
       },
       "equipment": {
         "en": "<p>\r\nSome equipment</p>\r\n"
-      }
+      },
+      "projectCategories": [ {
+        "type": "APPLIEDRESEARCH",
+        "label": {
+          "en": "Applied Research"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -431,7 +455,13 @@
       },
       "equipment": {
         "en": "<p>\r\nSome equipment</p>\r\n"
-      }
+      },
+      "projectCategories": [ {
+        "type": "APPLIEDRESEARCH",
+        "label": {
+          "en": "Applied Research"
+        }
+      } ]
     }
   ]
 }

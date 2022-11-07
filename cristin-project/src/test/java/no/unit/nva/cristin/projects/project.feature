@@ -149,3 +149,14 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.method['no'] == '#present'
     And match response.equipment == '#present'
     And match response.equipment['no'] == '#present'
+
+  Scenario: Fetch returns project categories
+    Given path '/project/616221'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.projectCategories == '#present'
+    And match response.projectCategories[0] == '#present'
+    And match response.projectCategories[0].type == 'APPLIEDRESEARCH'
+    And match response.projectCategories[0].label == '#present'
