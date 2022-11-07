@@ -30,7 +30,8 @@
       "popularScientificSummary": {},
       "method": {},
       "equipment": {},
-      "projectCategories": []
+      "projectCategories": [],
+      "keywords": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/999888",
@@ -58,7 +59,8 @@
       "popularScientificSummary": {},
       "method": {},
       "equipment": {},
-      "projectCategories": []
+      "projectCategories": [],
+      "keywords": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/111333",
@@ -86,7 +88,8 @@
       "popularScientificSummary": {},
       "method": {},
       "equipment": {},
-      "projectCategories": []
+      "projectCategories": [],
+      "keywords": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/222444",
@@ -110,7 +113,8 @@
       "popularScientificSummary": {},
       "method": {},
       "equipment": {},
-      "projectCategories": []
+      "projectCategories": [],
+      "keywords": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/444222",
@@ -134,7 +138,8 @@
       "popularScientificSummary": {},
       "method": {},
       "equipment": {},
-      "projectCategories": []
+      "projectCategories": [],
+      "keywords": []
     }
   ]
 }

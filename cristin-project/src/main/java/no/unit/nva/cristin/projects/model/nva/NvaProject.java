@@ -100,6 +100,8 @@ public class NvaProject implements JsonSerializable {
     private Map<String, String> equipment;
     @JsonProperty
     private List<TypedLabel> projectCategories;
+    @JsonProperty
+    private List<TypedLabel> keywords;
 
     private NvaProject() {
     }
@@ -296,6 +298,14 @@ public class NvaProject implements JsonSerializable {
         this.projectCategories = projectCategories;
     }
 
+    public List<TypedLabel> getKeywords() {
+        return nonEmptyOrDefault(keywords);
+    }
+
+    public void setKeywords(List<TypedLabel> keywords) {
+        this.keywords = keywords;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -328,7 +338,8 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getFundingAmount(), that.getFundingAmount())
                && Objects.equals(getMethod(), that.getMethod())
                && Objects.equals(getEquipment(), that.getEquipment())
-               && Objects.equals(getProjectCategories(), that.getProjectCategories());
+               && Objects.equals(getProjectCategories(), that.getProjectCategories())
+               && Objects.equals(getKeywords(), that.getKeywords());
     }
 
     @Override
@@ -338,7 +349,7 @@ public class NvaProject implements JsonSerializable {
                             getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
                             getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
-                            getProjectCategories());
+                            getProjectCategories(), getKeywords());
     }
 
     @Override
@@ -476,6 +487,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withProjectCategories(List<TypedLabel> projectCategories) {
             nvaProject.setProjectCategories(projectCategories);
+            return this;
+        }
+
+        public Builder withKeywords(List<TypedLabel> keywords) {
+            nvaProject.setKeywords(keywords);
             return this;
         }
 

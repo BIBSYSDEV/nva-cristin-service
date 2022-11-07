@@ -90,5 +90,13 @@
     "name" : {
       "en" : "Applied Research"
     }
-  } ]
+  } ],
+  "keywords": [
+    {
+      "code": "4837",
+      "name": {
+        "en": "Supply Chain"
+      }
+    }
+  ]
 }

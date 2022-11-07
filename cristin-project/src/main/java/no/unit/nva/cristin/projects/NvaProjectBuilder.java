@@ -115,6 +115,7 @@ public class NvaProjectBuilder {
                    .withMethod(cristinProject.getMethod())
                    .withEquipment(cristinProject.getEquipment())
                    .withProjectCategories(extractTypedLabels(cristinProject.getProjectCategories()))
+                   .withKeywords(extractTypedLabels(cristinProject.getKeywords()))
                    .build();
     }
 

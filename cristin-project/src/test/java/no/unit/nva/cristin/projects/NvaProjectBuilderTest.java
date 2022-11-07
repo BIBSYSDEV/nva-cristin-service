@@ -33,6 +33,8 @@ public class NvaProjectBuilderTest {
     public static final String ENGLISH_LANGUAGE_KEY = "en";
     public static final String APPLIEDRESEARCH_TYPE = "APPLIEDRESEARCH";
     public static final String APPLIEDRESEARCH_LABEL = "Applied Research";
+    public static final String KEYWORD_CODE = "4837";
+    public static final String KEYWORD_LABEL = "Supply Chain";
 
     @Test
     void shouldReturnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
@@ -69,6 +71,8 @@ public class NvaProjectBuilderTest {
         assertThat(nvaProject.getProjectCategories().get(0).getType(), equalTo(APPLIEDRESEARCH_TYPE));
         assertThat(nvaProject.getProjectCategories().get(0).getLabel().get(ENGLISH_LANGUAGE_KEY),
                    equalTo(APPLIEDRESEARCH_LABEL));
+        assertThat(nvaProject.getKeywords().get(0).getType(), equalTo(KEYWORD_CODE));
+        assertThat(nvaProject.getKeywords().get(0).getLabel().get(ENGLISH_LANGUAGE_KEY), equalTo(KEYWORD_LABEL));
     }
 
     @Test

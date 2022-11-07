@@ -28,6 +28,7 @@ public class CristinProject implements JsonSerializable {
     public static final String METHOD = "method";
     public static final String EQUIPMENT = "equipment";
     public static final String CRISTIN_PROJECT_CATEGORIES = "project_categories";
+    public static final String KEYWORDS = "keywords";
 
     private String cristinProjectId;
     private Boolean publishable;
@@ -56,6 +57,8 @@ public class CristinProject implements JsonSerializable {
     private Map<String, String> equipment;
     @JsonProperty(CRISTIN_PROJECT_CATEGORIES)
     private List<CristinTypedLabel> projectCategories;
+    @JsonProperty(KEYWORDS)
+    private List<CristinTypedLabel> keywords;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -217,6 +220,14 @@ public class CristinProject implements JsonSerializable {
         this.projectCategories = projectCategories;
     }
 
+    public List<CristinTypedLabel> getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(List<CristinTypedLabel> keywords) {
+        this.keywords = keywords;
+    }
+
     /**
      * Verifies CristinProject has enough data to be considered as valid.
      *
@@ -260,7 +271,8 @@ public class CristinProject implements JsonSerializable {
                && Objects.equals(getPopularScientificSummary(), that.getPopularScientificSummary())
                && Objects.equals(getMethod(), that.getMethod())
                && Objects.equals(getEquipment(), that.getEquipment())
-               && Objects.equals(getProjectCategories(), that.getProjectCategories());
+               && Objects.equals(getProjectCategories(), that.getProjectCategories())
+               && Objects.equals(getKeywords(), that.getKeywords());
     }
 
     @Override
@@ -270,7 +282,7 @@ public class CristinProject implements JsonSerializable {
                             getCoordinatingInstitution(), getProjectFundingSources(), getContactInfo(),
                             getTotalFundingAmount(), getParticipants(), getAcademicSummary(),
                             getPopularScientificSummary(),
-                            getMethod(), getEquipment(), getProjectCategories());
+                            getMethod(), getEquipment(), getProjectCategories(), getKeywords());
     }
 
     @Override
