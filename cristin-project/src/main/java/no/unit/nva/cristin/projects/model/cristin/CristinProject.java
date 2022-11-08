@@ -21,7 +21,7 @@ import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 
-@SuppressWarnings({"PMD.TooManyFields", "unused", "PMD.ExcessivePublicCount"})
+@SuppressWarnings({"PMD.TooManyFields", "unused", "PMD.ExcessivePublicCount", "PMD.GodClass"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinProject implements JsonSerializable {
 
