@@ -4,21 +4,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
-import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIERS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
-import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_ACADEMIC_SUMMARY;
-import static no.unit.nva.cristin.projects.model.nva.NvaProject.NVA_POPULAR_SCIENTIFIC_SUMMARY;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -35,12 +21,8 @@ import no.unit.nva.model.Organization;
 
 @SuppressWarnings({"PMD.ExcessivePublicCount","PMD.TooManyFields"})
 @JsonInclude(ALWAYS)
-@JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, TITLE, LANGUAGE, ALTERNATIVE_TITLES, START_DATE, END_DATE,
-        FUNDING, COORDINATING_INSTITUTION, CONTRIBUTORS, STATUS, NVA_ACADEMIC_SUMMARY, NVA_POPULAR_SCIENTIFIC_SUMMARY})
 public class NvaProject implements JsonSerializable {
 
-    public static final String NVA_ACADEMIC_SUMMARY = "academicSummary";
-    public static final String NVA_POPULAR_SCIENTIFIC_SUMMARY = "popularScientificSummary";
     public static final String PROJECT_CONTEXT = PROJECT_LOOKUP_CONTEXT_URL;
 
     @JsonProperty(CONTEXT)
