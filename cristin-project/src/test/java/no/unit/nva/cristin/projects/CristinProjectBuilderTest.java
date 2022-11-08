@@ -59,6 +59,7 @@ class CristinProjectBuilderTest {
         actual.setMethod(expected.getMethod());
         actual.setEquipment(expected.getEquipment());
         actual.setProjectCategories(expected.getProjectCategories());
+        actual.setKeywords(expected.getKeywords());
     }
 
     private Set<String> addFieldsToIgnoreListNotSupportedByCristinPost() {

@@ -91,6 +91,7 @@ public class RandomProjectDataGenerator {
                                           .withMethod(randomSummary())
                                           .withEquipment(randomSummary())
                                           .withProjectCategories(List.of(randomTypedLabel()))
+                                          .withKeywords(List.of(randomTypedLabel()))
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
