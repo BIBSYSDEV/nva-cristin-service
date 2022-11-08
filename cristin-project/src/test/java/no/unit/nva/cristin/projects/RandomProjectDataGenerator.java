@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
+import no.unit.nva.cristin.projects.model.nva.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
@@ -92,9 +93,14 @@ public class RandomProjectDataGenerator {
                                           .withEquipment(randomSummary())
                                           .withProjectCategories(List.of(randomTypedLabel()))
                                           .withKeywords(List.of(randomTypedLabel()))
+                                          .withExternalSources(List.of(randomExternalSource()))
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
+    }
+
+    private static ExternalSource randomExternalSource() {
+        return new ExternalSource(randomString(), randomString());
     }
 
     private static TypedLabel randomTypedLabel() {

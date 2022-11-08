@@ -102,6 +102,8 @@ public class NvaProject implements JsonSerializable {
     private List<TypedLabel> projectCategories;
     @JsonProperty
     private List<TypedLabel> keywords;
+    @JsonProperty
+    private List<ExternalSource> externalSources;
 
     private NvaProject() {
     }
@@ -306,6 +308,14 @@ public class NvaProject implements JsonSerializable {
         this.keywords = keywords;
     }
 
+    public List<ExternalSource> getExternalSources() {
+        return nonEmptyOrDefault(externalSources);
+    }
+
+    public void setExternalSources(List<ExternalSource> externalSources) {
+        this.externalSources = externalSources;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -339,7 +349,8 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getMethod(), that.getMethod())
                && Objects.equals(getEquipment(), that.getEquipment())
                && Objects.equals(getProjectCategories(), that.getProjectCategories())
-               && Objects.equals(getKeywords(), that.getKeywords());
+               && Objects.equals(getKeywords(), that.getKeywords())
+               && Objects.equals(getExternalSources(), that.getExternalSources());
     }
 
     @Override
@@ -349,7 +360,7 @@ public class NvaProject implements JsonSerializable {
                             getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
                             getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
-                            getProjectCategories(), getKeywords());
+                            getProjectCategories(), getKeywords(), getExternalSources());
     }
 
     @Override
@@ -492,6 +503,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withKeywords(List<TypedLabel> keywords) {
             nvaProject.setKeywords(keywords);
+            return this;
+        }
+
+        public Builder withExternalSources(List<ExternalSource> externalSources) {
+            nvaProject.setExternalSources(externalSources);
             return this;
         }
 

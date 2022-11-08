@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +15,7 @@ public class CristinTypedLabel {
     @JsonProperty(NAME)
     private final transient Map<String, String> name;
 
+    @JsonCreator
     public CristinTypedLabel(@JsonProperty(CODE) String code, @JsonProperty(NAME) Map<String, String> name) {
         this.code = code;
         this.name = name;
