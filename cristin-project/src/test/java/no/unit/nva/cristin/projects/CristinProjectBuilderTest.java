@@ -1,22 +1,18 @@
 package no.unit.nva.cristin.projects;
 
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
-import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
-import no.unit.nva.cristin.projects.model.cristin.CristinFundingAmount;
-import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import org.junit.jupiter.api.Test;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.projects.NvaProjectBuilderTest.CONTACT_EMAIL;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.IGNORE_LIST;
-import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNamesMap;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringFields;
-import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
-import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.core.attempt.Try.attempt;
+import static nva.commons.core.ioutils.IoUtils.stringFromResources;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CristinProjectBuilderTest {
 
+    public static final String ONE_CRISTIN_PROJECT = "cristinGetProjectResponse.json";
 
     @Test
     void projectShouldBeLossLessConvertedAndEqualAfterConvertedToCristinAndBack() {
@@ -43,33 +40,14 @@ class CristinProjectBuilderTest {
     }
 
     @Test
-    void shouldSerializeAndDeserializeCristinContactInfoIntoSameObject() {
-        var cristinContactInfo = new CristinContactInfo(randomString(), randomString(), CONTACT_EMAIL, randomString());
-        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(cristinContactInfo)).orElseThrow();
-        var deserialized =
-            attempt(() -> OBJECT_MAPPER.readValue(serialized, CristinContactInfo.class)).orElseThrow();
+    void shouldSerializeAndDeserializeCristinProjectIntoSameObject() {
+        var cristinJson = stringFromResources(Path.of(ONE_CRISTIN_PROJECT));
+        var cristinProject =
+            attempt(() -> OBJECT_MAPPER.readValue(cristinJson, CristinProject.class)).get();
+        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(cristinProject)).orElseThrow();
+        var deserialized = attempt(() -> OBJECT_MAPPER.readValue(serialized, CristinProject.class)).get();
 
-        assertThat(deserialized, equalTo(cristinContactInfo));
-    }
-
-    @Test
-    void shouldSerializeAndDeserializeCristinFundingAmountIntoSameObject() {
-        var cristinFundingAmount = new CristinFundingAmount(randomString(), randomInteger().doubleValue());
-        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(cristinFundingAmount)).orElseThrow();
-        var deserialized =
-            attempt(() -> OBJECT_MAPPER.readValue(serialized, CristinFundingAmount.class)).orElseThrow();
-
-        assertThat(deserialized, equalTo(cristinFundingAmount));
-    }
-
-    @Test
-    void shouldSerializeAndDeserializeCristinTypedLabelIntoSameObject() {
-        var cristinTypedLabel = new CristinTypedLabel(randomString(), randomNamesMap());
-        var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(cristinTypedLabel)).orElseThrow();
-        var deserialized =
-            attempt(() -> OBJECT_MAPPER.readValue(serialized, CristinTypedLabel.class)).orElseThrow();
-
-        assertThat(deserialized, equalTo(cristinTypedLabel));
+        assertThat(deserialized, equalTo(cristinProject));
     }
 
     // TODO: Remove fields from this method when they are POSTable to Cristin
