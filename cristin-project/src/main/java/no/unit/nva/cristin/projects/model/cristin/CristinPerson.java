@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import nva.commons.core.JacocoGenerated;
 
-@SuppressWarnings("unused")
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPerson {

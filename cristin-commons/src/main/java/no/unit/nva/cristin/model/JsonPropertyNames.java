@@ -25,7 +25,6 @@ public class JsonPropertyNames {
     public static final String COORDINATING_INSTITUTION = "coordinatingInstitution";
     public static final String CONTRIBUTORS = "contributors";
     public static final String NAME = "name";
-    public static final String IDENTITY = "identity";
     public static final String AFFILIATION = "affiliation";
     public static final String FIRST_NAME = "firstName";
     public static final String LAST_NAME = "lastName";

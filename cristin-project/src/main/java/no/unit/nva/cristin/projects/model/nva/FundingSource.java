@@ -14,12 +14,15 @@ import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class FundingSource {
 
+    public static final String NAMES = "names";
+    public static final String CODE = "code";
+
     @JsonPropertyOrder(alphabetic = true)
     private final Map<String, String> names;
     private final String code;
 
     @JsonCreator
-    public FundingSource(@JsonProperty("names") Map<String, String> names, @JsonProperty("code") String code) {
+    public FundingSource(@JsonProperty(NAMES) Map<String, String> names, @JsonProperty(CODE) String code) {
         this.names = names;
         this.code = code;
     }

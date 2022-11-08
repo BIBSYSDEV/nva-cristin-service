@@ -215,9 +215,8 @@ public class CristinProject implements JsonSerializable {
         this.equipment = equipment;
     }
 
-    // TODO: nonEmptyOrDefault for all Collections in this class?
     public List<CristinTypedLabel> getProjectCategories() {
-        return projectCategories;
+        return nonEmptyOrDefault(projectCategories);
     }
 
     public void setProjectCategories(List<CristinTypedLabel> projectCategories) {
@@ -225,7 +224,7 @@ public class CristinProject implements JsonSerializable {
     }
 
     public List<CristinTypedLabel> getKeywords() {
-        return keywords;
+        return nonEmptyOrDefault(keywords);
     }
 
     public void setKeywords(List<CristinTypedLabel> keywords) {
@@ -233,7 +232,7 @@ public class CristinProject implements JsonSerializable {
     }
 
     public List<CristinExternalSource> getExternalSources() {
-        return externalSources;
+        return nonEmptyOrDefault(externalSources);
     }
 
     public void setExternalSources(List<CristinExternalSource> externalSources) {

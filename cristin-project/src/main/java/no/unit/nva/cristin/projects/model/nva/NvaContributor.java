@@ -1,12 +1,8 @@
 package no.unit.nva.cristin.projects.model.nva;
 
 import static no.unit.nva.cristin.model.CristinInstitution.fromOrganization;
-import static no.unit.nva.cristin.model.JsonPropertyNames.AFFILIATION;
-import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTITY;
-import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.model.CristinUnit.extractUnitIdentifier;
 import static no.unit.nva.utils.ContributorRoleMapping.getCristinRole;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -16,8 +12,6 @@ import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.model.Organization;
 
-@SuppressWarnings("unused")
-@JsonPropertyOrder({TYPE, IDENTITY, AFFILIATION})
 public class NvaContributor {
 
     private String type;
@@ -103,12 +97,11 @@ public class NvaContributor {
         }
     }
 
-    private CristinRole addRolesBasedOnContributorsType(CristinRole cristinRole) {
+    private void addRolesBasedOnContributorsType(CristinRole cristinRole) {
         if (contributorTypeCanBeMappedToCristinRole()) {
             var cristinRoleCode = getCristinRole(getType()).orElseThrow();
             cristinRole.setRoleCode(cristinRoleCode);
         }
-        return cristinRole;
     }
 
     private boolean contributorHasValidUnitIdentifier() {

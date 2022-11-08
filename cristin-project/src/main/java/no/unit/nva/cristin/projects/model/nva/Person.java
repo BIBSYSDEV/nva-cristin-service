@@ -6,21 +6,17 @@ import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
-import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.nvaIdentifierToCristinIdentifier;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Objects;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 
-@SuppressWarnings("unused")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonPropertyOrder({ID, TYPE, FIRST_NAME, LAST_NAME})
 public class Person {
 
     private final URI id;

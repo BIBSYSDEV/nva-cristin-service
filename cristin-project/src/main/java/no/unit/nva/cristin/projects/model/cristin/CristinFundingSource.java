@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Objects;
 import nva.commons.core.JacocoGenerated;
 
-@SuppressWarnings("unused")
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinFundingSource {

@@ -10,11 +10,16 @@ import java.util.Objects;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Funding {
 
+    public static final String SOURCE = "source";
+    public static final String CODE = "code";
+
+    @JsonProperty(SOURCE)
     private final FundingSource source;
+    @JsonProperty(CODE)
     private final String code;
 
     @JsonCreator
-    public Funding(@JsonProperty("source") FundingSource source, @JsonProperty("code") String code) {
+    public Funding(@JsonProperty(SOURCE) FundingSource source, @JsonProperty(CODE) String code) {
         this.source = source;
         this.code = code;
     }

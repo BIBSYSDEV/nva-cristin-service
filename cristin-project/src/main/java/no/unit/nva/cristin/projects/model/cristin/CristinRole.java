@@ -9,7 +9,6 @@ import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.model.CristinUnit;
 import nva.commons.core.JacocoGenerated;
 
-@SuppressWarnings("unused")
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinRole {
