@@ -231,6 +231,7 @@ class CreateCristinProjectHandlerTest {
         expected.setEquipment(Collections.emptyMap());
         expected.setProjectCategories(Collections.emptyList());
         expected.setKeywords(Collections.emptyList());
+        expected.setExternalSources(Collections.emptyList());
     }
 
 }

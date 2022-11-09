@@ -29,6 +29,7 @@ public class CristinProject implements JsonSerializable {
     public static final String EQUIPMENT = "equipment";
     public static final String CRISTIN_PROJECT_CATEGORIES = "project_categories";
     public static final String KEYWORDS = "keywords";
+    public static final String CRISTIN_EXTERNAL_SOURCES = "external_sources";
 
     private String cristinProjectId;
     private Boolean publishable;
@@ -59,6 +60,8 @@ public class CristinProject implements JsonSerializable {
     private List<CristinTypedLabel> projectCategories;
     @JsonProperty(KEYWORDS)
     private List<CristinTypedLabel> keywords;
+    @JsonProperty(CRISTIN_EXTERNAL_SOURCES)
+    private List<CristinExternalSource> externalSources;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -212,6 +215,7 @@ public class CristinProject implements JsonSerializable {
         this.equipment = equipment;
     }
 
+    // TODO: nonEmptyOrDefault for all Collections in this class?
     public List<CristinTypedLabel> getProjectCategories() {
         return projectCategories;
     }
@@ -226,6 +230,14 @@ public class CristinProject implements JsonSerializable {
 
     public void setKeywords(List<CristinTypedLabel> keywords) {
         this.keywords = keywords;
+    }
+
+    public List<CristinExternalSource> getExternalSources() {
+        return externalSources;
+    }
+
+    public void setExternalSources(List<CristinExternalSource> externalSources) {
+        this.externalSources = externalSources;
     }
 
     /**
@@ -272,7 +284,8 @@ public class CristinProject implements JsonSerializable {
                && Objects.equals(getMethod(), that.getMethod())
                && Objects.equals(getEquipment(), that.getEquipment())
                && Objects.equals(getProjectCategories(), that.getProjectCategories())
-               && Objects.equals(getKeywords(), that.getKeywords());
+               && Objects.equals(getKeywords(), that.getKeywords())
+               && Objects.equals(getExternalSources(), that.getExternalSources());
     }
 
     @Override
@@ -282,7 +295,7 @@ public class CristinProject implements JsonSerializable {
                             getCoordinatingInstitution(), getProjectFundingSources(), getContactInfo(),
                             getTotalFundingAmount(), getParticipants(), getAcademicSummary(),
                             getPopularScientificSummary(),
-                            getMethod(), getEquipment(), getProjectCategories(), getKeywords());
+                            getMethod(), getEquipment(), getProjectCategories(), getKeywords(), getExternalSources());
     }
 
     @Override

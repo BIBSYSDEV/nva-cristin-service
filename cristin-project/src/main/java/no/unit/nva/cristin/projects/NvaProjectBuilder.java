@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
+import no.unit.nva.cristin.projects.model.cristin.CristinExternalSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingAmount;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.model.CristinOrganization;
@@ -13,6 +14,7 @@ import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
+import no.unit.nva.cristin.projects.model.nva.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
@@ -116,7 +118,21 @@ public class NvaProjectBuilder {
                    .withEquipment(cristinProject.getEquipment())
                    .withProjectCategories(extractTypedLabels(cristinProject.getProjectCategories()))
                    .withKeywords(extractTypedLabels(cristinProject.getKeywords()))
+                   .withExternalSources(extractExternalSources(cristinProject.getExternalSources()))
                    .build();
+    }
+
+    private List<ExternalSource> extractExternalSources(List<CristinExternalSource> cristinExternalSources) {
+        return nonNull(cristinExternalSources)
+                   ? cristinExternalSources.stream()
+                         .map(NvaProjectBuilder::toExternalSource)
+                         .collect(Collectors.toList())
+                   : null;
+    }
+
+    private static ExternalSource toExternalSource(CristinExternalSource cristinExternalSource) {
+        return new ExternalSource(cristinExternalSource.getSourceReferenceId(),
+                                  cristinExternalSource.getSourceShortName());
     }
 
     private List<TypedLabel> extractTypedLabels(List<CristinTypedLabel> cristinTypedLabels) {

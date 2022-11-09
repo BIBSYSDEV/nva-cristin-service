@@ -103,6 +103,11 @@
         "label": {
           "en": "Supply Chain"
         }
+      } ],
+      "externalSources": [ {
+        "type": "ExternalSource",
+        "identifier": "2016/2000",
+        "name": "REK"
       } ]
     },
     {
@@ -200,6 +205,11 @@
         "label": {
           "en": "Supply Chain"
         }
+      } ],
+      "externalSources": [ {
+        "type": "ExternalSource",
+        "identifier": "2016/2000",
+        "name": "REK"
       } ]
     },
     {
@@ -297,6 +307,11 @@
         "label": {
           "en": "Supply Chain"
         }
+      } ],
+      "externalSources": [ {
+        "type": "ExternalSource",
+        "identifier": "2016/2000",
+        "name": "REK"
       } ]
     },
     {
@@ -394,6 +409,11 @@
         "label": {
           "en": "Supply Chain"
         }
+      } ],
+      "externalSources": [ {
+        "type": "ExternalSource",
+        "identifier": "2016/2000",
+        "name": "REK"
       } ]
     },
     {
@@ -491,6 +511,11 @@
         "label": {
           "en": "Supply Chain"
         }
+      } ],
+      "externalSources": [ {
+        "type": "ExternalSource",
+        "identifier": "2016/2000",
+        "name": "REK"
       } ]
     }
   ]

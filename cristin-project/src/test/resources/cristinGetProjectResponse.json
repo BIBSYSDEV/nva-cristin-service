@@ -98,5 +98,9 @@
         "en": "Supply Chain"
       }
     }
-  ]
+  ],
+  "external_sources" : [ {
+    "source_short_name" : "REK",
+    "source_reference_id" : "2016/2000"
+  } ]
 }

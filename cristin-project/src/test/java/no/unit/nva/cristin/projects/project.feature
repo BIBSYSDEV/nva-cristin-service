@@ -164,3 +164,15 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.keywords[0] == '#present'
     And match response.keywords[0].type == '#present'
     And match response.keywords[0].label == '#present'
+
+  Scenario: Fetch returns project external sources
+    Given path '/project/529587'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.externalSources == '#present'
+    And match response.externalSources[0] == '#present'
+    And match response.externalSources[0].type == 'ExternalSource'
+    And match response.externalSources[0].identifier == '#present'
+    And match response.externalSources[0].name == '#present'

@@ -31,7 +31,8 @@
       "method": {},
       "equipment": {},
       "projectCategories": [],
-      "keywords": []
+      "keywords": [],
+      "externalSources": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/999888",
@@ -60,7 +61,8 @@
       "method": {},
       "equipment": {},
       "projectCategories": [],
-      "keywords": []
+      "keywords": [],
+      "externalSources": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/111333",
@@ -89,7 +91,8 @@
       "method": {},
       "equipment": {},
       "projectCategories": [],
-      "keywords": []
+      "keywords": [],
+      "externalSources": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/222444",
@@ -114,7 +117,8 @@
       "method": {},
       "equipment": {},
       "projectCategories": [],
-      "keywords": []
+      "keywords": [],
+      "externalSources": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/444222",
@@ -139,7 +143,8 @@
       "method": {},
       "equipment": {},
       "projectCategories": [],
-      "keywords": []
+      "keywords": [],
+      "externalSources": []
     }
   ]
 }
