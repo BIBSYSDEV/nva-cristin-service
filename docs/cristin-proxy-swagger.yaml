@@ -1430,6 +1430,11 @@ components:
               name:
                 type: string
                 description: The name of the source in short form
+        relatedProjects:
+          type: array
+          items:
+            type: string
+            description: Uri to the related project
     ProjectPost:
       type: object
       properties:
@@ -2175,6 +2180,8 @@ components:
               - type: 'ExternalSource'
                 identifier: '2016/2000'
                 name: 'REK'
+            relatedProjects:
+              - 'https://api.dev.nva.aws.unit.no/cristin/project/483302'
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2263,6 +2270,8 @@ components:
           - type: 'ExternalSource'
             identifier: '2016/2000'
             name: 'REK'
+        relatedProjects:
+          - 'https://api.dev.nva.aws.unit.no/cristin/project/483302'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2759,6 +2768,8 @@ components:
               - type: 'ExternalSource'
                 identifier: '2016/2000'
                 name: 'REK'
+            relatedProjects:
+              - 'https://api.dev.nva.aws.unit.no/cristin/project/483302'
 
   securitySchemes:
     CognitoUserPool:
