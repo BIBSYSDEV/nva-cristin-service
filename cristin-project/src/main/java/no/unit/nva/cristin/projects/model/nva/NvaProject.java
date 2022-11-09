@@ -86,6 +86,8 @@ public class NvaProject implements JsonSerializable {
     private List<TypedLabel> keywords;
     @JsonProperty
     private List<ExternalSource> externalSources;
+    @JsonProperty
+    private List<URI> relatedProjects;
 
     private NvaProject() {
     }
@@ -298,6 +300,14 @@ public class NvaProject implements JsonSerializable {
         this.externalSources = externalSources;
     }
 
+    public List<URI> getRelatedProjects() {
+        return nonEmptyOrDefault(relatedProjects);
+    }
+
+    public void setRelatedProjects(List<URI> relatedProjects) {
+        this.relatedProjects = relatedProjects;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -332,7 +342,8 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getEquipment(), that.getEquipment())
                && Objects.equals(getProjectCategories(), that.getProjectCategories())
                && Objects.equals(getKeywords(), that.getKeywords())
-               && Objects.equals(getExternalSources(), that.getExternalSources());
+               && Objects.equals(getExternalSources(), that.getExternalSources())
+               && Objects.equals(getRelatedProjects(), that.getRelatedProjects());
     }
 
     @Override
@@ -342,7 +353,7 @@ public class NvaProject implements JsonSerializable {
                             getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
                             getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
-                            getProjectCategories(), getKeywords(), getExternalSources());
+                            getProjectCategories(), getKeywords(), getExternalSources(), getRelatedProjects());
     }
 
     @Override
@@ -490,6 +501,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withExternalSources(List<ExternalSource> externalSources) {
             nvaProject.setExternalSources(externalSources);
+            return this;
+        }
+
+        public Builder withRelatedProjects(List<URI> relatedProjects) {
+            nvaProject.setRelatedProjects(relatedProjects);
             return this;
         }
 

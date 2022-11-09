@@ -99,5 +99,8 @@
     "type": "ExternalSource",
     "identifier": "2016/2000",
     "name": "REK"
-  } ]
+  } ],
+  "relatedProjects": [
+    "https://api.dev.nva.aws.unit.no/cristin/project/483302"
+  ]
 }

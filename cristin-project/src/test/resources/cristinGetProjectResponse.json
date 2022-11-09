@@ -102,5 +102,8 @@
   "external_sources" : [ {
     "source_short_name" : "REK",
     "source_reference_id" : "2016/2000"
-  } ]
+  } ],
+  "related_projects" : [
+    "https://api.cristin-test.uio.no/v2/projects/483302"
+  ]
 }

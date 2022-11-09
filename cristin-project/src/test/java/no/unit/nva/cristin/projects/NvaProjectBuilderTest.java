@@ -35,6 +35,9 @@ public class NvaProjectBuilderTest {
     public static final String APPLIEDRESEARCH_LABEL = "Applied Research";
     public static final String KEYWORD_CODE = "4837";
     public static final String KEYWORD_LABEL = "Supply Chain";
+    public static final String EXTERNAL_SOURCE_NAME = "REK";
+    public static final String EXTERNAL_SOURCE_IDENTIFIER = "2016/2000";
+    public static final String RELATED_PROJECT_URI = "https://api.dev.nva.aws.unit.no/cristin/project/483302";
 
     @Test
     void shouldReturnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
@@ -73,6 +76,9 @@ public class NvaProjectBuilderTest {
                    equalTo(APPLIEDRESEARCH_LABEL));
         assertThat(nvaProject.getKeywords().get(0).getType(), equalTo(KEYWORD_CODE));
         assertThat(nvaProject.getKeywords().get(0).getLabel().get(ENGLISH_LANGUAGE_KEY), equalTo(KEYWORD_LABEL));
+        assertThat(nvaProject.getExternalSources().get(0).getIdentifier(), equalTo(EXTERNAL_SOURCE_IDENTIFIER));
+        assertThat(nvaProject.getExternalSources().get(0).getName(), equalTo(EXTERNAL_SOURCE_NAME));
+        assertThat(nvaProject.getRelatedProjects().get(0).toString(), equalTo(RELATED_PROJECT_URI));
     }
 
     @Test

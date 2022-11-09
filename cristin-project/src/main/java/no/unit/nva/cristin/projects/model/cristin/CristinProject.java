@@ -30,6 +30,7 @@ public class CristinProject implements JsonSerializable {
     public static final String CRISTIN_PROJECT_CATEGORIES = "project_categories";
     public static final String KEYWORDS = "keywords";
     public static final String CRISTIN_EXTERNAL_SOURCES = "external_sources";
+    public static final String CRISTIN_RELATED_PROJECTS = "related_projects";
 
     private String cristinProjectId;
     private Boolean publishable;
@@ -62,6 +63,8 @@ public class CristinProject implements JsonSerializable {
     private List<CristinTypedLabel> keywords;
     @JsonProperty(CRISTIN_EXTERNAL_SOURCES)
     private List<CristinExternalSource> externalSources;
+    @JsonProperty(CRISTIN_RELATED_PROJECTS)
+    private List<String> relatedProjects;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -239,6 +242,14 @@ public class CristinProject implements JsonSerializable {
         this.externalSources = externalSources;
     }
 
+    public List<String> getRelatedProjects() {
+        return nonEmptyOrDefault(relatedProjects);
+    }
+
+    public void setRelatedProjects(List<String> relatedProjects) {
+        this.relatedProjects = relatedProjects;
+    }
+
     /**
      * Verifies CristinProject has enough data to be considered as valid.
      *
@@ -284,7 +295,8 @@ public class CristinProject implements JsonSerializable {
                && Objects.equals(getEquipment(), that.getEquipment())
                && Objects.equals(getProjectCategories(), that.getProjectCategories())
                && Objects.equals(getKeywords(), that.getKeywords())
-               && Objects.equals(getExternalSources(), that.getExternalSources());
+               && Objects.equals(getExternalSources(), that.getExternalSources())
+               && Objects.equals(getRelatedProjects(), that.getRelatedProjects());
     }
 
     @Override
@@ -294,7 +306,8 @@ public class CristinProject implements JsonSerializable {
                             getCoordinatingInstitution(), getProjectFundingSources(), getContactInfo(),
                             getTotalFundingAmount(), getParticipants(), getAcademicSummary(),
                             getPopularScientificSummary(),
-                            getMethod(), getEquipment(), getProjectCategories(), getKeywords(), getExternalSources());
+                            getMethod(), getEquipment(), getProjectCategories(), getKeywords(), getExternalSources(),
+                            getRelatedProjects());
     }
 
     @Override

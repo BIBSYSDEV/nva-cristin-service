@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import java.net.URI;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
@@ -31,12 +32,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import nva.commons.core.paths.UriWrapper;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
 import static no.unit.nva.utils.UriUtils.PROJECT;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.StringUtils.isNotBlank;
 
@@ -119,7 +122,21 @@ public class NvaProjectBuilder {
                    .withProjectCategories(extractTypedLabels(cristinProject.getProjectCategories()))
                    .withKeywords(extractTypedLabels(cristinProject.getKeywords()))
                    .withExternalSources(extractExternalSources(cristinProject.getExternalSources()))
+                   .withRelatedProjects(extractRelatedProjects(cristinProject.getRelatedProjects()))
                    .build();
+    }
+
+    private List<URI> extractRelatedProjects(List<String> cristinRelatedProjects) {
+        return nonNull(cristinRelatedProjects)
+                   ? cristinRelatedProjects.stream()
+                         .map(NvaProjectBuilder::cristinUriStringWithIdentifierToNvaUri)
+                         .collect(Collectors.toList())
+                   : null;
+    }
+
+    private static URI cristinUriStringWithIdentifierToNvaUri(String cristinUri) {
+        var identifier = extractLastPathElement(UriWrapper.fromUri(cristinUri).getUri());
+        return getNvaApiId(identifier, PROJECT);
     }
 
     private List<ExternalSource> extractExternalSources(List<CristinExternalSource> cristinExternalSources) {
