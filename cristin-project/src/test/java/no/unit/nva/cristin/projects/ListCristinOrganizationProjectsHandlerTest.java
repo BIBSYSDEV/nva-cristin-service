@@ -65,12 +65,12 @@ class ListCristinOrganizationProjectsHandlerTest {
     private ListCristinOrganizationProjectsHandler handler;
     private ByteArrayOutputStream output;
     private Context context;
-    private CristinApiClient cristinApiClient;
+    private QueryCristinOrganizationProjectApiClient cristinApiClient;
 
     @BeforeEach
     void setUp() {
         context = mock(Context.class);
-        cristinApiClient = new CristinApiClient();
+        cristinApiClient = new QueryCristinOrganizationProjectApiClient();
         output = new ByteArrayOutputStream();
         handler = new ListCristinOrganizationProjectsHandler(cristinApiClient, new Environment());
     }
@@ -120,7 +120,7 @@ class ListCristinOrganizationProjectsHandlerTest {
     @Test
     void shouldReturnSearchResponseWithEmptyHitsWhenBackendFetchIsEmpty() throws ApiGatewayException, IOException {
 
-        CristinApiClient apiClient = spy(cristinApiClient);
+        QueryCristinOrganizationProjectApiClient apiClient = spy(cristinApiClient);
         doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
                 generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(apiClient).listProjects(any());
         doReturn(Collections.emptyList()).when(apiClient).fetchQueryResultsOneByOne(any());

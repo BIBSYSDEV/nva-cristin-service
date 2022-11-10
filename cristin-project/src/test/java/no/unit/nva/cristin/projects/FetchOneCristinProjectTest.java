@@ -44,7 +44,7 @@ import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
+import static no.unit.nva.cristin.projects.FetchCristinProjectClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_KEY;
 import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.INVALID_QUERY_PARAM_VALUE;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -78,7 +78,7 @@ public class FetchOneCristinProjectTest {
     public static final String FIELD_STATUS = "status";
     public static final String NOT_LEGAL_STATUS = "not_legal_status";
 
-    private CristinApiClient cristinApiClientStub;
+    private FetchCristinProjectApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
@@ -86,7 +86,7 @@ public class FetchOneCristinProjectTest {
 
     @BeforeEach
     void setUp() {
-        cristinApiClientStub = new CristinApiClientStub();
+        cristinApiClientStub = new FetchCristinProjectClientStub();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new FetchOneCristinProject(cristinApiClientStub, environment);
@@ -333,7 +333,8 @@ public class FetchOneCristinProjectTest {
         final String summaryLanguage = randomLanguageCode();
         final String summary = randomSummary();
         final Map<String, String> expectedSummary = Map.of(summaryLanguage, summary);
-        final CristinApiClient cristinApiClient = createCristinApiClientWithAcademicSummary(summaryLanguage, summary);
+        final FetchCristinProjectApiClient cristinApiClient =
+            createCristinApiClientWithAcademicSummary(summaryLanguage, summary);
         final InputStream input = requestWithLanguageAndId(
                 of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(IDENTIFIER, DEFAULT_IDENTIFIER));
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -353,21 +354,22 @@ public class FetchOneCristinProjectTest {
         return "summary summary summary";
     }
 
-    private CristinApiClient createCristinApiClientWithAcademicSummary(String language, String summary)
+    private FetchCristinProjectClientStub createCristinApiClientWithAcademicSummary(String language, String summary)
             throws JsonProcessingException {
         JsonNode cristinProjectSource =
                 OBJECT_MAPPER.readTree(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
         ObjectNode summaryNode = JsonNodeFactory.instance.objectNode().put(language, summary);
         ((ObjectNode) cristinProjectSource).set(ACADEMIC_SUMMARY, summaryNode);
-        return new CristinApiClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
+        return new FetchCristinProjectClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
     }
 
 
-    private CristinApiClient createCristinApiClientWithResponseContainingError() throws JsonProcessingException {
+    private FetchCristinProjectClientStub createCristinApiClientWithResponseContainingError()
+        throws JsonProcessingException {
         JsonNode cristinProjectSource =
                 OBJECT_MAPPER.readTree(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
         ((ObjectNode) cristinProjectSource).put(FIELD_STATUS, NOT_LEGAL_STATUS);
-        return new CristinApiClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
+        return new FetchCristinProjectClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
     }
 
     private List<Funding> notRandomFunding() {

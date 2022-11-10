@@ -31,7 +31,7 @@ public class ListCristinOrganizationProjectsHandler extends CristinQueryHandler<
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
     public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(PAGE, NUMBER_OF_RESULTS);
 
-    private final transient CristinApiClient cristinApiClient;
+    private final transient QueryCristinOrganizationProjectApiClient cristinApiClient;
 
     @SuppressWarnings("unused")
     @JacocoGenerated
@@ -41,10 +41,11 @@ public class ListCristinOrganizationProjectsHandler extends CristinQueryHandler<
 
     @JacocoGenerated
     public ListCristinOrganizationProjectsHandler(Environment environment) {
-        this(new CristinApiClient(), environment);
+        this(new QueryCristinOrganizationProjectApiClient(), environment);
     }
 
-    protected ListCristinOrganizationProjectsHandler(CristinApiClient cristinApiClient, Environment environment) {
+    protected ListCristinOrganizationProjectsHandler(QueryCristinOrganizationProjectApiClient cristinApiClient,
+                                                     Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }
@@ -68,7 +69,7 @@ public class ListCristinOrganizationProjectsHandler extends CristinQueryHandler<
         validateHasIdentifierPathParameter(requestInfo);
         validateQueryParameterKeys(requestInfo);
 
-        Map<String, String> requestQueryParameters = Map.of(
+        var requestQueryParameters = Map.of(
                 CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, getValidId(requestInfo),
                 LANGUAGE, getValidLanguage(requestInfo),
                 PAGE, getValidPage(requestInfo),
@@ -96,7 +97,7 @@ public class ListCristinOrganizationProjectsHandler extends CristinQueryHandler<
     }
 
     private String getValidId(RequestInfo requestInfo) throws BadRequestException {
-        final String identifier = requestInfo.getPathParameter(IDENTIFIER);
+        final var identifier = requestInfo.getPathParameter(IDENTIFIER);
         if (PATTERN.matcher(identifier).matches()) {
             return identifier;
         }

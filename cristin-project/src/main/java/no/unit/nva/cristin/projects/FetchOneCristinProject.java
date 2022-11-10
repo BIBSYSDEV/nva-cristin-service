@@ -23,7 +23,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(LANGUAGE);
 
-    private final transient CristinApiClient cristinApiClient;
+    private final transient FetchCristinProjectApiClient cristinApiClient;
 
     @SuppressWarnings("unused")
     @JacocoGenerated
@@ -33,10 +33,10 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     @JacocoGenerated
     public FetchOneCristinProject(Environment environment) {
-        this(new CristinApiClient(), environment);
+        this(new FetchCristinProjectApiClient(), environment);
     }
 
-    public FetchOneCristinProject(CristinApiClient cristinApiClient, Environment environment) {
+    public FetchOneCristinProject(FetchCristinProjectApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }
@@ -47,8 +47,8 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
         validateThatSuppliedQueryParamsIsSupported(requestInfo);
 
-        String language = getValidLanguage(requestInfo);
-        String id = getValidIdentifier(requestInfo);
+        var language = getValidLanguage(requestInfo);
+        var id = getValidIdentifier(requestInfo);
 
         try {
             return getTransformedProjectFromCristin(id, language);
@@ -75,7 +75,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     private NvaProject authenticatedGetTransformedProjectFromCristin(String id, String language)
             throws ApiGatewayException {
-        return new CristinApiClient(CristinAuthenticator.getHttpClient())
+        return new FetchCristinProjectApiClient(CristinAuthenticator.getHttpClient())
                 .queryOneCristinProjectUsingIdIntoNvaProject(id, language);
     }
 

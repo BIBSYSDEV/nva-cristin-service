@@ -36,7 +36,7 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
     public static final Set<String> VALID_QUERY_PARAMETERS =
             Set.of(QUERY, ORGANIZATION, STATUS, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
 
-    private final transient CristinApiClient cristinApiClient;
+    private final transient QueryCristinProjectApiClient cristinApiClient;
 
     @SuppressWarnings("unused")
     @JacocoGenerated
@@ -46,10 +46,10 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
 
     @JacocoGenerated
     public FetchCristinProjects(Environment environment) {
-        this(new CristinApiClient(), environment);
+        this(new QueryCristinProjectApiClient(), environment);
     }
 
-    protected FetchCristinProjects(CristinApiClient cristinApiClient, Environment environment) {
+    protected FetchCristinProjects(QueryCristinProjectApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }
@@ -60,11 +60,11 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
 
         validateQueryParameterKeys(requestInfo);
 
-        String language = getValidLanguage(requestInfo);
-        String query = getValidQuery(requestInfo);
-        String page = getValidPage(requestInfo);
-        String numberOfResults = getValidNumberOfResults(requestInfo);
-        Map<String, String> requestQueryParameters = getQueryParameters(language, query, page, numberOfResults);
+        var language = getValidLanguage(requestInfo);
+        var query = getValidQuery(requestInfo);
+        var page = getValidPage(requestInfo);
+        var numberOfResults = getValidNumberOfResults(requestInfo);
+        var requestQueryParameters = getQueryParameters(language, query, page, numberOfResults);
         if (requestInfo.getQueryParameters().containsKey(ORGANIZATION)) {
             requestQueryParameters.put(ORGANIZATION, getValidOrganizationUri(requestInfo));
         }

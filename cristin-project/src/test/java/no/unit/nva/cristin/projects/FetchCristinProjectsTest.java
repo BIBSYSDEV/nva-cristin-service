@@ -59,7 +59,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
-import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
+import static no.unit.nva.cristin.projects.QueryCristinProjectClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.TOTAL_COUNT_EXAMPLE_VALUE;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -117,7 +117,7 @@ class FetchCristinProjectsTest {
         IoUtils.stringFromResources(Path.of("api_query_response_with_funding.json"));
 
     private final Environment environment = new Environment();
-    private CristinApiClient cristinApiClientStub;
+    private QueryCristinProjectApiClient cristinApiClientStub;
     private Context context;
     private ByteArrayOutputStream output;
     private FetchCristinProjects handler;
@@ -158,7 +158,7 @@ class FetchCristinProjectsTest {
 
     @BeforeEach
     void setUp() {
-        cristinApiClientStub = new CristinApiClientStub();
+        cristinApiClientStub = new QueryCristinProjectClientStub();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new FetchCristinProjects(cristinApiClientStub, environment);
