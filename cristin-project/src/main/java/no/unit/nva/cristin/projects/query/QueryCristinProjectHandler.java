@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
@@ -31,7 +31,7 @@ import static nva.commons.core.attempt.Try.attempt;
 /**
  * Handler for requests to Lambda function.
  */
-public class FetchCristinProjects extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
+public class QueryCristinProjectHandler extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
 
     public static final Set<String> VALID_QUERY_PARAMETERS =
             Set.of(QUERY, ORGANIZATION, STATUS, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
@@ -40,16 +40,16 @@ public class FetchCristinProjects extends CristinQueryHandler<Void, SearchRespon
 
     @SuppressWarnings("unused")
     @JacocoGenerated
-    public FetchCristinProjects() {
+    public QueryCristinProjectHandler() {
         this(new Environment());
     }
 
     @JacocoGenerated
-    public FetchCristinProjects(Environment environment) {
+    public QueryCristinProjectHandler(Environment environment) {
         this(new QueryCristinProjectApiClient(), environment);
     }
 
-    protected FetchCristinProjects(QueryCristinProjectApiClient cristinApiClient, Environment environment) {
+    protected QueryCristinProjectHandler(QueryCristinProjectApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }

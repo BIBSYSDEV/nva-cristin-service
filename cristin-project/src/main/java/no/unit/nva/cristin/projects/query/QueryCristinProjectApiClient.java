@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.query;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
@@ -20,6 +20,8 @@ import java.util.Map;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.model.Constants.QueryType;
 import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.projects.CristinApiClient;
+import no.unit.nva.cristin.projects.CristinQuery;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;

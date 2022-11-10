@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.query;
 
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
@@ -8,9 +8,9 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.GRANT_ID_EXAMPLE;
-import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.LANGUAGE_NB;
-import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.RANDOM_TITLE;
+import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandlerTest.GRANT_ID_EXAMPLE;
+import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandlerTest.LANGUAGE_NB;
+import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandlerTest.RANDOM_TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;
 import java.util.Map;

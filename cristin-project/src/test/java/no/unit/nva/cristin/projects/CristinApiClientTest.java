@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.LANGUAGE_NB;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -34,6 +33,7 @@ public class CristinApiClientTest {
     public static final String EXAMPLE_TITLE = "Example Title";
     private static final URI LOCALHOST_URI = URI.create("http://localhost/cristin");
     private final Set<String> ids = Set.of("123", "456", "789");
+    private static final String LANGUAGE_NB = "nb";
 
     final CristinApiClient cristinApiClient = new CristinApiClient();
 
