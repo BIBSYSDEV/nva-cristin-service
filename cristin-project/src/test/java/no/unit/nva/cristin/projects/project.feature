@@ -99,80 +99,42 @@ Feature: API tests for Cristin Project retrieve and search
     * def uri = 'https://api.dev.nva.aws.unit.no/' + basePath + '/project/0'
     And match response.detail == "The requested resource '" + uri + "' was not found"
 
-  Scenario: Fetch returns all supported fields
-    Given path '/project/6720765'
-    When method GET
-    Then status 200
-    And match response == '#object'
-    And match response['@context'] == '#present'
-    And match response.id == '#regex ' + projectIdRegex
-    And match response.type == 'Project'
-    And match response.published == '#present'
-    And match response.publishable == '#present'
-    And match response.created.date == '#present'
-    And match response.created.sourceShortName == '#present'
-    And match response.lastModified.date == '#present'
-
-  Scenario: Fetch returns contact info
+  Scenario: Fetch returns supported fields
     Given path '/project/550767'
     When method GET
     Then status 200
     And match response == '#object'
-    And match response['@context'] == '#present'
-    And match response.contactInfo == '#present'
-    And match response.contactInfo.type == '#present'
+    And match response.published == true
+    And match response.publishable == true
+    And match response.created.date == '#present'
+    And match response.lastModified.date == '#present'
     And match response.contactInfo.type == 'ContactInfo'
     And match response.contactInfo.contactPerson == '#present'
     And match response.contactInfo.organization == '#present'
     And match response.contactInfo.email == '#present'
     And match response.contactInfo.phone == '#present'
-
-  Scenario: Fetch returns total funding amount
-    Given path '/project/550767'
-    When method GET
-    Then status 200
-    And match response == '#object'
-    And match response['@context'] == '#present'
-    And match response.fundingAmount == '#present'
-    And match response.fundingAmount.type == '#present'
     And match response.fundingAmount.type == 'FundingAmount'
     And match response.fundingAmount.currency == '#present'
     And match response.fundingAmount.value == '#present'
+    And match response.projectCategories[0].type == '#present'
+    And match response.projectCategories[0].label == '#present'
+    And match response.keywords[0].type == '#present'
+    And match response.keywords[0].label == '#present'
+    And match response.relatedProjects[0] == '#present'
 
   Scenario: Fetch returns method and equipment
     Given path '/project/284612'
     When method GET
     Then status 200
     And match response == '#object'
-    And match response['@context'] == '#present'
-    And match response.method == '#present'
     And match response.method['no'] == '#present'
-    And match response.equipment == '#present'
     And match response.equipment['no'] == '#present'
-
-  Scenario: Fetch returns project categories and keywords
-    Given path '/project/616221'
-    When method GET
-    Then status 200
-    And match response == '#object'
-    And match response['@context'] == '#present'
-    And match response.projectCategories == '#present'
-    And match response.projectCategories[0] == '#present'
-    And match response.projectCategories[0].type == 'APPLIEDRESEARCH'
-    And match response.projectCategories[0].label == '#present'
-    And match response.keywords == '#present'
-    And match response.keywords[0] == '#present'
-    And match response.keywords[0].type == '#present'
-    And match response.keywords[0].label == '#present'
 
   Scenario: Fetch returns project external sources
     Given path '/project/529587'
     When method GET
     Then status 200
     And match response == '#object'
-    And match response['@context'] == '#present'
-    And match response.externalSources == '#present'
-    And match response.externalSources[0] == '#present'
     And match response.externalSources[0].type == 'ExternalSource'
     And match response.externalSources[0].identifier == '#present'
     And match response.externalSources[0].name == '#present'

@@ -8,17 +8,15 @@ import java.time.Instant;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
 
-@SuppressWarnings("unused")
+@JsonInclude(NON_NULL)
 public class DateInfo implements JsonSerializable {
 
-    public static final String DATE = "date";
     public static final String SOURCE_SHORT_NAME = "sourceShortName";
+    public static final String DATE = "date";
 
-    @JsonProperty
-    @JsonInclude(NON_NULL)
+    @JsonProperty(SOURCE_SHORT_NAME)
     private final transient String sourceShortName;
-    @JsonProperty
-    @JsonInclude(NON_NULL)
+    @JsonProperty(DATE)
     private final transient Instant date;
 
     @JsonCreator

@@ -108,7 +108,10 @@
         "type": "ExternalSource",
         "identifier": "2016/2000",
         "name": "REK"
-      } ]
+      } ],
+      "relatedProjects": [
+        "https://api.dev.nva.aws.unit.no/cristin/project/483302"
+      ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -210,7 +213,10 @@
         "type": "ExternalSource",
         "identifier": "2016/2000",
         "name": "REK"
-      } ]
+      } ],
+      "relatedProjects": [
+        "https://api.dev.nva.aws.unit.no/cristin/project/483302"
+      ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -312,7 +318,10 @@
         "type": "ExternalSource",
         "identifier": "2016/2000",
         "name": "REK"
-      } ]
+      } ],
+      "relatedProjects": [
+        "https://api.dev.nva.aws.unit.no/cristin/project/483302"
+      ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -414,7 +423,10 @@
         "type": "ExternalSource",
         "identifier": "2016/2000",
         "name": "REK"
-      } ]
+      } ],
+      "relatedProjects": [
+        "https://api.dev.nva.aws.unit.no/cristin/project/483302"
+      ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -516,7 +528,10 @@
         "type": "ExternalSource",
         "identifier": "2016/2000",
         "name": "REK"
-      } ]
+      } ],
+      "relatedProjects": [
+        "https://api.dev.nva.aws.unit.no/cristin/project/483302"
+      ]
     }
   ]
 }

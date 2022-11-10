@@ -16,7 +16,9 @@ public class CristinDateInfo {
     public static final String CRISTIN_DATE = "date";
 
     @JsonInclude(NON_NULL)
+    @JsonProperty(CRISTIN_SOURCE_SHORT_NAME)
     private final transient String sourceShortName;
+    @JsonProperty(CRISTIN_DATE)
     private final transient Instant date;
 
     @JsonCreator
