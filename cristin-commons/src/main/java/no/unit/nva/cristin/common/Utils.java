@@ -20,12 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidPathParameterMessage;
 import static no.unit.nva.cristin.model.Constants.EMPLOYMENT_ID;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORG_ID;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -174,6 +176,20 @@ public class Utils {
 
     private static BadRequestException failedToRetrieveTopLevelOrgCristinId() {
         return new BadRequestException(COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER);
+    }
+
+    /**
+     * Verifies that path parameter named 'identifier' is a numeric value and returns that value.
+     *
+     * @param requestInfo information from request used to extract path parameter
+     * @return String containing a valid identifier
+     * @throws BadRequestException if identifier is invalid
+     */
+    public static String getValidIdentifier(RequestInfo requestInfo) throws BadRequestException {
+        attempt(() -> Integer.parseInt(requestInfo.getPathParameter(IDENTIFIER)))
+            .orElseThrow(failure -> new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER));
+
+        return requestInfo.getPathParameter(IDENTIFIER);
     }
 
 }

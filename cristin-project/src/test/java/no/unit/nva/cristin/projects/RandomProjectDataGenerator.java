@@ -146,7 +146,7 @@ public class RandomProjectDataGenerator {
         return Map.of(randomLanguage(), randomString());
     }
 
-    static ProjectStatus randomStatus() {
+    public static ProjectStatus randomStatus() {
         return randomElement(ProjectStatus.values());
     }
 
@@ -158,7 +158,7 @@ public class RandomProjectDataGenerator {
         return getNvaApiId(identifier, ORGANIZATION_PATH);
     }
 
-    static List<NvaContributor> randomContributors() {
+    public static List<NvaContributor> randomContributors() {
         return IntStream.rangeClosed(0, randomInteger(5))
                 .mapToObj(i -> randomContributor()).collect(Collectors.toList());
     }
@@ -193,18 +193,21 @@ public class RandomProjectDataGenerator {
                 .collect(Collectors.toMap(languageCode -> languageCode, languageCode -> randomString())));
     }
 
-    static Organization randomOrganization() {
+    /**
+     * Creates a random organization.
+     */
+    public static Organization randomOrganization() {
         return new Organization.Builder()
                 .withId(semiRandomOrganizationId(randomString()))
                 .withName(randomNamesMap())
                 .build();
     }
 
-    static List<Map<String, String>> randomListOfTitles(URI usedLanguage) {
+    public static List<Map<String, String>> randomListOfTitles(URI usedLanguage) {
         return List.of(Map.of(randomLanguageCodeExcept(usedLanguage), randomString()));
     }
 
-    static String randomLanguage() {
+    public static String randomLanguage() {
         return randomElement(LANGUAGES);
     }
 
