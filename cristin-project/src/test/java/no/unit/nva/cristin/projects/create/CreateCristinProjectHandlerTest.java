@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.create;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;

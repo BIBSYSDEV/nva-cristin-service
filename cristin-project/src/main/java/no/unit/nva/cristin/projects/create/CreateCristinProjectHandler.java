@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.create;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;

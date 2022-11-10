@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.create;
 
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;

@@ -217,7 +217,10 @@ public class RandomProjectDataGenerator {
         return lang;
     }
 
-    protected static NvaContributor randomContributorWithUnitAffiliation() {
+    /**
+     * Creates a random contributor with unit affiliation.
+     */
+    public static NvaContributor randomContributorWithUnitAffiliation() {
         NvaContributor contributor = new NvaContributor();
         contributor.setAffiliation(someOrganizationFromUnitIdentifier());
         contributor.setIdentity(randomPerson());
@@ -225,14 +228,20 @@ public class RandomProjectDataGenerator {
         return contributor;
     }
 
-    protected static NvaContributor randomContributorWithoutUnitAffiliation() {
+    /**
+     * Creates a random contributor without unit affiliation.
+     */
+    public static NvaContributor randomContributorWithoutUnitAffiliation() {
         NvaContributor contributor = new NvaContributor();
         contributor.setIdentity(randomPerson());
         contributor.setType(randomContributorType());
         return contributor;
     }
 
-    protected static Organization someOrganizationFromUnitIdentifier() {
+    /**
+     * Creates a dummy organization with unit identifier.
+     */
+    public static Organization someOrganizationFromUnitIdentifier() {
         return new Organization.Builder().withId(getNvaApiId(SOME_UNIT_IDENTIFIER, ORGANIZATION_PATH)).build();
     }
 
