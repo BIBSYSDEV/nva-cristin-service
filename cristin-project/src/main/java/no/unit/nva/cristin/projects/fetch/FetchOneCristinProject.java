@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.fetch;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;

@@ -62,7 +62,8 @@ public class QueryCristinProjectApiClient extends CristinApiClient {
         throws ApiGatewayException {
 
         URI uri = attempt(() -> generateQueryProjectsUrl(parameters, queryType))
-                      .toOptional(failure -> logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED, queryParameters(parameters),
+                      .toOptional(failure -> logError(ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED,
+                                                      queryParameters(parameters),
                                                       failure.getException()))
                       .orElseThrow();
         HttpResponse<String> response = fetchQueryResults(uri);

@@ -75,7 +75,7 @@ public class CristinApiClient extends ApiClient {
                 .collect(Collectors.toList());
     }
 
-    protected URI generateGetProjectUri(String id, String language) {
+    public URI generateGetProjectUri(String id, String language) {
         return CristinQuery.fromIdAndLanguage(id, language);
     }
 

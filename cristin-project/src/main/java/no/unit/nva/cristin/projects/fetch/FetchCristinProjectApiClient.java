@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.fetch;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID;
@@ -8,6 +8,7 @@ import static nva.commons.core.attempt.Try.attempt;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.Optional;
+import no.unit.nva.cristin.projects.CristinApiClient;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder;
@@ -21,6 +22,9 @@ public class FetchCristinProjectApiClient extends CristinApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(FetchCristinProjectApiClient.class);
 
+    /**
+     * Creates instance with default Http Client.
+     */
     public FetchCristinProjectApiClient() {
         this(HttpClient.newBuilder()
                  .followRedirects(HttpClient.Redirect.ALWAYS)
@@ -54,7 +58,9 @@ public class FetchCristinProjectApiClient extends CristinApiClient {
 
     protected CristinProject getProject(String id, String language) throws ApiGatewayException {
         var uri = attempt(() -> generateGetProjectUri(id, language))
-                      .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID, id, failure.getException()))
+                      .toOptional(failure -> logError(ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID,
+                                                      id,
+                                                      failure.getException()))
                       .orElseThrow();
 
         var response = fetchGetResult(uri);
