@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.model.nva;
 
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.SingletonCollector;

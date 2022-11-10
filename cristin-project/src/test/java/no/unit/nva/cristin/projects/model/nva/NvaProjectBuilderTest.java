@@ -1,7 +1,6 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.model.nva;
 
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;

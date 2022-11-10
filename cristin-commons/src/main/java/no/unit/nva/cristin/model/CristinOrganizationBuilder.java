@@ -1,7 +1,6 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.model;
 
 import java.util.Optional;
-import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.model.Organization;
 
 import static no.unit.nva.cristin.model.CristinInstitution.fromOrganization;
