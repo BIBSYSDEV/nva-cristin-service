@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;

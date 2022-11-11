@@ -8,7 +8,7 @@ import static nva.commons.core.attempt.Try.attempt;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.Optional;
-import no.unit.nva.cristin.projects.CristinApiClient;
+import no.unit.nva.cristin.projects.common.CristinApiClient;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder;
