@@ -16,14 +16,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.projects.common.CristinApiClient;
+import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
 import no.unit.nva.cristin.projects.common.CristinQuery;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.paths.UriWrapper;
 
-public class QueryCristinOrganizationProjectApiClient extends CristinApiClient {
+public class QueryCristinOrganizationProjectApiClient extends CristinProjectApiClient {
 
     /**
      * Searches for an Organizations projects for a given parent_unit.

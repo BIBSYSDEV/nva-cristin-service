@@ -8,7 +8,7 @@ import static nva.commons.core.attempt.Try.attempt;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.Optional;
-import no.unit.nva.cristin.projects.common.CristinApiClient;
+import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder;
@@ -18,7 +18,7 @@ import nva.commons.apigateway.exceptions.BadGatewayException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FetchCristinProjectApiClient extends CristinApiClient {
+public class FetchCristinProjectApiClient extends CristinProjectApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(FetchCristinProjectApiClient.class);
 

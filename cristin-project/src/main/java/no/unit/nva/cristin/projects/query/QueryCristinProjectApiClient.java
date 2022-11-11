@@ -20,13 +20,13 @@ import java.util.Map;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.model.Constants.QueryType;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.projects.common.CristinApiClient;
+import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
 import no.unit.nva.cristin.projects.common.CristinQuery;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 
-public class QueryCristinProjectApiClient extends CristinApiClient {
+public class QueryCristinProjectApiClient extends CristinProjectApiClient {
 
     /**
      * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used

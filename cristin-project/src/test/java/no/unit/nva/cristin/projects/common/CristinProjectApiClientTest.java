@@ -28,14 +28,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CristinApiClientTest {
+public class CristinProjectApiClientTest {
 
     public static final String EXAMPLE_TITLE = "Example Title";
     private static final URI LOCALHOST_URI = URI.create("http://localhost/cristin");
     private final Set<String> ids = Set.of("123", "456", "789");
     private static final String LANGUAGE_NB = "nb";
 
-    final CristinApiClient cristinApiClient = new CristinApiClient();
+    final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient();
 
     @Test
     void returnsListOfResultsFromBothQueryAndEnrichmentIfAnyEnrichmentsFail() {
@@ -67,7 +67,7 @@ public class CristinApiClientTest {
     void returnsFetchGetResultHandlesException() throws IOException, InterruptedException {
         HttpClient mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(), any())).thenThrow(new RuntimeException(""));
-        final CristinApiClient cristinApiClient = new CristinApiClient(mockHttpClient);
+        final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
         assertThrows(RuntimeException.class, () ->  cristinApiClient.fetchGetResult(LOCALHOST_URI));
     }
 
@@ -77,7 +77,7 @@ public class CristinApiClientTest {
         HttpResponse<String> httpResponse =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(httpResponse);
-        final CristinApiClient cristinApiClient = new CristinApiClient(mockHttpClient);
+        final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
         HttpResponse<String> result = cristinApiClient.fetchGetResult(LOCALHOST_URI);
         assertNotNull(result);
     }
@@ -87,7 +87,7 @@ public class CristinApiClientTest {
     void returnsFetchQueryResultsHandlesException() throws IOException, InterruptedException {
         HttpClient mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(), any())).thenThrow(new RuntimeException(""));
-        final CristinApiClient cristinApiClient = new CristinApiClient(mockHttpClient);
+        final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
         assertThrows(RuntimeException.class, () ->  cristinApiClient.fetchQueryResults(LOCALHOST_URI));
     }
 
@@ -97,7 +97,7 @@ public class CristinApiClientTest {
         HttpResponse<String> httpResponse =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(httpResponse);
-        final CristinApiClient cristinApiClient = new CristinApiClient(mockHttpClient);
+        final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
         HttpResponse<String> result = cristinApiClient.fetchQueryResults(LOCALHOST_URI);
         assertNotNull(result);
     }

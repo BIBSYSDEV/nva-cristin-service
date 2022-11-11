@@ -16,12 +16,12 @@ import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.attempt.Try;
 
-public class CristinApiClient extends ApiClient {
+public class CristinProjectApiClient extends ApiClient {
 
     /**
      * Create a generic cristin API client with default HTTP client.
      */
-    public CristinApiClient() {
+    public CristinProjectApiClient() {
         this(HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
                 .connectTimeout(Duration.ofSeconds(30))
@@ -29,7 +29,7 @@ public class CristinApiClient extends ApiClient {
     }
 
 
-    public CristinApiClient(HttpClient client) {
+    public CristinProjectApiClient(HttpClient client) {
         super(client);
     }
 
