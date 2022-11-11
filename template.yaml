@@ -261,7 +261,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-project
-      Handler: no.unit.nva.cristin.projects.ListCristinOrganizationProjectsHandler::handleRequest
+      Handler: no.unit.nva.cristin.projects.query.organization.QueryCristinOrganizationProjectHandler::handleRequest
       Events:
         NvaListOrganizationProjectsEvent:
           Type: Api

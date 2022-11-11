@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.query.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
@@ -26,7 +26,7 @@ import static no.unit.nva.cristin.projects.CristinQuery.CRISTIN_QUERY_PARAMETER_
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 
 @SuppressWarnings({"Unused", "UnusedPrivateField"})
-public class ListCristinOrganizationProjectsHandler extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
+public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
     public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(PAGE, NUMBER_OF_RESULTS);
@@ -35,16 +35,16 @@ public class ListCristinOrganizationProjectsHandler extends CristinQueryHandler<
 
     @SuppressWarnings("unused")
     @JacocoGenerated
-    public ListCristinOrganizationProjectsHandler() {
+    public QueryCristinOrganizationProjectHandler() {
         this(new Environment());
     }
 
     @JacocoGenerated
-    public ListCristinOrganizationProjectsHandler(Environment environment) {
+    public QueryCristinOrganizationProjectHandler(Environment environment) {
         this(new QueryCristinOrganizationProjectApiClient(), environment);
     }
 
-    protected ListCristinOrganizationProjectsHandler(QueryCristinOrganizationProjectApiClient cristinApiClient,
+    protected QueryCristinOrganizationProjectHandler(QueryCristinOrganizationProjectApiClient cristinApiClient,
                                                      Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
