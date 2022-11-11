@@ -19,7 +19,7 @@ import static no.unit.nva.cristin.common.Utils.getValidIdentifier;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
 
-public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
+public class FetchCristinProjectHandler extends CristinHandler<Void, NvaProject> {
 
     public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(LANGUAGE);
 
@@ -27,16 +27,16 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     @SuppressWarnings("unused")
     @JacocoGenerated
-    public FetchOneCristinProject() {
+    public FetchCristinProjectHandler() {
         this(new Environment());
     }
 
     @JacocoGenerated
-    public FetchOneCristinProject(Environment environment) {
+    public FetchCristinProjectHandler(Environment environment) {
         this(new FetchCristinProjectApiClient(), environment);
     }
 
-    public FetchOneCristinProject(FetchCristinProjectApiClient cristinApiClient, Environment environment) {
+    public FetchCristinProjectHandler(FetchCristinProjectApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }

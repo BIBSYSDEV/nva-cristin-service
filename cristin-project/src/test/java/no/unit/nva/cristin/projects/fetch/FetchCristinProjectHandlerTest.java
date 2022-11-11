@@ -56,7 +56,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-public class FetchOneCristinProjectTest {
+public class FetchCristinProjectHandlerTest {
 
     private static final String CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON =
         "cristinGetProjectIdNotFoundResponse.json";
@@ -82,14 +82,14 @@ public class FetchOneCristinProjectTest {
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
-    private FetchOneCristinProject handler;
+    private FetchCristinProjectHandler handler;
 
     @BeforeEach
     void setUp() {
         cristinApiClientStub = new FetchCristinProjectClientStub();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class FetchOneCristinProjectTest {
         doReturn(new HttpResponseFaker(getBodyFromResource(CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON), 404))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
-        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
@@ -110,7 +110,7 @@ public class FetchOneCristinProjectTest {
         doReturn(new HttpResponseFaker(null, 500))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
-        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
@@ -138,7 +138,7 @@ public class FetchOneCristinProjectTest {
 
         doThrow(new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED)).when(cristinApiClientStub)
             .getProject(any(), any());
-        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
@@ -151,7 +151,7 @@ public class FetchOneCristinProjectTest {
         cristinApiClientStub = spy(cristinApiClientStub);
 
         doThrow(RuntimeException.class).when(cristinApiClientStub).getProject(any(), any());
-        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
@@ -168,7 +168,7 @@ public class FetchOneCristinProjectTest {
         doReturn(new HttpResponseFaker(getBodyFromResource(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON)))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
-        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         String expected = getBodyFromResource(API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON);
@@ -182,7 +182,7 @@ public class FetchOneCristinProjectTest {
         doReturn(new HttpResponseFaker(JSON_WITH_MISSING_REQUIRED_DATA))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
 
-        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
@@ -202,7 +202,7 @@ public class FetchOneCristinProjectTest {
 
         doReturn(new HttpResponseFaker(EMPTY_STRING))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
-        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
@@ -216,7 +216,7 @@ public class FetchOneCristinProjectTest {
 
         doReturn(new HttpResponseFaker(EMPTY_STRING, 418))
             .when(cristinApiClientStub).fetchGetResult(any(URI.class));
-        handler = new FetchOneCristinProject(cristinApiClientStub, environment);
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
@@ -303,7 +303,7 @@ public class FetchOneCristinProjectTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(body.getDetail(), containsString(
-                validQueryParameterNamesMessage(FetchOneCristinProject.VALID_QUERY_PARAMETERS)));
+                validQueryParameterNamesMessage(FetchCristinProjectHandler.VALID_QUERY_PARAMETERS)));
     }
 
     @Test
@@ -317,8 +317,8 @@ public class FetchOneCristinProjectTest {
 
     @Test
     void handlerReturnsBadGatewayWhenCristinProjectHasInvalidStatusValue() throws Exception {
-        final FetchOneCristinProject fetchHandler =
-                new FetchOneCristinProject(createCristinApiClientWithResponseContainingError(), environment);
+        final FetchCristinProjectHandler fetchHandler =
+                new FetchCristinProjectHandler(createCristinApiClientWithResponseContainingError(), environment);
         final InputStream input = requestWithLanguageAndId(
                 of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(IDENTIFIER, DEFAULT_IDENTIFIER));
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -338,7 +338,7 @@ public class FetchOneCristinProjectTest {
         final InputStream input = requestWithLanguageAndId(
                 of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(IDENTIFIER, DEFAULT_IDENTIFIER));
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        new FetchOneCristinProject(cristinApiClient, environment)
+        new FetchCristinProjectHandler(cristinApiClient, environment)
                 .handleRequest(input, outputStream, mock(Context.class));
         final GatewayResponse<NvaProject> gatewayResponse =
                 GatewayResponse.fromOutputStream(outputStream, NvaProject.class);

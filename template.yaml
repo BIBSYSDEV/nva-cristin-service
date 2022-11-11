@@ -158,7 +158,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-project
-      Handler: no.unit.nva.cristin.projects.fetch.FetchOneCristinProject::handleRequest
+      Handler: no.unit.nva.cristin.projects.fetch.FetchCristinProjectHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinOneProjectEvent:
