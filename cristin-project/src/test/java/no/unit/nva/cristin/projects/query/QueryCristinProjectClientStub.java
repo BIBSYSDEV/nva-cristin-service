@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.query;
 
 import java.net.URI;
 import java.net.http.HttpResponse;
@@ -7,17 +7,17 @@ import java.util.concurrent.CompletableFuture;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import nva.commons.core.ioutils.IoUtils;
 
-public class CristinApiClientStub extends CristinApiClient {
+public class QueryCristinProjectClientStub extends QueryCristinProjectApiClient {
 
     public static final String CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE = "cristinGetProjectResponse.json";
     public static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE = "cristinQueryProjectsResponse.json";
     private final String responseBody;
 
-    public CristinApiClientStub() {
+    public QueryCristinProjectClientStub() {
         this(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
     }
 
-    public CristinApiClientStub(String sampleResponse) {
+    public QueryCristinProjectClientStub(String sampleResponse) {
         responseBody = sampleResponse;
     }
 
@@ -46,7 +46,8 @@ public class CristinApiClientStub extends CristinApiClient {
     }
 
     private HttpResponse<String> mockQueryResponse() {
-        String body = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE));
+        var body = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE));
         return new HttpResponseFaker(body);
     }
+
 }

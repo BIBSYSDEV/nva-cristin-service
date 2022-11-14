@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.fetch;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
@@ -19,24 +19,24 @@ import static no.unit.nva.cristin.common.Utils.getValidIdentifier;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
 
-public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
+public class FetchCristinProjectHandler extends CristinHandler<Void, NvaProject> {
 
     public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(LANGUAGE);
 
-    private final transient CristinApiClient cristinApiClient;
+    private final transient FetchCristinProjectApiClient cristinApiClient;
 
     @SuppressWarnings("unused")
     @JacocoGenerated
-    public FetchOneCristinProject() {
+    public FetchCristinProjectHandler() {
         this(new Environment());
     }
 
     @JacocoGenerated
-    public FetchOneCristinProject(Environment environment) {
-        this(new CristinApiClient(), environment);
+    public FetchCristinProjectHandler(Environment environment) {
+        this(new FetchCristinProjectApiClient(), environment);
     }
 
-    public FetchOneCristinProject(CristinApiClient cristinApiClient, Environment environment) {
+    public FetchCristinProjectHandler(FetchCristinProjectApiClient cristinApiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }
@@ -47,8 +47,8 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
         validateThatSuppliedQueryParamsIsSupported(requestInfo);
 
-        String language = getValidLanguage(requestInfo);
-        String id = getValidIdentifier(requestInfo);
+        var language = getValidLanguage(requestInfo);
+        var id = getValidIdentifier(requestInfo);
 
         try {
             return getTransformedProjectFromCristin(id, language);
@@ -75,7 +75,7 @@ public class FetchOneCristinProject extends CristinHandler<Void, NvaProject> {
 
     private NvaProject authenticatedGetTransformedProjectFromCristin(String id, String language)
             throws ApiGatewayException {
-        return new CristinApiClient(CristinAuthenticator.getHttpClient())
+        return new FetchCristinProjectApiClient(CristinAuthenticator.getHttpClient())
                 .queryOneCristinProjectUsingIdIntoNvaProject(id, language);
     }
 

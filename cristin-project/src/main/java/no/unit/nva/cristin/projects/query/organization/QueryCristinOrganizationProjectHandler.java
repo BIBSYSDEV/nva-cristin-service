@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.query.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
@@ -22,29 +22,30 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.projects.CristinQuery.CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID;
+import static no.unit.nva.cristin.projects.common.CristinQuery.CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 
 @SuppressWarnings({"Unused", "UnusedPrivateField"})
-public class ListCristinOrganizationProjectsHandler extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
+public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
     public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(PAGE, NUMBER_OF_RESULTS);
 
-    private final transient CristinApiClient cristinApiClient;
+    private final transient QueryCristinOrganizationProjectApiClient cristinApiClient;
 
     @SuppressWarnings("unused")
     @JacocoGenerated
-    public ListCristinOrganizationProjectsHandler() {
+    public QueryCristinOrganizationProjectHandler() {
         this(new Environment());
     }
 
     @JacocoGenerated
-    public ListCristinOrganizationProjectsHandler(Environment environment) {
-        this(new CristinApiClient(), environment);
+    public QueryCristinOrganizationProjectHandler(Environment environment) {
+        this(new QueryCristinOrganizationProjectApiClient(), environment);
     }
 
-    protected ListCristinOrganizationProjectsHandler(CristinApiClient cristinApiClient, Environment environment) {
+    protected QueryCristinOrganizationProjectHandler(QueryCristinOrganizationProjectApiClient cristinApiClient,
+                                                     Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = cristinApiClient;
     }
@@ -68,7 +69,7 @@ public class ListCristinOrganizationProjectsHandler extends CristinQueryHandler<
         validateHasIdentifierPathParameter(requestInfo);
         validateQueryParameterKeys(requestInfo);
 
-        Map<String, String> requestQueryParameters = Map.of(
+        var requestQueryParameters = Map.of(
                 CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, getValidId(requestInfo),
                 LANGUAGE, getValidLanguage(requestInfo),
                 PAGE, getValidPage(requestInfo),
@@ -96,7 +97,7 @@ public class ListCristinOrganizationProjectsHandler extends CristinQueryHandler<
     }
 
     private String getValidId(RequestInfo requestInfo) throws BadRequestException {
-        final String identifier = requestInfo.getPathParameter(IDENTIFIER);
+        final var identifier = requestInfo.getPathParameter(IDENTIFIER);
         if (PATTERN.matcher(identifier).matches()) {
             return identifier;
         }
