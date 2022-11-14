@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.model.nva;
 
 import java.net.URI;
 import no.unit.nva.cristin.model.CristinInstitution;
@@ -13,16 +13,6 @@ import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
-import no.unit.nva.cristin.projects.model.nva.ContactInfo;
-import no.unit.nva.cristin.projects.model.nva.DateInfo;
-import no.unit.nva.cristin.projects.model.nva.ExternalSource;
-import no.unit.nva.cristin.projects.model.nva.Funding;
-import no.unit.nva.cristin.projects.model.nva.FundingAmount;
-import no.unit.nva.cristin.projects.model.nva.FundingSource;
-import no.unit.nva.cristin.projects.model.nva.NvaContributor;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.cristin.projects.model.nva.Person;
-import no.unit.nva.cristin.projects.model.nva.TypedLabel;
 import no.unit.nva.model.Organization;
 import nva.commons.core.language.LanguageMapper;
 

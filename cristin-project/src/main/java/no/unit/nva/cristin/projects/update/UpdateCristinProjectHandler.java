@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.update;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -15,16 +15,16 @@ import nva.commons.core.JacocoGenerated;
 import java.net.HttpURLConnection;
 import java.util.List;
 
+import static no.unit.nva.cristin.common.Utils.getValidIdentifier;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.projects.FetchOneCristinProject.getValidIdentifier;
 
 public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void> {
 
     public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
             "No supported fields in payload, not doing anything";
 
-    private final transient UpdateCristinApiClient cristinApiClient;
+    private final transient UpdateCristinProjectApiClient cristinApiClient;
 
     @JacocoGenerated
     public UpdateCristinProjectHandler() {
@@ -33,10 +33,10 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
 
     @JacocoGenerated
     public UpdateCristinProjectHandler(Environment environment) {
-        this(new UpdateCristinApiClient(CristinAuthenticator.getHttpClient()), environment);
+        this(new UpdateCristinProjectApiClient(CristinAuthenticator.getHttpClient()), environment);
     }
 
-    public UpdateCristinProjectHandler(UpdateCristinApiClient cristinApiClient, Environment environment) {
+    public UpdateCristinProjectHandler(UpdateCristinProjectApiClient cristinApiClient, Environment environment) {
         super(String.class, environment);
         this.cristinApiClient = cristinApiClient;
     }

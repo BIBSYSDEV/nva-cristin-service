@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;

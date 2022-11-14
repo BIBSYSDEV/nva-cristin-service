@@ -9,6 +9,7 @@ import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
+import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.TypedLabel;
 import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
@@ -26,10 +27,10 @@ import nva.commons.core.paths.UriWrapper;
 
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
-import static no.unit.nva.cristin.projects.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
-import static no.unit.nva.cristin.projects.NvaProjectBuilder.PROJECT_TYPE;
-import static no.unit.nva.cristin.projects.NvaProjectBuilder.TYPE;
-import static no.unit.nva.cristin.projects.NvaProjectBuilder.VALUE;
+import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
+import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.PROJECT_TYPE;
+import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.TYPE;
+import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.VALUE;
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringFields;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
@@ -146,7 +147,7 @@ public class RandomProjectDataGenerator {
         return Map.of(randomLanguage(), randomString());
     }
 
-    static ProjectStatus randomStatus() {
+    public static ProjectStatus randomStatus() {
         return randomElement(ProjectStatus.values());
     }
 
@@ -158,7 +159,7 @@ public class RandomProjectDataGenerator {
         return getNvaApiId(identifier, ORGANIZATION_PATH);
     }
 
-    static List<NvaContributor> randomContributors() {
+    public static List<NvaContributor> randomContributors() {
         return IntStream.rangeClosed(0, randomInteger(5))
                 .mapToObj(i -> randomContributor()).collect(Collectors.toList());
     }
@@ -193,18 +194,21 @@ public class RandomProjectDataGenerator {
                 .collect(Collectors.toMap(languageCode -> languageCode, languageCode -> randomString())));
     }
 
-    static Organization randomOrganization() {
+    /**
+     * Creates a random organization.
+     */
+    public static Organization randomOrganization() {
         return new Organization.Builder()
                 .withId(semiRandomOrganizationId(randomString()))
                 .withName(randomNamesMap())
                 .build();
     }
 
-    static List<Map<String, String>> randomListOfTitles(URI usedLanguage) {
+    public static List<Map<String, String>> randomListOfTitles(URI usedLanguage) {
         return List.of(Map.of(randomLanguageCodeExcept(usedLanguage), randomString()));
     }
 
-    static String randomLanguage() {
+    public static String randomLanguage() {
         return randomElement(LANGUAGES);
     }
 
@@ -217,7 +221,10 @@ public class RandomProjectDataGenerator {
         return lang;
     }
 
-    protected static NvaContributor randomContributorWithUnitAffiliation() {
+    /**
+     * Creates a random contributor with unit affiliation.
+     */
+    public static NvaContributor randomContributorWithUnitAffiliation() {
         NvaContributor contributor = new NvaContributor();
         contributor.setAffiliation(someOrganizationFromUnitIdentifier());
         contributor.setIdentity(randomPerson());
@@ -225,14 +232,20 @@ public class RandomProjectDataGenerator {
         return contributor;
     }
 
-    protected static NvaContributor randomContributorWithoutUnitAffiliation() {
+    /**
+     * Creates a random contributor without unit affiliation.
+     */
+    public static NvaContributor randomContributorWithoutUnitAffiliation() {
         NvaContributor contributor = new NvaContributor();
         contributor.setIdentity(randomPerson());
         contributor.setType(randomContributorType());
         return contributor;
     }
 
-    protected static Organization someOrganizationFromUnitIdentifier() {
+    /**
+     * Creates a dummy organization with unit identifier.
+     */
+    public static Organization someOrganizationFromUnitIdentifier() {
         return new Organization.Builder().withId(getNvaApiId(SOME_UNIT_IDENTIFIER, ORGANIZATION_PATH)).build();
     }
 

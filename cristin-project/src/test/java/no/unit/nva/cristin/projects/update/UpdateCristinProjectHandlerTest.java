@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.update;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
@@ -15,7 +15,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUM
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
-import static no.unit.nva.cristin.projects.ProjectPatchValidator.UNSUPPORTED_FIELDS_IN_PAYLOAD;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.UNSUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributors;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomLanguage;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomListOfTitles;
@@ -70,8 +70,8 @@ class UpdateCristinProjectHandlerTest {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        UpdateCristinApiClient updateCristinApiClient = new UpdateCristinApiClient(httpClientMock);
-        handler = new UpdateCristinProjectHandler(updateCristinApiClient, environment);
+        UpdateCristinProjectApiClient updateCristinProjectApiClient = new UpdateCristinProjectApiClient(httpClientMock);
+        handler = new UpdateCristinProjectHandler(updateCristinProjectApiClient, environment);
     }
 
     @Test
@@ -114,7 +114,7 @@ class UpdateCristinProjectHandlerTest {
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
 
         var keys = new ArrayList<>();
-        jsonObject.fieldNames().forEachRemaining(field -> keys.add(field));
+        jsonObject.fieldNames().forEachRemaining(keys::add);
         assertThat(gatewayResponse.getBody(), containsString(String.format(UNSUPPORTED_FIELDS_IN_PAYLOAD, keys)));
     }
 

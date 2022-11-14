@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;

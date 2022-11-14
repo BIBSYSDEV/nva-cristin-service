@@ -144,7 +144,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: cristin-project
-      Handler: no.unit.nva.cristin.projects.CreateCristinProjectHandler::handleRequest
+      Handler: no.unit.nva.cristin.projects.create.CreateCristinProjectHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinProjectsEvent:
@@ -172,7 +172,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-project
-      Handler: no.unit.nva.cristin.projects.UpdateCristinProjectHandler::handleRequest
+      Handler: no.unit.nva.cristin.projects.update.UpdateCristinProjectHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinUpdateProjectEvent:

@@ -1,9 +1,6 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.model.cristin;
 
 import no.unit.nva.cristin.model.CristinOrganization;
-import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
-import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
-import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -16,8 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
-import static no.unit.nva.cristin.projects.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
+import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
+import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 

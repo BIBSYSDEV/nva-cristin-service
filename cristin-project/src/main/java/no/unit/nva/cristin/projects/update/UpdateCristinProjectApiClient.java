@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.update;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.unit.nva.cristin.common.client.PatchApiClient;
@@ -17,19 +17,19 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 
-public class UpdateCristinApiClient extends PatchApiClient {
+public class UpdateCristinProjectApiClient extends PatchApiClient {
 
     /**
      * Create a cristin API client with default HTTP client.
      */
-    public UpdateCristinApiClient() {
+    public UpdateCristinProjectApiClient() {
         this(HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
                 .connectTimeout(Duration.ofSeconds(30))
                 .build());
     }
 
-    public UpdateCristinApiClient(HttpClient client) {
+    public UpdateCristinProjectApiClient(HttpClient client) {
         super(client);
     }
 
