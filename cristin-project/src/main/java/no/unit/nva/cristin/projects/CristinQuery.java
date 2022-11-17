@@ -11,11 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.*;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinQuery {
@@ -30,6 +26,20 @@ public class CristinQuery {
     private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
     private static final String CRISTIN_API_PROJECTS_PATH = "projects";
     private static final String CRISTIN_QUERY_PARAMETER_STATUS = "status";
+    private static final String CRISTIN_QUERY_PARAMETER_INSTITUTION = "institution";
+    private static final String CRISTIN_QUERY_PARAMETER_PROJECT_MANAGER = "project_manager";
+    private static final String CRISTIN_QUERY_PARAMETER_PARTICIPANT = "participant";
+    private static final String CRISTIN_QUERY_PARAMETER_KEYWORD = "keyword";
+    private static final String CRISTIN_QUERY_PARAMETER_FUNDING_SOURCE = "funding_source";
+    private static final String CRISTIN_QUERY_PARAMETER_APPROVAL_REFERENCE_ID = "approval_reference_id";
+    private static final String CRISTIN_QUERY_PARAMETER_SORT = "sort";
+    private static final String CRISTIN_QUERY_PARAMETER_UNIT = "unit";
+    private static final String CRISTIN_QUERY_PARAMETER_USER = "user";
+    private static final String CRISTIN_QUERY_PARAMETER_APPROVED_BY = "approved_by";
+    private static final String CRISTIN_QUERY_PARAMETER_FUNDING = "funding";
+    private static final String CRISTIN_QUERY_PARAMETER_LEVELS = "levels";
+    private static final String CRISTIN_QUERY_PARAMETER_MODIFIED_SINCE = "modified_since";
+    private static final String CRISTIN_QUERY_PARAMETER_BIOBANK = "biobank";
 
 
 
@@ -131,6 +141,146 @@ public class CristinQuery {
         return URLEncoder.encode(ProjectStatus.getNvaStatus(status).getCristinStatus(), StandardCharsets.UTF_8);
     }
 
+    /**
+     * Requested coordinating institution by cristin id, acronym, name, or part of the name.
+     */
+
+    public CristinQuery withInstitution(String institution) {
+        if (nonNull(institution)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_INSTITUTION, institution); //TODO: should be here an encoder?
+        }
+        return this;
+    }
+
+    /**
+     * Requested project manager by Cristin id, name or part of the name.
+     */
+    public CristinQuery withProjectManager(String projectManager) {
+        if (nonNull(projectManager)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PROJECT_MANAGER, projectManager);
+        }
+        return this;
+    }
+
+    /**
+     * Requested a participant of the project by Cristin id, name or part of the name.
+     */
+    public CristinQuery withParticipant(String participant) {
+        if (nonNull(participant)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PARTICIPANT, participant);
+        }
+        return this;
+    }
+
+    /**
+     * Requested search by keyword
+     */
+    public CristinQuery withKeyword(String keyword) {
+        if (nonNull(keyword)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_KEYWORD, keyword);
+        }
+        return this;
+    }
+
+    /**
+     * Requested funding source code.
+     */
+    public CristinQuery withFundingSource(String fundingSource) {
+        if (nonNull(fundingSource)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_FUNDING_SOURCE, fundingSource);
+        }
+        return this;
+    }
+
+    /**
+     * Requested reference id of project approval
+     */
+    public CristinQuery withApprovalReferenceId(String approvalReferenceId) {
+        if (nonNull(approvalReferenceId)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_APPROVAL_REFERENCE_ID, approvalReferenceId);
+        }
+        return this;
+    }
+
+    /**
+     * Requested sorting on 'start_date' and/or 'end_date'.
+     */
+    public CristinQuery withSort(String sort) {
+        if (nonNull(sort)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_SORT, sort);
+        }
+        return this;
+    }
+
+    /**
+     * Requested unit id.
+     */
+    public CristinQuery withUnit(String unit) {
+        if (nonNull(unit)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_UNIT, unit);
+        }
+        return this;
+    }
+
+    /**
+     * Requested a person's username in Cristin together with the institution id separated by ':'
+     */
+    public CristinQuery withUser(String user) {
+        if (nonNull(user)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_USER, user);
+        }
+        return this;
+    }
+
+    /**
+     * Requested code for the authority that evaluated a project approval.
+     */
+    public CristinQuery withApprovedBy(String approved_by) {
+        if (nonNull(approved_by)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_APPROVED_BY, approved_by);
+        }
+        return this;
+    }
+
+    /**
+     * Requested funding source code e.g: NFR, and project_code together separated by ':'
+     */
+    public CristinQuery withFunding(String funding) {
+        if (nonNull(funding)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_FUNDING, funding);
+        }
+        return this;
+    }
+
+    /**
+     * Requested how many levels down from 'parent_unit_id' will be included in the search
+     */
+    public CristinQuery withLevels(String levels) {
+        if (nonNull(levels)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_LEVELS, levels);
+        }
+        return this;
+    }
+
+    /**
+     * Requested only those projects that have been modified since this date will be returned.
+     */
+    public CristinQuery withModifiedSince(String modifiedSince) {
+        if (nonNull(modifiedSince)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_MODIFIED_SINCE, modifiedSince);
+        }
+        return this;
+    }
+
+    /**
+     * Requested Biobank id
+     */
+    public CristinQuery withBiobank(String biobank) {
+        if (nonNull(biobank)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_BIOBANK, biobank);
+        }
+        return this;
+    }
 
     /**
      * Builds URI to search Cristin projects based on parameters supplied to the builder methods.
@@ -154,6 +304,20 @@ public class CristinQuery {
         withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
         withParentUnitId(parameters.get(ORGANIZATION));
         withStatus(parameters.get(STATUS));
+        withInstitution(parameters.get(LANGUAGE));
+        withProjectManager(parameters.get(CRISTIN_INSTITUTION_ID));//TODO is it correct institution? INSTITUION?
+/*        withParticipant(parameters.get(LANGUAGE));
+        withKeyword(parameters.get(LANGUAGE));
+        withFundingSource(parameters.get(LANGUAGE));
+        withApprovalReferenceId(parameters.get(LANGUAGE));
+        withSort(parameters.get(LANGUAGE));
+        withUnit(parameters.get(LANGUAGE));
+        withUser(parameters.get(LANGUAGE));
+        withApprovedBy(parameters.get(LANGUAGE));
+        withFunding(parameters.get(LANGUAGE));
+        withLevels(parameters.get(LANGUAGE));
+        withBiobank(parameters.get(LANGUAGE));*/
+
 
         return this;
     }
