@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.common;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

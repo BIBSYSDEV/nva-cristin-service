@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.common;
 
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -16,17 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
-import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
-import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.GRANT_ID_EXAMPLE;
-import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.LANGUAGE_NB;
-import static no.unit.nva.cristin.projects.FetchCristinProjectsTest.RANDOM_TITLE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -39,41 +28,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CristinApiClientTest {
+public class CristinProjectApiClientTest {
 
-    private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
-        "https://api.cristin-test.uio.no/v2/projects?per_page=5&page=1&lang=nb&title=reindeer";
-    private static final String CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI =
-        "https://api.cristin-test.uio.no/v2/projects?per_page=5&project_code=1234567&page=1&lang=nb";
     public static final String EXAMPLE_TITLE = "Example Title";
     private static final URI LOCALHOST_URI = URI.create("http://localhost/cristin");
     private final Set<String> ids = Set.of("123", "456", "789");
+    private static final String LANGUAGE_NB = "nb";
 
-    final CristinApiClient cristinApiClient = new CristinApiClient();
-
-    @Test
-    void getsCristinUriWithTitleParamWhenCallingUriBuilderWithTitleQueryRequested() throws Exception {
-        Map<String, String> params = Map.of(
-            QUERY, RANDOM_TITLE,
-            LANGUAGE, LANGUAGE_NB,
-            PAGE, FIRST_PAGE,
-            NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS);
-        URI expectedUri = new URI(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI);
-
-        assertEquals(expectedUri, cristinApiClient.generateQueryProjectsUrl(params, QUERY_USING_TITLE));
-    }
-
-    @Test
-    void getsCristinUriWithProjectCodeParamWhenCallingUriBuilderWithGrantIdQueryRequested() throws Exception {
-        Map<String, String> params = Map.of(
-            QUERY, GRANT_ID_EXAMPLE,
-            LANGUAGE, LANGUAGE_NB,
-            PAGE, FIRST_PAGE,
-            NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS);
-        URI expectedUri = new URI(CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI);
-
-        assertEquals(expectedUri, cristinApiClient.generateQueryProjectsUrl(params, QUERY_USING_GRANT_ID));
-    }
+    final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient();
 
     @Test
     void returnsListOfResultsFromBothQueryAndEnrichmentIfAnyEnrichmentsFail() {
@@ -105,7 +67,7 @@ public class CristinApiClientTest {
     void returnsFetchGetResultHandlesException() throws IOException, InterruptedException {
         HttpClient mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(), any())).thenThrow(new RuntimeException(""));
-        final CristinApiClient cristinApiClient = new CristinApiClient(mockHttpClient);
+        final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
         assertThrows(RuntimeException.class, () ->  cristinApiClient.fetchGetResult(LOCALHOST_URI));
     }
 
@@ -115,7 +77,7 @@ public class CristinApiClientTest {
         HttpResponse<String> httpResponse =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(httpResponse);
-        final CristinApiClient cristinApiClient = new CristinApiClient(mockHttpClient);
+        final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
         HttpResponse<String> result = cristinApiClient.fetchGetResult(LOCALHOST_URI);
         assertNotNull(result);
     }
@@ -125,7 +87,7 @@ public class CristinApiClientTest {
     void returnsFetchQueryResultsHandlesException() throws IOException, InterruptedException {
         HttpClient mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(), any())).thenThrow(new RuntimeException(""));
-        final CristinApiClient cristinApiClient = new CristinApiClient(mockHttpClient);
+        final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
         assertThrows(RuntimeException.class, () ->  cristinApiClient.fetchQueryResults(LOCALHOST_URI));
     }
 
@@ -135,7 +97,7 @@ public class CristinApiClientTest {
         HttpResponse<String> httpResponse =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(httpResponse);
-        final CristinApiClient cristinApiClient = new CristinApiClient(mockHttpClient);
+        final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
         HttpResponse<String> result = cristinApiClient.fetchQueryResults(LOCALHOST_URI);
         assertNotNull(result);
     }

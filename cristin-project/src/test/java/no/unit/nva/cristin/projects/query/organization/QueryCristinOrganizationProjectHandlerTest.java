@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.query.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,7 +36,7 @@ import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.projects.ListCristinOrganizationProjectsHandler.VALID_QUERY_PARAMETERS;
+import static no.unit.nva.cristin.projects.query.organization.QueryCristinOrganizationProjectHandler.VALID_QUERY_PARAMETERS;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static nva.commons.core.paths.UriWrapper.HTTPS;
@@ -50,7 +50,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-class ListCristinOrganizationProjectsHandlerTest {
+class QueryCristinOrganizationProjectHandlerTest {
 
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     public static final String DUMMY_ORGANIZATION_IDENTIFIER = "4.3.2.1";
@@ -62,17 +62,17 @@ class ListCristinOrganizationProjectsHandlerTest {
     private static final String ZERO_VALUE = "0";
 
 
-    private ListCristinOrganizationProjectsHandler handler;
+    private QueryCristinOrganizationProjectHandler handler;
     private ByteArrayOutputStream output;
     private Context context;
-    private CristinApiClient cristinApiClient;
+    private QueryCristinOrganizationProjectApiClient cristinApiClient;
 
     @BeforeEach
     void setUp() {
         context = mock(Context.class);
-        cristinApiClient = new CristinApiClient();
+        cristinApiClient = new QueryCristinOrganizationProjectApiClient();
         output = new ByteArrayOutputStream();
-        handler = new ListCristinOrganizationProjectsHandler(cristinApiClient, new Environment());
+        handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
     }
 
     @Test
@@ -120,11 +120,11 @@ class ListCristinOrganizationProjectsHandlerTest {
     @Test
     void shouldReturnSearchResponseWithEmptyHitsWhenBackendFetchIsEmpty() throws ApiGatewayException, IOException {
 
-        CristinApiClient apiClient = spy(cristinApiClient);
+        QueryCristinOrganizationProjectApiClient apiClient = spy(cristinApiClient);
         doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
                 generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(apiClient).listProjects(any());
         doReturn(Collections.emptyList()).when(apiClient).fetchQueryResultsOneByOne(any());
-        handler = new ListCristinOrganizationProjectsHandler(apiClient, new Environment());
+        handler = new QueryCristinOrganizationProjectHandler(apiClient, new Environment());
         handler.handleRequest(generateHandlerDummyRequest(), output, context);
         GatewayResponse<SearchResponse> response = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         SearchResponse<NvaProject> searchResponse = response.getBodyObject(SearchResponse.class);

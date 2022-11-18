@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects;
+package no.unit.nva.cristin.projects.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -59,7 +59,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
-import static no.unit.nva.cristin.projects.CristinApiClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
+import static no.unit.nva.cristin.projects.query.QueryCristinProjectClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.TOTAL_COUNT_EXAMPLE_VALUE;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -76,7 +76,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-class FetchCristinProjectsTest {
+class QueryCristinProjectHandlerTest {
 
     public static final String LANGUAGE_NB = "nb";
     public static final String RANDOM_TITLE = "reindeer";
@@ -117,10 +117,10 @@ class FetchCristinProjectsTest {
         IoUtils.stringFromResources(Path.of("api_query_response_with_funding.json"));
 
     private final Environment environment = new Environment();
-    private CristinApiClient cristinApiClientStub;
+    private QueryCristinProjectApiClient cristinApiClientStub;
     private Context context;
     private ByteArrayOutputStream output;
-    private FetchCristinProjects handler;
+    private QueryCristinProjectHandler handler;
 
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
         return Stream.of(
@@ -158,10 +158,10 @@ class FetchCristinProjectsTest {
 
     @BeforeEach
     void setUp() {
-        cristinApiClientStub = new CristinApiClientStub();
+        cristinApiClientStub = new QueryCristinProjectClientStub();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
     }
 
     @ParameterizedTest
@@ -183,7 +183,7 @@ class FetchCristinProjectsTest {
     void handlerThrowsInternalErrorWhenQueryingProjectsFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
         doThrow(RuntimeException.class).when(cristinApiClientStub).getEnrichedProjectsUsingQueryResponse(any(), any());
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
 
         var gatewayResponse = sendDefaultQuery();
 
@@ -198,7 +198,7 @@ class FetchCristinProjectsTest {
         HttpResponse<String> response =
                 new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(CompletableFuture.completedFuture(response)).when(cristinApiClientStub).fetchGetResultAsync(any());
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
         var gatewayResponse = sendDefaultQuery();
         String expected = getBodyFromResource(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON);
 
@@ -298,7 +298,7 @@ class FetchCristinProjectsTest {
 
         doThrow(RuntimeException.class).when(cristinApiClientStub)
                 .generateQueryProjectsUrl(any(), any(QueryType.class));
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
         var gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
@@ -312,7 +312,7 @@ class FetchCristinProjectsTest {
 
         doReturn(new HttpResponseFaker(EMPTY_STRING))
                 .when(cristinApiClientStub).fetchQueryResults(any(URI.class));
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
         var gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
@@ -496,7 +496,7 @@ class FetchCristinProjectsTest {
         doThrow(RuntimeException.class)
                 .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
 
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
 
         InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE));
         handler.handleRequest(input, output, context);
@@ -517,7 +517,7 @@ class FetchCristinProjectsTest {
                 getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
                 .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
 
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
 
         InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE + RANDOM_TITLE));
         handler.handleRequest(input, output, context);
@@ -538,7 +538,7 @@ class FetchCristinProjectsTest {
                 getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
                 .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
 
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
 
         InputStream input = requestWithQueryParameters(Map.of(QUERY, GRANT_ID_EXAMPLE));
         handler.handleRequest(input, output, context);
@@ -576,7 +576,7 @@ class FetchCristinProjectsTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(body.getDetail(), containsString(
-                validQueryParameterNamesMessage(FetchCristinProjects.VALID_QUERY_PARAMETERS)));
+                validQueryParameterNamesMessage(QueryCristinProjectHandler.VALID_QUERY_PARAMETERS)));
     }
 
     @Test
@@ -646,7 +646,7 @@ class FetchCristinProjectsTest {
                 generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
                 .when(cristinApiClientStub).queryProjects(any(), any());
         doReturn(Collections.emptyList()).when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
     }
 
     private void modifyQueryResponseToClient(String body, java.net.http.HttpHeaders headers)
@@ -657,7 +657,7 @@ class FetchCristinProjectsTest {
         response = spy(response);
         doReturn(headers).when(response).headers();
         doReturn(response).when(cristinApiClientStub).fetchQueryResults(any(URI.class));
-        handler = new FetchCristinProjects(cristinApiClientStub, environment);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
     }
 
     private java.net.http.HttpHeaders generateHeaders(String totalCount, String link) {
