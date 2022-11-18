@@ -304,8 +304,8 @@ public class CristinQuery {
         withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
         withParentUnitId(parameters.get(ORGANIZATION));
         withStatus(parameters.get(STATUS));
-        withInstitution(parameters.get(LANGUAGE));
-        withProjectManager(parameters.get(CRISTIN_INSTITUTION_ID));//TODO is it correct institution? INSTITUION?
+        withInstitution(parameters.get(INSTITUTION_ID);
+        withProjectManager(parameters.get);//TODO is it correct institution? INSTITUION?
 /*        withParticipant(parameters.get(LANGUAGE));
         withKeyword(parameters.get(LANGUAGE));
         withFundingSource(parameters.get(LANGUAGE));
