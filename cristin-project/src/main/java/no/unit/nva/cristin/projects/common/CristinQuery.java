@@ -1,18 +1,19 @@
 package no.unit.nva.cristin.projects.common;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.SORT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.*;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinQuery {
@@ -300,12 +301,12 @@ public class CristinQuery {
      * Builds Cristin query parameters using builder methods and NVA input parameters.
      */
     public CristinQuery generateQueryParameters(Map<String, String> parameters) {
-        withLanguage(parameters.get(LANGUAGE));
-        withFromPage(parameters.get(PAGE));
+        withLanguage(parameters.get(JsonPropertyNames.LANGUAGE));
+        withFromPage(parameters.get(JsonPropertyNames.PAGE));
         withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
-        withParentUnitId(parameters.get(ORGANIZATION));
-        withStatus(parameters.get(STATUS));
-        withInstitution(parameters.get(CRISTIN_INSTITUTION_ID));
+        withParentUnitId(parameters.get(JsonPropertyNames.ORGANIZATION));
+        withStatus(parameters.get(JsonPropertyNames.STATUS));
+        withInstitution(parameters.get(JsonPropertyNames.CRISTIN_INSTITUTION_ID));
         withProjectManager(parameters.get(CRISTIN_QUERY_PARAMETER_PROJECT_MANAGER));
         withParticipant(parameters.get(CRISTIN_QUERY_PARAMETER_PARTICIPANT));
         withKeyword(parameters.get(CRISTIN_QUERY_PARAMETER_KEYWORD));
