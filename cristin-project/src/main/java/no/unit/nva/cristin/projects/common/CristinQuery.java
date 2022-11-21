@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.*;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
@@ -235,9 +236,9 @@ public class CristinQuery {
     /**
      * Requested code for the authority that evaluated a project approval.
      */
-    public CristinQuery withApprovedBy(String approved_by) {
-        if (nonNull(approved_by)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_APPROVED_BY, approved_by);
+    public CristinQuery withApprovedBy(String approvedby) {
+        if (nonNull(approvedby)) {
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_APPROVED_BY, approvedby);
         }
         return this;
     }
@@ -304,19 +305,19 @@ public class CristinQuery {
         withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
         withParentUnitId(parameters.get(ORGANIZATION));
         withStatus(parameters.get(STATUS));
-        withInstitution(parameters.get(INSTITUTION_ID);
-        withProjectManager(parameters.get);//TODO is it correct institution? INSTITUION?
-/*        withParticipant(parameters.get(LANGUAGE));
-        withKeyword(parameters.get(LANGUAGE));
-        withFundingSource(parameters.get(LANGUAGE));
-        withApprovalReferenceId(parameters.get(LANGUAGE));
-        withSort(parameters.get(LANGUAGE));
-        withUnit(parameters.get(LANGUAGE));
-        withUser(parameters.get(LANGUAGE));
-        withApprovedBy(parameters.get(LANGUAGE));
-        withFunding(parameters.get(LANGUAGE));
-        withLevels(parameters.get(LANGUAGE));
-        withBiobank(parameters.get(LANGUAGE));*/
+        withInstitution(parameters.get(CRISTIN_INSTITUTION_ID));
+        withProjectManager(parameters.get(CRISTIN_QUERY_PARAMETER_PROJECT_MANAGER));
+        withParticipant(parameters.get(CRISTIN_QUERY_PARAMETER_PARTICIPANT));
+        withKeyword(parameters.get(CRISTIN_QUERY_PARAMETER_KEYWORD));
+        withFundingSource(parameters.get(CRISTIN_QUERY_PARAMETER_FUNDING_SOURCE));
+        withApprovalReferenceId(parameters.get(CRISTIN_QUERY_PARAMETER_APPROVAL_REFERENCE_ID));
+        withSort(parameters.get(SORT));
+        withUnit(parameters.get(CRISTIN_QUERY_PARAMETER_UNIT));
+        withUser(parameters.get(CRISTIN_QUERY_PARAMETER_USER));
+        withApprovedBy(parameters.get(CRISTIN_QUERY_PARAMETER_APPROVED_BY));
+        withFunding(parameters.get(CRISTIN_QUERY_PARAMETER_FUNDING));
+        withLevels(parameters.get(CRISTIN_QUERY_PARAMETER_LEVELS));
+        withBiobank(parameters.get(CRISTIN_QUERY_PARAMETER_BIOBANK));
 
 
         return this;
