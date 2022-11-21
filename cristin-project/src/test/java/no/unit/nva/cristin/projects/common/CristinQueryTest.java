@@ -17,8 +17,20 @@ public class CristinQueryTest {
     private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI =
         "https://api.cristin-test.uio.no/v2/projects/1234?lang=nb";
 
-    private static final String CRISTIN_SORT = "start_date";
-    private static final String CRISTIN_PROJECT_CODE = "";
+    private static final String SORT = "start_date";
+    private static final String INSTITUTION_ID = "Nor";
+    private static final String PROJECT_MANAGER = "Ja";
+    private static final String PARTICIPANT = "St";
+    private static final String KEYWORD= "nature";
+    private static final String FUNDING_SOURCE = "NFR";
+    private static final String APPROVAL_REFERENCE_ID= "";
+    private static final String UNIT = "185.53.18.10";
+    private static final String USER = "askeladd:185";
+    private static final String APPROVED_BY = "";
+    private static final String FUNDING = "NFR:1342";
+    private static final String LEVELS = "7";
+    private static final String BIOBANK = "St";
+
 
     @Test
     void buildReturnsUriWithCustomParameterValuesWhenCustomParameterValuesAreSupplied() {
