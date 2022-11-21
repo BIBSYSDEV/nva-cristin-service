@@ -17,6 +17,9 @@ public class CristinQueryTest {
     private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI =
         "https://api.cristin-test.uio.no/v2/projects/1234?lang=nb";
 
+    private static final String CRISTIN_SORT = "start_date";
+    private static final String CRISTIN_PROJECT_CODE = "";
+
     @Test
     void buildReturnsUriWithCustomParameterValuesWhenCustomParameterValuesAreSupplied() {
         URI uri = new CristinQuery().withTitle(RANDOM_TITLE).withLanguage(LANGUAGE_NB).withItemsPerPage(PER_PAGE)
