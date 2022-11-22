@@ -18,20 +18,24 @@ public class CristinQueryTest {
         "https://api.cristin-test.uio.no/v2/projects/1234?lang=nb";
 
     private static final String SORT = "start_date";
-    private static final String INSTITUTION_ID = "Nor";
-    private static final String PROJECT_MANAGER = "Ja";
+    private static final String INSTITUTION_ID = "uib";
+    private static final String PROJECT_MANAGER = "st";
     private static final String PARTICIPANT = "St";
-    private static final String KEYWORD= "nature";
     private static final String FUNDING_SOURCE = "NFR";
+    private static final String UNIT = "184.12.60.0";
+    private static final String LEVELS = "7";
+    private static final String QUERY_EXAMPLE_WITH_MULTIPLE_PARAMETERS =
+            "https://api.cristin-test.uio.no/v2/projects?sort=end_date&institution=uib"
+                    + "&project_manager=st&participant=st&funding_source=NFR&unit=184.12.60.0&levels=7";
+
+
+
+    private static final String KEYWORD= "nature";
     private static final String APPROVAL_REFERENCE_ID= "";
-    private static final String UNIT = "185.53.18.10";
     private static final String USER = "askeladd:185";
     private static final String APPROVED_BY = "";
-    private static final String FUNDING = "NFR:1342";
-    private static final String LEVELS = "7";
+    private static final String FUNDING = "NFR:1234";
     private static final String BIOBANK = "St";
-
-
     @Test
     void buildReturnsUriWithCustomParameterValuesWhenCustomParameterValuesAreSupplied() {
         URI uri = new CristinQuery().withTitle(RANDOM_TITLE).withLanguage(LANGUAGE_NB).withItemsPerPage(PER_PAGE)
@@ -41,6 +45,12 @@ public class CristinQueryTest {
 
     @Test
     void buildReturnsUriWithIdAndLanguageWhenIdAndLanguageParametersAreSupplied() {
+        URI uri = CristinQuery.fromIdAndLanguage(ID, LANGUAGE_NB);
+        assertEquals(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI, uri.toString());
+    }
+
+    @Test
+    void buildReturnsUriWithExtendedListOfParameters() {
         URI uri = CristinQuery.fromIdAndLanguage(ID, LANGUAGE_NB);
         assertEquals(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI, uri.toString());
     }
