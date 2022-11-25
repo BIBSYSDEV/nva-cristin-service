@@ -11,9 +11,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
-import static no.unit.nva.cristin.model.Constants.SORT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.Constants.*;
+import static no.unit.nva.cristin.model.JsonPropertyNames.*;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinQuery {
@@ -307,18 +306,18 @@ public class CristinQuery {
         withParentUnitId(parameters.get(JsonPropertyNames.ORGANIZATION));
         withStatus(parameters.get(JsonPropertyNames.STATUS));
         withInstitution(parameters.get(JsonPropertyNames.CRISTIN_INSTITUTION_ID));
-        withProjectManager(parameters.get(CRISTIN_QUERY_PARAMETER_PROJECT_MANAGER));
-        withParticipant(parameters.get(CRISTIN_QUERY_PARAMETER_PARTICIPANT));
-        withKeyword(parameters.get(CRISTIN_QUERY_PARAMETER_KEYWORD));
-        withFundingSource(parameters.get(CRISTIN_QUERY_PARAMETER_FUNDING_SOURCE));
-        withApprovalReferenceId(parameters.get(CRISTIN_QUERY_PARAMETER_APPROVAL_REFERENCE_ID));
-        withSort(parameters.get(SORT));
-        withUnit(parameters.get(CRISTIN_QUERY_PARAMETER_UNIT));
-        withUser(parameters.get(CRISTIN_QUERY_PARAMETER_USER));
-        withApprovedBy(parameters.get(CRISTIN_QUERY_PARAMETER_APPROVED_BY));
-        withFunding(parameters.get(CRISTIN_QUERY_PARAMETER_FUNDING));
-        withLevels(parameters.get(CRISTIN_QUERY_PARAMETER_LEVELS));
-        withBiobank(parameters.get(CRISTIN_QUERY_PARAMETER_BIOBANK));
+        withProjectManager(parameters.get(JsonPropertyNames.PROJECT_MANAGER));
+        withParticipant(parameters.get(PROJECT_PARTICIPANT));
+        withKeyword(parameters.get(PROJECT_KEYWORD));
+        withFundingSource(parameters.get(JsonPropertyNames.FUNDING_SOURCE));
+        withFunding(parameters.get(FUNDING));
+        withApprovalReferenceId(parameters.get(PROJECT_APPROVAL_REFERENCE_ID));
+        withApprovedBy(parameters.get(PROJECT_APPROVED_BY));
+        withSort(parameters.get(PROJECT_SORT));
+        withUnit(parameters.get(UNIT_ID));
+        withUser(parameters.get(USER));
+        withLevels(parameters.get(LEVELS));
+        withBiobank(parameters.get(BIOBANK_ID));
 
 
         return this;
