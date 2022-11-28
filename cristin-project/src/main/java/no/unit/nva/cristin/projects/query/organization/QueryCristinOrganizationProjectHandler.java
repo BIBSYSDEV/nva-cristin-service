@@ -12,16 +12,17 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
-import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.Constants.UNIT_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.*;
+import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.projects.common.CristinQuery.CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 
@@ -29,7 +30,14 @@ import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
-    public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(PAGE, NUMBER_OF_RESULTS);
+    public static final Set<String> VALID_QUERY_PARAMETERS_VALIDATED = Set.of(PAGE, NUMBER_OF_RESULTS);
+
+    public static final Set<String> VALID_QUERY_PARAM_NO_VALIDATION =
+            Set.of(CRISTIN_INSTITUTION_ID, PROJECT_MANAGER, PROJECT_PARTICIPANT,
+                    PROJECT_KEYWORD, FUNDING_SOURCE, FUNDING, PROJECT_APPROVAL_REFERENCE_ID,
+                    PROJECT_APPROVED_BY, PROJECT_SORT, UNIT_ID, USER, LEVELS, BIOBANK_ID);
+
+    public static final Set<String> VALID_QUERY_PARAMETERS = mergeSets(VALID_QUERY_PARAMETERS_VALIDATED, VALID_QUERY_PARAM_NO_VALIDATION);
 
     private final transient QueryCristinOrganizationProjectApiClient cristinApiClient;
 
@@ -69,13 +77,19 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
         validateHasIdentifierPathParameter(requestInfo);
         validateQueryParameterKeys(requestInfo);
 
-        var requestQueryParameters = Map.of(
-                CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, getValidId(requestInfo),
-                LANGUAGE, getValidLanguage(requestInfo),
-                PAGE, getValidPage(requestInfo),
-                NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
+        var requestQueryParameters = extractQueryParameters(requestInfo);
 
         return cristinApiClient.listOrganizationProjects(requestQueryParameters);
+    }
+
+    private Map<String, String> extractQueryParameters(RequestInfo requestInfo) throws BadRequestException {
+        Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
+        requestQueryParameters.put(LANGUAGE, getValidLanguage(requestInfo));
+        requestQueryParameters.put(PAGE, getValidPage(requestInfo));
+        requestQueryParameters.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
+        //From here
+        VALID_QUERY_PARAM_NO_VALIDATION.forEach(paramName -> putOrNotQueryParameterOrEmpty(requestInfo, paramName, requestQueryParameters));
+        return requestQueryParameters;
     }
 
     /**
@@ -109,5 +123,19 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
         if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
             throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
         }
+    }
+
+    protected void putOrNotQueryParameterOrEmpty (RequestInfo requestInfo, String parameter, Map<String,String> requestQueryParameters) {
+        if(getQueryParameter(requestInfo, parameter).isPresent()){
+            requestQueryParameters.put(parameter,getQueryParameter(requestInfo, parameter).get());
+        };
+    }
+
+    public static<T> Set<T> mergeSets(Set<T> a, Set<T> b)
+    {
+        return new HashSet<T>() {{
+            addAll(a);
+            addAll(b);
+        }};
     }
 }
