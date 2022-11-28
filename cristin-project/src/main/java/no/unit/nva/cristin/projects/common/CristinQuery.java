@@ -314,7 +314,7 @@ public class CristinQuery {
         withApprovalReferenceId(parameters.get(PROJECT_APPROVAL_REFERENCE_ID));
         withApprovedBy(parameters.get(PROJECT_APPROVED_BY));
         withSort(parameters.get(PROJECT_SORT));
-        withUnit(parameters.get(UNIT_ID));
+        withUnit(parameters.get(JsonPropertyNames.PROJECT_UNIT));
         withUser(parameters.get(USER));
         withLevels(parameters.get(LEVELS));
         withBiobank(parameters.get(BIOBANK_ID));

@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
+import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
@@ -37,7 +38,7 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
     public static final Set<String> VALID_QUERY_PARAM_NO_VALIDATION =
             Set.of(CRISTIN_INSTITUTION_ID, PROJECT_MANAGER, PROJECT_PARTICIPANT,
                     PROJECT_KEYWORD, FUNDING_SOURCE, FUNDING, PROJECT_APPROVAL_REFERENCE_ID,
-                    PROJECT_APPROVED_BY, PROJECT_SORT, UNIT_ID, USER, LEVELS, BIOBANK_ID);
+                    PROJECT_APPROVED_BY, PROJECT_SORT, JsonPropertyNames.PROJECT_UNIT, USER, LEVELS, BIOBANK_ID);
 
     public static final Set<String> VALID_QUERY_PARAMETERS = mergeSets(VALID_QUERY_PARAMETERS_VALIDATED, VALID_QUERY_PARAM_NO_VALIDATION);
 

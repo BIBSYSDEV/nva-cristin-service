@@ -54,7 +54,7 @@ public class Constants {
     public static final String PERSON_ID = "id";
     public static final String PERSONS_PATH = "persons";
     public static final String CRISTIN_QUERY_NAME_PARAM = "name";
-    public static final String UNIT_ID = "unit";
+    public static final String UNIT_ID = "id";
     public static final String EMPLOYMENT_ID = "employmentId";
     public static final String ORG_ID = "orgId";
     public static final String SORT = "sort";
