@@ -83,10 +83,11 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
     }
 
     private Map<String, String> extractQueryParameters(RequestInfo requestInfo) throws BadRequestException {
-        Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
-        requestQueryParameters.put(LANGUAGE, getValidLanguage(requestInfo));
-        requestQueryParameters.put(PAGE, getValidPage(requestInfo));
-        requestQueryParameters.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
+        var requestQueryParameters = Map.of(
+                CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, getValidId(requestInfo),
+                LANGUAGE, getValidLanguage(requestInfo),
+                PAGE, getValidPage(requestInfo),
+                NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
         //From here
         VALID_QUERY_PARAM_NO_VALIDATION.forEach(paramName -> putOrNotQueryParameterOrEmpty(requestInfo, paramName, requestQueryParameters));
         return requestQueryParameters;
