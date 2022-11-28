@@ -21,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -40,6 +41,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
@@ -71,10 +73,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 class QueryCristinProjectHandlerTest {
 
@@ -176,7 +175,7 @@ class QueryCristinProjectHandlerTest {
     @Test
     void handlerReturnsOkWhenInputContainsTitleAndLanguage() throws Exception {
         var response = sendDefaultQuery();
-        assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
+        assertEquals(HTTP_OK, response.getStatusCode());
     }
 
     @Test
@@ -225,7 +224,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,Object.class);
 
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
@@ -329,7 +328,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(URI_WITH_PAGE_NUMBER_VALUE_OF_TWO));
     }
 
@@ -436,7 +435,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(URI_WITH_TEN_NUMBER_OF_RESULTS));
     }
 
@@ -502,7 +501,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
@@ -523,7 +522,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
@@ -546,7 +545,7 @@ class QueryCristinProjectHandlerTest {
 
         var actual = gatewayResponse.getBodyObject(SearchResponse.class);
         assertEquals(5, actual.getHits().size());
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
@@ -558,7 +557,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(URI_WITH_ESCAPED_WHITESPACE));
     }
 
@@ -588,7 +587,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(SAMPLE_NVA_ORGANIZATION_ENCODED));
     }
 
@@ -637,12 +636,12 @@ class QueryCristinProjectHandlerTest {
         var gatewayResponse =
                 GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
         cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HTTP_OK,
                 generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
                 .when(cristinApiClientStub).queryProjects(any(), any());
         doReturn(Collections.emptyList()).when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
@@ -689,4 +688,43 @@ class QueryCristinProjectHandlerTest {
         return Stream.of(Arguments.of(API_QUERY_RESPONSE_WITH_FUNDING_JSON));
     }
 
+
+    @Test
+    void shouldAddParamsToCristinQueryForFilteringAndReturnOk() throws IOException, ApiGatewayException {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, new Environment());
+        var queryParams = Map.of("query", "hello",
+                "funding", "NRE",
+                "biobank", "123321",
+                "keyword", "nature",
+                "results", "5",
+                "unit", "184.12.60.0",
+                "sort", "start_date");
+        var input = requestWithQueryParameters(queryParams);
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                SearchResponse.class);
+        var captor = ArgumentCaptor.forClass(URI.class);
+
+        verify(cristinApiClientStub).fetchQueryResults(captor.capture());
+        assertThat(captor.getValue().toString(),
+                containsString("page=5"));
+        assertThat(captor.getValue().toString(),
+                containsString("&biobank=123321"));
+        assertThat(captor.getValue().toString(),
+                containsString("&funding=NRE"));
+        assertThat(captor.getValue().toString(),
+                containsString("&page=1"));
+        assertThat(captor.getValue().toString(),
+                containsString("&lang=nb"));
+        assertThat(captor.getValue().toString(),
+                containsString("&title=hello"));
+        assertThat(captor.getValue().toString(),
+                containsString("&keyword=nature"));
+        assertThat(captor.getValue().toString(),
+                containsString("&unit=184.12.60.0"));
+        assertThat(captor.getValue().toString(),
+                containsString("&sort=start_date"));
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
 }

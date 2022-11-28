@@ -75,4 +75,6 @@ public class CristinQueryTest {
         URI uri = new CristinQuery().withApprovedBy(APPROVED_BY).withApprovalReferenceId(APPROVAL_REFERENCE_ID).toURI();
         assertEquals(QUERY_APPROVED_PARAM, uri.toString());
     }
+
+
 }
