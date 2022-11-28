@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects.common;
 
+import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.core.paths.UriWrapper;
@@ -11,8 +12,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.model.Constants.*;
-import static no.unit.nva.cristin.model.JsonPropertyNames.*;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinQuery {
@@ -67,7 +66,7 @@ public class CristinQuery {
      * @return an URI to Cristin Projects with ID and language parameters
      */
     public static URI fromIdAndLanguage(String id, String language) {
-        return UriWrapper.fromUri(CRISTIN_API_URL)
+        return UriWrapper.fromUri(Constants.CRISTIN_API_URL)
                 .addChild(CRISTIN_API_PROJECTS_PATH)
                 .addChild(id)
                 .addQueryParameters(Map.of(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language))
@@ -148,7 +147,7 @@ public class CristinQuery {
 
     public CristinQuery withInstitution(String institution) {
         if (nonNull(institution)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_INSTITUTION, institution); //TODO: should be here an encoder?
+            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_INSTITUTION, institution);
         }
         return this;
     }
@@ -174,7 +173,7 @@ public class CristinQuery {
     }
 
     /**
-     * Requested search by keyword
+     * Requested search by keyword.
      */
     public CristinQuery withKeyword(String keyword) {
         if (nonNull(keyword)) {
@@ -194,7 +193,7 @@ public class CristinQuery {
     }
 
     /**
-     * Requested reference id of project approval
+     * Requested reference id of project approval.
      */
     public CristinQuery withApprovalReferenceId(String approvalReferenceId) {
         if (nonNull(approvalReferenceId)) {
@@ -224,7 +223,7 @@ public class CristinQuery {
     }
 
     /**
-     * Requested a person's username in Cristin together with the institution id separated by ':'
+     * Requested a person's username in Cristin together with the institution id separated by ':'.
      */
     public CristinQuery withUser(String user) {
         if (nonNull(user)) {
@@ -254,7 +253,7 @@ public class CristinQuery {
     }
 
     /**
-     * Requested how many levels down from 'parent_unit_id' will be included in the search
+     * Requested how many levels down from 'parent_unit_id' will be included in the search.
      */
     public CristinQuery withLevels(String levels) {
         if (nonNull(levels)) {
@@ -274,7 +273,7 @@ public class CristinQuery {
     }
 
     /**
-     * Requested Biobank id
+     * Requested Biobank id.
      */
     public CristinQuery withBiobank(String biobank) {
         if (nonNull(biobank)) {
@@ -289,7 +288,7 @@ public class CristinQuery {
      * @return an URI to Cristin Projects with parameters
      */
     public URI toURI() {
-        return UriWrapper.fromUri(CRISTIN_API_URL)
+        return UriWrapper.fromUri(Constants.CRISTIN_API_URL)
                 .addChild(CRISTIN_API_PROJECTS_PATH)
                 .addQueryParameters(cristinQueryParameters)
                 .getUri();
@@ -302,22 +301,22 @@ public class CristinQuery {
     public CristinQuery generateQueryParameters(Map<String, String> parameters) {
         withLanguage(parameters.get(JsonPropertyNames.LANGUAGE));
         withFromPage(parameters.get(JsonPropertyNames.PAGE));
-        withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
+        withItemsPerPage(parameters.get(JsonPropertyNames.NUMBER_OF_RESULTS));
         withParentUnitId(parameters.get(JsonPropertyNames.ORGANIZATION));
         withStatus(parameters.get(JsonPropertyNames.STATUS));
         withInstitution(parameters.get(JsonPropertyNames.CRISTIN_INSTITUTION_ID));
         withProjectManager(parameters.get(JsonPropertyNames.PROJECT_MANAGER));
-        withParticipant(parameters.get(PROJECT_PARTICIPANT));
-        withKeyword(parameters.get(PROJECT_KEYWORD));
+        withParticipant(parameters.get(JsonPropertyNames.PROJECT_PARTICIPANT));
+        withKeyword(parameters.get(JsonPropertyNames.PROJECT_KEYWORD));
         withFundingSource(parameters.get(JsonPropertyNames.FUNDING_SOURCE));
-        withFunding(parameters.get(FUNDING));
-        withApprovalReferenceId(parameters.get(PROJECT_APPROVAL_REFERENCE_ID));
-        withApprovedBy(parameters.get(PROJECT_APPROVED_BY));
-        withSort(parameters.get(PROJECT_SORT));
+        withFunding(parameters.get(JsonPropertyNames.FUNDING));
+        withApprovalReferenceId(parameters.get(JsonPropertyNames.PROJECT_APPROVAL_REFERENCE_ID));
+        withApprovedBy(parameters.get(JsonPropertyNames.PROJECT_APPROVED_BY));
+        withSort(parameters.get(JsonPropertyNames.PROJECT_SORT));
         withUnit(parameters.get(JsonPropertyNames.PROJECT_UNIT));
-        withUser(parameters.get(USER));
-        withLevels(parameters.get(LEVELS));
-        withBiobank(parameters.get(BIOBANK_ID));
+        withUser(parameters.get(JsonPropertyNames.USER));
+        withLevels(parameters.get(JsonPropertyNames.LEVELS));
+        withBiobank(parameters.get(JsonPropertyNames.BIOBANK_ID));
 
 
         return this;

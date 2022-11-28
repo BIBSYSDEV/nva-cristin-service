@@ -28,12 +28,12 @@ public class CristinQueryTest {
             "https://api.cristin-test.uio.no/v2/projects?per_page=5&institution=uib&unit=184.12.60.0"
                     + "&funding_source=NFR&page=1&sort=start_date&project_manager=st&participant=St&levels=7";
 
-    private static final String KEYWORD= "nature";
+    private static final String KEYWORD = "nature";
     private static final String BIOBANK = "533895";
     private static final String KEYWORD_QUERY =
             "https://api.cristin-test.uio.no/v2/projects?per_page=5&page=1&keyword=nature&biobank=533895";
 
-    private static final String APPROVAL_REFERENCE_ID= "2017/1593";
+    private static final String APPROVAL_REFERENCE_ID = "2017/1593";
     private static final String APPROVED_BY = "REK";
     private static final String QUERY_APPROVED_PARAM =
         "https://api.cristin-test.uio.no/v2/projects?per_page=5&approved_by=REK&page=1&approval_reference_id=2017/1593";
