@@ -36,11 +36,9 @@ public class QueryCristinOrganizationProjectApiClient extends CristinProjectApiC
 
         long startRequestTime = System.currentTimeMillis();
         URI cristinUri = new CristinQuery()
-                             .withParentUnitId(requestQueryParameters.get(CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID))
-                             .withFromPage(requestQueryParameters.get(PAGE))
-                             .withLanguage(requestQueryParameters.get(LANGUAGE))
-                             .withItemsPerPage(requestQueryParameters.get(NUMBER_OF_RESULTS))
-                             .toURI();
+                .generateQueryParameters(requestQueryParameters)
+                .withParentUnitId(requestQueryParameters.get(CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID))
+                .toURI();
         HttpResponse<String> response = listProjects(cristinUri);
         List<CristinProject> cristinProjects =
             getEnrichedProjectsUsingQueryResponse(response, requestQueryParameters.get(LANGUAGE));
