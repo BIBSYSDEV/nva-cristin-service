@@ -24,6 +24,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVAL_REFER
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVED_BY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_MANAGER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_MODIFIED_SINCE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_PARTICIPANT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
@@ -330,6 +331,7 @@ public class CristinQuery {
         withApprovalReferenceId(parameters.get(PROJECT_APPROVAL_REFERENCE_ID));
         withApprovedBy(parameters.get(PROJECT_APPROVED_BY));
         withSort(parameters.get(PROJECT_SORT));
+        withModifiedSince(PROJECT_MODIFIED_SINCE);
         withUnit(parameters.get(PROJECT_UNIT));
         withUser(parameters.get(USER));
         withLevels(parameters.get(LEVELS));
