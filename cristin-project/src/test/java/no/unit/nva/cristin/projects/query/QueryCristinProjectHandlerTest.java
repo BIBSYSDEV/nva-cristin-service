@@ -25,7 +25,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -60,6 +59,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 
 class QueryCristinProjectHandlerTest {
@@ -145,7 +149,7 @@ class QueryCristinProjectHandlerTest {
     @BeforeEach
     void setUp() {
         cristinApiClientStub = new QueryCristinProjectClientStub();
-        context = Mockito.mock(Context.class);
+        context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
     }
@@ -167,8 +171,8 @@ class QueryCristinProjectHandlerTest {
 
     @Test
     void handlerThrowsInternalErrorWhenQueryingProjectsFails() throws Exception {
-        cristinApiClientStub = Mockito.spy(cristinApiClientStub);
-        Mockito.doThrow(RuntimeException.class).when(cristinApiClientStub)
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doThrow(RuntimeException.class).when(cristinApiClientStub)
                 .getEnrichedProjectsUsingQueryResponse(any(), any());
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
 
@@ -181,10 +185,10 @@ class QueryCristinProjectHandlerTest {
 
     @Test
     void handlerReturnsNonEnrichedBodyWhenEnrichingFails() throws Exception {
-        cristinApiClientStub = Mockito.spy(cristinApiClientStub);
+        cristinApiClientStub = spy(cristinApiClientStub);
         HttpResponse<String> response =
                 new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
-        Mockito.doReturn(CompletableFuture.completedFuture(response))
+        doReturn(CompletableFuture.completedFuture(response))
                 .when(cristinApiClientStub).fetchGetResultAsync(any());
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
         var gatewayResponse = sendDefaultQuery();
@@ -288,9 +292,9 @@ class QueryCristinProjectHandlerTest {
 
     @Test
     void handlerReturnsServerErrorExceptionWhenBackendThrowsGenericException() throws Exception {
-        cristinApiClientStub = Mockito.spy(cristinApiClientStub);
+        cristinApiClientStub = spy(cristinApiClientStub);
 
-        Mockito.doThrow(RuntimeException.class).when(cristinApiClientStub)
+        doThrow(RuntimeException.class).when(cristinApiClientStub)
                 .generateQueryProjectsUrl(any(), any(Constants.QueryType.class));
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
         var gatewayResponse = sendDefaultQuery();
@@ -302,9 +306,9 @@ class QueryCristinProjectHandlerTest {
 
     @Test
     void handlerThrowsBadGatewayExceptionWhenThereIsThrownIoExceptionWhenReadingFromJson() throws Exception {
-        cristinApiClientStub = Mockito.spy(cristinApiClientStub);
+        cristinApiClientStub = spy(cristinApiClientStub);
 
-        Mockito.doReturn(new HttpResponseFaker(EMPTY_STRING))
+        doReturn(new HttpResponseFaker(EMPTY_STRING))
                 .when(cristinApiClientStub).fetchQueryResults(any(URI.class));
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
         var gatewayResponse = sendDefaultQuery();
@@ -485,13 +489,13 @@ class QueryCristinProjectHandlerTest {
 
     @Test
     void handlerReturnsMatchingProjectsFromGrantIdSearchWhenSuppliedWithOnlyNumber() throws Exception {
-        cristinApiClientStub = Mockito.spy(cristinApiClientStub);
+        cristinApiClientStub = spy(cristinApiClientStub);
 
-        Mockito.doReturn(new HttpResponseFaker(
+        doReturn(new HttpResponseFaker(
                 getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
                 .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
-        Mockito.doThrow(RuntimeException.class)
+        doThrow(RuntimeException.class)
                 .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
 
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
@@ -506,12 +510,12 @@ class QueryCristinProjectHandlerTest {
 
     @Test
     void handlerReturnsProjectsFromTitleSearchWhenSuppliedWithQueryStringIncludingNumber() throws Exception {
-        cristinApiClientStub = Mockito.spy(cristinApiClientStub);
+        cristinApiClientStub = spy(cristinApiClientStub);
 
-        Mockito.doThrow(RuntimeException.class)
+        doThrow(RuntimeException.class)
                 .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
-        Mockito.doReturn(new HttpResponseFaker(
+        doReturn(new HttpResponseFaker(
                 getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
                 .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
 
@@ -528,12 +532,12 @@ class QueryCristinProjectHandlerTest {
 
     @Test
     void handlerReturnsProjectsFromTitleSearchWhenGrantIdSearchReturnsZeroResults() throws Exception {
-        cristinApiClientStub = Mockito.spy(cristinApiClientStub);
+        cristinApiClientStub = spy(cristinApiClientStub);
 
-        Mockito.doReturn(new HttpResponseFaker(EMPTY_LIST_STRING))
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING))
                 .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_GRANT_ID));
 
-        Mockito.doReturn(new HttpResponseFaker(
+        doReturn(new HttpResponseFaker(
                 getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
                 .when(cristinApiClientStub).queryProjects(any(), eq(QUERY_USING_TITLE));
 
@@ -641,22 +645,22 @@ class QueryCristinProjectHandlerTest {
     }
 
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
-        cristinApiClientStub = Mockito.spy(cristinApiClientStub);
-        Mockito.doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HTTP_OK,
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HTTP_OK,
                 generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
                 .when(cristinApiClientStub).queryProjects(any(), any());
-        Mockito.doReturn(Collections.emptyList()).when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
+        doReturn(Collections.emptyList()).when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
     }
 
     private void modifyQueryResponseToClient(String body, java.net.http.HttpHeaders headers)
             throws ApiGatewayException {
 
-        cristinApiClientStub = Mockito.spy(cristinApiClientStub);
+        cristinApiClientStub = spy(cristinApiClientStub);
         HttpResponse<String> response = new HttpResponseFaker(body);
-        response = Mockito.spy(response);
-        Mockito.doReturn(headers).when(response).headers();
-        Mockito.doReturn(response).when(cristinApiClientStub).fetchQueryResults(any(URI.class));
+        response = spy(response);
+        doReturn(headers).when(response).headers();
+        doReturn(response).when(cristinApiClientStub).fetchQueryResults(any(URI.class));
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
     }
 
@@ -692,7 +696,7 @@ class QueryCristinProjectHandlerTest {
 
     @Test
     void shouldAddParamsToCristinQueryForFilteringAndReturnOk() throws IOException, ApiGatewayException {
-        cristinApiClientStub = Mockito.spy(cristinApiClientStub);
+        cristinApiClientStub = spy(cristinApiClientStub);
         handler = new QueryCristinProjectHandler(cristinApiClientStub, new Environment());
         var queryParams = Map.of("query", "hello",
                 "funding", "NRE",
@@ -705,7 +709,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var captor = ArgumentCaptor.forClass(URI.class);
 
-        Mockito.verify(cristinApiClientStub).fetchQueryResults(captor.capture());
+        verify(cristinApiClientStub).fetchQueryResults(captor.capture());
         assertThat(captor.getValue().toString(),
                 containsString("page=5"));
         assertThat(captor.getValue().toString(),
