@@ -1,6 +1,4 @@
 package no.unit.nva.cristin.projects.common;
-
-import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.core.paths.UriWrapper;
 
@@ -11,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_INSTITUTION_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
@@ -84,7 +83,7 @@ public class CristinQuery {
      * @return an URI to Cristin Projects with ID and language parameters
      */
     public static URI fromIdAndLanguage(String id, String language) {
-        return UriWrapper.fromUri(Constants.CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
                 .addChild(CRISTIN_API_PROJECTS_PATH)
                 .addChild(id)
                 .addQueryParameters(Map.of(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language))
@@ -306,7 +305,7 @@ public class CristinQuery {
      * @return an URI to Cristin Projects with parameters
      */
     public URI toURI() {
-        return UriWrapper.fromUri(Constants.CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
                 .addChild(CRISTIN_API_PROJECTS_PATH)
                 .addQueryParameters(cristinQueryParameters)
                 .getUri();
