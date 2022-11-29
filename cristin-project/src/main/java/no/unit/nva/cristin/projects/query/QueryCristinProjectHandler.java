@@ -2,7 +2,6 @@ package no.unit.nva.cristin.projects.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
-import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
@@ -35,6 +34,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVAL_REFER
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVED_BY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_MANAGER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_MODIFIED_SINCE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_PARTICIPANT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
@@ -59,8 +59,8 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
                     FUNDING_SOURCE, FUNDING,
                     PROJECT_APPROVAL_REFERENCE_ID,
                     PROJECT_APPROVED_BY, PROJECT_SORT,
-                    PROJECT_UNIT, USER, LEVELS,
-                    BIOBANK_ID);
+                    PROJECT_MODIFIED_SINCE, PROJECT_UNIT,
+                    USER, LEVELS, BIOBANK_ID);
 
     public static final Set<String> VALID_QUERY_PARAMETERS
             = mergeSets(VALID_QUERY_PARAMETERS_VALIDATED, VALID_QUERY_PARAM_NO_VALIDATION);

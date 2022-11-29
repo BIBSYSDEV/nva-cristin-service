@@ -331,7 +331,7 @@ public class CristinQuery {
         withApprovalReferenceId(parameters.get(PROJECT_APPROVAL_REFERENCE_ID));
         withApprovedBy(parameters.get(PROJECT_APPROVED_BY));
         withSort(parameters.get(PROJECT_SORT));
-        withModifiedSince(PROJECT_MODIFIED_SINCE);
+        withModifiedSince(parameters.get(PROJECT_MODIFIED_SINCE));
         withUnit(parameters.get(PROJECT_UNIT));
         withUser(parameters.get(USER));
         withLevels(parameters.get(LEVELS));

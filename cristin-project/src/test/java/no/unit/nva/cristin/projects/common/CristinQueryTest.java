@@ -26,8 +26,8 @@ public class CristinQueryTest {
     private static final String SAMPLE_LEVELS = "7";
     private static final String QUERY_SAMPLE_WITH_MULTIPLE_PARAMETERS =
             "https://api.cristin-test.uio.no/v2/projects?per_page=5&sort=start_date&approval_reference_id=2017/1593"
-                    +"&participant=St&institution=uib&unit=184.12.60.0&approved_by=REK&funding_source=NFR&page=1"
-                    +"&project_manager=st&keyword=nature&biobank=533895&levels=7";
+                    + "&participant=St&institution=uib&unit=184.12.60.0&approved_by=REK&funding_source=NFR&page=1"
+                    + "&project_manager=st&keyword=nature&biobank=533895&levels=7";
 
     private static final String KEYWORD = "nature";
     private static final String BIOBANK = "533895";
