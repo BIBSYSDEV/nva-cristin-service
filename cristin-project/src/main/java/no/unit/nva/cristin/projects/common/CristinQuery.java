@@ -1,7 +1,6 @@
 package no.unit.nva.cristin.projects.common;
 
 import no.unit.nva.cristin.model.Constants;
-import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.core.paths.UriWrapper;
 
@@ -12,6 +11,24 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_INSTITUTION_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING_SOURCE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LEVELS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVAL_REFERENCE_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVED_BY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_MANAGER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_PARTICIPANT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.USER;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinQuery {
@@ -299,24 +316,24 @@ public class CristinQuery {
      * Builds Cristin query parameters using builder methods and NVA input parameters.
      */
     public CristinQuery generateQueryParameters(Map<String, String> parameters) {
-        withLanguage(parameters.get(JsonPropertyNames.LANGUAGE));
-        withFromPage(parameters.get(JsonPropertyNames.PAGE));
-        withItemsPerPage(parameters.get(JsonPropertyNames.NUMBER_OF_RESULTS));
-        withParentUnitId(parameters.get(JsonPropertyNames.ORGANIZATION));
-        withStatus(parameters.get(JsonPropertyNames.STATUS));
-        withInstitution(parameters.get(JsonPropertyNames.CRISTIN_INSTITUTION_ID));
-        withProjectManager(parameters.get(JsonPropertyNames.PROJECT_MANAGER));
-        withParticipant(parameters.get(JsonPropertyNames.PROJECT_PARTICIPANT));
-        withKeyword(parameters.get(JsonPropertyNames.PROJECT_KEYWORD));
-        withFundingSource(parameters.get(JsonPropertyNames.FUNDING_SOURCE));
-        withFunding(parameters.get(JsonPropertyNames.FUNDING));
-        withApprovalReferenceId(parameters.get(JsonPropertyNames.PROJECT_APPROVAL_REFERENCE_ID));
-        withApprovedBy(parameters.get(JsonPropertyNames.PROJECT_APPROVED_BY));
-        withSort(parameters.get(JsonPropertyNames.PROJECT_SORT));
-        withUnit(parameters.get(JsonPropertyNames.PROJECT_UNIT));
-        withUser(parameters.get(JsonPropertyNames.USER));
-        withLevels(parameters.get(JsonPropertyNames.LEVELS));
-        withBiobank(parameters.get(JsonPropertyNames.BIOBANK_ID));
+        withLanguage(parameters.get(LANGUAGE));
+        withFromPage(parameters.get(PAGE));
+        withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
+        withParentUnitId(parameters.get(ORGANIZATION));
+        withStatus(parameters.get(STATUS));
+        withInstitution(parameters.get(CRISTIN_INSTITUTION_ID));
+        withProjectManager(parameters.get(PROJECT_MANAGER));
+        withParticipant(parameters.get(PROJECT_PARTICIPANT));
+        withKeyword(parameters.get(PROJECT_KEYWORD));
+        withFundingSource(parameters.get(FUNDING_SOURCE));
+        withFunding(parameters.get(FUNDING));
+        withApprovalReferenceId(parameters.get(PROJECT_APPROVAL_REFERENCE_ID));
+        withApprovedBy(parameters.get(PROJECT_APPROVED_BY));
+        withSort(parameters.get(PROJECT_SORT));
+        withUnit(parameters.get(PROJECT_UNIT));
+        withUser(parameters.get(USER));
+        withLevels(parameters.get(LEVELS));
+        withBiobank(parameters.get(BIOBANK_ID));
 
 
         return this;
