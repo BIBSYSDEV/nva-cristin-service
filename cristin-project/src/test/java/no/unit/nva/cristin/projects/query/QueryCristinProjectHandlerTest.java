@@ -710,23 +710,24 @@ class QueryCristinProjectHandlerTest {
         var captor = ArgumentCaptor.forClass(URI.class);
 
         verify(cristinApiClientStub).fetchQueryResults(captor.capture());
-        assertThat(captor.getValue().toString(),
+        var actualURI = captor.getValue().toString();
+        assertThat(actualURI,
                 containsString("page=5"));
-        assertThat(captor.getValue().toString(),
+        assertThat(actualURI,
                 containsString("&biobank=123321"));
-        assertThat(captor.getValue().toString(),
+        assertThat(actualURI,
                 containsString("&funding=NRE"));
-        assertThat(captor.getValue().toString(),
+        assertThat(actualURI,
                 containsString("&page=1"));
-        assertThat(captor.getValue().toString(),
+        assertThat(actualURI,
                 containsString("&lang=nb"));
-        assertThat(captor.getValue().toString(),
+        assertThat(actualURI,
                 containsString("&title=hello"));
-        assertThat(captor.getValue().toString(),
+        assertThat(actualURI,
                 containsString("&keyword=nature"));
-        assertThat(captor.getValue().toString(),
+        assertThat(actualURI,
                 containsString("&unit=184.12.60.0"));
-        assertThat(captor.getValue().toString(),
+        assertThat(actualURI,
                 containsString("&sort=start_date"));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
