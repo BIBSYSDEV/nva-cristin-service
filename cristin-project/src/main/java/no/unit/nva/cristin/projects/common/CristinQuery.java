@@ -1,4 +1,5 @@
 package no.unit.nva.cristin.projects.common;
+
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.core.paths.UriWrapper;
 
