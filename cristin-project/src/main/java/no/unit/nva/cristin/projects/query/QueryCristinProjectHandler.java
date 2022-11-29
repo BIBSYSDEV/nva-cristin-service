@@ -106,7 +106,6 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
         requestQueryParameters.put(QUERY, getValidQuery(requestInfo));
         requestQueryParameters.put(PAGE, getValidPage(requestInfo));
         requestQueryParameters.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
-        //From here
         VALID_QUERY_PARAM_NO_VALIDATION.forEach(paramName -> putOrNotQueryParameterOrEmpty(requestInfo,
                 paramName, requestQueryParameters));
         return requestQueryParameters;
