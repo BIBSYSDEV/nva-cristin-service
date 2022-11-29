@@ -7,8 +7,6 @@ import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.projects.common.CristinQuery.CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID;
 import java.net.URI;
 import java.net.http.HttpResponse;
