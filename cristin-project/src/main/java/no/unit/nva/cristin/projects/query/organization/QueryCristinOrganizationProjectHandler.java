@@ -2,7 +2,6 @@ package no.unit.nva.cristin.projects.query.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
-import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.RequestInfo;
@@ -20,6 +19,23 @@ import java.util.regex.Pattern;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_INSTITUTION_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING_SOURCE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LEVELS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVAL_REFERENCE_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVED_BY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_MANAGER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_PARTICIPANT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.USER;
 import static no.unit.nva.cristin.projects.common.CristinQuery.CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 
@@ -27,16 +43,16 @@ import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
-    public static final Set<String> VALID_QUERY_PARAMETERS_VALIDATED = Set.of(JsonPropertyNames.PAGE,
-            JsonPropertyNames.NUMBER_OF_RESULTS);
+    public static final Set<String> VALID_QUERY_PARAMETERS_VALIDATED = Set.of(PAGE,
+            NUMBER_OF_RESULTS);
 
     public static final Set<String> VALID_QUERY_PARAM_NO_VALIDATION =
-            Set.of(JsonPropertyNames.CRISTIN_INSTITUTION_ID, JsonPropertyNames.PROJECT_MANAGER,
-                    JsonPropertyNames.PROJECT_PARTICIPANT, JsonPropertyNames.PROJECT_KEYWORD,
-                    JsonPropertyNames.FUNDING_SOURCE, JsonPropertyNames.FUNDING,
-                    JsonPropertyNames.PROJECT_APPROVAL_REFERENCE_ID, JsonPropertyNames.PROJECT_APPROVED_BY,
-                    JsonPropertyNames.PROJECT_SORT, JsonPropertyNames.PROJECT_UNIT, JsonPropertyNames.USER,
-                    JsonPropertyNames.LEVELS, JsonPropertyNames.BIOBANK_ID);
+            Set.of(CRISTIN_INSTITUTION_ID, PROJECT_MANAGER,
+                    PROJECT_PARTICIPANT, PROJECT_KEYWORD,
+                    FUNDING_SOURCE, FUNDING,
+                    PROJECT_APPROVAL_REFERENCE_ID, PROJECT_APPROVED_BY,
+                    PROJECT_SORT, PROJECT_UNIT, USER,
+                    LEVELS, BIOBANK_ID);
 
     public static final Set<String> VALID_QUERY_PARAMETERS = mergeSets(VALID_QUERY_PARAMETERS_VALIDATED,
             VALID_QUERY_PARAM_NO_VALIDATION);
@@ -87,9 +103,9 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
     private Map<String, String> extractQueryParameters(RequestInfo requestInfo) throws BadRequestException {
         var requestQueryParameters = Map.of(
                 CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, getValidId(requestInfo),
-                JsonPropertyNames.LANGUAGE, getValidLanguage(requestInfo),
-                JsonPropertyNames.PAGE, getValidPage(requestInfo),
-                JsonPropertyNames.NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
+                LANGUAGE, getValidLanguage(requestInfo),
+                PAGE, getValidPage(requestInfo),
+                NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
         //From here
         VALID_QUERY_PARAM_NO_VALIDATION.forEach(paramName -> putOrNotQueryParameterOrEmpty(requestInfo,
                 paramName, requestQueryParameters));
@@ -109,13 +125,13 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
     }
 
     private void validateHasIdentifierPathParameter(RequestInfo requestInfo) throws BadRequestException {
-        if (!requestInfo.getPathParameters().containsKey(JsonPropertyNames.IDENTIFIER)) {
+        if (!requestInfo.getPathParameters().containsKey(IDENTIFIER)) {
             throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
         }
     }
 
     private String getValidId(RequestInfo requestInfo) throws BadRequestException {
-        final var identifier = requestInfo.getPathParameter(JsonPropertyNames.IDENTIFIER);
+        final var identifier = requestInfo.getPathParameter(IDENTIFIER);
         if (PATTERN.matcher(identifier).matches()) {
             return identifier;
         }
