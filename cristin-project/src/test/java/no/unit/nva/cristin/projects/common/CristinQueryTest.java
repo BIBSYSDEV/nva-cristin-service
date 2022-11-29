@@ -25,18 +25,16 @@ public class CristinQueryTest {
     private static final String SAMPLE_UNIT = "184.12.60.0";
     private static final String SAMPLE_LEVELS = "7";
     private static final String QUERY_SAMPLE_WITH_MULTIPLE_PARAMETERS =
-            "https://api.cristin-test.uio.no/v2/projects?per_page=5&institution=uib&unit=184.12.60.0"
-                    + "&funding_source=NFR&page=1&sort=start_date&project_manager=st&participant=St&levels=7";
+            "https://api.cristin-test.uio.no/v2/projects?per_page=5&sort=start_date&approval_reference_id=2017/1593"
+                    +"&participant=St&institution=uib&unit=184.12.60.0&approved_by=REK&funding_source=NFR&page=1"
+                    +"&project_manager=st&keyword=nature&biobank=533895&levels=7";
 
     private static final String KEYWORD = "nature";
     private static final String BIOBANK = "533895";
-    private static final String KEYWORD_QUERY =
-            "https://api.cristin-test.uio.no/v2/projects?per_page=5&page=1&keyword=nature&biobank=533895";
 
     private static final String APPROVAL_REFERENCE_ID = "2017/1593";
     private static final String APPROVED_BY = "REK";
-    private static final String QUERY_APPROVED_PARAM =
-        "https://api.cristin-test.uio.no/v2/projects?per_page=5&approved_by=REK&page=1&approval_reference_id=2017/1593";
+
 
 
     @Test
@@ -60,21 +58,12 @@ public class CristinQueryTest {
                 .withFundingSource(SAMPLE_FUNDING_SOURCE)
                 .withUnit(SAMPLE_UNIT)
                 .withLevels(SAMPLE_LEVELS)
+                .withKeyword(KEYWORD)
+                .withBiobank(BIOBANK)
+                .withApprovedBy(APPROVED_BY)
+                .withApprovalReferenceId(APPROVAL_REFERENCE_ID)
                 .toURI();
         assertEquals(QUERY_SAMPLE_WITH_MULTIPLE_PARAMETERS, uri.toString());
     }
-
-    @Test
-    void buildReturnsUriWithKeyword() {
-        URI uri = new CristinQuery().withKeyword(KEYWORD).withBiobank(BIOBANK).toURI();
-        assertEquals(KEYWORD_QUERY, uri.toString());
-    }
-
-    @Test
-    void buildReturnsUriApproved() {
-        URI uri = new CristinQuery().withApprovedBy(APPROVED_BY).withApprovalReferenceId(APPROVAL_REFERENCE_ID).toURI();
-        assertEquals(QUERY_APPROVED_PARAM, uri.toString());
-    }
-
 
 }
