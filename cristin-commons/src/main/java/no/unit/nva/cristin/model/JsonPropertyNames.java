@@ -50,4 +50,19 @@ public class JsonPropertyNames {
     public static final String EMAIL = "email";
     public static final String PHONE = "phone";
 
+    public static final String PROJECT_MANAGER = "project_manager";
+    public static final String PROJECT_PARTICIPANT = "participant";
+    public static final String PROJECT_KEYWORD = "keyword";
+    public static final String FUNDING_SOURCE = "funding_source";
+    public static final String PROJECT_APPROVAL_REFERENCE_ID = "approval_reference_id";
+    public static final String PROJECT_SORT = "sort";
+    public static final String USER = "user";
+    public static final String PROJECT_UNIT = "unit";
+    public static final String PROJECT_APPROVED_BY = "approved_by";
+    public static final String FUNDING = "funding";
+    public static final String LEVELS = "levels";
+    public static final String PROJECT_MODIFIED_SINCE = "modified_since";
+    public static final String BIOBANK_ID = "biobank";
+
+
 }

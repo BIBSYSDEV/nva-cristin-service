@@ -13,6 +13,7 @@ import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -20,12 +21,26 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessageWithRange;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_INSTITUTION_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING_SOURCE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LEVELS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVAL_REFERENCE_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVED_BY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_MANAGER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_MODIFIED_SINCE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_PARTICIPANT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.USER;
 import static nva.commons.core.attempt.Try.attempt;
 
 /**
@@ -33,8 +48,22 @@ import static nva.commons.core.attempt.Try.attempt;
  */
 public class QueryCristinProjectHandler extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
 
-    public static final Set<String> VALID_QUERY_PARAMETERS =
-            Set.of(QUERY, ORGANIZATION, STATUS, LANGUAGE, PAGE, NUMBER_OF_RESULTS);
+    public static final Set<String> VALID_QUERY_PARAMETERS_VALIDATED =
+            Set.of(QUERY, ORGANIZATION,
+                    STATUS, LANGUAGE,
+                    PAGE, NUMBER_OF_RESULTS);
+
+    public static final Set<String> VALID_QUERY_PARAM_NO_VALIDATION =
+            Set.of(CRISTIN_INSTITUTION_ID, PROJECT_MANAGER,
+                    PROJECT_PARTICIPANT, PROJECT_KEYWORD,
+                    FUNDING_SOURCE, FUNDING,
+                    PROJECT_APPROVAL_REFERENCE_ID,
+                    PROJECT_APPROVED_BY, PROJECT_SORT,
+                    PROJECT_MODIFIED_SINCE, PROJECT_UNIT,
+                    USER, LEVELS, BIOBANK_ID);
+
+    public static final Set<String> VALID_QUERY_PARAMETERS
+            = mergeSets(VALID_QUERY_PARAMETERS_VALIDATED, VALID_QUERY_PARAM_NO_VALIDATION);
 
     private final transient QueryCristinProjectApiClient cristinApiClient;
 
@@ -60,24 +89,39 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
 
         validateQueryParameterKeys(requestInfo);
 
-        var language = getValidLanguage(requestInfo);
-        var query = getValidQuery(requestInfo);
-        var page = getValidPage(requestInfo);
-        var numberOfResults = getValidNumberOfResults(requestInfo);
-        var requestQueryParameters = getQueryParameters(language, query, page, numberOfResults);
+        var requestQueryParameters = extractQueryParameters(requestInfo);
         if (requestInfo.getQueryParameters().containsKey(ORGANIZATION)) {
             requestQueryParameters.put(ORGANIZATION, getValidOrganizationUri(requestInfo));
         }
-        getValidProjectStatus(requestInfo).ifPresent(status -> requestQueryParameters.put(STATUS, status.name()));
+        getValidProjectStatus(requestInfo).ifPresent(status -> requestQueryParameters
+                .put(STATUS, status.name()));
         return getTransformedCristinProjectsUsingWrapperObject(requestQueryParameters);
 
 
+    }
+
+    private Map<String, String> extractQueryParameters(RequestInfo requestInfo) throws BadRequestException {
+        Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
+        requestQueryParameters.put(LANGUAGE, getValidLanguage(requestInfo));
+        requestQueryParameters.put(QUERY, getValidQuery(requestInfo));
+        requestQueryParameters.put(PAGE, getValidPage(requestInfo));
+        requestQueryParameters.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
+        VALID_QUERY_PARAM_NO_VALIDATION.forEach(paramName -> putOrNotQueryParameterOrEmpty(requestInfo,
+                paramName, requestQueryParameters));
+        return requestQueryParameters;
     }
 
     @Override
     protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
             throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
+        }
+    }
+
+    protected void putOrNotQueryParameterOrEmpty(RequestInfo requestInfo,
+                                                  String parameter, Map<String,String> requestQueryParameters) {
+        if (getQueryParameter(requestInfo, parameter).isPresent()) {
+            requestQueryParameters.put(parameter,getQueryParameter(requestInfo, parameter).get());
         }
     }
 
@@ -92,15 +136,6 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
         return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(requestQueryParameters);
     }
 
-    private Map<String, String> getQueryParameters(String language, String query, String page, String numberOfResults) {
-        Map<String, String> requestQueryParameters = new ConcurrentHashMap<>();
-        requestQueryParameters.put(LANGUAGE, language);
-        requestQueryParameters.put(QUERY, query);
-        requestQueryParameters.put(PAGE, page);
-        requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
-        return requestQueryParameters;
-    }
-
     private Optional<ProjectStatus> getValidProjectStatus(RequestInfo requestInfo) throws BadRequestException {
         return requestInfo.getQueryParameters().containsKey(STATUS)
                 ? getOptionalProjectStatus(requestInfo)
@@ -109,12 +144,25 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
 
     private Optional<ProjectStatus> getOptionalProjectStatus(RequestInfo requestInfo) throws BadRequestException {
         return Optional.ofNullable(
-                attempt(() -> ProjectStatus.getNvaStatus(requestInfo.getQueryParameters().get(STATUS)))
+                attempt(() -> ProjectStatus
+                        .getNvaStatus(requestInfo.getQueryParameters().get(STATUS)))
                 .orElseThrow(fail -> new BadRequestException(getInvalidStatusMessage())));
     }
 
     private String getInvalidStatusMessage() {
-        return invalidQueryParametersMessageWithRange(STATUS, Arrays.toString(ProjectStatus.values()));
+        return invalidQueryParametersMessageWithRange(STATUS,
+                Arrays.toString(ProjectStatus.values()));
     }
+
+    /**
+     * Merging 2 sets, even static.
+     */
+    public static <T> Set<T> mergeSets(Set<T> a, Set<T> b) {
+        var mergedSet = new HashSet<T>();
+        mergedSet.addAll(a);
+        mergedSet.addAll(b);
+        return mergedSet;
+    }
+
 
 }

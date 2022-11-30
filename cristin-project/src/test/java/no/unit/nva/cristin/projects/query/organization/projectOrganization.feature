@@ -26,7 +26,7 @@ Feature: API tests for list Project pr Organization
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'page\', \'results\']'
+    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'cristin_institution_id\', \'funding\', \'funding_source\', \'keyword\', \'levels\', \'page\', \'participant\', \'project_manager\', \'results\', \'sort\', \'unit\', \'user\']'
 
   Scenario: Get returns status OK and context in dummy response
     Given path '/organization/'+dummyOrganizationIdentifier+'/projects'
