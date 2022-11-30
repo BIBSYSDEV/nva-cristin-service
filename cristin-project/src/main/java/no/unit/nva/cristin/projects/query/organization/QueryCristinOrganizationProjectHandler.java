@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
@@ -100,12 +101,12 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
         return cristinApiClient.listOrganizationProjects(requestQueryParameters);
     }
 
-    private Map<String, String> extractQueryParameters(RequestInfo requestInfo) throws BadRequestException {
-        var requestQueryParameters = Map.of(
+    private ConcurrentHashMap<String, String> extractQueryParameters(RequestInfo requestInfo) throws BadRequestException {
+        var requestQueryParameters = new ConcurrentHashMap<>(Map.of(
                 CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, getValidId(requestInfo),
                 LANGUAGE, getValidLanguage(requestInfo),
                 PAGE, getValidPage(requestInfo),
-                NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
+                NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo)));
         //From here
         VALID_QUERY_PARAM_NO_VALIDATION.forEach(paramName -> putOrNotQueryParameterOrEmpty(requestInfo,
                 paramName, requestQueryParameters));
@@ -149,7 +150,7 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
      * Putting the parameter if it exists in a map.
      */
     protected void putOrNotQueryParameterOrEmpty(RequestInfo requestInfo, String parameter,
-                                                 Map<String,String> requestQueryParameters) {
+                                                 ConcurrentHashMap<String,String> requestQueryParameters) {
         if (getQueryParameter(requestInfo, parameter).isPresent()) {
             requestQueryParameters.put(parameter,getQueryParameter(requestInfo, parameter).get());
         }
