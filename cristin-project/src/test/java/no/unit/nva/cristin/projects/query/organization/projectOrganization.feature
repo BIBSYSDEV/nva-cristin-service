@@ -3,7 +3,8 @@ Feature: API tests for list Project pr Organization
   Background:
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
-    * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
+#   * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
+    * def CRISTIN_BASE = 'https://api.dev.nva.aws.unit.no/cristin-np-16238-adding-query-parameters-cristin'
     * def illegalOrganizationIdentifier = '3.2.1'
     * def dummyOrganizationIdentifier = '4.3.2.1'
     * def realOrganizationIdentifier = '185.17.6.0'
@@ -52,3 +53,13 @@ Feature: API tests for list Project pr Organization
     And match response['@context'] == '#present'
     And match response['nextResults'] == '#present'
     And match response['previousResults'] == '#present'
+
+  Scenario: Query with extended list of parameters and valid values returns OK
+    Given path '/organization/'+realOrganizationIdentifier+'/projects'
+    And param query = queryString
+    And param sort = 'end_date'
+    And param biobank = '234567'
+    And param project_manager = 'St'
+    And param participant = "olav h"
+    When method GET
+    Then status 200
