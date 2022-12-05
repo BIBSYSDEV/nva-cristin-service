@@ -4,8 +4,10 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.unit.nva.commons.json.JsonUtils;
+import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.projects.query.QueryCristinProjectHandler;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -14,6 +16,7 @@ import nva.commons.core.Environment;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -46,9 +49,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.*;
 
 class QueryCristinOrganizationProjectHandlerTest {
 
@@ -131,6 +132,47 @@ class QueryCristinOrganizationProjectHandlerTest {
         assertThat(0, equalTo(searchResponse.getHits().size()));
     }
 
+    @Test
+    void shouldAddParamsToCristinQueryForFilteringAndReturnOk() throws IOException, ApiGatewayException {
+        QueryCristinOrganizationProjectApiClient apiClient = spy(cristinApiClient);
+        handler = new QueryCristinOrganizationProjectHandler(apiClient, new Environment());
+        var queryParams = Map.of("query", "hello",
+                "funding", "NRE",
+                "biobank", "123321",
+                "keyword", "nature",
+                "results", "5",
+                "unit", "184.12.60.0",
+                "sort", "start_date");
+        var input = requestWithQueryParameters(queryParams);
+        handler.handleRequest(input, output, context);
+        var captor = ArgumentCaptor.forClass(URI.class);
+
+        verify(apiClient).fetchQueryResults(captor.capture());
+        var actualURI = captor.getValue().toString();
+        assertThat(actualURI,
+                containsString("page=5"));
+        assertThat(actualURI,
+                containsString("&biobank=123321"));
+        assertThat(actualURI,
+                containsString("&funding=NRE"));
+        assertThat(actualURI,
+                containsString("&page=1"));
+        assertThat(actualURI,
+                containsString("&lang=nb"));
+        assertThat(actualURI,
+                containsString("&title=hello"));
+        assertThat(actualURI,
+                containsString("&keyword=nature"));
+        assertThat(actualURI,
+                containsString("&unit=184.12.60.0"));
+        assertThat(actualURI,
+                containsString("&sort=start_date"));
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                SearchResponse.class);
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
     private InputStream generateHandlerDummyRequestWithIllegalQueryParameters() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
@@ -169,6 +211,13 @@ class QueryCristinOrganizationProjectHandlerTest {
                 .addChild(identifier)
                 .addChild(PROJECTS_PATH)
                 .getUri();
+    }
+
+    private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
+        return new HandlerRequestBuilder<Void>(Constants.OBJECT_MAPPER)
+                .withBody(null)
+                .withQueryParameters(map)
+                .build();
     }
 
 }
