@@ -88,6 +88,93 @@ paths:
             type: number
             default: '5'
           example: '10'
+        - name: institution
+          in: query
+          description: Cristin id, acronym, name, or part of the name of the coordinating institution
+          required: false
+          schema:
+            type: string
+        - name: project_manager
+          in: query
+          description: Cristin id, name or part of the name of the project manager.
+          required: false
+          schema:
+            type: string
+        - name: participant
+          in: query
+          description: Cristin id, name or part of the name of a participant of the project. 'participant' can be used more than once.
+          required: false
+          schema:
+            type: string
+        - name: keyword
+          in: query
+          description: Keyword search. '?keyword=wind energy' makes a search for projects with keywords equal to or a substring of 'wind energy'. keyword can be used more than once
+          required: false
+          schema:
+            type: string
+        - name: approval_reference_id
+          in: query
+          description: Reference id of a project approval.
+          required: false
+          schema:
+            type: string
+        - name: funding_source
+          in: query
+          description: Funding source code.
+          required: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sorts on 'start_date' and/or 'end_date'. See Search and sort. Default sort order is on 'cristin_project_id' in ascending order.
+          required: false
+          schema:
+            type: string
+            enum:
+              - start_date
+              - end_date
+        - name: unit
+          in: query
+          description: Unit id
+          required: false
+          schema:
+            type: string
+        - name: user
+          in: query
+          description: A person's username in Cristin together with the institution id separated by ':'
+          required: false
+          schema:
+            type: string
+        - name: approved_by
+          in: query
+          description: Code for the authority that evaluated a project approval.
+          required: false
+          schema:
+            type: string
+        - name: funding
+          in: query
+          description: Funding source code e.g. NFR, and project_code together separated by ':'
+          required: false
+          schema:
+            type: string
+        - name: levels
+          in: query
+          description: How many levels down from 'parent_unit_id' will be included in the search.'levels=1' will return projects registered to 'parent_unit_id'. 'levels' can also be used by itself to search for all projects registered to a known cristin unit down to the given level.
+          required: false
+          schema:
+            type: string
+        - name: modified_since
+          in: query
+          description: Only projects that have been modified since this date will be returned. Format YYYY-MM-DD
+          required: false
+          schema:
+            type: string
+        - name: biobank
+          in: query
+          description: Biobank id. 'biobank' can be used more than once.
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -520,6 +607,90 @@ paths:
             type: number
             default: '5'
           example: '10'
+        - name: institution
+          in: query
+          description: Cristin id, acronym, name, or part of the name of the coordinating institution
+          required: false
+          schema:
+            type: string
+        - name: project_manager
+          in: query
+          description: Cristin id, name or part of the name of the project manager.
+          required: false
+          schema:
+            type: string
+        - name: participant
+          in: query
+          description: Cristin id, name or part of the name of a participant of the project. 'participant' can be used more than once.
+          required: false
+          schema:
+            type: string
+        - name: keyword
+          in: query
+          description: Keyword search. '?keyword=wind energy' makes a search for projects with keywords equal to or a substring of 'wind energy'. keyword can be used more than once
+          required: false
+          schema:
+            type: string
+        - name: approval_reference_id
+          in: query
+          description: Reference id of a project approval.
+          required: false
+          schema:
+            type: string
+        - name: funding_source
+          in: query
+          description: Funding source code.
+          required: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sorts on 'start_date' and/or 'end_date'. See Search and sort. Default sort order is on 'cristin_project_id' in ascending order.
+          required: false
+          schema:
+            type: string
+        - name: unit
+          in: query
+          description: Unit id
+          required: false
+          schema:
+            type: string
+        - name: user
+          in: query
+          description: A person's username in Cristin together with the institution id separated by ':'
+          required: false
+          schema:
+            type: string
+        - name: approved_by
+          in: query
+          description: Code for the authority that evaluated a project approval.
+          required: false
+          schema:
+            type: string
+        - name: funding
+          in: query
+          description: Funding source code e.g. NFR, and project_code together separated by ':'
+          required: false
+          schema:
+            type: string
+        - name: levels
+          in: query
+          description: How many levels down from 'parent_unit_id' will be included in the search.'levels=1' will return projects registered to 'parent_unit_id'. 'levels' can also be used by itself to search for all projects registered to a known cristin unit down to the given level.
+          required: false
+          schema:
+            type: string
+        - name: modified_since
+          in: query
+          description: Only projects that have been modified since this date will be returned. Format YYYY-MM-DD
+          required: false
+          schema:
+            type: string
+        - name: biobank
+          in: query
+          description: Biobank id. 'biobank' can be used more than once.
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: successful operation

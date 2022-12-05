@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessageWithRange;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_INSTITUTION_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING_SOURCE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
@@ -54,7 +54,7 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
                     PAGE, NUMBER_OF_RESULTS);
 
     public static final Set<String> VALID_QUERY_PARAM_NO_VALIDATION =
-            Set.of(CRISTIN_INSTITUTION_ID, PROJECT_MANAGER,
+            Set.of(INSTITUTION, PROJECT_MANAGER,
                     PROJECT_PARTICIPANT, PROJECT_KEYWORD,
                     FUNDING_SOURCE, FUNDING,
                     PROJECT_APPROVAL_REFERENCE_ID,
