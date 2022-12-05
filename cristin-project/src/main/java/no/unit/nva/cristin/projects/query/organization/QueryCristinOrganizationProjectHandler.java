@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_INSTITUTION_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING_SOURCE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
@@ -48,7 +48,7 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
             NUMBER_OF_RESULTS);
 
     public static final Set<String> VALID_QUERY_PARAM_NO_VALIDATION =
-            Set.of(CRISTIN_INSTITUTION_ID, PROJECT_MANAGER,
+            Set.of(INSTITUTION, PROJECT_MANAGER,
                     PROJECT_PARTICIPANT, PROJECT_KEYWORD,
                     FUNDING_SOURCE, FUNDING,
                     PROJECT_APPROVAL_REFERENCE_ID, PROJECT_APPROVED_BY,
