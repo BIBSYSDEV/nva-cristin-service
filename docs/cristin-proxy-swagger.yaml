@@ -126,12 +126,6 @@ paths:
             type: string
         - name: sort
           in: query
-          description: here
-          required: false
-          schema:
-            type: string
-        - name: name
-          in: query
           description: Sorts on 'start_date' and/or 'end_date'. See Search and sort. Default sort order is on 'cristin_project_id' in ascending order.
           required: false
           schema:
@@ -651,19 +645,10 @@ paths:
             type: string
         - name: sort
           in: query
-          description: here
-          required: false
-          schema:
-            type: string
-        - name: name
-          in: query
           description: Sorts on 'start_date' and/or 'end_date'. See Search and sort. Default sort order is on 'cristin_project_id' in ascending order.
           required: false
           schema:
             type: string
-            enum:
-              - start_date
-              - end_date
         - name: unit
           in: query
           description: Unit id
