@@ -61,6 +61,7 @@ class QueryCristinOrganizationProjectHandlerTest {
     public static final String INVALID_VALUE = "value";
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String ZERO_VALUE = "0";
+    public static final String QUERY = "query";
 
 
     private QueryCristinOrganizationProjectHandler handler;
@@ -134,33 +135,28 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     @Test
     void shouldAddParamsToCristinQueryForFilteringAndReturnOk() throws IOException, ApiGatewayException {
-        QueryCristinOrganizationProjectApiClient apiClient = spy(cristinApiClient);
-        handler = new QueryCristinOrganizationProjectHandler(apiClient, new Environment());
-        var queryParams = Map.of("query", "hello",
-                "funding", "NRE",
+        cristinApiClient = spy(cristinApiClient);
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK, generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(cristinApiClient).listProjects(any());
+        handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
+        var queryParams = Map.of("funding", "NRE:1234",
                 "biobank", "123321",
                 "keyword", "nature",
                 "results", "5",
                 "unit", "184.12.60.0",
                 "sort", "start_date");
-        var input = requestWithQueryParameters(queryParams);
-        handler.handleRequest(input, output, context);
+        handler.handleRequest(generateHandlerProRealisticRequest(queryParams), output, context);
         var captor = ArgumentCaptor.forClass(URI.class);
 
-        verify(apiClient).fetchQueryResults(captor.capture());
+        verify(cristinApiClient).listProjects(captor.capture());
         var actualURI = captor.getValue().toString();
         assertThat(actualURI,
                 containsString("page=5"));
         assertThat(actualURI,
                 containsString("&biobank=123321"));
         assertThat(actualURI,
-                containsString("&funding=NRE"));
+                containsString("&funding=NRE:1234"));
         assertThat(actualURI,
                 containsString("&page=1"));
-        assertThat(actualURI,
-                containsString("&lang=nb"));
-        assertThat(actualURI,
-                containsString("&title=hello"));
         assertThat(actualURI,
                 containsString("&keyword=nature"));
         assertThat(actualURI,
@@ -187,6 +183,14 @@ class QueryCristinOrganizationProjectHandlerTest {
                 .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                 .withQueryParameters(Map.of(PAGE, SAMPLE_PAGE))
                 .withQueryParameters(Map.of(NUMBER_OF_RESULTS, SAMPLE_RESULTS_SIZE))
+                .build();
+    }
+
+    private InputStream generateHandlerProRealisticRequest(Map <String, String> queryParametersMap) throws JsonProcessingException {
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                .withQueryParameters(queryParametersMap)
                 .build();
     }
 
