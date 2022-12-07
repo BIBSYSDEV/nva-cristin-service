@@ -3,7 +3,8 @@ Feature: API tests for Cristin projects query
   Background:
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
-    * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
+#    * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
+    * def CRISTIN_BASE = 'https://api.dev.nva.aws.unit.no/cristin-np-16238-adding-query-parameters-cristin'
     * def queryString = 'covid'
     * def projectIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/project\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
