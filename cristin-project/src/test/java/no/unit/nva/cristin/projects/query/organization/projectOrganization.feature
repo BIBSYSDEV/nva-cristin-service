@@ -3,8 +3,7 @@ Feature: API tests for list Project pr Organization
   Background:
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
-#    * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
-    * def CRISTIN_BASE = 'https://api.dev.nva.aws.unit.no/cristin-np-16238-adding-query-parameters-cristin'
+    * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     * def illegalOrganizationIdentifier = '3.2.1'
     * def dummyOrganizationIdentifier = '4.3.2.1'
     * def realOrganizationIdentifier = '185.17.6.0'
@@ -27,7 +26,7 @@ Feature: API tests for list Project pr Organization
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'funding\', \'funding_source\', \'institution\', \'keyword\', \'levels\', \'modified_since\', \'page\', \'participant\', \'project_manager\', \'results\', \'sort\', \'unit\', \'user\']'
+    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'funding\', \'funding_source\', \'institution\', \'keyword\', \'language\', \'levels\', \'modified_since\', \'page\', \'participant\', \'project_manager\', \'results\', \'sort\', \'unit\', \'user\']'
 
   Scenario: Get returns status OK and context in dummy response
     Given path '/organization/'+dummyOrganizationIdentifier+'/projects'
