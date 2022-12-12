@@ -49,7 +49,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 class QueryCristinOrganizationProjectHandlerTest {
 
@@ -136,7 +139,9 @@ class QueryCristinOrganizationProjectHandlerTest {
     @Test
     void shouldAddParamsToCristinQueryForFilteringAndReturnOk() throws IOException, ApiGatewayException {
         cristinApiClient = spy(cristinApiClient);
-        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK, generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(cristinApiClient).listProjects(any());
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING,
+                HttpURLConnection.HTTP_OK, generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
+                .when(cristinApiClient).listProjects(any());
         handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
         var queryParams = Map.of("funding", "NRE:1234",
                 "biobank", "123321",
@@ -186,7 +191,8 @@ class QueryCristinOrganizationProjectHandlerTest {
                 .build();
     }
 
-    private InputStream generateHandlerProRealisticRequest(Map <String, String> queryParametersMap) throws JsonProcessingException {
+    private InputStream generateHandlerProRealisticRequest(Map<String, String> queryParametersMap)
+            throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
                 .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))

@@ -20,23 +20,7 @@ import java.util.regex.Pattern;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
-import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.INSTITUTION;
-import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
-import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING_SOURCE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LEVELS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVAL_REFERENCE_ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVED_BY;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_MANAGER;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_PARTICIPANT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.USER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.*;
 import static no.unit.nva.cristin.projects.common.CristinQuery.CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 
@@ -53,7 +37,7 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
                     FUNDING_SOURCE, FUNDING,
                     PROJECT_APPROVAL_REFERENCE_ID, PROJECT_APPROVED_BY,
                     PROJECT_SORT, PROJECT_UNIT, USER,
-                    LEVELS, BIOBANK_ID);
+                    LEVELS, BIOBANK_ID, PROJECT_MODIFIED_SINCE);
 
     public static final Set<String> VALID_QUERY_PARAMETERS = mergeSets(VALID_QUERY_PARAMETERS_VALIDATED,
             VALID_QUERY_PARAM_NO_VALIDATION);
