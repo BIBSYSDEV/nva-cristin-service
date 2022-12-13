@@ -41,6 +41,8 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.projects.query.organization.QueryCristinOrganizationProjectHandler.VALID_QUERY_PARAMETERS;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static nva.commons.core.paths.UriWrapper.HTTPS;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -65,6 +67,11 @@ class QueryCristinOrganizationProjectHandlerTest {
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String ZERO_VALUE = "0";
     public static final String QUERY = "query";
+    public static final String START_DATE = "start_date";
+    public static final String DUMMY_UNIT_ID = "184.12.60.0";
+    public static final String FUNDING_SAMPLE = "NRE:1234";
+    public static final String BIOBANK_SAMPLE = String.valueOf(randomInteger());
+    public static final String KEYWORD_SAMPLE = randomString();
 
 
     private QueryCristinOrganizationProjectHandler handler;
@@ -143,12 +150,12 @@ class QueryCristinOrganizationProjectHandlerTest {
                 HttpURLConnection.HTTP_OK, generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
                 .when(cristinApiClient).listProjects(any());
         handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
-        var queryParams = Map.of("funding", "NRE:1234",
-                "biobank", "123321",
-                "keyword", "nature",
+        var queryParams = Map.of("funding", FUNDING_SAMPLE,
+                "biobank", BIOBANK_SAMPLE,
+                "keyword", KEYWORD_SAMPLE,
                 "results", "5",
-                "unit", "184.12.60.0",
-                "sort", "start_date");
+                "unit", DUMMY_UNIT_ID,
+                "sort", START_DATE);
         handler.handleRequest(generateHandlerProRealisticRequest(queryParams), output, context);
         var captor = ArgumentCaptor.forClass(URI.class);
 
@@ -157,17 +164,15 @@ class QueryCristinOrganizationProjectHandlerTest {
         assertThat(actualURI,
                 containsString("page=5"));
         assertThat(actualURI,
-                containsString("&biobank=123321"));
+                containsString("&biobank="+BIOBANK_SAMPLE));
         assertThat(actualURI,
-                containsString("&funding=NRE:1234"));
+                containsString("&funding="+FUNDING_SAMPLE));
         assertThat(actualURI,
-                containsString("&page=1"));
+                containsString("&keyword="+KEYWORD_SAMPLE));
         assertThat(actualURI,
-                containsString("&keyword=nature"));
+                containsString("&unit="+DUMMY_UNIT_ID));
         assertThat(actualURI,
-                containsString("&unit=184.12.60.0"));
-        assertThat(actualURI,
-                containsString("&sort=start_date"));
+                containsString("&sort="+START_DATE));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                 SearchResponse.class);

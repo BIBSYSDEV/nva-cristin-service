@@ -50,6 +50,8 @@ import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
 import static no.unit.nva.cristin.projects.query.QueryCristinProjectClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.TOTAL_COUNT_EXAMPLE_VALUE;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.anyOf;
@@ -105,6 +107,12 @@ class QueryCristinProjectHandlerTest {
             URLEncoder.encode(ILLEGAL_NVA_ORGANIZATION, StandardCharsets.UTF_8);
     private static final String API_QUERY_RESPONSE_WITH_FUNDING_JSON =
         IoUtils.stringFromResources(Path.of("api_query_response_with_funding.json"));
+    public static final String FUNDING_SAMPLE = "NRE:1234";
+    public static final String BIOBANK_SAMPLE = String.valueOf(randomInteger());
+    public static final String KEYWORD_SAMPLE = randomString();
+    public static final String UNIT_ID_SAMPLE = "184.12.60.0";
+    public static final String START_DATE = "start_date";
+    public static final String NB = "nb";
 
     private final Environment environment = new Environment();
     private QueryCristinProjectApiClient cristinApiClientStub;
@@ -699,12 +707,12 @@ class QueryCristinProjectHandlerTest {
         cristinApiClientStub = spy(cristinApiClientStub);
         handler = new QueryCristinProjectHandler(cristinApiClientStub, new Environment());
         var queryParams = Map.of("query", "hello",
-                "funding", "NRE",
-                "biobank", "123321",
-                "keyword", "nature",
+                "funding", FUNDING_SAMPLE,
+                "biobank", BIOBANK_SAMPLE,
+                "keyword", KEYWORD_SAMPLE,
                 "results", "5",
-                "unit", "184.12.60.0",
-                "sort", "start_date");
+                "unit", UNIT_ID_SAMPLE,
+                "sort", START_DATE);
         var input = requestWithQueryParameters(queryParams);
         handler.handleRequest(input, output, context);
         var captor = ArgumentCaptor.forClass(URI.class);
@@ -714,21 +722,19 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualURI,
                 containsString("page=5"));
         assertThat(actualURI,
-                containsString("&biobank=123321"));
+                containsString("&biobank="+BIOBANK_SAMPLE));
         assertThat(actualURI,
-                containsString("&funding=NRE"));
+                containsString("&funding="+FUNDING_SAMPLE));
         assertThat(actualURI,
-                containsString("&page=1"));
-        assertThat(actualURI,
-                containsString("&lang=nb"));
+                containsString("&lang="+ NB));
         assertThat(actualURI,
                 containsString("&title=hello"));
         assertThat(actualURI,
-                containsString("&keyword=nature"));
+                containsString("&keyword="+KEYWORD_SAMPLE));
         assertThat(actualURI,
-                containsString("&unit=184.12.60.0"));
+                containsString("&unit="+UNIT_ID_SAMPLE));
         assertThat(actualURI,
-                containsString("&sort=start_date"));
+                containsString("&sort="+START_DATE));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                 SearchResponse.class);
