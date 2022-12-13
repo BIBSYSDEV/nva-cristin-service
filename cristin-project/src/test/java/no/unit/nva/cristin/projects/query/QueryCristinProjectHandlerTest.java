@@ -47,6 +47,12 @@ import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
 import static no.unit.nva.cristin.projects.query.QueryCristinProjectClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.TOTAL_COUNT_EXAMPLE_VALUE;
@@ -722,19 +728,19 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualURI,
                 containsString("page=5"));
         assertThat(actualURI,
-                containsString("&biobank=" + BIOBANK_SAMPLE));
+                containsString("&" + BIOBANK_ID + "=" + BIOBANK_SAMPLE));
         assertThat(actualURI,
-                containsString("&funding=" + FUNDING_SAMPLE));
+                containsString("&" + FUNDING + "=" + FUNDING_SAMPLE));
         assertThat(actualURI,
-                containsString("&lang=" + NB));
+                containsString("&" + CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY + "=" + NB));
         assertThat(actualURI,
                 containsString("&title=hello"));
         assertThat(actualURI,
-                containsString("&keyword=" + KEYWORD_SAMPLE));
+                containsString("&" + PROJECT_KEYWORD + "=" + KEYWORD_SAMPLE));
         assertThat(actualURI,
-                containsString("&unit=" + UNIT_ID_SAMPLE));
+                containsString("&" + PROJECT_UNIT + "=" + UNIT_ID_SAMPLE));
         assertThat(actualURI,
-                containsString("&sort=" + START_DATE));
+                containsString("&" + PROJECT_SORT + "=" + START_DATE));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                 SearchResponse.class);
