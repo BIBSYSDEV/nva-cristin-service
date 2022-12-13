@@ -26,7 +26,7 @@ Feature: API tests for list Project pr Organization
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'funding\', \'funding_source\', \'institution\', \'keyword\', \'levels\', \'page\', \'participant\', \'project_manager\', \'results\', \'sort\', \'unit\', \'user\']'
+    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'funding\', \'funding_source\', \'institution\', \'keyword\', \'language\', \'levels\', \'modified_since\', \'page\', \'participant\', \'project_manager\', \'results\', \'sort\', \'unit\', \'user\']'
 
   Scenario: Get returns status OK and context in dummy response
     Given path '/organization/'+dummyOrganizationIdentifier+'/projects'
@@ -52,3 +52,12 @@ Feature: API tests for list Project pr Organization
     And match response['@context'] == '#present'
     And match response['nextResults'] == '#present'
     And match response['previousResults'] == '#present'
+
+  Scenario: Query with extended list of parameters and valid values returns OK
+    Given path '/organization/'+realOrganizationIdentifier+'/projects'
+    And param sort = 'end_date'
+    And param project_manager = 'St'
+    And param participant = "olav h"
+    And param funding_source = 'NRE'
+    When method GET
+    Then status 200

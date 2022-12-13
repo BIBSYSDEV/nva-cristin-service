@@ -192,4 +192,15 @@ Feature: API tests for Cristin projects query
       | 'NOTSTARTED' |
       | 'ACTIVE' |
 
+  Scenario: Query with extended list of parameters and valid values returns OK
+    Given path '/project/'
+    And param query = queryString
+    And param sort = 'end_date'
+    And param biobank = '234567'
+    And param project_manager = 'St'
+    And param participant = "olav h"
+    When method GET
+    Then status 200
+
+
 

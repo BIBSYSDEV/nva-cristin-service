@@ -42,6 +42,7 @@ public class JsonPropertyNames {
     public static final String ORGANIZATION = "organization";
     public static final String CRISTIN_UNIT_ID = "cristin_unit_id";
     public static final String CRISTIN_INSTITUTION_ID = "cristin_institution_id";
+    public static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
     public static final String INSTITUTION = "institution";
     public static final String POSITION_CODE = "code";
     public static final String CRISTIN_START_DATE = "start_date";
