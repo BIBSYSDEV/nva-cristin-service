@@ -164,15 +164,15 @@ class QueryCristinOrganizationProjectHandlerTest {
         assertThat(actualURI,
                 containsString("page=5"));
         assertThat(actualURI,
-                containsString("&biobank="+BIOBANK_SAMPLE));
+                containsString("&biobank=" + BIOBANK_SAMPLE));
         assertThat(actualURI,
-                containsString("&funding="+FUNDING_SAMPLE));
+                containsString("&funding=" + FUNDING_SAMPLE));
         assertThat(actualURI,
-                containsString("&keyword="+KEYWORD_SAMPLE));
+                containsString("&keyword=" + KEYWORD_SAMPLE));
         assertThat(actualURI,
-                containsString("&unit="+DUMMY_UNIT_ID));
+                containsString("&unit=" + DUMMY_UNIT_ID));
         assertThat(actualURI,
-                containsString("&sort="+START_DATE));
+                containsString("&sort=" + START_DATE));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                 SearchResponse.class);

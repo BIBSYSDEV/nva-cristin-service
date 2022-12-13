@@ -722,19 +722,19 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualURI,
                 containsString("page=5"));
         assertThat(actualURI,
-                containsString("&biobank="+BIOBANK_SAMPLE));
+                containsString("&biobank=" + BIOBANK_SAMPLE));
         assertThat(actualURI,
-                containsString("&funding="+FUNDING_SAMPLE));
+                containsString("&funding=" + FUNDING_SAMPLE));
         assertThat(actualURI,
-                containsString("&lang="+ NB));
+                containsString("&lang=" + NB));
         assertThat(actualURI,
                 containsString("&title=hello"));
         assertThat(actualURI,
-                containsString("&keyword="+KEYWORD_SAMPLE));
+                containsString("&keyword=" + KEYWORD_SAMPLE));
         assertThat(actualURI,
-                containsString("&unit="+UNIT_ID_SAMPLE));
+                containsString("&unit=" + UNIT_ID_SAMPLE));
         assertThat(actualURI,
-                containsString("&sort="+START_DATE));
+                containsString("&sort=" + START_DATE));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                 SearchResponse.class);

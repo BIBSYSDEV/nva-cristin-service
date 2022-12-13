@@ -102,7 +102,7 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
         return cristinApiClient.listOrganizationProjects(requestQueryParameters);
     }
 
-    private ConcurrentHashMap<String, String> extractQueryParameters(RequestInfo requestInfo)
+    private Map<String, String> extractQueryParameters(RequestInfo requestInfo)
             throws BadRequestException {
         var requestQueryParameters = new ConcurrentHashMap<>(Map.of(
                 CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, getValidId(requestInfo),
@@ -152,7 +152,7 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
      * Putting the parameter if it exists in a map.
      */
     protected void putOrNotQueryParameterOrEmpty(RequestInfo requestInfo, String parameter,
-                                                 ConcurrentHashMap<String,String> requestQueryParameters) {
+                                                 Map<String,String> requestQueryParameters) {
         if (getQueryParameter(requestInfo, parameter).isPresent()) {
             requestQueryParameters.put(parameter,getQueryParameter(requestInfo, parameter).get());
         }
