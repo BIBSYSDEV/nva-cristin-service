@@ -734,4 +734,6 @@ class QueryCristinProjectHandlerTest {
                 SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
+
+
 }
