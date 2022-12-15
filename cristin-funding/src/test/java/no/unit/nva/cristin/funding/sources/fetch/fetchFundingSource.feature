@@ -5,7 +5,7 @@ Feature: API tests for Cristin Funding Sources get
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
     * def validIdentifier = 'OTHER'
-    * def unknownIdentifier = "NOT_KNOWN_FOR_SURE
+    * def unknownIdentifier = 'NOT_KNOWN_FOR_SURE'
     * def fundingSourceIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/funding-sources\/.+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
 

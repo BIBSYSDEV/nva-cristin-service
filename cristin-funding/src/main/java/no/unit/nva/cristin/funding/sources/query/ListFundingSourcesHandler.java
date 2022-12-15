@@ -7,6 +7,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.stream.Collectors;
+import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.funding.sources.client.CristinFundingSourcesApiClient;
 import no.unit.nva.cristin.funding.sources.common.DomainUriUtils;
 import no.unit.nva.cristin.funding.sources.common.MappingUtils;
@@ -18,7 +19,7 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
 
-public class ListFundingSourcesHandler extends ApiGatewayHandler<Void, FundingSources> {
+public class ListFundingSourcesHandler extends CristinQueryHandler<Void, FundingSources> {
 
     private static final URI CONTEXT_URI = UriWrapper.fromUri("https://bibsysdev.github.io/src/funding-context.json")
                                                .getUri();

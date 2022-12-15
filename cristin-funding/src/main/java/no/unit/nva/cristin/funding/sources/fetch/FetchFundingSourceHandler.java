@@ -7,6 +7,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import no.unit.nva.cristin.common.handler.CristinHandler;
 import no.unit.nva.cristin.funding.sources.client.CristinFundingSourcesApiClient;
 import no.unit.nva.cristin.funding.sources.common.MappingUtils;
 import no.unit.nva.cristin.funding.sources.model.nva.FundingSource;
@@ -16,7 +17,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class FetchFundingSourceHandler extends ApiGatewayHandler<Void, FundingSource> {
+public class FetchFundingSourceHandler extends CristinHandler<Void, FundingSource> {
 
     private static final String CODE_PATH_PARAMETER_NAME = "identifier";
     private final transient CristinFundingSourcesApiClient cristinClient;
