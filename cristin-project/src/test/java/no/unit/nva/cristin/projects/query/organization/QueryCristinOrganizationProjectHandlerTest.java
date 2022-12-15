@@ -4,8 +4,10 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.unit.nva.commons.json.JsonUtils;
+import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.projects.query.QueryCristinProjectHandler;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -14,6 +16,7 @@ import nva.commons.core.Environment;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -33,11 +36,18 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
 import static no.unit.nva.cristin.projects.query.organization.QueryCristinOrganizationProjectHandler.VALID_QUERY_PARAMETERS;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static nva.commons.core.paths.UriWrapper.HTTPS;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -49,6 +59,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 class QueryCristinOrganizationProjectHandlerTest {
 
@@ -60,6 +71,12 @@ class QueryCristinOrganizationProjectHandlerTest {
     public static final String INVALID_VALUE = "value";
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String ZERO_VALUE = "0";
+    public static final String QUERY = "query";
+    public static final String START_DATE = "start_date";
+    public static final String DUMMY_UNIT_ID = "184.12.60.0";
+    public static final String FUNDING_SAMPLE = "NRE:1234";
+    public static final String BIOBANK_SAMPLE = String.valueOf(randomInteger());
+    public static final String KEYWORD_SAMPLE = randomString();
 
 
     private QueryCristinOrganizationProjectHandler handler;
@@ -131,6 +148,42 @@ class QueryCristinOrganizationProjectHandlerTest {
         assertThat(0, equalTo(searchResponse.getHits().size()));
     }
 
+    @Test
+    void shouldAddParamsToCristinQueryForFilteringAndReturnOk() throws IOException, ApiGatewayException {
+        cristinApiClient = spy(cristinApiClient);
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING,
+                HttpURLConnection.HTTP_OK, generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
+                .when(cristinApiClient).listProjects(any());
+        handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
+        var queryParams = Map.of("funding", FUNDING_SAMPLE,
+                "biobank", BIOBANK_SAMPLE,
+                "keyword", KEYWORD_SAMPLE,
+                "results", "5",
+                "unit", DUMMY_UNIT_ID,
+                "sort", START_DATE);
+        handler.handleRequest(generateHandlerProRealisticRequest(queryParams), output, context);
+        var captor = ArgumentCaptor.forClass(URI.class);
+
+        verify(cristinApiClient).listProjects(captor.capture());
+        var actualURI = captor.getValue().toString();
+        assertThat(actualURI,
+                containsString("page=5"));
+        assertThat(actualURI,
+                containsString("&" + BIOBANK_ID + "=" + BIOBANK_SAMPLE));
+        assertThat(actualURI,
+                containsString("&" + FUNDING + "=" + FUNDING_SAMPLE));
+        assertThat(actualURI,
+                containsString("&" + PROJECT_KEYWORD + "=" + KEYWORD_SAMPLE));
+        assertThat(actualURI,
+                containsString("&" + PROJECT_UNIT + "=" + DUMMY_UNIT_ID));
+        assertThat(actualURI,
+                containsString("&" + PROJECT_SORT + "=" + START_DATE));
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                SearchResponse.class);
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
     private InputStream generateHandlerDummyRequestWithIllegalQueryParameters() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
@@ -145,6 +198,15 @@ class QueryCristinOrganizationProjectHandlerTest {
                 .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                 .withQueryParameters(Map.of(PAGE, SAMPLE_PAGE))
                 .withQueryParameters(Map.of(NUMBER_OF_RESULTS, SAMPLE_RESULTS_SIZE))
+                .build();
+    }
+
+    private InputStream generateHandlerProRealisticRequest(Map<String, String> queryParametersMap)
+            throws JsonProcessingException {
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                .withQueryParameters(queryParametersMap)
                 .build();
     }
 
@@ -169,6 +231,13 @@ class QueryCristinOrganizationProjectHandlerTest {
                 .addChild(identifier)
                 .addChild(PROJECTS_PATH)
                 .getUri();
+    }
+
+    private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
+        return new HandlerRequestBuilder<Void>(Constants.OBJECT_MAPPER)
+                .withBody(null)
+                .withQueryParameters(map)
+                .build();
     }
 
 }
