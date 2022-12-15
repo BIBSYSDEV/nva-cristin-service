@@ -30,6 +30,8 @@ import nva.commons.core.Environment;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.zalando.problem.Problem;
 
@@ -66,11 +68,13 @@ public class FetchFundingSourcesHandlerTest {
         cristinFundingSourcesStubs.resetStub();
     }
 
-    @Test
-    public void shouldReturnFundingSourceWhenExists() throws IOException {
+    @ParameterizedTest(name = "Should support accept header {0}")
+    @ValueSource(strings = {"application/json", "application/ld+json"})
+    public void shouldReturnFundingSourceWhenExists(String acceptHeaderValue) throws IOException {
         var input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
                         .withPathParameters(Map.of("identifier",
                                                    EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED))
+                        .withHeaders(Map.of("Accept", acceptHeaderValue))
                         .build();
 
         cristinFundingSourcesStubs.stubSuccess();

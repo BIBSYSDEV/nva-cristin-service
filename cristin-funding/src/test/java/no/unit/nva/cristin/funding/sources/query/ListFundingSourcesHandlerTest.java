@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.Map;
 import java.util.Optional;
 import no.unit.nva.cristin.funding.sources.CristinFundingSourcesStubs;
 import no.unit.nva.cristin.funding.sources.client.CristinFundingSourcesApiClient;
@@ -29,6 +30,8 @@ import nva.commons.core.Environment;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.zalando.problem.Problem;
 
@@ -61,9 +64,11 @@ public class ListFundingSourcesHandlerTest {
         cristinFundingSourcesStubs.resetStub();
     }
 
-    @Test
-    public void shouldReturnAllFundingSourcesFromCristinOnSuccess() throws IOException {
+    @ParameterizedTest(name = "Should support accept header {0}")
+    @ValueSource(strings = {"application/json", "application/ld+json"})
+    public void shouldReturnAllFundingSourcesFromCristinOnSuccess(String acceptHeaderValue) throws IOException {
         InputStream input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
+                                .withHeaders(Map.of("Accept", acceptHeaderValue))
                                 .build();
 
         cristinFundingSourcesStubs.stubSuccess();
