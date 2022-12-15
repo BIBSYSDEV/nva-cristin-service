@@ -20,6 +20,8 @@ awsSdk2 = { strictly = '2.17.191' }
 bekkopen-nocommons = { strictly = '0.12.0' }
 com-auth0-jwt = { strictly = '3.18.3' }
 com-auth0-jwks = { strictly = '0.20.2' }
+wiremock = { strictly = '2.33.2' }
+
 [libraries]
 
 #Test
@@ -80,8 +82,10 @@ com-auth0-jwks = { group = 'com.auth0', name =  'jwks-rsa', version.ref= 'com-au
 
 aws-sdk2-urlconnection = { group = 'software.amazon.awssdk', name = 'url-connection-client', version.ref = 'awsSdk2' }
 
+wiremock = { group = 'com.github.tomakehurst', name = 'wiremock-jre8', version.ref = 'wiremock' }
+
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
-testing = ['junit-jupiter-api', 'junit-jupiter-params', 'junit-jupiter-engine', 'mockito-core', 'hamcrest', 'nva-testutils', 'nva-logutils', 'zalando']
+testing = ['junit-jupiter-api', 'junit-jupiter-params', 'junit-jupiter-engine', 'mockito-core', 'hamcrest', 'nva-testutils', 'nva-logutils', 'zalando', 'wiremock']
 jackson = ['jackson-core', 'jackson-databind', 'jackson-annotations', 'jackson-datatype-jdk8', 'jackson-datatype-jsr310']
 others = ['javax-ws-rs', 'slf4j-api', 'log4j-api', 'jsoup', 'aws-lambda-java-core', 'google-guava']

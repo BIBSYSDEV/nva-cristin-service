@@ -1,0 +1,43 @@
+dependencies {
+    implementation project(":cristin-commons")
+    implementation libs.nva.json
+    implementation libs.nva.core
+    implementation libs.nva.language
+//    implementation libs.aws.sdk2.core
+//    implementation libs.aws.sdk2.cognitoidp
+//    implementation libs.google.guava
+    implementation libs.aws.lambda.java.core
+
+    testImplementation libs.junit.jupiter.api
+    testImplementation libs.nva.testutils
+    testImplementation libs.karate.core
+    testImplementation libs.karate.junit5
+    testImplementation libs.wiremock
+    testImplementation project(":cristin-testing")
+}
+
+
+tasks.named('test') {
+    useJUnitPlatform {
+        excludeTags 'karateTest'
+    }
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    finalizedBy jacocoTestReport
+}
+
+sourceSets {
+    test {
+        resources {
+            srcDir file('src/test/java')
+            exclude '**/*.java'
+        }
+    }
+}
+
+test{
+    environment "COGNITO_URI", "https://example.cognito.org"
+}
+

@@ -1,0 +1,3972 @@
+[
+  {
+    "code": "EC/FP7",
+    "name": {
+      "nb": "EC/FP7",
+      "nn": "EC/FP7",
+      "en": "EC/FP7"
+    }
+  },
+  {
+    "code": "EC/H2020",
+    "name": {
+      "nb": "EC/H2020",
+      "nn": "EC/H2020",
+      "en": "EC/H2020"
+    }
+  },
+  {
+    "code": "EC/HEU",
+    "name": {
+      "nb": "EU – Horisont Europa (EC/HEU)",
+      "en": "EU – Horizon Europe (EC/HEU)"
+    }
+  },
+  {
+    "code": "EU",
+    "name": {
+      "nb": "EU",
+      "en": "EU"
+    }
+  },
+  {
+    "code": "NFR",
+    "name": {
+      "nb": "Norges forskningsråd",
+      "en": "Research Council of Norway (RCN)"
+    }
+  },
+  {
+    "code": "AAUKF",
+    "name": {
+      "nb": "Aust-Agder utviklings- og kompetansefond",
+      "en": "Aust-Agder utviklings- og kompetansefond"
+    }
+  },
+  {
+    "code": "ABELIA",
+    "name": {
+      "nb": "Abelia",
+      "en": "Abelia"
+    }
+  },
+  {
+    "code": "AFI",
+    "name": {
+      "nb": "Arbeidsforskningsinstituttet",
+      "en": "Work Research Institute"
+    }
+  },
+  {
+    "code": "AGDERFORSK",
+    "name": {
+      "nb": "Agderforskning",
+      "en": "Agder Research Foundation"
+    }
+  },
+  {
+    "code": "AGRICULTUREANDFOOD",
+    "name": {
+      "nb": "Landbruks- og matdepartementet",
+      "en": "Ministry of Agriculture and Food"
+    }
+  },
+  {
+    "code": "AHO",
+    "name": {
+      "nb": "Arkitektur- og designhøgskolen i Oslo",
+      "en": "The Oslo School of Architecture and Design"
+    }
+  },
+  {
+    "code": "AHUS",
+    "name": {
+      "nb": "Akershus universitetssykehus HF",
+      "en": "Akershus University Hospital Trust"
+    }
+  },
+  {
+    "code": "AIRAMBULANCE",
+    "name": {
+      "nb": "Stiftelsen Norsk Luftambulanse",
+      "en": "Norwegian Air Ambulance Foundation"
+    }
+  },
+  {
+    "code": "AKADEMIKERNE",
+    "name": {
+      "nb": "Akademikerne",
+      "en": "The Federation of Norwegian Professional Associations"
+    }
+  },
+  {
+    "code": "AKERBP",
+    "name": {
+      "nb": "Aker BP",
+      "en": "Aker BP"
+    }
+  },
+  {
+    "code": "ALSNORGE",
+    "name": {
+      "nb": "ALS Norge",
+      "en": "ALS Norge"
+    }
+  },
+  {
+    "code": "AMAP",
+    "name": {
+      "nb": "Arctic Monitoring and Assessment Programme",
+      "en": "Arctic Monitoring and Assessment Programme"
+    }
+  },
+  {
+    "code": "AMS",
+    "name": {
+      "nb": "Aluminiumindustriens Miljøsekretariat - AMS",
+      "en": "AMS Aluminium"
+    }
+  },
+  {
+    "code": "ANIMALPROCTECT",
+    "name": {
+      "nb": "Dyrevernalliansens forskningsfond",
+      "en": "The Norwegian Animal Protection Alliance's Research Fund"
+    }
+  },
+  {
+    "code": "APO",
+    "name": {
+      "nb": "Sykehusapotekene i Midt-Norge HF ",
+      "en": "Central Norway Hospital Pharmacies Trust"
+    }
+  },
+  {
+    "code": "APOTEKSØ",
+    "name": {
+      "nb": "Sykehusapotekene i Sør-Øst RHF",
+      "en": "South Eastern Norway Hospital Pharmacies Regional Health Authority"
+    }
+  },
+  {
+    "code": "ARCTICCOUNCIL",
+    "name": {
+      "nb": "Arktisk råd",
+      "en": "Arctic Council"
+    }
+  },
+  {
+    "code": "ARCUS",
+    "name": {
+      "nb": "Arcus ASA",
+      "nn": "Arcus Asa",
+      "en": "Arcus ASA"
+    }
+  },
+  {
+    "code": "ARTSBANK",
+    "name": {
+      "nb": "Artsdatabanken",
+      "en": "Norwegian Biodiversity Information Centre"
+    }
+  },
+  {
+    "code": "ARTSCOUNCIL",
+    "name": {
+      "nb": "Kulturrådet",
+      "en": "Arts Council Norway"
+    }
+  },
+  {
+    "code": "ASKO",
+    "name": {
+      "nb": "Asko Norge AS",
+      "en": "Asko Norge AS"
+    }
+  },
+  {
+    "code": "ASKØYMUNIC",
+    "name": {
+      "nb": "Askøy kommune",
+      "nn": "Askøy kommune",
+      "en": "Askøy municipality"
+    }
+  },
+  {
+    "code": "ATH",
+    "name": {
+      "nb": "Ansgar Teologiske Høgskole",
+      "en": "Ansgar School of Theology and Mission"
+    }
+  },
+  {
+    "code": "ATLUNGSTAD",
+    "name": {
+      "nb": "Atlungstad Brenneri",
+      "nn": "Atlungstad Brenneri",
+      "en": "Atlungstad Brenneri"
+    }
+  },
+  {
+    "code": "AVFALLNORGE",
+    "name": {
+      "nb": "Avfall Norge",
+      "en": "Avfall Norge"
+    }
+  },
+  {
+    "code": "AVINOR",
+    "name": {
+      "nb": "Avinor",
+      "en": "Avinor"
+    }
+  },
+  {
+    "code": "BARRATDUE",
+    "name": {
+      "nb": "Barrat Dues musikkinstitutt",
+      "en": "Barratt Dues Conservatory of Music"
+    }
+  },
+  {
+    "code": "BDH",
+    "name": {
+      "nb": "Betanien diakonale høgskole",
+      "en": "Betanien Deaconal University College"
+    }
+  },
+  {
+    "code": "BERGENMUN",
+    "name": {
+      "nb": "Bergen kommune",
+      "en": "Bergen municipaltity"
+    }
+  },
+  {
+    "code": "BERGESENFOUND",
+    "name": {
+      "nb": "Bergesenstiftelsen",
+      "en": "The Bergesen Foundation"
+    }
+  },
+  {
+    "code": "BETANIEN",
+    "name": {
+      "nb": "Betanien Hospital",
+      "en": "Betanien Hospital"
+    }
+  },
+  {
+    "code": "BFS",
+    "name": {
+      "nb": "Bergens forskningsstiftelse",
+      "en": "The Bergen Research Foundation"
+    }
+  },
+  {
+    "code": "BI",
+    "name": {
+      "nb": "Handelshøyskolen BI",
+      "en": "BI Norwegian Business School "
+    }
+  },
+  {
+    "code": "BILLEDVED",
+    "name": {
+      "nb": "Billedkunstnernes Vederlagsfond"
+    }
+  },
+  {
+    "code": "BIOFORSK",
+    "name": {
+      "nb": "Bioforsk",
+      "en": "Bioforsk, Norwegian Institute for Agricultural and Environmental Research"
+    }
+  },
+  {
+    "code": "BJORKNES",
+    "name": {
+      "nb": "Bjørknes høyskole",
+      "en": "Bjørknes College"
+    }
+  },
+  {
+    "code": "BKH",
+    "name": {
+      "nb": "Bildende kunstneres hjelpefond",
+      "en": "The Relief Fund for Visual Artists"
+    }
+  },
+  {
+    "code": "BKV",
+    "name": {
+      "nb": "Prosjektstøtte billedkunstnere",
+      "en": "Prosjektstøtte billedkunstnere"
+    }
+  },
+  {
+    "code": "BLUEMARITIME",
+    "name": {
+      "nb": "GCE Blue Maritime",
+      "nn": "GCE Blue Maritime",
+      "en": "GCE Blue Maritime"
+    }
+  },
+  {
+    "code": "BNL",
+    "name": {
+      "nb": "Byggenæringens Landsforening (BNL)",
+      "en": "The Federation of Norwegian Construction Industries (BNL)"
+    }
+  },
+  {
+    "code": "BRITACADEMY",
+    "name": {
+      "nb": "British Academy",
+      "nn": "British Academy",
+      "en": "British Academy"
+    }
+  },
+  {
+    "code": "BUFDIR",
+    "name": {
+      "nb": "Barne-, ungdoms og familiedirektoratet (Bufdir)",
+      "en": "Norwegian Directorate for Children, Youth and Family Affairs"
+    }
+  },
+  {
+    "code": "BYGDEFORSK",
+    "name": {
+      "nb": "Norsk senter for bygdeforskning",
+      "en": "Centre for Rural Research"
+    }
+  },
+  {
+    "code": "CALRSBERGFOUND",
+    "name": {
+      "nb": "Carlsbergfondet",
+      "nn": "Carlsbergfondet",
+      "en": "Carlsberg Foundation"
+    }
+  },
+  {
+    "code": "CANCERREG",
+    "name": {
+      "nb": "Kreftregisteret",
+      "en": "The Cancer Registry of Norway"
+    }
+  },
+  {
+    "code": "CANICA",
+    "name": {
+      "nb": "Canica A/S",
+      "en": "Canica A/S"
+    }
+  },
+  {
+    "code": "CAS",
+    "name": {
+      "nb": "Senter for grunnforskning",
+      "nn": "Senter for grunnforskning",
+      "en": "Centre for Advanced Study"
+    }
+  },
+  {
+    "code": "CEDR",
+    "name": {
+      "nb": "Conference of European Directors of Roads",
+      "en": "Conference of European Directors of Roads"
+    }
+  },
+  {
+    "code": "CEPI",
+    "name": {
+      "nb": "The Coalition for Epidemic Preparedness Innovations",
+      "en": "The Coalition for Epidemic Preparedness Innovations"
+    }
+  },
+  {
+    "code": "CHILDCANCER",
+    "name": {
+      "nb": "Barnekreftforeningen",
+      "en": "The Norwegian Childhood Cancer Society"
+    }
+  },
+  {
+    "code": "CICERO",
+    "name": {
+      "nb": "CICERO -  Senter for internasjonal klima og miljøforskning",
+      "en": "CICERO Center for International Climate and Environmental Research - Oslo"
+    }
+  },
+  {
+    "code": "CIVITA",
+    "name": {
+      "nb": "Civita",
+      "en": "Civita"
+    }
+  },
+  {
+    "code": "CK",
+    "name": {
+      "nb": "Campus Kristiania",
+      "en": "Campus Kristiania"
+    }
+  },
+  {
+    "code": "CLIMATE",
+    "name": {
+      "nb": "Klima- og miljødepartementet",
+      "en": "Ministry of Climate and Environment"
+    }
+  },
+  {
+    "code": "CLIMIT",
+    "name": {
+      "nb": "CLIMIT",
+      "nn": "CLIMIT",
+      "en": "CLIMIT"
+    }
+  },
+  {
+    "code": "CLIMITDEMO",
+    "name": {
+      "nb": "CLIMIT DEMO/Gassnova",
+      "en": "CLIMIT DEMO/Gassnova"
+    }
+  },
+  {
+    "code": "CMI",
+    "name": {
+      "nb": "Chr. Michelsens Institutt",
+      "en": "Chr. Michelsen Institute"
+    }
+  },
+  {
+    "code": "CMR",
+    "name": {
+      "nb": "Christian Michelsen Research",
+      "en": "Christian Michelsen Research"
+    }
+  },
+  {
+    "code": "COASTALADMIN",
+    "name": {
+      "nb": "Kystverket",
+      "en": "The Norwegian Coastal Administration"
+    }
+  },
+  {
+    "code": "CONOCOPHILIPS",
+    "name": {
+      "nb": "Conoco Phillips",
+      "nn": "Conoco Phillips",
+      "en": "Conoco Phillips"
+    }
+  },
+  {
+    "code": "COOP",
+    "name": {
+      "nb": "Coop",
+      "en": "Co-op"
+    }
+  },
+  {
+    "code": "COPENHAGENMUNIC",
+    "name": {
+      "nb": "København kommune",
+      "en": "Copenhagen municipality"
+    }
+  },
+  {
+    "code": "COPERNICUS",
+    "name": {
+      "nb": "Copernicus-programmet",
+      "en": "Copernicus Programme"
+    }
+  },
+  {
+    "code": "COST",
+    "name": {
+      "nb": "COST (European Cooperation in Science and Technology)",
+      "en": "COST (European Cooperation in Science and Technology)"
+    }
+  },
+  {
+    "code": "COUNTGOVROGALAND",
+    "name": {
+      "nb": "Fylkesmannen i Rogaland",
+      "en": "County Governor of Rogaland"
+    }
+  },
+  {
+    "code": "CSP",
+    "name": {
+      "nb": "Senter for seniorpolitikk",
+      "en": "Centre for Senior Policy (CSP)"
+    }
+  },
+  {
+    "code": "CULTURE",
+    "name": {
+      "nb": "Kulturdepartementet",
+      "en": "Ministry of Culture"
+    }
+  },
+  {
+    "code": "DAGBLADET",
+    "name": {
+      "nb": "Dagbladets stifelse",
+      "nn": "Dagbladets stiftelse",
+      "en": "Dagbladets stiftelse"
+    }
+  },
+  {
+    "code": "DANSK-NORSK",
+    "name": {
+      "nb": "Fondet for dansk-norsk Samarbeid"
+    }
+  },
+  {
+    "code": "DEA",
+    "name": {
+      "nb": "DEA",
+      "en": "DEA"
+    }
+  },
+  {
+    "code": "DFG",
+    "name": {
+      "nb": "Deutsche Forschungsgemeinschaft",
+      "en": "DFG funding"
+    }
+  },
+  {
+    "code": "DFØ",
+    "name": {
+      "nb": "Direktoratet for økonomistyring (DFØ)",
+      "en": "The Norwegian Government Agency for Financial Management (DFØ)"
+    }
+  },
+  {
+    "code": "DGE",
+    "name": {
+      "nb": "DG Environment",
+      "en": "DG Environment"
+    }
+  },
+  {
+    "code": "DHS",
+    "name": {
+      "nb": "Diakonhjemmet høgskole",
+      "en": "Diakonhjemmet University College"
+    }
+  },
+  {
+    "code": "DIAKON",
+    "name": {
+      "nb": "Diakonhjemmet Sykehus",
+      "en": "Diakonhjemmet Hospital"
+    }
+  },
+  {
+    "code": "DIFI",
+    "name": {
+      "nb": "Direktoratet for forvaltning og IKT (Difi)",
+      "en": "Agency for Public Management and eGovernment (Difi)"
+    }
+  },
+  {
+    "code": "DIGDIR",
+    "name": {
+      "nb": "Digitaliseringsdirektoratet",
+      "en": "Norwegian Digitalisation Agency"
+    }
+  },
+  {
+    "code": "DIKU",
+    "name": {
+      "nb": "Direktoratet for internasjonalisering og kvalitetsutvikling i høgare utdanning",
+      "en": "The Norwegian Agency for International Cooperation and Quality Enhancement in Higher Education\r\n"
+    }
+  },
+  {
+    "code": "DLW",
+    "name": {
+      "nb": "Arbeids- og velferdsdirektoratet",
+      "en": "Directorate of Labour and Welfare"
+    }
+  },
+  {
+    "code": "DMMH",
+    "name": {
+      "nb": "Dronning Mauds Minne Høgskole for barnehagelærerutdanning",
+      "en": "Queen Maud University College of Early Childhood Education"
+    }
+  },
+  {
+    "code": "DNB",
+    "name": {
+      "nb": "DNB ASA",
+      "en": "DNB ASA"
+    }
+  },
+  {
+    "code": "EDUCATION",
+    "name": {
+      "nb": "Kunnskapsdepartementet",
+      "en": "Ministry of Education and Research"
+    }
+  },
+  {
+    "code": "EDUPOLEN",
+    "name": {
+      "nb": "Ministry of Science and Higher Education in Poland",
+      "en": "Ministry of Science and Higher Education in Poland"
+    }
+  },
+  {
+    "code": "EEA",
+    "name": {
+      "nb": "EØS - Det europeiske økonomiske samarbeidsområde",
+      "en": "EEA - The Agreement on the European Economic Area"
+    }
+  },
+  {
+    "code": "EEANORWAYGRANTS",
+    "name": {
+      "nb": "The EEA and Norway Grants Fund for Regional Cooperation",
+      "nn": "The EEA and Norway Grants Fund for Regional Cooperation",
+      "en": "The EEA and Norway Grants Fund for Regional Cooperation"
+    }
+  },
+  {
+    "code": "EI",
+    "name": {
+      "nb": "Egen institusjon",
+      "en": "Own institution"
+    }
+  },
+  {
+    "code": "EILERTSENSLEGAT",
+    "name": {
+      "nb": "Johanne og Einar Eilertsens legat",
+      "en": "Johanne og Einar Eilertsens legat"
+    }
+  },
+  {
+    "code": "ELKEM",
+    "name": {
+      "nb": "Elkem",
+      "en": "Elkem"
+    }
+  },
+  {
+    "code": "ELVIA",
+    "name": {
+      "nb": "Elvia AS",
+      "en": "Elvia AS"
+    }
+  },
+  {
+    "code": "ENERGINORGE",
+    "name": {
+      "nb": "Energi Norge",
+      "en": "Energy Norway"
+    }
+  },
+  {
+    "code": "ENERGISINT",
+    "name": {
+      "nb": "SINTEF Energi AS",
+      "en": "SINTEF Energy Research"
+    }
+  },
+  {
+    "code": "ENOVA",
+    "name": {
+      "nb": "ENOVA SF",
+      "en": "ENOVA SF"
+    }
+  },
+  {
+    "code": "EPB-KAVLI",
+    "name": {
+      "nb": "The Egil and Pauline Braathen and Fred Kavli Centre for Cortical Microcircuits",
+      "en": "The Egil and Pauline Braathen and Fred Kavli Centre for Cortical Microcircuits"
+    }
+  },
+  {
+    "code": "EPSRC",
+    "name": {
+      "nb": "Engineering and Physical Sciences Research Council (EPSRC)",
+      "nn": "Engineering and Physical Sciences Research Council (EPSRC)",
+      "en": "Engineering and Physical Sciences Research Council (EPSRC)"
+    }
+  },
+  {
+    "code": "EQUINOR",
+    "name": {
+      "nb": "Equinor",
+      "nn": "Equinor",
+      "en": "Equinor"
+    }
+  },
+  {
+    "code": "ERC",
+    "name": {
+      "nb": "ERC-European Research Council",
+      "nn": "ERC-European Research Council",
+      "en": "ERC-European Research Council"
+    }
+  },
+  {
+    "code": "ERCIM",
+    "name": {
+      "nb": "ERCIM",
+      "nn": "ERCIM",
+      "en": "ERCIM"
+    }
+  },
+  {
+    "code": "ESA",
+    "name": {
+      "nb": "ESA - den europeiske romfartsorganisasjonen",
+      "en": "ESA - European Space Agency"
+    }
+  },
+  {
+    "code": "ESF",
+    "name": {
+      "nb": "European Science Foundation (ESF)",
+      "en": "European Science Foundation (ESF)"
+    }
+  },
+  {
+    "code": "ESPRC",
+    "name": {
+      "nb": "The ESPRC Centre for Doctoral Training (CDT) in Industrially Focused Mathematical Modelling (InFoMM)",
+      "en": "The ESPRC Centre for Doctoral Training (CDT) in Industrially Focused Mathematical Modelling (InFoMM)"
+    }
+  },
+  {
+    "code": "EUROENVIRAGENCY",
+    "name": {
+      "nb": "Det europeiske miljøbyrået",
+      "en": "European Environment Agency"
+    }
+  },
+  {
+    "code": "EUROREGDEVFUND",
+    "name": {
+      "nb": "European Regional Development Fund",
+      "nn": "European Regional Development Fund",
+      "en": "European Regional Development Fund"
+    }
+  },
+  {
+    "code": "EURYTMI",
+    "name": {
+      "nb": "Den norske eurytmihøgskolen",
+      "en": "College of Eurythmics"
+    }
+  },
+  {
+    "code": "EXTRA",
+    "name": {
+      "nb": "Stiftelsen Dam",
+      "en": "Dam Foundation"
+    }
+  },
+  {
+    "code": "FAFO",
+    "name": {
+      "nb": "Forskningsstiftelsen Fafo",
+      "en": "Norwegian Trade Union Centre for Social Science and Research"
+    }
+  },
+  {
+    "code": "FAGFORBUNDET",
+    "name": {
+      "nb": "Fagforbundet",
+      "en": "Norwegian Union of Municipal and General Employees"
+    }
+  },
+  {
+    "code": "FEVF",
+    "name": {
+      "nb": "Fond til etter- og videreutdanning av fysioterapeuter ",
+      "en": "Norwegian Physiotherapist Association"
+    }
+  },
+  {
+    "code": "FFI",
+    "name": {
+      "nb": "Forsvarets forskningsinstitutt",
+      "en": "Norwegian Defence Research Establishment"
+    }
+  },
+  {
+    "code": "FFL",
+    "name": {
+      "nb": "Fondet for forskningsavgift på landbruksprodukter",
+      "en": "Fondet for forskningsavgift på landbruksprodukter"
+    }
+  },
+  {
+    "code": "FFL/JA",
+    "name": {
+      "nb": "Forskningsmidlene for jordbruk og matindustri",
+      "en": "Forskningsmidlene for jordbruk og matindustri"
+    }
+  },
+  {
+    "code": "FFO",
+    "name": {
+      "nb": "Funksjonshemmedes Fellesorganisasjon (FFO)",
+      "en": "The Norwegian Federation of Organizations of Disabled People"
+    }
+  },
+  {
+    "code": "FFOND",
+    "name": {
+      "nb": "Det Faglitterære Fond",
+      "en": "Det Faglitterære Fond"
+    }
+  },
+  {
+    "code": "FHF",
+    "name": {
+      "nb": "Fiskeri- og havbruksnæringens forskningsfinansiering",
+      "en": "The Norwegian Seafood Research Fund"
+    }
+  },
+  {
+    "code": "FHI",
+    "name": {
+      "nb": "Folkehelseinstituttet",
+      "en": "Norwegian Institute of Public Health"
+    }
+  },
+  {
+    "code": "FHS",
+    "name": {
+      "nb": "Forsvarets høgskole",
+      "nn": "Forsvarets Høgskole",
+      "en": "The Norwegian Defence Univerity College"
+    }
+  },
+  {
+    "code": "FHT",
+    "name": {
+      "nb": "Finnmarkssykehuset",
+      "en": "Finnmark Hospital Trust"
+    }
+  },
+  {
+    "code": "FIH",
+    "name": {
+      "nb": "Fjellhaug Internasjonale Høgskole",
+      "en": "Fjellhaug International University College"
+    }
+  },
+  {
+    "code": "FINANCE",
+    "name": {
+      "nb": "Finansdepartementet",
+      "en": "Ministry of Finance"
+    }
+  },
+  {
+    "code": "FINANSMARKEDFOND",
+    "name": {
+      "nb": "Finansmarkedfondet",
+      "en": "The Finance Market Fund"
+    }
+  },
+  {
+    "code": "FISKOGHAV",
+    "name": {
+      "nb": "SINTEF Fiskeri og havbruk AS",
+      "en": "SINTEF Fisheries and Aquaculture"
+    }
+  },
+  {
+    "code": "FIVEN",
+    "name": {
+      "nb": "Fiven Norge AS",
+      "en": "Fiven Norway"
+    }
+  },
+  {
+    "code": "FJELLMUNIC",
+    "name": {
+      "nb": "Fjell kommune",
+      "nn": "Fjell kommune",
+      "en": "Fjell municipality"
+    }
+  },
+  {
+    "code": "FKN",
+    "name": {
+      "nb": "Fredrikstad kommunes næringsfond\r\n",
+      "en": "Fredrikstad kommunes næringsfond\r\n"
+    }
+  },
+  {
+    "code": "FNI",
+    "name": {
+      "nb": "Fridtjof Nansens institutt",
+      "en": "Fridtjof Nansen Institute"
+    }
+  },
+  {
+    "code": "FNORDEN",
+    "name": {
+      "nb": "Foreningen Norden",
+      "nn": "Foreningen Norden",
+      "en": "Foreningen Norden"
+    }
+  },
+  {
+    "code": "FO",
+    "name": {
+      "nb": "Fond",
+      "en": "Funds"
+    }
+  },
+  {
+    "code": "FOLKEHERMAN",
+    "name": {
+      "nb": "Folke Hermansens Fond",
+      "nn": "Folke Hermansens Fond",
+      "en": "Folke Hermansens Fond"
+    }
+  },
+  {
+    "code": "FONDBANKFINANS",
+    "name": {
+      "nb": "Fondet til fremme av bank- og finansstudier",
+      "en": "Fondet til fremme av bank- og finansstudier"
+    }
+  },
+  {
+    "code": "FONDUTOVENDE",
+    "name": {
+      "nb": "Fond for utøvende kunstnere",
+      "en": "Fond for utøvende kunstnere"
+    }
+  },
+  {
+    "code": "FORBRUKERRÅDET",
+    "name": {
+      "nb": "Forbrukerrådet",
+      "en": "The Norwegian Consumer Council"
+    }
+  },
+  {
+    "code": "FOREIGNAFFAIRS",
+    "name": {
+      "nb": "Utenriksdepartementet",
+      "en": "Ministry of Foreign Affairs"
+    }
+  },
+  {
+    "code": "FORREGION1",
+    "name": {
+      "nb": "Forregion 1",
+      "nn": "Forregion 1",
+      "en": "Forregion 1"
+    }
+  },
+  {
+    "code": "FORSIKRINGSAKADEMIET",
+    "name": {
+      "nb": "Stiftelsen Forsikringsakademiet",
+      "en": "Stiftelsen Forsikringsakademiet"
+    }
+  },
+  {
+    "code": "FORSKERFORBUNDET",
+    "name": {
+      "nb": "Forskerforbundet",
+      "en": "The Norwegian Association of Researchers - NAR"
+    }
+  },
+  {
+    "code": "FORSKMOBAGDER",
+    "name": {
+      "nb": "Forskningsmobilisering Agder",
+      "en": "Forskningsmobilisering Agder"
+    }
+  },
+  {
+    "code": "FORSKNINGSPARKEN",
+    "name": {
+      "nb": "Forskningsparken",
+      "en": "Oslo Science Park"
+    }
+  },
+  {
+    "code": "FRAM",
+    "name": {
+      "nb": "Framsenteret",
+      "en": "The Fram Centre"
+    }
+  },
+  {
+    "code": "FRAMBU",
+    "name": {
+      "nb": "Frambu Senter for sjeldne funksjonshemninger",
+      "en": "Frambu"
+    }
+  },
+  {
+    "code": "FRANCAIS",
+    "name": {
+      "nb": "Institut Français Norge",
+      "en": "Institut Français Norvège"
+    }
+  },
+  {
+    "code": "FRISCH",
+    "name": {
+      "nb": "Stiftelsen Frischsenteret for samfunnsøkonomisk forskning",
+      "en": "Ragnar Frisch Centre for Economic Research"
+    }
+  },
+  {
+    "code": "FRITTORD",
+    "name": {
+      "nb": "Fritt ord",
+      "en": "The Fritt Ord Foundation"
+    }
+  },
+  {
+    "code": "FRV",
+    "name": {
+      "nb": "Fondet for regionale verneombud",
+      "en": "Regional Safety Representative "
+    }
+  },
+  {
+    "code": "FULBRIGHT",
+    "name": {
+      "nb": "Fulbright",
+      "en": "Fulbright"
+    }
+  },
+  {
+    "code": "FYLKESMANNHORD",
+    "name": {
+      "nb": "Fylkesmannen i Hordaland",
+      "en": "County Governor of Hordaland"
+    }
+  },
+  {
+    "code": "FYLKMANNOPPLAND",
+    "name": {
+      "nb": "Fylkesmannen i Oppland",
+      "en": "County Governor of Oppland"
+    }
+  },
+  {
+    "code": "FYLKMANNTRØNDELAG",
+    "name": {
+      "nb": "Fylkesmannen i Trøndelag",
+      "en": "County Governor of Trøndelag"
+    }
+  },
+  {
+    "code": "GA",
+    "name": {
+      "nb": "Gaver",
+      "en": "Gifts"
+    }
+  },
+  {
+    "code": "GATESFOUND",
+    "name": {
+      "nb": "Bill & Melinda Gates Foundation",
+      "en": "Bill & Melinda Gates Foundation"
+    }
+  },
+  {
+    "code": "GENO",
+    "name": {
+      "nb": "GENO",
+      "nn": "GENO",
+      "en": "GENO"
+    }
+  },
+  {
+    "code": "GJENSIDIGE",
+    "name": {
+      "nb": "Gjensidige forsikring",
+      "en": "Gjensidige Group"
+    }
+  },
+  {
+    "code": "GLITTRE",
+    "name": {
+      "nb": "Glittreklinikken",
+      "en": "LHL- Glittre"
+    }
+  },
+  {
+    "code": "GROFONDET",
+    "name": {
+      "nb": "Grofondet",
+      "en": "Grofondet"
+    }
+  },
+  {
+    "code": "GVPGENT",
+    "name": {
+      "nb": "Generalitat Valenciana plan GenT",
+      "en": "Generalitat Valenciana plan GenT"
+    }
+  },
+  {
+    "code": "HAUKELAND",
+    "name": {
+      "nb": "Haukeland Universitetssykehus",
+      "en": "Haukeland University Hospital"
+    }
+  },
+  {
+    "code": "HAVFORSK",
+    "name": {
+      "nb": "Havforskningsinstituttet",
+      "en": "Institute of Marine Research"
+    }
+  },
+  {
+    "code": "HBB",
+    "name": {
+      "nb": "Høgskolen Betanien",
+      "en": "Betanien Deaconal University College"
+    }
+  },
+  {
+    "code": "HDH",
+    "name": {
+      "nb": "Haraldsplass diakonale høgskole",
+      "en": "Bergen Deaconess University College"
+    }
+  },
+  {
+    "code": "HDI",
+    "name": {
+      "nb": "Helsedirektoratet",
+      "en": "Norwegian Directorate of Healt"
+    }
+  },
+  {
+    "code": "HEALTHCARE",
+    "name": {
+      "nb": "Helse- og omsorgsdepartementet",
+      "en": "Ministry of Health and Care Services"
+    }
+  },
+  {
+    "code": "HEDMARKCOUNTY",
+    "name": {
+      "nb": "Hedmark fylkeskommune",
+      "nn": "Hedmark fylkeskommune",
+      "en": "Hedmark county"
+    }
+  },
+  {
+    "code": "HELGELANDKRAFT",
+    "name": {
+      "nb": "Helgeland Kraft AS",
+      "en": "Helgeland Kraft AS"
+    }
+  },
+  {
+    "code": "HELSEFONDEN",
+    "name": {
+      "nb": "Helsefonden (Danmark)",
+      "en": "The Health Foundation (Denmark)"
+    }
+  },
+  {
+    "code": "HELSEFONNA",
+    "name": {
+      "nb": "Helse Fonna HF",
+      "en": "District General Hospital of Fonna"
+    }
+  },
+  {
+    "code": "HELSEFØRDE",
+    "name": {
+      "nb": "Helse Førde HF",
+      "en": "Førde Hospital Trust"
+    }
+  },
+  {
+    "code": "HELSEHELG",
+    "name": {
+      "nb": "Helgelandssykehuset ",
+      "en": "Helgeland Hospital"
+    }
+  },
+  {
+    "code": "HELSEMIDT",
+    "name": {
+      "nb": "Helse Midt-Norge",
+      "en": "Central Norway Regional Health Authority"
+    }
+  },
+  {
+    "code": "HELSEMIDTNORGENTNU",
+    "name": {
+      "nb": "Samarbeidsorganet mellom Helse Midt-Norge og NTNU",
+      "en": "Liaison Committee between the Central Norway Regional health Authority (RHA) and the Norwegian University of Science and Technology (NTNU)"
+    }
+  },
+  {
+    "code": "HF",
+    "name": {
+      "nb": "Helseforetak",
+      "en": "Health Enterprise"
+    }
+  },
+  {
+    "code": "HFI",
+    "name": {
+      "nb": "Helse Finnmark HF ",
+      "en": "Finnmark Hospital Trust"
+    }
+  },
+  {
+    "code": "HIAK",
+    "name": {
+      "nb": "Høgskolen i Akershus",
+      "en": "Akerhus University College"
+    }
+  },
+  {
+    "code": "HIALS",
+    "name": {
+      "nb": "Høgskolen i Ålesund",
+      "en": "Ålesund University College"
+    }
+  },
+  {
+    "code": "HIB",
+    "name": {
+      "nb": "Høgskolen i Bergen",
+      "en": "Bergen Univeristy College"
+    }
+  },
+  {
+    "code": "HIBU",
+    "name": {
+      "nb": "Høgskolen i Buskerud",
+      "en": "Buskerud University College"
+    }
+  },
+  {
+    "code": "HIF",
+    "name": {
+      "nb": "Høgskolen i Finnmark",
+      "en": "Finmark University College"
+    }
+  },
+  {
+    "code": "HIG",
+    "name": {
+      "nb": "Høgskolen i Gjøvik",
+      "en": "Gjøvik University College"
+    }
+  },
+  {
+    "code": "HIH",
+    "name": {
+      "nb": "Høgskolen i Harstad",
+      "en": "Harstad University College"
+    }
+  },
+  {
+    "code": "HIHM",
+    "name": {
+      "nb": "Høgskolen i Hedmark",
+      "en": "Hedmark University College"
+    }
+  },
+  {
+    "code": "HIL",
+    "name": {
+      "nb": "Høgskolen i Lillehammer",
+      "en": "Lillehammer University College"
+    }
+  },
+  {
+    "code": "HIM",
+    "name": {
+      "nb": "Høgskolen i Molde - Vitenskapelig høgskole i logistikk",
+      "en": "Molde University College - Specialized University in Logistics"
+    }
+  },
+  {
+    "code": "HIN",
+    "name": {
+      "nb": "Høgskolen i Narvik",
+      "en": "Narvik University College"
+    }
+  },
+  {
+    "code": "HINE",
+    "name": {
+      "nb": "Høgskolen i Nesna",
+      "en": "Nesna University College"
+    }
+  },
+  {
+    "code": "HINT",
+    "name": {
+      "nb": "Høgskolen i Nord-Trøndelag",
+      "en": "Nord-Trøndelag University College"
+    }
+  },
+  {
+    "code": "HIO",
+    "name": {
+      "nb": "OsloMet - storbyuniversitetet",
+      "en": "Oslo Metropolitan University"
+    }
+  },
+  {
+    "code": "HIOA",
+    "name": {
+      "nb": "Høgskolen i Oslo og Akershus",
+      "en": "Oslo and Akershus University College of Applied Sciences"
+    }
+  },
+  {
+    "code": "HIOF",
+    "name": {
+      "nb": "Høgskolen i Østfold",
+      "en": "Østfold University College"
+    }
+  },
+  {
+    "code": "HIS",
+    "name": {
+      "nb": "Høgskolen i Staffeldtsgate",
+      "en": "Staffeldtgate University College"
+    }
+  },
+  {
+    "code": "HIST",
+    "name": {
+      "nb": "Høgskolen i Sør-Trøndelag",
+      "en": "Sør Trøndelag University College"
+    }
+  },
+  {
+    "code": "HIT",
+    "name": {
+      "nb": "Høgskolen i Telemark",
+      "en": "Telemark University College"
+    }
+  },
+  {
+    "code": "HIVE",
+    "name": {
+      "nb": "Høgskolen i Vestfold",
+      "en": "Vestfold Univeristy College"
+    }
+  },
+  {
+    "code": "HK-DIR",
+    "name": {
+      "nb": "HK-dir - Direktoratet for høyere utdanning og kompetanse",
+      "en": "Norwegian Directorate for Higher Education and Skills"
+    }
+  },
+  {
+    "code": "HLB",
+    "name": {
+      "nb": "Høgskulen for landbruk og bygdenæringar",
+      "en": "The Norwegian University College for Agriculture and Rural Development"
+    }
+  },
+  {
+    "code": "HLT",
+    "name": {
+      "nb": "Høyskolen for Ledelse og Teologi",
+      "en": "Norwegian School of Leadership and Theology"
+    }
+  },
+  {
+    "code": "HMR",
+    "name": {
+      "nb": "Helse Møre og Romsdal HF",
+      "en": "Møre og Romsdal Hopital Trust"
+    }
+  },
+  {
+    "code": "HN",
+    "name": {
+      "nb": "Helse Nord RHF",
+      "en": "Northern Norway Regional Health Authority"
+    }
+  },
+  {
+    "code": "HNR",
+    "name": {
+      "nb": "Helse Nordmøre og Romsdal HF",
+      "en": "The Nordmøre and Romsdal Hospital Trust"
+    }
+  },
+  {
+    "code": "HNT",
+    "name": {
+      "nb": "Helse Nord-Trøndelag HF ",
+      "en": "Nord Trondelag Hospital Trust"
+    }
+  },
+  {
+    "code": "HORDALAND",
+    "name": {
+      "nb": "Hordaland fylkeskommune",
+      "nn": "Hordaland fylkeskommune",
+      "en": "Hordaland County Council"
+    }
+  },
+  {
+    "code": "HR",
+    "name": {
+      "nb": "Helse og rehabilitering",
+      "en": "Health and Rehabilitation"
+    }
+  },
+  {
+    "code": "HSF",
+    "name": {
+      "nb": "Høgskulen i Sogn og Fjordane",
+      "nn": "Høgskulen i Sogn og Fjordane",
+      "en": "Sogn og Fjordane University college"
+    }
+  },
+  {
+    "code": "HSH",
+    "name": {
+      "nb": "Høgskolen Stord/Haugesund",
+      "en": "Stord/Haugesund University college"
+    }
+  },
+  {
+    "code": "HSM",
+    "name": {
+      "nb": "Helse Sunnmøre HF",
+      "en": "Helse Sunnmøre HF"
+    }
+  },
+  {
+    "code": "HSØ",
+    "name": {
+      "nb": "Helse Sør-Øst RHF",
+      "en": "South-Eastern Norway Regional Health Authority"
+    }
+  },
+  {
+    "code": "HUSBANKEN",
+    "name": {
+      "nb": "Husbanken",
+      "en": "Norwegian State Housing Bank"
+    }
+  },
+  {
+    "code": "HV",
+    "name": {
+      "nb": "Helse Vest RHF",
+      "en": "Western Norway Regional Health Authority"
+    }
+  },
+  {
+    "code": "HVE",
+    "name": {
+      "nb": "Høgskulen på Vestlandet",
+      "en": " Western Norway University of Applied Sciences"
+    }
+  },
+  {
+    "code": "HVO",
+    "name": {
+      "nb": "Høgskulen i Volda",
+      "en": "Volda University College"
+    }
+  },
+  {
+    "code": "HVPRIVATE",
+    "name": {
+      "nb": "Private ideelle i Helse Vest",
+      "en": "Private Foundation Trusts in Western Norway"
+    }
+  },
+  {
+    "code": "HYDRO",
+    "name": {
+      "nb": "Norsk Hydro",
+      "en": "Hydro"
+    }
+  },
+  {
+    "code": "IF",
+    "name": {
+      "nb": "Internasjonale organisasjoner",
+      "en": "International organizations"
+    }
+  },
+  {
+    "code": "IFE",
+    "name": {
+      "nb": "Institutt for energiteknikk",
+      "en": "Institute for Energy Technology"
+    }
+  },
+  {
+    "code": "IG",
+    "name": {
+      "nb": "Internasjonale gaver",
+      "en": "Internasjonale gaver"
+    }
+  },
+  {
+    "code": "II",
+    "name": {
+      "nb": "Internasjonale institusjoner",
+      "en": "International institutuions"
+    }
+  },
+  {
+    "code": "IMDI",
+    "name": {
+      "nb": "Integrerings- og mangfoldsdirektoratet (IMDi) ",
+      "en": "The Directorate of Integration and Diversity (IMDi)"
+    }
+  },
+  {
+    "code": "IN",
+    "name": {
+      "nb": "Innovasjon Norge",
+      "en": "Innovation Norway"
+    }
+  },
+  {
+    "code": "INN",
+    "name": {
+      "nb": "Høgskolen i Innlandet",
+      "en": "Inland Norway University of Applied Sciences"
+    }
+  },
+  {
+    "code": "INTERREG",
+    "name": {
+      "nb": "Interreg",
+      "nn": "Interreg",
+      "en": "Interreg"
+    }
+  },
+  {
+    "code": "IOR",
+    "name": {
+      "nb": "IOR-senteret - økt oljeutvinning",
+      "en": "The National IOR Centre of Norway"
+    }
+  },
+  {
+    "code": "IRIS",
+    "name": {
+      "nb": "International Research Institute of Stavanger",
+      "en": "International Research Institute of Stavanger"
+    }
+  },
+  {
+    "code": "ISF",
+    "name": {
+      "nb": "Institutt for samfunnsforskning",
+      "en": "Institute for Social Research"
+    }
+  },
+  {
+    "code": "IVA",
+    "name": {
+      "nb": "Kungliga Ingenjörsvetenskapsakademien (IVA)",
+      "en": "The Royal Swedish Academy of Engineering Sciences (IVA)"
+    }
+  },
+  {
+    "code": "JA",
+    "name": {
+      "nb": "Norsk: Forskningsmidler over jordbruksavtalen",
+      "en": "Engelsk: Agricultural Agreement Research Funds"
+    }
+  },
+  {
+    "code": "JACOBFOUND",
+    "name": {
+      "nb": "Jacobs Foundation",
+      "nn": "Jacobs Foundation",
+      "en": "Jacobs Foundation"
+    }
+  },
+  {
+    "code": "JAHRE",
+    "name": {
+      "nb": "Anders Jahres humanitære stiftelse",
+      "nn": "Anders Jahres humanitære stiftelse",
+      "en": "Anders Jahres humanitære stiftelse"
+    }
+  },
+  {
+    "code": "JOHANSSON",
+    "name": {
+      "nb": "Joh. Johansson",
+      "en": "Joh. Johansson"
+    }
+  },
+  {
+    "code": "JORDBRUKSAVTALEN",
+    "name": {
+      "nb": "Jordbruksavtalen",
+      "en": "Agricultural Agreement"
+    }
+  },
+  {
+    "code": "JST",
+    "name": {
+      "nb": "Japan Science and Technology Agency (JST)",
+      "en": "Japan Science and Technology Agency (JST)"
+    }
+  },
+  {
+    "code": "JUSTICE",
+    "name": {
+      "nb": "Justis- og beredskapsdepartementet",
+      "en": "The Ministry of Justice and Public Security"
+    }
+  },
+  {
+    "code": "KANVASFOND",
+    "name": {
+      "nb": "Stiftelsen Kanvas",
+      "en": "Kanvas Foundation"
+    }
+  },
+  {
+    "code": "KAVLI",
+    "name": {
+      "nb": "Kavli Foundation",
+      "nn": "Kavli Foundation",
+      "en": "Kavli Foundation"
+    }
+  },
+  {
+    "code": "KBN",
+    "name": {
+      "nb": "KBN Kommunalbanken",
+      "en": "KBN Komunnalbanken Norway"
+    }
+  },
+  {
+    "code": "KEGA",
+    "name": {
+      "nb": "Cultural and Educational Grant Agency of the Ministry of Education, Science, Research and Sport of the Slovak Republic ",
+      "en": "Cultural and Educational Grant Agency of the Ministry of Education, Science, Research and Sport of the Slovak Republic "
+    }
+  },
+  {
+    "code": "KF",
+    "name": {
+      "nb": "Kreftforeningen",
+      "en": "Norwegian Cancer Society"
+    }
+  },
+  {
+    "code": "KHIO",
+    "name": {
+      "nb": "Kunsthøgskolen i Oslo",
+      "en": "Oslo National Academy of the Arts"
+    }
+  },
+  {
+    "code": "KONGSBERGGROUP",
+    "name": {
+      "nb": "Kongsberg Gruppen",
+      "en": "Kongsberg Group"
+    }
+  },
+  {
+    "code": "KONKURRANSE",
+    "name": {
+      "nb": "Konkurransetilsynet",
+      "en": "The Competition Authority"
+    }
+  },
+  {
+    "code": "KOPINOR",
+    "name": {
+      "nb": "Kopinor",
+      "en": "Kopinor"
+    }
+  },
+  {
+    "code": "KORO",
+    "name": {
+      "nb": "KORO - Kunst i offentlige rom",
+      "en": "Public Art Norway (KORO) "
+    }
+  },
+  {
+    "code": "KRUS",
+    "name": {
+      "nb": "Kriminalomsorgens utdanningssenter, Forskningsavdelingen",
+      "en": "Correctional Service of Norway Staff Academy, Department for Research"
+    }
+  },
+  {
+    "code": "KS",
+    "name": {
+      "nb": "KS - Kommunesektorens organisasjon",
+      "en": "The Norwegian Association of Local and Regional Authorities (KS)"
+    }
+  },
+  {
+    "code": "KUC",
+    "name": {
+      "nb": "Høyskolen Kristiania",
+      "en": "Kristiania University College"
+    }
+  },
+  {
+    "code": "KUNSTFOND",
+    "name": {
+      "nb": "Statens kunstnerstipend",
+      "en": "Government Grants for Artists"
+    }
+  },
+  {
+    "code": "LABOUR&SOCIALAFFAIRS",
+    "name": {
+      "nb": "Arbeids- og sosialdepartementet",
+      "en": "Ministry of Labour and Social Affairs"
+    }
+  },
+  {
+    "code": "LDH",
+    "name": {
+      "nb": "Lovisenberg diakonale høgskole",
+      "en": "Lovisenberg Deaconal University College"
+    }
+  },
+  {
+    "code": "LDS",
+    "name": {
+      "nb": "Lovisenberg Diakonale Sykehus",
+      "en": "Lovisenberg Diakonale Hospital"
+    }
+  },
+  {
+    "code": "LEVERHULME",
+    "name": {
+      "nb": "The Leverhulme Trust",
+      "en": "The Leverhulme Trust"
+    }
+  },
+  {
+    "code": "LF",
+    "name": {
+      "nb": "The Laerdal Foundation",
+      "nn": "The Laerdal Foundation",
+      "en": "The Laerdal Foundation"
+    }
+  },
+  {
+    "code": "LHL",
+    "name": {
+      "nb": "LHL helse",
+      "en": "LHL-clinics"
+    }
+  },
+  {
+    "code": "LILLEHAMMERMUNIC",
+    "name": {
+      "nb": "Lillehammer kommune",
+      "en": "Lillehammer municipality"
+    }
+  },
+  {
+    "code": "LM",
+    "name": {
+      "nb": "Legemiddelfirma",
+      "en": "Pharmaceutical company"
+    }
+  },
+  {
+    "code": "LO",
+    "name": {
+      "nb": "Landsorganisasjonen i Norge (LO)",
+      "en": "The Norwegian Confederation of Trade Unions (LO)"
+    }
+  },
+  {
+    "code": "LOCALGOV",
+    "name": {
+      "nb": "Kommunal- og moderniseringsdepartementet",
+      "en": "Ministry of Local Government and Modernisation"
+    }
+  },
+  {
+    "code": "LS",
+    "name": {
+      "nb": "Legater/Stiftelser",
+      "en": "Endowments and foundations"
+    }
+  },
+  {
+    "code": "LUNDIN",
+    "name": {
+      "nb": "Lundin Norway",
+      "nn": "Lundin Norway",
+      "en": "Lundin Norway"
+    }
+  },
+  {
+    "code": "LYSEEL",
+    "name": {
+      "nb": "Lyse Elnett AS",
+      "en": "Lyse Elnett AS"
+    }
+  },
+  {
+    "code": "LÅNEKASSA",
+    "name": {
+      "nb": "Statens lånekasse for utdanning",
+      "en": "Norwegian State Educational Loan Fund"
+    }
+  },
+  {
+    "code": "MABIT",
+    "name": {
+      "nb": "MABIT",
+      "en": "MABIT"
+    }
+  },
+  {
+    "code": "MARINTEK",
+    "name": {
+      "nb": "MARINTEK",
+      "en": "MARINTEK"
+    }
+  },
+  {
+    "code": "MAROFF",
+    "name": {
+      "nb": "Maritim virksomhet og offshore operasjoner",
+      "en": "Maritime Activities and Offshore Operations (MAROFF)"
+    }
+  },
+  {
+    "code": "MCES",
+    "name": {
+      "nb": "Barne-, likestillings- og inkluderingsdepartementet",
+      "en": "The Ministry og Children, Equality and Social Inclusion"
+    }
+  },
+  {
+    "code": "MF",
+    "name": {
+      "nb": "MF vitenskapelig høyskole for teologi, religion og samfunn",
+      "en": "MF Norwegian School of Theology, Religion and Society"
+    }
+  },
+  {
+    "code": "MHG",
+    "name": {
+      "nb": "Mediehøgskolen Gimlekollen",
+      "en": "Gimlekollen School og Journalism and Communication"
+    }
+  },
+  {
+    "code": "MHH",
+    "name": {
+      "nb": "Martina Hansens Hospital",
+      "en": "Martina Hansens Hospital"
+    }
+  },
+  {
+    "code": "MHS",
+    "name": {
+      "nb": "Misjonshøgskolen",
+      "en": "School of Mission and Theology"
+    }
+  },
+  {
+    "code": "MI",
+    "name": {
+      "nb": "Meteorologisk institutt",
+      "en": "The Norwegian Meteorological Institute"
+    }
+  },
+  {
+    "code": "MICINN",
+    "name": {
+      "nb": "Ministerio de Ciencia e Innovación (MICINN)",
+      "en": "Spanish Ministry of Science and Innovation"
+    }
+  },
+  {
+    "code": "MIDTNORSKFILM",
+    "name": {
+      "nb": "Midtnorsk Filmsenter",
+      "en": "Midtnorsk Filmsenter"
+    }
+  },
+  {
+    "code": "MILJØDIR",
+    "name": {
+      "nb": "Miljødirektoratet",
+      "en": "Norwegian Environment Agency"
+    }
+  },
+  {
+    "code": "MIN-EDU-SLOVAK",
+    "name": {
+      "nb": "The Ministry of Education, Science, Research and Sport of the Slovak Republic",
+      "en": "The Ministry of Education, Science, Research and Sport of the Slovak Republic"
+    }
+  },
+  {
+    "code": "MIT",
+    "name": {
+      "nb": "MIT Sloan School of Management",
+      "en": "MIT Sloan School of Management"
+    }
+  },
+  {
+    "code": "MNEMONIC",
+    "name": {
+      "nb": "Mnemonic AS",
+      "en": "Mnemonic AS"
+    }
+  },
+  {
+    "code": "MOD",
+    "name": {
+      "nb": "Forsvarsdepartementet",
+      "en": "Ministry of Defence"
+    }
+  },
+  {
+    "code": "MODUM",
+    "name": {
+      "nb": "Modum Bad",
+      "en": "Modum Mental Health Centre"
+    }
+  },
+  {
+    "code": "MOONSHOT",
+    "name": {
+      "nb": "Moonshot R&D",
+      "en": "Moonshot R&D"
+    }
+  },
+  {
+    "code": "MRRF",
+    "name": {
+      "nb": "Møreforskning",
+      "en": "Møre og Romsdal Research Foundation"
+    }
+  },
+  {
+    "code": "MUSIKKNARRAD",
+    "name": {
+      "nb": "Musikkbransjens næringsråd",
+      "en": "Musikkbransjens næringsråd"
+    }
+  },
+  {
+    "code": "NABP",
+    "name": {
+      "nb": "Norges blindeforbund",
+      "en": "The Norwegian Association of the Blind and Partially Sighted"
+    }
+  },
+  {
+    "code": "NAFVA",
+    "name": {
+      "nb": "Forsvarets veterantjeneste",
+      "en": "Norwegian Armed Forces Veterans Affairs"
+    }
+  },
+  {
+    "code": "NASA",
+    "name": {
+      "nb": "NASA National Aeronautics and Space Administration",
+      "en": "NASA National Aeronautics and Space Administration"
+    }
+  },
+  {
+    "code": "NATARCHIVAL",
+    "name": {
+      "nb": "Arkivverket - Riksarkivet og statsarkivene",
+      "en": "The National Archival Services of Norway"
+    }
+  },
+  {
+    "code": "NATHEALTH",
+    "name": {
+      "nb": "Helsedepartementet",
+      "en": "National Health"
+    }
+  },
+  {
+    "code": "NATSCIFOUND",
+    "name": {
+      "nb": "National Science Foundation",
+      "en": "National Science Foundation"
+    }
+  },
+  {
+    "code": "NAV",
+    "name": {
+      "nb": "NAV",
+      "nn": "NAV",
+      "en": "NAV"
+    }
+  },
+  {
+    "code": "NB",
+    "name": {
+      "nb": "Nasjonalbiblioteket",
+      "nn": "Nasjonalbiblioteket",
+      "en": "The National Library of Norway"
+    }
+  },
+  {
+    "code": "NBANK",
+    "name": {
+      "nb": "Norges Bank",
+      "en": "Norges Bank - The central bank of Norway"
+    }
+  },
+  {
+    "code": "NBBL",
+    "name": {
+      "nb": "Norsk Boligbyggelag – NBBL",
+      "en": "The Co-operative Housing Federation of Norway (NBBL)"
+    }
+  },
+  {
+    "code": "NC-SPECTRUM",
+    "name": {
+      "nb": "NC-Spectrum AS",
+      "en": "NC-Spectrum AS"
+    }
+  },
+  {
+    "code": "NCI",
+    "name": {
+      "nb": "NCI",
+      "en": "NCI"
+    }
+  },
+  {
+    "code": "NCOA",
+    "name": {
+      "nb": "Norsk senter for økologisk landbruk",
+      "en": "Norwegian Centre for Organic Agriculture"
+    }
+  },
+  {
+    "code": "NDH",
+    "name": {
+      "nb": "Norges Dansehøyskole",
+      "en": "The Norwegian College of Dance"
+    }
+  },
+  {
+    "code": "NEPTUNENERGY",
+    "name": {
+      "nb": "Neptun Energy",
+      "en": "Neptun Energy"
+    }
+  },
+  {
+    "code": "NERC",
+    "name": {
+      "nb": "Natural Environment Research Council",
+      "en": "Natural Environment Research Council"
+    }
+  },
+  {
+    "code": "NERSC",
+    "name": {
+      "nb": "Nansen Senter for Miljø og Fjernmåling",
+      "en": "Nansen Environmental and Remote Sensing Center"
+    }
+  },
+  {
+    "code": "NF",
+    "name": {
+      "nb": "Nordlandsforskning",
+      "en": "Nordland Research Foundation"
+    }
+  },
+  {
+    "code": "NFF",
+    "name": {
+      "nb": "Norsk faglitterær forfatter- og oversetterforening (NFF)",
+      "en": "The Norwegian Non-fiction Writers And Translators Association"
+    }
+  },
+  {
+    "code": "NFI",
+    "name": {
+      "nb": "Norsk Filminstitutt (NFI)",
+      "en": "Norsk Filminstitutt (NFI)"
+    }
+  },
+  {
+    "code": "NGI",
+    "name": {
+      "nb": "Norges Geotekniske Institutt",
+      "en": "Norwegian Geotechnical Institute"
+    }
+  },
+  {
+    "code": "NGU",
+    "name": {
+      "nb": "Norges geologiske undersøkelse",
+      "en": "Geological Survey of Norway"
+    }
+  },
+  {
+    "code": "NHH",
+    "name": {
+      "nb": "Norges Handelshøyskole",
+      "en": "Norwegian School of Economics and Business Administration"
+    }
+  },
+  {
+    "code": "NHO",
+    "name": {
+      "nb": "Næringslivets Hovedorganisasjon",
+      "en": "The Confederation of Norwegian Enterprise"
+    }
+  },
+  {
+    "code": "NIBIO",
+    "name": {
+      "nb": "NIBIO - Norsk institutt for bioøkonomi",
+      "en": "Norwegiajn Institute of Bioeconomy Research"
+    }
+  },
+  {
+    "code": "NIBR",
+    "name": {
+      "nb": "Norsk institutt for by- og regionforskning",
+      "en": "Norwegian Institute for Urban and Regional Research"
+    }
+  },
+  {
+    "code": "NIFES",
+    "name": {
+      "nb": "Nasjonalt institutt for ernærings- og sjømatforskning",
+      "en": "National Institute of Nutrition and Seafood Research"
+    }
+  },
+  {
+    "code": "NIFU",
+    "name": {
+      "nb": "NIFU",
+      "en": "NIFU Nordic Institute for Studies in Innovation, Research and Education"
+    }
+  },
+  {
+    "code": "NIH",
+    "name": {
+      "nb": "Norges Idrettshøgskole",
+      "en": "Norwegian School of Sport Sciences"
+    }
+  },
+  {
+    "code": "NIHE",
+    "name": {
+      "nb": "National Institutes of Health",
+      "en": "National Institutes of Health"
+    }
+  },
+  {
+    "code": "NIKU",
+    "name": {
+      "nb": "Norsk institutt for kulturminneforskning",
+      "en": "The Norwegian Institute for Cultural Heritage Research"
+    }
+  },
+  {
+    "code": "NILF",
+    "name": {
+      "nb": "Norsk institutt for landbruksøkonomisk forskning",
+      "en": "Norwegian Agricultural Economics Research Institute"
+    }
+  },
+  {
+    "code": "NILS",
+    "name": {
+      "nb": "NILS Science and Sustainability",
+      "en": "NILS Science and Sustainability"
+    }
+  },
+  {
+    "code": "NILU",
+    "name": {
+      "nb": "NILU - Norsk institutt for luftforskning",
+      "en": "Norwegian Institute for Air Research"
+    }
+  },
+  {
+    "code": "NINA",
+    "name": {
+      "nb": "Norsk institutt for naturforskning",
+      "en": "Norwegian Institute for Nature Research"
+    }
+  },
+  {
+    "code": "NINDUSTRI",
+    "name": {
+      "nb": "Norsk Industri",
+      "en": "The Federation of Norwegian Industries"
+    }
+  },
+  {
+    "code": "NIOM",
+    "name": {
+      "nb": "Nordisk Institutt for Odontologiske Materialer AS",
+      "en": "Nordic Institute of Dental Materials"
+    }
+  },
+  {
+    "code": "NISL",
+    "name": {
+      "nb": "Norsk institutt for skog og landskap",
+      "en": "Norwegian Forest and Landscape Institute"
+    }
+  },
+  {
+    "code": "NITH",
+    "name": {
+      "nb": "Norges Informasjonsteknologiske Høgskole",
+      "en": "Norwegian School of Information Technology"
+    }
+  },
+  {
+    "code": "NIVA",
+    "name": {
+      "nb": "Norsk institutt for vannforskning",
+      "en": "Norwegian Institute of Water Research"
+    }
+  },
+  {
+    "code": "NKF",
+    "name": {
+      "nb": "Norsk Kulturfond",
+      "en": "Norsk Kulturfond"
+    }
+  },
+  {
+    "code": "NKS",
+    "name": {
+      "nb": "Norske kvinners sanitetsforening",
+      "en": "Norwegian Women's Public Health Association"
+    }
+  },
+  {
+    "code": "NKS-NNSR",
+    "name": {
+      "nb": "NKS - Nordic Nuclear Safety Research",
+      "en": "NKS - Nordic Nuclear Safety Research"
+    }
+  },
+  {
+    "code": "NKVTS",
+    "name": {
+      "nb": "Nasjonalt kunnskapssenter om vold og traumatisk stress",
+      "en": "Norwegian Center for Studies on Violence and Traumatic Stress"
+    }
+  },
+  {
+    "code": "NL",
+    "name": {
+      "nb": "Næringsliv",
+      "en": "Business"
+    }
+  },
+  {
+    "code": "NLAH",
+    "name": {
+      "nb": "NLA Høgskolen",
+      "en": "NLA School of Religion, Education and Intercultural Studies"
+    }
+  },
+  {
+    "code": "NLF",
+    "name": {
+      "nb": "Norges landbruksvitenskapelige forskningsråd",
+      "en": "Agricultural Scientific Research Council"
+    }
+  },
+  {
+    "code": "NLSH",
+    "name": {
+      "nb": "Nordlandssykehuset",
+      "en": "Nordland Hospital Trust"
+    }
+  },
+  {
+    "code": "NM",
+    "name": {
+      "nb": "Nordisk ministerråd",
+      "en": "The Nordic Council of Ministers"
+    }
+  },
+  {
+    "code": "NMA",
+    "name": {
+      "nb": "Legeforeningen",
+      "en": "The Norwegian Medical Association (NMA)"
+    }
+  },
+  {
+    "code": "NMBU",
+    "name": {
+      "nb": "NMBU - Norges miljø- og biovitenskapelige universitet",
+      "en": "NMBU - Norwegian University of Life Sciences"
+    }
+  },
+  {
+    "code": "NMH",
+    "name": {
+      "nb": "Norges musikkhøgskole",
+      "en": "Norwegian State Academy of Music"
+    }
+  },
+  {
+    "code": "NMK",
+    "name": {
+      "nb": "Nasjonalmuseet for kunst, arkitektur og design",
+      "en": "The National Museum of Art, Architecture and Design"
+    }
+  },
+  {
+    "code": "NMR",
+    "name": {
+      "nb": "Norsk Musikkråd",
+      "en": "Norsk Musikkråd"
+    }
+  },
+  {
+    "code": "NOFIMA",
+    "name": {
+      "nb": "Nofima AS",
+      "en": "Nofima AS"
+    }
+  },
+  {
+    "code": "NOKC",
+    "name": {
+      "nb": "Nasjonalt kunnskapssenter for helsetjenesten",
+      "en": "Norwegian Knowledge Centre for the Health Services"
+    }
+  },
+  {
+    "code": "NOKUT",
+    "name": {
+      "nb": "NOKUT (Nasjonalt organ for kvalitet i utdanningen)",
+      "en": "NOKUT"
+    }
+  },
+  {
+    "code": "NORAD",
+    "name": {
+      "nb": "NORAD, direktoratet for utviklingssamarbeid",
+      "en": "The Norwegian Agency for Development Cooperation"
+    }
+  },
+  {
+    "code": "NORAGRAGENCY",
+    "name": {
+      "nb": "Landbruksdirektoratet",
+      "en": "Norwegian Agriculture Agency"
+    }
+  },
+  {
+    "code": "NORCE",
+    "name": {
+      "nb": "NORCE Norwegian Research Centre AS",
+      "en": "NORCE Norwegian Research Centre AS"
+    }
+  },
+  {
+    "code": "NORD",
+    "name": {
+      "nb": "Nord Universitet",
+      "en": "Nord University"
+    }
+  },
+  {
+    "code": "NORDFORSK",
+    "name": {
+      "nb": "Nordforsk",
+      "en": "Nordforsk"
+    }
+  },
+  {
+    "code": "NORDICCOUNCIL",
+    "name": {
+      "nb": "Nordisk Råd",
+      "en": "The Nordic Council"
+    }
+  },
+  {
+    "code": "NORDISKENERGIFORSK",
+    "name": {
+      "nb": "Nordisk Energiforskning",
+      "en": "Nordic Energy Research"
+    }
+  },
+  {
+    "code": "NORDISKFILM",
+    "name": {
+      "nb": "Nordisk Film & TV Fond",
+      "en": "Nordisk Film & TV Fond"
+    }
+  },
+  {
+    "code": "NORDLANDCOUNTY",
+    "name": {
+      "nb": "Nordland fylkeskommune",
+      "nn": "Nordland fylkeskommune",
+      "en": "Nordland county"
+    }
+  },
+  {
+    "code": "NORDNORSKFILM",
+    "name": {
+      "nb": "Nordnorsk Filmsenter",
+      "en": "Nordnorsk Filmsenter"
+    }
+  },
+  {
+    "code": "NORDPLUS",
+    "name": {
+      "nb": "Nordplus",
+      "nn": "Nordplus",
+      "en": "Nordplus"
+    }
+  },
+  {
+    "code": "NORHED",
+    "name": {
+      "nb": "NORHED",
+      "en": "NORHED"
+    }
+  },
+  {
+    "code": "NORPHYSASS",
+    "name": {
+      "nb": "Norsk fysioterapeutforbund",
+      "en": "Norwegian Physiotherapist Association"
+    }
+  },
+  {
+    "code": "NORSAR",
+    "name": {
+      "nb": "NORSAR",
+      "en": "NORSAR - The Norwegian Seismic Array"
+    }
+  },
+  {
+    "code": "NORSIS",
+    "name": {
+      "nb": "Norsk senter for informasjonssikring",
+      "en": "The Norwegian Center for Information Security"
+    }
+  },
+  {
+    "code": "NORSKFILM",
+    "name": {
+      "nb": "Norsk Filmforbund",
+      "en": "Norsk Filmforbund"
+    }
+  },
+  {
+    "code": "NORSKKOMP",
+    "name": {
+      "nb": "Norsk komponistforbund",
+      "en": "Norsk komponistforbund"
+    }
+  },
+  {
+    "code": "NORSPACE",
+    "name": {
+      "nb": "Norsk romsenter",
+      "en": "Norwegian SPace Agency"
+    }
+  },
+  {
+    "code": "NORTEM",
+    "name": {
+      "nb": "NORTEM",
+      "nn": "NORTEM",
+      "en": "NORTEM"
+    }
+  },
+  {
+    "code": "NORUT",
+    "name": {
+      "nb": "Norut Northern Research Institute AS",
+      "en": "Norut Northern Research Institute AS"
+    }
+  },
+  {
+    "code": "NORUTAL",
+    "name": {
+      "nb": "Northern Research Institute Alta AS ",
+      "en": "Northern Research Institute Alta AS"
+    }
+  },
+  {
+    "code": "NORUTNA",
+    "name": {
+      "nb": "Norut Northern Research Institute Narvik AS",
+      "en": "Norut Northern Research Institute Narvik AS"
+    }
+  },
+  {
+    "code": "NORWAYNAVY",
+    "name": {
+      "nb": "Sjøforsvaret",
+      "en": "The Royal Norwegian Navy"
+    }
+  },
+  {
+    "code": "NORWOCCTHERAPYASS",
+    "name": {
+      "nb": "Norsk ergoterapiforbund",
+      "en": "Norwegian Occupational Therapy Association"
+    }
+  },
+  {
+    "code": "NOS-HS",
+    "name": {
+      "nb": "NOS-HS (Nordisk samarbeidsnemnd for humanistisk og samfunnsvitenskapelig forskning)",
+      "en": "Joint Committee for Nordic research councils in the Humanities and Social Sciences (NOS-HS)"
+    }
+  },
+  {
+    "code": "NOU",
+    "name": {
+      "nb": "Norgesuniversitet",
+      "en": "Norway Opening Universities"
+    }
+  },
+  {
+    "code": "NOVA",
+    "name": {
+      "nb": "NOVA",
+      "en": "NOVA-Norwegian Social Research"
+    }
+  },
+  {
+    "code": "NOVO",
+    "name": {
+      "nb": "Novo Nordisk Fonden",
+      "en": "The Novo Nordisk Foundation"
+    }
+  },
+  {
+    "code": "NPRA",
+    "name": {
+      "nb": "Statens Vegvesen",
+      "en": "The Norwegian Public Roads Administration (NPRA)"
+    }
+  },
+  {
+    "code": "NR",
+    "name": {
+      "nb": "Norsk Regnesentral",
+      "en": "Norwegian Computing Center"
+    }
+  },
+  {
+    "code": "NRADIOGRAF",
+    "name": {
+      "nb": "Norsk Radiografforbund",
+      "en": "The Norwegian Society of Radiographers"
+    }
+  },
+  {
+    "code": "NRC",
+    "name": {
+      "nb": "Røde kors",
+      "en": "The Norwegian Red Cross"
+    }
+  },
+  {
+    "code": "NREF",
+    "name": {
+      "nb": "Handelens miljøfond",
+      "en": "Norwegian Retailsers' Environment Fund"
+    }
+  },
+  {
+    "code": "NSF",
+    "name": {
+      "nb": "Norsk sykepleierforbund",
+      "en": "Norwegian Nurses Organisation"
+    }
+  },
+  {
+    "code": "NSG",
+    "name": {
+      "nb": "Norsk Sau og geiteavlslag",
+      "en": "The Norwegian Association of Sheep and Goat Farmers"
+    }
+  },
+  {
+    "code": "NTNU",
+    "name": {
+      "nb": "Norges teknisk-naturvitenskapelige universitet",
+      "en": "Norwegian University of Science and Technology"
+    }
+  },
+  {
+    "code": "NUPI",
+    "name": {
+      "nb": "Norsk Utenrikspolitisk Institutt",
+      "en": "Norwegian Institute of International Affairs"
+    }
+  },
+  {
+    "code": "NVE",
+    "name": {
+      "nb": "NVE - Norges vassdrags- og energidirektorat",
+      "en": "Norwegian Water Resources and Energy Directorate"
+    }
+  },
+  {
+    "code": "NVH",
+    "name": {
+      "nb": "Norges Veterinærhøgskole",
+      "en": "Norwegian School of Veterinary Science"
+    }
+  },
+  {
+    "code": "OBELFOUND",
+    "name": {
+      "nb": "Det Obelske Familiefond",
+      "nn": "Det Obelske Familiefond",
+      "en": "The Obel Family Foundation"
+    }
+  },
+  {
+    "code": "OLAVIKEN",
+    "name": {
+      "nb": "NKS Olaviken Alderspsykiatriske sykehus",
+      "en": "NKS Olaviken Alderspsykiatriske sykehus"
+    }
+  },
+  {
+    "code": "OLJEGASS",
+    "name": {
+      "nb": "Norsk olje og gass",
+      "en": "The Norwegian Oil and Gas Association"
+    }
+  },
+  {
+    "code": "OLYMPIATOPPEN",
+    "name": {
+      "nb": "Olympiatoppen",
+      "en": "The Norwegian Olympic Sports Centre, Olympiatoppen"
+    }
+  },
+  {
+    "code": "ONR",
+    "name": {
+      "nb": "Office of Naval Research (ONR)",
+      "en": "Office of Naval Research (ONR)"
+    }
+  },
+  {
+    "code": "ONR-GLOBAL",
+    "name": {
+      "nb": "Office of Naval Research - Global (ONR-Global)",
+      "en": "Office of Naval Research - Global (ONR-Global)"
+    }
+  },
+  {
+    "code": "OSLOKOMMUNE",
+    "name": {
+      "nb": "Oslo Kommune",
+      "en": "Oslo municipality"
+    }
+  },
+  {
+    "code": "OSLOPOLICE",
+    "name": {
+      "nb": "Oslo Politidistrikt",
+      "en": "Oslo Police District"
+    }
+  },
+  {
+    "code": "OSLOPORT",
+    "name": {
+      "nb": "Oslo Havn",
+      "en": "Oslo Port"
+    }
+  },
+  {
+    "code": "OSTFSYK",
+    "name": {
+      "nb": "Sykehuset Østfold HF",
+      "en": "Østfold Hospital Trust"
+    }
+  },
+  {
+    "code": "OTHER",
+    "name": {
+      "nb": "Andre",
+      "en": "Other"
+    }
+  },
+  {
+    "code": "OUS",
+    "name": {
+      "nb": "Oslo universitetssykehus HF",
+      "en": "Oslo University Hospital"
+    }
+  },
+  {
+    "code": "PAOFS",
+    "name": {
+      "nb": "Polish Academy of Sciences",
+      "en": "Polish Academy of Sciences"
+    }
+  },
+  {
+    "code": "PEDERSATHER",
+    "name": {
+      "nb": "Peder Sather Center",
+      "en": "Peder Sather Center"
+    }
+  },
+  {
+    "code": "PETRANDENERGY",
+    "name": {
+      "nb": "Olje- og energidepartementet",
+      "en": "Ministry of Petroleum and Energy"
+    }
+  },
+  {
+    "code": "PETROBAS",
+    "name": {
+      "nb": "Petrobras",
+      "en": "Petrobras"
+    }
+  },
+  {
+    "code": "PF",
+    "name": {
+      "nb": "Pasientforening",
+      "en": "Pasientforening"
+    }
+  },
+  {
+    "code": "PFTSEN",
+    "name": {
+      "nb": "Private ideelle i Helse Sør-Øst",
+      "en": "Private Foundation Trust in Southeastern Norway"
+    }
+  },
+  {
+    "code": "PHS",
+    "name": {
+      "nb": "Politihøgskolen",
+      "en": "Norwegian Police University College"
+    }
+  },
+  {
+    "code": "PKU",
+    "name": {
+      "nb": "Program for kunstnerisk utviklingsarbeid",
+      "en": "Norwegian Artistic Research Programme"
+    }
+  },
+  {
+    "code": "PMI",
+    "name": {
+      "nb": "Project Management Institute",
+      "en": "Project Management Institute"
+    }
+  },
+  {
+    "code": "POLARRES",
+    "name": {
+      "nb": "Norsk Polarinstitutt",
+      "en": "Norwegian Polar Research Institute"
+    }
+  },
+  {
+    "code": "POLYCIGRBRANSJE",
+    "name": {
+      "nb": "Policygruppen for bransjekontakt",
+      "en": "Policygruppen for bransjekontakt"
+    }
+  },
+  {
+    "code": "POLYFON",
+    "name": {
+      "nb": "Polyfon kunnskapsklynge for musikkterapi",
+      "en": "Polyfon"
+    }
+  },
+  {
+    "code": "POLYTEC",
+    "name": {
+      "nb": "Polytec",
+      "en": "Polytec"
+    }
+  },
+  {
+    "code": "PRIO",
+    "name": {
+      "nb": "PRIO - Institutt for fredsforskning",
+      "en": "PRIO - Peace Research Institute"
+    }
+  },
+  {
+    "code": "PROSJEKTNORGE",
+    "name": {
+      "nb": "Prosjekt Norge",
+      "en": "Project Norway"
+    }
+  },
+  {
+    "code": "PUBLDENTAL",
+    "name": {
+      "nb": "Tannhelsetjenestens kompetansesentre",
+      "en": "Public Dental Service Competence Centres"
+    }
+  },
+  {
+    "code": "RAM",
+    "name": {
+      "nb": "Rådet for anvendt medieforskning (RAM)",
+      "en": "RAM, Norwegian media authority"
+    }
+  },
+  {
+    "code": "RAMBOLL",
+    "name": {
+      "nb": "Rambøll Management Consulting",
+      "nn": "Rambøll Management Consulting",
+      "en": "Rambøll Management Consulting"
+    }
+  },
+  {
+    "code": "RANNIS",
+    "name": {
+      "nb": "Rannis",
+      "nn": "Rannis",
+      "en": "The Icelandic Centre for Research"
+    }
+  },
+  {
+    "code": "RBUP-ØS",
+    "name": {
+      "nb": "RBUP Øst og Sør",
+      "en": "RBUP Oslo"
+    }
+  },
+  {
+    "code": "REGDRUGWEST",
+    "name": {
+      "nb": "Regionalt Kompetansesenter for rusmiddelforskning i Helse  Vest",
+      "en": "Centre for Alcohol & Drug Research, Stavanger University Hospital"
+    }
+  },
+  {
+    "code": "REPSOL",
+    "name": {
+      "nb": "Repsol Norge",
+      "en": "Repsol Norway"
+    }
+  },
+  {
+    "code": "RES",
+    "name": {
+      "nb": "RES Tirant Supercomputing",
+      "nn": "RES Tirant Supercomputing",
+      "en": "RES Tirant Supercomputing"
+    }
+  },
+  {
+    "code": "RFF-AGDER",
+    "name": {
+      "nb": "Regionale forskningsfond Agder",
+      "en": "Regional research fund Agder"
+    }
+  },
+  {
+    "code": "RFF-HOVEDSTADEN",
+    "name": {
+      "nb": "Regionale forskningsfond Hovedstaden",
+      "en": "Regional research fund Hovedstaden"
+    }
+  },
+  {
+    "code": "RFF-INNLANDET",
+    "name": {
+      "nb": "Regionale forskningsfond Innlandet",
+      "en": "Regional research fund Innlandet"
+    }
+  },
+  {
+    "code": "RFF-MIDT-NORGE",
+    "name": {
+      "nb": "Regionale forskningsfond Midt-Norge",
+      "en": "Regional research fund Midt-Norge"
+    }
+  },
+  {
+    "code": "RFF-NORD-NORGE",
+    "name": {
+      "nb": "Regionale forskningsfond Nord-Norge",
+      "en": "Regional research fund Nord-Norge"
+    }
+  },
+  {
+    "code": "RFF-OSLOFJORDFONDET",
+    "name": {
+      "nb": "Regionale forskningsfond Oslofjordfondet",
+      "en": "Regional research fund Oslofjordfondet"
+    }
+  },
+  {
+    "code": "RFF-VESTLANDET",
+    "name": {
+      "nb": "Regionale forskningsfond Vestlandet",
+      "en": "Regional research fund Vestlandet"
+    }
+  },
+  {
+    "code": "RFF-VF-TEL",
+    "name": {
+      "nb": "Regionale forskningsfond Vestfold og Telemark",
+      "en": "Regional research fund Vestfold and Telemark"
+    }
+  },
+  {
+    "code": "RFF-VIKEN",
+    "name": {
+      "nb": "Regionale forskningsfond Viken",
+      "en": "Regional Research Fund Viken"
+    }
+  },
+  {
+    "code": "RFI",
+    "name": {
+      "nb": "Regionale forskningsfond Innlandet",
+      "en": "Regional Research Fund Innlandet"
+    }
+  },
+  {
+    "code": "RFMR",
+    "name": {
+      "nb": "Regionalt forskningsfond Møre og Romsdal",
+      "en": "Regional Research Fund Møre and Romsdal"
+    }
+  },
+  {
+    "code": "RFPH",
+    "name": {
+      "nb": "Rådet for psykisk helse",
+      "en": "Council for Mental Health"
+    }
+  },
+  {
+    "code": "RFV",
+    "name": {
+      "nb": "Regionalt Forskningsfond - Vestlandet",
+      "en": "Regional Research Fund Western Norway"
+    }
+  },
+  {
+    "code": "RH",
+    "name": {
+      "nb": "Regionalt helseforetak",
+      "en": "Regional Health Authority"
+    }
+  },
+  {
+    "code": "RIKSARKIVAREN",
+    "name": {
+      "nb": "Riksarkivaren",
+      "en": "Directorate for Cultural Heritage"
+    }
+  },
+  {
+    "code": "RIKSREVISJONEN",
+    "name": {
+      "nb": "Riksrevisjonen",
+      "en": "Office of the Auditor General of Norway"
+    }
+  },
+  {
+    "code": "RJ",
+    "name": {
+      "nb": "Riksbankens jubileumsfond (RJ)",
+      "en": "Riksbankens jubileumsfond (RJ)"
+    }
+  },
+  {
+    "code": "RMN",
+    "name": {
+      "nb": "Rusbehandling Midt-Norge HF",
+      "en": "KoRus"
+    }
+  },
+  {
+    "code": "ROMANIANGOV",
+    "name": {
+      "nb": "Romanian Government",
+      "nn": "Romanian Government",
+      "en": "Romanian Government"
+    }
+  },
+  {
+    "code": "RS",
+    "name": {
+      "nb": "Revmatismesykehuset AS",
+      "en": "Hospital for Rheumatic Diseases"
+    }
+  },
+  {
+    "code": "RSH",
+    "name": {
+      "nb": "Rudolf Steinerhøyskolen",
+      "en": "Rudolf Steiner College of Education"
+    }
+  },
+  {
+    "code": "RUKHS",
+    "name": {
+      "nb": "Rådet for utdanning og kompetanseutvikling innen handels- og servicenæringen",
+      "en": "Rådet for utdanning og kompetanseutvikling innen handels- og servicenæringen"
+    }
+  },
+  {
+    "code": "RURALIS",
+    "name": {
+      "nb": "RURALIS – Institutt for rural- og regionalforskning",
+      "en": "RURALIS – Institute for Rural and Regional Research"
+    }
+  },
+  {
+    "code": "SA/SH",
+    "name": {
+      "nb": "Sámi allaskuvla/Samisk høgskole",
+      "en": "Saami University College"
+    }
+  },
+  {
+    "code": "SALMA",
+    "name": {
+      "nb": "Salma",
+      "nn": "Salma",
+      "en": "Salma"
+    }
+  },
+  {
+    "code": "SAMFORSK",
+    "name": {
+      "nb": "NTNU Samfunnsforskning AS",
+      "en": "NTNU Social Research"
+    }
+  },
+  {
+    "code": "SAMFUNNSV",
+    "name": {
+      "nb": "Samfunnsviterne",
+      "en": "The Association of Social Scientists"
+    }
+  },
+  {
+    "code": "SANDEFJORDMUNIC",
+    "name": {
+      "nb": "Sandefjord kommune",
+      "en": "Sandefjord municipality"
+    }
+  },
+  {
+    "code": "SAV",
+    "name": {
+      "nb": "Sjukehusapoteka Vest HF",
+      "en": "Western Norway Hospital Pharmacy Trust"
+    }
+  },
+  {
+    "code": "SAVINGDNB",
+    "name": {
+      "nb": "Sparebankstiftelsen DNB",
+      "en": "The Savings Bank Foundation DNB"
+    }
+  },
+  {
+    "code": "SBN",
+    "name": {
+      "nb": "Senter for byggenæringen (BI)",
+      "en": "Centre for the Construction Industry (BI)"
+    }
+  },
+  {
+    "code": "SEKAL",
+    "name": {
+      "nb": "Sekal",
+      "nn": "Sekal",
+      "en": "Sekal"
+    }
+  },
+  {
+    "code": "SG",
+    "name": {
+      "nb": "Støttegrupper",
+      "en": "Support Groups"
+    }
+  },
+  {
+    "code": "SHARE",
+    "name": {
+      "nb": "SHARE - Centre for Resilience in Healthcare",
+      "nn": "SHARE - Centre for Resilience in Healthcare",
+      "en": "SHARE - Centre for Resilience in Healthcare"
+    }
+  },
+  {
+    "code": "SI",
+    "name": {
+      "nb": "Sykehuset Innlandet HF",
+      "en": "Innlandet Hospital Trust"
+    }
+  },
+  {
+    "code": "SIEMENS",
+    "name": {
+      "nb": "Siemens AS",
+      "en": "Siemens AS"
+    }
+  },
+  {
+    "code": "SIFO",
+    "name": {
+      "nb": "Statens institutt for forbruksforskning",
+      "en": "National Institute for Consumer Research"
+    }
+  },
+  {
+    "code": "SIGMA2",
+    "name": {
+      "nb": "Sigma2",
+      "nn": "Sigma2",
+      "en": "Sigma2"
+    }
+  },
+  {
+    "code": "SIKTU",
+    "name": {
+      "nb": "Senter for IKT i utdanningen",
+      "en": "The Norwegian Centre for ICT in Education"
+    }
+  },
+  {
+    "code": "SIMULA",
+    "name": {
+      "nb": "Simula Research Laboratory",
+      "en": "Simula Research Laboratory"
+    }
+  },
+  {
+    "code": "SINTEF",
+    "name": {
+      "nb": "SINTEF AS",
+      "en": "SINTEF AS"
+    }
+  },
+  {
+    "code": "SINTEFDIG",
+    "name": {
+      "nb": "Sintef Digital",
+      "en": "Sintef Digital"
+    }
+  },
+  {
+    "code": "SINTEFMAN",
+    "name": {
+      "nb": "SINTEF Manufacturing",
+      "en": "SINTEF Manufacturing"
+    }
+  },
+  {
+    "code": "SINTEFOCEAN",
+    "name": {
+      "nb": "SINTEF Ocean",
+      "en": "SINTEF Ocean"
+    }
+  },
+  {
+    "code": "SINTEFPETR",
+    "name": {
+      "nb": "SINTEF Petroleumsforskning AS",
+      "en": "SINTEF Petroleum Research"
+    }
+  },
+  {
+    "code": "SIRUS",
+    "name": {
+      "nb": "Statens institutt for rusmiddelforskning",
+      "en": "Norwegian Institute for Alcohol and Drug Research"
+    }
+  },
+  {
+    "code": "SIU",
+    "name": {
+      "nb": "SiU, Senter for internasjonalisering av utdanning",
+      "en": "Norwegian Centre for International Cooperation in Education"
+    }
+  },
+  {
+    "code": "SIV",
+    "name": {
+      "nb": "Sykehuset i Vestfold HF",
+      "en": "Vestfold Hospital Trust"
+    }
+  },
+  {
+    "code": "SIVA",
+    "name": {
+      "nb": "SIVA",
+      "en": "The Industrial Development Corporation of Norway"
+    }
+  },
+  {
+    "code": "SKF",
+    "name": {
+      "nb": "Sørlandet kompetansefond",
+      "en": "Sørlandet Knowledge Foundation"
+    }
+  },
+  {
+    "code": "SKGJ",
+    "name": {
+      "nb": "Stiftelsen Kristian Gerhard Jebsen",
+      "en": "Stiftelsen Kristian Gerhard Jebsen"
+    }
+  },
+  {
+    "code": "SNF",
+    "name": {
+      "nb": "Samfunns- og næringslivsforskning AS",
+      "en": "Institute for Research in Economics and Business Administration"
+    }
+  },
+  {
+    "code": "SNHF",
+    "name": {
+      "nb": "Sykehusapoteket Nord HF ",
+      "en": "Northern Norway Hospital Pharmacy Trust"
+    }
+  },
+  {
+    "code": "SNSF",
+    "name": {
+      "nb": "Swiss National Science Foundation",
+      "en": "Swiss National Science Foundation"
+    }
+  },
+  {
+    "code": "SOGNFJORDCOUNTY",
+    "name": {
+      "nb": "Sogn og Fjordane Fylkeskommune",
+      "nn": "Sogn og Fjordane Fylkeskommune",
+      "en": "Sogn og Fjordane County Counsil"
+    }
+  },
+  {
+    "code": "SPAREBANK",
+    "name": {
+      "nb": "Sparebankforeningen",
+      "en": "The Norwegian Savings Banks Association"
+    }
+  },
+  {
+    "code": "SPAREBANKSOGNFJORD",
+    "name": {
+      "nb": "Sparebankstiftinga Sogn og Fjordane",
+      "nn": "Sparebankstiftinga Sogn og Fjordane",
+      "en": "Sparebank Foundation Sogn og Fjordane"
+    }
+  },
+  {
+    "code": "SPAREMORE",
+    "name": {
+      "nb": "Sparebanken Møre",
+      "nn": "Sparebanken Møre",
+      "en": "Sparebanken Møre"
+    }
+  },
+  {
+    "code": "SPARESOUTH",
+    "name": {
+      "nb": "Sparebankstiftelsen Sparebanken Sør",
+      "en": "Sparebank Foundation South"
+    }
+  },
+  {
+    "code": "SPEKTER",
+    "name": {
+      "nb": "Spekter",
+      "en": "The Employers’ Association Spekter"
+    }
+  },
+  {
+    "code": "SPRÅKRÅDET",
+    "name": {
+      "nb": "Språkrådet - Norsk språkråd",
+      "en": "The Language Council of Norway"
+    }
+  },
+  {
+    "code": "SSB",
+    "name": {
+      "nb": "Statistisk sentralbyrå",
+      "en": "Statistics Norway"
+    }
+  },
+  {
+    "code": "SSGR",
+    "name": {
+      "nb": "Senter for eierforskning (CCGR)",
+      "en": "Centre for Corporate Governance (CCGR)"
+    }
+  },
+  {
+    "code": "SSHF",
+    "name": {
+      "nb": "Sørlandet sykehus HF",
+      "en": "Sorlandet Hospital"
+    }
+  },
+  {
+    "code": "ST",
+    "name": {
+      "nb": "Stipendier",
+      "en": "Scholarships"
+    }
+  },
+  {
+    "code": "STAMI",
+    "name": {
+      "nb": "Statens arbeidsmiljøinstitutt",
+      "en": "National Institute of Occupational Health"
+    }
+  },
+  {
+    "code": "STATKRAFT",
+    "name": {
+      "nb": "Statkraft",
+      "en": "Statkraft"
+    }
+  },
+  {
+    "code": "STATNETT",
+    "name": {
+      "nb": "Statnett SF",
+      "en": "Statnett SF"
+    }
+  },
+  {
+    "code": "STATPENSJON",
+    "name": {
+      "nb": "Statens pensjonskasse",
+      "en": "The Norwegian Public Service Pension Fund"
+    }
+  },
+  {
+    "code": "STATSKOG",
+    "name": {
+      "nb": "Statsskog SF    Statsskog",
+      "en": "SF - the Norwegian state-owned land and forest enterprise"
+    }
+  },
+  {
+    "code": "STAVMUN",
+    "name": {
+      "nb": "Stavanger kommune",
+      "en": "Stavanger municipality"
+    }
+  },
+  {
+    "code": "STEINER",
+    "name": {
+      "nb": "Steinerhøyskolen",
+      "en": "Steiner College of Education"
+    }
+  },
+  {
+    "code": "STHF",
+    "name": {
+      "nb": "Sykehuset Telemark",
+      "en": "Telemark Hospital"
+    }
+  },
+  {
+    "code": "STO",
+    "name": {
+      "nb": "St Olavs Hospital HF",
+      "en": "St. Olavs Hospital, Trondheim University Hospital"
+    }
+  },
+  {
+    "code": "STOREBRAND",
+    "name": {
+      "nb": "Storebrand",
+      "en": "Storebrand"
+    }
+  },
+  {
+    "code": "SUNNAAS",
+    "name": {
+      "nb": "Sunnaas Sykehus HF",
+      "en": "Sunnaas Rehabilitation Hospital"
+    }
+  },
+  {
+    "code": "SUS",
+    "name": {
+      "nb": "Stavanger Universitetssjukehus",
+      "en": "Stavanger University Hospital"
+    }
+  },
+  {
+    "code": "SVALBARDMILJØ",
+    "name": {
+      "nb": "Svalbards miljøvernfond",
+      "en": "Svalbards Environmental Protection"
+    }
+  },
+  {
+    "code": "SVBYGGINDUSTRI",
+    "name": {
+      "nb": "Sveriges Byggindustrier",
+      "en": "Sveriges Byggindustrier"
+    }
+  },
+  {
+    "code": "SØF",
+    "name": {
+      "nb": "Senter for økonomisk forskning AS (NTNU)",
+      "en": "Centre for Economic Research at NTNU"
+    }
+  },
+  {
+    "code": "TAL",
+    "name": {
+      "nb": "Tourisme aérien Laurentides",
+      "en": "Tourisme aérien Laurentides"
+    }
+  },
+  {
+    "code": "TEKNA",
+    "name": {
+      "nb": "Tekna",
+      "en": "Tekna - The Norwegian Society of Graduate Technical and Scientific Professionals"
+    }
+  },
+  {
+    "code": "TEL-TEK",
+    "name": {
+      "nb": "Telemark Teknisk Industrielle Utviklingssenter",
+      "en": "Telemark Technological Research and Development Centre"
+    }
+  },
+  {
+    "code": "TELENOR",
+    "name": {
+      "nb": "Telenor",
+      "en": "Telenor"
+    }
+  },
+  {
+    "code": "TF",
+    "name": {
+      "nb": "Telemarksforskning",
+      "en": "Telemark Research Foundation"
+    }
+  },
+  {
+    "code": "TFN",
+    "name": {
+      "nb": "Telemarksforskning-Notodden",
+      "en": "Telemark Educational Research"
+    }
+  },
+  {
+    "code": "TFOU",
+    "name": {
+      "nb": "Trøndelag Forskning og Utvikling",
+      "en": "Trøndelag R&D Institute"
+    }
+  },
+  {
+    "code": "TFS",
+    "name": {
+      "nb": "Tromsø forskningsstiftelse",
+      "en": "Tromsø Research Foundation"
+    }
+  },
+  {
+    "code": "TG",
+    "name": {
+      "nb": "Technopolis Group",
+      "en": "Technopolis Group"
+    }
+  },
+  {
+    "code": "THON",
+    "name": {
+      "nb": "Olav Thon Stiftelsen",
+      "en": "Olav Thon Foundation"
+    }
+  },
+  {
+    "code": "TINE",
+    "name": {
+      "nb": "TINE SA",
+      "en": "TINE SA"
+    }
+  },
+  {
+    "code": "TMF",
+    "name": {
+      "nb": "Trond Mohn stiftelse",
+      "en": "Trond Mohn Foundation"
+    }
+  },
+  {
+    "code": "TOTALE&P",
+    "name": {
+      "nb": "Total E&P",
+      "en": "Total E&P"
+    }
+  },
+  {
+    "code": "TRADEINDUSTRYANDFISH",
+    "name": {
+      "nb": "Nærings- og fiskeridepartementet",
+      "en": "Ministry of Trade, Industry and Fisheries"
+    }
+  },
+  {
+    "code": "TRANSPORT",
+    "name": {
+      "nb": "Samferdselsdepartementet",
+      "en": "Ministry of Transport and Communications"
+    }
+  },
+  {
+    "code": "TROMS",
+    "name": {
+      "nb": "Troms Fylkeskommune",
+      "en": "Troms county"
+    }
+  },
+  {
+    "code": "TRYGGTRAF",
+    "name": {
+      "nb": "Trygg Trafikk",
+      "en": "The Norwegian Council for Road Safety"
+    }
+  },
+  {
+    "code": "TRØNDELAG",
+    "name": {
+      "nb": "Trøndelag fylkeskommune",
+      "en": "Trøndelag county council"
+    }
+  },
+  {
+    "code": "TØI",
+    "name": {
+      "nb": "Transportøkonomisk institutt",
+      "en": "Institute of Transport Economics"
+    }
+  },
+  {
+    "code": "UARCTIC",
+    "name": {
+      "nb": "The University of the Arctic",
+      "en": "The University of the Arctic"
+    }
+  },
+  {
+    "code": "UDI",
+    "name": {
+      "nb": "Utlendingsdirektoratet",
+      "en": "The Norwegian Directorate of Immigration"
+    }
+  },
+  {
+    "code": "UDIR",
+    "name": {
+      "nb": "Utdanningsdirektoratet",
+      "en": "The Norwegian Directorate for Education and Training "
+    }
+  },
+  {
+    "code": "UFS",
+    "name": {
+      "nb": "Utviklingsfondet for skogbruket (Landburksdirektoratet)",
+      "en": "Norwegian Agriculture Agency"
+    }
+  },
+  {
+    "code": "UH",
+    "name": {
+      "nb": "Universiteter/Høyskoler",
+      "en": "Universities and University Colleges"
+    }
+  },
+  {
+    "code": "UHR",
+    "name": {
+      "nb": "Universitets- og høgskolerådet (UHR)",
+      "en": "The Norwegian Association of Higher Education Institutions"
+    }
+  },
+  {
+    "code": "UIA",
+    "name": {
+      "nb": "Universitetet i Agder",
+      "en": "University of Agder"
+    }
+  },
+  {
+    "code": "UIB",
+    "name": {
+      "nb": "Universitetet i Bergen",
+      "en": "University of Bergen"
+    }
+  },
+  {
+    "code": "UIN",
+    "name": {
+      "nb": "Universitetet i Nordland",
+      "en": "University of Nordland"
+    }
+  },
+  {
+    "code": "UIO",
+    "name": {
+      "nb": "Universitetet i Oslo",
+      "en": "University of Oslo"
+    }
+  },
+  {
+    "code": "UIS",
+    "name": {
+      "nb": "Universitetet i Stavanger",
+      "en": "University of Stavanger"
+    }
+  },
+  {
+    "code": "UIT",
+    "name": {
+      "nb": "UiT Norges arktiske universitet",
+      "en": "UiT The Arctic University of Norway"
+    }
+  },
+  {
+    "code": "UMB",
+    "name": {
+      "nb": "Universitetet for miljø- og biovitenskap",
+      "en": "Norwegian University of Life Sciences"
+    }
+  },
+  {
+    "code": "UNECE",
+    "name": {
+      "nb": "FNs økonomiske kommisjon for Europa (UNECE)",
+      "en": "United Nations Economic Commission for Europe (UNECE)"
+    }
+  },
+  {
+    "code": "UNI",
+    "name": {
+      "nb": "Uni Research",
+      "en": "Uni Research"
+    }
+  },
+  {
+    "code": "UNIK",
+    "name": {
+      "nb": "Universitetsstudiene på Kjeller ",
+      "en": "UniK - University Graduate Center"
+    }
+  },
+  {
+    "code": "UNIO",
+    "name": {
+      "nb": "Unio - Hovedorganisasjonen for universitets- og høyskoleutdannede",
+      "en": "UNIO"
+    }
+  },
+  {
+    "code": "UNIS",
+    "name": {
+      "nb": "Universitetssenteret på Svalbard",
+      "en": "University Centre in Svalbard"
+    }
+  },
+  {
+    "code": "UNN",
+    "name": {
+      "nb": "Universitetssykehuset Nord-Norge HF",
+      "en": "University Hospital of North Norway"
+    }
+  },
+  {
+    "code": "UOM",
+    "name": {
+      "nb": "University of Minnesota",
+      "nn": "University of Minnesota",
+      "en": "University of Minnesota"
+    }
+  },
+  {
+    "code": "UOSG",
+    "name": {
+      "nb": "University of St. Gallen",
+      "nn": "University of St. Gallen",
+      "en": "University of St. Gallen"
+    }
+  },
+  {
+    "code": "UOZ",
+    "name": {
+      "nb": "University of Zurich",
+      "nn": "University of Zurich",
+      "en": "University of Zurich"
+    }
+  },
+  {
+    "code": "USEN",
+    "name": {
+      "nb": "Universitetet i Sørøst-Norge",
+      "en": "University of South-Eastern Norway"
+    }
+  },
+  {
+    "code": "USN",
+    "name": {
+      "nb": "Høgskolen i Sørøst-Norge (HSN)",
+      "en": "University College of Southeast Norway (USN)"
+    }
+  },
+  {
+    "code": "UTDFORBUNDET",
+    "name": {
+      "nb": "Utdanningsforbundet",
+      "en": "Union of Education Norway"
+    }
+  },
+  {
+    "code": "VEGA",
+    "name": {
+      "nb": "Scientific Grant Agency of the Ministry of Education, Science, Research and Sports of the Slovak Republic and the Slovak Academy of Sciences",
+      "en": "Scientific Grant Agency of the Ministry of Education, Science, Research and Sports of the Slovak Republic and the Slovak Academy of Sciences"
+    }
+  },
+  {
+    "code": "VEIDEKKE",
+    "name": {
+      "nb": "Veidekke ASA",
+      "en": "Veidekke ASA"
+    }
+  },
+  {
+    "code": "VENERGI",
+    "name": {
+      "nb": "Vår Energi",
+      "en": "Vår Energi"
+    }
+  },
+  {
+    "code": "VESTFOLDCOUNTY",
+    "name": {
+      "nb": "Vestfold fylkeskommune",
+      "en": "Vestfold county"
+    }
+  },
+  {
+    "code": "VESTNORSKFILM",
+    "name": {
+      "nb": "Vestnorsk Filmsenter",
+      "en": "Vestnorsk Filmsenter"
+    }
+  },
+  {
+    "code": "VETENSKAPSRÅDET",
+    "name": {
+      "nb": "Vetenskapsrådet",
+      "en": "Swedish Research Council"
+    }
+  },
+  {
+    "code": "VETINST",
+    "name": {
+      "nb": "Veterinærinstituttet",
+      "en": "Norwegian Veterinary Institute"
+    }
+  },
+  {
+    "code": "VF",
+    "name": {
+      "nb": "Vestlandsforsking",
+      "en": "Western Norway Research Institute"
+    }
+  },
+  {
+    "code": "VHSS",
+    "name": {
+      "nb": "Valnesfjord Helsesportssenter",
+      "en": "Valnesfjord Health Sport Center"
+    }
+  },
+  {
+    "code": "VID",
+    "name": {
+      "nb": "VID vitenskapelige høgskole",
+      "nn": "VID vitenskapelige høgskole",
+      "en": "VID Sepcialized University"
+    }
+  },
+  {
+    "code": "VILTSKADESENT",
+    "name": {
+      "nb": "Norsk viltskadesenter",
+      "en": "Norsk viltskadesenter"
+    }
+  },
+  {
+    "code": "VINNOVA",
+    "name": {
+      "nb": "VINNOVA",
+      "en": "VINNOVA"
+    }
+  },
+  {
+    "code": "VIRKE",
+    "name": {
+      "nb": "Virke",
+      "en": "Virke - The Enterprise Federation of Norway"
+    }
+  },
+  {
+    "code": "VIST",
+    "name": {
+      "nb": "VISTA",
+      "nn": "VISTA",
+      "en": "VISTA"
+    }
+  },
+  {
+    "code": "VIVALDI",
+    "name": {
+      "nb": "Vivaldi Invest",
+      "en": "Vivaldi Invest"
+    }
+  },
+  {
+    "code": "VV",
+    "name": {
+      "nb": "Vestre Viken HF",
+      "en": "Vestre Viken Hospital Trust"
+    }
+  },
+  {
+    "code": "VW",
+    "name": {
+      "nb": "Volkswagen Foundation",
+      "nn": "Volkswagen Foundation",
+      "en": "Volkswagen Foundation"
+    }
+  },
+  {
+    "code": "WALLENBERG",
+    "name": {
+      "nb": "Wallenbergstiftelsen",
+      "en": "The Wallenberg Foundations"
+    }
+  },
+  {
+    "code": "WINTERDEA",
+    "name": {
+      "nb": "Wintershall Dea",
+      "nn": "Wintershall Dea",
+      "en": "Wintershall Dea"
+    }
+  },
+  {
+    "code": "WSOC",
+    "name": {
+      "nb": "Westerdals Høyskole",
+      "nn": "Westerdals Høgskole",
+      "en": "Westerdals School of Communication"
+    }
+  },
+  {
+    "code": "YARA",
+    "name": {
+      "nb": "Yara",
+      "en": "Yara"
+    }
+  },
+  {
+    "code": "ØF",
+    "name": {
+      "nb": "Østlandsforskning AS",
+      "en": "Eastern Norway Research Institute"
+    }
+  },
+  {
+    "code": "ØFK",
+    "name": {
+      "nb": "Østfold fylkeskommune",
+      "nn": "Østfold fylkeskommune",
+      "en": "Østfold County"
+    }
+  },
+  {
+    "code": "ØSTFOLDFOR",
+    "name": {
+      "nb": "Østfoldforskning AS",
+      "en": "Ostfold Research"
+    }
+  }
+]

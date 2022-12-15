@@ -1339,6 +1339,72 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /funding-sources:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListFundingSourcesFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - FundingSources
+      summary: List funding sources
+      description: Returns all support funding sources
+      operationId: ListFundingSources
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundingSources'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/FundingSourcesSample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/FundingSources'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/FundingSourcesSample'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+  /funding-sources/{identifier}:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchFundingSourceFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - FundingSource
+      summary: Fetch a funding source by identifier
+      description: Returns the funding source with the given identifier
+      operationId: FetchFundingSource
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FundingSourceNew'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/FundingSourceNewSample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/FundingSourceNew'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/FundingSourceNewSample'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 
 components:
   responses:
@@ -2134,6 +2200,47 @@ components:
             $ref: '#/components/schemas/Languages'
         enabled:
           type: boolean
+    FundingSources:
+      type: object
+      required:
+        - type
+        - '@Context'
+        - id
+        - sources
+      properties:
+        type:
+          type: string
+          description: Always FundingSources
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          type: string
+          description: URI to the query
+        sources:
+          type: array
+          description: The list of funding sources
+          items:
+            $ref: '#/components/schemas/FundingSourceNew'
+    FundingSourceNew:
+      type: object
+      required:
+        - type
+        - id
+        - identifier
+        - name
+      properties:
+        type:
+          type: string
+          description: Always FundingSources
+        id:
+          type: string
+          description: URI to the resource itself
+        identifier:
+          type: string
+          description: the identifier (code) for the funding source
+        name:
+          $ref: '#/components/schemas/Languages'
+
     PersonEmploymentQuery:
       type: object
       properties:
@@ -2750,6 +2857,35 @@ components:
             name:
               en: Academic adviser
             enabled: true
+    FundingSourcesSample:
+      value:
+        type: "FundingSources"
+        "@context": "https://bibsysdev.github.io/src/funding-source.json"
+        id: "https://api.{env.}nva.aws.unit.no/funding-sources"
+        sources:
+          - type: "FundingSource"
+            id: "https://api.{env.}nva.aws.unit.no/funding-sources/EC%2FFP7"
+            identifier: "EC/FP7"
+            name:
+              nb: "EC/FP7"
+              nn: "EC/FP7"
+              en: "EC/FP7"
+          - type: "FundingSource"
+            id: "https://api.{env.}nva.aws.unit.no/funding-sources/EC%2FH2020"
+            identifier: "EC/H2020"
+            name:
+              nb: "EC/H2020"
+              nn: "EC/H2020"
+              en: "EC/H2020"
+    FundingSourceNewSample:
+      value:
+        type: "FundingSource"
+        id: "https://api.{env.}nva.aws.unit.no/funding-sources/EC%2FFP7"
+        identifier: "EC/FP7"
+        name:
+          nb: "EC/FP7"
+          nn: "EC/FP7"
+          en: "EC/FP7"
     PersonEmploymentQueryExample:
       value:
         '@context': 'https://example.org/person-employment-search-context.json'
