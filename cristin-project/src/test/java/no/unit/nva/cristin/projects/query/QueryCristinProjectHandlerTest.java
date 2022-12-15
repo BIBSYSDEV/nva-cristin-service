@@ -14,6 +14,7 @@ import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.RestRequestHandler;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
@@ -25,6 +26,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -44,6 +47,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
@@ -125,6 +129,8 @@ class QueryCristinProjectHandlerTest {
     private Context context;
     private ByteArrayOutputStream output;
     private QueryCristinProjectHandler handler;
+
+    private static final Logger logger = LoggerFactory.getLogger(RestRequestHandler.class);
 
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
         return Stream.of(
@@ -747,5 +753,21 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
+    @Test
+    void handlerThrowsBadRequestWithWrongParams() throws IOException {
+        InputStream input = requestWithQueryParameters(Map.of(
+                PROJECT_SORT, "cristin id"));
 
+        handler.handleRequest(input, output, context);
+
+        var gatewayResponse =
+                GatewayResponse.fromOutputStream(output, Problem.class);
+        String actualDetail = getProblemDetail(gatewayResponse);
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertEquals(ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST, actualDetail);
+    }
+
+    private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
+        return gatewayResponse.getBodyObject(Problem.class).getDetail();
+    }
 }
