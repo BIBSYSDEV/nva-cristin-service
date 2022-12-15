@@ -12,7 +12,6 @@ import no.unit.nva.cristin.funding.sources.client.CristinFundingSourcesApiClient
 import no.unit.nva.cristin.funding.sources.common.DomainUriUtils;
 import no.unit.nva.cristin.funding.sources.common.MappingUtils;
 import no.unit.nva.cristin.funding.sources.model.nva.FundingSources;
-import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
