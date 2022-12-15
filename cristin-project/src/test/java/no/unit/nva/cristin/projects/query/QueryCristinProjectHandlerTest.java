@@ -49,6 +49,7 @@ import java.util.stream.Stream;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
@@ -123,6 +124,7 @@ class QueryCristinProjectHandlerTest {
     public static final String UNIT_ID_SAMPLE = "184.12.60.0";
     public static final String START_DATE = "start_date";
     public static final String NB = "nb";
+    public static final String BAD_PARAM_FOR_SORT = "cristin id";
 
     private final Environment environment = new Environment();
     private QueryCristinProjectApiClient cristinApiClientStub;
@@ -698,6 +700,18 @@ class QueryCristinProjectHandlerTest {
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
+    private GatewayResponse<SearchResponse> sendBadParameterRequestQuery() throws IOException {
+        InputStream input = requestWithQueryParameters(Map.of(
+                JsonPropertyNames.QUERY,
+                RANDOM_TITLE,
+                JsonPropertyNames.LANGUAGE,
+                LANGUAGE_NB,
+                PROJECT_SORT, BAD_PARAM_FOR_SORT));
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
+    }
+
+
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
         return new HandlerRequestBuilder<Void>(Constants.OBJECT_MAPPER)
                 .withBody(null)
@@ -753,18 +767,18 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
+
     @Test
-    void handlerThrowsBadRequestWithWrongParams() throws IOException {
-        InputStream input = requestWithQueryParameters(Map.of(
-                PROJECT_SORT, "cristin id"));
+    void shouldReturnBadRequestToClientWhenUpstreamGetReturnsTheSame() throws ApiGatewayException, IOException {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HTTP_BAD_REQUEST))
+                .when(cristinApiClientStub)
+                .fetchQueryResults(any());
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        var gatewayResponse = sendBadParameterRequestQuery();
 
-        handler.handleRequest(input, output, context);
-
-        var gatewayResponse =
-                GatewayResponse.fromOutputStream(output, Problem.class);
-        String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST, actualDetail);
+        assertThat(gatewayResponse.getBody(), containsString(UPSTREAM_RETURNED_BAD_REQUEST));
     }
 
     private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {

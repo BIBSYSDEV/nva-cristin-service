@@ -203,4 +203,16 @@ Feature: API tests for Cristin projects query
     Then status 200
 
 
+  Scenario: Query with valid parameter key but bad value not validated returns Bad Request from upstream
+    Given path '/project/'
+    And param query = queryString
+    And param sort = 'notADateRange'
+    When method GET
+    Then status 400
+    * def contentType = responseHeaders['Content-Type'][0]
+    And match contentType == PROBLEM_JSON_MEDIA_TYPE
+    And match response.title == 'Bad Request'
+    And match response.status == 400
+    And match response.detail == 'Upstream returned 400 (Bad Request).That might indicate bad query parameters'
+
 
