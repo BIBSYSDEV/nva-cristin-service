@@ -132,7 +132,6 @@ class QueryCristinProjectHandlerTest {
     private ByteArrayOutputStream output;
     private QueryCristinProjectHandler handler;
 
-    private static final Logger logger = LoggerFactory.getLogger(RestRequestHandler.class);
 
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
         return Stream.of(
@@ -781,7 +780,4 @@ class QueryCristinProjectHandlerTest {
         assertThat(gatewayResponse.getBody(), containsString(UPSTREAM_RETURNED_BAD_REQUEST));
     }
 
-    private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
-        return gatewayResponse.getBodyObject(Problem.class).getDetail();
-    }
 }
