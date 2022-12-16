@@ -14,6 +14,7 @@ import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.RestRequestHandler;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
@@ -25,6 +26,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -44,12 +47,22 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
 import static no.unit.nva.cristin.projects.query.QueryCristinProjectClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.TOTAL_COUNT_EXAMPLE_VALUE;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.anyOf;
@@ -105,12 +118,20 @@ class QueryCristinProjectHandlerTest {
             URLEncoder.encode(ILLEGAL_NVA_ORGANIZATION, StandardCharsets.UTF_8);
     private static final String API_QUERY_RESPONSE_WITH_FUNDING_JSON =
         IoUtils.stringFromResources(Path.of("api_query_response_with_funding.json"));
+    public static final String FUNDING_SAMPLE = "NRE:1234";
+    public static final String BIOBANK_SAMPLE = String.valueOf(randomInteger());
+    public static final String KEYWORD_SAMPLE = randomString();
+    public static final String UNIT_ID_SAMPLE = "184.12.60.0";
+    public static final String START_DATE = "start_date";
+    public static final String NB = "nb";
+    public static final String BAD_PARAM_FOR_SORT = "cristin id";
 
     private final Environment environment = new Environment();
     private QueryCristinProjectApiClient cristinApiClientStub;
     private Context context;
     private ByteArrayOutputStream output;
     private QueryCristinProjectHandler handler;
+
 
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
         return Stream.of(
@@ -678,6 +699,18 @@ class QueryCristinProjectHandlerTest {
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
+    private GatewayResponse<SearchResponse> sendBadParameterRequestQuery() throws IOException {
+        InputStream input = requestWithQueryParameters(Map.of(
+                JsonPropertyNames.QUERY,
+                RANDOM_TITLE,
+                JsonPropertyNames.LANGUAGE,
+                LANGUAGE_NB,
+                PROJECT_SORT, BAD_PARAM_FOR_SORT));
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
+    }
+
+
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
         return new HandlerRequestBuilder<Void>(Constants.OBJECT_MAPPER)
                 .withBody(null)
@@ -699,12 +732,12 @@ class QueryCristinProjectHandlerTest {
         cristinApiClientStub = spy(cristinApiClientStub);
         handler = new QueryCristinProjectHandler(cristinApiClientStub, new Environment());
         var queryParams = Map.of("query", "hello",
-                "funding", "NRE",
-                "biobank", "123321",
-                "keyword", "nature",
+                "funding", FUNDING_SAMPLE,
+                "biobank", BIOBANK_SAMPLE,
+                "keyword", KEYWORD_SAMPLE,
                 "results", "5",
-                "unit", "184.12.60.0",
-                "sort", "start_date");
+                "unit", UNIT_ID_SAMPLE,
+                "sort", START_DATE);
         var input = requestWithQueryParameters(queryParams);
         handler.handleRequest(input, output, context);
         var captor = ArgumentCaptor.forClass(URI.class);
@@ -714,24 +747,37 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualURI,
                 containsString("page=5"));
         assertThat(actualURI,
-                containsString("&biobank=123321"));
+                containsString("&" + BIOBANK_ID + "=" + BIOBANK_SAMPLE));
         assertThat(actualURI,
-                containsString("&funding=NRE"));
+                containsString("&" + FUNDING + "=" + FUNDING_SAMPLE));
         assertThat(actualURI,
-                containsString("&page=1"));
-        assertThat(actualURI,
-                containsString("&lang=nb"));
+                containsString("&" + CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY + "=" + NB));
         assertThat(actualURI,
                 containsString("&title=hello"));
         assertThat(actualURI,
-                containsString("&keyword=nature"));
+                containsString("&" + PROJECT_KEYWORD + "=" + KEYWORD_SAMPLE));
         assertThat(actualURI,
-                containsString("&unit=184.12.60.0"));
+                containsString("&" + PROJECT_UNIT + "=" + UNIT_ID_SAMPLE));
         assertThat(actualURI,
-                containsString("&sort=start_date"));
+                containsString("&" + PROJECT_SORT + "=" + START_DATE));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                 SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
+
+
+    @Test
+    void shouldReturnBadRequestToClientWhenUpstreamGetReturnsTheSame() throws ApiGatewayException, IOException {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HTTP_BAD_REQUEST))
+                .when(cristinApiClientStub)
+                .fetchQueryResults(any());
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        var gatewayResponse = sendBadParameterRequestQuery();
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(UPSTREAM_RETURNED_BAD_REQUEST));
+    }
+
 }

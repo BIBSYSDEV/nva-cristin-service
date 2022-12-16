@@ -7,6 +7,7 @@ import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
 import nva.commons.core.attempt.Try;
@@ -198,13 +199,15 @@ public class ApiClient {
     }
 
     protected void checkHttpStatusCode(URI uri, int statusCode)
-            throws NotFoundException, BadGatewayException, UnauthorizedException {
+            throws NotFoundException, BadGatewayException, BadRequestException, UnauthorizedException {
 
         String uriAsString = Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
 
         if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
             String msg = String.format(ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, uriAsString);
             throw new NotFoundException(msg);
+        } else if (statusCode == HttpURLConnection.HTTP_BAD_REQUEST) {
+            throw new BadRequestException(ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST);
         } else if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             throw new UnauthorizedException();
         } else if (remoteServerHasInternalProblems(statusCode)) {
