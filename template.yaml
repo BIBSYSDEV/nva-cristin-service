@@ -479,7 +479,6 @@ Resources:
     Properties:
       CodeUri: cristin-funding
       Handler: no.unit.nva.cristin.funding.sources.query.ListFundingSourcesHandler::handleRequest
-      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinListFundingSourcesEvent:
           Type: Api
@@ -494,7 +493,6 @@ Resources:
     Properties:
       CodeUri: cristin-funding
       Handler: no.unit.nva.cristin.funding.sources.fetch.FetchFundingSourceHandler::handleRequest
-      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinFetchFundingSourceEvent:
           Type: Api

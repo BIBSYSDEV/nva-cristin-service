@@ -87,7 +87,13 @@ public class ListFundingSourcesHandlerTest {
         var expectedId = URI.create("https://api.sandbox.nva.aws.unit.no/cristin/funding-sources");
         assertThat(fundingSources.getId(), is(equalTo(expectedId)));
 
-        assertThat(fundingSources.getSources(), iterableWithSize(559));
+        assertThat(fundingSources.getSources(), iterableWithSize(2));
+
+        var firstEntry = fundingSources.getSources().get(0);
+        assertThat(firstEntry.getIdentifier(), is(equalTo("EC/FP7")));
+
+        var secondEntry = fundingSources.getSources().get(1);
+        assertThat(secondEntry.getIdentifier(), is(equalTo("EC/H2020")));
     }
 
     @Test

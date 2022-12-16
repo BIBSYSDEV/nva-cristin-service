@@ -3,9 +3,6 @@ dependencies {
     implementation libs.nva.json
     implementation libs.nva.core
     implementation libs.nva.language
-//    implementation libs.aws.sdk2.core
-//    implementation libs.aws.sdk2.cognitoidp
-//    implementation libs.google.guava
     implementation libs.aws.lambda.java.core
 
     testImplementation libs.junit.jupiter.api
