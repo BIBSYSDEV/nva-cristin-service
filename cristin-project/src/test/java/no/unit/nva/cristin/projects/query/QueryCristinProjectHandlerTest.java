@@ -14,6 +14,7 @@ import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.RestRequestHandler;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
@@ -25,6 +26,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -44,7 +47,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_GRANT_ID;
 import static no.unit.nva.cristin.model.Constants.QueryType.QUERY_USING_TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
@@ -119,12 +124,14 @@ class QueryCristinProjectHandlerTest {
     public static final String UNIT_ID_SAMPLE = "184.12.60.0";
     public static final String START_DATE = "start_date";
     public static final String NB = "nb";
+    public static final String BAD_PARAM_FOR_SORT = "cristin id";
 
     private final Environment environment = new Environment();
     private QueryCristinProjectApiClient cristinApiClientStub;
     private Context context;
     private ByteArrayOutputStream output;
     private QueryCristinProjectHandler handler;
+
 
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
         return Stream.of(
@@ -692,6 +699,18 @@ class QueryCristinProjectHandlerTest {
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
+    private GatewayResponse<SearchResponse> sendBadParameterRequestQuery() throws IOException {
+        InputStream input = requestWithQueryParameters(Map.of(
+                JsonPropertyNames.QUERY,
+                RANDOM_TITLE,
+                JsonPropertyNames.LANGUAGE,
+                LANGUAGE_NB,
+                PROJECT_SORT, BAD_PARAM_FOR_SORT));
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
+    }
+
+
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
         return new HandlerRequestBuilder<Void>(Constants.OBJECT_MAPPER)
                 .withBody(null)
@@ -746,4 +765,19 @@ class QueryCristinProjectHandlerTest {
                 SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
+
+
+    @Test
+    void shouldReturnBadRequestToClientWhenUpstreamGetReturnsTheSame() throws ApiGatewayException, IOException {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HTTP_BAD_REQUEST))
+                .when(cristinApiClientStub)
+                .fetchQueryResults(any());
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        var gatewayResponse = sendBadParameterRequestQuery();
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(UPSTREAM_RETURNED_BAD_REQUEST));
+    }
+
 }
