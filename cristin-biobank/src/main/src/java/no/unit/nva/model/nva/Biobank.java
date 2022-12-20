@@ -11,7 +11,7 @@ import java.util.Map;
 
 @JsonInclude(NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-public class FundingSource {
+public class Biobank {
     private static final String ID_FIELD = "id";
     private static final String IDENTIFIER_FIELD = "identifier";
     private static final String NAME_FIELD = "name";
