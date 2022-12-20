@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.funding.sources.common;
+package no.unit.nva.cristin.biobank.common;
 
 public final class EnvironmentKeys {
     public static final String ENV_KEY_ALLOWED_ORIGIN = "ALLOWED_ORIGIN";

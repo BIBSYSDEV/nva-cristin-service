@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.funding.sources.model.nva;
+package no.unit.nva.cristin.biobank.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import com.fasterxml.jackson.annotation.JsonCreator;
