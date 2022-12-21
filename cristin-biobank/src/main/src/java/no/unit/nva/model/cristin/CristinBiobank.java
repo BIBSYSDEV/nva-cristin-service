@@ -16,7 +16,7 @@ public final class CristinBiobank {
     public CristinBiobank(@JsonProperty(CODE_FIELD) String code,
                           @JsonProperty(NAME_FIELD) Map<String, String> name) {
         this.code = code;
-        this.name  = Collections.unmodifiableMap(name);;
+        this.name  = Collections.unmodifiableMap(name);
     }
 
     public String getCode() {
