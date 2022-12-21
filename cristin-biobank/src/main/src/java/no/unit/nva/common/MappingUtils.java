@@ -2,7 +2,7 @@ package no.unit.nva.common;
 
 import java.net.URI;
 import no.unit.nva.cristin.biobank.model.nva.Biobank;
-import no.unit.nva.model.cristin.CristinBiobank;;
+import no.unit.nva.model.cristin.CristinBiobank;
 
 public final class MappingUtils {
 

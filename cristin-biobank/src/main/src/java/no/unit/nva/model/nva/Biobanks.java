@@ -23,7 +23,7 @@ public final class Biobanks {
     @JsonProperty(ID)
     private final URI id;
     @JsonProperty(BIOBANKS_STRING)
-    private final List<Biobank> biobanks;
+    private final List<Biobank> biobankList;
 
     @JsonCreator
     public Biobanks(@JsonProperty(CONTEXT) URI context,
@@ -31,7 +31,7 @@ public final class Biobanks {
                           @JsonProperty(BIOBANKS_STRING) List<Biobank> biobanks) {
         this.context = context;
         this.id = id;
-        this.biobanks = Collections.unmodifiableList(biobanks);
+        this.biobankList = Collections.unmodifiableList(biobanks);
     }
 
     public URI getContext() {
@@ -42,7 +42,7 @@ public final class Biobanks {
         return id;
     }
 
-    public List<Biobank> getBiobanks() {
-        return biobanks;
+    public List<Biobank> getBiobankList() {
+        return biobankList;
     }
 }
