@@ -24,7 +24,7 @@ public class Biobank {
     private final Map<String, String> name;
 
     @JsonCreator
-    public FundingSource(@JsonProperty(ID_FIELD) URI id,
+    public Biobank(@JsonProperty(ID_FIELD) URI id,
                          @JsonProperty(IDENTIFIER_FIELD) String identifier,
                          @JsonProperty(NAME_FIELD) Map<String, String> name) {
         this.id = id;

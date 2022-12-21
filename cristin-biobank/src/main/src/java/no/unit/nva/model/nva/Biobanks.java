@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.biobank.model.nva;
+package no.unit.nva.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
@@ -10,27 +10,27 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import no.unit.nva.cristin.biobank.model.nva.Biobank;
 
 @JsonInclude(NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public final class Biobanks {
-    //Not sure we need biobankS. But I assume we do, especially if we are going to reuse functionality in project.
-    private static final String SOURCES_FIELD_NAME = "sources";
+    private static final String BIOBANKS = "biobanks";
 
     @JsonProperty(CONTEXT)
     private final URI context;
     @JsonProperty(ID)
     private final URI id;
-    @JsonProperty(SOURCES_FIELD_NAME)
-    private final List<Biobank> sources;
+    @JsonProperty(BIOBANKS)
+    private final List<no.unit.nva.cristin.biobank.model.nva.Biobank> biobanks;
 
     @JsonCreator
     public Biobanks(@JsonProperty(CONTEXT) URI context,
                           @JsonProperty(ID) URI id,
-                          @JsonProperty(SOURCES_FIELD_NAME) List<Biobank> sources) {
+                          @JsonProperty(BIOBANKS) List<Biobank> biobanks) {
         this.context = context;
         this.id = id;
-        this.sources = Collections.unmodifiableList(sources);
+        this.biobanks = Collections.unmodifiableList(biobanks);
     }
 
     public URI getContext() {
@@ -41,7 +41,7 @@ public final class Biobanks {
         return id;
     }
 
-    public List<Biobank> getSources() {
-        return sources;
+    public List<Biobank> getBiobanks() {
+        return biobanks;
     }
 }
