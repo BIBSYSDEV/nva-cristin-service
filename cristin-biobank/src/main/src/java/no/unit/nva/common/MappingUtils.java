@@ -2,8 +2,7 @@ package no.unit.nva.common;
 
 import java.net.URI;
 import no.unit.nva.cristin.biobank.model.nva.Biobank;
-import no.unit.nva.model.cristin.CristinBiobank;
-import no.unit.nva.common.DomainUriUtils;
+import no.unit.nva.model.cristin.CristinBiobank;;
 
 public final class MappingUtils {
 
@@ -14,11 +13,11 @@ public final class MappingUtils {
     public static Biobank cristinModelToNvaModel(CristinBiobank cristinBiobank,
                                                  String domainName,
                                                  String basePath) {
-        var id = getBiobankUri(cristinBiobank.getCristin_biobank_id(), domainName, basePath);
-        return new Biobank (id, cristinBiobank.getCristin_biobank_id(), cristinBiobank.getName());
+        var id = getBiobankUri(cristinBiobank.getCristinBiobankId(), domainName, basePath);
+        return new Biobank (id, cristinBiobank.getCristinBiobankId(), cristinBiobank.getName());
     }
 
-    private static URI getBiobankUri(String cristin_biobank_id, String domainName, String basePath) {
-        return DomainUriUtils.getBiobankUri(domainName, basePath, cristin_biobank_id);
+    private static URI getBiobankUri(String cristinBiobankId, String domainName, String basePath) {
+        return DomainUriUtils.getBiobankUri(domainName, basePath, cristinBiobankId);
     }
 }

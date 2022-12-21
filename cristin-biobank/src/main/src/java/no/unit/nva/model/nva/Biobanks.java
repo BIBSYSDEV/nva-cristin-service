@@ -9,25 +9,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Collections;
-import java.util.List;
 import no.unit.nva.cristin.biobank.model.nva.Biobank;
+import java.util.List;
+
 
 @JsonInclude(NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public final class Biobanks {
-    private static final String BIOBANKS = "biobanks";
+    private static final String BIOBANKS_STRING = "biobanks";
 
     @JsonProperty(CONTEXT)
     private final URI context;
     @JsonProperty(ID)
     private final URI id;
-    @JsonProperty(BIOBANKS)
-    private final List<no.unit.nva.cristin.biobank.model.nva.Biobank> biobanks;
+    @JsonProperty(BIOBANKS_STRING)
+    private final List<Biobank> biobanks;
 
     @JsonCreator
     public Biobanks(@JsonProperty(CONTEXT) URI context,
                           @JsonProperty(ID) URI id,
-                          @JsonProperty(BIOBANKS) List<Biobank> biobanks) {
+                          @JsonProperty(BIOBANKS_STRING) List<Biobank> biobanks) {
         this.context = context;
         this.id = id;
         this.biobanks = Collections.unmodifiableList(biobanks);

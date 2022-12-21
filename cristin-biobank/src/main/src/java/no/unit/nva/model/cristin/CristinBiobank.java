@@ -11,19 +11,19 @@ public final class CristinBiobank {
     private static final String NAME_FIELD = "name";
 
     @JsonProperty(CRISTIN_BIOBANK_ID)
-    private final String cristin_biobank_id;
+    private final String cristinBiobankId;
     @JsonProperty(NAME_FIELD)
     private final Map<String, String> name;
 
 
-    public CristinBiobank(@JsonProperty(CRISTIN_BIOBANK_ID) String cristin_biobank_id,
+    public CristinBiobank(@JsonProperty(CRISTIN_BIOBANK_ID) String cristinBiobankId,
                           @JsonProperty(NAME_FIELD) Map<String, String> name) {
-        this.cristin_biobank_id = cristin_biobank_id;
+        this.cristinBiobankId = cristinBiobankId;
         this.name  = Collections.unmodifiableMap(name);
     }
 
-    public String getCristin_biobank_id() {
-        return cristin_biobank_id;
+    public String getCristinBiobankId() {
+        return cristinBiobankId;
     }
 
     public Map<String, String> getName() {
