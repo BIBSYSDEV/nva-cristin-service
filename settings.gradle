@@ -5,5 +5,7 @@ include 'cristin-project'
 include 'cristin-organization'
 include 'cristin-person'
 include 'cristin-funding'
+include 'cristin-biobank'
 include 'cristin-testing'
+
 
