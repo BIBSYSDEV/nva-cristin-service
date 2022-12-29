@@ -14,7 +14,8 @@ public final class MappingUtils {
                                                  String domainName,
                                                  String basePath) {
         var id = getBiobankUri(cristinBiobank.getCristinBiobankId(), domainName, basePath);
-        return new Biobank (id, cristinBiobank.getCristinBiobankId(), cristinBiobank.getName());
+        return new Biobank (id, cristinBiobank.getCristinBiobankId(),
+                cristinBiobank.getName(), cristinBiobank.getCristinBiobankModifiedSince());
     }
 
     private static URI getBiobankUri(String cristinBiobankId, String domainName, String basePath) {

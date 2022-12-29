@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects.model.nva;
+package no.unit.nva.utils;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import com.fasterxml.jackson.annotation.JsonCreator;

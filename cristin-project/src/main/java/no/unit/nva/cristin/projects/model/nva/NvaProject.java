@@ -17,6 +17,7 @@ import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.model.Organization;
+import no.unit.nva.utils.DateInfo;
 
 @SuppressWarnings({"PMD.ExcessivePublicCount","PMD.TooManyFields"})
 @JsonInclude(ALWAYS)
