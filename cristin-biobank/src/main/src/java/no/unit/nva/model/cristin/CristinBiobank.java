@@ -53,7 +53,7 @@ public final class CristinBiobank {
     private final CristinTimeStampFromSource cristinBiobankLastModified;
 
     @JsonProperty(CRISTIN_BIOBANK_COORDINATING_INSTITUTION)
-    private final CristinCoordinatinInstitution cristinBiobankInstitution;
+    private final CristinCoordinatinInstitution cristinCoordinatinInstitution;
 
     @JsonProperty(CRISTIN_BIOBANK_COORDINATOR)
     private final CristinCoordinator cristinBiobankCoordinator;
@@ -73,7 +73,7 @@ public final class CristinBiobank {
     private final List<CristinBiobankMaterial> cristinBiobankMaterials;
 
     @JsonSerialize(using = CustomInstantSerializer.class)
-    private Instant startDate;
+    private final Instant startDate;
 
     public CristinBiobank(@JsonProperty(CRISTIN_BIOBANK_ID) String cristinBiobankId,
                           @JsonProperty(CRISTIN_BIOBANK_TYPE) String cristinBiobankType,
@@ -84,7 +84,7 @@ public final class CristinBiobank {
                           String cristinBiobankStatus,
                           CristinTimeStampFromSource cristinBiobankCreated,
                           CristinTimeStampFromSource cristinBiobankLastModified,
-                          CristinCoordinatinInstitution cristinBiobankInstitution,
+                          CristinCoordinatinInstitution cristinCoordinatinInstitution,
                           CristinCoordinator cristinBiobankCoordinator,
                           CristinAssocProjectForBiobank cristinBiobankAssocProject,
                           CristinExternalSourcesBiobank cristinBiobankExternalSources,
@@ -100,7 +100,7 @@ public final class CristinBiobank {
         this.cristinBiobankStatus = cristinBiobankStatus;
         this.cristinBiobankCreated = cristinBiobankCreated;
         this.cristinBiobankLastModified = cristinBiobankLastModified;
-        this.cristinBiobankInstitution = cristinBiobankInstitution;
+        this.cristinCoordinatinInstitution = cristinCoordinatinInstitution;
         this.cristinBiobankCoordinator = cristinBiobankCoordinator;
         this.cristinBiobankAssocProject = cristinBiobankAssocProject;
         this.cristinBiobankExternalSources = cristinBiobankExternalSources;
@@ -118,8 +118,6 @@ public final class CristinBiobank {
         return name;
     }
 
-    public String getCristinBiobankInstitution() { return cristinBiobankInstitution; }
-    public String getCristinBiobankProjectCodeKey() { return cristinBiobankProjectCodeKey; }
     public String getCristinBiobankType() { return cristinBiobankType; }
     public String getCristinBiobankLanguage() { return cristinBiobankLanguage; }
     public Instant getCristinBiobankStartDate() { return cristinBiobankStartDate; }

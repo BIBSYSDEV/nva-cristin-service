@@ -11,9 +11,9 @@ public class CristinCoordinatinInstitution {
     public static final String CRISTIN_UNIT = "unit";
 
     @JsonProperty(CRISTIN_INSTITUTION)
-    private final transient CristinInstitution cristinInstitution;
+    private final CristinInstitution cristinInstitution;
     @JsonProperty(CRISTIN_UNIT)
-    private final transient CristinUnit cristinUnit;
+    private final CristinUnit cristinUnit;
 
     public CristinCoordinatinInstitution(CristinInstitution cristinInstitution, CristinUnit cristinUnit) {
         this.cristinInstitution = cristinInstitution;
