@@ -1,35 +1,21 @@
 package no.unit.nva.cristin.biobank.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static javax.management.remote.rmi.RMIConnectorServer.CREATED;
 import static no.unit.nva.cristin.model.JsonPropertyNames.*;
-import static sun.net.www.protocol.file.FileURLConnection.LAST_MODIFIED;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import no.unit.nva.model.cristin.CristinAssocProjectForBiobank;
-import no.unit.nva.model.cristin.CristinBiobankApprovals;
-import no.unit.nva.model.cristin.CristinBiobankMaterial;
-import no.unit.nva.model.cristin.CristinCoordinatinInstitution;
-import no.unit.nva.model.cristin.CristinCoordinator;
-import no.unit.nva.model.cristin.CristinExternalSourcesBiobank;
-import no.unit.nva.model.cristin.CristinTimeStampFromSource;
-import no.unit.nva.model.nva.AssocProjectForBiobank;
 import no.unit.nva.model.nva.BiobankApprovals;
 import no.unit.nva.model.nva.BiobankMaterial;
-import no.unit.nva.model.nva.CoordinatinInstitution;
-import no.unit.nva.model.nva.Coordinator;
 import no.unit.nva.model.nva.ExternalSourcesBiobank;
 import no.unit.nva.model.nva.TimeStampFromSource;
 import no.unit.nva.utils.CustomInstantSerializer;
-import no.unit.nva.utils.DateInfo;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -46,19 +32,23 @@ public class Biobank {
     private static final String STORED_UNTIL_DATE = "storedUntilDate";
     private static final String MAIN_LANGUAGE_KEY = "mainLanguage";
     private static final String BIOBANK_TYPE = "biobankType";
+    private static final String COORDINATING_INSTITUTION_ORGANIZATION = "coordinating_institution_org";
+    private static final String COORDINATING_INSTITUTION_UNIT = "coordinating_institution_unit";
+
+    private static final String ID_BIOBANK ="id";
+
+    @JsonProperty(ID_BIOBANK)
+    private final URI biobank_id;
 
     @JsonProperty(IDENTIFIER)
-    private final String cristinBiobankId;
+    private final String biobankIdentifier;
 
     @JsonProperty(BIOBANK_TYPE)
-    private final String type;
+    private final String biobankType;
     @JsonProperty(NAME)
     private final Map<String, String> name;
     @JsonProperty(MAIN_LANGUAGE_KEY)
     private final String mainLanguage;
-
-    @JsonProperty(START_DATE)
-    private final Instant startDate;
 
     @JsonProperty(STORED_UNTIL_DATE)
     private final Instant storeUntilDate;
@@ -70,15 +60,18 @@ public class Biobank {
     @JsonProperty(LAST_MODIFIED)
     private final TimeStampFromSource lastModified;
 
-    @JsonProperty(COORDINATING_INSTITUTION)
-    private final CoordinatinInstitution coordinatinInstitution;
+    @JsonProperty(COORDINATING_INSTITUTION_ORGANIZATION)
+    private final URI coordinatinInstitutionOrg;
+
+    @JsonProperty(COORDINATING_INSTITUTION_UNIT)
+    private final  URI coordinatinInstitutionUnit;
 
     @JsonProperty(COORDINATOR)
-    private final Coordinator cristinBiobankCoordinator;
+    private final URI biobankCoordinator;
 
 
     @JsonProperty(ASSOCIATED_PROJECT)
-    private final AssocProjectForBiobank assocProject;
+    private final URI assocProject;
 
     @JsonProperty(EXTERNAL_SOURCES)
     private final ExternalSourcesBiobank externalSources;
@@ -94,4 +87,31 @@ public class Biobank {
     private final Instant startDate;
 
 
+    public Biobank(URI biobank_id, String biobankIdentifier,
+                   String type, Map<String, String> name,
+                   String mainLanguage, Instant startDate,
+                   Instant storeUntilDate, String status,
+                   TimeStampFromSource created, TimeStampFromSource lastModified,
+                   URI coordinatinInstitutionOrg,
+                   URI coordinatinInstitutionUnit, URI biobankCoordinator,
+                   URI assocProject, ExternalSourcesBiobank externalSources,
+                   BiobankApprovals approvals, List<BiobankMaterial> biobankMaterials) {
+        this.biobank_id = biobank_id;
+        this.biobankIdentifier = biobankIdentifier;
+        this.biobankType = type;
+        this.name = name;
+        this.mainLanguage = mainLanguage;
+        this.startDate = startDate;
+        this.storeUntilDate = storeUntilDate;
+        this.status = status;
+        this.created = created;
+        this.lastModified = lastModified;
+        this.coordinatinInstitutionOrg = coordinatinInstitutionOrg;
+        this.coordinatinInstitutionUnit = coordinatinInstitutionUnit;
+        this.biobankCoordinator = biobankCoordinator;
+        this.assocProject = assocProject;
+        this.externalSources = externalSources;
+        this.approvals = approvals;
+        this.biobankMaterials = biobankMaterials;
+    }
 }

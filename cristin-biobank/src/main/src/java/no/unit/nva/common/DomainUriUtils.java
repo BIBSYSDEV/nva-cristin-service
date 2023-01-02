@@ -11,6 +11,7 @@ public final class DomainUriUtils {
 
     private static final String BIOBANK_PATH_ELEMENT = "biobank";
 
+
     private DomainUriUtils() {
     }
 
@@ -23,6 +24,14 @@ public final class DomainUriUtils {
         var uriString = getBaseUriWrapper(domainName, basePath)
                    .addChild(BIOBANK_PATH_ELEMENT)
                    .toString();
+        return URI.create(uriString + "/" + urlEncodedIdentifier);
+    }
+
+    public static URI getBiobankParamUri(String domainName, String basePath, String identifier, String pathElement) {
+        var urlEncodedIdentifier = URLEncoder.encode(identifier, StandardCharsets.UTF_8);
+        var uriString = getBaseUriWrapper(domainName, basePath)
+                .addChild(pathElement)
+                .toString();
         return URI.create(uriString + "/" + urlEncodedIdentifier);
     }
 

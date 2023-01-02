@@ -128,6 +128,7 @@ public final class CristinBiobank {
     public CristinTimeStampFromSource getCristinBiobankCreated() { return cristinBiobankCreated; }
 
     public CristinTimeStampFromSource getCristinBiobankLastModified() { return cristinBiobankLastModified; }
+    public CristinCoordinatinInstitution getCristinCoordinatinInstitution() { return cristinCoordinatinInstitution; }
 
     public CristinCoordinator getCristinBiobankCoordinator() { return cristinBiobankCoordinator; }
 
