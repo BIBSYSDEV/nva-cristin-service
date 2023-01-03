@@ -40,23 +40,23 @@ public class Biobank {
     private static final String ID_BIOBANK ="id";
 
     @JsonProperty(ID_BIOBANK)
-    private final URI biobankId;
+    private transient final URI biobankId;
 
     @JsonProperty(IDENTIFIER)
-    private final String biobankIdentifier;
+    private  transient final String biobankIdentifier;
 
     @JsonProperty(BIOBANK_TYPE)
-    private final String biobankType;
+    private  transient final String biobankType;
     @JsonProperty(NAME)
-    private final Map<String, String> name;
+    private  transient final Map<String, String> name;
     @JsonProperty(MAIN_LANGUAGE_KEY)
-    private final String mainLanguage;
+    private  transient final String mainLanguage;
 
     @JsonProperty(STORED_UNTIL_DATE)
-    private final Instant storeUntilDate;
+    private  transient final Instant storeUntilDate;
 
     @JsonProperty(STATUS)
-    private final String status;
+    private  transient final String status;
     @JsonProperty(CREATED)
     private transient final TimeStampFromSource created;
     @JsonProperty(LAST_MODIFIED)
@@ -83,10 +83,10 @@ public class Biobank {
 
 
     @JsonProperty(BIOBANK_MATERIALS)
-    private final List<BiobankMaterial> biobankMaterials;
+    private  transient final List<BiobankMaterial> biobankMaterials;
 
     @JsonSerialize(using = CustomInstantSerializer.class)
-    private final Instant startDate;
+    private  transient final Instant startDate;
 
 
     public Biobank(URI biobank_id, String biobankIdentifier,
