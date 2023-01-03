@@ -1,7 +1,9 @@
 package no.unit.nva.cristin.biobank.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static no.unit.nva.cristin.model.JsonPropertyNames.*;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -38,7 +40,7 @@ public class Biobank {
     private static final String ID_BIOBANK ="id";
 
     @JsonProperty(ID_BIOBANK)
-    private final URI biobank_id;
+    private final URI biobankId;
 
     @JsonProperty(IDENTIFIER)
     private final String biobankIdentifier;
@@ -56,28 +58,28 @@ public class Biobank {
     @JsonProperty(STATUS)
     private final String status;
     @JsonProperty(CREATED)
-    private final TimeStampFromSource created;
+    private transient final TimeStampFromSource created;
     @JsonProperty(LAST_MODIFIED)
-    private final TimeStampFromSource lastModified;
+    private transient final TimeStampFromSource lastModified;
 
     @JsonProperty(COORDINATING_INSTITUTION_ORGANIZATION)
-    private final URI coordinatinInstitutionOrg;
+    private transient final URI coordinatinInstitutionOrg;
 
     @JsonProperty(COORDINATING_INSTITUTION_UNIT)
-    private final  URI coordinatinInstitutionUnit;
+    private transient final  URI coordinatinInstitutionUnit;
 
     @JsonProperty(COORDINATOR)
-    private final URI biobankCoordinator;
+    private transient final URI biobankCoordinator;
 
 
     @JsonProperty(ASSOCIATED_PROJECT)
-    private final URI assocProject;
+    private transient final URI assocProject;
 
     @JsonProperty(EXTERNAL_SOURCES)
-    private final ExternalSourcesBiobank externalSources;
+    private transient final ExternalSourcesBiobank externalSources;
 
     @JsonProperty(APPROVALS)
-    private final BiobankApprovals approvals;
+    private transient final BiobankApprovals approvals;
 
 
     @JsonProperty(BIOBANK_MATERIALS)
@@ -96,7 +98,7 @@ public class Biobank {
                    URI coordinatinInstitutionUnit, URI biobankCoordinator,
                    URI assocProject, ExternalSourcesBiobank externalSources,
                    BiobankApprovals approvals, List<BiobankMaterial> biobankMaterials) {
-        this.biobank_id = biobank_id;
+        this.biobankId = biobank_id;
         this.biobankIdentifier = biobankIdentifier;
         this.biobankType = type;
         this.name = name;

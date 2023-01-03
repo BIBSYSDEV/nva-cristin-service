@@ -12,6 +12,7 @@ public class CristinCoordinator {
     private final String cristinPersonIdentifier;
     private final String firstName;
     private final String lastName;
+    private final URI id;
 
     public String getCristinPersonIdentifier() {
         return cristinPersonIdentifier;
@@ -29,7 +30,6 @@ public class CristinCoordinator {
         return id;
     }
 
-    private final URI id;
 
     public CristinCoordinator(String cristinPersonIdentifier,
                               String firstName,
