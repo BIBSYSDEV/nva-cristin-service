@@ -1,6 +1,7 @@
 package no.unit.nva.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import no.unit.nva.model.cristin.CristinBiobankApprovals;
 
 import java.time.Instant;
 
@@ -36,6 +37,14 @@ public class BiobankApprovals {
         this.approvedSTatus = approvedSTatus;
         this.applicationCode = applicationCode;
         this.approvalReferenceId = approvalReferenceId;
+    }
+
+    public BiobankApprovals (CristinBiobankApprovals cristinApprovals) {
+        this.approvedDate = cristinApprovals.getApprovedDate();
+        this.approvedBy = cristinApprovals.getApprovedBy();
+        this.approvedSTatus = cristinApprovals.getApprovedSTatus();
+        this.applicationCode = cristinApprovals.getApplicationCode();
+        this.approvalReferenceId = cristinApprovals.getApprovalReferenceId();
     }
 
     public Instant getApprovedDate() {

@@ -1,6 +1,7 @@
 package no.unit.nva.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import no.unit.nva.model.cristin.CristinBiobankMaterial;
 
 public class BiobankMaterial {
     public static final String MATERIAL_CODE = "materialCode";
@@ -15,6 +16,11 @@ public class BiobankMaterial {
                                   String otherMaterialDescription) {
         this.materialCode = materialCode;
         this.otherMaterialDescription = otherMaterialDescription;
+    }
+
+    public BiobankMaterial(CristinBiobankMaterial cristinMaterial) {
+        this.materialCode = cristinMaterial.getMaterialCode();
+        this.otherMaterialDescription = cristinMaterial.getOtherMaterialDescription();
     }
 
     public String getMaterialCode() {

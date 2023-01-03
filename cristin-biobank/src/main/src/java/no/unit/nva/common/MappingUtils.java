@@ -1,8 +1,16 @@
 package no.unit.nva.common;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import no.unit.nva.cristin.biobank.model.nva.Biobank;
 import no.unit.nva.model.cristin.CristinBiobank;
+import no.unit.nva.model.cristin.CristinBiobankMaterial;
+import no.unit.nva.model.nva.BiobankApprovals;
+import no.unit.nva.model.nva.BiobankMaterial;
+import no.unit.nva.model.nva.ExternalSourcesBiobank;
+import no.unit.nva.model.nva.TimeStampFromSource;
 
 import static no.unit.nva.common.DomainUriUtils.getBiobankParamUri;
 
@@ -38,18 +46,25 @@ public final class MappingUtils {
                 cristinBiobank.getCristinBiobankType(), cristinBiobank.getName(),
                 cristinBiobank.getCristinBiobankLanguage(), cristinBiobank.getStartDate(),
                 cristinBiobank.getCristinBiobankStoreUntilDate(), cristinBiobank.getCristinBiobankStatus(),
-                cristinBiobank.getCristinBiobankCreated(), cristinBiobank.getCristinBiobankLastModified(),
+                new TimeStampFromSource(cristinBiobank.getCristinBiobankCreated()),
+                new TimeStampFromSource(cristinBiobank.getCristinBiobankLastModified()),
                 institutionId,
                 unitId,
                 personId,
                 cristinBiobank.getCristinBiobankAssocProject().getCristinProjectId(),
-                cristinBiobank.getCristinBiobankExternalSources(),
-                cristinBiobank.getCristinBiobankApprovals(),
-                cristinBiobank.getCristinBiobankMaterials()
+                new ExternalSourcesBiobank(cristinBiobank.getCristinBiobankExternalSources()),
+                new BiobankApprovals(cristinBiobank.getCristinBiobankApprovals()),
+                getBiobankMaterialList(cristinBiobank.getCristinBiobankMaterials())
                 );
     }
 
     private static URI getBiobankUri(String cristinBiobankId, String domainName, String basePath) {
         return DomainUriUtils.getBiobankUri(domainName, basePath, cristinBiobankId);
+    }
+
+    private static List<BiobankMaterial> getBiobankMaterialList (List <CristinBiobankMaterial> cristinListOfMaterials) {
+        List nvaListMaterials = new ArrayList<>();
+        cristinListOfMaterials.forEach(material -> nvaListMaterials.add(new BiobankMaterial(material)));
+        return nvaListMaterials;
     }
 }

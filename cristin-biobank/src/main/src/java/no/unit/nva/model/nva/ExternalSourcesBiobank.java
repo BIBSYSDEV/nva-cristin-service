@@ -1,6 +1,7 @@
 package no.unit.nva.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import no.unit.nva.model.cristin.CristinExternalSourcesBiobank;
 
 public class ExternalSourcesBiobank {
 
@@ -17,6 +18,11 @@ public class ExternalSourcesBiobank {
     public ExternalSourcesBiobank(String sourceReferenceId, String sourceShortName) {
         this.sourceReferenceId = sourceReferenceId;
         this.sourceShortName = sourceShortName;
+    }
+
+    public ExternalSourcesBiobank (CristinExternalSourcesBiobank cristinExternalSourcesBiobank) {
+        this.sourceReferenceId = cristinExternalSourcesBiobank.getSourceReferenceId();
+        this.sourceShortName = cristinExternalSourcesBiobank.getSourceShortName();
     }
 
     public String getSourceReferenceId() {
