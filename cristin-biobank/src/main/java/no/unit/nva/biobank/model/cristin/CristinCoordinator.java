@@ -1,4 +1,4 @@
-package no.unit.nva.model.cristin;
+package no.unit.nva.biobank.model.cristin;
 
 import java.net.URI;
 

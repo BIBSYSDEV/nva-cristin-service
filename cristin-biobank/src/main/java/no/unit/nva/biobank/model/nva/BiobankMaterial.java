@@ -1,7 +1,7 @@
-package no.unit.nva.model.nva;
+package no.unit.nva.biobank.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import no.unit.nva.model.cristin.CristinBiobankMaterial;
+import no.unit.nva.biobank.model.cristin.CristinBiobankMaterial;
 
 public class BiobankMaterial {
     public static final String MATERIAL_CODE = "materialCode";

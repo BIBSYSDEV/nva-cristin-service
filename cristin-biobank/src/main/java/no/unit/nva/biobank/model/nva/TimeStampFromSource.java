@@ -1,6 +1,6 @@
-package no.unit.nva.model.nva;
+package no.unit.nva.biobank.model.nva;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import no.unit.nva.model.cristin.CristinTimeStampFromSource;
+import no.unit.nva.biobank.model.cristin.CristinTimeStampFromSource;
 
 import java.time.Instant;
 

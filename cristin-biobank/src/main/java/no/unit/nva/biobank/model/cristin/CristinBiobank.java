@@ -1,4 +1,4 @@
-package no.unit.nva.model.cristin;
+package no.unit.nva.biobank.model.cristin;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

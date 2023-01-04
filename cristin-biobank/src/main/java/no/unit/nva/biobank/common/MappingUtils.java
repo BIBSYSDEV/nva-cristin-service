@@ -1,18 +1,16 @@
-package no.unit.nva.common;
+package no.unit.nva.biobank.common;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.unit.nva.biobank.model.cristin.CristinBiobank;
+import no.unit.nva.biobank.model.cristin.CristinBiobankMaterial;
+import no.unit.nva.biobank.model.nva.BiobankApprovals;
+import no.unit.nva.biobank.model.nva.BiobankMaterial;
+import no.unit.nva.biobank.model.nva.ExternalSourcesBiobank;
+import no.unit.nva.biobank.model.nva.TimeStampFromSource;
 import no.unit.nva.cristin.biobank.model.nva.Biobank;
-import no.unit.nva.model.cristin.CristinBiobank;
-import no.unit.nva.model.cristin.CristinBiobankMaterial;
-import no.unit.nva.model.nva.BiobankApprovals;
-import no.unit.nva.model.nva.BiobankMaterial;
-import no.unit.nva.model.nva.ExternalSourcesBiobank;
-import no.unit.nva.model.nva.TimeStampFromSource;
-
-import static no.unit.nva.common.DomainUriUtils.getBiobankParamUri;
 
 public final class MappingUtils {
     private static final String INSTITUTIONS_PATH_ELEMENT = "institutions";
@@ -30,15 +28,15 @@ public final class MappingUtils {
                                                  ) {
         var id = getBiobankUri(cristinBiobank.getCristinBiobankId(), domainName, basePath);
 
-        var institutionId = getBiobankParamUri(domainName, basePath,
+        var institutionId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
                 cristinBiobank.getCristinCoordinatinInstitution().getCristinInstitution().getCristinInstitutionId(),
                 INSTITUTIONS_PATH_ELEMENT);
 
-        var unitId = getBiobankParamUri(domainName, basePath,
+        var unitId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
                 cristinBiobank.getCristinCoordinatinInstitution().getCristinUnit().getCristinUnitId(),
                 UNITS_PATH_ELEMENT);
 
-        var personId = getBiobankParamUri(domainName, basePath,
+        var personId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
                 cristinBiobank.getCristinBiobankCoordinator().getCristinPersonIdentifier(),
                 PERSONS_PATH_ELEMENT);
 

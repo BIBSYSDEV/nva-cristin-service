@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.biobank.model.nva;
+package no.unit.nva.biobank.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
@@ -10,10 +10,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import no.unit.nva.model.nva.BiobankApprovals;
-import no.unit.nva.model.nva.BiobankMaterial;
-import no.unit.nva.model.nva.ExternalSourcesBiobank;
-import no.unit.nva.model.nva.TimeStampFromSource;
 import no.unit.nva.utils.CustomInstantSerializer;
 
 import java.net.URI;
@@ -89,7 +85,7 @@ public class Biobank {
     private  transient final Instant startDate;
 
 
-    public Biobank(URI biobank_id, String biobankIdentifier,
+    public Biobank(URI biobankId, String biobankIdentifier,
                    String type, Map<String, String> name,
                    String mainLanguage, Instant startDate,
                    Instant storeUntilDate, String status,
@@ -98,7 +94,7 @@ public class Biobank {
                    URI coordinatinInstitutionUnit, URI biobankCoordinator,
                    URI assocProject, ExternalSourcesBiobank externalSources,
                    BiobankApprovals approvals, List<BiobankMaterial> biobankMaterials) {
-        this.biobankId = biobank_id;
+        this.biobankId = biobankId;
         this.biobankIdentifier = biobankIdentifier;
         this.biobankType = type;
         this.name = name;

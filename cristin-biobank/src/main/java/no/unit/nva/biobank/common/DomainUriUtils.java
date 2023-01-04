@@ -1,4 +1,4 @@
-package no.unit.nva.common;
+package no.unit.nva.biobank.common;
 
 import static nva.commons.core.paths.UriWrapper.HTTPS;
 import java.net.URI;

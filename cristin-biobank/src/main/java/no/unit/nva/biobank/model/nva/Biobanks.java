@@ -1,4 +1,4 @@
-package no.unit.nva.model.nva;
+package no.unit.nva.biobank.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;

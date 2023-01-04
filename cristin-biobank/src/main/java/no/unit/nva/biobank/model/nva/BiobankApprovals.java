@@ -1,7 +1,7 @@
-package no.unit.nva.model.nva;
+package no.unit.nva.biobank.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import no.unit.nva.model.cristin.CristinBiobankApprovals;
+import no.unit.nva.biobank.model.cristin.CristinBiobankApprovals;
 
 import java.time.Instant;
 
