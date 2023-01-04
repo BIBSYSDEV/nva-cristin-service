@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("PMD.ExcessiveParameterList")
 public final class CristinBiobank {
     //Here be more params
     private static final String CRISTIN_BIOBANK_ID = "cristin_biobank_id";

@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings({"PMD.ExcessiveParameterList", "PMD.TooManyFields"})
 @JsonInclude(NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Biobank {
