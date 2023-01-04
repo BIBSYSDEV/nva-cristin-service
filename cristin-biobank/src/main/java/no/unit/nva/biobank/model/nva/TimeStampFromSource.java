@@ -1,4 +1,5 @@
 package no.unit.nva.biobank.model.nva;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import no.unit.nva.biobank.model.cristin.CristinTimeStampFromSource;
 
@@ -21,7 +22,7 @@ public class TimeStampFromSource {
         this.sourceShortName = sourceShortName;
     }
 
-    public TimeStampFromSource(CristinTimeStampFromSource cristinTimeStampFromSource){
+    public TimeStampFromSource(CristinTimeStampFromSource cristinTimeStampFromSource) {
         this.date = cristinTimeStampFromSource.getDate();
         this.sourceShortName = cristinTimeStampFromSource.getSourceShortName();
     }

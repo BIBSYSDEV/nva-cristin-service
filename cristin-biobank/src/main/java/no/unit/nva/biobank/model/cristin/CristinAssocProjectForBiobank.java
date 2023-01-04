@@ -20,6 +20,12 @@ public class CristinAssocProjectForBiobank {
     private final Map<String, String> title;
 
 
+    /**
+     * Constructor
+     * @param cristinProjectId - URI
+     * @param cristinProjectIdentificator - code
+     * @param title - name of the project
+     */
     public CristinAssocProjectForBiobank(URI cristinProjectId,
                                          String cristinProjectIdentificator,
                                          Map<String, String> title) {

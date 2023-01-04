@@ -1,5 +1,6 @@
 package no.unit.nva.biobank.model.cristin;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
@@ -26,7 +27,15 @@ public class CristinBiobankApprovals {
     @JsonProperty (CRISTIN_APPROVAL_REFERENCE_ID)
     private final String approvalReferenceId;
 
-
+    /**
+     * Constructor.
+     * @param approvedDate - timestamp
+     * @param approvedBy - short code of approver
+     * @param approvedSTatus - status of approval
+     * @param applicationCode - application code usually "BIOBANK"
+     * @param approvalReferenceId - reference id
+     */
+    @JsonCreator
     public CristinBiobankApprovals(Instant approvedDate,
                                    String approvedBy,
                                    String approvedSTatus,

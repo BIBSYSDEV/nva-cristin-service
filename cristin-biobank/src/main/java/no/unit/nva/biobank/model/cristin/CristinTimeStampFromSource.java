@@ -1,4 +1,5 @@
 package no.unit.nva.biobank.model.cristin;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;

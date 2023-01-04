@@ -1,5 +1,7 @@
 package no.unit.nva.biobank.model.cristin;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import java.net.URI;
 
 public class CristinCoordinator {
@@ -30,7 +32,14 @@ public class CristinCoordinator {
         return id;
     }
 
-
+    /**
+     * Constructor.
+     * @param cristinPersonIdentifier - cristin code id of the person
+     * @param firstName - of the person
+     * @param lastName - of the person
+     * @param id - URI
+     */
+    @JsonCreator
     public CristinCoordinator(String cristinPersonIdentifier,
                               String firstName,
                               String lastName,

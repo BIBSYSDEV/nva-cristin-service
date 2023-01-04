@@ -26,7 +26,14 @@ public class BiobankApprovals {
     @JsonProperty (APPROVAL_REFERENCE_ID)
     private final String approvalReferenceId;
 
-
+    /**
+     * Default constructor.
+     * @param approvedDate - timestamp for approval
+     * @param approvedBy code of approver e.g. "REK"
+     * @param approvedSTatus - status
+     * @param applicationCode - application code "BIOBANK" in most cases
+     * @param approvalReferenceId - code for approval reference
+     */
     public BiobankApprovals(Instant approvedDate,
                                    String approvedBy,
                                    String approvedSTatus,
@@ -39,7 +46,11 @@ public class BiobankApprovals {
         this.approvalReferenceId = approvalReferenceId;
     }
 
-    public BiobankApprovals (CristinBiobankApprovals cristinApprovals) {
+    /**
+     * Constructor based on cristin model.
+     * @param cristinApprovals - the corresponding field of Cristin model
+     */
+    public BiobankApprovals(CristinBiobankApprovals cristinApprovals) {
         this.approvedDate = cristinApprovals.getApprovedDate();
         this.approvedBy = cristinApprovals.getApprovedBy();
         this.approvedSTatus = cristinApprovals.getApprovedSTatus();

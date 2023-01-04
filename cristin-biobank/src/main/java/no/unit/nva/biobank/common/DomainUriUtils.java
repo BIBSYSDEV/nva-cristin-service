@@ -19,6 +19,13 @@ public final class DomainUriUtils {
         return getBaseUriWrapper(domainName, basePath).addChild(BIOBANK_PATH_ELEMENT).getUri();
     }
 
+    /**
+     * Building up URI ID for Biobank.
+     * @param domainName - env
+     * @param basePath - path
+     * @param identifier - code
+     * @return
+     */
     public static URI getBiobankUri(String domainName, String basePath, String identifier) {
         var urlEncodedIdentifier = URLEncoder.encode(identifier, StandardCharsets.UTF_8);
         var uriString = getBaseUriWrapper(domainName, basePath)
@@ -27,6 +34,14 @@ public final class DomainUriUtils {
         return URI.create(uriString + "/" + urlEncodedIdentifier);
     }
 
+    /**
+     * Generating URIs for fields of the Biobank, considering their specific path.
+     * @param domainName - env
+     * @param basePath - path
+     * @param identifier - code
+     * @param pathElement -path element for particular parameter
+     * @return
+     */
     public static URI getBiobankParamUri(String domainName, String basePath, String identifier, String pathElement) {
         var urlEncodedIdentifier = URLEncoder.encode(identifier, StandardCharsets.UTF_8);
         var uriString = getBaseUriWrapper(domainName, basePath)

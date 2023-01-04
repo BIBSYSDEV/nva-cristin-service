@@ -20,7 +20,7 @@ public class ExternalSourcesBiobank {
         this.sourceShortName = sourceShortName;
     }
 
-    public ExternalSourcesBiobank (CristinExternalSourcesBiobank cristinExternalSourcesBiobank) {
+    public ExternalSourcesBiobank(CristinExternalSourcesBiobank cristinExternalSourcesBiobank) {
         this.sourceReferenceId = cristinExternalSourcesBiobank.getSourceReferenceId();
         this.sourceShortName = cristinExternalSourcesBiobank.getSourceShortName();
     }

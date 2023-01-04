@@ -33,58 +33,77 @@ public class Biobank {
     private static final String COORDINATING_INSTITUTION_ORGANIZATION = "coordinating_institution_org";
     private static final String COORDINATING_INSTITUTION_UNIT = "coordinating_institution_unit";
 
-    private static final String ID_BIOBANK ="id";
+    private static final String ID_BIOBANK = "id";
 
     @JsonProperty(ID_BIOBANK)
-    private transient final URI biobankId;
+    private final transient URI biobankId;
 
     @JsonProperty(IDENTIFIER)
-    private  transient final String biobankIdentifier;
+    private final transient String biobankIdentifier;
 
     @JsonProperty(BIOBANK_TYPE)
-    private  transient final String biobankType;
+    private final transient String biobankType;
     @JsonProperty(NAME)
-    private  transient final Map<String, String> name;
+    private final transient Map<String, String> name;
     @JsonProperty(MAIN_LANGUAGE_KEY)
-    private  transient final String mainLanguage;
+    private final transient String mainLanguage;
 
     @JsonProperty(STORED_UNTIL_DATE)
-    private  transient final Instant storeUntilDate;
+    private final transient Instant storeUntilDate;
 
     @JsonProperty(STATUS)
-    private  transient final String status;
+    private final  transient String status;
     @JsonProperty(CREATED)
-    private transient final TimeStampFromSource created;
+    private final transient TimeStampFromSource created;
     @JsonProperty(LAST_MODIFIED)
-    private transient final TimeStampFromSource lastModified;
+    private final transient TimeStampFromSource lastModified;
 
     @JsonProperty(COORDINATING_INSTITUTION_ORGANIZATION)
-    private transient final URI coordinatinInstitutionOrg;
+    private final transient URI coordinatinInstitutionOrg;
 
     @JsonProperty(COORDINATING_INSTITUTION_UNIT)
-    private transient final  URI coordinatinInstitutionUnit;
+    private final transient  URI coordinatinInstitutionUnit;
 
     @JsonProperty(COORDINATOR)
-    private transient final URI biobankCoordinator;
+    private final transient URI biobankCoordinator;
 
 
     @JsonProperty(ASSOCIATED_PROJECT)
-    private transient final URI assocProject;
+    private final transient URI assocProject;
 
     @JsonProperty(EXTERNAL_SOURCES)
-    private transient final ExternalSourcesBiobank externalSources;
+    private final transient ExternalSourcesBiobank externalSources;
 
     @JsonProperty(APPROVALS)
-    private transient final BiobankApprovals approvals;
+    private final transient BiobankApprovals approvals;
 
 
     @JsonProperty(BIOBANK_MATERIALS)
-    private  transient final List<BiobankMaterial> biobankMaterials;
+    private final transient List<BiobankMaterial> biobankMaterials;
 
     @JsonSerialize(using = CustomInstantSerializer.class)
-    private  transient final Instant startDate;
+    private final transient Instant startDate;
 
-
+    /**
+     * Constructor.
+     * @param biobankId - biobank URI
+     * @param biobankIdentifier - cristin id code
+     * @param type - type
+     * @param name - names mapped with languages
+     * @param mainLanguage - code of the language
+     * @param startDate - timestamp
+     * @param storeUntilDate - timestamp
+     * @param status - status
+     * @param created - timestamp and source of creation short name code
+     * @param lastModified - timestamp and source of modification short name code
+     * @param coordinatinInstitutionOrg - Id of the institution (URI)
+     * @param coordinatinInstitutionUnit - Id of the unit (uri)
+     * @param biobankCoordinator - Id of coordinator (person URI)
+     * @param assocProject - Id of the project (URI)
+     * @param externalSources - source short name and reference id
+     * @param approvals - approval parameters
+     * @param biobankMaterials - material code and description
+     */
     public Biobank(URI biobankId, String biobankIdentifier,
                    String type, Map<String, String> name,
                    String mainLanguage, Instant startDate,

@@ -1,8 +1,6 @@
 package no.unit.nva.biobank.model.cristin;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import no.unit.nva.utils.CustomInstantSerializer;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -72,9 +70,25 @@ public final class CristinBiobank {
     @JsonProperty(CRISTIN_BIOBANK_MATERIALS)
     private final List<CristinBiobankMaterial> cristinBiobankMaterials;
 
-    @JsonSerialize(using = CustomInstantSerializer.class)
-    private final Instant startDate;
 
+    /**
+     * Constructor
+     * @param cristinBiobankId - cristin id code
+     * @param cristinBiobankType - type
+     * @param cristinBiobankLanguage - code of the language
+     * @param name - names mapped with languages
+     * @param cristinBiobankStartDate - timestamp
+     * @param cristinBiobankStoreUntilDate - timestamp
+     * @param cristinBiobankStatus -status
+     * @param cristinBiobankCreated - - timestamp and source of creation short name code
+     * @param cristinBiobankLastModified - timestamp and source of modification short name code
+     * @param cristinCoordinatinInstitution - Information about coordinating institution organization and unit (uri)
+     * @param cristinBiobankCoordinator - Id of coordinator (person URI)
+     * @param cristinBiobankAssocProject - Id of the project (URI)
+     * @param cristinBiobankExternalSources - source short name and reference id
+     * @param cristinBiobankApprovals - approval parameters
+     * @param cristinBiobankMaterials - material code and description
+     */
     public CristinBiobank(@JsonProperty(CRISTIN_BIOBANK_ID) String cristinBiobankId,
                           @JsonProperty(CRISTIN_BIOBANK_TYPE) String cristinBiobankType,
                           @JsonProperty(CRISTIN_BIOBANK_MAIN_LANGUAGE_KEY) String cristinBiobankLanguage,
@@ -89,8 +103,7 @@ public final class CristinBiobank {
                           CristinAssocProjectForBiobank cristinBiobankAssocProject,
                           CristinExternalSourcesBiobank cristinBiobankExternalSources,
                           CristinBiobankApprovals cristinBiobankApprovals,
-                          List<CristinBiobankMaterial> cristinBiobankMaterials,
-                          Instant startDate) {
+                          List<CristinBiobankMaterial> cristinBiobankMaterials) {
         this.cristinBiobankId = cristinBiobankId;
         this.cristinBiobankType = cristinBiobankType;
         this.cristinBiobankLanguage = cristinBiobankLanguage;
@@ -106,7 +119,6 @@ public final class CristinBiobank {
         this.cristinBiobankExternalSources = cristinBiobankExternalSources;
         this.cristinBiobankApprovals = cristinBiobankApprovals;
         this.cristinBiobankMaterials = cristinBiobankMaterials;
-        this.startDate = startDate;
     }
 
 
@@ -118,29 +130,59 @@ public final class CristinBiobank {
         return name;
     }
 
-    public String getCristinBiobankType() { return cristinBiobankType; }
-    public String getCristinBiobankLanguage() { return cristinBiobankLanguage; }
-    public Instant getCristinBiobankStartDate() { return cristinBiobankStartDate; }
-    public Instant getCristinBiobankStoreUntilDate() { return cristinBiobankStoreUntilDate; }
+    public String getCristinBiobankType() {
+        return cristinBiobankType;
+    }
 
-    public String getCristinBiobankStatus() { return cristinBiobankStatus; }
+    public String getCristinBiobankLanguage() {
+        return cristinBiobankLanguage;
+    }
 
-    public CristinTimeStampFromSource getCristinBiobankCreated() { return cristinBiobankCreated; }
+    public Instant getCristinBiobankStartDate() {
+        return cristinBiobankStartDate;
+    }
 
-    public CristinTimeStampFromSource getCristinBiobankLastModified() { return cristinBiobankLastModified; }
-    public CristinCoordinatinInstitution getCristinCoordinatinInstitution() { return cristinCoordinatinInstitution; }
+    public Instant getCristinBiobankStoreUntilDate() {
+        return cristinBiobankStoreUntilDate;
+    }
 
-    public CristinCoordinator getCristinBiobankCoordinator() { return cristinBiobankCoordinator; }
+    public String getCristinBiobankStatus() {
+        return cristinBiobankStatus;
+    }
 
-    public CristinAssocProjectForBiobank getCristinBiobankAssocProject() { return cristinBiobankAssocProject; }
+    public CristinTimeStampFromSource getCristinBiobankCreated() {
+        return cristinBiobankCreated;
+    }
 
-    public CristinExternalSourcesBiobank getCristinBiobankExternalSources() { return cristinBiobankExternalSources; }
+    public CristinTimeStampFromSource getCristinBiobankLastModified() {
+        return cristinBiobankLastModified;
+    }
 
-    public CristinBiobankApprovals getCristinBiobankApprovals() { return cristinBiobankApprovals; }
+    public CristinCoordinatinInstitution getCristinCoordinatinInstitution() {
+        return cristinCoordinatinInstitution;
+    }
 
-    public List<CristinBiobankMaterial> getCristinBiobankMaterials() { return cristinBiobankMaterials; }
+    public CristinCoordinator getCristinBiobankCoordinator() {
+        return cristinBiobankCoordinator;
+    }
 
-    public Instant getStartDate() { return startDate; }
+    public CristinAssocProjectForBiobank getCristinBiobankAssocProject() {
+        return cristinBiobankAssocProject;
+    }
+
+    public CristinExternalSourcesBiobank getCristinBiobankExternalSources() {
+        return cristinBiobankExternalSources;
+    }
+
+    public CristinBiobankApprovals getCristinBiobankApprovals() {
+        return cristinBiobankApprovals;
+    }
+
+    public List<CristinBiobankMaterial> getCristinBiobankMaterials() {
+        return cristinBiobankMaterials;
+    }
+
+
 
 
 }
