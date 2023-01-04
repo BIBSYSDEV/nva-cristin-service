@@ -131,4 +131,72 @@ public class Biobank {
         this.approvals = approvals;
         this.biobankMaterials = biobankMaterials;
     }
+
+    public URI getBiobankId() {
+        return biobankId;
+    }
+
+    public String getBiobankIdentifier() {
+        return biobankIdentifier;
+    }
+
+    public String getBiobankType() {
+        return biobankType;
+    }
+
+    public Map<String, String> getName() {
+        return name;
+    }
+
+    public String getMainLanguage() {
+        return mainLanguage;
+    }
+
+    public Instant getStoreUntilDate() {
+        return storeUntilDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public TimeStampFromSource getCreated() {
+        return created;
+    }
+
+    public TimeStampFromSource getLastModified() {
+        return lastModified;
+    }
+
+    public URI getCoordinatinInstitutionOrg() {
+        return coordinatinInstitutionOrg;
+    }
+
+    public URI getCoordinatinInstitutionUnit() {
+        return coordinatinInstitutionUnit;
+    }
+
+    public URI getBiobankCoordinator() {
+        return biobankCoordinator;
+    }
+
+    public URI getAssocProject() {
+        return assocProject;
+    }
+
+    public ExternalSourcesBiobank getExternalSources() {
+        return externalSources;
+    }
+
+    public BiobankApprovals getApprovals() {
+        return approvals;
+    }
+
+    public List<BiobankMaterial> getBiobankMaterials() {
+        return biobankMaterials;
+    }
+
+    public Instant getStartDate() {
+        return startDate;
+    }
 }
