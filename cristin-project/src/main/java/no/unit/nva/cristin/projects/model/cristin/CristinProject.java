@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
