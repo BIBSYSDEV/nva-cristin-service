@@ -2,6 +2,7 @@ package no.unit.nva.biobank.model.cristin;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import no.unit.nva.cristin.model.CristinExternalSource;
+import no.unit.nva.cristin.model.CristinOrganization;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -54,7 +55,7 @@ public final class CristinBiobank {
     private final CristinTimeStampFromSource lastModified;
 
     @JsonProperty(CRISTIN_BIOBANK_COORDINATING_INSTITUTION)
-    private final CristinCoordinatinInstitution coordinatinInstitution;
+    private final CristinOrganization coordinatinInstitution;
 
     @JsonProperty(CRISTIN_BIOBANK_COORDINATOR)
     private final CristinCoordinator coordinator;
@@ -101,7 +102,7 @@ public final class CristinBiobank {
                           String status,
                           CristinTimeStampFromSource created,
                           CristinTimeStampFromSource cristinBiobankLastModified,
-                          CristinCoordinatinInstitution coordinatinInstitution,
+                          CristinOrganization coordinatinInstitution,
                           CristinCoordinator coordinator,
                           CristinAssocProjectForBiobank assocProject,
                           CristinExternalSource externalSources,
@@ -161,7 +162,7 @@ public final class CristinBiobank {
         return lastModified;
     }
 
-    public CristinCoordinatinInstitution getCoordinatinInstitution() {
+    public CristinOrganization getCoordinatinInstitution() {
         return coordinatinInstitution;
     }
 

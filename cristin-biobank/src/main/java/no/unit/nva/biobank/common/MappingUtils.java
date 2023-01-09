@@ -36,11 +36,11 @@ public final class MappingUtils {
         var id = getBiobankUri(cristinBiobank.getCristinBiobankId(), domainName, basePath);
 
         var institutionId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
-                cristinBiobank.getCoordinatinInstitution().getCristinInstitution().getCristinInstitutionId(),
+                cristinBiobank.getCoordinatinInstitution().getInstitution().getUrl(),
                 INSTITUTIONS_PATH_ELEMENT);
 
         var unitId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
-                cristinBiobank.getCoordinatinInstitution().getCristinUnit().getCristinUnitId(),
+                cristinBiobank.getCoordinatinInstitution().getInstitutionUnit().getUrl(),
                 UNITS_PATH_ELEMENT);
 
         var personId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
