@@ -29,159 +29,161 @@ public final class CristinBiobank {
     private static final String CRISTIN_BIOBANK_MATERIALS = "biobank_material";
 
     @JsonProperty(CRISTIN_BIOBANK_ID)
-    private final String cristinBiobankId;
+    private final String biobankId;
 
     @JsonProperty(CRISTIN_BIOBANK_TYPE)
-    private final String cristinBiobankType;
+    private final String type;
     @JsonProperty(CRISTIN_NAME_FIELD)
+
     private final Map<String, String> name;
     @JsonProperty(CRISTIN_BIOBANK_MAIN_LANGUAGE_KEY)
-    private final String cristinBiobankLanguage;
+    private final String language;
 
     @JsonProperty(CRISTIN_BIOBANK_START_DATE)
-    private final Instant cristinBiobankStartDate;
+    private final Instant startDate;
 
     @JsonProperty(CRISTIN_BIOBANK_STORED_UNTIL_DATE)
-    private final Instant cristinBiobankStoreUntilDate;
+    private final Instant storeUntilDate;
 
     @JsonProperty(CRISTIN_BIOBANK_STATUS)
-    private final String cristinBiobankStatus;
+    private final String status;
     @JsonProperty(CRISTIN_BIOBANK_CREATED)
-    private final CristinTimeStampFromSource cristinBiobankCreated;
+    private final CristinTimeStampFromSource created;
     @JsonProperty(CRISTIN_BIOBANK_LAST_MODIFIED)
-    private final CristinTimeStampFromSource cristinBiobankLastModified;
+    private final CristinTimeStampFromSource lastModified;
 
     @JsonProperty(CRISTIN_BIOBANK_COORDINATING_INSTITUTION)
-    private final CristinCoordinatinInstitution cristinCoordinatinInstitution;
+    private final CristinCoordinatinInstitution coordinatinInstitution;
 
     @JsonProperty(CRISTIN_BIOBANK_COORDINATOR)
-    private final CristinCoordinator cristinBiobankCoordinator;
+    private final CristinCoordinator coordinator;
 
 
     @JsonProperty(CRISTIN_BIOBANK_ASSOC_PROJECT)
-    private final CristinAssocProjectForBiobank cristinBiobankAssocProject;
+    private final CristinAssocProjectForBiobank assocProject;
 
     @JsonProperty(CRISTIN_BIOBANK_EXTERNAL_SOURCES)
-    private final CristinExternalSourcesBiobank cristinBiobankExternalSources;
+    private final CristinExternalSourcesBiobank externalSources;
 
     @JsonProperty(CRISTIN_BIOBANK_APPROVALS)
-    private final CristinBiobankApprovals cristinBiobankApprovals;
+    private final CristinBiobankApprovals approvals;
 
 
     @JsonProperty(CRISTIN_BIOBANK_MATERIALS)
-    private final List<CristinBiobankMaterial> cristinBiobankMaterials;
+    private final List<CristinBiobankMaterial> materials;
 
 
     /**
      * Constructor
      * @param cristinBiobankId - cristin id code
-     * @param cristinBiobankType - type
+     * @param type - type
      * @param cristinBiobankLanguage - code of the language
      * @param name - names mapped with languages
-     * @param cristinBiobankStartDate - timestamp
+     * @param startDate - timestamp
      * @param cristinBiobankStoreUntilDate - timestamp
-     * @param cristinBiobankStatus -status
-     * @param cristinBiobankCreated - - timestamp and source of creation short name code
+     * @param status -status
+     * @param created - - timestamp and source of creation short name code
      * @param cristinBiobankLastModified - timestamp and source of modification short name code
-     * @param cristinCoordinatinInstitution - Information about coordinating institution organization and unit (uri)
-     * @param cristinBiobankCoordinator - Id of coordinator (person URI)
-     * @param cristinBiobankAssocProject - Id of the project (URI)
-     * @param cristinBiobankExternalSources - source short name and reference id
-     * @param cristinBiobankApprovals - approval parameters
-     * @param cristinBiobankMaterials - material code and description
+     * @param coordinatinInstitution - Information about coordinating institution organization and unit (uri)
+     * @param coordinator - Id of coordinator (person URI)
+     * @param assocProject - Id of the project (URI)
+     * @param externalSources - source short name and reference id
+     * @param approvals - approval parameters
+     * @param materials - material code and description
      */
     public CristinBiobank(@JsonProperty(CRISTIN_BIOBANK_ID) String cristinBiobankId,
-                          @JsonProperty(CRISTIN_BIOBANK_TYPE) String cristinBiobankType,
+                          @JsonProperty(CRISTIN_BIOBANK_TYPE) String type,
                           @JsonProperty(CRISTIN_BIOBANK_MAIN_LANGUAGE_KEY) String cristinBiobankLanguage,
                           @JsonProperty(CRISTIN_NAME_FIELD) Map<String, String> name,
-                          Instant cristinBiobankStartDate,
+                          Instant startDate,
                           Instant cristinBiobankStoreUntilDate,
-                          String cristinBiobankStatus,
-                          CristinTimeStampFromSource cristinBiobankCreated,
+                          String status,
+                          CristinTimeStampFromSource created,
                           CristinTimeStampFromSource cristinBiobankLastModified,
-                          CristinCoordinatinInstitution cristinCoordinatinInstitution,
-                          CristinCoordinator cristinBiobankCoordinator,
-                          CristinAssocProjectForBiobank cristinBiobankAssocProject,
-                          CristinExternalSourcesBiobank cristinBiobankExternalSources,
-                          CristinBiobankApprovals cristinBiobankApprovals,
-                          List<CristinBiobankMaterial> cristinBiobankMaterials) {
-        this.cristinBiobankId = cristinBiobankId;
-        this.cristinBiobankType = cristinBiobankType;
-        this.cristinBiobankLanguage = cristinBiobankLanguage;
+                          CristinCoordinatinInstitution coordinatinInstitution,
+                          CristinCoordinator coordinator,
+                          CristinAssocProjectForBiobank assocProject,
+                          CristinExternalSourcesBiobank externalSources,
+                          CristinBiobankApprovals approvals,
+                          List<CristinBiobankMaterial> materials) {
+        this.biobankId = cristinBiobankId;
+        this.type = type;
+        this.language = cristinBiobankLanguage;
         this.name = Collections.unmodifiableMap(name);
-        this.cristinBiobankStartDate = cristinBiobankStartDate;
-        this.cristinBiobankStoreUntilDate = cristinBiobankStoreUntilDate;
-        this.cristinBiobankStatus = cristinBiobankStatus;
-        this.cristinBiobankCreated = cristinBiobankCreated;
-        this.cristinBiobankLastModified = cristinBiobankLastModified;
-        this.cristinCoordinatinInstitution = cristinCoordinatinInstitution;
-        this.cristinBiobankCoordinator = cristinBiobankCoordinator;
-        this.cristinBiobankAssocProject = cristinBiobankAssocProject;
-        this.cristinBiobankExternalSources = cristinBiobankExternalSources;
-        this.cristinBiobankApprovals = cristinBiobankApprovals;
-        this.cristinBiobankMaterials = cristinBiobankMaterials;
+        this.startDate = startDate;
+        this.storeUntilDate = cristinBiobankStoreUntilDate;
+        this.status = status;
+        this.created = created;
+        this.lastModified = cristinBiobankLastModified;
+        this.coordinatinInstitution = coordinatinInstitution;
+        this.coordinator = coordinator;
+        this.assocProject = assocProject;
+        this.externalSources = externalSources;
+        this.approvals = approvals;
+        this.materials = materials;
     }
 
 
     public String getCristinBiobankId() {
-        return cristinBiobankId;
+        return biobankId;
     }
 
     public Map<String, String> getName() {
         return name;
     }
 
-    public String getCristinBiobankType() {
-        return cristinBiobankType;
+    public String getType() {
+        return type;
     }
 
-    public String getCristinBiobankLanguage() {
-        return cristinBiobankLanguage;
+    public String getLanguage() {
+        return language;
     }
 
-    public Instant getCristinBiobankStartDate() {
-        return cristinBiobankStartDate;
+    public Instant getStartDate() {
+        return startDate;
     }
 
-    public Instant getCristinBiobankStoreUntilDate() {
-        return cristinBiobankStoreUntilDate;
+    public Instant getStoreUntilDate() {
+        return storeUntilDate;
     }
 
-    public String getCristinBiobankStatus() {
-        return cristinBiobankStatus;
+    public String getStatus() {
+        return status;
     }
 
-    public CristinTimeStampFromSource getCristinBiobankCreated() {
-        return cristinBiobankCreated;
+    public CristinTimeStampFromSource getCreated() {
+        return created;
     }
 
-    public CristinTimeStampFromSource getCristinBiobankLastModified() {
-        return cristinBiobankLastModified;
+    public CristinTimeStampFromSource getLastModified() {
+        return lastModified;
     }
 
-    public CristinCoordinatinInstitution getCristinCoordinatinInstitution() {
-        return cristinCoordinatinInstitution;
+    public CristinCoordinatinInstitution getCoordinatinInstitution() {
+        return coordinatinInstitution;
     }
 
-    public CristinCoordinator getCristinBiobankCoordinator() {
-        return cristinBiobankCoordinator;
+    public CristinCoordinator getCoordinator() {
+        return coordinator;
     }
 
-    public CristinAssocProjectForBiobank getCristinBiobankAssocProject() {
-        return cristinBiobankAssocProject;
+    public CristinAssocProjectForBiobank getAssocProject() {
+        return assocProject;
     }
 
-    public CristinExternalSourcesBiobank getCristinBiobankExternalSources() {
-        return cristinBiobankExternalSources;
+    public CristinExternalSourcesBiobank getExternalSources() {
+        return externalSources;
     }
 
-    public CristinBiobankApprovals getCristinBiobankApprovals() {
-        return cristinBiobankApprovals;
+    public CristinBiobankApprovals getApprovals() {
+        return approvals;
     }
 
-    public List<CristinBiobankMaterial> getCristinBiobankMaterials() {
-        return cristinBiobankMaterials;
+    public List<CristinBiobankMaterial> getMaterials() {
+        return materials;
     }
+
 
 
 

@@ -36,30 +36,30 @@ public final class MappingUtils {
         var id = getBiobankUri(cristinBiobank.getCristinBiobankId(), domainName, basePath);
 
         var institutionId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
-                cristinBiobank.getCristinCoordinatinInstitution().getCristinInstitution().getCristinInstitutionId(),
+                cristinBiobank.getCoordinatinInstitution().getCristinInstitution().getCristinInstitutionId(),
                 INSTITUTIONS_PATH_ELEMENT);
 
         var unitId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
-                cristinBiobank.getCristinCoordinatinInstitution().getCristinUnit().getCristinUnitId(),
+                cristinBiobank.getCoordinatinInstitution().getCristinUnit().getCristinUnitId(),
                 UNITS_PATH_ELEMENT);
 
         var personId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
-                cristinBiobank.getCristinBiobankCoordinator().getCristinPersonIdentifier(),
+                cristinBiobank.getCoordinator().getCristinPersonIdentifier(),
                 PERSONS_PATH_ELEMENT);
 
         return new Biobank(id, cristinBiobank.getCristinBiobankId(),
-                cristinBiobank.getCristinBiobankType(), cristinBiobank.getName(),
-                cristinBiobank.getCristinBiobankLanguage(), cristinBiobank.getCristinBiobankStartDate(),
-                cristinBiobank.getCristinBiobankStoreUntilDate(), cristinBiobank.getCristinBiobankStatus(),
-                new TimeStampFromSource(cristinBiobank.getCristinBiobankCreated()),
-                new TimeStampFromSource(cristinBiobank.getCristinBiobankLastModified()),
+                cristinBiobank.getType(), cristinBiobank.getName(),
+                cristinBiobank.getLanguage(), cristinBiobank.getStartDate(),
+                cristinBiobank.getStoreUntilDate(), cristinBiobank.getStatus(),
+                new TimeStampFromSource(cristinBiobank.getCreated()),
+                new TimeStampFromSource(cristinBiobank.getLastModified()),
                 institutionId,
                 unitId,
                 personId,
-                cristinBiobank.getCristinBiobankAssocProject().getCristinProjectId(),
-                new ExternalSourcesBiobank(cristinBiobank.getCristinBiobankExternalSources()),
-                new BiobankApprovals(cristinBiobank.getCristinBiobankApprovals()),
-                getBiobankMaterialList(cristinBiobank.getCristinBiobankMaterials())
+                cristinBiobank.getAssocProject().getCristinProjectId(),
+                new ExternalSourcesBiobank(cristinBiobank.getExternalSources()),
+                new BiobankApprovals(cristinBiobank.getApprovals()),
+                getBiobankMaterialList(cristinBiobank.getMaterials())
                 );
     }
 
@@ -68,8 +68,9 @@ public final class MappingUtils {
     }
 
     private static List<BiobankMaterial> getBiobankMaterialList(List<CristinBiobankMaterial> cristinListOfMaterials) {
-        List nvaListMaterials = new ArrayList<>();
+        var nvaListMaterials = new ArrayList<BiobankMaterial>();
         cristinListOfMaterials.forEach(material -> nvaListMaterials.add(new BiobankMaterial(material)));
         return nvaListMaterials;
     }
+
 }
