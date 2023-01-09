@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.utils.DateInfo;
+import no.unit.nva.model.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;

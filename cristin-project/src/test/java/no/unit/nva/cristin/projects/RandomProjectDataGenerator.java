@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.projects;
 
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
-import no.unit.nva.utils.DateInfo;
+import no.unit.nva.model.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingAmount;

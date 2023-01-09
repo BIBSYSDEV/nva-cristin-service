@@ -14,7 +14,7 @@ import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.DateInfo;
+import no.unit.nva.model.DateInfo;
 import nva.commons.core.language.LanguageMapper;
 
 import java.util.Collections;
