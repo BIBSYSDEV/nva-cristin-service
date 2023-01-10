@@ -3,11 +3,13 @@ package no.unit.nva.biobank.common;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import no.unit.nva.biobank.model.cristin.CristinBiobank;
 import no.unit.nva.biobank.model.cristin.CristinBiobankMaterial;
 import no.unit.nva.biobank.model.nva.Biobank;
 import no.unit.nva.biobank.model.nva.BiobankApprovals;
+import no.unit.nva.biobank.model.nva.BiobankBuilder;
 import no.unit.nva.biobank.model.nva.BiobankMaterial;
 import no.unit.nva.biobank.model.nva.ExternalSourcesBiobank;
 import no.unit.nva.biobank.model.nva.TimeStampFromSource;
@@ -33,34 +35,70 @@ public final class MappingUtils {
                                                  String domainName,
                                                  String basePath
                                                  ) {
-        var id = getBiobankUri(cristinBiobank.getCristinBiobankId(), domainName, basePath);
 
-        var institutionId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
-                cristinBiobank.getCoordinatinInstitution().getInstitution().getUrl(),
-                INSTITUTIONS_PATH_ELEMENT);
+        var id = getBiobankUri(cristinBiobank.getBiobankId(), domainName, basePath);
 
-        var unitId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
-                cristinBiobank.getCoordinatinInstitution().getInstitutionUnit().getUrl(),
-                UNITS_PATH_ELEMENT);
+        var institutionId= Optional.ofNullable(cristinBiobank.getCoordinatinInstitution()
+                .getInstitution().getUrl())
+                .isPresent()
+                ? DomainUriUtils.getBiobankParamUri(domainName, basePath,
+                cristinBiobank.getCoordinatinInstitution().getInstitution().getUrl(), INSTITUTIONS_PATH_ELEMENT)
+                : null;
 
-        var personId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
-                cristinBiobank.getCoordinator().getCristinPersonIdentifier(),
-                PERSONS_PATH_ELEMENT);
+        var unitId = Optional.ofNullable(cristinBiobank.getCoordinatinInstitution()
+                .getInstitutionUnit().getUrl())
+                .isPresent() ?
+                DomainUriUtils.getBiobankParamUri(domainName, basePath,
+                        cristinBiobank.getCoordinatinInstitution().getInstitutionUnit().getUrl(), UNITS_PATH_ELEMENT) :
+                null;
 
-        return new Biobank(id, cristinBiobank.getCristinBiobankId(),
-                cristinBiobank.getType(), cristinBiobank.getName(),
-                cristinBiobank.getLanguage(), cristinBiobank.getStartDate(),
-                cristinBiobank.getStoreUntilDate(), cristinBiobank.getStatus(),
-                new TimeStampFromSource(cristinBiobank.getCreated()),
-                new TimeStampFromSource(cristinBiobank.getLastModified()),
-                institutionId,
-                unitId,
-                personId,
-                cristinBiobank.getAssocProject().getCristinProjectId(),
-                new ExternalSourcesBiobank(cristinBiobank.getExternalSources()),
-                new BiobankApprovals(cristinBiobank.getApprovals()),
-                getBiobankMaterialList(cristinBiobank.getMaterials())
-                );
+        var personId = Optional.ofNullable(cristinBiobank.getCoordinator().getCristinPersonIdentifier())
+                .isPresent() ?
+                DomainUriUtils.getBiobankParamUri(domainName, basePath,
+                        cristinBiobank.getCoordinator().getCristinPersonIdentifier(), PERSONS_PATH_ELEMENT) :
+                null;
+
+        var language = Optional.ofNullable(cristinBiobank.getLanguage())
+                .isPresent() ? cristinBiobank.getLanguage() : null;
+
+        var type = Optional.ofNullable(cristinBiobank.getType())
+                .isPresent() ? cristinBiobank.getType() : null;
+
+        var startDate = Optional.ofNullable(cristinBiobank.getStartDate())
+                .isPresent() ? cristinBiobank.getStartDate() : null;
+
+        var storeUntilDate = Optional.ofNullable(cristinBiobank.getStoreUntilDate())
+                .isPresent() ? cristinBiobank.getStoreUntilDate() : null;
+
+        var status = Optional.ofNullable(cristinBiobank.getStatus())
+                .isPresent() ? cristinBiobank.getLanguage() : null;
+
+
+        return new BiobankBuilder()
+                .setBiobankId(id)
+                .setBiobankIdentifier(cristinBiobank.getBiobankId())
+                .setType(type)
+                .setName(cristinBiobank.getName())
+                .setMainLanguage(language)
+                .setStartDate(startDate)
+                .setStoreUntilDate(storeUntilDate)
+                .setStatus(status)
+                .setCoordinatinInstitutionOrg(institutionId)
+                .setCoordinatinInstitutionUnit(unitId)
+                .setBiobankCoordinator(personId)
+                .setAssocProject(Optional.ofNullable(cristinBiobank.getAssocProject().getCristinProjectId())
+                        .isPresent() ? cristinBiobank.getAssocProject().getCristinProjectId() : null)
+                .setExternalSources(Optional.ofNullable(cristinBiobank.getExternalSources())
+                        .isPresent() ? new ExternalSourcesBiobank(cristinBiobank.getExternalSources()) : null)
+                .setApprovals(Optional.ofNullable(cristinBiobank.getApprovals())
+                        .isPresent() ? new BiobankApprovals(cristinBiobank.getApprovals()) : null)
+                .setBiobankMaterials(Optional.ofNullable(cristinBiobank.getMaterials())
+                        .isPresent() ? getBiobankMaterialList(cristinBiobank.getMaterials()) : null)
+                .setCreated(Optional.ofNullable(cristinBiobank.getCreated())
+                        .isPresent() ? new TimeStampFromSource(cristinBiobank.getCreated()) : null)
+                .setLastModified(Optional.ofNullable(cristinBiobank.getLastModified())
+                        .isPresent() ? new TimeStampFromSource(cristinBiobank.getLastModified()) : null)
+                .createBiobank();
     }
 
     private static URI getBiobankUri(String cristinBiobankId, String domainName, String basePath) {
