@@ -50,6 +50,8 @@ public class CristinProjectBuilder {
         cristinProject.setProjectFundingSources(extractFundings(nvaProject.getFunding()));
         cristinProject.setParticipants(extractContributors(nvaProject.getContributors()));
         cristinProject.setCoordinatingInstitution(extractCristinOrganization(nvaProject.getCoordinatingInstitution()));
+        cristinProject.setMethod(extractSummary(nvaProject.getMethod()));
+        cristinProject.setEquipment(extractSummary(nvaProject.getEquipment()));
 
         return cristinProject;
     }

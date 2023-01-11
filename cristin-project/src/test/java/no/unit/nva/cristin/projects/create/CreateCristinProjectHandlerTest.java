@@ -218,7 +218,7 @@ class CreateCristinProjectHandlerTest {
         var customerId = randomUri();
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
             .withBody(body)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
             .build();
     }
@@ -227,8 +227,6 @@ class CreateCristinProjectHandlerTest {
     private void removeFieldsNotSupportedByPost(NvaProject expected) {
         expected.setContactInfo(null);
         expected.setFundingAmount(null);
-        expected.setMethod(Collections.emptyMap());
-        expected.setEquipment(Collections.emptyMap());
         expected.setProjectCategories(Collections.emptyList());
         expected.setKeywords(Collections.emptyList());
         expected.setExternalSources(Collections.emptyList());
