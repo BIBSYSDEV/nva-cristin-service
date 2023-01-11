@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
+import java.net.URI;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
@@ -40,7 +41,7 @@ public class CristinProjectBuilder {
     public CristinProject build() {
 
         cristinProject.setCristinProjectId(extractLastPathElement(nvaProject.getId()));
-        cristinProject.setMainLanguage(getLanguageByUri(nvaProject.getLanguage()).getIso6391Code());
+        cristinProject.setMainLanguage(extractMainLanguage(nvaProject.getLanguage()));
         cristinProject.setTitle(extractTitles(nvaProject));
         cristinProject.setStatus(extractStatus(nvaProject));
         cristinProject.setStartDate(nvaProject.getStartDate());
@@ -54,6 +55,10 @@ public class CristinProjectBuilder {
         cristinProject.setEquipment(extractSummary(nvaProject.getEquipment()));
 
         return cristinProject;
+    }
+
+    private String extractMainLanguage(URI language) {
+        return nonNull(language) ? getLanguageByUri(nvaProject.getLanguage()).getIso6391Code() : null;
     }
 
     private CristinOrganization extractCristinOrganization(Organization organization) {

@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects.create;
 
+import static java.net.HttpURLConnection.HTTP_CREATED;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithUnitAffiliation;
@@ -108,7 +109,7 @@ class CreateCristinProjectHandlerTest {
         expected.setId(identifier);
         removeFieldsNotSupportedByPost(expected);
 
-        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
+        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
         NvaProject actual = response.getBodyObject(NvaProject.class);
         assertNotNull(actual.getId());
         assertThat(actual, equalTo(expected));
@@ -124,7 +125,7 @@ class CreateCristinProjectHandlerTest {
         requestProject.setId(null);  // Cannot create with Id
         GatewayResponse<NvaProject> response = executeRequest(requestProject);
 
-        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
+        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
         NvaProject actual = response.getBodyObject(NvaProject.class);
         assertNotNull(actual.getId());
         assertThat(actual, equalTo(expected));
@@ -136,7 +137,7 @@ class CreateCristinProjectHandlerTest {
         mockUpstreamUsingRequest(request);
         GatewayResponse<NvaProject> response = executeRequest(request);
 
-        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
+        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
 
         NvaProject actual = response.getBodyObject(NvaProject.class);
 
@@ -159,13 +160,24 @@ class CreateCristinProjectHandlerTest {
         mockUpstreamUsingRequest(request);
         GatewayResponse<NvaProject> response = executeRequest(request);
 
-        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_CREATED));
+        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
 
         NvaProject actual = response.getBodyObject(NvaProject.class);
 
         Organization actualAffiliation = actual.getContributors().get(0).getAffiliation();
         Organization expectedAffiliation = request.getContributors().get(0).getAffiliation();
         assertThat(actualAffiliation, equalTo(expectedAffiliation));
+    }
+
+    @Test
+    void shouldAllowCreationOfProjectWithoutLanguage() throws IOException, InterruptedException {
+        var request = randomMinimalNvaProject();
+        request.setId(null); // Is not supported for input
+        request.setLanguage(null);
+        mockUpstreamUsingRequest(request);
+        var response = executeRequest(request);
+
+        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
     }
 
     private String actualIdentifierFromOrganization(Organization organization) {
