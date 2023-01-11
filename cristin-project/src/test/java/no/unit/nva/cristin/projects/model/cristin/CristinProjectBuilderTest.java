@@ -55,8 +55,6 @@ class CristinProjectBuilderTest {
         actual.setLastModified(expected.getLastModified());
         actual.setContactInfo(expected.getContactInfo());
         actual.setFundingAmount(expected.getFundingAmount());
-        actual.setMethod(expected.getMethod());
-        actual.setEquipment(expected.getEquipment());
         actual.setProjectCategories(expected.getProjectCategories());
         actual.setKeywords(expected.getKeywords());
         actual.setExternalSources(expected.getExternalSources());
