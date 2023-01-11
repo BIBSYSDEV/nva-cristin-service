@@ -21,6 +21,8 @@ import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinProjectBuilder {
 
+    public static final String DEFAULT_TITLE_LANGUAGE_KEY = "nb";
+
     private final transient CristinProject cristinProject;
     private final transient NvaProject nvaProject;
 
@@ -89,6 +91,8 @@ public class CristinProjectBuilder {
         Map<String, String> titles = new ConcurrentHashMap<>();
         if (nonNull(nvaProject.getLanguage())) {
             titles.put(getLanguageByUri(nvaProject.getLanguage()).getIso6391Code(), nvaProject.getTitle());
+        } else {
+            titles.put(DEFAULT_TITLE_LANGUAGE_KEY, nvaProject.getTitle());
         }
         nvaProject.getAlternativeTitles().forEach(titles::putAll);
         return titles;
