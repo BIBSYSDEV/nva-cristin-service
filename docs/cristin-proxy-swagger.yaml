@@ -1741,6 +1741,10 @@ components:
           $ref: '#/components/schemas/Languages'
         popularScientificSummary:
           $ref: '#/components/schemas/Languages'
+        method:
+          $ref: '#/components/schemas/Languages'
+        equipment:
+          $ref: '#/components/schemas/Languages'
     ProjectPatch:
       type: object
       properties:
@@ -2599,6 +2603,10 @@ components:
           en: "Summary in an academic manner"
         popularScientificSummary:
           en: "popularScientificSummary popularScientificSummary popularScientificSummary"
+        method:
+          en: "My method"
+        equipment:
+          en: "My equipment"
     OrganizationsExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
