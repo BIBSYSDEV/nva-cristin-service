@@ -55,8 +55,18 @@ public class CristinProjectBuilder {
         cristinProject.setCoordinatingInstitution(extractCristinOrganization(nvaProject.getCoordinatingInstitution()));
         cristinProject.setMethod(extractSummary(nvaProject.getMethod()));
         cristinProject.setEquipment(extractSummary(nvaProject.getEquipment()));
+        cristinProject.setInstitutionsResponsibleForResearch(
+            extractInstitutionsResponsibleForResearch(nvaProject.getInstitutionsResponsibleForResearch()));
 
         return cristinProject;
+    }
+
+    private List<CristinOrganization> extractInstitutionsResponsibleForResearch(
+        List<Organization> institutionsResponsibleForResearch) {
+
+        return institutionsResponsibleForResearch.stream()
+                   .map(this::extractCristinOrganization)
+                   .collect(Collectors.toList());
     }
 
     private String extractMainLanguage(URI language) {

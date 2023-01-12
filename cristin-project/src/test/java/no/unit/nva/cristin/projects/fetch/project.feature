@@ -138,3 +138,11 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.externalSources[0].type == 'ExternalSource'
     And match response.externalSources[0].identifier == '#present'
     And match response.externalSources[0].name == '#present'
+
+  Scenario: Fetch returns project institutions responsible for research
+    Given path '/project/548126'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.institutionsResponsibleForResearch[0].id == '#present'
+    And match response.institutionsResponsibleForResearch[0].name == '#present'

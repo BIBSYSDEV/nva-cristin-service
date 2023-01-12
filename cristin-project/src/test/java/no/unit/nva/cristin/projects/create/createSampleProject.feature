@@ -63,7 +63,13 @@ Feature: API tests for Cristin Project retrieve and search
       },
       'equipment': {
         'en': 'My equipment'
-      }
+      },
+      'institutionsResponsibleForResearch': [
+        {
+          'type': 'Organization',
+          'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
+        }
+      ]
     }
     """
     Given url CRISTIN_BASE
@@ -77,6 +83,7 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 201
     And match response.method == '#present'
     And match response.equipment == '#present'
+    And match response.institutionsResponsibleForResearch[0].id == '#present'
     And print response
 
   Scenario: Creating project with only minimum required data returns 201 Created

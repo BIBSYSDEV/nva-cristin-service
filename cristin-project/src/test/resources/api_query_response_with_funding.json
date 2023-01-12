@@ -111,6 +111,15 @@
       } ],
       "relatedProjects": [
         "https://api.dev.nva.aws.unit.no/cristin/project/483302"
+      ],
+      "institutionsResponsibleForResearch": [
+        {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+          "type": "Organization",
+          "name": {
+            "en": "Medical Department"
+          }
+        }
       ]
     },
     {
@@ -216,6 +225,15 @@
       } ],
       "relatedProjects": [
         "https://api.dev.nva.aws.unit.no/cristin/project/483302"
+      ],
+      "institutionsResponsibleForResearch": [
+        {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+          "type": "Organization",
+          "name": {
+            "en": "Medical Department"
+          }
+        }
       ]
     },
     {
@@ -321,6 +339,15 @@
       } ],
       "relatedProjects": [
         "https://api.dev.nva.aws.unit.no/cristin/project/483302"
+      ],
+      "institutionsResponsibleForResearch": [
+        {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+          "type": "Organization",
+          "name": {
+            "en": "Medical Department"
+          }
+        }
       ]
     },
     {
@@ -426,6 +453,15 @@
       } ],
       "relatedProjects": [
         "https://api.dev.nva.aws.unit.no/cristin/project/483302"
+      ],
+      "institutionsResponsibleForResearch": [
+        {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+          "type": "Organization",
+          "name": {
+            "en": "Medical Department"
+          }
+        }
       ]
     },
     {
@@ -531,6 +567,15 @@
       } ],
       "relatedProjects": [
         "https://api.dev.nva.aws.unit.no/cristin/project/483302"
+      ],
+      "institutionsResponsibleForResearch": [
+        {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+          "type": "Organization",
+          "name": {
+            "en": "Medical Department"
+          }
+        }
       ]
     }
   ]

@@ -31,6 +31,7 @@ public class CristinProject implements JsonSerializable {
     public static final String KEYWORDS = "keywords";
     public static final String CRISTIN_EXTERNAL_SOURCES = "external_sources";
     public static final String CRISTIN_RELATED_PROJECTS = "related_projects";
+    public static final String INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH = "institutions_responsible_for_research";
 
     private String cristinProjectId;
     private Boolean publishable;
@@ -65,6 +66,8 @@ public class CristinProject implements JsonSerializable {
     private List<CristinExternalSource> externalSources;
     @JsonProperty(CRISTIN_RELATED_PROJECTS)
     private List<String> relatedProjects;
+    @JsonProperty(INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)
+    private List<CristinOrganization> institutionsResponsibleForResearch;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -250,6 +253,14 @@ public class CristinProject implements JsonSerializable {
         this.relatedProjects = relatedProjects;
     }
 
+    public List<CristinOrganization> getInstitutionsResponsibleForResearch() {
+        return nonEmptyOrDefault(institutionsResponsibleForResearch);
+    }
+
+    public void setInstitutionsResponsibleForResearch(List<CristinOrganization> institutionsResponsibleForResearch) {
+        this.institutionsResponsibleForResearch = institutionsResponsibleForResearch;
+    }
+
     /**
      * Verifies CristinProject has enough data to be considered as valid.
      *
@@ -296,7 +307,8 @@ public class CristinProject implements JsonSerializable {
                && Objects.equals(getProjectCategories(), that.getProjectCategories())
                && Objects.equals(getKeywords(), that.getKeywords())
                && Objects.equals(getExternalSources(), that.getExternalSources())
-               && Objects.equals(getRelatedProjects(), that.getRelatedProjects());
+               && Objects.equals(getRelatedProjects(), that.getRelatedProjects())
+               && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch());
     }
 
     @Override
@@ -307,7 +319,7 @@ public class CristinProject implements JsonSerializable {
                             getTotalFundingAmount(), getParticipants(), getAcademicSummary(),
                             getPopularScientificSummary(),
                             getMethod(), getEquipment(), getProjectCategories(), getKeywords(), getExternalSources(),
-                            getRelatedProjects());
+                            getRelatedProjects(), getInstitutionsResponsibleForResearch());
     }
 
     @Override
