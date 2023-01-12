@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
+import java.net.URI;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
@@ -19,6 +20,8 @@ import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
 public class CristinProjectBuilder {
+
+    public static final String DEFAULT_TITLE_LANGUAGE_KEY = "nb";
 
     private final transient CristinProject cristinProject;
     private final transient NvaProject nvaProject;
@@ -40,7 +43,7 @@ public class CristinProjectBuilder {
     public CristinProject build() {
 
         cristinProject.setCristinProjectId(extractLastPathElement(nvaProject.getId()));
-        cristinProject.setMainLanguage(getLanguageByUri(nvaProject.getLanguage()).getIso6391Code());
+        cristinProject.setMainLanguage(extractMainLanguage(nvaProject.getLanguage()));
         cristinProject.setTitle(extractTitles(nvaProject));
         cristinProject.setStatus(extractStatus(nvaProject));
         cristinProject.setStartDate(nvaProject.getStartDate());
@@ -50,8 +53,14 @@ public class CristinProjectBuilder {
         cristinProject.setProjectFundingSources(extractFundings(nvaProject.getFunding()));
         cristinProject.setParticipants(extractContributors(nvaProject.getContributors()));
         cristinProject.setCoordinatingInstitution(extractCristinOrganization(nvaProject.getCoordinatingInstitution()));
+        cristinProject.setMethod(extractSummary(nvaProject.getMethod()));
+        cristinProject.setEquipment(extractSummary(nvaProject.getEquipment()));
 
         return cristinProject;
+    }
+
+    private String extractMainLanguage(URI language) {
+        return nonNull(language) ? getLanguageByUri(nvaProject.getLanguage()).getIso6391Code() : null;
     }
 
     private CristinOrganization extractCristinOrganization(Organization organization) {
@@ -82,6 +91,8 @@ public class CristinProjectBuilder {
         Map<String, String> titles = new ConcurrentHashMap<>();
         if (nonNull(nvaProject.getLanguage())) {
             titles.put(getLanguageByUri(nvaProject.getLanguage()).getIso6391Code(), nvaProject.getTitle());
+        } else {
+            titles.put(DEFAULT_TITLE_LANGUAGE_KEY, nvaProject.getTitle());
         }
         nvaProject.getAlternativeTitles().forEach(titles::putAll);
         return titles;
