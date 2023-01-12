@@ -70,7 +70,7 @@ public class CristinProjectBuilder {
     }
 
     private String extractMainLanguage(URI language) {
-        return nonNull(language) ? getLanguageByUri(nvaProject.getLanguage()).getIso6391Code() : null;
+        return nonNull(language) ? getLanguageByUri(language).getIso6391Code() : null;
     }
 
     private CristinOrganization extractCristinOrganization(Organization organization) {
