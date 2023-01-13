@@ -37,6 +37,9 @@ public class NvaProjectBuilderTest {
     public static final String EXTERNAL_SOURCE_NAME = "REK";
     public static final String EXTERNAL_SOURCE_IDENTIFIER = "2016/2000";
     public static final String RELATED_PROJECT_URI = "https://api.dev.nva.aws.unit.no/cristin/project/483302";
+    public static final String ORGANIZATION_IDENTIFIER = "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0"
+                                                         + ".0.0";
+    public static final String MEDICAL_DEPARTMENT = "Medical Department";
 
     @Test
     void shouldReturnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
@@ -78,6 +81,10 @@ public class NvaProjectBuilderTest {
         assertThat(nvaProject.getExternalSources().get(0).getIdentifier(), equalTo(EXTERNAL_SOURCE_IDENTIFIER));
         assertThat(nvaProject.getExternalSources().get(0).getName(), equalTo(EXTERNAL_SOURCE_NAME));
         assertThat(nvaProject.getRelatedProjects().get(0).toString(), equalTo(RELATED_PROJECT_URI));
+        assertThat(nvaProject.getInstitutionsResponsibleForResearch().get(0).getId().toString(),
+                   equalTo(ORGANIZATION_IDENTIFIER));
+        assertThat(nvaProject.getInstitutionsResponsibleForResearch().get(0).getName().get(ENGLISH_LANGUAGE_KEY),
+                   equalTo(MEDICAL_DEPARTMENT));
     }
 
     @Test

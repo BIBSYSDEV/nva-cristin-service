@@ -105,5 +105,23 @@
   } ],
   "related_projects" : [
     "https://api.cristin-test.uio.no/v2/projects/483302"
+  ],
+  "institutions_responsible_for_research": [
+    {
+      "institution": {
+        "cristin_institution_id": "1234",
+        "institution_name": {
+          "en": "University"
+        },
+        "url": "https://api.cristin.no/v2/institutions/1234"
+      },
+      "unit": {
+        "cristin_unit_id": "1234.0.0.0",
+        "unit_name": {
+          "en": "Medical Department"
+        },
+        "url": "https://api.cristin.no/v2/units/1234.0.0.0"
+      }
+    }
   ]
 }
