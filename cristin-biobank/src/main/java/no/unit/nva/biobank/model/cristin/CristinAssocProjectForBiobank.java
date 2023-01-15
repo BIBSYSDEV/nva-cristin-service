@@ -21,7 +21,7 @@ public class CristinAssocProjectForBiobank {
 
 
     /**
-     * Constructor
+     * Constructor.
      * @param cristinProjectId - URI
      * @param cristinProjectIdentificator - code
      * @param title - name of the project

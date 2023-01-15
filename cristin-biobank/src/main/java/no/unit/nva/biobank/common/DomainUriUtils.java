@@ -24,7 +24,6 @@ public final class DomainUriUtils {
      * @param domainName - env
      * @param basePath - path
      * @param identifier - code
-     * @return
      */
     public static URI getBiobankUri(String domainName, String basePath, String identifier) {
         var urlEncodedIdentifier = URLEncoder.encode(identifier, StandardCharsets.UTF_8);
@@ -40,7 +39,6 @@ public final class DomainUriUtils {
      * @param basePath - path
      * @param identifier - code
      * @param pathElement -path element for particular parameter
-     * @return
      */
     public static URI getBiobankParamUri(String domainName, String basePath, String identifier, String pathElement) {
         var urlEncodedIdentifier = URLEncoder.encode(identifier, StandardCharsets.UTF_8);
