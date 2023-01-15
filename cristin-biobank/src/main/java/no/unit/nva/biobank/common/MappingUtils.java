@@ -33,7 +33,7 @@ public final class MappingUtils {
                                                  String domainName,
                                                  String basePath
                                                  ) {
-        var id = getBiobankUri(cristinBiobank.getCristinBiobankId(), domainName, basePath);
+        var id = getBiobankUri(cristinBiobank.getBiobankId(), domainName, basePath);
 
         var institutionId = DomainUriUtils.getBiobankParamUri(domainName, basePath,
                 cristinBiobank.getCoordinatinInstitution().getInstitution().getUrl(),
@@ -47,7 +47,7 @@ public final class MappingUtils {
                 cristinBiobank.getCoordinator().getCristinPersonIdentifier(),
                 PERSONS_PATH_ELEMENT);
 
-        return new Biobank(id, cristinBiobank.getCristinBiobankId(),
+        return new Biobank(id, cristinBiobank.getBiobankId(),
                 cristinBiobank.getType(), cristinBiobank.getName(),
                 cristinBiobank.getLanguage(), cristinBiobank.getStartDate(),
                 cristinBiobank.getStoreUntilDate(), cristinBiobank.getStatus(),

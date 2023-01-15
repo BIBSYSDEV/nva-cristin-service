@@ -30,6 +30,8 @@ public final class CristinBiobank {
     private static final String CRISTIN_BIOBANK_APPROVALS = "approvals";
     private static final String CRISTIN_BIOBANK_MATERIALS = "biobank_material";
 
+
+
     @JsonProperty(CRISTIN_BIOBANK_ID)
     private final String biobankId;
 
@@ -126,7 +128,7 @@ public final class CristinBiobank {
     }
 
 
-    public String getCristinBiobankId() {
+    public String getBiobankId() {
         return biobankId;
     }
 
