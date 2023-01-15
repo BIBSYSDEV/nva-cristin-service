@@ -76,7 +76,7 @@ public final class CristinBiobank {
 
 
     /**
-     * Constructor.
+     * Constructor
      * @param cristinBiobankId - cristin id code
      * @param type - type
      * @param cristinBiobankLanguage - code of the language
@@ -125,7 +125,8 @@ public final class CristinBiobank {
         this.materials = materials;
     }
 
-    public String getBiobankId() {
+
+    public String getCristinBiobankId() {
         return biobankId;
     }
 

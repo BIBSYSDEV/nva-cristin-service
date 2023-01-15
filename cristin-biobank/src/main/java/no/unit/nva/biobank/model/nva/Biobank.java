@@ -16,7 +16,6 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @SuppressWarnings({"PMD.ExcessiveParameterList", "PMD.TooManyFields"})
 @JsonInclude(NON_NULL)
@@ -125,14 +124,13 @@ public class Biobank {
         this.status = status;
         this.created = created;
         this.lastModified = lastModified;
-        this.coordinatinInstitutionOrg = coordinatinInstitutionOrg;//
-        this.coordinatinInstitutionUnit = coordinatinInstitutionUnit;//
+        this.coordinatinInstitutionOrg = coordinatinInstitutionOrg;
+        this.coordinatinInstitutionUnit = coordinatinInstitutionUnit;
         this.biobankCoordinator = biobankCoordinator;
         this.assocProject = assocProject;
         this.externalSources = externalSources;
         this.approvals = approvals;
         this.biobankMaterials = biobankMaterials;
-
     }
 
     public URI getBiobankId() {
