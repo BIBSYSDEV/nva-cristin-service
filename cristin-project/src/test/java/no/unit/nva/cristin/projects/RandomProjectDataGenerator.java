@@ -56,7 +56,11 @@ public class RandomProjectDataGenerator {
             ".contributors.affiliation.context",
             ".contributors.affiliation.acronym",
             "published",
-            "publishable"
+            "publishable",
+            ".institutionsResponsibleForResearch.hasPart",
+            ".institutionsResponsibleForResearch.partOf",
+            ".institutionsResponsibleForResearch.acronym",
+            ".institutionsResponsibleForResearch.context"
     );
     private static final String NORWEGIAN = "nb";
     private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
@@ -98,6 +102,7 @@ public class RandomProjectDataGenerator {
                                           .withKeywords(List.of(randomTypedLabel()))
                                           .withExternalSources(List.of(randomExternalSource()))
                                           .withRelatedProjects(List.of(randomRelatedProjects()))
+                                          .withInstitutionsResponsibleForResearch(List.of(randomOrganization()))
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;

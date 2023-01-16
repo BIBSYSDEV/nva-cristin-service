@@ -114,7 +114,17 @@ public class NvaProjectBuilder {
                    .withKeywords(extractTypedLabels(cristinProject.getKeywords()))
                    .withExternalSources(extractExternalSources(cristinProject.getExternalSources()))
                    .withRelatedProjects(extractRelatedProjects(cristinProject.getRelatedProjects()))
+                   .withInstitutionsResponsibleForResearch(
+                       extractInstitutionsResponsibleForResearch(
+                           cristinProject.getInstitutionsResponsibleForResearch()))
                    .build();
+    }
+
+    private List<Organization> extractInstitutionsResponsibleForResearch(List<CristinOrganization>
+                                                                             institutionsResponsibleForResearch) {
+        return institutionsResponsibleForResearch.stream()
+                   .map(CristinOrganization::extractPreferredTypeOfOrganization)
+                   .collect(Collectors.toList());
     }
 
     private List<URI> extractRelatedProjects(List<String> cristinRelatedProjects) {
