@@ -99,17 +99,19 @@ public final class CristinBiobank {
                           @JsonProperty(CRISTIN_BIOBANK_TYPE) String type,
                           @JsonProperty(CRISTIN_BIOBANK_MAIN_LANGUAGE_KEY) String cristinBiobankLanguage,
                           @JsonProperty(CRISTIN_NAME_FIELD) Map<String, String> name,
-                          Instant startDate,
-                          Instant cristinBiobankStoreUntilDate,
-                          String status,
-                          CristinTimeStampFromSource created,
+                          @JsonProperty(CRISTIN_BIOBANK_START_DATE) Instant startDate,
+                          @JsonProperty(CRISTIN_BIOBANK_STORED_UNTIL_DATE) Instant cristinBiobankStoreUntilDate,
+                          @JsonProperty(CRISTIN_BIOBANK_STATUS) String status,
+                          @JsonProperty(CRISTIN_BIOBANK_CREATED) CristinTimeStampFromSource created,
+                          @JsonProperty(CRISTIN_BIOBANK_LAST_MODIFIED)
                           CristinTimeStampFromSource cristinBiobankLastModified,
+                          @JsonProperty(CRISTIN_BIOBANK_COORDINATING_INSTITUTION)
                           CristinOrganization coordinatinInstitution,
-                          CristinCoordinator coordinator,
-                          CristinAssocProjectForBiobank assocProject,
-                          CristinExternalSource externalSources,
-                          CristinBiobankApprovals approvals,
-                          List<CristinBiobankMaterial> materials) {
+                          @JsonProperty(CRISTIN_BIOBANK_COORDINATOR) CristinCoordinator coordinator,
+                          @JsonProperty(CRISTIN_BIOBANK_ASSOC_PROJECT) CristinAssocProjectForBiobank assocProject,
+                          @JsonProperty(CRISTIN_BIOBANK_EXTERNAL_SOURCES) CristinExternalSource externalSources,
+                          @JsonProperty(CRISTIN_BIOBANK_APPROVALS) CristinBiobankApprovals approvals,
+                          @JsonProperty(CRISTIN_BIOBANK_MATERIALS) List<CristinBiobankMaterial> materials) {
         this.biobankId = cristinBiobankId;
         this.type = type;
         this.language = cristinBiobankLanguage;
