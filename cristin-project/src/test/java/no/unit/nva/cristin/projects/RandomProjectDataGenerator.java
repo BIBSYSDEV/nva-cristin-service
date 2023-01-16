@@ -6,6 +6,7 @@ import no.unit.nva.cristin.projects.model.nva.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
+import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
@@ -103,9 +104,14 @@ public class RandomProjectDataGenerator {
                                           .withExternalSources(List.of(randomExternalSource()))
                                           .withRelatedProjects(List.of(randomRelatedProjects()))
                                           .withInstitutionsResponsibleForResearch(List.of(randomOrganization()))
+                                          .withHealthProjectData(randomHealthProjectData())
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
+    }
+
+    private static HealthProjectData randomHealthProjectData() {
+        return new HealthProjectData(randomString(), randomNamesMap(), randomString());
     }
 
     private static URI randomRelatedProjects() {

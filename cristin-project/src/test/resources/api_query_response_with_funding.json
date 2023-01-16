@@ -120,7 +120,14 @@
             "en": "Medical Department"
           }
         }
-      ]
+      ],
+      "healthProjectData": {
+        "type": "DRUGSTUDY",
+        "label": {
+          "en": "Drug study"
+        },
+        "clinicalTrialPhase": "3"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -234,7 +241,14 @@
             "en": "Medical Department"
           }
         }
-      ]
+      ],
+      "healthProjectData": {
+        "type": "DRUGSTUDY",
+        "label": {
+          "en": "Drug study"
+        },
+        "clinicalTrialPhase": "3"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -348,7 +362,14 @@
             "en": "Medical Department"
           }
         }
-      ]
+      ],
+      "healthProjectData": {
+        "type": "DRUGSTUDY",
+        "label": {
+          "en": "Drug study"
+        },
+        "clinicalTrialPhase": "3"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -462,7 +483,14 @@
             "en": "Medical Department"
           }
         }
-      ]
+      ],
+      "healthProjectData": {
+        "type": "DRUGSTUDY",
+        "label": {
+          "en": "Drug study"
+        },
+        "clinicalTrialPhase": "3"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -576,7 +604,14 @@
             "en": "Medical Department"
           }
         }
-      ]
+      ],
+      "healthProjectData": {
+        "type": "DRUGSTUDY",
+        "label": {
+          "en": "Drug study"
+        },
+        "clinicalTrialPhase": "3"
+      }
     }
   ]
 }

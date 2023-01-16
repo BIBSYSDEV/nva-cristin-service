@@ -243,6 +243,7 @@ class CreateCristinProjectHandlerTest {
         expected.setKeywords(Collections.emptyList());
         expected.setExternalSources(Collections.emptyList());
         expected.setRelatedProjects(Collections.emptyList());
+        expected.setHealthProjectData(null);
     }
 
 }

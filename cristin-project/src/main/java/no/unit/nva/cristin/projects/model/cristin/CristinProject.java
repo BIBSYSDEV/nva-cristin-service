@@ -32,6 +32,9 @@ public class CristinProject implements JsonSerializable {
     public static final String CRISTIN_EXTERNAL_SOURCES = "external_sources";
     public static final String CRISTIN_RELATED_PROJECTS = "related_projects";
     public static final String INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH = "institutions_responsible_for_research";
+    public static final String HEALTH_PROJECT_TYPE = "health_project_type";
+    public static final String HEALTH_PROJECT_TYPE_NAME = "health_project_type_name";
+    public static final String CLINICAL_TRIAL_PHASE = "clinical_trial_phase";
 
     private String cristinProjectId;
     private Boolean publishable;
@@ -68,6 +71,12 @@ public class CristinProject implements JsonSerializable {
     private List<String> relatedProjects;
     @JsonProperty(INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)
     private List<CristinOrganization> institutionsResponsibleForResearch;
+    @JsonProperty(HEALTH_PROJECT_TYPE)
+    private String healthProjectType;
+    @JsonProperty(HEALTH_PROJECT_TYPE_NAME)
+    private Map<String, String> healthProjectTypeName;
+    @JsonProperty(CLINICAL_TRIAL_PHASE)
+    private String clinicalTrialPhase;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -261,6 +270,30 @@ public class CristinProject implements JsonSerializable {
         this.institutionsResponsibleForResearch = institutionsResponsibleForResearch;
     }
 
+    public String getHealthProjectType() {
+        return healthProjectType;
+    }
+
+    public void setHealthProjectType(String healthProjectType) {
+        this.healthProjectType = healthProjectType;
+    }
+
+    public Map<String, String> getHealthProjectTypeName() {
+        return nonEmptyOrDefault(healthProjectTypeName);
+    }
+
+    public void setHealthProjectTypeName(Map<String, String> healthProjectTypeName) {
+        this.healthProjectTypeName = healthProjectTypeName;
+    }
+
+    public String getClinicalTrialPhase() {
+        return clinicalTrialPhase;
+    }
+
+    public void setClinicalTrialPhase(String clinicalTrialPhase) {
+        this.clinicalTrialPhase = clinicalTrialPhase;
+    }
+
     /**
      * Verifies CristinProject has enough data to be considered as valid.
      *
@@ -308,7 +341,10 @@ public class CristinProject implements JsonSerializable {
                && Objects.equals(getKeywords(), that.getKeywords())
                && Objects.equals(getExternalSources(), that.getExternalSources())
                && Objects.equals(getRelatedProjects(), that.getRelatedProjects())
-               && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch());
+               && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch())
+               && Objects.equals(getHealthProjectType(), that.getHealthProjectType())
+               && Objects.equals(getHealthProjectTypeName(), that.getHealthProjectTypeName())
+               && Objects.equals(getClinicalTrialPhase(), that.getClinicalTrialPhase());
     }
 
     @Override
@@ -319,7 +355,8 @@ public class CristinProject implements JsonSerializable {
                             getTotalFundingAmount(), getParticipants(), getAcademicSummary(),
                             getPopularScientificSummary(),
                             getMethod(), getEquipment(), getProjectCategories(), getKeywords(), getExternalSources(),
-                            getRelatedProjects(), getInstitutionsResponsibleForResearch());
+                            getRelatedProjects(), getInstitutionsResponsibleForResearch(), getHealthProjectType(),
+                            getHealthProjectTypeName(), getClinicalTrialPhase());
     }
 
     @Override
