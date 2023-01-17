@@ -18,6 +18,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,6 +44,7 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class CreateCristinProjectHandlerTest {
 
@@ -231,13 +234,35 @@ class CreateCristinProjectHandlerTest {
     void shouldReturnCreatedWhenHealthProjectDataHasFullData() throws Exception {
         var randomNvaProject = randomNvaProject();
         randomNvaProject.setId(null);
-        var healthProjectData = new HealthProjectData(DRUGSTUDY, randomNamesMap(), CLINICAL_TRIAL_PHASE_VALUE);
-        randomNvaProject.setHealthProjectData(healthProjectData);
 
         mockUpstreamUsingRequest(randomNvaProject);
         var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
+    }
+
+    @Test
+    void shouldHaveProjectWithHealthDataAddedAndSentToUpstream() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        var healthProjectData = new HealthProjectData(DRUGSTUDY, randomNamesMap(), CLINICAL_TRIAL_PHASE_VALUE);
+        nvaProject.setHealthProjectData(healthProjectData);
+
+        mockUpstreamUsingRequest(nvaProject);
+        executeRequest(nvaProject);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+
+        assertThat(capturedCristinProject.getHealthProjectType(),
+                   equalTo(nvaProject.getHealthProjectData().getType()));
+        assertThat(capturedCristinProject.getClinicalTrialPhase(),
+                   equalTo(nvaProject.getHealthProjectData().getClinicalTrialPhase()));
     }
 
     private String actualIdentifierFromOrganization(Organization organization) {
@@ -303,7 +328,6 @@ class CreateCristinProjectHandlerTest {
         expected.setKeywords(Collections.emptyList());
         expected.setExternalSources(Collections.emptyList());
         expected.setRelatedProjects(Collections.emptyList());
-        expected.setHealthProjectData(null);
     }
 
 }
