@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects.create;
 
 import static java.net.HttpURLConnection.HTTP_CREATED;
+import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithUnitAffiliation;
@@ -28,10 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
@@ -74,109 +73,105 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldReturn403ForbiddenWhenRequestIsMissingRole() throws Exception {
-        NvaProject randomNvaProject = randomNvaProject();
-        InputStream input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
+        var randomNvaProject = randomNvaProject();
+        var input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
             .withBody(randomNvaProject)
             .withRoles(NO_ACCESS)
             .build();
         handler.handleRequest(input, output, context);
-        GatewayResponse<Object> response = GatewayResponse.fromOutputStream(output, Object.class);
+        var response = GatewayResponse.fromOutputStream(output, Object.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_FORBIDDEN));
     }
 
     @Test
     void shouldReturn400BadRequestWhenMissingRequiredFieldsInInput() throws Exception {
-
-        NvaProject randomNvaProject = randomNvaProject();
+        var randomNvaProject = randomNvaProject();
         randomNvaProject.setId(randomUri());
         randomNvaProject.setTitle(null);
 
-        GatewayResponse<NvaProject> response = executeRequest(randomNvaProject);
+        var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
     }
 
     @Test
     void shouldReturn400BadRequestWhenIllegalRoleValueInInput() throws Exception {
-
-        NvaProject randomNvaProject = randomNvaProject();
+        var randomNvaProject = randomNvaProject();
         randomNvaProject.getContributors().get(FIRST_CONTRIBUTOR).setType(ILLEGAL_CONTRIBUTOR_ROLE);
 
-        GatewayResponse<NvaProject> response = executeRequest(randomNvaProject);
+        var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
     }
 
     @Test
     void shouldReturnProjectDataWithNewIdentifierWhenCreated() throws Exception {
-        NvaProject expected = randomNvaProject();
+        var expected = randomNvaProject();
         expected.setContext(NvaProject.PROJECT_CONTEXT);
         mockUpstreamUsingRequest(expected);
 
         var identifier = expected.getId(); // We need to put this back after request
         expected.setId(null); // Cannot create with Id
-        GatewayResponse<NvaProject> response = executeRequest(expected);
+        var response = executeRequest(expected);
         expected.setId(identifier);
         removeFieldsNotSupportedByPost(expected);
 
         assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
-        NvaProject actual = response.getBodyObject(NvaProject.class);
+        var actual = response.getBodyObject(NvaProject.class);
         assertNotNull(actual.getId());
         assertThat(actual, equalTo(expected));
     }
 
     @Test
     void shouldReturnMinimalProjectDataWhenCreatedWithTitleAndStatus() throws Exception {
-        NvaProject expected = randomMinimalNvaProject();
+        var expected = randomMinimalNvaProject();
         expected.setContext(NvaProject.PROJECT_CONTEXT);
         mockUpstreamUsingRequest(expected);
 
-        NvaProject requestProject = expected.toCristinProject().toNvaProject();
+        var requestProject = expected.toCristinProject().toNvaProject();
         requestProject.setId(null);  // Cannot create with Id
-        GatewayResponse<NvaProject> response = executeRequest(requestProject);
+        var response = executeRequest(requestProject);
 
         assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
-        NvaProject actual = response.getBodyObject(NvaProject.class);
+        var actual = response.getBodyObject(NvaProject.class);
         assertNotNull(actual.getId());
         assertThat(actual, equalTo(expected));
     }
 
     @Test
     void shouldReturnProjectDataWhenCreatingWithUnitIdentifier() throws IOException, InterruptedException {
-        NvaProject request = nvaProjectUsingUnitIdentifiers();
+        var request = nvaProjectUsingUnitIdentifiers();
         mockUpstreamUsingRequest(request);
-        GatewayResponse<NvaProject> response = executeRequest(request);
+        var response = executeRequest(request);
 
         assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
 
-        NvaProject actual = response.getBodyObject(NvaProject.class);
+        var actual = response.getBodyObject(NvaProject.class);
 
-        Organization actualOrganization = actual.getCoordinatingInstitution();
-        Organization expectedOrganization = request.getCoordinatingInstitution();
+        var actualOrganization = actual.getCoordinatingInstitution();
+        var expectedOrganization = request.getCoordinatingInstitution();
         assertThat(actualOrganization, equalTo(expectedOrganization));
         assertThat(actualIdentifierFromOrganization(actualOrganization), equalTo(SOME_UNIT_IDENTIFIER));
 
-        Organization actualAffiliation = actual.getContributors().get(0).getAffiliation();
-        Organization expectedAffiliation = request.getContributors().get(0).getAffiliation();
+        var actualAffiliation = actual.getContributors().get(0).getAffiliation();
+        var expectedAffiliation = request.getContributors().get(0).getAffiliation();
         assertThat(actualAffiliation, equalTo(expectedAffiliation));
         assertThat(actualIdentifierFromOrganization(actualAffiliation), equalTo(SOME_UNIT_IDENTIFIER));
     }
 
     @Test
-    void shouldCreateProjectWithoutNonRequiredFieldContributorAffiliation()
-        throws IOException, InterruptedException {
-
-        NvaProject request = nvaProjectWithoutContributorAffiliation();
+    void shouldCreateProjectWithoutNonRequiredFieldContributorAffiliation() throws IOException, InterruptedException {
+        var request = nvaProjectWithoutContributorAffiliation();
         mockUpstreamUsingRequest(request);
-        GatewayResponse<NvaProject> response = executeRequest(request);
+        var response = executeRequest(request);
 
         assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
 
-        NvaProject actual = response.getBodyObject(NvaProject.class);
+        var actual = response.getBodyObject(NvaProject.class);
 
-        Organization actualAffiliation = actual.getContributors().get(0).getAffiliation();
-        Organization expectedAffiliation = request.getContributors().get(0).getAffiliation();
+        var actualAffiliation = actual.getContributors().get(0).getAffiliation();
+        var expectedAffiliation = request.getContributors().get(0).getAffiliation();
         assertThat(actualAffiliation, equalTo(expectedAffiliation));
     }
 
@@ -272,8 +267,7 @@ class CreateCristinProjectHandlerTest {
     private void mockUpstreamUsingRequest(NvaProject request) throws IOException, InterruptedException {
         var cristinProject = request.toCristinProject();
         addMockedResponseFieldsToCristinProject(cristinProject, request);
-        HttpResponse<String> httpResponse =
-            new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(cristinProject), 201);
+        var httpResponse = new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(cristinProject), 201);
         when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
     }
 
@@ -283,20 +277,20 @@ class CreateCristinProjectHandlerTest {
     }
 
     private CristinDateInfo fromDateInfo(DateInfo dateInfo) {
-        if (Objects.isNull(dateInfo)) {
+        if (isNull(dateInfo)) {
             return null;
         }
         return new CristinDateInfo(dateInfo.getSourceShortName(), dateInfo.getDate());
     }
 
     private GatewayResponse<NvaProject> executeRequest(NvaProject request) throws IOException {
-        InputStream input = requestWithBodyAndRole(request);
+        var input = requestWithBodyAndRole(request);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, NvaProject.class);
     }
 
     private NvaProject nvaProjectUsingUnitIdentifiers() {
-        NvaProject requestBody = randomMinimalNvaProject();
+        var requestBody = randomMinimalNvaProject();
         requestBody.setId(null);
         requestBody.setCoordinatingInstitution(someOrganizationFromUnitIdentifier());
         requestBody.setContributors(List.of(randomContributorWithUnitAffiliation()));
@@ -304,7 +298,7 @@ class CreateCristinProjectHandlerTest {
     }
 
     private NvaProject nvaProjectWithoutContributorAffiliation() {
-        NvaProject requestBody = randomMinimalNvaProject();
+        var requestBody = randomMinimalNvaProject();
         requestBody.setId(null);
         requestBody.setCoordinatingInstitution(someOrganizationFromUnitIdentifier());
         requestBody.setContributors(List.of(randomContributorWithoutUnitAffiliation()));
