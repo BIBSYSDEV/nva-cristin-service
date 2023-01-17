@@ -26,6 +26,7 @@ import nva.commons.core.paths.UriWrapper;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
 import static no.unit.nva.utils.UriUtils.PROJECT;
@@ -116,7 +117,16 @@ public class NvaProjectBuilder {
                    .withInstitutionsResponsibleForResearch(
                        extractInstitutionsResponsibleForResearch(
                            cristinProject.getInstitutionsResponsibleForResearch()))
+                   .withHealthProjectData(extractHealthProjectData(cristinProject))
                    .build();
+    }
+
+    private HealthProjectData extractHealthProjectData(CristinProject cristinProject) {
+        if (isNull(cristinProject.getHealthProjectType()) && isNull(cristinProject.getClinicalTrialPhase())) {
+            return null;
+        }
+        return new HealthProjectData(cristinProject.getHealthProjectType(), cristinProject.getHealthProjectTypeName(),
+                                     cristinProject.getClinicalTrialPhase());
     }
 
     private List<Organization> extractInstitutionsResponsibleForResearch(List<CristinOrganization>

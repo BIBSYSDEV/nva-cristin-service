@@ -89,6 +89,9 @@ public class NvaProject implements JsonSerializable {
     private List<URI> relatedProjects;
     @JsonProperty
     private List<Organization> institutionsResponsibleForResearch;
+    @JsonProperty
+    @JsonInclude(NON_NULL)
+    private HealthProjectData healthProjectData;
 
     private NvaProject() {
     }
@@ -317,6 +320,14 @@ public class NvaProject implements JsonSerializable {
         this.institutionsResponsibleForResearch = institutionsResponsibleForResearch;
     }
 
+    public HealthProjectData getHealthProjectData() {
+        return healthProjectData;
+    }
+
+    public void setHealthProjectData(HealthProjectData healthProjectData) {
+        this.healthProjectData = healthProjectData;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -353,7 +364,8 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getKeywords(), that.getKeywords())
                && Objects.equals(getExternalSources(), that.getExternalSources())
                && Objects.equals(getRelatedProjects(), that.getRelatedProjects())
-               && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch());
+               && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch())
+               && Objects.equals(getHealthProjectData(), that.getHealthProjectData());
     }
 
     @Override
@@ -364,7 +376,7 @@ public class NvaProject implements JsonSerializable {
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
                             getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
                             getProjectCategories(), getKeywords(), getExternalSources(), getRelatedProjects(),
-                            getInstitutionsResponsibleForResearch());
+                            getInstitutionsResponsibleForResearch(), getHealthProjectData());
     }
 
     @Override
@@ -522,6 +534,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withInstitutionsResponsibleForResearch(List<Organization> institutionsResponsibleForResearch) {
             nvaProject.setInstitutionsResponsibleForResearch(institutionsResponsibleForResearch);
+            return this;
+        }
+
+        public Builder withHealthProjectData(HealthProjectData healthProjectData) {
+            nvaProject.setHealthProjectData(healthProjectData);
             return this;
         }
 

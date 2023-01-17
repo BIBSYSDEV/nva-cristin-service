@@ -123,5 +123,10 @@
         "url": "https://api.cristin.no/v2/units/1234.0.0.0"
       }
     }
-  ]
+  ],
+  "health_project_type" : "DRUGSTUDY",
+  "health_project_type_name" : {
+    "en" : "Drug study"
+  },
+  "clinical_trial_phase" : "3"
 }
