@@ -23,7 +23,7 @@ import no.unit.nva.commons.json.JsonSerializable;
 public class Organization implements JsonSerializable {
 
     public static final String ORGANIZATION_IDENTIFIER_PATTERN = "^(?:[0-9]+\\.){3}[0-9]{1,3}$";
-    public static final String ORGANIZATION_CONTEXT = "https://api.dev.nva.aws.unit.no/cristin/organization";
+    public static final String ORGANIZATION_CONTEXT = "https://bibsysdev.github.io/src/organization-context.json";
 
     @JsonProperty(ID)
     private final URI id;
