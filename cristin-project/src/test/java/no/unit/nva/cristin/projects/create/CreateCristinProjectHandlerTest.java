@@ -10,6 +10,8 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMini
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNamesMap;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
+import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.INVALID_CLINICAL_TRIAL_PHASE;
+import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.INVALID_HEALTH_PROJECT_TYPE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -50,11 +52,10 @@ class CreateCristinProjectHandlerTest {
     public static final String NO_ACCESS = "NoAccess";
     public static final String ILLEGAL_CONTRIBUTOR_ROLE = "illegalContributorRole";
     public static final int FIRST_CONTRIBUTOR = 0;
-    public static final String ERROR_HEALTH_DATA_TYPE = "Health Project Type is invalid";
-    public static final String ERROR_HEALTH_DATA_CLINICAL_TRIAL = "Clinical Trial Phase is invalid";
     public static final String DRUGSTUDY = "DRUGSTUDY";
     public static final String INVALIDVALUE = "INVALIDVALUE";
     public static final String CLINICAL_TRIAL_PHASE_VALUE = "1";
+    public static final String OTHERSTUDY = "OTHERSTUDY";
 
     private final Environment environment = new Environment();
     private Context context;
@@ -196,7 +197,7 @@ class CreateCristinProjectHandlerTest {
         var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertThat(response.getBody(), containsString(ERROR_HEALTH_DATA_TYPE));
+        assertThat(response.getBody(), containsString(INVALID_HEALTH_PROJECT_TYPE));
     }
 
     @Test
@@ -209,26 +210,15 @@ class CreateCristinProjectHandlerTest {
         var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertThat(response.getBody(), containsString(ERROR_HEALTH_DATA_CLINICAL_TRIAL));
+        assertThat(response.getBody(), containsString(INVALID_CLINICAL_TRIAL_PHASE));
     }
 
     @Test
     void shouldReturnCreatedWhenHealthProjectDataHasPartialData() throws Exception {
         var randomNvaProject = randomNvaProject();
         randomNvaProject.setId(null);
-        var healthProjectData = new HealthProjectData(DRUGSTUDY, randomNamesMap(), null);
+        var healthProjectData = new HealthProjectData(OTHERSTUDY, null, null);
         randomNvaProject.setHealthProjectData(healthProjectData);
-
-        mockUpstreamUsingRequest(randomNvaProject);
-        var response = executeRequest(randomNvaProject);
-
-        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
-    }
-
-    @Test
-    void shouldReturnCreatedWhenHealthProjectDataHasFullData() throws Exception {
-        var randomNvaProject = randomNvaProject();
-        randomNvaProject.setId(null);
 
         mockUpstreamUsingRequest(randomNvaProject);
         var response = executeRequest(randomNvaProject);
@@ -244,7 +234,7 @@ class CreateCristinProjectHandlerTest {
 
         var nvaProject = randomNvaProject();
         nvaProject.setId(null);
-        var healthProjectData = new HealthProjectData(DRUGSTUDY, randomNamesMap(), CLINICAL_TRIAL_PHASE_VALUE);
+        var healthProjectData = new HealthProjectData(DRUGSTUDY, null, CLINICAL_TRIAL_PHASE_VALUE);
         nvaProject.setHealthProjectData(healthProjectData);
 
         mockUpstreamUsingRequest(nvaProject);

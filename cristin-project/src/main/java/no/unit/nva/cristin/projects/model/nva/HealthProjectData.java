@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,7 +28,7 @@ public class HealthProjectData implements JsonSerializable {
     public HealthProjectData(@JsonProperty(TYPE) String type, @JsonProperty(LABEL) Map<String, String> label,
                              @JsonProperty(CLINICAL_TRIAL_PHASE) String clinicalTrialPhase) {
         this.type = type;
-        this.label = Collections.unmodifiableMap(label);
+        this.label = nonNull(label) ? Collections.unmodifiableMap(label) : Collections.emptyMap();
         this.clinicalTrialPhase = clinicalTrialPhase;
     }
 
