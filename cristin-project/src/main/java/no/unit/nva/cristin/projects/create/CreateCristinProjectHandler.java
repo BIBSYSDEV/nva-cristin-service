@@ -3,24 +3,16 @@ package no.unit.nva.cristin.projects.create;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.model.Organization;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
-import nva.commons.core.StringUtils;
 
 import java.net.HttpURLConnection;
-import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 
-import static java.util.Objects.isNull;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
 
@@ -31,6 +23,7 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
     /**
      * Create CreateCristinProjectHandler with default authenticated HttpClient.
      */
+    @SuppressWarnings("unused")
     public CreateCristinProjectHandler() {
         this(new CreateCristinProjectApiClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
@@ -62,41 +55,9 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
             throws ApiGatewayException {
 
         verifyRequesterCanEditProjects(requestInfo);
-        validateInput(input);
+        new CreateCristinProjectValidator().validate(input);
 
         return apiClient.createProjectInCristin(input);
-    }
-
-    private void validateInput(NvaProject project) throws BadRequestException {
-        if (isNull(project)
-            || hasId(project)
-            || noTitle(project)
-            || invalidStartDate(project.getStartDate())
-            || hasNoContributors(project.getContributors())
-            || hasNoCoordinatingOrganization(project.getCoordinatingInstitution())
-        ) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
-        }
-    }
-
-    private boolean hasNoCoordinatingOrganization(Organization coordinatingInstitution) {
-        return isNull(coordinatingInstitution);
-    }
-
-    private boolean hasNoContributors(List<NvaContributor> contributors) {
-        return isNull(contributors) || contributors.isEmpty();
-    }
-
-    private boolean invalidStartDate(Instant startDate) {
-        return isNull(startDate);
-    }
-
-    private boolean hasId(NvaProject project) {
-        return Objects.nonNull(project.getId());
-    }
-
-    private boolean noTitle(NvaProject project) {
-        return StringUtils.isEmpty(project.getTitle());
     }
 
     /**
