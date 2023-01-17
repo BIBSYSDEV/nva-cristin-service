@@ -69,7 +69,14 @@ Feature: API tests for Cristin Project retrieve and search
           'type': 'Organization',
           'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
         }
-      ]
+      ],
+      'healthProjectData': {
+        'type': 'DRUGSTUDY',
+        'label': {
+          'en': 'Drug study'
+        },
+        'clinicalTrialPhase': '3'
+      }
     }
     """
     Given url CRISTIN_BASE

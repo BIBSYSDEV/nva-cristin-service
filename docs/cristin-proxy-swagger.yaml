@@ -1677,6 +1677,27 @@ components:
           description: List of institutions responsible for research on the project
           items:
             $ref: '#/components/schemas/Organization'
+        healthProjectData:
+          type: object
+          description: 'If project is related to health, this field will contain data'
+          properties:
+            type:
+              type: string
+              description: 'Health project classification. DRUGSTUDY: Drug study (en), Legemiddelstudium (nb), Legemedelstudium (nn); OTHERCLIN: Other clinical trial (en), Annet klinisk behandlingsstudium (nb), Anna klinisk behandlingsstudium (nn); OTHERSTUDY: Other study (en), Annet studium (nb), Anna studium (nn).'
+              enum:
+                - DRUGSTUDY
+                - OTHERCLIN
+                - OTHERSTUDY
+            label:
+              $ref: '#/components/schemas/Languages'
+            clinicalTrialPhase:
+              type: string
+              description: 'Mandatory if type is DRUGSTUDY.'
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
     ProjectPost:
       type: object
       properties:
@@ -1755,6 +1776,27 @@ components:
           description: List of institutions responsible for research on the project
           items:
             $ref: '#/components/schemas/Organization'
+        healthProjectData:
+          type: object
+          description: 'If project is related to health, this field will contain data'
+          properties:
+            type:
+              type: string
+              description: 'Health project classification. DRUGSTUDY: Drug study (en), Legemiddelstudium (nb), Legemedelstudium (nn); OTHERCLIN: Other clinical trial (en), Annet klinisk behandlingsstudium (nb), Anna klinisk behandlingsstudium (nn); OTHERSTUDY: Other study (en), Annet studium (nb), Anna studium (nn).'
+              enum:
+                - DRUGSTUDY
+                - OTHERCLIN
+                - OTHERSTUDY
+            label:
+              $ref: '#/components/schemas/Languages'
+            clinicalTrialPhase:
+              type: string
+              description: 'Mandatory if type is DRUGSTUDY.'
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
     ProjectPatch:
       type: object
       properties:
@@ -2477,6 +2519,11 @@ components:
             institutionsResponsibleForResearch:
               - type: 'Organization'
                 id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+            healthProjectData:
+              type: 'DRUGSTUDY'
+              label:
+                en: 'Drug study'
+              clinicalTrialPhase: '3'
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2570,6 +2617,11 @@ components:
         institutionsResponsibleForResearch:
           - type: 'Organization'
             id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+        healthProjectData:
+          type: 'DRUGSTUDY'
+          label:
+            en: 'Drug study'
+          clinicalTrialPhase: '3'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2626,6 +2678,11 @@ components:
         institutionsResponsibleForResearch:
           - type: 'Organization'
             id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+        healthProjectData:
+          type: 'DRUGSTUDY'
+          label:
+            en: 'Drug study'
+          clinicalTrialPhase: '3'
     OrganizationsExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
