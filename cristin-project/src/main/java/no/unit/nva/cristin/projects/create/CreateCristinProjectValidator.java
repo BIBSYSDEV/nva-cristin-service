@@ -1,12 +1,14 @@
 package no.unit.nva.cristin.projects.create;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static nva.commons.core.attempt.Try.attempt;
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 import no.unit.nva.cristin.projects.common.ProjectValidator;
+import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
@@ -16,13 +18,21 @@ import nva.commons.core.StringUtils;
 
 public class CreateCristinProjectValidator implements ProjectValidator {
 
+    public static final Set<String> validClinicalTrialPhases = Set.of("1", "2", "3", "4");
+    public static final Set<String> validHealthProjectTypes = Set.of("DRUGSTUDY", "OTHERCLIN", "OTHERSTUDY");
+    public static final String INVALID_CLINICAL_TRIAL_PHASE =
+        "Clinical Trial Phase is invalid, can only contain the following values: ";
+    public static final String INVALID_HEALTH_PROJECT_TYPE =
+        "Health Project Type is invalid, can only contain the following values: ";
+
     @Override
     public <T> void validate(T classOfT) throws ApiGatewayException {
         var nvaProject = attempt(() -> (NvaProject) classOfT).orElseThrow();
-        validateInput(nvaProject);
+        validateRequiredInput(nvaProject);
+        validateOptionalInput(nvaProject);
     }
 
-    private void validateInput(NvaProject project) throws BadRequestException {
+    private void validateRequiredInput(NvaProject project) throws BadRequestException {
         if (isNull(project)
             || hasId(project)
             || noTitle(project)
@@ -47,11 +57,36 @@ public class CreateCristinProjectValidator implements ProjectValidator {
     }
 
     private boolean hasId(NvaProject project) {
-        return Objects.nonNull(project.getId());
+        return nonNull(project.getId());
     }
 
     private boolean noTitle(NvaProject project) {
         return StringUtils.isEmpty(project.getTitle());
     }
 
+    private void validateOptionalInput(NvaProject nvaProject) throws BadRequestException {
+        if (nonNull(nvaProject.getHealthProjectData())) {
+            validateHealthData(nvaProject.getHealthProjectData());
+        }
+    }
+
+    private void validateHealthData(HealthProjectData healthData) throws BadRequestException {
+        if (nonNull(healthData.getType()) && !validHealthProjectTypes.contains(healthData.getType())) {
+            throw exceptionInvalidHealthProjectType();
+        }
+        if (nonNull(healthData.getClinicalTrialPhase())
+            && !validClinicalTrialPhases.contains(healthData.getClinicalTrialPhase())) {
+            throw exceptionInvalidClinicalTrialPhase();
+        }
+    }
+
+    private BadRequestException exceptionInvalidHealthProjectType() {
+        return new BadRequestException(INVALID_HEALTH_PROJECT_TYPE
+                                       + String.join(" ; ", validHealthProjectTypes));
+    }
+
+    private BadRequestException exceptionInvalidClinicalTrialPhase() {
+        return new BadRequestException(INVALID_CLINICAL_TRIAL_PHASE
+                                       + String.join(" ; ", validClinicalTrialPhases));
+    }
 }

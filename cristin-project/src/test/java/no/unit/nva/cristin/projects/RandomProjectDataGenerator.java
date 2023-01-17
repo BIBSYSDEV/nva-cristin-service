@@ -28,6 +28,8 @@ import nva.commons.core.paths.UriWrapper;
 
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.validClinicalTrialPhases;
+import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.validHealthProjectTypes;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.TYPE;
@@ -111,7 +113,9 @@ public class RandomProjectDataGenerator {
     }
 
     private static HealthProjectData randomHealthProjectData() {
-        return new HealthProjectData(randomString(), randomNamesMap(), randomString());
+        return new HealthProjectData(randomElement(validHealthProjectTypes),
+                                     randomNamesMap(),
+                                     randomElement(validClinicalTrialPhases));
     }
 
     private static URI randomRelatedProjects() {
