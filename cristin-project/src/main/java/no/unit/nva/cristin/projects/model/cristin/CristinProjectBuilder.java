@@ -62,6 +62,7 @@ public class CristinProjectBuilder {
         cristinProject.setHealthProjectType(extractHealthProjectType(nvaProject.getHealthProjectData()));
         cristinProject.setHealthProjectTypeName(extractHealthProjectTypeName(nvaProject.getHealthProjectData()));
         cristinProject.setClinicalTrialPhase(extractHealthProjectClinicalTrialPhase(nvaProject.getHealthProjectData()));
+        cristinProject.setExemptFromPublicDisclosure(nvaProject.getExemptFromPublicDisclosure());
 
         return cristinProject;
     }

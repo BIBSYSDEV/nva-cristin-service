@@ -92,6 +92,9 @@ public class NvaProject implements JsonSerializable {
     @JsonProperty
     @JsonInclude(NON_NULL)
     private HealthProjectData healthProjectData;
+    @JsonProperty
+    @JsonInclude(NON_NULL)
+    private Boolean exemptFromPublicDisclosure;
 
     private NvaProject() {
     }
@@ -328,6 +331,14 @@ public class NvaProject implements JsonSerializable {
         this.healthProjectData = healthProjectData;
     }
 
+    public Boolean getExemptFromPublicDisclosure() {
+        return exemptFromPublicDisclosure;
+    }
+
+    public void setExemptFromPublicDisclosure(Boolean exemptFromPublicDisclosure) {
+        this.exemptFromPublicDisclosure = exemptFromPublicDisclosure;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -365,7 +376,8 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getExternalSources(), that.getExternalSources())
                && Objects.equals(getRelatedProjects(), that.getRelatedProjects())
                && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch())
-               && Objects.equals(getHealthProjectData(), that.getHealthProjectData());
+               && Objects.equals(getHealthProjectData(), that.getHealthProjectData())
+               && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure());
     }
 
     @Override
@@ -376,7 +388,8 @@ public class NvaProject implements JsonSerializable {
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
                             getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
                             getProjectCategories(), getKeywords(), getExternalSources(), getRelatedProjects(),
-                            getInstitutionsResponsibleForResearch(), getHealthProjectData());
+                            getInstitutionsResponsibleForResearch(), getHealthProjectData(),
+                            getExemptFromPublicDisclosure());
     }
 
     @Override
@@ -539,6 +552,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withHealthProjectData(HealthProjectData healthProjectData) {
             nvaProject.setHealthProjectData(healthProjectData);
+            return this;
+        }
+
+        public Builder withExemptFromPublicDisclosure(Boolean exemptFromPublicDisclosure) {
+            nvaProject.setExemptFromPublicDisclosure(exemptFromPublicDisclosure);
             return this;
         }
 

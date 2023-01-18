@@ -35,6 +35,7 @@ public class CristinProject implements JsonSerializable {
     public static final String HEALTH_PROJECT_TYPE = "health_project_type";
     public static final String HEALTH_PROJECT_TYPE_NAME = "health_project_type_name";
     public static final String CLINICAL_TRIAL_PHASE = "clinical_trial_phase";
+    public static final String EXEMPT_FROM_PUBLIC_DISCLOSURE = "exempt_from_public_disclosure";
 
     private String cristinProjectId;
     private Boolean publishable;
@@ -77,6 +78,8 @@ public class CristinProject implements JsonSerializable {
     private Map<String, String> healthProjectTypeName;
     @JsonProperty(CLINICAL_TRIAL_PHASE)
     private String clinicalTrialPhase;
+    @JsonProperty(EXEMPT_FROM_PUBLIC_DISCLOSURE)
+    private Boolean exemptFromPublicDisclosure;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -294,6 +297,14 @@ public class CristinProject implements JsonSerializable {
         this.clinicalTrialPhase = clinicalTrialPhase;
     }
 
+    public Boolean getExemptFromPublicDisclosure() {
+        return exemptFromPublicDisclosure;
+    }
+
+    public void setExemptFromPublicDisclosure(Boolean exemptFromPublicDisclosure) {
+        this.exemptFromPublicDisclosure = exemptFromPublicDisclosure;
+    }
+
     /**
      * Verifies CristinProject has enough data to be considered as valid.
      *
@@ -344,7 +355,8 @@ public class CristinProject implements JsonSerializable {
                && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch())
                && Objects.equals(getHealthProjectType(), that.getHealthProjectType())
                && Objects.equals(getHealthProjectTypeName(), that.getHealthProjectTypeName())
-               && Objects.equals(getClinicalTrialPhase(), that.getClinicalTrialPhase());
+               && Objects.equals(getClinicalTrialPhase(), that.getClinicalTrialPhase())
+               && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure());
     }
 
     @Override
@@ -356,7 +368,7 @@ public class CristinProject implements JsonSerializable {
                             getPopularScientificSummary(),
                             getMethod(), getEquipment(), getProjectCategories(), getKeywords(), getExternalSources(),
                             getRelatedProjects(), getInstitutionsResponsibleForResearch(), getHealthProjectType(),
-                            getHealthProjectTypeName(), getClinicalTrialPhase());
+                            getHealthProjectTypeName(), getClinicalTrialPhase(), getExemptFromPublicDisclosure());
     }
 
     @Override
