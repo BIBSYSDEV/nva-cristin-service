@@ -47,7 +47,8 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
         AccessUtils.verifyRequesterCanEditProjects(requestInfo);
 
         ObjectNode objectNode = readJsonFromInput(input);
-        ProjectPatchValidator.validate(objectNode);
+        var validator = new ProjectPatchValidator();
+        validator.validate(objectNode);
         ObjectNode cristinJson = new CristinProjectPatchJsonCreator(objectNode).create().getOutput();
 
         if (noSupportedValuesPresent(cristinJson)) {
