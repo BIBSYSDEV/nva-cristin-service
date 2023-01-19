@@ -3,7 +3,6 @@ package no.unit.nva.cristin.projects.create;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.cristin.projects.common.ProjectValidator;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -56,7 +55,7 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
             throws ApiGatewayException {
 
         verifyRequesterCanEditProjects(requestInfo);
-        ProjectValidator validator = new CreateCristinProjectValidator();
+        var validator = new CreateCristinProjectValidator();
         validator.validate(input);
 
         return apiClient.createProjectInCristin(input);

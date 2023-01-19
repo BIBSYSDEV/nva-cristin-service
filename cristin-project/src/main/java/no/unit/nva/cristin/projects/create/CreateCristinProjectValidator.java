@@ -3,11 +3,10 @@ package no.unit.nva.cristin.projects.create;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
-import static nva.commons.core.attempt.Try.attempt;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
-import no.unit.nva.cristin.projects.common.ProjectValidator;
+import no.unit.nva.Validator;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -16,7 +15,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.StringUtils;
 
-public class CreateCristinProjectValidator implements ProjectValidator {
+public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
     public static final Set<String> validClinicalTrialPhases = Set.of("1", "2", "3", "4");
     public static final Set<String> validHealthProjectTypes = Set.of("DRUGSTUDY", "OTHERCLIN", "OTHERSTUDY");
@@ -26,8 +25,7 @@ public class CreateCristinProjectValidator implements ProjectValidator {
         "Health Project Type is invalid, can only contain the following values: ";
 
     @Override
-    public <T> void validate(T classOfT) throws ApiGatewayException {
-        var nvaProject = attempt(() -> (NvaProject) classOfT).orElseThrow();
+    public void validate(NvaProject nvaProject) throws ApiGatewayException {
         validateRequiredInput(nvaProject);
         validateOptionalInput(nvaProject);
     }
