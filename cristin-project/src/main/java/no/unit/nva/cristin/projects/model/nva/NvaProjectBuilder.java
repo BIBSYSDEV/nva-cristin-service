@@ -125,11 +125,10 @@ public class NvaProjectBuilder {
         if (isNull(cristinProject.getHealthProjectType()) && isNull(cristinProject.getClinicalTrialPhase())) {
             return null;
         }
-        var clinicalTrialPhase = extractClinicalTrialPhase(cristinProject);
 
         return new HealthProjectData(cristinProject.getHealthProjectType(),
                                      cristinProject.getHealthProjectTypeName(),
-                                     clinicalTrialPhase);
+                                     extractClinicalTrialPhase(cristinProject));
     }
 
     private ClinicalTrialPhase extractClinicalTrialPhase(CristinProject cristinProject) {
