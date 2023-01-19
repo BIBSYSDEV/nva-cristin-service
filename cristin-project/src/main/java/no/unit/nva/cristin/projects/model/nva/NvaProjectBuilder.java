@@ -125,8 +125,16 @@ public class NvaProjectBuilder {
         if (isNull(cristinProject.getHealthProjectType()) && isNull(cristinProject.getClinicalTrialPhase())) {
             return null;
         }
-        return new HealthProjectData(cristinProject.getHealthProjectType(), cristinProject.getHealthProjectTypeName(),
-                                     cristinProject.getClinicalTrialPhase());
+        var clinicalTrialPhase = extractClinicalTrialPhase(cristinProject);
+
+        return new HealthProjectData(cristinProject.getHealthProjectType(),
+                                     cristinProject.getHealthProjectTypeName(),
+                                     clinicalTrialPhase);
+    }
+
+    private ClinicalTrialPhase extractClinicalTrialPhase(CristinProject cristinProject) {
+        var phase = cristinProject.getClinicalTrialPhase();
+        return ClinicalTrialPhase.fromValue(phase);
     }
 
     private List<Organization> extractInstitutionsResponsibleForResearch(List<CristinOrganization>

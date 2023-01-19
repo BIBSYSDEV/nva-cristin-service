@@ -73,7 +73,7 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
             throw exceptionInvalidHealthProjectType();
         }
         if (nonNull(healthData.getClinicalTrialPhase())
-            && !validClinicalTrialPhases.contains(healthData.getClinicalTrialPhase())) {
+            && !validClinicalTrialPhases.contains(healthData.getClinicalTrialPhase().getPhase())) {
             throw exceptionInvalidClinicalTrialPhase();
         }
     }

@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
@@ -115,7 +116,7 @@ public class RandomProjectDataGenerator {
     private static HealthProjectData randomHealthProjectData() {
         return new HealthProjectData(randomElement(validHealthProjectTypes),
                                      randomNamesMap(),
-                                     randomElement(validClinicalTrialPhases));
+                                     ClinicalTrialPhase.PHASE_ONE);
     }
 
     private static URI randomRelatedProjects() {
