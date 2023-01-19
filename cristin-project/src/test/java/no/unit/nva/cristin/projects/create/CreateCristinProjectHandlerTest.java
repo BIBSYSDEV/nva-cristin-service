@@ -10,7 +10,6 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMini
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNamesMap;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
-import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.INVALID_CLINICAL_TRIAL_PHASE;
 import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.INVALID_HEALTH_PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_ONE;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_THREE;
@@ -61,6 +60,7 @@ class CreateCristinProjectHandlerTest {
     public static final String OTHERSTUDY = "OTHERSTUDY";
     public static final String API_REQUEST_ONE_NVA_PROJECT_JSON = "api_request_one_nva_project.json";
     public static final String CLINICAL_TRIAL_PHASE_JSON_FIELD = "\"clinicalTrialPhase\": \"%s\"";
+    public static final String SUPPLIED_CLINICAL_TRIAL_PHASE_IS_NOT_VALID = "Supplied ClinicalTrialPhase is not valid";
 
     private final Environment environment = new Environment();
     private Context context;
@@ -219,7 +219,7 @@ class CreateCristinProjectHandlerTest {
         var response = executeRequest(expectedNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertThat(response.getBody(), containsString(INVALID_CLINICAL_TRIAL_PHASE));
+        assertThat(response.getBody(), containsString(SUPPLIED_CLINICAL_TRIAL_PHASE_IS_NOT_VALID));
     }
 
     @Test

@@ -5,6 +5,7 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.Optional;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
 public enum ClinicalTrialPhase {
@@ -15,7 +16,7 @@ public enum ClinicalTrialPhase {
     PHASE_FOUR("4"),
     INVALID_VALUE("INVALID_VALUE");
 
-    public static final String ERROR_MESSAGE_TEMPLATE = "%s not a valid ClinicalTrialPhase, expected one of: %s";
+    public static final String ERROR_MESSAGE_TEMPLATE = "Supplied ClinicalTrialPhase is not valid, expected one of: %s";
     public static final String DELIMITER = ", ";
 
     private final String phase;
@@ -52,11 +53,20 @@ public enum ClinicalTrialPhase {
     }
 
     /**
+     * Check if value for invalid is the enum contained in the class.
+     */
+    public static boolean hasValueInvalid(ClinicalTrialPhase clinicalTrialPhase) {
+        return Optional.ofNullable(clinicalTrialPhase)
+                   .map(ClinicalTrialPhase::getPhase)
+                   .filter(str -> ClinicalTrialPhase.INVALID_VALUE.getPhase().equals(str))
+                   .isPresent();
+    }
+
+    /**
      * Generates a suitable exception for handling unsupported value.
      */
-    public static BadRequestException valueNotFoundException(String value) {
+    public static BadRequestException valueNotFoundException() {
         return new BadRequestException(format(ERROR_MESSAGE_TEMPLATE,
-                                              value,
                                               stream(ClinicalTrialPhase.values())
                                                   .filter(phase -> phase != ClinicalTrialPhase.INVALID_VALUE)
                                                   .map(ClinicalTrialPhase::getPhase)

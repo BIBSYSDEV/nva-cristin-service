@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import no.unit.nva.Validator;
+import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -17,10 +18,7 @@ import nva.commons.core.StringUtils;
 
 public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
-    public static final Set<String> validClinicalTrialPhases = Set.of("1", "2", "3", "4");
     public static final Set<String> validHealthProjectTypes = Set.of("DRUGSTUDY", "OTHERCLIN", "OTHERSTUDY");
-    public static final String INVALID_CLINICAL_TRIAL_PHASE =
-        "Clinical Trial Phase is invalid, can only contain the following values: ";
     public static final String INVALID_HEALTH_PROJECT_TYPE =
         "Health Project Type is invalid, can only contain the following values: ";
 
@@ -72,9 +70,8 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         if (nonNull(healthData.getType()) && !validHealthProjectTypes.contains(healthData.getType())) {
             throw exceptionInvalidHealthProjectType();
         }
-        if (nonNull(healthData.getClinicalTrialPhase())
-            && !validClinicalTrialPhases.contains(healthData.getClinicalTrialPhase().getPhase())) {
-            throw exceptionInvalidClinicalTrialPhase();
+        if (ClinicalTrialPhase.hasValueInvalid(healthData.getClinicalTrialPhase())) {
+            throw ClinicalTrialPhase.valueNotFoundException();
         }
     }
 
@@ -83,8 +80,4 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
                                        + String.join(" ; ", validHealthProjectTypes));
     }
 
-    private BadRequestException exceptionInvalidClinicalTrialPhase() {
-        return new BadRequestException(INVALID_CLINICAL_TRIAL_PHASE
-                                       + String.join(" ; ", validClinicalTrialPhases));
-    }
 }

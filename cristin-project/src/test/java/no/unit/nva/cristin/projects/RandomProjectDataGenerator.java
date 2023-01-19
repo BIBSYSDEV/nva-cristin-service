@@ -29,7 +29,6 @@ import nva.commons.core.paths.UriWrapper;
 
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
-import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.validClinicalTrialPhases;
 import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.validHealthProjectTypes;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.PROJECT_TYPE;
