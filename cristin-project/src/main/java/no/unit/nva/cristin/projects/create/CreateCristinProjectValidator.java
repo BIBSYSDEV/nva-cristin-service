@@ -29,7 +29,7 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         Empty(" (no project data)"),
         HasId(" (project already created)"),
         NoTitle(" (missing title)"),
-        InvalidStartDate(" (invalid start date"),
+        InvalidStartDate(" (invalid start date)"),
         HasNoContributors(" (no contributors)"),
         HasNoCoordinatingOrganization(" (no coordinating organization)");
         public final String label;
