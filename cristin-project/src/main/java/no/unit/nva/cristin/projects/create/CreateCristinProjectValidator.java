@@ -47,7 +47,7 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
     private void validateRequiredInput(NvaProject project) throws BadRequestException {
         var validatedResult = validateProjectInput(project);
-        if (validatedResult.ordinal() > ValidatedResult.Ok.ordinal()) {
+        if (!validatedResult.equals(ValidatedResult.Ok)) {
             throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD + validatedResult.label);
         }
     }
