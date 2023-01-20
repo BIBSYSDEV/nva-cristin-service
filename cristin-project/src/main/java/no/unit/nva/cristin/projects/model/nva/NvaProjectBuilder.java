@@ -126,9 +126,14 @@ public class NvaProjectBuilder {
             return null;
         }
 
-        return new HealthProjectData(cristinProject.getHealthProjectType(),
+        return new HealthProjectData(extractHealthProjectType(cristinProject),
                                      cristinProject.getHealthProjectTypeName(),
                                      extractClinicalTrialPhase(cristinProject));
+    }
+
+    private HealthProjectType extractHealthProjectType(CristinProject cristinProject) {
+        var type = cristinProject.getHealthProjectType();
+        return HealthProjectType.fromValue(type);
     }
 
     private ClinicalTrialPhase extractClinicalTrialPhase(CristinProject cristinProject) {

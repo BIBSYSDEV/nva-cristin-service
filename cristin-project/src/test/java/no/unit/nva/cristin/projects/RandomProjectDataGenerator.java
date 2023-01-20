@@ -8,6 +8,7 @@ import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
+import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
@@ -29,7 +30,6 @@ import nva.commons.core.paths.UriWrapper;
 
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
-import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.validHealthProjectTypes;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.TYPE;
@@ -113,7 +113,7 @@ public class RandomProjectDataGenerator {
     }
 
     private static HealthProjectData randomHealthProjectData() {
-        return new HealthProjectData(randomElement(validHealthProjectTypes),
+        return new HealthProjectData(HealthProjectType.DRUGSTUDY,
                                      randomNamesMap(),
                                      ClinicalTrialPhase.PHASE_ONE);
     }
