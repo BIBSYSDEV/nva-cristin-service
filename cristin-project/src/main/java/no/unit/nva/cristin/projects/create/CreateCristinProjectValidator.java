@@ -24,6 +24,21 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
     public static final String INVALID_HEALTH_PROJECT_TYPE =
         "Health Project Type is invalid, can only contain the following values: ";
 
+    protected enum ValidatedResult {
+        Ok("no errors"),
+        Empty(" (no project data)"),
+        HasId(" (project already created)"),
+        NoTitle(" (missing title)"),
+        InvalidStartDate(" (invalid start date"),
+        HasNoContributors(" (no contributors)"),
+        HasNoCoordinatingOrganization(" (no coordinating organization)");
+        public final String label;
+
+        ValidatedResult(String label) {
+            this.label = label;
+        }
+    }
+
     @Override
     public void validate(NvaProject nvaProject) throws ApiGatewayException {
         validateRequiredInput(nvaProject);
@@ -31,15 +46,32 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
     }
 
     private void validateRequiredInput(NvaProject project) throws BadRequestException {
-        if (isNull(project)
-            || hasId(project)
-            || noTitle(project)
-            || invalidStartDate(project.getStartDate())
-            || hasNoContributors(project.getContributors())
-            || hasNoCoordinatingOrganization(project.getCoordinatingInstitution())
-        ) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
+        var validatedResult = validateProjectInput(project);
+        if (validatedResult.ordinal() > ValidatedResult.Ok.ordinal()) {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD + validatedResult.label);
         }
+    }
+
+    private ValidatedResult validateProjectInput(NvaProject project) {
+        if (isNull(project)) {
+            return ValidatedResult.Empty;
+        }
+        if (hasId(project)) {
+            return ValidatedResult.HasId;
+        }
+        if (noTitle(project)) {
+            return ValidatedResult.NoTitle;
+        }
+        if (invalidStartDate(project.getStartDate())) {
+            return ValidatedResult.InvalidStartDate;
+        }
+        if (hasNoContributors(project.getContributors())) {
+            return ValidatedResult.HasNoContributors;
+        }
+        if (hasNoCoordinatingOrganization(project.getCoordinatingInstitution())) {
+            return ValidatedResult.HasNoCoordinatingOrganization;
+        }
+        return ValidatedResult.Ok;
     }
 
     private boolean hasNoCoordinatingOrganization(Organization coordinatingInstitution) {
