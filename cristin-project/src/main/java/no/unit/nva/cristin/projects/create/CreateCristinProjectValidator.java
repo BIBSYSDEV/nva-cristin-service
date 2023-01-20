@@ -26,12 +26,12 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
     protected enum ValidatedResult {
         Ok("no errors"),
-        Empty(" (no project data)"),
-        HasId(" (project already created)"),
-        NoTitle(" (missing title)"),
-        InvalidStartDate(" (invalid start date)"),
-        HasNoContributors(" (no contributors)"),
-        HasNoCoordinatingOrganization(" (no coordinating organization)");
+        Empty(" (project data required)"),
+        HasId(" (project identifier not allowed)"),
+        NoTitle(" (title required)"),
+        InvalidStartDate(" (start date invalid)"),
+        HasNoContributors(" (contributors required)"),
+        HasNoCoordinatingOrganization(" (coordinating organization required)");
         public final String label;
 
         ValidatedResult(String label) {
