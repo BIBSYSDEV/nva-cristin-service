@@ -26,11 +26,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -49,6 +52,7 @@ import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.zalando.problem.Problem;
 
 class CreateCristinProjectHandlerTest {
 
@@ -217,13 +221,23 @@ class CreateCristinProjectHandlerTest {
         String expected = json.replace(String.format(jsonToReplace, PHASE_THREE.getPhase()),
                                        String.format(jsonToReplace, INVALIDVALUE));
 
-        var expectedNvaProject = OBJECT_MAPPER.readValue(expected, NvaProject.class);
 
-        mockUpstreamUsingRequest(expectedNvaProject);
-        var response = executeRequest(expectedNvaProject);
+        InputStream input = getInputStreamFromString(expected);
+        handler.handleRequest(input, output, context);
+        var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
         assertThat(response.getBody(), containsString(SUPPLIED_CLINICAL_TRIAL_PHASE_IS_NOT_VALID));
+    }
+
+    private static InputStream getInputStreamFromString(String expected) throws JsonProcessingException {
+        var customerId = randomUri();
+        var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+                .withBody(expected)
+                .withCurrentCustomer(customerId)
+                .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
+                .build();
+        return input;
     }
 
     @Test

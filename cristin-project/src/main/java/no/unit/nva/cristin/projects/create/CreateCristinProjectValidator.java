@@ -66,9 +66,5 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         if (HealthProjectType.hasValueInvalid(healthData.getType())) {
             throw HealthProjectType.valueNotFoundException();
         }
-        if (ClinicalTrialPhase.hasValueInvalid(healthData.getClinicalTrialPhase())) {
-            throw ClinicalTrialPhase.valueNotFoundException();
-        }
     }
-
 }
