@@ -6,9 +6,6 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAY
 import java.time.Instant;
 import java.util.List;
 import no.unit.nva.Validator;
-import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
-import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
-import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
@@ -21,7 +18,6 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
     @Override
     public void validate(NvaProject nvaProject) throws ApiGatewayException {
         validateRequiredInput(nvaProject);
-        validateOptionalInput(nvaProject);
     }
 
     private void validateRequiredInput(NvaProject project) throws BadRequestException {
@@ -54,17 +50,5 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
     private boolean noTitle(NvaProject project) {
         return StringUtils.isEmpty(project.getTitle());
-    }
-
-    private void validateOptionalInput(NvaProject nvaProject) throws BadRequestException {
-        if (nonNull(nvaProject.getHealthProjectData())) {
-            validateHealthData(nvaProject.getHealthProjectData());
-        }
-    }
-
-    private void validateHealthData(HealthProjectData healthData) throws BadRequestException {
-        if (HealthProjectType.hasValueInvalid(healthData.getType())) {
-            throw HealthProjectType.valueNotFoundException();
-        }
     }
 }

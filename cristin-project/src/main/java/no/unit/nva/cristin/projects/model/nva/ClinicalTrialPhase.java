@@ -1,14 +1,9 @@
 package no.unit.nva.cristin.projects.model.nva;
 
-import static java.lang.String.format;
 import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
-import nva.commons.apigateway.exceptions.BadRequestException;
 
 public enum ClinicalTrialPhase {
 
@@ -32,11 +27,11 @@ public enum ClinicalTrialPhase {
     }
 
     /**
-     * Lookup ClinicalTrialPhase by json. If value not supported, default to value for invalid input.
+     * Lookup ClinicalTrialPhase by json. If value not supported, throws exception.
      */
     @JsonCreator
     @SuppressWarnings("unused")
-    public static ClinicalTrialPhase fromJson(String value) throws BadRequestException {
+    public static ClinicalTrialPhase fromJson(String value) {
         return stream(values())
                    .filter(nameType -> nameType.getPhase().equalsIgnoreCase(value))
                    .findAny()

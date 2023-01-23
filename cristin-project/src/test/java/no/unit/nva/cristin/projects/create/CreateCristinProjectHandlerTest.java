@@ -27,13 +27,11 @@ import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -204,10 +202,9 @@ class CreateCristinProjectHandlerTest {
         String expected = json.replace(String.format(jsonToReplace, DRUGSTUDY.getType()),
                                        String.format(jsonToReplace, INVALIDVALUE));
 
-        var expectedNvaProject = OBJECT_MAPPER.readValue(expected, NvaProject.class);
-
-        mockUpstreamUsingRequest(expectedNvaProject);
-        var response = executeRequest(expectedNvaProject);
+        var input = getInputStreamFromString(expected);
+        handler.handleRequest(input, output, context);
+        var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
         assertThat(response.getBody(), containsString(SUPPLIED_HEALTH_PROJECT_TYPE_IS_NOT_VALID));
@@ -228,16 +225,6 @@ class CreateCristinProjectHandlerTest {
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
         assertThat(response.getBody(), containsString(SUPPLIED_CLINICAL_TRIAL_PHASE_IS_NOT_VALID));
-    }
-
-    private static InputStream getInputStreamFromString(String expected) throws JsonProcessingException {
-        var customerId = randomUri();
-        var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
-                .withBody(expected)
-                .withCurrentCustomer(customerId)
-                .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
-                .build();
-        return input;
     }
 
     @Test
@@ -343,6 +330,15 @@ class CreateCristinProjectHandlerTest {
 
     private String getProjectPostRequestJsonSample() {
         return IoUtils.stringFromResources(Path.of(API_REQUEST_ONE_NVA_PROJECT_JSON));
+    }
+
+    private static InputStream getInputStreamFromString(String expected) throws JsonProcessingException {
+        var customerId = randomUri();
+        return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+                   .withBody(expected)
+                   .withCurrentCustomer(customerId)
+                   .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
+                   .build();
     }
 
 }
