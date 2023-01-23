@@ -4,8 +4,10 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import no.unit.nva.Validator;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
@@ -26,12 +28,12 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
     protected enum ValidatedResult {
         Ok("no errors"),
-        Empty(" (project data required)"),
-        HasId(" (project identifier not allowed)"),
-        NoTitle(" (title required)"),
-        InvalidStartDate(" (start date invalid)"),
-        HasNoContributors(" (contributors required)"),
-        HasNoCoordinatingOrganization(" (coordinating organization required)");
+        Empty("project data required"),
+        HasId("project identifier not allowed"),
+        NoTitle("title required"),
+        InvalidStartDate("start date invalid"),
+        HasNoContributors("contributors required"),
+        HasNoCoordinatingOrganization("coordinating organization required");
         public final String label;
 
         ValidatedResult(String label) {
@@ -47,31 +49,37 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
     private void validateRequiredInput(NvaProject project) throws BadRequestException {
         var validatedResult = validateProjectInput(project);
-        if (!validatedResult.equals(ValidatedResult.Ok)) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD + validatedResult.label);
+        if (!validatedResult.contains(ValidatedResult.Ok)) {
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD +
+                                          validatedResult.stream().map(result-> result.label).collect(
+                                              Collectors.joining(", "," (", ")")));
         }
     }
 
-    private ValidatedResult validateProjectInput(NvaProject project) {
+    private Set<ValidatedResult> validateProjectInput(NvaProject project) {
+        var results = new HashSet<ValidatedResult>();
         if (isNull(project)) {
-            return ValidatedResult.Empty;
+            results.add(ValidatedResult.Empty);
         }
         if (hasId(project)) {
-            return ValidatedResult.HasId;
+            results.add(ValidatedResult.HasId);
         }
         if (noTitle(project)) {
-            return ValidatedResult.NoTitle;
+            results.add(ValidatedResult.NoTitle);
         }
         if (invalidStartDate(project.getStartDate())) {
-            return ValidatedResult.InvalidStartDate;
+            results.add(ValidatedResult.InvalidStartDate);
         }
         if (hasNoContributors(project.getContributors())) {
-            return ValidatedResult.HasNoContributors;
+            results.add(ValidatedResult.HasNoContributors);
         }
         if (hasNoCoordinatingOrganization(project.getCoordinatingInstitution())) {
-            return ValidatedResult.HasNoCoordinatingOrganization;
+            results.add(ValidatedResult.HasNoCoordinatingOrganization);
         }
-        return ValidatedResult.Ok;
+        if (results.isEmpty()) {
+            results.add(ValidatedResult.Ok);
+        }
+        return results;
     }
 
     private boolean hasNoCoordinatingOrganization(Organization coordinatingInstitution) {

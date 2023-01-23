@@ -134,6 +134,22 @@ class CreateCristinProjectHandlerTest {
     }
 
     @Test
+    void shouldReturn400BadRequestWhenMissingFields() throws Exception {
+        var randomNvaProject = randomNvaProject();
+        randomNvaProject.setId(null);
+        randomNvaProject.setCoordinatingInstitution(null);
+        randomNvaProject.setContributors(null);
+        randomNvaProject.setStartDate(null);
+
+        var response = executeRequest(randomNvaProject);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasNoCoordinatingOrganization.label));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasNoContributors.label));
+        assertThat(response.getBody(), containsString(ValidatedResult.InvalidStartDate.label));
+    }
+
+    @Test
     void shouldReturn400BadRequestWhenHasNoCoordinatingOrganization() throws Exception {
         var randomNvaProject = randomNvaProject();
         randomNvaProject.setId(null);
