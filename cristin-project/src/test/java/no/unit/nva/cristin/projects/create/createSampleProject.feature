@@ -73,7 +73,13 @@ Feature: API tests for Cristin Project retrieve and search
       'healthProjectData': {
         'type': 'DRUGSTUDY',
         'clinicalTrialPhase': '3'
-      }
+      },
+      'externalSources': [{
+          'type': 'ExternalSource',
+          'identifier': '123456',
+          'name': 'REK'
+        }
+      ]
     }
     """
     Given url CRISTIN_BASE
