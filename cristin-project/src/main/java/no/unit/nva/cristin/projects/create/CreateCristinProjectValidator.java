@@ -27,7 +27,6 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         "Health Project Type is invalid, can only contain the following values: ";
 
     protected enum ValidatedResult {
-        Ok("no errors"),
         Empty("project data required"),
         HasId("project identifier not allowed"),
         NoTitle("title required"),
@@ -49,10 +48,12 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
     private void validateRequiredInput(NvaProject project) throws BadRequestException {
         var validatedResult = validateProjectInput(project);
-        if (!validatedResult.contains(ValidatedResult.Ok)) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD +
-                                          validatedResult.stream().map(result-> result.label).collect(
-                                              Collectors.joining(", "," (", ")")));
+        if (!validatedResult.isEmpty()) {
+            var validateDescriptions =
+                validatedResult.stream()
+                    .map(result-> result.label)
+                    .collect(Collectors.joining(", "," (", ")"));
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD + validateDescriptions);
         }
     }
 
@@ -75,9 +76,6 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         }
         if (hasNoCoordinatingOrganization(project.getCoordinatingInstitution())) {
             results.add(ValidatedResult.HasNoCoordinatingOrganization);
-        }
-        if (results.isEmpty()) {
-            results.add(ValidatedResult.Ok);
         }
         return results;
     }
