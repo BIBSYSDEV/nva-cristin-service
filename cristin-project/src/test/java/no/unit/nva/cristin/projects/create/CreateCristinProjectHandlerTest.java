@@ -35,6 +35,7 @@ import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
@@ -93,14 +94,78 @@ class CreateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldReturn400BadRequestWhenMissingRequiredFieldsInInput() throws Exception {
+    void shouldReturn400BadRequestWhenIdIsDefined() throws Exception {
         var randomNvaProject = randomNvaProject();
         randomNvaProject.setId(randomUri());
+
+        var response = executeRequest(randomNvaProject);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasId.label));
+    }
+
+    @Test
+    void shouldReturn400BadRequestWhenNoTitle() throws Exception {
+        var randomNvaProject = randomNvaProject();
+        randomNvaProject.setId(null);
         randomNvaProject.setTitle(null);
 
         var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
+        assertThat(response.getBody(), containsString(ValidatedResult.NoTitle.label));
+    }
+
+    @Test
+    void shouldReturn400BadRequestWhenInvalidStartDate() throws Exception {
+        var randomNvaProject = randomNvaProject();
+        randomNvaProject.setId(null);
+        randomNvaProject.setStartDate(null);
+
+        var response = executeRequest(randomNvaProject);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
+        assertThat(response.getBody(), containsString(ValidatedResult.InvalidStartDate.label));
+    }
+
+    @Test
+    void shouldReturn400BadRequestWhenHasNoContributors() throws Exception {
+        var randomNvaProject = randomNvaProject();
+        randomNvaProject.setId(null);
+        randomNvaProject.setContributors(null);
+
+        var response = executeRequest(randomNvaProject);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasNoContributors.label));
+    }
+
+    @Test
+    void shouldReturn400BadRequestWhenMissingFields() throws Exception {
+        var randomNvaProject = randomNvaProject();
+        randomNvaProject.setId(null);
+        randomNvaProject.setCoordinatingInstitution(null);
+        randomNvaProject.setContributors(null);
+        randomNvaProject.setStartDate(null);
+
+        var response = executeRequest(randomNvaProject);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasNoCoordinatingOrganization.label));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasNoContributors.label));
+        assertThat(response.getBody(), containsString(ValidatedResult.InvalidStartDate.label));
+    }
+
+    @Test
+    void shouldReturn400BadRequestWhenHasNoCoordinatingOrganization() throws Exception {
+        var randomNvaProject = randomNvaProject();
+        randomNvaProject.setId(null);
+        randomNvaProject.setCoordinatingInstitution(null);
+
+        var response = executeRequest(randomNvaProject);
+
+        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasNoCoordinatingOrganization.label));
     }
 
     @Test

@@ -54,7 +54,7 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Supplied payload is not valid'
+    And match response.detail == 'Supplied payload is not valid (project identifier not allowed)'
 
   Scenario: Create returns status Bad request when input is insufficient
     Given path '/project'
@@ -64,7 +64,7 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Supplied payload is not valid'
+    And match response.detail == 'Supplied payload is not valid (title required)'
 
   Scenario: Create returns status Bad request when input has illegal values
     Given path '/project'
@@ -74,7 +74,7 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Supplied payload is not valid'
+    And match response.detail == 'Supplied payload is not valid (title required)'
 
   Scenario: Create returns status 201 Created when input is valid and persisted in crisin
     Given path '/project'
