@@ -4,6 +4,7 @@ import static java.util.Arrays.stream;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.stream.Collectors;
+import nva.commons.core.SingletonCollector;
 
 public enum HealthProjectType {
 
@@ -33,8 +34,8 @@ public enum HealthProjectType {
     public static HealthProjectType fromJson(String value) {
         return stream(values())
                    .filter(nameType -> nameType.getType().equalsIgnoreCase(value))
-                   .findAny()
-                   .orElseThrow(() -> new IllegalArgumentException(constructError()));
+                   .collect(SingletonCollector.tryCollect())
+                   .orElseThrow(failure -> new IllegalArgumentException(constructError()));
     }
 
     private static String constructError() {
@@ -51,8 +52,7 @@ public enum HealthProjectType {
     public static HealthProjectType fromValue(String value) {
         return stream(values())
                    .filter(nameType -> nameType.getType().equalsIgnoreCase(value))
-                   .findAny()
-                   .orElse(null);
+                   .collect(SingletonCollector.collectOrElse(null));
     }
 
 }
