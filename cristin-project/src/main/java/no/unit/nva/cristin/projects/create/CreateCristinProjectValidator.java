@@ -42,7 +42,7 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         if (!validatedResult.isEmpty()) {
             var validateDescriptions =
                 validatedResult.stream()
-                    .map(result-> result.label)
+                    .map(result -> result.label)
                     .collect(Collectors.joining(", "," (", ")"));
             throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD + validateDescriptions);
         }
@@ -52,6 +52,7 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         var results = new HashSet<ValidatedResult>();
         if (isNull(project)) {
             results.add(ValidatedResult.Empty);
+            return results;
         }
         if (hasId(project)) {
             results.add(ValidatedResult.HasId);
