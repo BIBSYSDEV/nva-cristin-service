@@ -127,7 +127,18 @@
           "en": "Drug study"
         },
         "clinicalTrialPhase": "3"
-      }
+      },
+      "approvals" : [ {
+        "type" : "Approval",
+        "date" : "2017-04-26T00:00:00Z",
+        "authority" : "REK",
+        "status" : "APPROVED",
+        "applicationCode" : "ETICHAPPR",
+        "identifier" : "2017/800",
+        "authorityName" : {
+          "en" : "Regional committees for medical and health research ethics"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -248,7 +259,18 @@
           "en": "Drug study"
         },
         "clinicalTrialPhase": "3"
-      }
+      },
+      "approvals" : [ {
+        "type" : "Approval",
+        "date" : "2017-04-26T00:00:00Z",
+        "authority" : "REK",
+        "status" : "APPROVED",
+        "applicationCode" : "ETICHAPPR",
+        "identifier" : "2017/800",
+        "authorityName" : {
+          "en" : "Regional committees for medical and health research ethics"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -369,7 +391,18 @@
           "en": "Drug study"
         },
         "clinicalTrialPhase": "3"
-      }
+      },
+      "approvals" : [ {
+        "type" : "Approval",
+        "date" : "2017-04-26T00:00:00Z",
+        "authority" : "REK",
+        "status" : "APPROVED",
+        "applicationCode" : "ETICHAPPR",
+        "identifier" : "2017/800",
+        "authorityName" : {
+          "en" : "Regional committees for medical and health research ethics"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -490,7 +523,18 @@
           "en": "Drug study"
         },
         "clinicalTrialPhase": "3"
-      }
+      },
+      "approvals" : [ {
+        "type" : "Approval",
+        "date" : "2017-04-26T00:00:00Z",
+        "authority" : "REK",
+        "status" : "APPROVED",
+        "applicationCode" : "ETICHAPPR",
+        "identifier" : "2017/800",
+        "authorityName" : {
+          "en" : "Regional committees for medical and health research ethics"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -611,7 +655,18 @@
           "en": "Drug study"
         },
         "clinicalTrialPhase": "3"
-      }
+      },
+      "approvals" : [ {
+        "type" : "Approval",
+        "date" : "2017-04-26T00:00:00Z",
+        "authority" : "REK",
+        "status" : "APPROVED",
+        "applicationCode" : "ETICHAPPR",
+        "identifier" : "2017/800",
+        "authorityName" : {
+          "en" : "Regional committees for medical and health research ethics"
+        }
+      } ]
     }
   ]
 }

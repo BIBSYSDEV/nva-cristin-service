@@ -1,5 +1,9 @@
 package no.unit.nva.cristin.projects;
 
+import no.unit.nva.cristin.projects.model.nva.ApplicationCode;
+import no.unit.nva.cristin.projects.model.nva.Approval;
+import no.unit.nva.cristin.projects.model.nva.ApprovalAuthority;
+import no.unit.nva.cristin.projects.model.nva.ApprovalStatus;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
@@ -107,9 +111,22 @@ public class RandomProjectDataGenerator {
                                           .withRelatedProjects(List.of(randomRelatedProjects()))
                                           .withInstitutionsResponsibleForResearch(List.of(randomOrganization()))
                                           .withHealthProjectData(randomHealthProjectData())
+                                          .withApprovals(randomApprovals())
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
+    }
+
+    /**
+     * List of approvals with random data.
+     */
+    public static List<Approval> randomApprovals() {
+        return List.of(new Approval(randomInstant(),
+                                    randomElement(ApprovalAuthority.values()),
+                                    randomElement(ApprovalStatus.values()),
+                                    randomElement(ApplicationCode.values()),
+                                    randomString(),
+                                    randomNamesMap()));
     }
 
     private static HealthProjectData randomHealthProjectData() {

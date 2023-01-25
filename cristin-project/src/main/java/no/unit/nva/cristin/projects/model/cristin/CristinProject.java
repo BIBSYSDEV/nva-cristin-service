@@ -298,7 +298,7 @@ public class CristinProject implements JsonSerializable {
     }
 
     public List<CristinApproval> getApprovals() {
-        return approvals;
+        return nonEmptyOrDefault(approvals);
     }
 
     public void setApprovals(List<CristinApproval> approvals) {

@@ -4,6 +4,7 @@ import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomApprovals;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithoutUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
@@ -12,6 +13,8 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaP
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
 import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.INVALID_CLINICAL_TRIAL_PHASE;
 import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.INVALID_HEALTH_PROJECT_TYPE;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -33,9 +36,13 @@ import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
+import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.Approval;
+import no.unit.nva.cristin.projects.model.nva.ApprovalAuthority;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -313,6 +320,46 @@ class CreateCristinProjectHandlerTest {
                    equalTo(nvaProject.getHealthProjectData().getType()));
         assertThat(capturedCristinProject.getClinicalTrialPhase(),
                    equalTo(nvaProject.getHealthProjectData().getClinicalTrialPhase()));
+    }
+
+    @Test
+    void shouldReturnCreatedWhenApprovalsHasPartialData() throws Exception {
+        var randomNvaProject = randomNvaProject();
+        randomNvaProject.setId(null);
+        var approval = new Approval(randomInstant(), ApprovalAuthority.DIRHEALTH, null, null,
+                                    randomString(), null);
+        randomNvaProject.setApprovals(List.of(approval));
+
+        mockUpstreamUsingRequest(randomNvaProject);
+        var response = executeRequest(randomNvaProject);
+
+        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
+    }
+
+    @Test
+    void shouldHaveProjectWithApprovalsAddedAndSentToUpstream() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        var approvals = randomApprovals();
+        nvaProject.setApprovals(approvals);
+
+        mockUpstreamUsingRequest(nvaProject);
+        executeRequest(nvaProject);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+
+        var actualApprovals = capturedCristinProject.getApprovals()
+                                   .stream()
+                                   .map(CristinApproval::toApproval)
+                                   .collect(Collectors.toList());
+
+        assertThat(actualApprovals, equalTo(approvals));
     }
 
     private String actualIdentifierFromOrganization(Organization organization) {

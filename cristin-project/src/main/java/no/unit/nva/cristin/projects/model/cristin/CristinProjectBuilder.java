@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.model.cristin;
 import java.net.URI;
 import java.util.Optional;
 import no.unit.nva.cristin.model.CristinOrganization;
+import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
@@ -64,8 +65,13 @@ public class CristinProjectBuilder {
         cristinProject.setHealthProjectTypeName(extractHealthProjectTypeName(nvaProject.getHealthProjectData()));
         cristinProject.setClinicalTrialPhase(extractHealthProjectClinicalTrialPhase(nvaProject.getHealthProjectData()));
         cristinProject.setExternalSources(extractExternalSources(nvaProject.getExternalSources()));
+        cristinProject.setApprovals(extractApprovals(nvaProject.getApprovals()));
 
         return cristinProject;
+    }
+
+    private List<CristinApproval> extractApprovals(List<Approval> approvals) {
+        return approvals.stream().map(Approval::toCristinApproval).collect(Collectors.toList());
     }
 
     private List<CristinExternalSource> extractExternalSources(List<ExternalSource> nvaExternalSources) {

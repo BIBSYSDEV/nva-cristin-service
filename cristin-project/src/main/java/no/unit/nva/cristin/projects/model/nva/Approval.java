@@ -1,12 +1,16 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Approval implements JsonSerializable {
@@ -15,6 +19,8 @@ public class Approval implements JsonSerializable {
     public static final String APPROVAL_AUTHORITY = "authority";
     public static final String APPROVAL_STATUS = "status";
     public static final String APPLICATION_CODE = "applicationCode";
+    public static final String AUTHORITY_NAME = "authorityName";
+
     @JsonProperty(APPROVAL_DATE)
     private final Instant date;
     @JsonProperty(APPROVAL_AUTHORITY)
@@ -25,18 +31,22 @@ public class Approval implements JsonSerializable {
     private final ApplicationCode applicationCode;
     @JsonProperty(IDENTIFIER)
     private final String identifier;
+    @JsonProperty(AUTHORITY_NAME)
+    private final Map<String, String> authorityName;
 
     @JsonCreator
     public Approval(@JsonProperty(APPROVAL_DATE) Instant date,
                     @JsonProperty(APPROVAL_AUTHORITY) ApprovalAuthority authority,
                     @JsonProperty(APPROVAL_STATUS) ApprovalStatus status,
                     @JsonProperty(APPLICATION_CODE) ApplicationCode applicationCode,
-                    @JsonProperty(IDENTIFIER) String identifier) {
+                    @JsonProperty(IDENTIFIER) String identifier,
+                    @JsonProperty(AUTHORITY_NAME) Map<String, String> authorityName) {
         this.date = date;
         this.authority = authority;
         this.status = status;
         this.applicationCode = applicationCode;
         this.identifier = identifier;
+        this.authorityName = authorityName;
     }
 
     public Instant getDate() {
@@ -59,6 +69,20 @@ public class Approval implements JsonSerializable {
         return identifier;
     }
 
+    public Map<String, String> getAuthorityName() {
+        return nonEmptyOrDefault(authorityName);
+    }
+
+    @SuppressWarnings("PMD.NullAssignment")
+    public CristinApproval toCristinApproval() {
+        return new CristinApproval(getDate(),
+                                   nonNull(getAuthority()) ? getAuthority().getAuthorityValue() : null,
+                                   nonNull(getStatus()) ? getStatus().getStatusValue() : null,
+                                   nonNull(getApplicationCode()) ? getApplicationCode().getCodeValue() : null,
+                                   getIdentifier(),
+                                   getAuthorityName());
+    }
+
     @Override
     public String toString() {
         return toJsonString();
@@ -77,11 +101,13 @@ public class Approval implements JsonSerializable {
                && getAuthority() == approval.getAuthority()
                && getStatus() == approval.getStatus()
                && getApplicationCode() == approval.getApplicationCode()
-               && Objects.equals(getIdentifier(), approval.getIdentifier());
+               && Objects.equals(getIdentifier(), approval.getIdentifier())
+               && Objects.equals(getAuthorityName(), approval.getAuthorityName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getDate(), getAuthority(), getStatus(), getApplicationCode(), getIdentifier());
+        return Objects.hash(getDate(), getAuthority(), getStatus(), getApplicationCode(), getIdentifier(),
+                            getAuthorityName());
     }
 }

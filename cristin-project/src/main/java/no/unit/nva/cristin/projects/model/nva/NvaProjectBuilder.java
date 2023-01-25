@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects.model.nva;
 
 import java.net.URI;
 import no.unit.nva.cristin.model.CristinInstitution;
+import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinExternalSource;
@@ -118,7 +119,12 @@ public class NvaProjectBuilder {
                        extractInstitutionsResponsibleForResearch(
                            cristinProject.getInstitutionsResponsibleForResearch()))
                    .withHealthProjectData(extractHealthProjectData(cristinProject))
+                   .withApprovals(extractApprovals(cristinProject.getApprovals()))
                    .build();
+    }
+
+    private List<Approval> extractApprovals(List<CristinApproval> cristinApprovals) {
+        return cristinApprovals.stream().map(CristinApproval::toApproval).collect(Collectors.toList());
     }
 
     private HealthProjectData extractHealthProjectData(CristinProject cristinProject) {
