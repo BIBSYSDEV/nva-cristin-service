@@ -73,14 +73,25 @@ public class Approval implements JsonSerializable {
         return nonEmptyOrDefault(authorityName);
     }
 
-    @SuppressWarnings("PMD.NullAssignment")
     public CristinApproval toCristinApproval() {
         return new CristinApproval(getDate(),
-                                   nonNull(getAuthority()) ? getAuthority().getAuthorityValue() : null,
-                                   nonNull(getStatus()) ? getStatus().getStatusValue() : null,
-                                   nonNull(getApplicationCode()) ? getApplicationCode().getCodeValue() : null,
+                                   getAuthorityValue(),
+                                   getApprovalStatusValue(),
+                                   getApplicationCodeValue(),
                                    getIdentifier(),
                                    getAuthorityName());
+    }
+
+    private String getAuthorityValue() {
+        return nonNull(getAuthority()) ? getAuthority().getAuthorityValue() : null;
+    }
+
+    private String getApprovalStatusValue() {
+        return nonNull(getStatus()) ? getStatus().getStatusValue() : null;
+    }
+
+    private String getApplicationCodeValue() {
+        return nonNull(getApplicationCode()) ? getApplicationCode().getCodeValue() : null;
     }
 
     @Override

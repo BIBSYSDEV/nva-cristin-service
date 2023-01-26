@@ -1698,6 +1698,9 @@ components:
                 - 2
                 - 3
                 - 4
+        approvals:
+          $ref: '#/components/schemas/Approvals'
+
     ProjectPost:
       type: object
       properties:
@@ -1795,6 +1798,8 @@ components:
                 - 2
                 - 3
                 - 4
+        approvals:
+          $ref: '#/components/schemas/Approvals'
     ProjectPatch:
       type: object
       properties:
@@ -1980,6 +1985,52 @@ components:
           $ref: '#/components/schemas/Languages'
         code:
           type: string
+    Approvals:
+      type: array
+      required: [ date, authority, status ]
+      items:
+        type: object
+        properties:
+          type:
+            type: string
+          date:
+            type: string
+            format: date-time
+            description: 'Date of approval'
+          authority:
+            type: string
+            description: 'Approval authority. Only certain combinations of authority and applicationCode are allowed. REK: Regional committees for medical and health research ethics (en), Regionale komitéer for medisinsk og helsefaglig forskningsetikk (REK) (nb), Regionale komitéer for medisinsk og helsefaglig forskningsetikk (REK) (nn), application_code: ETICHAPPR or BIOBANK; NARA: The Norwegian Animal Research Authority (en), Forsøksdyrutvalget (nb), Forsøksdyrutvalet (nn), application_code: TESTANIMAL; NDPA: The Norwegian Data Protection Authority (en), Datatilsynet (nb), Datatilsynet (nn), application_code: SENSINFO; NMA: Norwegian Medicines Agency (en), Statens legemiddelverk (nb), Statens legemiddelverk (nn), application_code: DRUGTRIAL; DIRHEALTH: Norwegian Directorate of Health (en), Helsedirektoratet (nb), Helsedirektoratet (nn), application_code: BIOTECHN or MEDEQUIP.'
+            enum:
+              - REK
+              - NARA
+              - NDFA
+              - NMA
+              - DIRHEALTH
+          status:
+            type: string
+            description: 'Status of the application sent to the approval authority. NOTAPPLIED: Not applied (en), Ikke søkt (nb), Ikkje søkt (nn); APPLIED: Applied (en), Søkt (nb), Søkt (nn); APPROVED: Approved (en), Godkjent (nb), Godkjent (nn); DECLINED: Declined (en), Avvist (nb) Avvist (nn); REJECTION: Rejection (en), Avslag (nb), Avslag (nn).'
+            enum:
+              - NOTAPPLIED
+              - APPLIED
+              - APPROVED
+              - DECLINED
+              - REJECTION
+          applicationCode:
+            type: string
+            description: 'These codes apply only for applications (søknader) to the approval authorities. Only certain combinations of application_code and approved_by are allowed, see approved_by above. ETICHAPPR: Application for ethical approval of a health research project (en), Søknad om etisk godkjenning, Helseforskningsprosjekt (nb), Søknad om etisk godkjenning av helseforskingsprosjekt (nn); BIOBANK: Application for establishing a biobank (en), Søknad om etablering av biobank (nb), Søknad om etablering av biobank (nn); DRUGTRIAL: Application for a clinical drug trial (en), Søknad om legemiddelutprøving (nb), Søknad om legemiddelutprøving (nn); BIOTECHN: Application for medical use of biotechnology (en), Søknad om medisinsk bruk av bioteknologi (nb), Søknad om medisinsk bruk av bioteknologi (nn); MEDEQUIP: Application for clinical testing for medical equipment (en), Søknad om klinisk utprøving av medisinsk utstyr (nb), Søknad om klinisk utprøving av medisinsk utstyr (nn); TESTANIMAL: Application for testing on animals (en), Søknad om å utføre forsøk på dyr (nb), Søknad om å utføre forsøk på dyr (nn); SENSINFO: Application for license tp process sensitive personal information (en), Søknad om konsesjon for behandling av sensitive personopplysninger (nb), Søknad om konsesjon for handsaming av sensitive personopplysingar(nn).'
+            enum:
+              - ETICHAPPR
+              - BIOBANK
+              - DRUGTRIAL
+              - BIOTECHN
+              - MEDEQUIP
+              - TESTANIMAL
+              - SENSINFO
+          identifier:
+            type: string
+            description: 'Reference ID used by the approval authority for this approval.'
+          authorityName:
+            $ref: '#/components/schemas/Languages'
     Persons:
       type: object
       properties:
@@ -2522,6 +2573,15 @@ components:
               label:
                 en: 'Drug study'
               clinicalTrialPhase: '3'
+            approvals:
+              - type: 'Approval'
+                date: '2020-12-31T09:45:17Z'
+                authority: 'REK'
+                status: 'APPROVED'
+                applicationCode: 'ETICHAPPR'
+                identifier: '2017/800'
+                authorityName:
+                  en: 'Regional committees for medical and health research ethics'
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2620,6 +2680,15 @@ components:
           label:
             en: 'Drug study'
           clinicalTrialPhase: '3'
+        approvals:
+          - type: 'Approval'
+            date: '2020-12-31T09:45:17Z'
+            authority: 'REK'
+            status: 'APPROVED'
+            applicationCode: 'ETICHAPPR'
+            identifier: '2017/800'
+            authorityName:
+              en: 'Regional committees for medical and health research ethics'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2679,6 +2748,13 @@ components:
         healthProjectData:
           type: 'DRUGSTUDY'
           clinicalTrialPhase: '3'
+        approvals:
+          - type: 'Approval'
+            date: '2020-12-31T09:45:17Z'
+            authority: 'REK'
+            status: 'APPROVED'
+            applicationCode: 'ETICHAPPR'
+            identifier: '2017/800'
     OrganizationsExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'

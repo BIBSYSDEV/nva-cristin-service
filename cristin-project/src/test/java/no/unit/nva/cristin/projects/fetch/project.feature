@@ -147,7 +147,7 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.institutionsResponsibleForResearch[0].id == '#present'
     And match response.institutionsResponsibleForResearch[0].name == '#present'
 
-  Scenario: Fetch returns project with additional health data
+  Scenario: Fetch returns project with additional health data and approvals
     Given path '/project/538881'
     When method GET
     Then status 200
@@ -156,3 +156,8 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.healthProjectData.type == 'DRUGSTUDY'
     And match response.healthProjectData.label == '#present'
     And match response.healthProjectData.clinicalTrialPhase == '3'
+    And match response.approvals[0].authority == 'REK'
+    And match response.approvals[0].status == 'APPROVED'
+    And match response.approvals[0].applicationCode == 'ETICHAPPR'
+    And match response.approvals[0].identifier == '2017/800'
+    And match response.approvals[0].authorityName == '#present'
