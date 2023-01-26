@@ -113,9 +113,9 @@ public class RandomProjectDataGenerator {
     }
 
     private static HealthProjectData randomHealthProjectData() {
-        return new HealthProjectData(HealthProjectType.DRUGSTUDY,
+        return new HealthProjectData(randomElement(HealthProjectType.values()),
                                      randomNamesMap(),
-                                     ClinicalTrialPhase.PHASE_ONE);
+                                     randomElement(ClinicalTrialPhase.values()));
     }
 
     private static URI randomRelatedProjects() {
