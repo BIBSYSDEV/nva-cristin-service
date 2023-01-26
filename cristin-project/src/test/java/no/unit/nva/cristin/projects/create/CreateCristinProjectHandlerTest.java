@@ -36,6 +36,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
+import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
@@ -325,8 +326,11 @@ class CreateCristinProjectHandlerTest {
 
         assertThat(capturedCristinProject.getHealthProjectType(),
                    equalTo(nvaProject.getHealthProjectData().getType().getType()));
-        assertThat(capturedCristinProject.getClinicalTrialPhase(),
-                   equalTo(nvaProject.getHealthProjectData().getClinicalTrialPhase().getPhase()));
+
+        var cristinPhase = capturedCristinProject.getClinicalTrialPhase();
+        var nvaPhase = nvaProject.getHealthProjectData().getClinicalTrialPhase();
+
+        assertThat(cristinPhase, equalTo(CristinClinicalTrialPhaseBuilder.reverseLookup(nvaPhase)));
     }
 
     private String actualIdentifierFromOrganization(Organization organization) {

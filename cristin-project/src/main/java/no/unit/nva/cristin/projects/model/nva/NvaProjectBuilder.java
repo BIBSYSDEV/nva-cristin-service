@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects.model.nva;
 
 import java.net.URI;
 import no.unit.nva.cristin.model.CristinInstitution;
+import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinExternalSource;
@@ -45,8 +46,11 @@ public class NvaProjectBuilder {
     private final transient CristinProject cristinProject;
     private transient String context;
 
+    private final transient ClinicalTrialPhaseBuilder clinicalTrialPhaseBuilder;
+
     public NvaProjectBuilder(CristinProject cristinProject) {
         this.cristinProject = cristinProject;
+        this.clinicalTrialPhaseBuilder = new CristinClinicalTrialPhaseBuilder(cristinProject);
     }
 
     private static List<NvaContributor> transformCristinPersonsToNvaContributors(List<CristinPerson> participants) {
@@ -128,17 +132,12 @@ public class NvaProjectBuilder {
 
         return new HealthProjectData(extractHealthProjectType(cristinProject),
                                      cristinProject.getHealthProjectTypeName(),
-                                     extractClinicalTrialPhase(cristinProject));
+                                     clinicalTrialPhaseBuilder.build());
     }
 
     private HealthProjectType extractHealthProjectType(CristinProject cristinProject) {
         var type = cristinProject.getHealthProjectType();
         return HealthProjectType.fromValue(type);
-    }
-
-    private ClinicalTrialPhase extractClinicalTrialPhase(CristinProject cristinProject) {
-        var phase = cristinProject.getClinicalTrialPhase();
-        return ClinicalTrialPhase.fromValue(phase);
     }
 
     private List<Organization> extractInstitutionsResponsibleForResearch(List<CristinOrganization>

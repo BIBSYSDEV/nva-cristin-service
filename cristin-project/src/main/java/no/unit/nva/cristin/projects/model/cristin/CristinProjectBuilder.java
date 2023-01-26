@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Optional;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
-import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
@@ -92,7 +91,7 @@ public class CristinProjectBuilder {
     private String extractHealthProjectClinicalTrialPhase(HealthProjectData healthProjectData) {
         return Optional.ofNullable(healthProjectData)
                    .map(HealthProjectData::getClinicalTrialPhase)
-                   .map(ClinicalTrialPhase::getPhase)
+                   .map(CristinClinicalTrialPhaseBuilder::reverseLookup)
                    .orElse(null);
     }
 
