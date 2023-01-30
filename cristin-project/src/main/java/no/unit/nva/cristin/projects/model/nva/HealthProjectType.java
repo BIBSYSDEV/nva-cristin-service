@@ -8,9 +8,9 @@ import nva.commons.core.SingletonCollector;
 
 public enum HealthProjectType {
 
-    DRUGSTUDY("DRUGSTUDY"),
-    OTHERCLIN("OTHERCLIN"),
-    OTHERSTUDY("OTHERSTUDY");
+    DRUGSTUDY("Drugstudy"),
+    OTHERCLIN("Otherclin"),
+    OTHERSTUDY("Otherstudy");
 
     public static final String ERROR_MESSAGE_TEMPLATE = "Supplied HealthProjectType is not valid, expected one of: %s";
     public static final String DELIMITER = ", ";

@@ -122,7 +122,7 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
@@ -243,7 +243,7 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
@@ -364,7 +364,7 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
@@ -485,7 +485,7 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
@@ -606,7 +606,7 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },

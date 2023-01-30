@@ -1,8 +1,8 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
 import static java.util.Objects.isNull;
+import static no.unit.nva.cristin.projects.model.nva.EnumBuilder.mapValuesReversed;
 import java.util.Map;
-import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
 import no.unit.nva.cristin.projects.model.nva.EnumBuilder;
 
@@ -34,7 +34,7 @@ public class CristinClinicalTrialPhaseBuilder implements EnumBuilder<CristinProj
         if (isNull(clinicalTrialPhase)) {
             return null;
         }
-        return mapValuesReversed().get(clinicalTrialPhase.getPhase());
+        return mapValuesReversed(mapper).get(clinicalTrialPhase.getPhase());
     }
 
     private static Map<String, String> mapValues() {
@@ -44,8 +44,4 @@ public class CristinClinicalTrialPhaseBuilder implements EnumBuilder<CristinProj
                       CRISTIN_PHASE_FOUR, PHASE_FOUR);
     }
 
-    private static Map<String, String> mapValuesReversed() {
-        return mapper.entrySet().stream()
-                   .collect(Collectors.toUnmodifiableMap(Map.Entry::getValue, Map.Entry::getKey));
-    }
 }

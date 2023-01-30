@@ -80,7 +80,7 @@ public class CristinProjectBuilder {
     private String extractHealthProjectType(HealthProjectData healthProjectData) {
         return Optional.ofNullable(healthProjectData)
                    .map(HealthProjectData::getType)
-                   .map(HealthProjectType::getType)
+                   .map(CristinHealthProjectTypeBuilder::reverseLookup)
                    .orElse(null);
     }
 
