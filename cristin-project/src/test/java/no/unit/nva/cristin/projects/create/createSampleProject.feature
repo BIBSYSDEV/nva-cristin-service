@@ -71,7 +71,7 @@ Feature: API tests for Cristin Project retrieve and search
         }
       ],
       'healthProjectData': {
-        'type': 'DRUGSTUDY',
+        'type': 'Drugstudy',
         'clinicalTrialPhase': 'PhaseIII'
       },
       'externalSources': [{
