@@ -155,4 +155,4 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.healthProjectData == '#present'
     And match response.healthProjectData.type == 'DRUGSTUDY'
     And match response.healthProjectData.label == '#present'
-    And match response.healthProjectData.clinicalTrialPhase == '3'
+    And match response.healthProjectData.clinicalTrialPhase == 'PhaseIII'
