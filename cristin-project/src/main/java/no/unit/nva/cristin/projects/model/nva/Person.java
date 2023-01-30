@@ -3,9 +3,11 @@ package no.unit.nva.cristin.projects.model.nva;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+import static no.unit.nva.cristin.model.JsonPropertyNames.EMAIL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PHONE;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.nvaIdentifierToCristinIdentifier;
@@ -22,6 +24,8 @@ public class Person {
     private final URI id;
     private final String firstName;
     private final String lastName;
+    private final String email;
+    private final String phone;
 
     /**
      * Create a valid NVA Person.
@@ -29,10 +33,14 @@ public class Person {
     @JsonCreator
     public Person(@JsonProperty(ID) URI id,
                   @JsonProperty(FIRST_NAME) String firstName,
-                  @JsonProperty(LAST_NAME) String lastName) {
+                  @JsonProperty(LAST_NAME) String lastName,
+                  @JsonProperty(EMAIL)String email,
+                  @JsonProperty(PHONE)String phone) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
     }
 
     /**
@@ -47,7 +55,12 @@ public class Person {
         }
 
         URI id = getNvaApiId(cristinPerson.getCristinPersonId(), PERSON_PATH_NVA);
-        return new Person(id, cristinPerson.getFirstName(), cristinPerson.getSurname());
+        return new Person(
+            id,
+            cristinPerson.getFirstName(),
+            cristinPerson.getSurname(),
+            cristinPerson.getEmail(),
+            cristinPerson.getPhone());
     }
 
     public URI getId() {
@@ -62,9 +75,18 @@ public class Person {
         return lastName;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getFirstName(), getLastName());
+        return Objects.hash(getId(), getFirstName(), getLastName(), getPhone(), getEmail());
     }
 
     @Override
@@ -77,8 +99,10 @@ public class Person {
         }
         Person nvaPerson = (Person) o;
         return getId().equals(nvaPerson.getId())
-            && Objects.equals(getFirstName(), nvaPerson.getFirstName())
-            && Objects.equals(getLastName(), nvaPerson.getLastName());
+               && Objects.equals(getFirstName(), nvaPerson.getFirstName())
+               && Objects.equals(getLastName(), nvaPerson.getLastName())
+               && Objects.equals(getPhone(), nvaPerson.getPhone())
+               && Objects.equals(getEmail(), nvaPerson.getEmail());
     }
 
     /**
@@ -92,6 +116,8 @@ public class Person {
         cristinPerson.setUrl(nvaIdentifierToCristinIdentifier(getId(), PERSON_PATH).toString());
         cristinPerson.setFirstName(getFirstName());
         cristinPerson.setSurname(getLastName());
+        cristinPerson.setEmail(getEmail());
+        cristinPerson.setPhone(getPhone());
         return cristinPerson;
     }
 

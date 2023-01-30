@@ -2,8 +2,8 @@ package no.unit.nva.cristin.projects.model.cristin;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.google.common.base.Objects;
 import java.util.List;
-import java.util.Objects;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
@@ -14,6 +14,8 @@ public class CristinPerson {
     private String firstName;
     private String surname;
     private String url;
+    private String email;
+    private String phone;
     private List<CristinRole> roles;
 
     public String getCristinPersonId() {
@@ -48,6 +50,22 @@ public class CristinPerson {
         this.url = url;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public List<CristinRole> getRoles() {
         return roles;
     }
@@ -65,16 +83,20 @@ public class CristinPerson {
             return false;
         }
         CristinPerson that = (CristinPerson) o;
-        return Objects.equals(getCristinPersonId(), that.getCristinPersonId())
-               && Objects.equals(getFirstName(), that.getFirstName())
-               && Objects.equals(getSurname(), that.getSurname())
-               && Objects.equals(getUrl(), that.getUrl())
-               && Objects.equals(getRoles(), that.getRoles());
+        return Objects.equal(getCristinPersonId(), that.getCristinPersonId())
+               && Objects.equal(getFirstName(), that.getFirstName())
+               && Objects.equal(getSurname(), that.getSurname())
+               && Objects.equal(getUrl(), that.getUrl())
+               && Objects.equal(getEmail(), that.getEmail())
+               && Objects.equal(getPhone(), that.getPhone())
+               && Objects.equal(getRoles(), that.getRoles());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCristinPersonId(), getFirstName(), getSurname(), getUrl(), getRoles());
+        return Objects.hashCode(getCristinPersonId(), getFirstName(), getSurname(), getUrl(), getEmail(), getPhone(),
+                                getRoles());
     }
+
 }
 
