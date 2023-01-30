@@ -46,11 +46,11 @@ public class NvaProjectBuilder {
     private final transient CristinProject cristinProject;
     private transient String context;
 
-    private final transient ClinicalTrialPhaseBuilder clinicalTrialPhaseBuilder;
+    private final transient EnumBuilder<CristinProject, ClinicalTrialPhase> clinicalTrialPhaseBuilder;
 
     public NvaProjectBuilder(CristinProject cristinProject) {
         this.cristinProject = cristinProject;
-        this.clinicalTrialPhaseBuilder = new CristinClinicalTrialPhaseBuilder(cristinProject);
+        this.clinicalTrialPhaseBuilder = new CristinClinicalTrialPhaseBuilder();
     }
 
     private static List<NvaContributor> transformCristinPersonsToNvaContributors(List<CristinPerson> participants) {
@@ -132,7 +132,7 @@ public class NvaProjectBuilder {
 
         return new HealthProjectData(extractHealthProjectType(cristinProject),
                                      cristinProject.getHealthProjectTypeName(),
-                                     clinicalTrialPhaseBuilder.build());
+                                     clinicalTrialPhaseBuilder.build(cristinProject));
     }
 
     private HealthProjectType extractHealthProjectType(CristinProject cristinProject) {

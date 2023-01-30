@@ -4,9 +4,9 @@ import static java.util.Objects.isNull;
 import java.util.Map;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
-import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhaseBuilder;
+import no.unit.nva.cristin.projects.model.nva.EnumBuilder;
 
-public class CristinClinicalTrialPhaseBuilder implements ClinicalTrialPhaseBuilder {
+public class CristinClinicalTrialPhaseBuilder implements EnumBuilder<CristinProject, ClinicalTrialPhase> {
 
     private static final Map<String, String> mapper = mapValues();
     public static final String CRISTIN_PHASE_ONE = "1";
@@ -18,14 +18,8 @@ public class CristinClinicalTrialPhaseBuilder implements ClinicalTrialPhaseBuild
     public static final String CRISTIN_PHASE_FOUR = "4";
     public static final String PHASE_FOUR = "PhaseIV";
 
-    private final transient CristinProject cristinProject;
-
-    public CristinClinicalTrialPhaseBuilder(CristinProject cristinProject) {
-        this.cristinProject = cristinProject;
-    }
-
     @Override
-    public ClinicalTrialPhase build() {
+    public ClinicalTrialPhase build(CristinProject cristinProject) {
         if (isNull(cristinProject) || isNull(cristinProject.getClinicalTrialPhase())) {
             return null;
         }
