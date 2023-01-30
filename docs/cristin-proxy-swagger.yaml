@@ -1563,6 +1563,14 @@ components:
                     type: string
                     pattern: '.+'
                     description: Last name
+                  email:
+                    type: string
+                    pattern: '.+'
+                    description: Email
+                  phone:
+                    type: string
+                    pattern: '.+'
+                    description: Phone number
               affiliation:
                 $ref: '#/components/schemas/Organization'
         status:
