@@ -1372,6 +1372,14 @@ paths:
         502:
           $ref: '#/components/responses/502'
   /funding-sources/{identifier}:
+    parameters:
+      - name: identifier
+        in: path
+        description: Identifier of funding source
+        required: true
+        schema:
+          type: string
+        example: 'NFR'
     get:
       x-amazon-apigateway-integration:
         uri:
