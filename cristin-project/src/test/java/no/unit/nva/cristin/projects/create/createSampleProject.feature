@@ -79,6 +79,14 @@ Feature: API tests for Cristin Project retrieve and search
           'identifier': '123456',
           'name': 'REK'
         }
+      ],
+      'funding': [
+        {
+          'source': {
+            'code': 'NFR'
+          },
+          'code': '1234'
+        }
       ]
     }
     """
