@@ -373,7 +373,6 @@ class CreateCristinProjectHandlerTest {
     private void removeFieldsNotSupportedByPost(NvaProject expected) {
         expected.setContactInfo(null);
         expected.setFundingAmount(null);
-        expected.setProjectCategories(Collections.emptyList());
         expected.setRelatedProjects(Collections.emptyList());
     }
 

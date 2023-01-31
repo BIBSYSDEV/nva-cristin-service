@@ -1808,6 +1808,14 @@ components:
               code:
                 type: string
                 description: Keyword code
+        projectCategories:
+          type: array
+          description: Project categories
+          items:
+            properties:
+              code:
+                type: string
+                description: project category code
     ProjectPatch:
       type: object
       properties:
@@ -2711,6 +2719,8 @@ components:
         keywords:
           - code: '4245'
           - code: '5686'
+        projectCategories:
+          - code: 'PHD'
     OrganizationsExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'

@@ -96,6 +96,11 @@ Feature: API tests for Cristin Project retrieve and search
           'type': '4245'
         }
       ]
+      'projectCategories': [
+        {
+          'type': 'PHD'
+        }
+      ]
     }
     """
     Given url CRISTIN_BASE

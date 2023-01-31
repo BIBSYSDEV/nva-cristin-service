@@ -65,13 +65,14 @@ public class CristinProjectBuilder {
         cristinProject.setHealthProjectTypeName(extractHealthProjectTypeName(nvaProject.getHealthProjectData()));
         cristinProject.setClinicalTrialPhase(extractHealthProjectClinicalTrialPhase(nvaProject.getHealthProjectData()));
         cristinProject.setExternalSources(extractExternalSources(nvaProject.getExternalSources()));
-        cristinProject.setKeywords(extractKeywords(nvaProject.getKeywords()));
+        cristinProject.setKeywords(extractCristinTypedLabels(nvaProject.getKeywords()));
+        cristinProject.setProjectCategories(extractCristinTypedLabels(nvaProject.getProjectCategories()));
 
         return cristinProject;
     }
 
-    private List<CristinTypedLabel> extractKeywords(List<TypedLabel> keywords) {
-        return keywords.stream().map(this::toCristinTypedLabel).collect(Collectors.toList());
+    private List<CristinTypedLabel> extractCristinTypedLabels(List<TypedLabel> typedLabels) {
+        return typedLabels.stream().map(this::toCristinTypedLabel).collect(Collectors.toList());
     }
 
     private CristinTypedLabel toCristinTypedLabel(TypedLabel typedLabel) {
