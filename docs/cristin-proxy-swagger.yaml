@@ -1821,6 +1821,17 @@ components:
           items:
             type: string
             description: URI to the related project
+        contactInfo:
+          type: object
+          properties:
+            contactPerson:
+              type: string
+            organization:
+              type: string
+            email:
+              type: string
+            phone:
+              type: string
     ProjectPatch:
       type: object
       properties:
@@ -2728,6 +2739,11 @@ components:
           - code: 'PHD'
         relatedProjects:
           - 'https://api.dev.nva.aws.unit.no/cristin/project/21500'
+        contactInfo:
+          contactPerson: 'Navn Navnesen'
+          organization: 'Universitetet i Oslo'
+          email: 'navn.navnesen@uio.no'
+          phone: '99223344'
     OrganizationsExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'

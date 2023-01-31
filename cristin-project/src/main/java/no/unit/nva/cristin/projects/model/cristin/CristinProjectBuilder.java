@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.model.cristin;
 import java.net.URI;
 import java.util.Optional;
 import no.unit.nva.cristin.model.CristinOrganization;
+import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
@@ -18,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import no.unit.nva.utils.UriUtils;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
@@ -70,8 +72,19 @@ public class CristinProjectBuilder {
         cristinProject.setKeywords(extractCristinTypedLabels(nvaProject.getKeywords()));
         cristinProject.setProjectCategories(extractCristinTypedLabels(nvaProject.getProjectCategories()));
         cristinProject.setRelatedProjects(extractRelatedProjects(nvaProject.getRelatedProjects()));
+        cristinProject.setContactInfo(extractContactInfo(nvaProject.getContactInfo()));
 
         return cristinProject;
+    }
+
+    private CristinContactInfo extractContactInfo(ContactInfo contactInfo) {
+        if (isNull(contactInfo)) {
+            return null;
+        }
+        return new CristinContactInfo(contactInfo.getContactPerson(),
+                                      contactInfo.getOrganization(),
+                                      contactInfo.getEmail(),
+                                      contactInfo.getPhone());
     }
 
     private List<String> extractRelatedProjects(List<URI> relatedProjects) {
