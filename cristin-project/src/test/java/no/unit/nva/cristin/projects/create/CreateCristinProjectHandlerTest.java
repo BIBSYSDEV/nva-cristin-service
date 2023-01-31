@@ -36,7 +36,9 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
+import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
+import no.unit.nva.cristin.projects.model.cristin.CristinHealthProjectTypeBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
@@ -323,10 +325,14 @@ class CreateCristinProjectHandlerTest {
         verify(apiClient).post(any(), captor.capture());
         var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
 
-        assertThat(capturedCristinProject.getHealthProjectType(),
-                   equalTo(nvaProject.getHealthProjectData().getType().getType()));
-        assertThat(capturedCristinProject.getClinicalTrialPhase(),
-                   equalTo(nvaProject.getHealthProjectData().getClinicalTrialPhase().getPhase()));
+        var cristinHealthType = capturedCristinProject.getHealthProjectType();
+        var nvaHealthType = nvaProject.getHealthProjectData().getType();
+
+        var cristinPhase = capturedCristinProject.getClinicalTrialPhase();
+        var nvaPhase = nvaProject.getHealthProjectData().getClinicalTrialPhase();
+
+        assertThat(cristinHealthType, equalTo(CristinHealthProjectTypeBuilder.reverseLookup(nvaHealthType)));
+        assertThat(cristinPhase, equalTo(CristinClinicalTrialPhaseBuilder.reverseLookup(nvaPhase)));
     }
 
     private String actualIdentifierFromOrganization(Organization organization) {

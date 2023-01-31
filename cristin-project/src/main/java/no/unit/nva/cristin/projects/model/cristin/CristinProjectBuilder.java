@@ -4,10 +4,8 @@ import java.net.URI;
 import java.util.Optional;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
-import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
-import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
@@ -81,7 +79,7 @@ public class CristinProjectBuilder {
     private String extractHealthProjectType(HealthProjectData healthProjectData) {
         return Optional.ofNullable(healthProjectData)
                    .map(HealthProjectData::getType)
-                   .map(HealthProjectType::getType)
+                   .map(CristinHealthProjectTypeBuilder::reverseLookup)
                    .orElse(null);
     }
 
@@ -92,7 +90,7 @@ public class CristinProjectBuilder {
     private String extractHealthProjectClinicalTrialPhase(HealthProjectData healthProjectData) {
         return Optional.ofNullable(healthProjectData)
                    .map(HealthProjectData::getClinicalTrialPhase)
-                   .map(ClinicalTrialPhase::getPhase)
+                   .map(CristinClinicalTrialPhaseBuilder::reverseLookup)
                    .orElse(null);
     }
 

@@ -8,10 +8,10 @@ import nva.commons.core.SingletonCollector;
 
 public enum ClinicalTrialPhase {
 
-    PHASE_ONE("1"),
-    PHASE_TWO("2"),
-    PHASE_THREE("3"),
-    PHASE_FOUR("4");
+    PHASE_ONE("PhaseI"),
+    PHASE_TWO("PhaseII"),
+    PHASE_THREE("PhaseIII"),
+    PHASE_FOUR("PhaseIV");
 
     public static final String ERROR_MESSAGE_TEMPLATE = "Supplied ClinicalTrialPhase is not valid, expected one of: %s";
     public static final String DELIMITER = ", ";
