@@ -87,6 +87,14 @@ Feature: API tests for Cristin Project retrieve and search
           },
           'code': '1234'
         }
+      ],
+      'keywords': [
+        {
+          'type': '5686'
+        },
+        {
+          'type': '4245'
+        }
       ]
     }
     """

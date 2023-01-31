@@ -374,7 +374,6 @@ class CreateCristinProjectHandlerTest {
         expected.setContactInfo(null);
         expected.setFundingAmount(null);
         expected.setProjectCategories(Collections.emptyList());
-        expected.setKeywords(Collections.emptyList());
         expected.setRelatedProjects(Collections.emptyList());
     }
 

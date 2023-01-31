@@ -1800,6 +1800,14 @@ components:
           description: Fundings for this project
           items:
             $ref: '#/components/schemas/FundingPost'
+        keywords:
+          type: array
+          description: Project keywords
+          items:
+            properties:
+              code:
+                type: string
+                description: Keyword code
     ProjectPatch:
       type: object
       properties:
@@ -2700,6 +2708,9 @@ components:
           - source:
               code: 'NFR'
             code: '1234'
+        keywords:
+          - code: '4245'
+          - code: '5686'
     OrganizationsExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'

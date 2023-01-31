@@ -8,6 +8,7 @@ import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.projects.model.nva.TypedLabel;
 import no.unit.nva.model.Organization;
 
 import java.util.Collections;
@@ -64,8 +65,17 @@ public class CristinProjectBuilder {
         cristinProject.setHealthProjectTypeName(extractHealthProjectTypeName(nvaProject.getHealthProjectData()));
         cristinProject.setClinicalTrialPhase(extractHealthProjectClinicalTrialPhase(nvaProject.getHealthProjectData()));
         cristinProject.setExternalSources(extractExternalSources(nvaProject.getExternalSources()));
+        cristinProject.setKeywords(extractKeywords(nvaProject.getKeywords()));
 
         return cristinProject;
+    }
+
+    private List<CristinTypedLabel> extractKeywords(List<TypedLabel> keywords) {
+        return keywords.stream().map(this::toCristinTypedLabel).collect(Collectors.toList());
+    }
+
+    private CristinTypedLabel toCristinTypedLabel(TypedLabel typedLabel) {
+        return new CristinTypedLabel(typedLabel.getType(), typedLabel.getLabel());
     }
 
     private List<CristinExternalSource> extractExternalSources(List<ExternalSource> nvaExternalSources) {
