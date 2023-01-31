@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import no.unit.nva.utils.UriUtils;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
@@ -67,8 +69,16 @@ public class CristinProjectBuilder {
         cristinProject.setExternalSources(extractExternalSources(nvaProject.getExternalSources()));
         cristinProject.setKeywords(extractCristinTypedLabels(nvaProject.getKeywords()));
         cristinProject.setProjectCategories(extractCristinTypedLabels(nvaProject.getProjectCategories()));
+        cristinProject.setRelatedProjects(extractRelatedProjects(nvaProject.getRelatedProjects()));
 
         return cristinProject;
+    }
+
+    private List<String> extractRelatedProjects(List<URI> relatedProjects) {
+        return relatedProjects.stream()
+                   .map(uri -> UriUtils.nvaIdentifierToCristinIdentifier(uri, PROJECTS_PATH))
+                   .map(URI::toString)
+                   .collect(Collectors.toList());
     }
 
     private List<CristinTypedLabel> extractCristinTypedLabels(List<TypedLabel> typedLabels) {

@@ -100,6 +100,9 @@ Feature: API tests for Cristin Project retrieve and search
         {
           'type': 'PHD'
         }
+      ],
+      'relatedProjects': [
+        'https://api.dev.nva.aws.unit.no/cristin/project/6721135'
       ]
     }
     """

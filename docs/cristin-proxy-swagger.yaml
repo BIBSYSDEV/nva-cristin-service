@@ -1816,6 +1816,11 @@ components:
               code:
                 type: string
                 description: project category code
+        relatedProjects:
+          type: array
+          items:
+            type: string
+            description: URI to the related project
     ProjectPatch:
       type: object
       properties:
@@ -2721,6 +2726,8 @@ components:
           - code: '5686'
         projectCategories:
           - code: 'PHD'
+        relatedProjects:
+          - 'https://api.dev.nva.aws.unit.no/cristin/project/21500'
     OrganizationsExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
