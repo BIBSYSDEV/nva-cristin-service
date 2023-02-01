@@ -1832,6 +1832,10 @@ components:
         contactInfo:
           type: object
           properties:
+            type:
+              type: string
+              pattern: 'ContactInfo'
+              description: Always ContactInfo
             contactPerson:
               type: string
             organization:
@@ -2029,11 +2033,19 @@ components:
       type: object
       description: Funding creation
       properties:
+        type:
+          type: string
+          pattern: 'Funding'
+          description: Always Funding
         code:
           type: string
           description: Project code of the funding
         source:
           properties:
+            type:
+              type: string
+              pattern: 'FundingSource'
+              description: Always FundingSource
             code:
               type: string
               description: Code of the funding source, like NFR
@@ -2737,7 +2749,9 @@ components:
           type: 'DRUGSTUDY'
           clinicalTrialPhase: '3'
         funding:
-          - source:
+          - type: 'Funding'
+            source:
+              type: 'FundingSource'
               code: 'NFR'
             code: '1234'
         keywords:
@@ -2748,6 +2762,7 @@ components:
         relatedProjects:
           - 'https://api.dev.nva.aws.unit.no/cristin/project/21500'
         contactInfo:
+          type: 'ContactInfo'
           contactPerson: 'Navn Navnesen'
           organization: 'Universitetet i Oslo'
           email: 'navn.navnesen@uio.no'

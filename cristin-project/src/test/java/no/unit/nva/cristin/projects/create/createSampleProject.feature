@@ -82,7 +82,9 @@ Feature: API tests for Cristin Project retrieve and search
       ],
       'funding': [
         {
+          'type': 'Funding',
           'source': {
+            'type': 'FundingSource',
             'code': 'NFR'
           },
           'code': '1234'
@@ -104,8 +106,9 @@ Feature: API tests for Cristin Project retrieve and search
       'relatedProjects': [
         'https://api.dev.nva.aws.unit.no/cristin/project/6721135'
       ],
-      'contact_info': {
-        'contact_person': 'Navn Navnesen',
+      'contactInfo': {
+        'type': 'ContactInfo',
+        'contactPerson': 'Navn Navnesen',
         'institution': 'Universitetet i Oslo',
         'email': 'navn.navnesen@uio.no',
         'phone': '99223344'
