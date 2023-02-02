@@ -38,10 +38,8 @@ import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
 import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
-import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinHealthProjectTypeBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -377,11 +375,7 @@ class CreateCristinProjectHandlerTest {
         var captor = ArgumentCaptor.forClass(String.class);
         verify(apiClient).post(any(), captor.capture());
         var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
-
-        var actualApprovals = capturedCristinProject.getApprovals()
-                                   .stream()
-                                   .map(CristinApproval::toApproval)
-                                   .collect(Collectors.toList());
+        var actualApprovals = capturedCristinProject.toNvaProject().getApprovals();
 
         assertThat(actualApprovals, equalTo(expectedApprovals));
     }

@@ -106,9 +106,9 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.equipment == '#present'
     And match response.institutionsResponsibleForResearch[0].id == '#present'
     And match response.approvals[0].date == '#present'
-    And match response.approvals[0].authority == 'REK'
-    And match response.approvals[0].status == 'APPROVED'
-    And match response.approvals[0].applicationCode == 'ETICHAPPR'
+    And match response.approvals[0].authority == 'Rek'
+    And match response.approvals[0].status == 'Approved'
+    And match response.approvals[0].applicationCode == 'EtichAppr'
     And match response.approvals[0].identifier == '2017/800'
     And match response.approvals[0].authorityName == '#present'
     And print response

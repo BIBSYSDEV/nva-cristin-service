@@ -8,10 +8,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
-import no.unit.nva.cristin.projects.model.nva.ApplicationCode;
-import no.unit.nva.cristin.projects.model.nva.Approval;
-import no.unit.nva.cristin.projects.model.nva.ApprovalAuthority;
-import no.unit.nva.cristin.projects.model.nva.ApprovalStatus;
 import no.unit.nva.utils.CustomInstantSerializer;
 
 public class CristinApproval implements JsonSerializable {
@@ -77,19 +73,6 @@ public class CristinApproval implements JsonSerializable {
 
     public Map<String, String> getApprovedByName() {
         return nonEmptyOrDefault(approvedByName);
-    }
-
-    // TODO: Remove method and use the one in NvaProjectBuilder
-    /**
-     * Converts this object to object of type Approval.
-     */
-    public Approval toApproval() {
-        return new Approval(getApprovedDate(),
-                            ApprovalAuthority.fromValue(getApprovedBy()),
-                            ApprovalStatus.fromValue(getApprovalStatus()),
-                            ApplicationCode.fromValue(getApplicationCode()),
-                            getApprovalReferenceId(),
-                            getApprovedByName());
     }
 
     @Override
