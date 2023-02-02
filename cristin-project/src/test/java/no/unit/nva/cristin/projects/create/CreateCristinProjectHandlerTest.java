@@ -7,11 +7,11 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithoutUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
-import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNamesMap;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
-import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.INVALID_CLINICAL_TRIAL_PHASE;
-import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.INVALID_HEALTH_PROJECT_TYPE;
+import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_ONE;
+import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_THREE;
+import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.DRUGSTUDY;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -26,37 +26,46 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
+import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
+import no.unit.nva.cristin.projects.model.cristin.CristinHealthProjectTypeBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
+import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.zalando.problem.Problem;
 
 class CreateCristinProjectHandlerTest {
 
     public static final String NO_ACCESS = "NoAccess";
     public static final String ILLEGAL_CONTRIBUTOR_ROLE = "illegalContributorRole";
     public static final int FIRST_CONTRIBUTOR = 0;
-    public static final String DRUGSTUDY = "DRUGSTUDY";
     public static final String INVALIDVALUE = "INVALIDVALUE";
-    public static final String CLINICAL_TRIAL_PHASE_VALUE = "1";
-    public static final String OTHERSTUDY = "OTHERSTUDY";
+    public static final String API_REQUEST_ONE_NVA_PROJECT_JSON = "api_request_one_nva_project.json";
+    public static final String CLINICAL_TRIAL_PHASE_JSON_FIELD = "\"clinicalTrialPhase\": \"%s\"";
+    public static final String SUPPLIED_CLINICAL_TRIAL_PHASE_IS_NOT_VALID = "Supplied ClinicalTrialPhase is not valid";
+    public static final String HEALTH_PROJECT_TYPE_JSON_FIELD = "\"type\": \"%s\"";
+    public static final String SUPPLIED_HEALTH_PROJECT_TYPE_IS_NOT_VALID = "Supplied HealthProjectType is not valid";
 
     private final Environment environment = new Environment();
     private Context context;
@@ -254,35 +263,42 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenHealthProjectDataTypePresentButInvalid() throws Exception {
-        var randomNvaProject = randomNvaProject();
-        randomNvaProject.setId(null);
-        var healthProjectData = new HealthProjectData(INVALIDVALUE, randomNamesMap(), CLINICAL_TRIAL_PHASE_VALUE);
-        randomNvaProject.setHealthProjectData(healthProjectData);
+        String json = getProjectPostRequestJsonSample();
+        String jsonToReplace = HEALTH_PROJECT_TYPE_JSON_FIELD;
 
-        var response = executeRequest(randomNvaProject);
+        String expected = json.replace(String.format(jsonToReplace, DRUGSTUDY.getType()),
+                                       String.format(jsonToReplace, INVALIDVALUE));
+
+        var input = getInputStreamFromString(expected);
+        handler.handleRequest(input, output, context);
+        var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertThat(response.getBody(), containsString(INVALID_HEALTH_PROJECT_TYPE));
+        assertThat(response.getBody(), containsString(SUPPLIED_HEALTH_PROJECT_TYPE_IS_NOT_VALID));
     }
 
     @Test
     void shouldReturnBadRequestWhenHealthProjectDataClinicalPhasePresentButInvalid() throws Exception {
-        var randomNvaProject = randomNvaProject();
-        randomNvaProject.setId(null);
-        var healthProjectData = new HealthProjectData(DRUGSTUDY, randomNamesMap(), INVALIDVALUE);
-        randomNvaProject.setHealthProjectData(healthProjectData);
+        String json = getProjectPostRequestJsonSample();
+        String jsonToReplace = CLINICAL_TRIAL_PHASE_JSON_FIELD;
 
-        var response = executeRequest(randomNvaProject);
+        String expected = json.replace(String.format(jsonToReplace, PHASE_THREE.getPhase()),
+                                       String.format(jsonToReplace, INVALIDVALUE));
+
+
+        InputStream input = getInputStreamFromString(expected);
+        handler.handleRequest(input, output, context);
+        var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertThat(response.getBody(), containsString(INVALID_CLINICAL_TRIAL_PHASE));
+        assertThat(response.getBody(), containsString(SUPPLIED_CLINICAL_TRIAL_PHASE_IS_NOT_VALID));
     }
 
     @Test
     void shouldReturnCreatedWhenHealthProjectDataHasPartialData() throws Exception {
         var randomNvaProject = randomNvaProject();
         randomNvaProject.setId(null);
-        var healthProjectData = new HealthProjectData(OTHERSTUDY, null, null);
+        var healthProjectData = new HealthProjectData(HealthProjectType.OTHERSTUDY, null, null);
         randomNvaProject.setHealthProjectData(healthProjectData);
 
         mockUpstreamUsingRequest(randomNvaProject);
@@ -299,7 +315,7 @@ class CreateCristinProjectHandlerTest {
 
         var nvaProject = randomNvaProject();
         nvaProject.setId(null);
-        var healthProjectData = new HealthProjectData(DRUGSTUDY, null, CLINICAL_TRIAL_PHASE_VALUE);
+        var healthProjectData = new HealthProjectData(DRUGSTUDY, null, PHASE_ONE);
         nvaProject.setHealthProjectData(healthProjectData);
 
         mockUpstreamUsingRequest(nvaProject);
@@ -309,10 +325,14 @@ class CreateCristinProjectHandlerTest {
         verify(apiClient).post(any(), captor.capture());
         var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
 
-        assertThat(capturedCristinProject.getHealthProjectType(),
-                   equalTo(nvaProject.getHealthProjectData().getType()));
-        assertThat(capturedCristinProject.getClinicalTrialPhase(),
-                   equalTo(nvaProject.getHealthProjectData().getClinicalTrialPhase()));
+        var cristinHealthType = capturedCristinProject.getHealthProjectType();
+        var nvaHealthType = nvaProject.getHealthProjectData().getType();
+
+        var cristinPhase = capturedCristinProject.getClinicalTrialPhase();
+        var nvaPhase = nvaProject.getHealthProjectData().getClinicalTrialPhase();
+
+        assertThat(cristinHealthType, equalTo(CristinHealthProjectTypeBuilder.reverseLookup(nvaHealthType)));
+        assertThat(cristinPhase, equalTo(CristinClinicalTrialPhaseBuilder.reverseLookup(nvaPhase)));
     }
 
     private String actualIdentifierFromOrganization(Organization organization) {
@@ -376,6 +396,19 @@ class CreateCristinProjectHandlerTest {
         expected.setProjectCategories(Collections.emptyList());
         expected.setKeywords(Collections.emptyList());
         expected.setRelatedProjects(Collections.emptyList());
+    }
+
+    private String getProjectPostRequestJsonSample() {
+        return IoUtils.stringFromResources(Path.of(API_REQUEST_ONE_NVA_PROJECT_JSON));
+    }
+
+    private static InputStream getInputStreamFromString(String expected) throws JsonProcessingException {
+        var customerId = randomUri();
+        return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+                   .withBody(expected)
+                   .withCurrentCustomer(customerId)
+                   .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
+                   .build();
     }
 
 }
