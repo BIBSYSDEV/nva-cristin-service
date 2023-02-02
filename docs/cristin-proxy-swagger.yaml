@@ -1683,24 +1683,23 @@ components:
           properties:
             type:
               type: string
-              description: 'Health project classification. DRUGSTUDY: Drug study (en), Legemiddelstudium (nb), Legemedelstudium (nn); OTHERCLIN: Other clinical trial (en), Annet klinisk behandlingsstudium (nb), Anna klinisk behandlingsstudium (nn); OTHERSTUDY: Other study (en), Annet studium (nb), Anna studium (nn).'
+              description: 'Health project classification. Drugstudy: Drug study (en), Legemiddelstudium (nb), Legemedelstudium (nn); Otherclin: Other clinical trial (en), Annet klinisk behandlingsstudium (nb), Anna klinisk behandlingsstudium (nn); Otherstudy: Other study (en), Annet studium (nb), Anna studium (nn).'
               enum:
-                - DRUGSTUDY
-                - OTHERCLIN
-                - OTHERSTUDY
+                - Drugstudy
+                - Otherclin
+                - Otherstudy
             label:
               $ref: '#/components/schemas/Languages'
             clinicalTrialPhase:
               type: string
-              description: 'Mandatory if type is DRUGSTUDY.'
+              description: 'Mandatory if type is Drugstudy.'
               enum:
-                - 1
-                - 2
-                - 3
-                - 4
+                - PhaseI
+                - PhaseII
+                - PhaseIII
+                - PhaseIV
         approvals:
           $ref: '#/components/schemas/Approvals'
-
     ProjectPost:
       type: object
       properties:
@@ -1785,19 +1784,19 @@ components:
           properties:
             type:
               type: string
-              description: 'Health project classification. DRUGSTUDY: Drug study (en), Legemiddelstudium (nb), Legemedelstudium (nn); OTHERCLIN: Other clinical trial (en), Annet klinisk behandlingsstudium (nb), Anna klinisk behandlingsstudium (nn); OTHERSTUDY: Other study (en), Annet studium (nb), Anna studium (nn).'
+              description: 'Health project classification. Drugstudy: Drug study (en), Legemiddelstudium (nb), Legemedelstudium (nn); Otherclin: Other clinical trial (en), Annet klinisk behandlingsstudium (nb), Anna klinisk behandlingsstudium (nn); Otherstudy: Other study (en), Annet studium (nb), Anna studium (nn).'
               enum:
-                - DRUGSTUDY
-                - OTHERCLIN
-                - OTHERSTUDY
+                - Drugstudy
+                - Otherclin
+                - Otherstudy
             clinicalTrialPhase:
               type: string
-              description: 'Mandatory if type is DRUGSTUDY.'
+              description: 'Mandatory if type is Drugstudy.'
               enum:
-                - 1
-                - 2
-                - 3
-                - 4
+                - PhaseI
+                - PhaseII
+                - PhaseIII
+                - PhaseIV
         approvals:
           $ref: '#/components/schemas/Approvals'
     ProjectPatch:
@@ -2569,10 +2568,10 @@ components:
               - type: 'Organization'
                 id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             healthProjectData:
-              type: 'DRUGSTUDY'
+              type: 'Drugstudy'
               label:
                 en: 'Drug study'
-              clinicalTrialPhase: '3'
+              clinicalTrialPhase: 'PhaseIII'
             approvals:
               - type: 'Approval'
                 date: '2020-12-31T09:45:17Z'
@@ -2676,10 +2675,10 @@ components:
           - type: 'Organization'
             id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
         healthProjectData:
-          type: 'DRUGSTUDY'
+          type: 'Drugstudy'
           label:
             en: 'Drug study'
-          clinicalTrialPhase: '3'
+          clinicalTrialPhase: 'PhaseIII'
         approvals:
           - type: 'Approval'
             date: '2020-12-31T09:45:17Z'
@@ -2746,8 +2745,8 @@ components:
           - type: 'Organization'
             id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
         healthProjectData:
-          type: 'DRUGSTUDY'
-          clinicalTrialPhase: '3'
+          type: 'Drugstudy'
+          clinicalTrialPhase: 'PhaseIII'
         approvals:
           - type: 'Approval'
             date: '2020-12-31T09:45:17Z'

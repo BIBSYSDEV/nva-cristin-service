@@ -83,7 +83,10 @@ public class CristinProjectBuilder {
     }
 
     private String extractHealthProjectType(HealthProjectData healthProjectData) {
-        return Optional.ofNullable(healthProjectData).map(HealthProjectData::getType).orElse(null);
+        return Optional.ofNullable(healthProjectData)
+                   .map(HealthProjectData::getType)
+                   .map(CristinHealthProjectTypeBuilder::reverseLookup)
+                   .orElse(null);
     }
 
     private Map<String, String> extractHealthProjectTypeName(HealthProjectData healthProjectData) {
@@ -91,7 +94,10 @@ public class CristinProjectBuilder {
     }
 
     private String extractHealthProjectClinicalTrialPhase(HealthProjectData healthProjectData) {
-        return Optional.ofNullable(healthProjectData).map(HealthProjectData::getClinicalTrialPhase).orElse(null);
+        return Optional.ofNullable(healthProjectData)
+                   .map(HealthProjectData::getClinicalTrialPhase)
+                   .map(CristinClinicalTrialPhaseBuilder::reverseLookup)
+                   .orElse(null);
     }
 
     private List<CristinOrganization> extractInstitutionsResponsibleForResearch(

@@ -83,7 +83,7 @@ class UpdateCristinProjectHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenSendingNullBody() throws IOException {
-        var gatewayResponse = sendQuery(validPath, null);
+        var gatewayResponse = sendQuery(null);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
@@ -97,7 +97,7 @@ class UpdateCristinProjectHandlerTest {
         jsonObject.put(LANGUAGE, LanguageMapper.getLanguageByIso6391Code(randomLanguage()).getLexvoUri().toString());
         jsonObject.put(START_DATE, randomInstantString());
         jsonObject.put(TITLE, randomString());
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(jsonObject.toString());
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
@@ -109,7 +109,7 @@ class UpdateCristinProjectHandlerTest {
         jsonObject.put(ALTERNATIVE_TITLES, getTitleAsString());
         jsonObject.put(POPULAR_SCIENTIFIC_SUMMARY, getSummaryAsString());
         jsonObject.put(STATUS, OBJECT_MAPPER.writeValueAsString(randomStatus()));
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
 
@@ -122,7 +122,7 @@ class UpdateCristinProjectHandlerTest {
     void shouldReturnBadRequestWhenTitleHasNoLanguageFieldPresent() throws IOException {
         var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(TITLE, randomString());
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(jsonObject.toString());
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
     }
 
@@ -131,7 +131,7 @@ class UpdateCristinProjectHandlerTest {
         var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(TITLE, randomString());
         jsonObject.put(LANGUAGE, toUri(randomLanguage()).toString());
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
+        GatewayResponse<Void> gatewayResponse = sendQuery(jsonObject.toString());
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
@@ -151,20 +151,20 @@ class UpdateCristinProjectHandlerTest {
         return String.valueOf(randomInteger());
     }
 
-    private GatewayResponse<Void> sendQuery(Map<String, String> pathParam, String body) throws IOException {
-        InputStream input = createRequest(pathParam, body);
+    private GatewayResponse<Void> sendQuery(String body) throws IOException {
+        InputStream input = createRequest(body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
-    private InputStream createRequest(Map<String, String> pathParam, String body) throws JsonProcessingException {
+    private InputStream createRequest(String body) throws JsonProcessingException {
         var customerId = randomUri();
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
-            .withBody(body)
-            .withCustomerId(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
-            .withPathParameters(pathParam)
-            .build();
+                   .withBody(body)
+                   .withCurrentCustomer(customerId)
+                   .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
+                   .withPathParameters(validPath)
+                   .build();
     }
 
     private GatewayResponse<Void> queryWithoutRequiredAccessRights() throws IOException {

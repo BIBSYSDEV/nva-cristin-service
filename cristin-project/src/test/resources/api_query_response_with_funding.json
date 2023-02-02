@@ -122,11 +122,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       },
       "approvals" : [ {
         "type" : "Approval",
@@ -254,11 +254,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       },
       "approvals" : [ {
         "type" : "Approval",
@@ -386,11 +386,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       },
       "approvals" : [ {
         "type" : "Approval",
@@ -518,11 +518,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       },
       "approvals" : [ {
         "type" : "Approval",
@@ -650,11 +650,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       },
       "approvals" : [ {
         "type" : "Approval",
