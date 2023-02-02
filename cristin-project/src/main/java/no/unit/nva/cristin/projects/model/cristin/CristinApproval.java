@@ -37,6 +37,9 @@ public class CristinApproval implements JsonSerializable {
     @JsonProperty(APPROVED_BY_NAME)
     private final Map<String, String> approvedByName;
 
+    /**
+     * Constructor for object of type CristinApproval.
+     */
     @JsonCreator
     public CristinApproval(@JsonProperty(APPROVED_DATE) Instant approvedDate,
                            @JsonProperty(APPROVED_BY) String approvedBy,
@@ -76,6 +79,10 @@ public class CristinApproval implements JsonSerializable {
         return nonEmptyOrDefault(approvedByName);
     }
 
+    // TODO: Remove method and use the one in NvaProjectBuilder
+    /**
+     * Converts this object to object of type Approval.
+     */
     public Approval toApproval() {
         return new Approval(getApprovedDate(),
                             ApprovalAuthority.fromValue(getApprovedBy()),

@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects.model.nva;
 
-import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -10,7 +9,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
-import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Approval implements JsonSerializable {
@@ -34,6 +32,9 @@ public class Approval implements JsonSerializable {
     @JsonProperty(AUTHORITY_NAME)
     private final Map<String, String> authorityName;
 
+    /**
+     * Constructor for object of type Approval.
+     */
     @JsonCreator
     public Approval(@JsonProperty(APPROVAL_DATE) Instant date,
                     @JsonProperty(APPROVAL_AUTHORITY) ApprovalAuthority authority,
@@ -71,27 +72,6 @@ public class Approval implements JsonSerializable {
 
     public Map<String, String> getAuthorityName() {
         return nonEmptyOrDefault(authorityName);
-    }
-
-    public CristinApproval toCristinApproval() {
-        return new CristinApproval(getDate(),
-                                   getAuthorityValue(),
-                                   getApprovalStatusValue(),
-                                   getApplicationCodeValue(),
-                                   getIdentifier(),
-                                   getAuthorityName());
-    }
-
-    private String getAuthorityValue() {
-        return nonNull(getAuthority()) ? getAuthority().getAuthorityValue() : null;
-    }
-
-    private String getApprovalStatusValue() {
-        return nonNull(getStatus()) ? getStatus().getStatusValue() : null;
-    }
-
-    private String getApplicationCodeValue() {
-        return nonNull(getApplicationCode()) ? getApplicationCode().getCodeValue() : null;
     }
 
     @Override

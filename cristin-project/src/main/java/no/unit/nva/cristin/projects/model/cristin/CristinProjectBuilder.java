@@ -71,7 +71,19 @@ public class CristinProjectBuilder {
     }
 
     private List<CristinApproval> extractApprovals(List<Approval> approvals) {
-        return approvals.stream().map(Approval::toCristinApproval).collect(Collectors.toList());
+        return approvals.stream().map(this::toCristinApproval).collect(Collectors.toList());
+    }
+
+    /**
+     * Converts object of type Approval to object of type CristinApproval.
+     */
+    private CristinApproval toCristinApproval(Approval approval) {
+        return new CristinApproval(approval.getDate(),
+                                   CristinApprovalAuthorityBuilder.reverseLookup(approval.getAuthority()),
+                                   CristinApprovalStatusBuilder.reverseLookup(approval.getStatus()),
+                                   CristinApplicationCodeBuilder.reverseLookup(approval.getApplicationCode()),
+                                   approval.getIdentifier(),
+                                   approval.getAuthorityName());
     }
 
     private List<CristinExternalSource> extractExternalSources(List<ExternalSource> nvaExternalSources) {

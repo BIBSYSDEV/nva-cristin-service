@@ -8,11 +8,11 @@ import nva.commons.core.SingletonCollector;
 
 public enum ApprovalStatus {
 
-    NOT_APPLIED("NOTAPPLIED"),
-    APPLIED("APPLIED"),
-    APPROVED("APPROVED"),
-    DECLINED("DECLINED"),
-    REJECTION("REJECTION");
+    NOT_APPLIED("NotApplied"),
+    APPLIED("Applied"),
+    APPROVED("Approved"),
+    DECLINED("Declined"),
+    REJECTION("Rejection");
 
     public static final String ERROR_MESSAGE_TEMPLATE = "Supplied ApprovalStatus is not valid expected one of: %s";
     public static final String DELIMITER = ", ";

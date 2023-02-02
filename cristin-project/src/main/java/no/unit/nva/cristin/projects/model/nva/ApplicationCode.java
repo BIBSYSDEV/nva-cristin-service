@@ -8,13 +8,13 @@ import nva.commons.core.SingletonCollector;
 
 public enum ApplicationCode {
 
-    ETHICHAPR("ETICHAPPR"),
-    BIOBANK("BIOBANK"),
-    DRUGTRIAL("DRUGTRIAL"),
-    BIOTECHN("BIOTECHN"),
-    MEDEQUIP("MEDEQUIP"),
-    TESTANIMAL("TESTANIMAL"),
-    SENSINFO("SENSINFO");
+    ETHICHAPR("EtichAppr"),
+    BIOBANK("Biobank"),
+    DRUGTRIAL("DrugTrial"),
+    BIOTECHN("BioTechN"),
+    MEDEQUIP("MedEquip"),
+    TESTANIMAL("TestAnimal"),
+    SENSINFO("SensInfo");
 
     public static final String ERROR_MESSAGE_TEMPLATE = "Supplied ApplicationCode is not valid expected one of: %s";
     public static final String DELIMITER = ", ";

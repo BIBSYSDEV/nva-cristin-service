@@ -85,9 +85,9 @@ Feature: API tests for Cristin Project retrieve and search
         {
           'type' : 'Approval',
           'date' : '2017-04-26T00:00:00.000Z',
-          'authority' : 'REK',
-          'status' : 'APPROVED',
-          'applicationCode' : 'ETICHAPPR',
+          'authority' : 'Rek',
+          'status' : 'Approved',
+          'applicationCode' : 'EtichAppr',
           'identifier' : '2017/800'
         }
       ]

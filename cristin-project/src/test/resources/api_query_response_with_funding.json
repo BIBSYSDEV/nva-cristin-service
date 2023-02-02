@@ -131,9 +131,9 @@
       "approvals" : [ {
         "type" : "Approval",
         "date" : "2017-04-26T00:00:00Z",
-        "authority" : "REK",
-        "status" : "APPROVED",
-        "applicationCode" : "ETICHAPPR",
+        "authority" : "Rek",
+        "status" : "Approved",
+        "applicationCode" : "EtichAppr",
         "identifier" : "2017/800",
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
@@ -263,9 +263,9 @@
       "approvals" : [ {
         "type" : "Approval",
         "date" : "2017-04-26T00:00:00Z",
-        "authority" : "REK",
-        "status" : "APPROVED",
-        "applicationCode" : "ETICHAPPR",
+        "authority" : "Rek",
+        "status" : "Approved",
+        "applicationCode" : "EtichAppr",
         "identifier" : "2017/800",
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
@@ -395,9 +395,9 @@
       "approvals" : [ {
         "type" : "Approval",
         "date" : "2017-04-26T00:00:00Z",
-        "authority" : "REK",
-        "status" : "APPROVED",
-        "applicationCode" : "ETICHAPPR",
+        "authority" : "Rek",
+        "status" : "Approved",
+        "applicationCode" : "EtichAppr",
         "identifier" : "2017/800",
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
@@ -527,9 +527,9 @@
       "approvals" : [ {
         "type" : "Approval",
         "date" : "2017-04-26T00:00:00Z",
-        "authority" : "REK",
-        "status" : "APPROVED",
-        "applicationCode" : "ETICHAPPR",
+        "authority" : "Rek",
+        "status" : "Approved",
+        "applicationCode" : "EtichAppr",
         "identifier" : "2017/800",
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
@@ -659,9 +659,9 @@
       "approvals" : [ {
         "type" : "Approval",
         "date" : "2017-04-26T00:00:00Z",
-        "authority" : "REK",
-        "status" : "APPROVED",
-        "applicationCode" : "ETICHAPPR",
+        "authority" : "Rek",
+        "status" : "Approved",
+        "applicationCode" : "EtichAppr",
         "identifier" : "2017/800",
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
