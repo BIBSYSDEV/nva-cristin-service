@@ -346,9 +346,8 @@ class CreateCristinProjectHandlerTest {
     void shouldReturnCreatedWhenApprovalsHasPartialData() throws Exception {
         var randomNvaProject = randomNvaProject();
         randomNvaProject.setId(null);
-        var approval = new Approval(randomInstant(), ApprovalAuthority.DIRHEALTH, null, null,
-                                    randomString(), null);
-        randomNvaProject.setApprovals(List.of(approval));
+        var approvalWithOnlySomeFieldsPopulated = approvalWithOnlySomeFieldsPopulated();
+        randomNvaProject.setApprovals(List.of(approvalWithOnlySomeFieldsPopulated));
 
         mockUpstreamUsingRequest(randomNvaProject);
         var response = executeRequest(randomNvaProject);
@@ -356,16 +355,21 @@ class CreateCristinProjectHandlerTest {
         assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
     }
 
+    private Approval approvalWithOnlySomeFieldsPopulated() {
+        return new Approval(randomInstant(), ApprovalAuthority.DIRHEALTH, null, null,
+                            randomString(), null);
+    }
+
     @Test
-    void shouldHaveProjectWithApprovalsAddedAndSentToUpstream() throws Exception {
+    void shouldHaveApprovalsInProjectPayloadWhenSendingToUpstream() throws Exception {
         var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
         apiClient = spy(apiClient);
         handler = new CreateCristinProjectHandler(apiClient, environment);
 
         var nvaProject = randomNvaProject();
         nvaProject.setId(null);
-        var approvals = randomApprovals();
-        nvaProject.setApprovals(approvals);
+        var expectedApprovals = randomApprovals();
+        nvaProject.setApprovals(expectedApprovals);
 
         mockUpstreamUsingRequest(nvaProject);
         executeRequest(nvaProject);
@@ -379,7 +383,7 @@ class CreateCristinProjectHandlerTest {
                                    .map(CristinApproval::toApproval)
                                    .collect(Collectors.toList());
 
-        assertThat(actualApprovals, equalTo(approvals));
+        assertThat(actualApprovals, equalTo(expectedApprovals));
     }
 
     private String actualIdentifierFromOrganization(Organization organization) {
