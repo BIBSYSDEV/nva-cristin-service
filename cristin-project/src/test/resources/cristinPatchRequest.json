@@ -3,9 +3,8 @@
     "en": "Updated Title"
   },
   "coordinating_institution": {
-    "institution": {
-      "cristin_institution_id": "20202.0.0.0",
-      "url": "https://api.cristin-test.uio.no/v2/institutions/20202.0.0.0"
+    "unit": {
+      "cristin_unit_id": "20202.0.0.0"
     }
   },
   "participants": [

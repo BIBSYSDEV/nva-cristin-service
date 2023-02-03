@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
@@ -63,7 +64,9 @@ public class CristinProjectPatchJsonCreator {
                     attempt(() -> OBJECT_MAPPER.readValue(input.get(COORDINATING_INSTITUTION).toString(),
                             Organization.class))
                             .orElseThrow();
-            var cristinOrganization = fromOrganizationContainingInstitution(coordinatingInstitution);
+
+            var cristinOrganization = fromOrganizationContainingUnitIfPresent(coordinatingInstitution)
+                                          .orElse(fromOrganizationContainingInstitution(coordinatingInstitution));
             output.set(CRISTIN_COORDINATING_INSTITUTION, OBJECT_MAPPER.valueToTree(cristinOrganization));
         }
     }
