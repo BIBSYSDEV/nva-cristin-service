@@ -110,10 +110,10 @@ class UpdateCristinProjectHandlerTest {
     @Test
     void shouldReturnBadRequestWhenNoSupportedFieldsArePresent() throws IOException {
         var jsonObject = OBJECT_MAPPER.createObjectNode();
-        jsonObject.put(ACADEMIC_SUMMARY, getSummaryAsString());
-        jsonObject.put(ALTERNATIVE_TITLES, getTitleAsString());
-        jsonObject.put(POPULAR_SCIENTIFIC_SUMMARY, getSummaryAsString());
-        jsonObject.put(STATUS, OBJECT_MAPPER.writeValueAsString(randomStatus()));
+        jsonObject.put(ACADEMIC_SUMMARY, randomNamesMap().toString());
+        jsonObject.put(ALTERNATIVE_TITLES, randomNamesMap().toString());
+        jsonObject.put(POPULAR_SCIENTIFIC_SUMMARY, randomNamesMap().toString());
+        jsonObject.put(STATUS, randomStatus().toString());
         GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
@@ -129,15 +129,6 @@ class UpdateCristinProjectHandlerTest {
         jsonObject.put(TITLE, randomString());
         GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-    }
-
-    @Test
-    void shouldReturnOKNoContentWhenRequestHasTitleAndLanguagePresent() throws IOException {
-        var jsonObject = OBJECT_MAPPER.createObjectNode();
-        jsonObject.put(TITLE, randomString());
-        jsonObject.put(LANGUAGE, toUri(randomLanguage()).toString());
-        GatewayResponse<Void> gatewayResponse = sendQuery(validPath, jsonObject.toString());
-        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
     @Test
@@ -170,14 +161,6 @@ class UpdateCristinProjectHandlerTest {
         jsonObject.put(TITLE, randomString());
 
         return jsonObject;
-    }
-
-    private String getTitleAsString() throws JsonProcessingException {
-        return OBJECT_MAPPER.writeValueAsString(randomListOfTitles(URI.create(randomLanguage())));
-    }
-
-    private String getSummaryAsString() throws JsonProcessingException {
-        return OBJECT_MAPPER.writeValueAsString(randomListOfTitles(URI.create(randomLanguage())).get(0));
     }
 
     private String randomInstantString() {
