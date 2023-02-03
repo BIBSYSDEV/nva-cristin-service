@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import no.unit.nva.Validator;
-import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
@@ -18,13 +17,6 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.StringUtils;
 
 public class CreateCristinProjectValidator implements Validator<NvaProject> {
-
-    public static final Set<String> validClinicalTrialPhases = Set.of("1", "2", "3", "4");
-    public static final Set<String> validHealthProjectTypes = Set.of("DRUGSTUDY", "OTHERCLIN", "OTHERSTUDY");
-    public static final String INVALID_CLINICAL_TRIAL_PHASE =
-        "Clinical Trial Phase is invalid, can only contain the following values: ";
-    public static final String INVALID_HEALTH_PROJECT_TYPE =
-        "Health Project Type is invalid, can only contain the following values: ";
 
     protected enum ValidatedResult {
         Empty("project data required"),
@@ -43,7 +35,6 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
     @Override
     public void validate(NvaProject nvaProject) throws ApiGatewayException {
         validateRequiredInput(nvaProject);
-        validateOptionalInput(nvaProject);
     }
 
     private void validateRequiredInput(NvaProject project) throws BadRequestException {
@@ -51,7 +42,7 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         if (!validatedResult.isEmpty()) {
             var validateDescriptions =
                 validatedResult.stream()
-                    .map(result-> result.label)
+                    .map(result -> result.label)
                     .collect(Collectors.joining(", "," (", ")"));
             throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD + validateDescriptions);
         }
@@ -61,6 +52,7 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         var results = new HashSet<ValidatedResult>();
         if (isNull(project)) {
             results.add(ValidatedResult.Empty);
+            return results;
         }
         if (hasId(project)) {
             results.add(ValidatedResult.HasId);
@@ -98,31 +90,5 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
     private boolean noTitle(NvaProject project) {
         return StringUtils.isEmpty(project.getTitle());
-    }
-
-    private void validateOptionalInput(NvaProject nvaProject) throws BadRequestException {
-        if (nonNull(nvaProject.getHealthProjectData())) {
-            validateHealthData(nvaProject.getHealthProjectData());
-        }
-    }
-
-    private void validateHealthData(HealthProjectData healthData) throws BadRequestException {
-        if (nonNull(healthData.getType()) && !validHealthProjectTypes.contains(healthData.getType())) {
-            throw exceptionInvalidHealthProjectType();
-        }
-        if (nonNull(healthData.getClinicalTrialPhase())
-            && !validClinicalTrialPhases.contains(healthData.getClinicalTrialPhase())) {
-            throw exceptionInvalidClinicalTrialPhase();
-        }
-    }
-
-    private BadRequestException exceptionInvalidHealthProjectType() {
-        return new BadRequestException(INVALID_HEALTH_PROJECT_TYPE
-                                       + String.join(" ; ", validHealthProjectTypes));
-    }
-
-    private BadRequestException exceptionInvalidClinicalTrialPhase() {
-        return new BadRequestException(INVALID_CLINICAL_TRIAL_PHASE
-                                       + String.join(" ; ", validClinicalTrialPhases));
     }
 }

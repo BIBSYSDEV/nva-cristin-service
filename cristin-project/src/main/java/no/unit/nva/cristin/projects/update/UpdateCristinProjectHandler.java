@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.update;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
+import no.unit.nva.Validator;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
@@ -47,7 +48,8 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
         AccessUtils.verifyRequesterCanEditProjects(requestInfo);
 
         ObjectNode objectNode = readJsonFromInput(input);
-        ProjectPatchValidator.validate(objectNode);
+        Validator<ObjectNode> validator = new ProjectPatchValidator();
+        validator.validate(objectNode);
         ObjectNode cristinJson = new CristinProjectPatchJsonCreator(objectNode).create().getOutput();
 
         if (noSupportedValuesPresent(cristinJson)) {
