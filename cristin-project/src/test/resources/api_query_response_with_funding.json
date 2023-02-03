@@ -122,11 +122,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       }
     },
     {
@@ -243,11 +243,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       }
     },
     {
@@ -364,11 +364,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       }
     },
     {
@@ -485,11 +485,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       }
     },
     {
@@ -606,11 +606,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       }
     }
   ]

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import no.unit.nva.Validator;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.model.Organization;
 import no.unit.nva.utils.PatchValidator;
@@ -27,7 +28,7 @@ import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static nva.commons.core.attempt.Try.attempt;
 
 
-public class ProjectPatchValidator extends PatchValidator {
+public class ProjectPatchValidator extends PatchValidator implements Validator<ObjectNode> {
 
     private static final Set<String> SUPPORTED_PATCH_FIELDS =
             Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE, FUNDING);
@@ -42,7 +43,8 @@ public class ProjectPatchValidator extends PatchValidator {
      * @param input ObjectNode containing fields with input data to be changed.
      * @throws BadRequestException thrown when input has illegal or invalid values.
      */
-    public static void validate(ObjectNode input) throws BadRequestException {
+    @Override
+    public void validate(ObjectNode input) throws BadRequestException {
         validateExtraPayload(input);
         validateTitleAndLanguage(input);
         validateContributors(input);
