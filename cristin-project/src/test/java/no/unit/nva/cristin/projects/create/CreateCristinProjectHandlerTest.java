@@ -103,7 +103,7 @@ class CreateCristinProjectHandlerTest {
         var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertThat(response.getBody(), containsString(ValidatedResult.HasId.label));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasId.getLabel()));
     }
 
     @Test
@@ -115,7 +115,7 @@ class CreateCristinProjectHandlerTest {
         var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertThat(response.getBody(), containsString(ValidatedResult.NoTitle.label));
+        assertThat(response.getBody(), containsString(ValidatedResult.NoTitle.getLabel()));
     }
 
     @Test
@@ -127,7 +127,7 @@ class CreateCristinProjectHandlerTest {
         var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertThat(response.getBody(), containsString(ValidatedResult.InvalidStartDate.label));
+        assertThat(response.getBody(), containsString(ValidatedResult.InvalidStartDate.getLabel()));
     }
 
     @Test
@@ -139,7 +139,7 @@ class CreateCristinProjectHandlerTest {
         var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertThat(response.getBody(), containsString(ValidatedResult.HasNoContributors.label));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasNoContributors.getLabel()));
     }
 
     @Test
@@ -153,9 +153,9 @@ class CreateCristinProjectHandlerTest {
         var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertThat(response.getBody(), containsString(ValidatedResult.HasNoCoordinatingOrganization.label));
-        assertThat(response.getBody(), containsString(ValidatedResult.HasNoContributors.label));
-        assertThat(response.getBody(), containsString(ValidatedResult.InvalidStartDate.label));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasNoCoordinatingOrganization.getLabel()));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasNoContributors.getLabel()));
+        assertThat(response.getBody(), containsString(ValidatedResult.InvalidStartDate.getLabel()));
     }
 
     @Test
@@ -167,7 +167,7 @@ class CreateCristinProjectHandlerTest {
         var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
-        assertThat(response.getBody(), containsString(ValidatedResult.HasNoCoordinatingOrganization.label));
+        assertThat(response.getBody(), containsString(ValidatedResult.HasNoCoordinatingOrganization.getLabel()));
     }
 
     @Test

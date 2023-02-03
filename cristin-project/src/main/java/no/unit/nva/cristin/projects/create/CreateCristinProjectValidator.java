@@ -25,10 +25,15 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         InvalidStartDate("start date invalid"),
         HasNoContributors("contributors required"),
         HasNoCoordinatingOrganization("coordinating organization required");
-        public final String label;
+        private final String label;
 
         ValidatedResult(String label) {
             this.label = label;
+        }
+
+
+        public String getLabel() {
+            return label;
         }
     }
 
@@ -42,7 +47,7 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         if (!validatedResult.isEmpty()) {
             var validateDescriptions =
                 validatedResult.stream()
-                    .map(result -> result.label)
+                    .map(ValidatedResult::getLabel)
                     .collect(Collectors.joining(", "," (", ")"));
             throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD + validateDescriptions);
         }
