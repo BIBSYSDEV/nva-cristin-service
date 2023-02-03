@@ -60,7 +60,7 @@ public class CristinProjectPatchJsonCreator {
     private void addCoordinatingInstitutionIfPresent() {
         if (input.has(COORDINATING_INSTITUTION)) {
             var coordinatingInstitution =
-                    attempt(() -> OBJECT_MAPPER.readValue(input.get(COORDINATING_INSTITUTION).asText(),
+                    attempt(() -> OBJECT_MAPPER.readValue(input.get(COORDINATING_INSTITUTION).toString(),
                             Organization.class))
                             .orElseThrow();
             var cristinOrganization = fromOrganizationContainingInstitution(coordinatingInstitution);
@@ -73,7 +73,7 @@ public class CristinProjectPatchJsonCreator {
             TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
             };
             var contributors =
-                    attempt(() -> OBJECT_MAPPER.readValue(input.get(CONTRIBUTORS).asText(), typeRef)).orElseThrow();
+                    attempt(() -> OBJECT_MAPPER.readValue(input.get(CONTRIBUTORS).toString(), typeRef)).orElseThrow();
             output.set(PARTICIPANTS, OBJECT_MAPPER.valueToTree(extractContributors(contributors)));
         }
     }

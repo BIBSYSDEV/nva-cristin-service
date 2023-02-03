@@ -2,7 +2,6 @@ package no.unit.nva.cristin.projects.update;
 
 import static java.lang.String.format;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
-import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -24,7 +23,6 @@ import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.UNSUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributors;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomLanguage;
-import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomListOfTitles;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomOrganization;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomStatus;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
@@ -33,12 +31,14 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
-import static nva.commons.core.language.LanguageMapper.toUri;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,8 +48,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.http.HttpClient;
+import java.nio.file.Path;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,13 +61,17 @@ import no.unit.nva.language.LanguageMapper;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class UpdateCristinProjectHandlerTest {
 
     private static final String PROJECT_IDENTIFIER = "identifier";
     private static final Map<String, String> validPath = Map.of(PROJECT_IDENTIFIER, randomIntegerAsString());
+    public static final String PATCH_REQUEST_JSON = "nvaApiPatchRequest.json";
+    public static final String CRISTIN_PATCH_REQUEST_JSON = "cristinPatchRequest.json";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private Context context;
@@ -151,10 +155,35 @@ class UpdateCristinProjectHandlerTest {
         assertThat(gatewayResponse.getBody(), containsString(format(MUST_BE_A_LIST, FUNDING)));
     }
 
-    private ObjectNode minimalJsonProject() throws JsonProcessingException {
+    @Test
+    void shouldProduceCorrectPayloadToSendToCristin() throws Exception {
+        var mockHttpClient = mock(HttpClient.class);
+        var apiClient = new UpdateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new UpdateCristinProjectHandler(apiClient, environment);
+        mockUpstream(mockHttpClient);
+        String input = IoUtils.stringFromResources(Path.of(PATCH_REQUEST_JSON));
+        sendQuery(validPath, input);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).patch(any(), captor.capture());
+        var capturedCristinProjectString = captor.getValue();
+
+        String expectedPayload = IoUtils.stringFromResources(Path.of(CRISTIN_PATCH_REQUEST_JSON));
+
+        assertThat(OBJECT_MAPPER.readTree(capturedCristinProjectString),
+                   equalTo(OBJECT_MAPPER.readTree(expectedPayload)));
+    }
+
+    private void mockUpstream(HttpClient mockHttpClient) throws IOException, InterruptedException {
+        var httpResponse = new HttpResponseFaker("", 204);
+        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+    }
+
+    private ObjectNode minimalJsonProject() {
         var jsonObject = OBJECT_MAPPER.createObjectNode();
-        jsonObject.put(CONTRIBUTORS, OBJECT_MAPPER.writeValueAsString(randomContributors()));
-        jsonObject.put(COORDINATING_INSTITUTION, OBJECT_MAPPER.writeValueAsString(randomOrganization()));
+        jsonObject.putPOJO(CONTRIBUTORS, randomContributors());
+        jsonObject.putPOJO(COORDINATING_INSTITUTION, randomOrganization());
         jsonObject.put(END_DATE, randomInstantString());
         jsonObject.put(LANGUAGE, LanguageMapper.getLanguageByIso6391Code(randomLanguage()).getLexvoUri().toString());
         jsonObject.put(START_DATE, randomInstantString());

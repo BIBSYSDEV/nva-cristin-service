@@ -1,0 +1,24 @@
+{
+  "title": {
+    "en": "Updated Title"
+  },
+  "coordinating_institution": {
+    "institution": {
+      "cristin_institution_id": "20202.0.0.0",
+      "url": "https://api.cristin-test.uio.no/v2/institutions/20202.0.0.0"
+    }
+  },
+  "participants": [
+    {
+      "cristin_person_id": "538786",
+      "url": "https://api.cristin-test.uio.no/v2/persons/538786",
+      "roles": [
+        {
+          "role_code": "PRO_MANAGER"
+        }
+      ]
+    }
+  ],
+  "startDate": "2022-10-09T00:00:00.001Z",
+  "endDate": "2030-12-31T00:00:00.001Z"
+}

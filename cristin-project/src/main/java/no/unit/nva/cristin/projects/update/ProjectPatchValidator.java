@@ -76,7 +76,7 @@ public class ProjectPatchValidator extends PatchValidator {
     private static void validateCoordinatingInstitution(ObjectNode input) throws BadRequestException {
         validateNotNullIfPresent(input, COORDINATING_INSTITUTION);
         if (propertyHasValue(input, COORDINATING_INSTITUTION)) {
-            attempt(() -> OBJECT_MAPPER.readValue(input.get(COORDINATING_INSTITUTION).asText(), Organization.class))
+            attempt(() -> OBJECT_MAPPER.readValue(input.get(COORDINATING_INSTITUTION).toString(), Organization.class))
                     .orElseThrow(fail ->
                         new BadRequestException(format(ILLEGAL_VALUE_FOR_PROPERTY, COORDINATING_INSTITUTION)));
         }
@@ -88,7 +88,7 @@ public class ProjectPatchValidator extends PatchValidator {
         if (propertyHasValue(input, CONTRIBUTORS)) {
             TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
             };
-            validateJsonReadable(typeRef, input.get(CONTRIBUTORS).asText(), CONTRIBUTORS);
+            validateJsonReadable(typeRef, input.get(CONTRIBUTORS).toString(), CONTRIBUTORS);
         }
     }
 
