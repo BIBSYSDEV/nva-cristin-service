@@ -34,7 +34,7 @@ Feature: API tests for Cristin Project Update
     """
     Given url CRISTIN_BASE
 
-  Scenario: Create returns status 204 No Content on successful update of project
+  Scenario: Update returns status 204 No Content on successful update of project
     Given path '/project/10910700'
     * header Authorization = 'Bearer ' + token
     And request swaggerSampleProject
