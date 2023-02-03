@@ -1565,11 +1565,11 @@ components:
                     description: Last name
                   email:
                     type: string
-                    pattern: '.+'
+                    pattern: '.*'
                     description: Email
                   phone:
                     type: string
-                    pattern: '.+'
+                    pattern: '.*'
                     description: Phone number
               affiliation:
                 $ref: '#/components/schemas/Organization'
@@ -2827,6 +2827,10 @@ components:
             value: 'Kjell Ola'
           - type: 'LastName'
             value: 'Nordmann'
+          - type: 'Email'
+            value: 'ola.nordmann@example.org'
+          - type: 'Phone'
+            value: '12345678'
         contactDetails:
           telephone: '+4799885566'
         image: 'https://api.cristin.no/v2/persons/359084/picture'
