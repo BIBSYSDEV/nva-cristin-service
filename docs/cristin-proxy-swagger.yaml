@@ -1847,17 +1847,6 @@ components:
                     description: Type of identity. Always Person
               affiliation:
                 $ref: '#/components/schemas/Organization'
-        status:
-          type: string
-          enum:
-            - NOTSTARTED
-            - ACTIVE
-            - CONCLUDED
-          description: Project status, based on start_date and end_date.
-        academicSummary:
-          $ref: '#/components/schemas/Languages'
-        popularScientificSummary:
-          $ref: '#/components/schemas/Languages'
     Problem:
       type: object
       properties:
@@ -2635,7 +2624,6 @@ components:
             identity:
               type: 'Person'
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/538786'
-        status: NOTSTARTED
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'

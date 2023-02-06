@@ -16,6 +16,8 @@ import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_END_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
@@ -83,13 +85,13 @@ public class CristinProjectPatchJsonCreator {
 
     private void addStartDateIfPresent() {
         if (input.has(START_DATE)) {
-            output.put(START_DATE, addMillisToInstantString(input.get(START_DATE).asText()));
+            output.put(CRISTIN_START_DATE, addMillisToInstantString(input.get(START_DATE).asText()));
         }
     }
 
     private void addEndDateIfPresent() {
         if (input.has(END_DATE)) {
-            output.put(END_DATE, addMillisToInstantString(input.get(END_DATE).asText()));
+            output.put(CRISTIN_END_DATE, addMillisToInstantString(input.get(END_DATE).asText()));
         }
     }
 
