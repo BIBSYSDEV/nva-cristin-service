@@ -1734,7 +1734,7 @@ components:
           $ref: '#/components/schemas/Organization'
         contributors:
           type: array
-          description: List of contributors on the project
+          description: List of contributors on the project (ProjectManager is required and needs an identity)
           items:
             type: object
             description: One contributor
@@ -1754,6 +1754,23 @@ components:
                     type: string
                     pattern: 'Person'
                     description: Type of identity. Always Person
+                  firstName:
+                    type: string
+                    pattern: '.+'
+                    description: First name (needed if identity is missing)
+                  lastName:
+                    type: string
+                    pattern: '.+'
+                    description: Last name (needed if identity is missing)
+                  email:
+                    type: string
+                    pattern: '.*'
+                    description: Email
+                  phone:
+                    type: string
+                    pattern: '.*'
+                    description: Phone number
+
               affiliation:
                 $ref: '#/components/schemas/Organization'
         status:
@@ -2668,6 +2685,16 @@ components:
             identity:
               type: 'Person'
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
+            affiliation:
+              type: 'Organization'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+          - type: 'ProjectParticipant'
+            identity:
+              type: 'Person'
+              FirstName: 'Kjell Ola'
+              LastName: 'Nordmann'
+              Email: 'ola.nordmann@example.org'
+              Phone: '12345678'
             affiliation:
               type: 'Organization'
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'

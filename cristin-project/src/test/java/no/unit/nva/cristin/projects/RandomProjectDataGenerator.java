@@ -192,7 +192,8 @@ public class RandomProjectDataGenerator {
     }
 
     private static Person randomPerson() {
-        return new Person(semiRandomPersonId(randomString()), randomString(), randomString());
+        return new Person(semiRandomPersonId(randomString()), randomString(), randomString(),
+                          randomString() + EMAIL_DOMAIN, randomString());
     }
 
     public static List<Funding> randomFundings() {
