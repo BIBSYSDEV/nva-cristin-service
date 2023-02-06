@@ -29,6 +29,14 @@ Feature: API tests for Cristin Project Update
             'id': 'https://api.dev.nva.aws.unit.no/cristin/person/538786'
           }
         }
+      ],
+      'funding': [
+        {
+          'source': {
+            'code': 'NFR'
+          },
+          'code': '1234'
+        }
       ]
     }
     """
