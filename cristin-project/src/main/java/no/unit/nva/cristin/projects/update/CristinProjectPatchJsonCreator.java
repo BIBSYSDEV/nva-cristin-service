@@ -1,8 +1,14 @@
 package no.unit.nva.cristin.projects.update;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import no.unit.nva.cristin.projects.model.nva.Funding;
+import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.model.Organization;
 
@@ -19,10 +25,13 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTI
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
+import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.CustomInstantSerializer.addMillisToInstantString;
 import static nva.commons.core.attempt.Try.attempt;
@@ -31,6 +40,7 @@ public class CristinProjectPatchJsonCreator {
 
     public static final String CRISTIN_COORDINATING_INSTITUTION = "coordinating_institution";
     public static final String PARTICIPANTS = "participants";
+
     private final transient ObjectNode input;
     private final transient ObjectNode output;
 
@@ -50,6 +60,7 @@ public class CristinProjectPatchJsonCreator {
         addContributorsIfPresent();
         addStartDateIfPresent();
         addEndDateIfPresent();
+        addFundingIfPresent();
         return this;
     }
 
@@ -101,5 +112,31 @@ public class CristinProjectPatchJsonCreator {
 
     private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
         return contributors.stream().map(NvaContributor::toCristinPersonWithRoles).collect(Collectors.toList());
+    }
+
+    private void addFundingIfPresent() {
+        if (input.has(FUNDING)) {
+            if (input.get(FUNDING).isNull()) {
+                output.putNull(PROJECT_FUNDING_SOURCES);
+            }
+
+            var cristinFundingSources = new ArrayList<CristinFundingSource>();
+            ArrayNode fundingSources = (ArrayNode) input.get(FUNDING);
+            fundingSources.forEach(node -> cristinFundingSources.add(oneFundingToCristinFunding(node)));
+
+            output.set(PROJECT_FUNDING_SOURCES, OBJECT_MAPPER.valueToTree(cristinFundingSources));
+        }
+    }
+
+    private CristinFundingSource oneFundingToCristinFunding(JsonNode fundingSource) {
+        var cristinFundingSource = new CristinFundingSource();
+        var sourceCode = fundingSource.get(SOURCE).get(FundingSource.CODE).asText();
+        cristinFundingSource.setFundingSourceCode(sourceCode);
+        if (fundingSource.has(Funding.CODE)) {
+            var projectCode = fundingSource.get(Funding.CODE).asText();
+            cristinFundingSource.setProjectCode(projectCode);
+        }
+
+        return cristinFundingSource;
     }
 }

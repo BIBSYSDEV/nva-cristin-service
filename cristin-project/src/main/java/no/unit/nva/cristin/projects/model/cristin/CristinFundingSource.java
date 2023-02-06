@@ -4,11 +4,12 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Map;
 import java.util.Objects;
+import no.unit.nva.commons.json.JsonSerializable;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CristinFundingSource {
+public class CristinFundingSource implements JsonSerializable {
 
     private String fundingSourceCode;
     private String projectCode;
@@ -57,5 +58,9 @@ public class CristinFundingSource {
         return Objects.hash(getFundingSourceCode(), getProjectCode(), getFundingSourceName());
     }
 
+    @Override
+    public String toString() {
+        return toJsonString();
+    }
 }
 

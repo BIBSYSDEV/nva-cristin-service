@@ -35,6 +35,7 @@ public class CristinProject implements JsonSerializable {
     public static final String HEALTH_PROJECT_TYPE = "health_project_type";
     public static final String HEALTH_PROJECT_TYPE_NAME = "health_project_type_name";
     public static final String CLINICAL_TRIAL_PHASE = "clinical_trial_phase";
+    public static final String PROJECT_FUNDING_SOURCES = "project_funding_sources";
 
     private String cristinProjectId;
     private Boolean publishable;
@@ -49,6 +50,7 @@ public class CristinProject implements JsonSerializable {
     private CristinDateInfo created;
     private CristinDateInfo lastModified;
     private CristinOrganization coordinatingInstitution;
+    @JsonProperty(PROJECT_FUNDING_SOURCES)
     private List<CristinFundingSource> projectFundingSources;
     private CristinContactInfo contactInfo;
     private CristinFundingAmount totalFundingAmount;
