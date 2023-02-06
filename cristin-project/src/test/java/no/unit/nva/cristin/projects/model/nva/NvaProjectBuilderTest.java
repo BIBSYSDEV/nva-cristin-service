@@ -13,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NvaProjectBuilderTest {
@@ -85,6 +86,7 @@ public class NvaProjectBuilderTest {
                    equalTo(ORGANIZATION_IDENTIFIER));
         assertThat(nvaProject.getInstitutionsResponsibleForResearch().get(0).getName().get(ENGLISH_LANGUAGE_KEY),
                    equalTo(MEDICAL_DEPARTMENT));
+        assertThat(nvaProject.getContributors().get(0).getIdentity().getEmail(), notNullValue());
     }
 
     @Test

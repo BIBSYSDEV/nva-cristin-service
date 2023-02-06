@@ -14,6 +14,8 @@ public class CristinPerson {
     private String firstName;
     private String surname;
     private String url;
+    private String email;
+    private String phone;
     private List<CristinRole> roles;
 
     public String getCristinPersonId() {
@@ -48,6 +50,22 @@ public class CristinPerson {
         this.url = url;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public List<CristinRole> getRoles() {
         return roles;
     }
@@ -76,5 +94,6 @@ public class CristinPerson {
     public int hashCode() {
         return Objects.hash(getCristinPersonId(), getFirstName(), getSurname(), getUrl(), getRoles());
     }
+
 }
 
