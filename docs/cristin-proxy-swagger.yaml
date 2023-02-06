@@ -1879,6 +1879,14 @@ components:
               code:
                 type: string
                 description: Project code of the funding related to this source
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
     Problem:
       type: object
       properties:
@@ -2660,6 +2668,9 @@ components:
           - source:
               code: 'NFR'
             code: '1234/PO'
+        keywords:
+          - type: '4837'
+          - type: '5686'
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'

@@ -37,6 +37,14 @@ Feature: API tests for Cristin Project Update
           },
           'code': '1234'
         }
+      ],
+      'keywords': [
+        {
+          'type': '5686'
+        },
+        {
+          'type': '4245'
+        }
       ]
     }
     """

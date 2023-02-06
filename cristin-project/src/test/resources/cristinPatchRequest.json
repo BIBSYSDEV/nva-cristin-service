@@ -25,5 +25,13 @@
       "funding_source_code": "NFR",
       "project_code": "1234/PO"
     }
+  ],
+  "keywords": [
+    {
+      "code": "5686"
+    },
+    {
+      "code": "4245"
+    }
   ]
 }

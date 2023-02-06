@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
@@ -30,6 +31,8 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
@@ -61,6 +64,7 @@ public class CristinProjectPatchJsonCreator {
         addStartDateIfPresent();
         addEndDateIfPresent();
         addFundingIfPresent();
+        addKeywordsIfPresent();
         return this;
     }
 
@@ -138,5 +142,19 @@ public class CristinProjectPatchJsonCreator {
         }
 
         return cristinFundingSource;
+    }
+
+    private void addKeywordsIfPresent() {
+        if (input.has(KEYWORDS)) {
+            if (input.get(KEYWORDS).isNull()) {
+                output.putNull(KEYWORDS);
+            }
+
+            var cristinKeywords = new ArrayList<CristinTypedLabel>();
+            ArrayNode keywords = (ArrayNode) input.get(KEYWORDS);
+            keywords.forEach(node -> cristinKeywords.add(new CristinTypedLabel(node.get(TYPE).asText(), null)));
+
+            output.set(KEYWORDS, OBJECT_MAPPER.valueToTree(cristinKeywords));
+        }
     }
 }
