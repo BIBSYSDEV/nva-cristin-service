@@ -121,7 +121,7 @@ public class CristinProjectPatchJsonCreator {
             }
 
             var cristinFundingSources = new ArrayList<CristinFundingSource>();
-            ArrayNode fundingSources = (ArrayNode) input.get(FUNDING);
+            var fundingSources = (ArrayNode) input.get(FUNDING);
             fundingSources.forEach(node -> cristinFundingSources.add(oneFundingToCristinFunding(node)));
 
             output.set(PROJECT_FUNDING_SOURCES, OBJECT_MAPPER.valueToTree(cristinFundingSources));

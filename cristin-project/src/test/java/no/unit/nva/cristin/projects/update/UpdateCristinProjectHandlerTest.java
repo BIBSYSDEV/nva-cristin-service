@@ -18,6 +18,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomFundings;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNamesMap;
+import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.FUNDING_MISSING_REQUIRED_FIELDS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.UNSUPPORTED_FIELDS_IN_PAYLOAD;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import java.io.ByteArrayOutputStream;
@@ -52,10 +54,8 @@ import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import no.unit.nva.cristin.projects.model.nva.Funding;
-import no.unit.nva.cristin.projects.model.nva.FundingSource;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.language.LanguageMapper;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -64,6 +64,9 @@ import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 
 class UpdateCristinProjectHandlerTest {
@@ -135,24 +138,14 @@ class UpdateCristinProjectHandlerTest {
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
     }
 
-    @Test
-    void shouldReturnBadRequestWhenFundingIsMissingRequiredFieldFundingSourceCode() throws IOException {
+    @ParameterizedTest(name = "Exception for field {0} with message {2}")
+    @MethodSource("badRequestProvider")
+    void shouldReturnBadRequestOnInvalidJson(String field, JsonNode json, String exceptionMessage) throws IOException {
         var input = minimalJsonProject();
-        var fundingWithoutRequiredFieldCode = new Funding(new FundingSource(randomNamesMap(), null), randomString());
-        input.putPOJO(FUNDING, List.of(fundingWithoutRequiredFieldCode));
-        GatewayResponse<Void> gatewayResponse = sendQuery(input.toPrettyString());
+        input.set(field, json);
+        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
 
-        assertThat(gatewayResponse.getBody(), containsString(FUNDING_MISSING_REQUIRED_FIELDS));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenFundingIsNotAnArray() throws IOException {
-        var input = minimalJsonProject();
-        var notAList = randomString();
-        input.put(FUNDING, notAList);
-        GatewayResponse<Void> gatewayResponse = sendQuery(input.toPrettyString());
-
-        assertThat(gatewayResponse.getBody(), containsString(format(MUST_BE_A_LIST, FUNDING)));
+        assertThat(gatewayResponse.getBody(), containsString(exceptionMessage));
     }
 
     @Test
@@ -223,5 +216,24 @@ class UpdateCristinProjectHandlerTest {
             .build();
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
+    }
+
+    private static Stream<Arguments> badRequestProvider() {
+        return Stream.of(
+            Arguments.of(FUNDING, fundingNotAnArray(), format(MUST_BE_A_LIST, FUNDING)),
+            Arguments.of(FUNDING, fundingWithoutRequiredFields(), FUNDING_MISSING_REQUIRED_FIELDS)
+        );
+    }
+
+    private static JsonNode fundingNotAnArray() {
+        return OBJECT_MAPPER.createObjectNode().put(FUNDING, randomString());
+    }
+
+    private static JsonNode fundingWithoutRequiredFields() {
+        var invalidFunding = OBJECT_MAPPER.createObjectNode();
+        var invalidSource = OBJECT_MAPPER.createObjectNode().put(randomString(), randomString());
+        invalidFunding.set(SOURCE, invalidSource);
+
+        return OBJECT_MAPPER.createArrayNode().add(invalidFunding);
     }
 }
