@@ -21,6 +21,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTI
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
@@ -33,12 +34,15 @@ import static nva.commons.core.attempt.Try.attempt;
 public class ProjectPatchValidator extends PatchValidator implements Validator<ObjectNode> {
 
     private static final Set<String> SUPPORTED_PATCH_FIELDS =
-            Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE, FUNDING, KEYWORDS);
+            Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE, FUNDING, KEYWORDS,
+                   PROJECT_CATEGORIES);
     public static final String UNSUPPORTED_FIELDS_IN_PAYLOAD = "Unsupported fields in payload %s";
     public static final String TITLE_MUST_HAVE_A_LANGUAGE = "Title must have a language associated";
     public static final String FUNDING_MISSING_REQUIRED_FIELDS = "Funding missing required fields";
     public static final String MUST_BE_A_LIST = "Field %s must be a list";
     public static final String KEYWORDS_MISSING_REQUIRED_FIELD_TYPE = "Keywords missing required field 'type'";
+    public static final String PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE = "ProjectCategories missing required "
+                                                                                + "field 'type'";
 
     /**
      * Validate changes to Project, both nullable fields and values.
@@ -57,6 +61,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         validateLanguage(input);
         validateFundingsIfPresent(input);
         validateKeywordsIfPresent(input);
+        validateProjectCategoriesIfPresent(input);
     }
 
     private static void validateTitleAndLanguage(ObjectNode input) throws BadRequestException {
@@ -127,22 +132,44 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     }
 
     private void validateKeywordsIfPresent(ObjectNode input) throws BadRequestException {
-        if (!input.has(KEYWORDS)) {
-            return;
-        }
-        if (input.get(KEYWORDS).isArray()) {
-            var keywordsArray = (ArrayNode) input.get(KEYWORDS);
-            for (JsonNode keyword : keywordsArray) {
-                validateKeyword(keyword);
-            }
-        } else {
-            throw new BadRequestException(format(MUST_BE_A_LIST, KEYWORDS));
+        if (input.has(KEYWORDS)) {
+            var keywords = input.get(KEYWORDS);
+            validateIsArray(keywords, KEYWORDS);
+            validateKeywords(keywords);
         }
     }
 
-    private void validateKeyword(JsonNode keyword) throws BadRequestException {
-        if (!keyword.has(TYPE) || keyword.get(TYPE).isNull() || keyword.get(TYPE).asText().isBlank()) {
-            throw new BadRequestException(KEYWORDS_MISSING_REQUIRED_FIELD_TYPE);
+    private void validateKeywords(JsonNode keywords) throws BadRequestException {
+        for (JsonNode keyword : keywords) {
+            if (typedValueFieldNotValid(keyword)) {
+                throw new BadRequestException(KEYWORDS_MISSING_REQUIRED_FIELD_TYPE);
+            }
+        }
+    }
+
+    private void validateProjectCategoriesIfPresent(ObjectNode input) throws BadRequestException {
+        if (input.has(PROJECT_CATEGORIES)) {
+            var projectCategories = input.get(PROJECT_CATEGORIES);
+            validateIsArray(projectCategories, PROJECT_CATEGORIES);
+            validateEachProjectCategory(projectCategories);
+        }
+    }
+
+    private void validateEachProjectCategory(JsonNode projectCategories) throws BadRequestException {
+        for (JsonNode node : projectCategories) {
+            if (typedValueFieldNotValid(node)) {
+                throw new BadRequestException(PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE);
+            }
+        }
+    }
+
+    private boolean typedValueFieldNotValid(JsonNode node) {
+        return !node.has(TYPE) || node.get(TYPE).isNull() || node.get(TYPE).asText().isBlank();
+    }
+
+    private void validateIsArray(JsonNode node, String fieldName) throws BadRequestException {
+        if (!node.isArray()) {
+            throw new BadRequestException(format(MUST_BE_A_LIST, fieldName));
         }
     }
 }

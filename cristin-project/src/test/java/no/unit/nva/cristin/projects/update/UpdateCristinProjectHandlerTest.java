@@ -13,6 +13,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
@@ -22,6 +23,7 @@ import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.FUNDING_MISSING_REQUIRED_FIELDS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.KEYWORDS_MISSING_REQUIRED_FIELD_TYPE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.UNSUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributors;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomLanguage;
@@ -188,6 +190,19 @@ class UpdateCristinProjectHandlerTest {
         GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
 
         assertThat(gatewayResponse.getBody(), containsString(KEYWORDS_MISSING_REQUIRED_FIELD_TYPE));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenProjectCategoriesIsMissingRequiredFieldType() throws IOException {
+        var input = minimalJsonProject();
+        var invalidCategoryElement = OBJECT_MAPPER.createObjectNode();
+        invalidCategoryElement.put(randomString(), randomString());
+        var categoryArray = OBJECT_MAPPER.createArrayNode();
+        categoryArray.add(invalidCategoryElement);
+        input.set(PROJECT_CATEGORIES, categoryArray);
+        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
+
+        assertThat(gatewayResponse.getBody(), containsString(PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE));
     }
 
     private void mockUpstream(HttpClient mockHttpClient) throws IOException, InterruptedException {

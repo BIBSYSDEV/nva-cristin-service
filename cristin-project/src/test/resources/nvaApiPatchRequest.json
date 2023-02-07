@@ -31,5 +31,10 @@
     {
       "type": "4245"
     }
+  ],
+  "projectCategories": [
+    {
+      "type": "PHD"
+    }
   ]
 }

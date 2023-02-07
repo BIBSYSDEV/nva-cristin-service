@@ -28,10 +28,12 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
@@ -65,6 +67,7 @@ public class CristinProjectPatchJsonCreator {
         addEndDateIfPresent();
         addFundingIfPresent();
         addKeywordsIfPresent();
+        addProjectCategoriesIfPresent();
         return this;
     }
 
@@ -146,15 +149,25 @@ public class CristinProjectPatchJsonCreator {
 
     private void addKeywordsIfPresent() {
         if (input.has(KEYWORDS)) {
-            if (input.get(KEYWORDS).isNull()) {
-                output.putNull(KEYWORDS);
-            }
-
-            var cristinKeywords = new ArrayList<CristinTypedLabel>();
-            ArrayNode keywords = (ArrayNode) input.get(KEYWORDS);
-            keywords.forEach(node -> cristinKeywords.add(new CristinTypedLabel(node.get(TYPE).asText(), null)));
-
-            output.set(KEYWORDS, OBJECT_MAPPER.valueToTree(cristinKeywords));
+            addTypedLabelsUsingFieldNames(KEYWORDS, KEYWORDS);
         }
+    }
+
+    private void addProjectCategoriesIfPresent() {
+        if (input.has(PROJECT_CATEGORIES)) {
+            addTypedLabelsUsingFieldNames(PROJECT_CATEGORIES, CRISTIN_PROJECT_CATEGORIES);
+        }
+    }
+
+    private void addTypedLabelsUsingFieldNames(String fieldName, String outputFieldName) {
+        if (input.get(fieldName).isNull()) {
+            output.putNull(fieldName);
+        }
+
+        var cristinLabels = new ArrayList<CristinTypedLabel>();
+        ArrayNode labels = (ArrayNode) input.get(fieldName);
+        labels.forEach(node -> cristinLabels.add(new CristinTypedLabel(node.get(TYPE).asText(), null)));
+
+        output.set(outputFieldName, OBJECT_MAPPER.valueToTree(cristinLabels));
     }
 }

@@ -45,6 +45,11 @@ Feature: API tests for Cristin Project Update
         {
           'type': '4245'
         }
+      ],
+      'projectCategories': [
+        {
+          'type': 'PHD'
+        }
       ]
     }
     """
