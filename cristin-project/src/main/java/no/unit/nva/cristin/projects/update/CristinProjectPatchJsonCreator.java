@@ -165,7 +165,7 @@ public class CristinProjectPatchJsonCreator {
         }
 
         var cristinLabels = new ArrayList<CristinTypedLabel>();
-        ArrayNode labels = (ArrayNode) input.get(fieldName);
+        var labels = (ArrayNode) input.get(fieldName);
         labels.forEach(node -> cristinLabels.add(new CristinTypedLabel(node.get(TYPE).asText(), null)));
 
         output.set(outputFieldName, OBJECT_MAPPER.valueToTree(cristinLabels));
