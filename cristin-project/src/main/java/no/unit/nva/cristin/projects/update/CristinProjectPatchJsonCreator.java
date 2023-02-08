@@ -10,6 +10,7 @@ import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
+import no.unit.nva.language.Language;
 import no.unit.nva.model.Organization;
 
 import java.net.URI;
@@ -32,6 +33,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
+import static no.unit.nva.language.LanguageConstants.UNDEFINED_LANGUAGE;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.CustomInstantSerializer.addMillisToInstantString;
 import static nva.commons.core.attempt.Try.attempt;
@@ -55,7 +57,7 @@ public class CristinProjectPatchJsonCreator {
      * title coordinating_institution institutions_responsible_for_research start_date end_date participants
      */
     public CristinProjectPatchJsonCreator create() {
-        addTitleAndLanguageIfBothPresent();
+        addTitleAndLanguageIfPresent();
         addCoordinatingInstitutionIfPresent();
         addContributorsIfPresent();
         addStartDateIfPresent();
@@ -64,11 +66,27 @@ public class CristinProjectPatchJsonCreator {
         return this;
     }
 
-    private void addTitleAndLanguageIfBothPresent() {
+    private void addTitleAndLanguageIfPresent() {
         var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
-        if (nonNull(language)) {
-            output.set(TITLE, OBJECT_MAPPER.valueToTree(Map.of(language.getIso6391Code(), input.get(TITLE).asText())));
+        var title = input.get(TITLE);
+        if (nonNull(language) && nonNull(title)) {
+            updateLanguage(language, title);
+        } else if (nonNull(language) && isSupportedLanguage(language)) {
+            eraseLanguage(language);
         }
+    }
+
+    private void updateLanguage(Language language, JsonNode title) {
+        output.set(TITLE, OBJECT_MAPPER.valueToTree(Map.of(language.getIso6391Code(), title.asText())));
+    }
+
+    private void eraseLanguage(Language language) {
+        var languageToBeErased = OBJECT_MAPPER.createObjectNode().putNull(language.getIso6391Code());
+        output.set(TITLE, languageToBeErased);
+    }
+
+    private boolean isSupportedLanguage(Language language) {
+        return !UNDEFINED_LANGUAGE.equals(language);
     }
 
     private void addCoordinatingInstitutionIfPresent() {
