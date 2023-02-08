@@ -90,7 +90,7 @@ Feature: API tests for Cristin Project retrieve and search
           'name': 'REK'
         }
       ],
-      'funding-CURRENTLY-UNSUPPORTED': [
+      'funding': [
         {
           'type': 'Funding',
           'source': {
@@ -100,7 +100,7 @@ Feature: API tests for Cristin Project retrieve and search
           'code': '1234'
         }
       ],
-      'keywords-CURRENTLY-UNSUPPORTED': [
+      'keywords': [
         {
           'type': '5686'
         },
@@ -116,7 +116,7 @@ Feature: API tests for Cristin Project retrieve and search
       'relatedProjects': [
         'https://api.dev.nva.aws.unit.no/cristin/project/6721135'
       ],
-      'contactInfo-CURRENTLY-UNSUPPORTED': {
+      'contactInfo': {
         'type': 'ContactInfo',
         'contactPerson': 'Navn Navnesen',
         'institution': 'Universitetet i Oslo',
