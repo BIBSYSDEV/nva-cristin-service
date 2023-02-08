@@ -50,6 +50,16 @@ Feature: API tests for Cristin Project retrieve and search
             'type': 'Organization',
             'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
           }
+        },
+        {
+          'type': 'ProjectParticipant',
+          'identity': {
+            'type': 'Person',
+            'email': 'ola.borte.moen@example.org',
+            'phone': '12345678',
+            'firstName':'Ola',
+            'lastName':'Borte'
+          }
         }
       ],
       'academicSummary': {
