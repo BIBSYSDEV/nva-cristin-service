@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects;
 
+import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
@@ -7,6 +8,7 @@ import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
+import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
@@ -28,8 +30,6 @@ import java.util.stream.IntStream;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
-import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.validClinicalTrialPhases;
-import static no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.validHealthProjectTypes;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.TYPE;
@@ -112,9 +112,9 @@ public class RandomProjectDataGenerator {
     }
 
     private static HealthProjectData randomHealthProjectData() {
-        return new HealthProjectData(randomElement(validHealthProjectTypes),
+        return new HealthProjectData(randomElement(HealthProjectType.values()),
                                      randomNamesMap(),
-                                     randomElement(validClinicalTrialPhases));
+                                     randomElement(ClinicalTrialPhase.values()));
     }
 
     private static URI randomRelatedProjects() {
@@ -195,7 +195,8 @@ public class RandomProjectDataGenerator {
     }
 
     private static Person randomPerson() {
-        return new Person(semiRandomPersonId(randomString()), randomString(), randomString());
+        return new Person(semiRandomPersonId(randomString()), randomString(), randomString(),
+                          randomString() + EMAIL_DOMAIN, randomString());
     }
 
     private static List<Funding> randomFundings() {

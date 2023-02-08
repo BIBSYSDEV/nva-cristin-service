@@ -1691,21 +1691,21 @@ components:
           properties:
             type:
               type: string
-              description: 'Health project classification. DRUGSTUDY: Drug study (en), Legemiddelstudium (nb), Legemedelstudium (nn); OTHERCLIN: Other clinical trial (en), Annet klinisk behandlingsstudium (nb), Anna klinisk behandlingsstudium (nn); OTHERSTUDY: Other study (en), Annet studium (nb), Anna studium (nn).'
+              description: 'Health project classification. Drugstudy: Drug study (en), Legemiddelstudium (nb), Legemedelstudium (nn); Otherclin: Other clinical trial (en), Annet klinisk behandlingsstudium (nb), Anna klinisk behandlingsstudium (nn); Otherstudy: Other study (en), Annet studium (nb), Anna studium (nn).'
               enum:
-                - DRUGSTUDY
-                - OTHERCLIN
-                - OTHERSTUDY
+                - Drugstudy
+                - Otherclin
+                - Otherstudy
             label:
               $ref: '#/components/schemas/Languages'
             clinicalTrialPhase:
               type: string
-              description: 'Mandatory if type is DRUGSTUDY.'
+              description: 'Mandatory if type is Drugstudy.'
               enum:
-                - 1
-                - 2
-                - 3
-                - 4
+                - PhaseI
+                - PhaseII
+                - PhaseIII
+                - PhaseIV
     ProjectPost:
       type: object
       properties:
@@ -1742,7 +1742,7 @@ components:
           $ref: '#/components/schemas/Organization'
         contributors:
           type: array
-          description: List of contributors on the project
+          description: List of contributors on the project (ProjectManager is required and needs an identity)
           items:
             type: object
             description: One contributor
@@ -1762,6 +1762,23 @@ components:
                     type: string
                     pattern: 'Person'
                     description: Type of identity. Always Person
+                  firstName:
+                    type: string
+                    pattern: '.+'
+                    description: First name (needed if identity is missing)
+                  lastName:
+                    type: string
+                    pattern: '.+'
+                    description: Last name (needed if identity is missing)
+                  email:
+                    type: string
+                    pattern: '.*'
+                    description: Email
+                  phone:
+                    type: string
+                    pattern: '.*'
+                    description: Phone number
+
               affiliation:
                 $ref: '#/components/schemas/Organization'
         status:
@@ -1790,19 +1807,19 @@ components:
           properties:
             type:
               type: string
-              description: 'Health project classification. DRUGSTUDY: Drug study (en), Legemiddelstudium (nb), Legemedelstudium (nn); OTHERCLIN: Other clinical trial (en), Annet klinisk behandlingsstudium (nb), Anna klinisk behandlingsstudium (nn); OTHERSTUDY: Other study (en), Annet studium (nb), Anna studium (nn).'
+              description: 'Health project classification. Drugstudy: Drug study (en), Legemiddelstudium (nb), Legemedelstudium (nn); Otherclin: Other clinical trial (en), Annet klinisk behandlingsstudium (nb), Anna klinisk behandlingsstudium (nn); Otherstudy: Other study (en), Annet studium (nb), Anna studium (nn).'
               enum:
-                - DRUGSTUDY
-                - OTHERCLIN
-                - OTHERSTUDY
+                - Drugstudy
+                - Otherclin
+                - Otherstudy
             clinicalTrialPhase:
               type: string
-              description: 'Mandatory if type is DRUGSTUDY.'
+              description: 'Mandatory if type is Drugstudy.'
               enum:
-                - 1
-                - 2
-                - 3
-                - 4
+                - PhaseI
+                - PhaseII
+                - PhaseIII
+                - PhaseIV
         funding:
           type: array
           description: Fundings for this project
@@ -2587,10 +2604,10 @@ components:
               - type: 'Organization'
                 id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             healthProjectData:
-              type: 'DRUGSTUDY'
+              type: 'Drugstudy'
               label:
                 en: 'Drug study'
-              clinicalTrialPhase: '3'
+              clinicalTrialPhase: 'PhaseIII'
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2685,10 +2702,10 @@ components:
           - type: 'Organization'
             id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
         healthProjectData:
-          type: 'DRUGSTUDY'
+          type: 'Drugstudy'
           label:
             en: 'Drug study'
-          clinicalTrialPhase: '3'
+          clinicalTrialPhase: 'PhaseIII'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2733,6 +2750,16 @@ components:
             affiliation:
               type: 'Organization'
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+          - type: 'ProjectParticipant'
+            identity:
+              type: 'Person'
+              FirstName: 'Kjell Ola'
+              LastName: 'Nordmann'
+              Email: 'ola.nordmann@example.org'
+              Phone: '12345678'
+            affiliation:
+              type: 'Organization'
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
         status: CONCLUDED
         academicSummary:
           en: "Summary in an academic manner"
@@ -2746,8 +2773,8 @@ components:
           - type: 'Organization'
             id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
         healthProjectData:
-          type: 'DRUGSTUDY'
-          clinicalTrialPhase: '3'
+          type: 'Drugstudy'
+          clinicalTrialPhase: 'PhaseIII'
         funding:
           - type: 'Funding'
             source:

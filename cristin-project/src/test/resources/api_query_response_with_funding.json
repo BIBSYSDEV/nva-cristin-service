@@ -49,7 +49,9 @@
             "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
-            "lastName": "Nordmann"
+            "lastName": "Nordmann",
+            "email": "ola.nordmann@example.org",
+            "phone": "12345678"
           },
           "affiliation": {
             "type": "Organization",
@@ -122,11 +124,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       }
     },
     {
@@ -170,7 +172,9 @@
             "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
-            "lastName": "Nordmann"
+            "lastName": "Nordmann",
+            "email": "ola.nordmann@example.org",
+            "phone": "12345678"
           },
           "affiliation": {
             "type": "Organization",
@@ -243,11 +247,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       }
     },
     {
@@ -291,7 +295,9 @@
             "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
-            "lastName": "Nordmann"
+            "lastName": "Nordmann",
+            "email": "ola.nordmann@example.org",
+            "phone": "12345678"
           },
           "affiliation": {
             "type": "Organization",
@@ -364,11 +370,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       }
     },
     {
@@ -412,7 +418,9 @@
             "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
-            "lastName": "Nordmann"
+            "lastName": "Nordmann",
+            "email": "ola.nordmann@example.org",
+            "phone": "12345678"
           },
           "affiliation": {
             "type": "Organization",
@@ -485,11 +493,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       }
     },
     {
@@ -533,7 +541,9 @@
             "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
-            "lastName": "Nordmann"
+            "lastName": "Nordmann",
+            "email": "ola.nordmann@example.org",
+            "phone": "12345678"
           },
           "affiliation": {
             "type": "Organization",
@@ -606,11 +616,11 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
+        "clinicalTrialPhase": "PhaseIII"
       }
     }
   ]

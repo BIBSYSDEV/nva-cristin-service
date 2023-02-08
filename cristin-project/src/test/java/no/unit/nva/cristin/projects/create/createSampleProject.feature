@@ -50,6 +50,16 @@ Feature: API tests for Cristin Project retrieve and search
             'type': 'Organization',
             'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
           }
+        },
+        {
+          'type': 'ProjectParticipant',
+          'identity': {
+            'type': 'Person',
+            'email': 'ola.borte.moen@example.org',
+            'phone': '12345678',
+            'firstName':'Ola',
+            'lastName':'Borte'
+          }
         }
       ],
       'academicSummary': {
@@ -71,8 +81,8 @@ Feature: API tests for Cristin Project retrieve and search
         }
       ],
       'healthProjectData': {
-        'type': 'DRUGSTUDY',
-        'clinicalTrialPhase': '3'
+        'type': 'Drugstudy',
+        'clinicalTrialPhase': 'PhaseIII'
       },
       'externalSources': [{
           'type': 'ExternalSource',
@@ -135,6 +145,7 @@ Feature: API tests for Cristin Project retrieve and search
     {
       'title': 'Example Title',
       'startDate': '2012-01-09T00:00:00.000Z',
+      'endDate': '2030-01-09T00:00:00.000Z',
       'coordinatingInstitution': {
         'type': 'Organization',
         'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
