@@ -149,6 +149,14 @@ class UpdateCristinProjectHandlerTest {
                    equalTo(OBJECT_MAPPER.readTree(expectedPayload)));
     }
 
+    @Test
+    void shouldAllowErasingFundingsBySendingItAsNullValue() throws IOException {
+        var input = OBJECT_MAPPER.createObjectNode().putNull(FUNDING);
+        var gatewayResponse = sendQuery(input.toString());
+
+        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
     private void mockUpstream(HttpClient mockHttpClient) throws IOException, InterruptedException {
         var httpResponse = new HttpResponseFaker("", 204);
         when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);

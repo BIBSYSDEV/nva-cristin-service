@@ -102,7 +102,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     }
 
     private static void validateFundingsIfPresent(ObjectNode input) throws BadRequestException {
-        if (!input.has(FUNDING)) {
+        if (!input.has(FUNDING) || input.get(FUNDING).isNull()) {
             return;
         }
         if (input.get(FUNDING).isArray()) {

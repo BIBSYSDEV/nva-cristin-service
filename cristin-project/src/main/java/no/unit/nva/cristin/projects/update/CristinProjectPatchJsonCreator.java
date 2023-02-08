@@ -67,12 +67,14 @@ public class CristinProjectPatchJsonCreator {
     }
 
     private void addTitleAndLanguageIfPresent() {
-        var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
-        var title = input.get(TITLE);
-        if (nonNull(language) && nonNull(title)) {
-            updateLanguage(language, title);
-        } else if (nonNull(language) && isSupportedLanguage(language)) {
-            eraseLanguage(language);
+        if (input.has(LANGUAGE)) {
+            var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
+            var title = input.get(TITLE);
+            if (nonNull(language) && nonNull(title)) {
+                updateLanguage(language, title);
+            } else if (nonNull(language) && isSupportedLanguage(language)) {
+                eraseLanguage(language);
+            }
         }
     }
 
@@ -136,6 +138,7 @@ public class CristinProjectPatchJsonCreator {
         if (input.has(FUNDING)) {
             if (input.get(FUNDING).isNull()) {
                 output.putNull(PROJECT_FUNDING_SOURCES);
+                return;
             }
 
             var cristinFundingSources = new ArrayList<CristinFundingSource>();
