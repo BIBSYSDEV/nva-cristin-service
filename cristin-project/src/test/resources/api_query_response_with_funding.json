@@ -135,7 +135,7 @@
         "date" : "2017-04-26T00:00:00Z",
         "authority" : "Rek",
         "status" : "Approved",
-        "applicationCode" : "EtichAppr",
+        "applicationCode" : "EthicalApproval",
         "identifier" : "2017/800",
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
@@ -269,7 +269,7 @@
         "date" : "2017-04-26T00:00:00Z",
         "authority" : "Rek",
         "status" : "Approved",
-        "applicationCode" : "EtichAppr",
+        "applicationCode" : "EthicalApproval",
         "identifier" : "2017/800",
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
@@ -403,7 +403,7 @@
         "date" : "2017-04-26T00:00:00Z",
         "authority" : "Rek",
         "status" : "Approved",
-        "applicationCode" : "EtichAppr",
+        "applicationCode" : "EthicalApproval",
         "identifier" : "2017/800",
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
@@ -537,7 +537,7 @@
         "date" : "2017-04-26T00:00:00Z",
         "authority" : "Rek",
         "status" : "Approved",
-        "applicationCode" : "EtichAppr",
+        "applicationCode" : "EthicalApproval",
         "identifier" : "2017/800",
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
@@ -671,7 +671,7 @@
         "date" : "2017-04-26T00:00:00Z",
         "authority" : "Rek",
         "status" : "Approved",
-        "applicationCode" : "EtichAppr",
+        "applicationCode" : "EthicalApproval",
         "identifier" : "2017/800",
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"

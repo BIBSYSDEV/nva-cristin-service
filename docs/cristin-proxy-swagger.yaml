@@ -2033,15 +2033,30 @@ components:
               - Rejection
           applicationCode:
             type: string
-            description: 'These codes apply only for applications to the approval authorities. Only certain combinations of applicationCode and authority are allowed, see authority above. EtichAppr: Application for ethical approval of a health research project (en), Søknad om etisk godkjenning, Helseforskningsprosjekt (nb), Søknad om etisk godkjenning av helseforskingsprosjekt (nn); Biobank: Application for establishing a biobank (en), Søknad om etablering av biobank (nb), Søknad om etablering av biobank (nn); DrugTrial: Application for a clinical drug trial (en), Søknad om legemiddelutprøving (nb), Søknad om legemiddelutprøving (nn); BioTechN: Application for medical use of biotechnology (en), Søknad om medisinsk bruk av bioteknologi (nb), Søknad om medisinsk bruk av bioteknologi (nn); MedEquip: Application for clinical testing for medical equipment (en), Søknad om klinisk utprøving av medisinsk utstyr (nb), Søknad om klinisk utprøving av medisinsk utstyr (nn); TestAnimal: Application for testing on animals (en), Søknad om å utføre forsøk på dyr (nb), Søknad om å utføre forsøk på dyr (nn); SensInfo: Application for license tp process sensitive personal information (en), Søknad om konsesjon for behandling av sensitive personopplysninger (nb), Søknad om konsesjon for handsaming av sensitive personopplysingar(nn).'
+            description: 'These codes apply only for applications to the approval authorities. 
+            Only certain combinations of applicationCode and authority are allowed, see authority above. 
+            EthicalApproval: Application for ethical approval of a health research project (en), 
+            Søknad om etisk godkjenning, Helseforskningsprosjekt (nb), Søknad om etisk godkjenning av helseforskingsprosjekt (nn); 
+            BioBank: Application for establishing a biobank (en), Søknad om etablering av biobank (nb), 
+            Søknad om etablering av biobank (nn); 
+            DrugTrial: Application for a clinical drug trial (en), Søknad om legemiddelutprøving (nb), Søknad om legemiddelutprøving (nn); 
+            BioTechnology: Application for medical use of biotechnology (en), Søknad om medisinsk bruk av bioteknologi (nb), 
+            Søknad om medisinsk bruk av bioteknologi (nn); 
+            MedicalEquipment: Application for clinical testing for medical equipment (en), 
+            Søknad om klinisk utprøving av medisinsk utstyr (nb), Søknad om klinisk utprøving av medisinsk utstyr (nn); 
+            TestAnimal: Application for testing on animals (en), Søknad om å utføre forsøk på dyr (nb), 
+            Søknad om å utføre forsøk på dyr (nn); 
+            SensitiveInformation: Application for license tp process sensitive personal information (en), 
+            Søknad om konsesjon for behandling av sensitive personopplysninger (nb), 
+            Søknad om konsesjon for handsaming av sensitive personopplysingar(nn).'
             enum:
-              - EtichAppr
-              - Biobank
+              - EthicalApproval
+              - BioBank
               - DrugTrial
-              - BioTechN
-              - MedEquip
+              - BioTechnology
+              - MedicalEquipment
               - TestAnimal
-              - SensInfo
+              - SensitiveInformation
           identifier:
             type: string
             description: 'Reference ID used by the approval authority for this approval.'
@@ -2594,7 +2609,7 @@ components:
                 date: '2020-12-31T09:45:17Z'
                 authority: 'Rek'
                 status: 'Approved'
-                applicationCode: 'EtichAppr'
+                applicationCode: 'EthicalApproval'
                 identifier: '2017/800'
                 authorityName:
                   en: 'Regional committees for medical and health research ethics'
@@ -2701,7 +2716,7 @@ components:
             date: '2020-12-31T09:45:17Z'
             authority: 'Rek'
             status: 'Approved'
-            applicationCode: 'EtichAppr'
+            applicationCode: 'EthicalApproval'
             identifier: '2017/800'
             authorityName:
               en: 'Regional committees for medical and health research ethics'
@@ -2779,7 +2794,7 @@ components:
             date: '2020-12-31T09:45:17Z'
             authority: 'Rek'
             status: 'Approved'
-            applicationCode: 'EtichAppr'
+            applicationCode: 'EthicalApproval'
             identifier: '2017/800'
     OrganizationsExample:
       value:

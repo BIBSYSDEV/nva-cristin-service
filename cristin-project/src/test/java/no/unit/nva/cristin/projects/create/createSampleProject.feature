@@ -97,7 +97,7 @@ Feature: API tests for Cristin Project retrieve and search
           'date' : '2017-04-26T00:00:00.000Z',
           'authority' : 'Rek',
           'status' : 'Approved',
-          'applicationCode' : 'EtichAppr',
+          'applicationCode' : 'EthicalApproval',
           'identifier' : '2017/800'
         }
       ]
@@ -118,7 +118,7 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.approvals[0].date == '#present'
     And match response.approvals[0].authority == 'Rek'
     And match response.approvals[0].status == 'Approved'
-    And match response.approvals[0].applicationCode == 'EtichAppr'
+    And match response.approvals[0].applicationCode == 'EthicalApproval'
     And match response.approvals[0].identifier == '2017/800'
     And match response.approvals[0].authorityName == '#present'
     And print response
