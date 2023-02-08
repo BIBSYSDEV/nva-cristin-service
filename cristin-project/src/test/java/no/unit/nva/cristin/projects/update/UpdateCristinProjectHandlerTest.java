@@ -112,7 +112,7 @@ class UpdateCristinProjectHandlerTest {
         jsonObject.put(ALTERNATIVE_TITLES, randomNamesMap().toString());
         jsonObject.put(POPULAR_SCIENTIFIC_SUMMARY, randomNamesMap().toString());
         jsonObject.put(STATUS, randomStatus().toString());
-        GatewayResponse<Void> gatewayResponse = sendQuery(jsonObject.toString());
+        var gatewayResponse = sendQuery(jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
 
@@ -124,7 +124,7 @@ class UpdateCristinProjectHandlerTest {
     @ParameterizedTest(name = "Exception for field {0} with message {2}")
     @MethodSource("badRequestProvider")
     void shouldReturnBadRequestOnInvalidJson(String field, JsonNode input, String exceptionMessage) throws IOException {
-        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
+        var gatewayResponse = sendQuery(input.toString());
 
         assertThat(gatewayResponse.getBody(), containsString(exceptionMessage));
     }
@@ -167,7 +167,7 @@ class UpdateCristinProjectHandlerTest {
     }
 
     private GatewayResponse<Void> sendQuery(String body) throws IOException {
-        InputStream input = createRequest(body);
+        var input = createRequest(body);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
@@ -183,7 +183,7 @@ class UpdateCristinProjectHandlerTest {
     }
 
     private GatewayResponse<Void> queryWithoutRequiredAccessRights() throws IOException {
-        InputStream input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+        var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
             .withBody(EMPTY_JSON)
             .withPathParameters(validPath)
             .build();
