@@ -354,8 +354,8 @@ class CreateCristinProjectHandlerTest {
     }
 
     private Approval approvalWithOnlySomeFieldsPopulated() {
-        return new Approval(randomInstant(), ApprovalAuthority.DIRHEALTH, null, null,
-                            randomString(), null);
+        return new Approval(randomInstant(), ApprovalAuthority.NORWEGIAN_DIRECTORATE_OF_HEALTH, null,
+                            null, randomString(), null);
     }
 
     @Test

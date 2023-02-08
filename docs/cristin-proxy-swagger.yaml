@@ -2015,13 +2015,25 @@ components:
             description: 'Date of approval'
           authority:
             type: string
-            description: 'Approval authority. Only certain combinations of authority and applicationCode are allowed. Rek: Regional committees for medical and health research ethics (en), Regionale komitéer for medisinsk og helsefaglig forskningsetikk (Rek) (nb), Regionale komitéer for medisinsk og helsefaglig forskningsetikk (Rek) (nn), applicationCode: EtichAppr or Biobank; Nara: The Norwegian Animal Research Authority (en), Forsøksdyrutvalget (nb), Forsøksdyrutvalet (nn), applicationCode: TestAnimal; Ndpa: The Norwegian Data Protection Authority (en), Datatilsynet (nb), Datatilsynet (nn), applicationCode: SensInfo; Nma: Norwegian Medicines Agency (en), Statens legemiddelverk (nb), Statens legemiddelverk (nn), applicationCode: DrugTrial; Dirhealth: Norwegian Directorate of Health (en), Helsedirektoratet (nb), Helsedirektoratet (nn), applicationCode: BioTechN or MedEquip.'
+            description: 'Approval authority. Only certain combinations of authority and applicationCode are allowed. 
+            RegionalEthicalCommittees: Regional committees for medical and health research ethics (en), 
+            Regionale komitéer for medisinsk og helsefaglig forskningsetikk (REK) (nb), 
+            Regionale komitéer for medisinsk og helsefaglig forskningsetikk (REK) (nn), 
+            applicationCode: EthicalApproval or BioBank; 
+            NorwegianAnimalResearchAuthority: The Norwegian Animal Research Authority (en), Forsøksdyrutvalget (nb), Forsøksdyrutvalet (nn), 
+            applicationCode: TestAnimal; 
+            NorwegianDataProtectionAuthority: The Norwegian Data Protection Authority (en), Datatilsynet (nb), Datatilsynet (nn), 
+            applicationCode: SensitiveInformation; 
+            NorwegianMedicinesAgency: Norwegian Medicines Agency (en), Statens legemiddelverk (nb), Statens legemiddelverk (nn), 
+            applicationCode: DrugTrial; 
+            NorwegianDirectorateOfHealth: Norwegian Directorate of Health (en), Helsedirektoratet (nb), Helsedirektoratet (nn), 
+            applicationCode: BioTechnology or MedicalEquipment.'
             enum:
-              - Rek
-              - Nara
-              - Ndfa
-              - Nma
-              - Dirhealth
+              - RegionalEthicalCommittees
+              - NorwegianAnimalResearchAuthority
+              - NorwegianDataProtectionAuthority
+              - NorwegianMedicinesAgency
+              - NorwegianDirectorateOfHealth
           status:
             type: string
             description: 'Status of the application sent to the approval authority.'
@@ -2607,7 +2619,7 @@ components:
             approvals:
               - type: 'Approval'
                 date: '2020-12-31T09:45:17Z'
-                authority: 'Rek'
+                authority: 'RegionalEthicalCommittees'
                 status: 'Approved'
                 applicationCode: 'EthicalApproval'
                 identifier: '2017/800'
@@ -2714,7 +2726,7 @@ components:
         approvals:
           - type: 'Approval'
             date: '2020-12-31T09:45:17Z'
-            authority: 'Rek'
+            authority: 'RegionalEthicalCommittees'
             status: 'Approved'
             applicationCode: 'EthicalApproval'
             identifier: '2017/800'
@@ -2792,7 +2804,7 @@ components:
         approvals:
           - type: 'Approval'
             date: '2020-12-31T09:45:17Z'
-            authority: 'Rek'
+            authority: 'RegionalEthicalCommittees'
             status: 'Approved'
             applicationCode: 'EthicalApproval'
             identifier: '2017/800'

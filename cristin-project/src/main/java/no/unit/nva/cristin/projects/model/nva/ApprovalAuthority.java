@@ -8,11 +8,11 @@ import nva.commons.core.SingletonCollector;
 
 public enum ApprovalAuthority {
 
-    REK("Rek"),
-    NARA("Nara"),
-    NDPA("Ndpa"),
-    NMA("Nma"),
-    DIRHEALTH("Dirhealth");
+    REGIONAL_ETHICAL_COMMITTEES("RegionalEthicalCommittees"),
+    NORWEGIAN_ANIMAL_RESEARCH_AUTHORITY("NorwegianAnimalResearchAuthority"),
+    NORWEGIAN_DATA_PROTECTION_AUTHORITY("NorwegianDataProtectionAuthority"),
+    NORWEGIAN_MEDICINES_AGENCY("NorwegianMedicinesAgency"),
+    NORWEGIAN_DIRECTORATE_OF_HEALTH("NorwegianDirectorateOfHealth");
 
     public static final String ERROR_MESSAGE_TEMPLATE = "Supplied ApprovalAuthority is not valid expected one of: %s";
     public static final String DELIMITER = ", ";

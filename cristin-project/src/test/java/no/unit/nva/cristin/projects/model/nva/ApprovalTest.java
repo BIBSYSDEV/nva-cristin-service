@@ -13,7 +13,7 @@ public class ApprovalTest {
         String approvalString = "{\n"
                                 + "\"type\" : \"Approval\",\n"
                                 + "\"date\" : \"2009-03-13T09:17:50.326Z\",\n"
-                                + "\"authority\" : \"DIRHEALTH\",\n"
+                                + "\"authority\" : \"NorwegianDirectorateOfHealth\",\n"
                                 + "\"identifier\" : \"lwV7zz35TaM75kn\"\n"
                                 + "}";
 

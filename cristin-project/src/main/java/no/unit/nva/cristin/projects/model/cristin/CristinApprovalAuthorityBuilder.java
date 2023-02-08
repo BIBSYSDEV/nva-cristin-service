@@ -11,15 +11,15 @@ public class CristinApprovalAuthorityBuilder implements EnumBuilder<CristinAppro
     private static final Map<String, String> mapper = mapValues();
 
     public static final String CRISTIN_REK = "REK";
-    public static final String REK = "Rek";
+    public static final String REGIONAL_ETHICAL_COMMITTEES = "RegionalEthicalCommittees";
     public static final String CRISTIN_NARA = "NARA";
-    public static final String NARA = "Nara";
+    public static final String NORWEGIAN_ANIMAL_RESEARCH_AUTHORITY = "NorwegianAnimalResearchAuthority";
     public static final String CRISTIN_NDPA = "NDPA";
-    public static final String NDPA = "Ndpa";
+    public static final String NORWEGIAN_DATA_PROTECTION_AUTHORITY = "NorwegianDataProtectionAuthority";
     public static final String CRISTIN_NMA = "NMA";
-    public static final String NMA = "Nma";
+    public static final String NORWEGIAN_MEDICINES_AGENCY = "NorwegianMedicinesAgency";
     public static final String CRISTIN_DIRHEALTH = "DIRHEALTH";
-    public static final String DIRHEALTH = "Dirhealth";
+    public static final String NORWEGIAN_DIRECTORATE_OF_HEALTH = "NorwegianDirectorateOfHealth";
 
     @Override
     public ApprovalAuthority build(CristinApproval cristinApproval) {
@@ -41,10 +41,10 @@ public class CristinApprovalAuthorityBuilder implements EnumBuilder<CristinAppro
     }
 
     private static Map<String, String> mapValues() {
-        return Map.of(CRISTIN_REK, REK,
-                      CRISTIN_NARA, NARA,
-                      CRISTIN_NDPA, NDPA,
-                      CRISTIN_NMA, NMA,
-                      CRISTIN_DIRHEALTH, DIRHEALTH);
+        return Map.of(CRISTIN_REK, REGIONAL_ETHICAL_COMMITTEES,
+                      CRISTIN_NARA, NORWEGIAN_ANIMAL_RESEARCH_AUTHORITY,
+                      CRISTIN_NDPA, NORWEGIAN_DATA_PROTECTION_AUTHORITY,
+                      CRISTIN_NMA, NORWEGIAN_MEDICINES_AGENCY,
+                      CRISTIN_DIRHEALTH, NORWEGIAN_DIRECTORATE_OF_HEALTH);
     }
 }
