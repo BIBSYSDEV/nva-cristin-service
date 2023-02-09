@@ -65,5 +65,6 @@ public class JsonPropertyNames {
     public static final String PROJECT_MODIFIED_SINCE = "modified_since";
     public static final String BIOBANK_ID = "biobank";
     public static final String PROJECT_CATEGORIES = "projectCategories";
+    public static final String RELATED_PROJECTS = "relatedProjects";
 
 }

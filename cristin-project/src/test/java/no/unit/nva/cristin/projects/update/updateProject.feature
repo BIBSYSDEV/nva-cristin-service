@@ -50,6 +50,9 @@ Feature: API tests for Cristin Project Update
         {
           'type': 'PHD'
         }
+      ],
+      'relatedProjects': [
+        'https://api.dev.nva.aws.unit.no/cristin/project/483302'
       ]
     }
     """

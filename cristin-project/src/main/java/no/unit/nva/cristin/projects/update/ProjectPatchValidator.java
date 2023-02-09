@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.URI;
 import no.unit.nva.Validator;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.model.Organization;
@@ -22,12 +23,14 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
+import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
 import static no.unit.nva.cristin.projects.model.nva.Funding.CODE;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.core.attempt.Try.attempt;
 
 
@@ -35,7 +38,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
 
     private static final Set<String> SUPPORTED_PATCH_FIELDS =
             Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE, FUNDING, KEYWORDS,
-                   PROJECT_CATEGORIES);
+                   PROJECT_CATEGORIES, RELATED_PROJECTS);
     public static final String UNSUPPORTED_FIELDS_IN_PAYLOAD = "Unsupported fields in payload %s";
     public static final String TITLE_MUST_HAVE_A_LANGUAGE = "Title must have a language associated";
     public static final String FUNDING_MISSING_REQUIRED_FIELDS = "Funding missing required fields";
@@ -43,6 +46,8 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     public static final String KEYWORDS_MISSING_REQUIRED_FIELD_TYPE = "Keywords missing required field 'type'";
     public static final String PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE = "ProjectCategories missing required "
                                                                                 + "field 'type'";
+    public static final String MUST_BE_A_LIST_OF_IDENTIFIERS = "RelatedProjects must be a list of identifiers, "
+                                                               + "numeric or URI";
 
     /**
      * Validate changes to Project, both nullable fields and values.
@@ -62,6 +67,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         validateFundingsIfPresent(input);
         validateKeywordsIfPresent(input);
         validateProjectCategoriesIfPresent(input);
+        validateRelatedProjects(input);
     }
 
     private static void validateTitleAndLanguage(ObjectNode input) throws BadRequestException {
@@ -170,6 +176,18 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     private void validateIsArray(JsonNode node, String fieldName) throws BadRequestException {
         if (!node.isArray()) {
             throw new BadRequestException(format(MUST_BE_A_LIST, fieldName));
+        }
+    }
+
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+    private void validateRelatedProjects(ObjectNode input) throws BadRequestException {
+        if (input.has(RELATED_PROJECTS) && !input.get(RELATED_PROJECTS).isNull()) {
+            var relatedProjects = input.get(RELATED_PROJECTS);
+            validateIsArray(relatedProjects, RELATED_PROJECTS);
+            for (JsonNode project : relatedProjects) {
+                attempt(() -> extractLastPathElement(URI.create(project.asText())))
+                    .orElseThrow(failure -> new BadRequestException(MUST_BE_A_LIST_OF_IDENTIFIERS));
+            }
         }
     }
 }

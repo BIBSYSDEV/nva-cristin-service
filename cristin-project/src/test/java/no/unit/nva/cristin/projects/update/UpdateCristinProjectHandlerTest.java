@@ -11,6 +11,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
+import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNamesMap;
@@ -19,6 +20,7 @@ import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.FUNDING_MISSING_REQUIRED_FIELDS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.KEYWORDS_MISSING_REQUIRED_FIELD_TYPE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST_OF_IDENTIFIERS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.TITLE_MUST_HAVE_A_LANGUAGE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.UNSUPPORTED_FIELDS_IN_PAYLOAD;
@@ -63,6 +65,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
 class UpdateCristinProjectHandlerTest {
@@ -153,9 +156,10 @@ class UpdateCristinProjectHandlerTest {
                    equalTo(OBJECT_MAPPER.readTree(expectedPayload)));
     }
 
-    @Test
-    void shouldAllowErasingFundingsBySendingItAsNullValue() throws IOException {
-        var input = OBJECT_MAPPER.createObjectNode().putNull(FUNDING);
+    @ParameterizedTest(name = "Allowing null value for field {0}")
+    @ValueSource(strings = {"funding", "relatedProjects"})
+    void shouldAllowFieldsWhichCanBeNullable(String fieldName) throws IOException {
+        var input = OBJECT_MAPPER.createObjectNode().putNull(fieldName);
         var gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
@@ -197,19 +201,21 @@ class UpdateCristinProjectHandlerTest {
 
     private static Stream<Arguments> badRequestProvider() {
         return Stream.of(
-            Arguments.of(FUNDING, fundingNotAnArray(), format(MUST_BE_A_LIST, FUNDING)),
+            Arguments.of(FUNDING, notAnArray(FUNDING), format(MUST_BE_A_LIST, FUNDING)),
             Arguments.of(FUNDING, fundingWithoutRequiredFields(), FUNDING_MISSING_REQUIRED_FIELDS),
             Arguments.of(LANGUAGE, languageNotSupported(), format(ILLEGAL_VALUE_FOR_PROPERTY, LANGUAGE)),
             Arguments.of(LANGUAGE, titlePresentButNotLanguage(), TITLE_MUST_HAVE_A_LANGUAGE),
             Arguments.of(LANGUAGE, languageNotAValidValue(), COULD_NOT_PARSE_LANGUAGE_FIELD),
             Arguments.of(KEYWORDS, missingRequiredFieldType(KEYWORDS), KEYWORDS_MISSING_REQUIRED_FIELD_TYPE),
             Arguments.of(PROJECT_CATEGORIES, missingRequiredFieldType(PROJECT_CATEGORIES),
-                         PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE)
+                         PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE),
+            Arguments.of(RELATED_PROJECTS, notAnArray(RELATED_PROJECTS), format(MUST_BE_A_LIST, RELATED_PROJECTS)),
+            Arguments.of(RELATED_PROJECTS, notListOfStrings(), MUST_BE_A_LIST_OF_IDENTIFIERS)
         );
     }
 
-    private static JsonNode fundingNotAnArray() {
-        return OBJECT_MAPPER.createObjectNode().put(FUNDING, randomString());
+    private static JsonNode notAnArray(String fieldName) {
+        return OBJECT_MAPPER.createObjectNode().put(fieldName, randomString());
     }
 
     private static JsonNode fundingWithoutRequiredFields() {
@@ -243,6 +249,15 @@ class UpdateCristinProjectHandlerTest {
         var array = OBJECT_MAPPER.createArrayNode();
         array.add(invalidElement);
         input.set(field, array);
+        return input;
+    }
+
+    private static JsonNode notListOfStrings() {
+        var input = OBJECT_MAPPER.createObjectNode();
+        var objectField = OBJECT_MAPPER.createObjectNode().put(randomString(), randomString());
+        var array = OBJECT_MAPPER.createArrayNode();
+        array.add(objectField);
+        input.set(RELATED_PROJECTS, array);
         return input;
     }
 

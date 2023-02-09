@@ -1887,6 +1887,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TypedLabelPostPatch'
+        relatedProjects:
+          type: array
+          items:
+            type: string
+            description: URI or numeric value for the identifier of the related project
     Problem:
       type: object
       properties:
@@ -2679,6 +2684,8 @@ components:
           - type: '5686'
         projectCategories:
           - type: 'PHD'
+        relatedProjects:
+          - 'https://api.dev.nva.aws.unit.no/cristin/project/483302'
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
