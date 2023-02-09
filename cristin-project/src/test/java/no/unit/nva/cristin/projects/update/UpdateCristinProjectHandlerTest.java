@@ -11,7 +11,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
-import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNamesMap;
@@ -162,32 +161,6 @@ class UpdateCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
-    @Test
-    void shouldReturnBadRequestWhenKeywordsIsMissingRequiredFieldType() throws IOException {
-        var input = minimalJsonProject();
-        var invalidKeywordElement = OBJECT_MAPPER.createObjectNode();
-        invalidKeywordElement.put(randomString(), randomString());
-        var keywordArray = OBJECT_MAPPER.createArrayNode();
-        keywordArray.add(invalidKeywordElement);
-        input.set(KEYWORDS, keywordArray);
-        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
-
-        assertThat(gatewayResponse.getBody(), containsString(KEYWORDS_MISSING_REQUIRED_FIELD_TYPE));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenProjectCategoriesIsMissingRequiredFieldType() throws IOException {
-        var input = minimalJsonProject();
-        var invalidCategoryElement = OBJECT_MAPPER.createObjectNode();
-        invalidCategoryElement.put(randomString(), randomString());
-        var categoryArray = OBJECT_MAPPER.createArrayNode();
-        categoryArray.add(invalidCategoryElement);
-        input.set(PROJECT_CATEGORIES, categoryArray);
-        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
-
-        assertThat(gatewayResponse.getBody(), containsString(PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE));
-    }
-
     private void mockUpstream(HttpClient mockHttpClient) throws IOException, InterruptedException {
         var httpResponse = new HttpResponseFaker("", 204);
         when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
@@ -228,7 +201,10 @@ class UpdateCristinProjectHandlerTest {
             Arguments.of(FUNDING, fundingWithoutRequiredFields(), FUNDING_MISSING_REQUIRED_FIELDS),
             Arguments.of(LANGUAGE, languageNotSupported(), format(ILLEGAL_VALUE_FOR_PROPERTY, LANGUAGE)),
             Arguments.of(LANGUAGE, titlePresentButNotLanguage(), TITLE_MUST_HAVE_A_LANGUAGE),
-            Arguments.of(LANGUAGE, languageNotAValidValue(), COULD_NOT_PARSE_LANGUAGE_FIELD)
+            Arguments.of(LANGUAGE, languageNotAValidValue(), COULD_NOT_PARSE_LANGUAGE_FIELD),
+            Arguments.of(KEYWORDS, missingRequiredFieldType(KEYWORDS), KEYWORDS_MISSING_REQUIRED_FIELD_TYPE),
+            Arguments.of(PROJECT_CATEGORIES, missingRequiredFieldType(PROJECT_CATEGORIES),
+                         PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE)
         );
     }
 
@@ -258,6 +234,16 @@ class UpdateCristinProjectHandlerTest {
 
     private static JsonNode titlePresentButNotLanguage() {
         return OBJECT_MAPPER.createObjectNode().put(TITLE, randomString());
+    }
+
+    private static JsonNode missingRequiredFieldType(String field) {
+        var input = OBJECT_MAPPER.createObjectNode();
+        var invalidElement = OBJECT_MAPPER.createObjectNode();
+        invalidElement.put(randomString(), randomString());
+        var array = OBJECT_MAPPER.createArrayNode();
+        array.add(invalidElement);
+        input.set(field, array);
+        return input;
     }
 
 }
