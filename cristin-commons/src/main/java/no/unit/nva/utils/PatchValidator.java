@@ -17,6 +17,7 @@ public class PatchValidator {
 
     public static final String FIELD_CAN_NOT_BE_ERASED = "Field %s can not be erased";
     public static final String ILLEGAL_VALUE_FOR_PROPERTY = "Illegal value for '%s'";
+    public static final String COULD_NOT_PARSE_LANGUAGE_FIELD = "Could not parse language field";
 
     /**
      * Verifies input contains a valid language property.
@@ -38,7 +39,9 @@ public class PatchValidator {
      * @throws BadRequestException thrown when language uri is not valid
      */
     public static void validateLanguageUri(JsonNode jsonNode) throws BadRequestException {
-        if (getLanguageByUri(URI.create(jsonNode.textValue())).equals(UNDEFINED_LANGUAGE)) {
+        var languageUri = attempt(() -> URI.create(jsonNode.textValue()))
+                              .orElseThrow(failure -> new BadRequestException(COULD_NOT_PARSE_LANGUAGE_FIELD));
+        if (UNDEFINED_LANGUAGE.equals(getLanguageByUri(languageUri))) {
             throw new BadRequestException(String.format(ILLEGAL_VALUE_FOR_PROPERTY, LANGUAGE));
         }
     }
