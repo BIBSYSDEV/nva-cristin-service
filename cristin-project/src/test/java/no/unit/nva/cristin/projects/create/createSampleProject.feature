@@ -100,7 +100,40 @@ Feature: API tests for Cristin Project retrieve and search
           'applicationCode' : 'EthicalApproval',
           'identifier' : '2017/800'
         }
-      ]
+      ],
+      'funding': [
+        {
+          'type': 'Funding',
+          'source': {
+            'type': 'FundingSource',
+            'code': 'NFR'
+          },
+          'code': '1234'
+        }
+      ],
+      'keywords': [
+        {
+          'type': '5686'
+        },
+        {
+          'type': '4245'
+        }
+      ],
+      'projectCategories': [
+        {
+          'type': 'PHD'
+        }
+      ],
+      'relatedProjects': [
+        'https://api.dev.nva.aws.unit.no/cristin/project/6721135'
+      ],
+      'contactInfo': {
+        'type': 'ContactInfo',
+        'contactPerson': 'Navn Navnesen',
+        'institution': 'Universitetet i Oslo',
+        'email': 'navn.navnesen@uio.no',
+        'phone': '99223344'
+      }
     }
     """
     Given url CRISTIN_BASE

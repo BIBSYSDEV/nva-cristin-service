@@ -36,7 +36,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
 import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
@@ -434,13 +433,8 @@ class CreateCristinProjectHandlerTest {
             .build();
     }
 
-    //TODO: Remove each of these when supported by POST
     private void removeFieldsNotSupportedByPost(NvaProject expected) {
-        expected.setContactInfo(null);
         expected.setFundingAmount(null);
-        expected.setProjectCategories(Collections.emptyList());
-        expected.setKeywords(Collections.emptyList());
-        expected.setRelatedProjects(Collections.emptyList());
     }
 
     private String getProjectPostRequestJsonSample() {

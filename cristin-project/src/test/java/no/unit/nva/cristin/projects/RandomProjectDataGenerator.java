@@ -30,10 +30,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import nva.commons.core.paths.UriWrapper;
 
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.TYPE;
@@ -44,7 +44,6 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
-import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -136,7 +135,7 @@ public class RandomProjectDataGenerator {
     }
 
     private static URI randomRelatedProjects() {
-        return UriWrapper.fromUri(randomUri()).addChild(randomInteger(99999).toString()).getUri();
+        return semiRandomProjectId(randomInteger(99999).toString());
     }
 
     private static ExternalSource randomExternalSource() {
@@ -189,6 +188,10 @@ public class RandomProjectDataGenerator {
 
     private static URI semiRandomOrganizationId(String identifier) {
         return getNvaApiId(identifier, ORGANIZATION_PATH);
+    }
+
+    private static URI semiRandomProjectId(String identifier) {
+        return getNvaApiId(identifier, PROJECT_PATH_NVA);
     }
 
     public static List<NvaContributor> randomContributors() {

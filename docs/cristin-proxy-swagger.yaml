@@ -1372,6 +1372,14 @@ paths:
         502:
           $ref: '#/components/responses/502'
   /funding-sources/{identifier}:
+    parameters:
+      - name: identifier
+        in: path
+        description: Identifier of funding source
+        required: true
+        schema:
+          type: string
+        example: 'NFR'
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -1816,6 +1824,47 @@ components:
                 - PhaseIV
         approvals:
           $ref: '#/components/schemas/Approvals'
+        funding:
+          type: array
+          description: Fundings for this project
+          items:
+            $ref: '#/components/schemas/FundingPost'
+        keywords:
+          type: array
+          description: Project keywords
+          items:
+            properties:
+              code:
+                type: string
+                description: Keyword code
+        projectCategories:
+          type: array
+          description: Project categories
+          items:
+            properties:
+              code:
+                type: string
+                description: project category code
+        relatedProjects:
+          type: array
+          items:
+            type: string
+            description: URI to the related project
+        contactInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              pattern: 'ContactInfo'
+              description: Always ContactInfo
+            contactPerson:
+              type: string
+            organization:
+              type: string
+            email:
+              type: string
+            phone:
+              type: string
     ProjectPatch:
       type: object
       properties:
@@ -2074,6 +2123,26 @@ components:
             description: 'Reference ID used by the approval authority for this approval.'
           authorityName:
             $ref: '#/components/schemas/Languages'
+    FundingPost:
+      type: object
+      description: Funding creation
+      properties:
+        type:
+          type: string
+          pattern: 'Funding'
+          description: Always Funding
+        code:
+          type: string
+          description: Project code of the funding
+        source:
+          properties:
+            type:
+              type: string
+              pattern: 'FundingSource'
+              description: Always FundingSource
+            code:
+              type: string
+              description: Code of the funding source, like NFR
     Persons:
       type: object
       properties:
@@ -2808,6 +2877,25 @@ components:
             status: 'Approved'
             applicationCode: 'EthicalApproval'
             identifier: '2017/800'
+        funding:
+          - type: 'Funding'
+            source:
+              type: 'FundingSource'
+              code: 'NFR'
+            code: '1234'
+        keywords:
+          - code: '4245'
+          - code: '5686'
+        projectCategories:
+          - code: 'PHD'
+        relatedProjects:
+          - 'https://api.dev.nva.aws.unit.no/cristin/project/21500'
+        contactInfo:
+          type: 'ContactInfo'
+          contactPerson: 'Navn Navnesen'
+          organization: 'Universitetet i Oslo'
+          email: 'navn.navnesen@uio.no'
+          phone: '99223344'
     OrganizationsExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
