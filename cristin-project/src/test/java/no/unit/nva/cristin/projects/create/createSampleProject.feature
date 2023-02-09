@@ -84,10 +84,21 @@ Feature: API tests for Cristin Project retrieve and search
         'type': 'Drugstudy',
         'clinicalTrialPhase': 'PhaseIII'
       },
-      'externalSources': [{
+      'externalSources': [
+        {
           'type': 'ExternalSource',
           'identifier': '123456',
           'name': 'REK'
+        }
+      ],
+      'approvals': [
+        {
+          'type' : 'Approval',
+          'date' : '2017-04-26T00:00:00.000Z',
+          'authority' : 'RegionalEthicalCommittees',
+          'status' : 'Approved',
+          'applicationCode' : 'EthicalApproval',
+          'identifier' : '2017/800'
         }
       ],
       'funding': [
@@ -137,6 +148,12 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.method == '#present'
     And match response.equipment == '#present'
     And match response.institutionsResponsibleForResearch[0].id == '#present'
+    And match response.approvals[0].date == '#present'
+    And match response.approvals[0].authority == 'RegionalEthicalCommittees'
+    And match response.approvals[0].status == 'Approved'
+    And match response.approvals[0].applicationCode == 'EthicalApproval'
+    And match response.approvals[0].identifier == '2017/800'
+    And match response.approvals[0].authorityName == '#present'
     And print response
 
   Scenario: Creating project with only minimum required data returns 201 Created

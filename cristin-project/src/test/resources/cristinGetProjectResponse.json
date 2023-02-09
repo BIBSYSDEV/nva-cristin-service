@@ -130,5 +130,15 @@
   "health_project_type_name" : {
     "en" : "Drug study"
   },
-  "clinical_trial_phase" : "3"
+  "clinical_trial_phase" : "3",
+  "approvals" : [ {
+    "approved_date" : "2017-04-26T00:00:00.000Z",
+    "approved_by" : "REK",
+    "approved_by_name" : {
+      "en" : "Regional committees for medical and health research ethics"
+    },
+    "approval_status" : "APPROVED",
+    "application_code" : "ETICHAPPR",
+    "approval_reference_id" : "2017/800"
+  } ]
 }
