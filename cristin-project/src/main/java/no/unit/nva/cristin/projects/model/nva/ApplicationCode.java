@@ -13,7 +13,7 @@ public enum ApplicationCode {
     DRUG_TRIAL("DrugTrial"),
     BIO_TECHNOLOGY("BioTechnology"),
     MEDICAL_EQUIPMENT("MedicalEquipment"),
-    TEST_ANIMAL("TestAnimal"),
+    ANIMAL_TESTING("AnimalTesting"),
     SENSITIVE_INFORMATION("SensitiveInformation");
 
     public static final String ERROR_MESSAGE_TEMPLATE = "Supplied ApplicationCode is not valid expected one of: %s";

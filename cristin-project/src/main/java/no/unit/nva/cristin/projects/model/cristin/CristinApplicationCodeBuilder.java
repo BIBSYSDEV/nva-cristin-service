@@ -21,7 +21,7 @@ public class CristinApplicationCodeBuilder implements EnumBuilder<CristinApprova
     public static final String CRISTIN_MEDEQUIP = "MEDEQUIP";
     public static final String MEDICAL_EQUIPMENT = "MedicalEquipment";
     public static final String CRISTIN_TESTANIMAL = "TESTANIMAL";
-    public static final String TEST_ANIMAL = "TestAnimal";
+    public static final String ANIMAL_TESTING = "AnimalTesting";
     public static final String CRISTIN_SENSINFO = "SENSINFO";
     public static final String SENSITIVE_INFORMATION = "SensitiveInformation";
 
@@ -50,7 +50,7 @@ public class CristinApplicationCodeBuilder implements EnumBuilder<CristinApprova
                       CRISTIN_DRUGTRIAL, DRUG_TRIAL,
                       CRISTIN_BIOTECHN, BIO_TECHNOLOGY,
                       CRISTIN_MEDEQUIP, MEDICAL_EQUIPMENT,
-                      CRISTIN_TESTANIMAL, TEST_ANIMAL,
+                      CRISTIN_TESTANIMAL, ANIMAL_TESTING,
                       CRISTIN_SENSINFO, SENSITIVE_INFORMATION);
     }
 

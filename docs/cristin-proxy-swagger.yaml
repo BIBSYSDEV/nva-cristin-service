@@ -2021,7 +2021,7 @@ components:
             Regionale komitéer for medisinsk og helsefaglig forskningsetikk (REK) (nn), 
             applicationCode: EthicalApproval or BioBank; 
             NorwegianAnimalResearchAuthority: The Norwegian Animal Research Authority (en), Forsøksdyrutvalget (nb), Forsøksdyrutvalet (nn), 
-            applicationCode: TestAnimal; 
+            applicationCode: AnimalTesting; 
             NorwegianDataProtectionAuthority: The Norwegian Data Protection Authority (en), Datatilsynet (nb), Datatilsynet (nn), 
             applicationCode: SensitiveInformation; 
             NorwegianMedicinesAgency: Norwegian Medicines Agency (en), Statens legemiddelverk (nb), Statens legemiddelverk (nn), 
@@ -2056,7 +2056,7 @@ components:
             Søknad om medisinsk bruk av bioteknologi (nn); 
             MedicalEquipment: Application for clinical testing for medical equipment (en), 
             Søknad om klinisk utprøving av medisinsk utstyr (nb), Søknad om klinisk utprøving av medisinsk utstyr (nn); 
-            TestAnimal: Application for testing on animals (en), Søknad om å utføre forsøk på dyr (nb), 
+            AnimalTesting: Application for testing on animals (en), Søknad om å utføre forsøk på dyr (nb), 
             Søknad om å utføre forsøk på dyr (nn); 
             SensitiveInformation: Application for license tp process sensitive personal information (en), 
             Søknad om konsesjon for behandling av sensitive personopplysninger (nb), 
@@ -2067,7 +2067,7 @@ components:
               - DrugTrial
               - BioTechnology
               - MedicalEquipment
-              - TestAnimal
+              - AnimalTesting
               - SensitiveInformation
           identifier:
             type: string
