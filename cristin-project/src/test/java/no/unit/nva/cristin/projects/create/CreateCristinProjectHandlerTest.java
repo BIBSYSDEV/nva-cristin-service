@@ -4,6 +4,7 @@ import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomApprovals;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithoutUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
@@ -12,6 +13,8 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrgani
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_ONE;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_THREE;
 import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.DRUGSTUDY;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -40,6 +43,8 @@ import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuild
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinHealthProjectTypeBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.Approval;
+import no.unit.nva.cristin.projects.model.nva.ApprovalAuthority;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
@@ -333,6 +338,46 @@ class CreateCristinProjectHandlerTest {
 
         assertThat(cristinHealthType, equalTo(CristinHealthProjectTypeBuilder.reverseLookup(nvaHealthType)));
         assertThat(cristinPhase, equalTo(CristinClinicalTrialPhaseBuilder.reverseLookup(nvaPhase)));
+    }
+
+    @Test
+    void shouldReturnCreatedWhenApprovalsHasPartialData() throws Exception {
+        var randomNvaProject = randomNvaProject();
+        randomNvaProject.setId(null);
+        var approvalWithOnlySomeFieldsPopulated = approvalWithOnlySomeFieldsPopulated();
+        randomNvaProject.setApprovals(List.of(approvalWithOnlySomeFieldsPopulated));
+
+        mockUpstreamUsingRequest(randomNvaProject);
+        var response = executeRequest(randomNvaProject);
+
+        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
+    }
+
+    private Approval approvalWithOnlySomeFieldsPopulated() {
+        return new Approval(randomInstant(), ApprovalAuthority.NORWEGIAN_DIRECTORATE_OF_HEALTH, null,
+                            null, randomString(), null);
+    }
+
+    @Test
+    void shouldHaveApprovalsInProjectPayloadWhenSendingToUpstream() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        var expectedApprovals = randomApprovals();
+        nvaProject.setApprovals(expectedApprovals);
+
+        mockUpstreamUsingRequest(nvaProject);
+        executeRequest(nvaProject);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+        var actualApprovals = capturedCristinProject.toNvaProject().getApprovals();
+
+        assertThat(actualApprovals, equalTo(expectedApprovals));
     }
 
     private String actualIdentifierFromOrganization(Organization organization) {

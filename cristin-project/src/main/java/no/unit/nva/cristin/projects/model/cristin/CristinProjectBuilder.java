@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.model.cristin;
 import java.net.URI;
 import java.util.Optional;
 import no.unit.nva.cristin.model.CristinOrganization;
+import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
@@ -64,8 +65,25 @@ public class CristinProjectBuilder {
         cristinProject.setHealthProjectTypeName(extractHealthProjectTypeName(nvaProject.getHealthProjectData()));
         cristinProject.setClinicalTrialPhase(extractHealthProjectClinicalTrialPhase(nvaProject.getHealthProjectData()));
         cristinProject.setExternalSources(extractExternalSources(nvaProject.getExternalSources()));
+        cristinProject.setApprovals(extractApprovals(nvaProject.getApprovals()));
 
         return cristinProject;
+    }
+
+    private List<CristinApproval> extractApprovals(List<Approval> approvals) {
+        return approvals.stream().map(this::toCristinApproval).collect(Collectors.toList());
+    }
+
+    /**
+     * Converts object of type Approval to object of type CristinApproval.
+     */
+    private CristinApproval toCristinApproval(Approval approval) {
+        return new CristinApproval(approval.getDate(),
+                                   CristinApprovalAuthorityBuilder.reverseLookup(approval.getAuthority()),
+                                   CristinApprovalStatusBuilder.reverseLookup(approval.getStatus()),
+                                   CristinApplicationCodeBuilder.reverseLookup(approval.getApplicationCode()),
+                                   approval.getIdentifier(),
+                                   approval.getAuthorityName());
     }
 
     private List<CristinExternalSource> extractExternalSources(List<ExternalSource> nvaExternalSources) {
