@@ -1,31 +1,10 @@
 {
-  "@context": "https://bibsysdev.github.io/src/project-context.json",
-  "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
   "type": "Project",
-  "identifiers": [
-    {
-      "type": "CristinIdentifier",
-      "value": "456789"
-    }
-  ],
   "title": "Example Title",
   "language": "http://lexvo.org/id/iso639-3/eng",
   "alternativeTitles": [],
   "startDate": "2018-11-01T00:00:00Z",
   "endDate": "2021-05-01T00:00:00Z",
-  "funding": [
-    {
-      "type": "Funding",
-      "source": {
-        "type": "FundingSource",
-        "names": {
-          "en": "Research Council of Norway (RCN)"
-        },
-        "code": "NFR"
-      },
-      "code": "654321"
-    }
-  ],
   "coordinatingInstitution": {
     "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
     "type": "Organization",
@@ -40,9 +19,7 @@
         "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
         "type": "Person",
         "firstName": "Ola",
-        "lastName": "Nordmann",
-        "email": "ola.nordmann@example.org",
-        "phone": "12345678"
+        "lastName": "Nordmann"
       },
       "affiliation": {
         "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
@@ -53,19 +30,10 @@
       }
     }
   ],
-  "status":"ACTIVE",
+  "status": "ACTIVE",
   "academicSummary": { },
   "popularScientificSummary": {
     "en": "<p>Some popular scientific summary</p>\r\n"
-  },
-  "publishable" : true,
-  "published" : true,
-  "created": {
-    "sourceShortName": "REK",
-    "date": "2019-12-31T09:45:17Z"
-  },
-  "lastModified": {
-    "date": "2019-12-31T09:48:20Z"
   },
   "contactInfo": {
     "type": "ContactInfo",
@@ -74,11 +42,6 @@
     "email": "helge@test.no",
     "phone": "44223355"
   },
-  "fundingAmount": {
-    "type": "FundingAmount",
-    "currency": "NOK",
-    "value": 5660000.0
-  },
   "method": {
     "en": "<p>\r\nSome method</p>\r\n"
   },
@@ -86,16 +49,10 @@
     "en": "<p>\r\nSome equipment</p>\r\n"
   },
   "projectCategories": [ {
-    "type": "APPLIEDRESEARCH",
-    "label": {
-      "en": "Applied Research"
-    }
+    "type": "APPLIEDRESEARCH"
   } ],
   "keywords": [ {
-    "type": "4837",
-    "label": {
-      "en": "Supply Chain"
-    }
+    "type": "4837"
   } ],
   "externalSources": [ {
     "type": "ExternalSource",
@@ -120,16 +77,5 @@
       "en": "Drug study"
     },
     "clinicalTrialPhase": "PhaseIII"
-  },
-  "approvals" : [ {
-    "type" : "Approval",
-    "date" : "2017-04-26T00:00:00Z",
-    "authority" : "RegionalEthicalCommittees",
-    "status" : "Approved",
-    "applicationCode" : "EthicalApproval",
-    "identifier" : "2017/800",
-    "authorityName" : {
-      "en" : "Regional committees for medical and health research ethics"
-    }
-  } ]
+  }
 }

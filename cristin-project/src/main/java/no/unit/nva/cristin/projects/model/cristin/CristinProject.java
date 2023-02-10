@@ -35,6 +35,7 @@ public class CristinProject implements JsonSerializable {
     public static final String HEALTH_PROJECT_TYPE = "health_project_type";
     public static final String HEALTH_PROJECT_TYPE_NAME = "health_project_type_name";
     public static final String CLINICAL_TRIAL_PHASE = "clinical_trial_phase";
+    public static final String APPROVALS = "approvals";
     public static final String EXEMPT_FROM_PUBLIC_DISCLOSURE = "exempt_from_public_disclosure";
 
     private String cristinProjectId;
@@ -78,6 +79,8 @@ public class CristinProject implements JsonSerializable {
     private Map<String, String> healthProjectTypeName;
     @JsonProperty(CLINICAL_TRIAL_PHASE)
     private String clinicalTrialPhase;
+    @JsonProperty(APPROVALS)
+    private List<CristinApproval> approvals;
     @JsonProperty(EXEMPT_FROM_PUBLIC_DISCLOSURE)
     private Boolean exemptFromPublicDisclosure;
 
@@ -297,6 +300,14 @@ public class CristinProject implements JsonSerializable {
         this.clinicalTrialPhase = clinicalTrialPhase;
     }
 
+    public List<CristinApproval> getApprovals() {
+        return nonEmptyOrDefault(approvals);
+    }
+
+    public void setApprovals(List<CristinApproval> approvals) {
+        this.approvals = approvals;
+    }
+
     public Boolean getExemptFromPublicDisclosure() {
         return exemptFromPublicDisclosure;
     }
@@ -356,6 +367,7 @@ public class CristinProject implements JsonSerializable {
                && Objects.equals(getHealthProjectType(), that.getHealthProjectType())
                && Objects.equals(getHealthProjectTypeName(), that.getHealthProjectTypeName())
                && Objects.equals(getClinicalTrialPhase(), that.getClinicalTrialPhase())
+               && Objects.equals(getApprovals(), that.getApprovals())
                && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure());
     }
 
@@ -368,7 +380,8 @@ public class CristinProject implements JsonSerializable {
                             getPopularScientificSummary(),
                             getMethod(), getEquipment(), getProjectCategories(), getKeywords(), getExternalSources(),
                             getRelatedProjects(), getInstitutionsResponsibleForResearch(), getHealthProjectType(),
-                            getHealthProjectTypeName(), getClinicalTrialPhase(), getExemptFromPublicDisclosure());
+                            getHealthProjectTypeName(), getClinicalTrialPhase(), getApprovals(),
+                            getExemptFromPublicDisclosure());
     }
 
     @Override

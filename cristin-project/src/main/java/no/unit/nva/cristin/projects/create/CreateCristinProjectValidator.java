@@ -4,10 +4,11 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import no.unit.nva.Validator;
-import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
@@ -17,29 +18,63 @@ import nva.commons.core.StringUtils;
 
 public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
-    public static final Set<String> validClinicalTrialPhases = Set.of("1", "2", "3", "4");
-    public static final Set<String> validHealthProjectTypes = Set.of("DRUGSTUDY", "OTHERCLIN", "OTHERSTUDY");
-    public static final String INVALID_CLINICAL_TRIAL_PHASE =
-        "Clinical Trial Phase is invalid, can only contain the following values: ";
-    public static final String INVALID_HEALTH_PROJECT_TYPE =
-        "Health Project Type is invalid, can only contain the following values: ";
+    protected enum ValidatedResult {
+        Empty("project data required"),
+        HasId("project identifier not allowed"),
+        NoTitle("title required"),
+        InvalidStartDate("start date invalid"),
+        HasNoContributors("contributors required"),
+        HasNoCoordinatingOrganization("coordinating organization required");
+        private final String label;
+
+        ValidatedResult(String label) {
+            this.label = label;
+        }
+
+
+        public String getLabel() {
+            return label;
+        }
+    }
 
     @Override
     public void validate(NvaProject nvaProject) throws ApiGatewayException {
         validateRequiredInput(nvaProject);
-        validateOptionalInput(nvaProject);
     }
 
     private void validateRequiredInput(NvaProject project) throws BadRequestException {
-        if (isNull(project)
-            || hasId(project)
-            || noTitle(project)
-            || invalidStartDate(project.getStartDate())
-            || hasNoContributors(project.getContributors())
-            || hasNoCoordinatingOrganization(project.getCoordinatingInstitution())
-        ) {
-            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD);
+        var validatedResult = validateProjectInput(project);
+        if (!validatedResult.isEmpty()) {
+            var validateDescriptions =
+                validatedResult.stream()
+                    .map(ValidatedResult::getLabel)
+                    .collect(Collectors.joining(", "," (", ")"));
+            throw new BadRequestException(ERROR_MESSAGE_INVALID_PAYLOAD + validateDescriptions);
         }
+    }
+
+    private Set<ValidatedResult> validateProjectInput(NvaProject project) {
+        var results = new HashSet<ValidatedResult>();
+        if (isNull(project)) {
+            results.add(ValidatedResult.Empty);
+            return results;
+        }
+        if (hasId(project)) {
+            results.add(ValidatedResult.HasId);
+        }
+        if (noTitle(project)) {
+            results.add(ValidatedResult.NoTitle);
+        }
+        if (invalidStartDate(project.getStartDate())) {
+            results.add(ValidatedResult.InvalidStartDate);
+        }
+        if (hasNoContributors(project.getContributors())) {
+            results.add(ValidatedResult.HasNoContributors);
+        }
+        if (hasNoCoordinatingOrganization(project.getCoordinatingInstitution())) {
+            results.add(ValidatedResult.HasNoCoordinatingOrganization);
+        }
+        return results;
     }
 
     private boolean hasNoCoordinatingOrganization(Organization coordinatingInstitution) {
@@ -60,31 +95,5 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
     private boolean noTitle(NvaProject project) {
         return StringUtils.isEmpty(project.getTitle());
-    }
-
-    private void validateOptionalInput(NvaProject nvaProject) throws BadRequestException {
-        if (nonNull(nvaProject.getHealthProjectData())) {
-            validateHealthData(nvaProject.getHealthProjectData());
-        }
-    }
-
-    private void validateHealthData(HealthProjectData healthData) throws BadRequestException {
-        if (nonNull(healthData.getType()) && !validHealthProjectTypes.contains(healthData.getType())) {
-            throw exceptionInvalidHealthProjectType();
-        }
-        if (nonNull(healthData.getClinicalTrialPhase())
-            && !validClinicalTrialPhases.contains(healthData.getClinicalTrialPhase())) {
-            throw exceptionInvalidClinicalTrialPhase();
-        }
-    }
-
-    private BadRequestException exceptionInvalidHealthProjectType() {
-        return new BadRequestException(INVALID_HEALTH_PROJECT_TYPE
-                                       + String.join(" ; ", validHealthProjectTypes));
-    }
-
-    private BadRequestException exceptionInvalidClinicalTrialPhase() {
-        return new BadRequestException(INVALID_CLINICAL_TRIAL_PHASE
-                                       + String.join(" ; ", validClinicalTrialPhases));
     }
 }

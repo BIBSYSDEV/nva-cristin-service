@@ -15,24 +15,24 @@ public class HealthProjectData implements JsonSerializable {
     public static final String CLINICAL_TRIAL_PHASE = "clinicalTrialPhase";
 
     @JsonProperty(TYPE)
-    private final String type;
+    private final HealthProjectType type;
     @JsonProperty(LABEL)
     private final Map<String, String> label;
     @JsonProperty(CLINICAL_TRIAL_PHASE)
-    private final String clinicalTrialPhase;
+    private final ClinicalTrialPhase clinicalTrialPhase;
 
     /**
      * Nva model for a project having additional health related data.
      */
     @JsonCreator
-    public HealthProjectData(@JsonProperty(TYPE) String type, @JsonProperty(LABEL) Map<String, String> label,
-                             @JsonProperty(CLINICAL_TRIAL_PHASE) String clinicalTrialPhase) {
+    public HealthProjectData(@JsonProperty(TYPE) HealthProjectType type, @JsonProperty(LABEL) Map<String, String> label,
+                             @JsonProperty(CLINICAL_TRIAL_PHASE) ClinicalTrialPhase clinicalTrialPhase) {
         this.type = type;
         this.label = nonNull(label) ? Collections.unmodifiableMap(label) : Collections.emptyMap();
         this.clinicalTrialPhase = clinicalTrialPhase;
     }
 
-    public String getType() {
+    public HealthProjectType getType() {
         return type;
     }
 
@@ -40,7 +40,7 @@ public class HealthProjectData implements JsonSerializable {
         return label;
     }
 
-    public String getClinicalTrialPhase() {
+    public ClinicalTrialPhase getClinicalTrialPhase() {
         return clinicalTrialPhase;
     }
 

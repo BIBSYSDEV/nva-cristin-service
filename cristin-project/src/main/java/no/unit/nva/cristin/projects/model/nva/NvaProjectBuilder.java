@@ -2,12 +2,18 @@ package no.unit.nva.cristin.projects.model.nva;
 
 import java.net.URI;
 import no.unit.nva.cristin.model.CristinInstitution;
+import no.unit.nva.cristin.projects.model.cristin.CristinApplicationCodeBuilder;
+import no.unit.nva.cristin.projects.model.cristin.CristinApprovalAuthorityBuilder;
+import no.unit.nva.cristin.projects.model.cristin.CristinApprovalStatusBuilder;
+import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
+import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinExternalSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingAmount;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.model.CristinOrganization;
+import no.unit.nva.cristin.projects.model.cristin.CristinHealthProjectTypeBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
@@ -45,8 +51,22 @@ public class NvaProjectBuilder {
     private final transient CristinProject cristinProject;
     private transient String context;
 
+    private final transient EnumBuilder<CristinProject, ClinicalTrialPhase> clinicalTrialPhaseBuilder;
+    private final transient EnumBuilder<CristinProject, HealthProjectType> healthProjectTypeBuilder;
+    private final transient EnumBuilder<CristinApproval, ApprovalAuthority> approvalAuthorityBuilder;
+    private final transient EnumBuilder<CristinApproval, ApplicationCode> applicationCodeBuilder;
+    private final transient EnumBuilder<CristinApproval, ApprovalStatus> approvalStatusBuilder;
+
+    /**
+     * Builds a NvaProject from a Cristin Project.
+     */
     public NvaProjectBuilder(CristinProject cristinProject) {
         this.cristinProject = cristinProject;
+        this.clinicalTrialPhaseBuilder = new CristinClinicalTrialPhaseBuilder();
+        this.healthProjectTypeBuilder = new CristinHealthProjectTypeBuilder();
+        this.approvalAuthorityBuilder = new CristinApprovalAuthorityBuilder();
+        this.applicationCodeBuilder = new CristinApplicationCodeBuilder();
+        this.approvalStatusBuilder = new CristinApprovalStatusBuilder();
     }
 
     private static List<NvaContributor> transformCristinPersonsToNvaContributors(List<CristinPerson> participants) {
@@ -118,16 +138,32 @@ public class NvaProjectBuilder {
                        extractInstitutionsResponsibleForResearch(
                            cristinProject.getInstitutionsResponsibleForResearch()))
                    .withHealthProjectData(extractHealthProjectData(cristinProject))
+                   .withApprovals(extractApprovals(cristinProject.getApprovals()))
                    .withExemptFromPublicDisclosure(cristinProject.getExemptFromPublicDisclosure())
                    .build();
+    }
+
+    private List<Approval> extractApprovals(List<CristinApproval> cristinApprovals) {
+        return cristinApprovals.stream().map(this::toApproval).collect(Collectors.toList());
+    }
+
+    private Approval toApproval(CristinApproval cristinApproval) {
+        var authority = approvalAuthorityBuilder.build(cristinApproval);
+        var applicationCode = applicationCodeBuilder.build(cristinApproval);
+        var status = approvalStatusBuilder.build(cristinApproval);
+
+        return new Approval(cristinApproval.getApprovedDate(), authority, status, applicationCode,
+                            cristinApproval.getApprovalReferenceId(), cristinApproval.getApprovedByName());
     }
 
     private HealthProjectData extractHealthProjectData(CristinProject cristinProject) {
         if (isNull(cristinProject.getHealthProjectType()) && isNull(cristinProject.getClinicalTrialPhase())) {
             return null;
         }
-        return new HealthProjectData(cristinProject.getHealthProjectType(), cristinProject.getHealthProjectTypeName(),
-                                     cristinProject.getClinicalTrialPhase());
+
+        return new HealthProjectData(healthProjectTypeBuilder.build(cristinProject),
+                                     cristinProject.getHealthProjectTypeName(),
+                                     clinicalTrialPhaseBuilder.build(cristinProject));
     }
 
     private List<Organization> extractInstitutionsResponsibleForResearch(List<CristinOrganization>

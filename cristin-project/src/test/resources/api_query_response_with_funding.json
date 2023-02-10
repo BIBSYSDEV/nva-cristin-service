@@ -49,7 +49,9 @@
             "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
-            "lastName": "Nordmann"
+            "lastName": "Nordmann",
+            "email": "ola.nordmann@example.org",
+            "phone": "12345678"
           },
           "affiliation": {
             "type": "Organization",
@@ -122,12 +124,23 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
-      }
+        "clinicalTrialPhase": "PhaseIII"
+      },
+      "approvals" : [ {
+        "type" : "Approval",
+        "date" : "2017-04-26T00:00:00Z",
+        "authority" : "RegionalEthicalCommittees",
+        "status" : "Approved",
+        "applicationCode" : "EthicalApproval",
+        "identifier" : "2017/800",
+        "authorityName" : {
+          "en" : "Regional committees for medical and health research ethics"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -170,7 +183,9 @@
             "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
-            "lastName": "Nordmann"
+            "lastName": "Nordmann",
+            "email": "ola.nordmann@example.org",
+            "phone": "12345678"
           },
           "affiliation": {
             "type": "Organization",
@@ -243,12 +258,23 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
-      }
+        "clinicalTrialPhase": "PhaseIII"
+      },
+      "approvals" : [ {
+        "type" : "Approval",
+        "date" : "2017-04-26T00:00:00Z",
+        "authority" : "RegionalEthicalCommittees",
+        "status" : "Approved",
+        "applicationCode" : "EthicalApproval",
+        "identifier" : "2017/800",
+        "authorityName" : {
+          "en" : "Regional committees for medical and health research ethics"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -291,7 +317,9 @@
             "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
-            "lastName": "Nordmann"
+            "lastName": "Nordmann",
+            "email": "ola.nordmann@example.org",
+            "phone": "12345678"
           },
           "affiliation": {
             "type": "Organization",
@@ -364,12 +392,23 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
-      }
+        "clinicalTrialPhase": "PhaseIII"
+      },
+      "approvals" : [ {
+        "type" : "Approval",
+        "date" : "2017-04-26T00:00:00Z",
+        "authority" : "RegionalEthicalCommittees",
+        "status" : "Approved",
+        "applicationCode" : "EthicalApproval",
+        "identifier" : "2017/800",
+        "authorityName" : {
+          "en" : "Regional committees for medical and health research ethics"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -412,7 +451,9 @@
             "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
-            "lastName": "Nordmann"
+            "lastName": "Nordmann",
+            "email": "ola.nordmann@example.org",
+            "phone": "12345678"
           },
           "affiliation": {
             "type": "Organization",
@@ -485,12 +526,23 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
-      }
+        "clinicalTrialPhase": "PhaseIII"
+      },
+      "approvals" : [ {
+        "type" : "Approval",
+        "date" : "2017-04-26T00:00:00Z",
+        "authority" : "RegionalEthicalCommittees",
+        "status" : "Approved",
+        "applicationCode" : "EthicalApproval",
+        "identifier" : "2017/800",
+        "authorityName" : {
+          "en" : "Regional committees for medical and health research ethics"
+        }
+      } ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -533,7 +585,9 @@
             "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
             "firstName": "Ola",
-            "lastName": "Nordmann"
+            "lastName": "Nordmann",
+            "email": "ola.nordmann@example.org",
+            "phone": "12345678"
           },
           "affiliation": {
             "type": "Organization",
@@ -606,12 +660,23 @@
         }
       ],
       "healthProjectData": {
-        "type": "DRUGSTUDY",
+        "type": "Drugstudy",
         "label": {
           "en": "Drug study"
         },
-        "clinicalTrialPhase": "3"
-      }
+        "clinicalTrialPhase": "PhaseIII"
+      },
+      "approvals" : [ {
+        "type" : "Approval",
+        "date" : "2017-04-26T00:00:00Z",
+        "authority" : "RegionalEthicalCommittees",
+        "status" : "Approved",
+        "applicationCode" : "EthicalApproval",
+        "identifier" : "2017/800",
+        "authorityName" : {
+          "en" : "Regional committees for medical and health research ethics"
+        }
+      } ]
     }
   ]
 }

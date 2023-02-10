@@ -93,6 +93,8 @@ public class NvaProject implements JsonSerializable {
     @JsonInclude(NON_NULL)
     private HealthProjectData healthProjectData;
     @JsonProperty
+    private List<Approval> approvals;
+    @JsonProperty
     @JsonInclude(NON_NULL)
     private Boolean exemptFromPublicDisclosure;
 
@@ -331,6 +333,14 @@ public class NvaProject implements JsonSerializable {
         this.healthProjectData = healthProjectData;
     }
 
+    public List<Approval> getApprovals() {
+        return nonEmptyOrDefault(approvals);
+    }
+
+    public void setApprovals(List<Approval> approvals) {
+        this.approvals = approvals;
+    }
+
     public Boolean getExemptFromPublicDisclosure() {
         return exemptFromPublicDisclosure;
     }
@@ -377,6 +387,7 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getRelatedProjects(), that.getRelatedProjects())
                && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch())
                && Objects.equals(getHealthProjectData(), that.getHealthProjectData())
+               && Objects.equals(getApprovals(), that.getApprovals())
                && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure());
     }
 
@@ -388,7 +399,7 @@ public class NvaProject implements JsonSerializable {
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
                             getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
                             getProjectCategories(), getKeywords(), getExternalSources(), getRelatedProjects(),
-                            getInstitutionsResponsibleForResearch(), getHealthProjectData(),
+                            getInstitutionsResponsibleForResearch(), getHealthProjectData(), getApprovals(),
                             getExemptFromPublicDisclosure());
     }
 
@@ -552,6 +563,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withHealthProjectData(HealthProjectData healthProjectData) {
             nvaProject.setHealthProjectData(healthProjectData);
+            return this;
+        }
+
+        public Builder withApprovals(List<Approval> approvals) {
+            nvaProject.setApprovals(approvals);
             return this;
         }
 

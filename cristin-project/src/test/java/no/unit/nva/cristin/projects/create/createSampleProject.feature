@@ -50,6 +50,16 @@ Feature: API tests for Cristin Project retrieve and search
             'type': 'Organization',
             'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
           }
+        },
+        {
+          'type': 'ProjectParticipant',
+          'identity': {
+            'type': 'Person',
+            'email': 'ola.borte.moen@example.org',
+            'phone': '12345678',
+            'firstName':'Ola',
+            'lastName':'Borte'
+          }
         }
       ],
       'academicSummary': {
@@ -71,8 +81,58 @@ Feature: API tests for Cristin Project retrieve and search
         }
       ],
       'healthProjectData': {
-        'type': 'DRUGSTUDY',
-        'clinicalTrialPhase': '3'
+        'type': 'Drugstudy',
+        'clinicalTrialPhase': 'PhaseIII'
+      },
+      'externalSources': [
+        {
+          'type': 'ExternalSource',
+          'identifier': '123456',
+          'name': 'REK'
+        }
+      ],
+      'approvals': [
+        {
+          'type' : 'Approval',
+          'date' : '2017-04-26T00:00:00.000Z',
+          'authority' : 'RegionalEthicalCommittees',
+          'status' : 'Approved',
+          'applicationCode' : 'EthicalApproval',
+          'identifier' : '2017/800'
+        }
+      ],
+      'funding': [
+        {
+          'type': 'Funding',
+          'source': {
+            'type': 'FundingSource',
+            'code': 'NFR'
+          },
+          'code': '1234'
+        }
+      ],
+      'keywords': [
+        {
+          'type': '5686'
+        },
+        {
+          'type': '4245'
+        }
+      ],
+      'projectCategories': [
+        {
+          'type': 'PHD'
+        }
+      ],
+      'relatedProjects': [
+        'https://api.dev.nva.aws.unit.no/cristin/project/6721135'
+      ],
+      'contactInfo': {
+        'type': 'ContactInfo',
+        'contactPerson': 'Navn Navnesen',
+        'institution': 'Universitetet i Oslo',
+        'email': 'navn.navnesen@uio.no',
+        'phone': '99223344'
       }
     }
     """
@@ -88,6 +148,12 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.method == '#present'
     And match response.equipment == '#present'
     And match response.institutionsResponsibleForResearch[0].id == '#present'
+    And match response.approvals[0].date == '#present'
+    And match response.approvals[0].authority == 'RegionalEthicalCommittees'
+    And match response.approvals[0].status == 'Approved'
+    And match response.approvals[0].applicationCode == 'EthicalApproval'
+    And match response.approvals[0].identifier == '2017/800'
+    And match response.approvals[0].authorityName == '#present'
     And print response
 
   Scenario: Creating project with only minimum required data returns 201 Created
@@ -96,6 +162,7 @@ Feature: API tests for Cristin Project retrieve and search
     {
       'title': 'Example Title',
       'startDate': '2012-01-09T00:00:00.000Z',
+      'endDate': '2030-01-09T00:00:00.000Z',
       'coordinatingInstitution': {
         'type': 'Organization',
         'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
