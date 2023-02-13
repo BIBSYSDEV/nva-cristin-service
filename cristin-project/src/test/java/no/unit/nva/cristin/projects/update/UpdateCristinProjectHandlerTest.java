@@ -6,6 +6,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAY
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
@@ -115,7 +116,7 @@ class UpdateCristinProjectHandlerTest {
     @Test
     void shouldReturnBadRequestWhenNoSupportedFieldsArePresent() throws IOException {
         var jsonObject = OBJECT_MAPPER.createObjectNode();
-        jsonObject.put(ACADEMIC_SUMMARY, randomNamesMap().toString());
+        jsonObject.put(CRISTIN_ACADEMIC_SUMMARY, randomNamesMap().toString());
         jsonObject.put(ALTERNATIVE_TITLES, randomNamesMap().toString());
         jsonObject.put(POPULAR_SCIENTIFIC_SUMMARY, randomNamesMap().toString());
         jsonObject.put(STATUS, randomStatus().toString());
@@ -210,7 +211,9 @@ class UpdateCristinProjectHandlerTest {
             Arguments.of(PROJECT_CATEGORIES, missingRequiredFieldType(PROJECT_CATEGORIES),
                          PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE),
             Arguments.of(RELATED_PROJECTS, notAnArray(RELATED_PROJECTS), format(MUST_BE_A_LIST, RELATED_PROJECTS)),
-            Arguments.of(RELATED_PROJECTS, notListOfStrings(), MUST_BE_A_LIST_OF_IDENTIFIERS)
+            Arguments.of(RELATED_PROJECTS, notListOfStrings(), MUST_BE_A_LIST_OF_IDENTIFIERS),
+            Arguments.of(ACADEMIC_SUMMARY, notADescription(),
+                         ACADEMIC_SUMMARY + " not a valid key value field")
         );
     }
 
@@ -258,6 +261,12 @@ class UpdateCristinProjectHandlerTest {
         var array = OBJECT_MAPPER.createArrayNode();
         array.add(objectField);
         input.set(RELATED_PROJECTS, array);
+        return input;
+    }
+
+    private static JsonNode notADescription() {
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.put(ACADEMIC_SUMMARY, randomString());
         return input;
     }
 

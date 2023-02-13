@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
+import java.util.Map;
 import no.unit.nva.Validator;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.model.Organization;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
@@ -38,7 +40,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
 
     private static final Set<String> SUPPORTED_PATCH_FIELDS =
             Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE, FUNDING, KEYWORDS,
-                   PROJECT_CATEGORIES, RELATED_PROJECTS);
+                   PROJECT_CATEGORIES, RELATED_PROJECTS, ACADEMIC_SUMMARY);
     public static final String UNSUPPORTED_FIELDS_IN_PAYLOAD = "Unsupported fields in payload %s";
     public static final String TITLE_MUST_HAVE_A_LANGUAGE = "Title must have a language associated";
     public static final String FUNDING_MISSING_REQUIRED_FIELDS = "Funding missing required fields";
@@ -48,6 +50,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
                                                                                 + "field 'type'";
     public static final String MUST_BE_A_LIST_OF_IDENTIFIERS = "RelatedProjects must be a list of identifiers, "
                                                                + "numeric or URI";
+    public static final String NOT_A_VALID_KEY_VALUE_FIELD = "%s not a valid key value field";
 
     /**
      * Validate changes to Project, both nullable fields and values.
@@ -68,6 +71,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         validateKeywordsIfPresent(input);
         validateProjectCategoriesIfPresent(input);
         validateRelatedProjects(input);
+        validateDescription(input, ACADEMIC_SUMMARY);
     }
 
     private static void validateTitleAndLanguage(ObjectNode input) throws BadRequestException {
@@ -188,6 +192,14 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
                 attempt(() -> extractLastPathElement(URI.create(project.asText())))
                     .orElseThrow(failure -> new BadRequestException(MUST_BE_A_LIST_OF_IDENTIFIERS));
             }
+        }
+    }
+
+    private void validateDescription(ObjectNode input, String fieldName) throws BadRequestException {
+        if (input.has(fieldName)) {
+            var description = input.get(fieldName);
+            attempt(() -> OBJECT_MAPPER.convertValue(description, new TypeReference<Map<String, String>>(){}))
+                .orElseThrow(failure -> new BadRequestException(format(NOT_A_VALID_KEY_VALUE_FIELD, fieldName)));
         }
     }
 }

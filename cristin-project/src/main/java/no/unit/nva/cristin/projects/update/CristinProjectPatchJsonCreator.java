@@ -22,8 +22,10 @@ import java.util.stream.Collectors;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
@@ -74,6 +76,7 @@ public class CristinProjectPatchJsonCreator {
         addKeywordsIfPresent();
         addProjectCategoriesIfPresent();
         addRelatedProjectsIfPresent();
+        addAcademicSummaryIfpresent();
         return this;
     }
 
@@ -208,6 +211,12 @@ public class CristinProjectPatchJsonCreator {
                 identifiers.add(extractLastPathElement(URI.create(project.asText())));
             }
             output.putPOJO(CRISTIN_RELATED_PROJECTS, identifiers);
+        }
+    }
+
+    private void addAcademicSummaryIfpresent() {
+        if (input.has(ACADEMIC_SUMMARY)) {
+            output.set(CRISTIN_ACADEMIC_SUMMARY, input.get(ACADEMIC_SUMMARY));
         }
     }
 }

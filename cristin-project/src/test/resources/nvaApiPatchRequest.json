@@ -39,5 +39,9 @@
   ],
   "relatedProjects": [
     "https://api.dev.nva.aws.unit.no/cristin/project/483302"
-  ]
+  ],
+  "academicSummary": {
+    "en": "Some academic summary",
+    "nn": null
+  }
 }
