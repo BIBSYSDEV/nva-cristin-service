@@ -2860,16 +2860,14 @@ components:
           - 'https://api.dev.nva.aws.unit.no/cristin/project/483302'
         academicSummary:
           en: 'Some academic summary'
-          nn: null
+          nn: 'null'
         popularScientificSummary:
           en: 'Some popular scientific summary'
-          nn: null
+          nb: 'null'
         method:
           en: 'Some method'
-          nn: null
         equipment:
           en: 'Some equipment'
-          nn: null
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
