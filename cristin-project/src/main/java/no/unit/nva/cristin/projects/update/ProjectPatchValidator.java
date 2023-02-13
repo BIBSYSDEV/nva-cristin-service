@@ -24,12 +24,15 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTI
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
 import static no.unit.nva.cristin.projects.model.nva.Funding.CODE;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -40,7 +43,8 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
 
     private static final Set<String> SUPPORTED_PATCH_FIELDS =
             Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE, FUNDING, KEYWORDS,
-                   PROJECT_CATEGORIES, RELATED_PROJECTS, ACADEMIC_SUMMARY);
+                   PROJECT_CATEGORIES, RELATED_PROJECTS, ACADEMIC_SUMMARY, POPULAR_SCIENTIFIC_SUMMARY, METHOD,
+                   EQUIPMENT);
     public static final String UNSUPPORTED_FIELDS_IN_PAYLOAD = "Unsupported fields in payload %s";
     public static final String TITLE_MUST_HAVE_A_LANGUAGE = "Title must have a language associated";
     public static final String FUNDING_MISSING_REQUIRED_FIELDS = "Funding missing required fields";
@@ -72,6 +76,9 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         validateProjectCategoriesIfPresent(input);
         validateRelatedProjects(input);
         validateDescription(input, ACADEMIC_SUMMARY);
+        validateDescription(input, POPULAR_SCIENTIFIC_SUMMARY);
+        validateDescription(input, METHOD);
+        validateDescription(input, EQUIPMENT);
     }
 
     private static void validateTitleAndLanguage(ObjectNode input) throws BadRequestException {

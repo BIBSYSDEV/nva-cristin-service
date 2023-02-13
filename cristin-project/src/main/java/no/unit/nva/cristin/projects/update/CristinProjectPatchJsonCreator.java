@@ -27,10 +27,12 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_END_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
@@ -39,7 +41,9 @@ import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizat
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_RELATED_PROJECTS;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.language.LanguageConstants.UNDEFINED_LANGUAGE;
@@ -77,6 +81,9 @@ public class CristinProjectPatchJsonCreator {
         addProjectCategoriesIfPresent();
         addRelatedProjectsIfPresent();
         addAcademicSummaryIfpresent();
+        addPopularScientificSummaryIfPresent();
+        addMethodIfPresent();
+        addEquipmentIfPresent();
         return this;
     }
 
@@ -219,4 +226,23 @@ public class CristinProjectPatchJsonCreator {
             output.set(CRISTIN_ACADEMIC_SUMMARY, input.get(ACADEMIC_SUMMARY));
         }
     }
+
+    private void addPopularScientificSummaryIfPresent() {
+        if (input.has(POPULAR_SCIENTIFIC_SUMMARY)) {
+            output.set(CRISTIN_POPULAR_SCIENTIFIC_SUMMARY, input.get(POPULAR_SCIENTIFIC_SUMMARY));
+        }
+    }
+
+    private void addMethodIfPresent() {
+        if (input.has(METHOD)) {
+            output.set(METHOD, input.get(METHOD));
+        }
+    }
+
+    private void addEquipmentIfPresent() {
+        if (input.has(EQUIPMENT)) {
+            output.set(EQUIPMENT, input.get(EQUIPMENT));
+        }
+    }
+
 }

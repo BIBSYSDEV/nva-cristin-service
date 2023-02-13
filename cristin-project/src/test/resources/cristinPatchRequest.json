@@ -45,5 +45,17 @@
   "academic_summary": {
     "en": "Some academic summary",
     "nn": null
+  },
+  "popular_scientific_summary": {
+    "en": "Some popular scientific summary",
+    "nn": null
+  },
+  "method": {
+    "en": "Some method",
+    "nn": null
+  },
+  "equipment": {
+    "en": "Some equipment",
+    "nn": null
   }
 }

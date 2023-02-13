@@ -19,7 +19,7 @@ import java.util.Map;
 
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_ACADEMIC_SUMMARY;
-import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_POPULAR_SCIENTIFIC_SUMMARY;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused", "PMD.ExcessivePublicCount", "PMD.GodClass"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -59,7 +59,7 @@ public class CristinProject implements JsonSerializable {
     private List<CristinPerson> participants;
     @JsonProperty(CRISTIN_ACADEMIC_SUMMARY)
     private Map<String, String> academicSummary;
-    @JsonProperty(POPULAR_SCIENTIFIC_SUMMARY)
+    @JsonProperty(CRISTIN_POPULAR_SCIENTIFIC_SUMMARY)
     private Map<String, String> popularScientificSummary;
     @JsonProperty(METHOD)
     private Map<String, String> method;

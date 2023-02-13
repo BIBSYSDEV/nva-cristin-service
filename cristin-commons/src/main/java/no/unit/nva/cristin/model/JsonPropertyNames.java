@@ -30,7 +30,7 @@ public class JsonPropertyNames {
     public static final String LAST_NAME = "lastName";
     public static final String STATUS = "status";
     public static final String CRISTIN_ACADEMIC_SUMMARY = "academic_summary";
-    public static final String POPULAR_SCIENTIFIC_SUMMARY = "popular_scientific_summary";
+    public static final String CRISTIN_POPULAR_SCIENTIFIC_SUMMARY = "popular_scientific_summary";
     public static final String PART_OF = "partOf";
     public static final String HAS_PART = "hasPart";
     public static final String ACRONYM = "acronym";
@@ -67,5 +67,6 @@ public class JsonPropertyNames {
     public static final String PROJECT_CATEGORIES = "projectCategories";
     public static final String RELATED_PROJECTS = "relatedProjects";
     public static final String ACADEMIC_SUMMARY = "academicSummary";
+    public static final String POPULAR_SCIENTIFIC_SUMMARY = "popularScientificSummary";
 
 }
