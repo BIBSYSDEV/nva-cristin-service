@@ -1372,6 +1372,14 @@ paths:
         502:
           $ref: '#/components/responses/502'
   /funding-sources/{identifier}:
+    parameters:
+      - name: identifier
+        in: path
+        description: Identifier of funding source
+        required: true
+        schema:
+          type: string
+        example: 'NFR'
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -1698,6 +1706,8 @@ components:
                 - PhaseII
                 - PhaseIII
                 - PhaseIV
+        approvals:
+          $ref: '#/components/schemas/Approvals'
     ProjectPost:
       type: object
       properties:
@@ -1812,6 +1822,49 @@ components:
                 - PhaseII
                 - PhaseIII
                 - PhaseIV
+        approvals:
+          $ref: '#/components/schemas/Approvals'
+        funding:
+          type: array
+          description: Fundings for this project
+          items:
+            $ref: '#/components/schemas/FundingPost'
+        keywords:
+          type: array
+          description: Project keywords
+          items:
+            properties:
+              code:
+                type: string
+                description: Keyword code
+        projectCategories:
+          type: array
+          description: Project categories
+          items:
+            properties:
+              code:
+                type: string
+                description: project category code
+        relatedProjects:
+          type: array
+          items:
+            type: string
+            description: URI to the related project
+        contactInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              pattern: 'ContactInfo'
+              description: Always ContactInfo
+            contactPerson:
+              type: string
+            organization:
+              type: string
+            email:
+              type: string
+            phone:
+              type: string
     ProjectPatch:
       type: object
       properties:
@@ -2014,6 +2067,99 @@ components:
           $ref: '#/components/schemas/Languages'
         code:
           type: string
+    Approvals:
+      type: array
+      required: [ date, authority, status ]
+      items:
+        type: object
+        properties:
+          type:
+            type: string
+          date:
+            type: string
+            format: date-time
+            description: 'Date of approval'
+          authority:
+            type: string
+            description: 'Approval authority. Only certain combinations of authority and applicationCode are allowed. 
+            RegionalEthicalCommittees: Regional committees for medical and health research ethics (en), 
+            Regionale komitéer for medisinsk og helsefaglig forskningsetikk (REK) (nb), 
+            Regionale komitéer for medisinsk og helsefaglig forskningsetikk (REK) (nn), 
+            applicationCode: EthicalApproval or BioBank; 
+            NorwegianAnimalResearchAuthority: The Norwegian Animal Research Authority (en), Forsøksdyrutvalget (nb), Forsøksdyrutvalet (nn), 
+            applicationCode: AnimalTesting; 
+            NorwegianDataProtectionAuthority: The Norwegian Data Protection Authority (en), Datatilsynet (nb), Datatilsynet (nn), 
+            applicationCode: SensitiveInformation; 
+            NorwegianMedicinesAgency: Norwegian Medicines Agency (en), Statens legemiddelverk (nb), Statens legemiddelverk (nn), 
+            applicationCode: DrugTrial; 
+            NorwegianDirectorateOfHealth: Norwegian Directorate of Health (en), Helsedirektoratet (nb), Helsedirektoratet (nn), 
+            applicationCode: BioTechnology or MedicalEquipment.'
+            enum:
+              - RegionalEthicalCommittees
+              - NorwegianAnimalResearchAuthority
+              - NorwegianDataProtectionAuthority
+              - NorwegianMedicinesAgency
+              - NorwegianDirectorateOfHealth
+          status:
+            type: string
+            description: 'Status of the application sent to the approval authority.'
+            enum:
+              - NotApplied
+              - Applied
+              - Approved
+              - Declined
+              - Rejection
+          applicationCode:
+            type: string
+            description: 'These codes apply only for applications to the approval authorities. 
+            Only certain combinations of applicationCode and authority are allowed, see authority above. 
+            EthicalApproval: Application for ethical approval of a health research project (en), 
+            Søknad om etisk godkjenning, Helseforskningsprosjekt (nb), Søknad om etisk godkjenning av helseforskingsprosjekt (nn); 
+            BioBank: Application for establishing a biobank (en), Søknad om etablering av biobank (nb), 
+            Søknad om etablering av biobank (nn); 
+            DrugTrial: Application for a clinical drug trial (en), Søknad om legemiddelutprøving (nb), Søknad om legemiddelutprøving (nn); 
+            BioTechnology: Application for medical use of biotechnology (en), Søknad om medisinsk bruk av bioteknologi (nb), 
+            Søknad om medisinsk bruk av bioteknologi (nn); 
+            MedicalEquipment: Application for clinical testing for medical equipment (en), 
+            Søknad om klinisk utprøving av medisinsk utstyr (nb), Søknad om klinisk utprøving av medisinsk utstyr (nn); 
+            AnimalTesting: Application for testing on animals (en), Søknad om å utføre forsøk på dyr (nb), 
+            Søknad om å utføre forsøk på dyr (nn); 
+            SensitiveInformation: Application for license tp process sensitive personal information (en), 
+            Søknad om konsesjon for behandling av sensitive personopplysninger (nb), 
+            Søknad om konsesjon for handsaming av sensitive personopplysingar(nn).'
+            enum:
+              - EthicalApproval
+              - BioBank
+              - DrugTrial
+              - BioTechnology
+              - MedicalEquipment
+              - AnimalTesting
+              - SensitiveInformation
+          identifier:
+            type: string
+            description: 'Reference ID used by the approval authority for this approval.'
+          authorityName:
+            $ref: '#/components/schemas/Languages'
+    FundingPost:
+      type: object
+      description: Funding creation
+      properties:
+        type:
+          type: string
+          pattern: 'Funding'
+          description: Always Funding
+        code:
+          type: string
+          description: Project code of the funding
+        source:
+          properties:
+            type:
+              type: string
+              pattern: 'FundingSource'
+              description: Always FundingSource
+            code:
+              type: string
+              description: Code of the funding source, like NFR
     TypedLabelPostPatch:
       type: object
       properties:
@@ -2562,6 +2708,15 @@ components:
               label:
                 en: 'Drug study'
               clinicalTrialPhase: 'PhaseIII'
+            approvals:
+              - type: 'Approval'
+                date: '2020-12-31T09:45:17Z'
+                authority: 'RegionalEthicalCommittees'
+                status: 'Approved'
+                applicationCode: 'EthicalApproval'
+                identifier: '2017/800'
+                authorityName:
+                  en: 'Regional committees for medical and health research ethics'
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -2660,6 +2815,15 @@ components:
           label:
             en: 'Drug study'
           clinicalTrialPhase: 'PhaseIII'
+        approvals:
+          - type: 'Approval'
+            date: '2020-12-31T09:45:17Z'
+            authority: 'RegionalEthicalCommittees'
+            status: 'Approved'
+            applicationCode: 'EthicalApproval'
+            identifier: '2017/800'
+            authorityName:
+              en: 'Regional committees for medical and health research ethics'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2739,6 +2903,32 @@ components:
         healthProjectData:
           type: 'Drugstudy'
           clinicalTrialPhase: 'PhaseIII'
+        approvals:
+          - type: 'Approval'
+            date: '2020-12-31T09:45:17Z'
+            authority: 'RegionalEthicalCommittees'
+            status: 'Approved'
+            applicationCode: 'EthicalApproval'
+            identifier: '2017/800'
+        funding:
+          - type: 'Funding'
+            source:
+              type: 'FundingSource'
+              code: 'NFR'
+            code: '1234'
+        keywords:
+          - code: '4245'
+          - code: '5686'
+        projectCategories:
+          - code: 'PHD'
+        relatedProjects:
+          - 'https://api.dev.nva.aws.unit.no/cristin/project/21500'
+        contactInfo:
+          type: 'ContactInfo'
+          contactPerson: 'Navn Navnesen'
+          organization: 'Universitetet i Oslo'
+          email: 'navn.navnesen@uio.no'
+          phone: '99223344'
     OrganizationsExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'

@@ -120,5 +120,16 @@
       "en": "Drug study"
     },
     "clinicalTrialPhase": "PhaseIII"
-  }
+  },
+  "approvals" : [ {
+    "type" : "Approval",
+    "date" : "2017-04-26T00:00:00Z",
+    "authority" : "RegionalEthicalCommittees",
+    "status" : "Approved",
+    "applicationCode" : "EthicalApproval",
+    "identifier" : "2017/800",
+    "authorityName" : {
+      "en" : "Regional committees for medical and health research ethics"
+    }
+  } ]
 }
