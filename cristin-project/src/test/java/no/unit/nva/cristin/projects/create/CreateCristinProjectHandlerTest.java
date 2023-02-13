@@ -4,6 +4,7 @@ import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomApprovals;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithoutUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
@@ -12,6 +13,8 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrgani
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_ONE;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_THREE;
 import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.DRUGSTUDY;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -33,13 +36,14 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
 import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinHealthProjectTypeBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.Approval;
+import no.unit.nva.cristin.projects.model.nva.ApprovalAuthority;
 import no.unit.nva.cristin.projects.model.nva.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
@@ -66,6 +70,7 @@ class CreateCristinProjectHandlerTest {
     public static final String SUPPLIED_CLINICAL_TRIAL_PHASE_IS_NOT_VALID = "Supplied ClinicalTrialPhase is not valid";
     public static final String HEALTH_PROJECT_TYPE_JSON_FIELD = "\"type\": \"%s\"";
     public static final String SUPPLIED_HEALTH_PROJECT_TYPE_IS_NOT_VALID = "Supplied HealthProjectType is not valid";
+    public static final boolean IS_EXEMPT_FROM_PUBLIC_DISCLOSURE = true;
 
     private final Environment environment = new Environment();
     private Context context;
@@ -309,21 +314,14 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldHaveProjectWithHealthDataAddedAndSentToUpstream() throws Exception {
-        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
-        apiClient = spy(apiClient);
-        handler = new CreateCristinProjectHandler(apiClient, environment);
+        var apiClient = createApiClientAndConnectToHandler();
 
         var nvaProject = randomNvaProject();
         nvaProject.setId(null);
         var healthProjectData = new HealthProjectData(DRUGSTUDY, null, PHASE_ONE);
         nvaProject.setHealthProjectData(healthProjectData);
 
-        mockUpstreamUsingRequest(nvaProject);
-        executeRequest(nvaProject);
-
-        var captor = ArgumentCaptor.forClass(String.class);
-        verify(apiClient).post(any(), captor.capture());
-        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+        var capturedCristinProject = captureCristinProjectFromApiClient(apiClient, nvaProject);
 
         var cristinHealthType = capturedCristinProject.getHealthProjectType();
         var nvaHealthType = nvaProject.getHealthProjectData().getType();
@@ -333,6 +331,74 @@ class CreateCristinProjectHandlerTest {
 
         assertThat(cristinHealthType, equalTo(CristinHealthProjectTypeBuilder.reverseLookup(nvaHealthType)));
         assertThat(cristinPhase, equalTo(CristinClinicalTrialPhaseBuilder.reverseLookup(nvaPhase)));
+    }
+
+    @Test
+    void shouldReturnCreatedWhenApprovalsHasPartialData() throws Exception {
+        var randomNvaProject = randomNvaProject();
+        randomNvaProject.setId(null);
+        var approvalWithOnlySomeFieldsPopulated = approvalWithOnlySomeFieldsPopulated();
+        randomNvaProject.setApprovals(List.of(approvalWithOnlySomeFieldsPopulated));
+
+        mockUpstreamUsingRequest(randomNvaProject);
+        var response = executeRequest(randomNvaProject);
+
+        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
+    }
+
+    private Approval approvalWithOnlySomeFieldsPopulated() {
+        return new Approval(randomInstant(), ApprovalAuthority.NORWEGIAN_DIRECTORATE_OF_HEALTH, null,
+                            null, randomString(), null);
+    }
+
+    @Test
+    void shouldHaveApprovalsInProjectPayloadWhenSendingToUpstream() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        var expectedApprovals = randomApprovals();
+        nvaProject.setApprovals(expectedApprovals);
+
+        mockUpstreamUsingRequest(nvaProject);
+        executeRequest(nvaProject);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+        var actualApprovals = capturedCristinProject.toNvaProject().getApprovals();
+
+        assertThat(actualApprovals, equalTo(expectedApprovals));
+    }
+
+    @Test
+    void shouldHaveProjectWithExemptFromPublicDisclosureAddedAndSentToUpstream() throws Exception {
+        var apiClient = createApiClientAndConnectToHandler();
+        var nvaProject = randomMinimalNvaProject();
+        nvaProject.setExemptFromPublicDisclosure(IS_EXEMPT_FROM_PUBLIC_DISCLOSURE);
+        nvaProject.setId(null);
+        var capturedCristinProject = captureCristinProjectFromApiClient(apiClient, nvaProject);
+
+        assertThat(capturedCristinProject.getExemptFromPublicDisclosure(), equalTo(IS_EXEMPT_FROM_PUBLIC_DISCLOSURE));
+    }
+
+    private CristinProject captureCristinProjectFromApiClient(CreateCristinProjectApiClient apiClient,
+                                                              NvaProject nvaProject) throws Exception {
+        mockUpstreamUsingRequest(nvaProject);
+        executeRequest(nvaProject);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        return OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+    }
+
+    private CreateCristinProjectApiClient createApiClientAndConnectToHandler() {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+        return apiClient;
     }
 
     private String actualIdentifierFromOrganization(Organization organization) {
@@ -389,13 +455,8 @@ class CreateCristinProjectHandlerTest {
             .build();
     }
 
-    //TODO: Remove each of these when supported by POST
     private void removeFieldsNotSupportedByPost(NvaProject expected) {
-        expected.setContactInfo(null);
         expected.setFundingAmount(null);
-        expected.setProjectCategories(Collections.emptyList());
-        expected.setKeywords(Collections.emptyList());
-        expected.setRelatedProjects(Collections.emptyList());
     }
 
     private String getProjectPostRequestJsonSample() {

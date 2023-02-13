@@ -34,7 +34,8 @@
       "keywords": [],
       "externalSources": [],
       "relatedProjects": [],
-      "institutionsResponsibleForResearch": []
+      "institutionsResponsibleForResearch": [],
+      "approvals": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/999888",
@@ -66,7 +67,8 @@
       "keywords": [],
       "externalSources": [],
       "relatedProjects": [],
-      "institutionsResponsibleForResearch": []
+      "institutionsResponsibleForResearch": [],
+      "approvals": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/111333",
@@ -98,7 +100,8 @@
       "keywords": [],
       "externalSources": [],
       "relatedProjects": [],
-      "institutionsResponsibleForResearch": []
+      "institutionsResponsibleForResearch": [],
+      "approvals": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/222444",
@@ -126,7 +129,8 @@
       "keywords": [],
       "externalSources": [],
       "relatedProjects": [],
-      "institutionsResponsibleForResearch": []
+      "institutionsResponsibleForResearch": [],
+      "approvals": []
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/444222",
@@ -154,7 +158,8 @@
       "keywords": [],
       "externalSources": [],
       "relatedProjects": [],
-      "institutionsResponsibleForResearch": []
+      "institutionsResponsibleForResearch": [],
+      "approvals": []
     }
   ]
 }

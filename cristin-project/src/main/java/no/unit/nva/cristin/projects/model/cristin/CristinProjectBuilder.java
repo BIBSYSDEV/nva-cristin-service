@@ -3,11 +3,14 @@ package no.unit.nva.cristin.projects.model.cristin;
 import java.net.URI;
 import java.util.Optional;
 import no.unit.nva.cristin.model.CristinOrganization;
+import no.unit.nva.cristin.projects.model.nva.Approval;
+import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.projects.model.nva.TypedLabel;
 import no.unit.nva.model.Organization;
 
 import java.util.Collections;
@@ -15,8 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import no.unit.nva.utils.UriUtils;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
@@ -64,8 +70,55 @@ public class CristinProjectBuilder {
         cristinProject.setHealthProjectTypeName(extractHealthProjectTypeName(nvaProject.getHealthProjectData()));
         cristinProject.setClinicalTrialPhase(extractHealthProjectClinicalTrialPhase(nvaProject.getHealthProjectData()));
         cristinProject.setExternalSources(extractExternalSources(nvaProject.getExternalSources()));
+        cristinProject.setApprovals(extractApprovals(nvaProject.getApprovals()));
+        cristinProject.setKeywords(extractCristinTypedLabels(nvaProject.getKeywords()));
+        cristinProject.setProjectCategories(extractCristinTypedLabels(nvaProject.getProjectCategories()));
+        cristinProject.setRelatedProjects(extractRelatedProjects(nvaProject.getRelatedProjects()));
+        cristinProject.setContactInfo(extractContactInfo(nvaProject.getContactInfo()));
+        cristinProject.setExemptFromPublicDisclosure(nvaProject.getExemptFromPublicDisclosure());
 
         return cristinProject;
+    }
+
+    private List<CristinApproval> extractApprovals(List<Approval> approvals) {
+        return approvals.stream().map(this::toCristinApproval).collect(Collectors.toList());
+    }
+
+    /**
+     * Converts object of type Approval to object of type CristinApproval.
+     */
+    private CristinApproval toCristinApproval(Approval approval) {
+        return new CristinApproval(approval.getDate(),
+                                   CristinApprovalAuthorityBuilder.reverseLookup(approval.getAuthority()),
+                                   CristinApprovalStatusBuilder.reverseLookup(approval.getStatus()),
+                                   CristinApplicationCodeBuilder.reverseLookup(approval.getApplicationCode()),
+                                   approval.getIdentifier(),
+                                   approval.getAuthorityName());
+    }
+
+    private CristinContactInfo extractContactInfo(ContactInfo contactInfo) {
+        if (isNull(contactInfo)) {
+            return null;
+        }
+        return new CristinContactInfo(contactInfo.getContactPerson(),
+                                      contactInfo.getOrganization(),
+                                      contactInfo.getEmail(),
+                                      contactInfo.getPhone());
+    }
+
+    private List<String> extractRelatedProjects(List<URI> relatedProjects) {
+        return relatedProjects.stream()
+                   .map(uri -> UriUtils.nvaIdentifierToCristinIdentifier(uri, PROJECTS_PATH))
+                   .map(URI::toString)
+                   .collect(Collectors.toList());
+    }
+
+    private List<CristinTypedLabel> extractCristinTypedLabels(List<TypedLabel> typedLabels) {
+        return typedLabels.stream().map(this::toCristinTypedLabel).collect(Collectors.toList());
+    }
+
+    private CristinTypedLabel toCristinTypedLabel(TypedLabel typedLabel) {
+        return new CristinTypedLabel(typedLabel.getType(), typedLabel.getLabel());
     }
 
     private List<CristinExternalSource> extractExternalSources(List<ExternalSource> nvaExternalSources) {
