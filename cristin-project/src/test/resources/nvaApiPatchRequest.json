@@ -1,0 +1,27 @@
+{
+  "title": "Updated Title",
+  "language": "http://lexvo.org/id/iso639-3/eng",
+  "startDate": "2022-10-09T00:00:00.001Z",
+  "endDate": "2030-12-31T00:00:00.001Z",
+  "coordinatingInstitution": {
+    "type": "Organization",
+    "id": "https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0"
+  },
+  "contributors": [
+    {
+      "type": "ProjectManager",
+      "identity": {
+        "type": "Person",
+        "id": "https://api.dev.nva.aws.unit.no/cristin/person/538786"
+      }
+    }
+  ],
+  "funding": [
+    {
+      "source": {
+        "code": "NFR"
+      },
+      "code": "1234/PO"
+    }
+  ]
+}

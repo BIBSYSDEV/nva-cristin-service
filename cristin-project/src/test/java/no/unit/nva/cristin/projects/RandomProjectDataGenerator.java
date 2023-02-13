@@ -218,7 +218,7 @@ public class RandomProjectDataGenerator {
                           randomString() + EMAIL_DOMAIN, randomString());
     }
 
-    private static List<Funding> randomFundings() {
+    public static List<Funding> randomFundings() {
         return IntStream.rangeClosed(0, randomInteger(7))
                 .mapToObj(i -> randomFunding()).collect(Collectors.toList());
     }

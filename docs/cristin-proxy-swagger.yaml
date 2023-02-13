@@ -1917,17 +1917,21 @@ components:
                     description: Type of identity. Always Person
               affiliation:
                 $ref: '#/components/schemas/Organization'
-        status:
-          type: string
-          enum:
-            - NOTSTARTED
-            - ACTIVE
-            - CONCLUDED
-          description: Project status, based on start_date and end_date.
-        academicSummary:
-          $ref: '#/components/schemas/Languages'
-        popularScientificSummary:
-          $ref: '#/components/schemas/Languages'
+        funding:
+          type: array
+          description: List of fundings for the project
+          items:
+            type: object
+            properties:
+              source:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: Code of the funding source
+              code:
+                type: string
+                description: Project code of the funding related to this source
     Problem:
       type: object
       properties:
@@ -2816,7 +2820,10 @@ components:
             identity:
               type: 'Person'
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/538786'
-        status: NOTSTARTED
+        funding:
+          - source:
+              code: 'NFR'
+            code: '1234/PO'
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'

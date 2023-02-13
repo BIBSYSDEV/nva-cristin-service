@@ -14,8 +14,8 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
-import static no.unit.nva.utils.UriUtils.PROJECT;
 
 public class UpdateCristinProjectApiClient extends PatchApiClient {
 
@@ -48,7 +48,7 @@ public class UpdateCristinProjectApiClient extends PatchApiClient {
     }
 
     private URI generateCristinUri(String projectId) {
-        return UriWrapper.fromUri(CRISTIN_API_URL).addChild(PROJECT).addChild(projectId).getUri();
+        return UriWrapper.fromUri(CRISTIN_API_URL).addChild(PROJECTS_PATH).addChild(projectId).getUri();
     }
 
     private URI generateIdUri(String projectId) {

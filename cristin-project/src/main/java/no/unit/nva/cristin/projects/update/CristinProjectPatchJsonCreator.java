@@ -1,9 +1,16 @@
 package no.unit.nva.cristin.projects.update;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import no.unit.nva.cristin.projects.model.nva.Funding;
+import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
+import no.unit.nva.language.Language;
 import no.unit.nva.model.Organization;
 
 import java.net.URI;
@@ -13,13 +20,20 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_END_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
+import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
+import static no.unit.nva.language.LanguageConstants.UNDEFINED_LANGUAGE;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.CustomInstantSerializer.addMillisToInstantString;
 import static nva.commons.core.attempt.Try.attempt;
@@ -28,6 +42,7 @@ public class CristinProjectPatchJsonCreator {
 
     public static final String CRISTIN_COORDINATING_INSTITUTION = "coordinating_institution";
     public static final String PARTICIPANTS = "participants";
+
     private final transient ObjectNode input;
     private final transient ObjectNode output;
 
@@ -42,28 +57,49 @@ public class CristinProjectPatchJsonCreator {
      * title coordinating_institution institutions_responsible_for_research start_date end_date participants
      */
     public CristinProjectPatchJsonCreator create() {
-        addTitleAndLanguageIfBothPresent();
+        addTitleAndLanguageIfPresent();
         addCoordinatingInstitutionIfPresent();
         addContributorsIfPresent();
         addStartDateIfPresent();
         addEndDateIfPresent();
+        addFundingIfPresent();
         return this;
     }
 
-    private void addTitleAndLanguageIfBothPresent() {
-        var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
-        if (nonNull(language)) {
-            output.set(TITLE, OBJECT_MAPPER.valueToTree(Map.of(language.getIso6391Code(), input.get(TITLE).asText())));
+    private void addTitleAndLanguageIfPresent() {
+        if (input.has(LANGUAGE)) {
+            var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
+            var title = input.get(TITLE);
+            if (nonNull(language) && nonNull(title)) {
+                updateLanguage(language, title);
+            } else if (nonNull(language) && isSupportedLanguage(language)) {
+                eraseLanguage(language);
+            }
         }
+    }
+
+    private void updateLanguage(Language language, JsonNode title) {
+        output.set(TITLE, OBJECT_MAPPER.valueToTree(Map.of(language.getIso6391Code(), title.asText())));
+    }
+
+    private void eraseLanguage(Language language) {
+        var languageToBeErased = OBJECT_MAPPER.createObjectNode().putNull(language.getIso6391Code());
+        output.set(TITLE, languageToBeErased);
+    }
+
+    private boolean isSupportedLanguage(Language language) {
+        return !UNDEFINED_LANGUAGE.equals(language);
     }
 
     private void addCoordinatingInstitutionIfPresent() {
         if (input.has(COORDINATING_INSTITUTION)) {
             var coordinatingInstitution =
-                    attempt(() -> OBJECT_MAPPER.readValue(input.get(COORDINATING_INSTITUTION).asText(),
+                    attempt(() -> OBJECT_MAPPER.readValue(input.get(COORDINATING_INSTITUTION).toString(),
                             Organization.class))
                             .orElseThrow();
-            var cristinOrganization = fromOrganizationContainingInstitution(coordinatingInstitution);
+
+            var cristinOrganization = fromOrganizationContainingUnitIfPresent(coordinatingInstitution)
+                                          .orElse(fromOrganizationContainingInstitution(coordinatingInstitution));
             output.set(CRISTIN_COORDINATING_INSTITUTION, OBJECT_MAPPER.valueToTree(cristinOrganization));
         }
     }
@@ -73,20 +109,20 @@ public class CristinProjectPatchJsonCreator {
             TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
             };
             var contributors =
-                    attempt(() -> OBJECT_MAPPER.readValue(input.get(CONTRIBUTORS).asText(), typeRef)).orElseThrow();
+                    attempt(() -> OBJECT_MAPPER.readValue(input.get(CONTRIBUTORS).toString(), typeRef)).orElseThrow();
             output.set(PARTICIPANTS, OBJECT_MAPPER.valueToTree(extractContributors(contributors)));
         }
     }
 
     private void addStartDateIfPresent() {
         if (input.has(START_DATE)) {
-            output.put(START_DATE, addMillisToInstantString(input.get(START_DATE).asText()));
+            output.put(CRISTIN_START_DATE, addMillisToInstantString(input.get(START_DATE).asText()));
         }
     }
 
     private void addEndDateIfPresent() {
         if (input.has(END_DATE)) {
-            output.put(END_DATE, addMillisToInstantString(input.get(END_DATE).asText()));
+            output.put(CRISTIN_END_DATE, addMillisToInstantString(input.get(END_DATE).asText()));
         }
     }
 
@@ -96,5 +132,32 @@ public class CristinProjectPatchJsonCreator {
 
     private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
         return contributors.stream().map(NvaContributor::toCristinPersonWithRoles).collect(Collectors.toList());
+    }
+
+    private void addFundingIfPresent() {
+        if (input.has(FUNDING)) {
+            if (input.get(FUNDING).isNull()) {
+                output.putNull(PROJECT_FUNDING_SOURCES);
+                return;
+            }
+
+            var cristinFundingSources = new ArrayList<CristinFundingSource>();
+            var fundingSources = (ArrayNode) input.get(FUNDING);
+            fundingSources.forEach(node -> cristinFundingSources.add(oneFundingToCristinFunding(node)));
+
+            output.set(PROJECT_FUNDING_SOURCES, OBJECT_MAPPER.valueToTree(cristinFundingSources));
+        }
+    }
+
+    private CristinFundingSource oneFundingToCristinFunding(JsonNode fundingSource) {
+        var cristinFundingSource = new CristinFundingSource();
+        var sourceCode = fundingSource.get(SOURCE).get(FundingSource.CODE).asText();
+        cristinFundingSource.setFundingSourceCode(sourceCode);
+        if (fundingSource.has(Funding.CODE)) {
+            var projectCode = fundingSource.get(Funding.CODE).asText();
+            cristinFundingSource.setProjectCode(projectCode);
+        }
+
+        return cristinFundingSource;
     }
 }
