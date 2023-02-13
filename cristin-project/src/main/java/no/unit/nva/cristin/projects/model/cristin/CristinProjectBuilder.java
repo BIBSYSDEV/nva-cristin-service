@@ -75,6 +75,7 @@ public class CristinProjectBuilder {
         cristinProject.setProjectCategories(extractCristinTypedLabels(nvaProject.getProjectCategories()));
         cristinProject.setRelatedProjects(extractRelatedProjects(nvaProject.getRelatedProjects()));
         cristinProject.setContactInfo(extractContactInfo(nvaProject.getContactInfo()));
+        cristinProject.setExemptFromPublicDisclosure(nvaProject.getExemptFromPublicDisclosure());
 
         return cristinProject;
     }

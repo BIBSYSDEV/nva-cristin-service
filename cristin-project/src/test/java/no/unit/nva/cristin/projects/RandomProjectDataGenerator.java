@@ -40,6 +40,7 @@ import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.VALUE;
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringFields;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
+import static no.unit.nva.testutils.RandomDataGenerator.randomBoolean;
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
@@ -111,6 +112,7 @@ public class RandomProjectDataGenerator {
                                           .withInstitutionsResponsibleForResearch(List.of(randomOrganization()))
                                           .withHealthProjectData(randomHealthProjectData())
                                           .withApprovals(randomApprovals())
+                                          .withExemptFromPublicDisclosure(randomBoolean())
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;

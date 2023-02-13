@@ -139,6 +139,7 @@ public class NvaProjectBuilder {
                            cristinProject.getInstitutionsResponsibleForResearch()))
                    .withHealthProjectData(extractHealthProjectData(cristinProject))
                    .withApprovals(extractApprovals(cristinProject.getApprovals()))
+                   .withExemptFromPublicDisclosure(cristinProject.getExemptFromPublicDisclosure())
                    .build();
     }
 

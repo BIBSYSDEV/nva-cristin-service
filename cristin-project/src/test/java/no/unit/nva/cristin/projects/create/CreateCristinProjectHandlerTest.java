@@ -70,6 +70,7 @@ class CreateCristinProjectHandlerTest {
     public static final String SUPPLIED_CLINICAL_TRIAL_PHASE_IS_NOT_VALID = "Supplied ClinicalTrialPhase is not valid";
     public static final String HEALTH_PROJECT_TYPE_JSON_FIELD = "\"type\": \"%s\"";
     public static final String SUPPLIED_HEALTH_PROJECT_TYPE_IS_NOT_VALID = "Supplied HealthProjectType is not valid";
+    public static final boolean IS_EXEMPT_FROM_PUBLIC_DISCLOSURE = true;
 
     private final Environment environment = new Environment();
     private Context context;
@@ -313,21 +314,14 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldHaveProjectWithHealthDataAddedAndSentToUpstream() throws Exception {
-        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
-        apiClient = spy(apiClient);
-        handler = new CreateCristinProjectHandler(apiClient, environment);
+        var apiClient = createApiClientAndConnectToHandler();
 
         var nvaProject = randomNvaProject();
         nvaProject.setId(null);
         var healthProjectData = new HealthProjectData(DRUGSTUDY, null, PHASE_ONE);
         nvaProject.setHealthProjectData(healthProjectData);
 
-        mockUpstreamUsingRequest(nvaProject);
-        executeRequest(nvaProject);
-
-        var captor = ArgumentCaptor.forClass(String.class);
-        verify(apiClient).post(any(), captor.capture());
-        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+        var capturedCristinProject = captureCristinProjectFromApiClient(apiClient, nvaProject);
 
         var cristinHealthType = capturedCristinProject.getHealthProjectType();
         var nvaHealthType = nvaProject.getHealthProjectData().getType();
@@ -377,6 +371,34 @@ class CreateCristinProjectHandlerTest {
         var actualApprovals = capturedCristinProject.toNvaProject().getApprovals();
 
         assertThat(actualApprovals, equalTo(expectedApprovals));
+    }
+
+    @Test
+    void shouldHaveProjectWithExemptFromPublicDisclosureAddedAndSentToUpstream() throws Exception {
+        var apiClient = createApiClientAndConnectToHandler();
+        var nvaProject = randomMinimalNvaProject();
+        nvaProject.setExemptFromPublicDisclosure(IS_EXEMPT_FROM_PUBLIC_DISCLOSURE);
+        nvaProject.setId(null);
+        var capturedCristinProject = captureCristinProjectFromApiClient(apiClient, nvaProject);
+
+        assertThat(capturedCristinProject.getExemptFromPublicDisclosure(), equalTo(IS_EXEMPT_FROM_PUBLIC_DISCLOSURE));
+    }
+
+    private CristinProject captureCristinProjectFromApiClient(CreateCristinProjectApiClient apiClient,
+                                                              NvaProject nvaProject) throws Exception {
+        mockUpstreamUsingRequest(nvaProject);
+        executeRequest(nvaProject);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        return OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+    }
+
+    private CreateCristinProjectApiClient createApiClientAndConnectToHandler() {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+        return apiClient;
     }
 
     private String actualIdentifierFromOrganization(Organization organization) {
