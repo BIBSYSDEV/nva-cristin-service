@@ -10,9 +10,7 @@ import no.unit.nva.model.Organization;
 import no.unit.nva.utils.PatchValidator;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static java.lang.String.format;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -30,9 +28,6 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public class ProjectPatchValidator extends PatchValidator implements Validator<ObjectNode> {
 
-    private static final Set<String> SUPPORTED_PATCH_FIELDS =
-            Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE, FUNDING);
-    public static final String UNSUPPORTED_FIELDS_IN_PAYLOAD = "Unsupported fields in payload %s";
     public static final String TITLE_MUST_HAVE_A_LANGUAGE = "Title must have a language associated";
     public static final String FUNDING_MISSING_REQUIRED_FIELDS = "Funding missing required fields";
     public static final String MUST_BE_A_LIST = "Field %s must be a list";
@@ -45,7 +40,6 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
      */
     @Override
     public void validate(ObjectNode input) throws BadRequestException {
-        validateExtraPayload(input);
         validateTitleAndLanguage(input);
         validateContributors(input);
         validateCoordinatingInstitution(input);
@@ -60,18 +54,6 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         validateNotNullIfPresent(input, LANGUAGE);
         if (propertyHasValue(input, TITLE) && !propertyHasValue(input, LANGUAGE)) {
             throw new BadRequestException(TITLE_MUST_HAVE_A_LANGUAGE);
-        }
-    }
-
-    private static void validateExtraPayload(ObjectNode input) throws BadRequestException {
-        List<String> keys = new ArrayList<>();
-        input.fieldNames().forEachRemaining(field -> {
-            if (!SUPPORTED_PATCH_FIELDS.contains(field)) {
-                keys.add(field);
-            }
-        });
-        if (!keys.isEmpty()) {
-            throw new BadRequestException(format(UNSUPPORTED_FIELDS_IN_PAYLOAD, keys));
         }
     }
 
