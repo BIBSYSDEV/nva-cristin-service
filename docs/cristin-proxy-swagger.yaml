@@ -2102,13 +2102,18 @@ components:
               - NorwegianDirectorateOfHealth
           status:
             type: string
-            description: 'Status of the application sent to the approval authority.'
+            description: 'Status of the application sent to the approval authority. 
+            NOTAPPLIED: Not applied (en), Ikke søkt (nb), Ikkje søkt (nn); 
+            APPLIED: Applied (en), Søkt (nb), Søkt (nn); 
+            APPROVED: Approved (en), Godkjent (nb), Godkjent (nn); 
+            DECLINED: Declined (en), Avvist (nb) Avvist (nn); 
+            REJECTED: Rejected (en), Avslått (nb), Avslått (nn).'
             enum:
               - NotApplied
               - Applied
               - Approved
               - Declined
-              - Rejection
+              - Rejected
           applicationCode:
             type: string
             description: 'These codes apply only for applications to the approval authorities. 
