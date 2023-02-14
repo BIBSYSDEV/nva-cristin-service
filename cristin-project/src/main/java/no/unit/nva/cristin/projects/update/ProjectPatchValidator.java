@@ -19,6 +19,7 @@ import java.util.Set;
 import static java.lang.String.format;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CONTACT_INFO;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
@@ -44,7 +45,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     private static final Set<String> SUPPORTED_PATCH_FIELDS =
             Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE, FUNDING, KEYWORDS,
                    PROJECT_CATEGORIES, RELATED_PROJECTS, ACADEMIC_SUMMARY, POPULAR_SCIENTIFIC_SUMMARY, METHOD,
-                   EQUIPMENT);
+                   EQUIPMENT, CONTACT_INFO);
     public static final String UNSUPPORTED_FIELDS_IN_PAYLOAD = "Unsupported fields in payload %s";
     public static final String TITLE_MUST_HAVE_A_LANGUAGE = "Title must have a language associated";
     public static final String FUNDING_MISSING_REQUIRED_FIELDS = "Funding missing required fields";

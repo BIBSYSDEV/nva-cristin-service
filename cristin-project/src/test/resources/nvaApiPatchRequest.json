@@ -55,5 +55,11 @@
   "equipment": {
     "en": "Some equipment",
     "nn": null
+  },
+  "contactInfo": {
+    "contactPerson": "Helge Testesen",
+    "organization": "Agricultural University of Iceland",
+    "email": "helge@test.no",
+    "phone": null
   }
 }
