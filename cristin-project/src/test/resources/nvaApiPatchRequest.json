@@ -61,5 +61,10 @@
     "organization": "Agricultural University of Iceland",
     "email": "helge@test.no",
     "phone": null
-  }
+  },
+  "institutionsResponsibleForResearch": [
+    {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/organization/192.0.0.0"
+    }
+  ]
 }

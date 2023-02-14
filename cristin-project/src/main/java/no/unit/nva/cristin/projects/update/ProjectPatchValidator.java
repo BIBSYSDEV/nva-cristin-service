@@ -24,6 +24,8 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
@@ -40,12 +42,13 @@ import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.core.attempt.Try.attempt;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class ProjectPatchValidator extends PatchValidator implements Validator<ObjectNode> {
 
     private static final Set<String> SUPPORTED_PATCH_FIELDS =
             Set.of(TITLE, CONTRIBUTORS, COORDINATING_INSTITUTION, LANGUAGE, START_DATE, END_DATE, FUNDING, KEYWORDS,
                    PROJECT_CATEGORIES, RELATED_PROJECTS, ACADEMIC_SUMMARY, POPULAR_SCIENTIFIC_SUMMARY, METHOD,
-                   EQUIPMENT, CONTACT_INFO);
+                   EQUIPMENT, CONTACT_INFO, NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH);
     public static final String UNSUPPORTED_FIELDS_IN_PAYLOAD = "Unsupported fields in payload %s";
     public static final String TITLE_MUST_HAVE_A_LANGUAGE = "Title must have a language associated";
     public static final String FUNDING_MISSING_REQUIRED_FIELDS = "Funding missing required fields";
@@ -80,6 +83,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         validateDescription(input, POPULAR_SCIENTIFIC_SUMMARY);
         validateDescription(input, METHOD);
         validateDescription(input, EQUIPMENT);
+        validateResearchResponsibleOrganizationsIfPresent(input);
     }
 
     private static void validateTitleAndLanguage(ObjectNode input) throws BadRequestException {
@@ -209,5 +213,26 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
             attempt(() -> OBJECT_MAPPER.convertValue(description, new TypeReference<Map<String, String>>(){}))
                 .orElseThrow(failure -> new BadRequestException(format(NOT_A_VALID_KEY_VALUE_FIELD, fieldName)));
         }
+    }
+
+    private void validateResearchResponsibleOrganizationsIfPresent(ObjectNode input) throws BadRequestException {
+        if (input.has(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)
+            && !input.get(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH).isNull()) {
+            var organizations = input.get(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH);
+            validateIsArray(organizations, NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH);
+            try {
+                parseOrganizations(organizations);
+            } catch (Exception e) {
+                throw invalidOrganizationsException();
+            }
+        }
+    }
+
+    private BadRequestException invalidOrganizationsException() {
+        return new BadRequestException(format(ILLEGAL_VALUE_FOR_PROPERTY, NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH));
+    }
+
+    private void parseOrganizations(JsonNode organizations) {
+        organizations.forEach(node -> extractLastPathElement(URI.create(node.get(ID).asText())));
     }
 }
