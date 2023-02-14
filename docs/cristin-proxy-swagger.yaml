@@ -1932,6 +1932,19 @@ components:
               code:
                 type: string
                 description: Project code of the funding related to this source
+        keywords:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypedLabelPostPatch'
+        projectCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypedLabelPostPatch'
+        relatedProjects:
+          type: array
+          items:
+            type: string
+            description: URI or numeric value for the identifier of the related project
     Problem:
       type: object
       properties:
@@ -2089,13 +2102,18 @@ components:
               - NorwegianDirectorateOfHealth
           status:
             type: string
-            description: 'Status of the application sent to the approval authority.'
+            description: 'Status of the application sent to the approval authority. 
+            NOTAPPLIED: Not applied (en), Ikke søkt (nb), Ikkje søkt (nn); 
+            APPLIED: Applied (en), Søkt (nb), Søkt (nn); 
+            APPROVED: Approved (en), Godkjent (nb), Godkjent (nn); 
+            DECLINED: Declined (en), Avvist (nb) Avvist (nn); 
+            REJECTED: Rejected (en), Avslått (nb), Avslått (nn).'
             enum:
               - NotApplied
               - Applied
               - Approved
               - Declined
-              - Rejection
+              - Rejected
           applicationCode:
             type: string
             description: 'These codes apply only for applications to the approval authorities. 
@@ -2147,6 +2165,12 @@ components:
             code:
               type: string
               description: Code of the funding source, like NFR
+    TypedLabelPostPatch:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type (code)
     Persons:
       type: object
       properties:
@@ -2824,6 +2848,13 @@ components:
           - source:
               code: 'NFR'
             code: '1234/PO'
+        keywords:
+          - type: '4837'
+          - type: '5686'
+        projectCategories:
+          - type: 'PHD'
+        relatedProjects:
+          - 'https://api.dev.nva.aws.unit.no/cristin/project/483302'
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'

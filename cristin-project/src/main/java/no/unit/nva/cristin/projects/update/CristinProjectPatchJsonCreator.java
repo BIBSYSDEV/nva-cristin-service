@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
@@ -28,14 +29,21 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
+import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_PROJECT_CATEGORIES;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_RELATED_PROJECTS;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.language.LanguageConstants.UNDEFINED_LANGUAGE;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.CustomInstantSerializer.addMillisToInstantString;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class CristinProjectPatchJsonCreator {
@@ -63,6 +71,9 @@ public class CristinProjectPatchJsonCreator {
         addStartDateIfPresent();
         addEndDateIfPresent();
         addFundingIfPresent();
+        addKeywordsIfPresent();
+        addProjectCategoriesIfPresent();
+        addRelatedProjectsIfPresent();
         return this;
     }
 
@@ -159,5 +170,44 @@ public class CristinProjectPatchJsonCreator {
         }
 
         return cristinFundingSource;
+    }
+
+    private void addKeywordsIfPresent() {
+        if (input.has(KEYWORDS)) {
+            addTypedLabelsUsingFieldNames(KEYWORDS, KEYWORDS);
+        }
+    }
+
+    private void addProjectCategoriesIfPresent() {
+        if (input.has(PROJECT_CATEGORIES)) {
+            addTypedLabelsUsingFieldNames(PROJECT_CATEGORIES, CRISTIN_PROJECT_CATEGORIES);
+        }
+    }
+
+    private void addTypedLabelsUsingFieldNames(String fieldName, String outputFieldName) {
+        if (input.get(fieldName).isNull()) {
+            output.putNull(fieldName);
+        }
+
+        var cristinLabels = new ArrayList<CristinTypedLabel>();
+        var labels = (ArrayNode) input.get(fieldName);
+        labels.forEach(node -> cristinLabels.add(new CristinTypedLabel(node.get(TYPE).asText(), null)));
+
+        output.set(outputFieldName, OBJECT_MAPPER.valueToTree(cristinLabels));
+    }
+
+    private void addRelatedProjectsIfPresent() {
+        if (input.has(RELATED_PROJECTS)) {
+            var relatedProjects = input.get(RELATED_PROJECTS);
+            if (relatedProjects.isNull()) {
+                output.putNull(CRISTIN_RELATED_PROJECTS);
+                return;
+            }
+            var identifiers = new ArrayList<String>();
+            for (JsonNode project : relatedProjects) {
+                identifiers.add(extractLastPathElement(URI.create(project.asText())));
+            }
+            output.putPOJO(CRISTIN_RELATED_PROJECTS, identifiers);
+        }
     }
 }

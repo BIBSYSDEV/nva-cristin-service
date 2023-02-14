@@ -37,6 +37,22 @@ Feature: API tests for Cristin Project Update
           },
           'code': '1234'
         }
+      ],
+      'keywords': [
+        {
+          'type': '5686'
+        },
+        {
+          'type': '4245'
+        }
+      ],
+      'projectCategories': [
+        {
+          'type': 'PHD'
+        }
+      ],
+      'relatedProjects': [
+        'https://api.dev.nva.aws.unit.no/cristin/project/483302'
       ]
     }
     """
