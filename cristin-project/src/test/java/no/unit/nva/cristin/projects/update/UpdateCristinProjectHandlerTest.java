@@ -5,18 +5,23 @@ import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.FUNDING_MISSING_REQUIRED_FIELDS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.KEYWORDS_MISSING_REQUIRED_FIELD_TYPE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST_OF_IDENTIFIERS;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_KEY_VALUE_FIELD;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.TITLE_MUST_HAVE_A_LANGUAGE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE;
@@ -199,7 +204,15 @@ class UpdateCristinProjectHandlerTest {
             Arguments.of(PROJECT_CATEGORIES, missingRequiredFieldType(PROJECT_CATEGORIES),
                          PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE),
             Arguments.of(RELATED_PROJECTS, notAnArray(RELATED_PROJECTS), format(MUST_BE_A_LIST, RELATED_PROJECTS)),
-            Arguments.of(RELATED_PROJECTS, notListOfStrings(), MUST_BE_A_LIST_OF_IDENTIFIERS)
+            Arguments.of(RELATED_PROJECTS, notListOfStrings(), MUST_BE_A_LIST_OF_IDENTIFIERS),
+            Arguments.of(ACADEMIC_SUMMARY, notADescription(ACADEMIC_SUMMARY),
+                         format(NOT_A_VALID_KEY_VALUE_FIELD, ACADEMIC_SUMMARY)),
+            Arguments.of(POPULAR_SCIENTIFIC_SUMMARY, notADescription(POPULAR_SCIENTIFIC_SUMMARY),
+                         format(NOT_A_VALID_KEY_VALUE_FIELD, POPULAR_SCIENTIFIC_SUMMARY)),
+            Arguments.of(METHOD, notADescription(METHOD),
+                         format(NOT_A_VALID_KEY_VALUE_FIELD, METHOD)),
+            Arguments.of(EQUIPMENT, notADescription(EQUIPMENT),
+                         format(NOT_A_VALID_KEY_VALUE_FIELD, EQUIPMENT))
         );
     }
 
@@ -247,6 +260,12 @@ class UpdateCristinProjectHandlerTest {
         var array = OBJECT_MAPPER.createArrayNode();
         array.add(objectField);
         input.set(RELATED_PROJECTS, array);
+        return input;
+    }
+
+    private static JsonNode notADescription(String fieldName) {
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.put(fieldName, randomString());
         return input;
     }
 

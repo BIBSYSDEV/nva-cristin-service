@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
+import java.util.Map;
 import no.unit.nva.Validator;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.model.Organization;
@@ -15,17 +16,21 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
 import static no.unit.nva.cristin.projects.model.nva.Funding.CODE;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -42,6 +47,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
                                                                                 + "field 'type'";
     public static final String MUST_BE_A_LIST_OF_IDENTIFIERS = "RelatedProjects must be a list of identifiers, "
                                                                + "numeric or URI";
+    public static final String NOT_A_VALID_KEY_VALUE_FIELD = "%s not a valid key value field";
 
     /**
      * Validate changes to Project, both nullable fields and values.
@@ -61,6 +67,10 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         validateKeywordsIfPresent(input);
         validateProjectCategoriesIfPresent(input);
         validateRelatedProjects(input);
+        validateDescription(input, ACADEMIC_SUMMARY);
+        validateDescription(input, POPULAR_SCIENTIFIC_SUMMARY);
+        validateDescription(input, METHOD);
+        validateDescription(input, EQUIPMENT);
     }
 
     private static void validateTitleAndLanguage(ObjectNode input) throws BadRequestException {
@@ -169,6 +179,14 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
                 attempt(() -> extractLastPathElement(URI.create(project.asText())))
                     .orElseThrow(failure -> new BadRequestException(MUST_BE_A_LIST_OF_IDENTIFIERS));
             }
+        }
+    }
+
+    private void validateDescription(ObjectNode input, String fieldName) throws BadRequestException {
+        if (input.has(fieldName)) {
+            var description = input.get(fieldName);
+            attempt(() -> OBJECT_MAPPER.convertValue(description, new TypeReference<Map<String, String>>(){}))
+                .orElseThrow(failure -> new BadRequestException(format(NOT_A_VALID_KEY_VALUE_FIELD, fieldName)));
         }
     }
 }

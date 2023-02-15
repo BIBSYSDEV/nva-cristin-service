@@ -53,7 +53,23 @@ Feature: API tests for Cristin Project Update
       ],
       'relatedProjects': [
         'https://api.dev.nva.aws.unit.no/cristin/project/483302'
-      ]
+      ],
+      'academicSummary': {
+        'en': 'Some academic summary',
+        'nn': null
+      },
+      'popularScientificSummary': {
+        'en': 'Some popular scientific summary',
+        'nn': null
+      },
+      'method': {
+        'en': 'Some method',
+        'nn': null
+      },
+      'equipment': {
+        'en': 'Some equipment',
+        'nn': null
+      }
     }
     """
     Given url CRISTIN_BASE

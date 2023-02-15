@@ -1945,6 +1945,14 @@ components:
           items:
             type: string
             description: URI or numeric value for the identifier of the related project
+        academicSummary:
+          $ref: '#/components/schemas/Languages'
+        popularScientificSummary:
+          $ref: '#/components/schemas/Languages'
+        method:
+          $ref: '#/components/schemas/Languages'
+        equipment:
+          $ref: '#/components/schemas/Languages'
     Problem:
       type: object
       properties:
@@ -2855,6 +2863,16 @@ components:
           - type: 'PHD'
         relatedProjects:
           - 'https://api.dev.nva.aws.unit.no/cristin/project/483302'
+        academicSummary:
+          en: 'Some academic summary'
+          nn: 'null'
+        popularScientificSummary:
+          en: 'Some popular scientific summary'
+          nb: 'null'
+        method:
+          en: 'Some method'
+        equipment:
+          en: 'Some equipment'
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
