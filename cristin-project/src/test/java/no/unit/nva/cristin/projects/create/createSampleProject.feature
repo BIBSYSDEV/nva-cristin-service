@@ -130,7 +130,7 @@ Feature: API tests for Cristin Project retrieve and search
       'contactInfo': {
         'type': 'ContactInfo',
         'contactPerson': 'Navn Navnesen',
-        'institution': 'Universitetet i Oslo',
+        'organization': 'Universitetet i Oslo',
         'email': 'navn.navnesen@uio.no',
         'phone': '99223344'
       }
@@ -154,6 +154,15 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.approvals[0].applicationCode == 'EthicalApproval'
     And match response.approvals[0].identifier == '2017/800'
     And match response.approvals[0].authorityName == '#present'
+    And match response.contactInfo.contactPerson == 'Navn Navnesen'
+    And match response.contactInfo.organization == 'Universitetet i Oslo'
+    And match response.contactInfo.email == 'navn.navnesen@uio.no'
+    And match response.contactInfo.phone == '99223344'
+    And match response.relatedProjects == '#[1]'
+    And match response.projectCategories == '#[1]'
+    And match response.keywords == '#[2]'
+    And match response.externalSources == '#[1]'
+    And match response.funding == '#[1]'
     And print response
 
   Scenario: Creating project with only minimum required data returns 201 Created

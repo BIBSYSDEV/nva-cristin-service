@@ -69,6 +69,12 @@ Feature: API tests for Cristin Project Update
       'equipment': {
         'en': 'Some equipment',
         'nn': null
+      },
+      'contactInfo': {
+        'contactPerson': 'Navn Navnesen',
+        'organization': 'Universitetet i Oslo',
+        'email': 'navn.navnesen@uio.no',
+        'phone': null
       }
     }
     """

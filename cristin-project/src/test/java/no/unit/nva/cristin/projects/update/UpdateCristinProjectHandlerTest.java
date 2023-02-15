@@ -6,6 +6,8 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAY
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CONTACT_INFO;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_CONTACT_INFO;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
@@ -13,8 +15,10 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUM
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
+import static no.unit.nva.cristin.projects.model.cristin.CristinContactInfo.CRISTIN_CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
+import static no.unit.nva.cristin.projects.model.nva.ContactInfo.CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.FUNDING_MISSING_REQUIRED_FIELDS;
@@ -32,6 +36,7 @@ import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static no.unit.nva.utils.PatchValidator.COULD_NOT_PARSE_LANGUAGE_FIELD;
 import static no.unit.nva.utils.PatchValidator.ILLEGAL_VALUE_FOR_PROPERTY;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -55,6 +60,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.exception.FailedHttpRequestException;
+import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
@@ -122,22 +129,14 @@ class UpdateCristinProjectHandlerTest {
 
     @Test
     void shouldProduceCorrectPayloadToSendToCristin() throws Exception {
-        var mockHttpClient = mock(HttpClient.class);
-        var apiClient = new UpdateCristinProjectApiClient(mockHttpClient);
-        apiClient = spy(apiClient);
-        handler = new UpdateCristinProjectHandler(apiClient, environment);
-        mockUpstream(mockHttpClient);
+        var apiClient = spyOnApiClient();
         var input = IoUtils.stringFromResources(Path.of(PATCH_REQUEST_JSON));
         sendQuery(input);
 
-        var captor = ArgumentCaptor.forClass(String.class);
-        verify(apiClient).patch(any(), captor.capture());
-        var capturedCristinProjectString = captor.getValue();
-
+        var actualPayload = captureCristinPayload(apiClient);
         var expectedPayload = IoUtils.stringFromResources(Path.of(CRISTIN_PATCH_REQUEST_JSON));
 
-        assertThat(OBJECT_MAPPER.readTree(capturedCristinProjectString),
-                   equalTo(OBJECT_MAPPER.readTree(expectedPayload)));
+        assertThat(OBJECT_MAPPER.readTree(actualPayload), equalTo(OBJECT_MAPPER.readTree(expectedPayload)));
     }
 
     @ParameterizedTest(name = "Allowing null value for field {0}")
@@ -157,6 +156,39 @@ class UpdateCristinProjectHandlerTest {
         var gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldDefaultToEmptyStringAndNotCrashWhenSendingNonTextualValuesForContactInfoFields() throws Exception {
+        var apiClient = spyOnApiClient();
+        var input = OBJECT_MAPPER.createObjectNode();
+        var contactInfo = OBJECT_MAPPER.createObjectNode();
+        contactInfo.putPOJO(CONTACT_PERSON, Map.of(randomString(), randomString()));
+        input.set(CONTACT_INFO, contactInfo);
+
+        var gatewayResponse = sendQuery(input.toString());
+        var actualPayload = captureCristinPayload(apiClient);
+
+        var actualContactInfo = OBJECT_MAPPER.readTree(actualPayload).get(CRISTIN_CONTACT_INFO);
+
+        assertThat(actualContactInfo.get(CRISTIN_CONTACT_PERSON).asText(), equalTo(EMPTY_STRING));
+        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    private UpdateCristinProjectApiClient spyOnApiClient() throws IOException, InterruptedException {
+        var mockHttpClient = mock(HttpClient.class);
+        var apiClient = new UpdateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new UpdateCristinProjectHandler(apiClient, environment);
+        mockUpstream(mockHttpClient);
+        return apiClient;
+    }
+
+    private String captureCristinPayload(UpdateCristinProjectApiClient apiClient)
+        throws GatewayTimeoutException, FailedHttpRequestException {
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).patch(any(), captor.capture());
+        return captor.getValue();
     }
 
     private void mockUpstream(HttpClient mockHttpClient) throws IOException, InterruptedException {

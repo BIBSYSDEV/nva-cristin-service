@@ -68,5 +68,7 @@ public class JsonPropertyNames {
     public static final String RELATED_PROJECTS = "relatedProjects";
     public static final String ACADEMIC_SUMMARY = "academicSummary";
     public static final String POPULAR_SCIENTIFIC_SUMMARY = "popularScientificSummary";
+    public static final String CONTACT_INFO = "contactInfo";
+    public static final String CRISTIN_CONTACT_INFO = "contact_info";
 
 }
