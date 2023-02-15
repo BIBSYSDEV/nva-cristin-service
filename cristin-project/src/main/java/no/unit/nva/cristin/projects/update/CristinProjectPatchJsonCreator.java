@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
+import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
@@ -34,8 +35,10 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.EMAIL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PHONE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
@@ -49,6 +52,7 @@ import static no.unit.nva.cristin.projects.model.cristin.CristinContactInfo.CRIS
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_RELATED_PROJECTS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
@@ -93,6 +97,8 @@ public class CristinProjectPatchJsonCreator {
         addMethodIfPresent();
         addEquipmentIfPresent();
         addContactInfoIfPresent();
+        addResponsibleInstitutionsIfPresent();
+
         return this;
     }
 
@@ -128,8 +134,7 @@ public class CristinProjectPatchJsonCreator {
                             Organization.class))
                             .orElseThrow();
 
-            var cristinOrganization = fromOrganizationContainingUnitIfPresent(coordinatingInstitution)
-                                          .orElse(fromOrganizationContainingInstitution(coordinatingInstitution));
+            var cristinOrganization = extractCristinOrganization(coordinatingInstitution);
             output.set(CRISTIN_COORDINATING_INSTITUTION, OBJECT_MAPPER.valueToTree(cristinOrganization));
         }
     }
@@ -280,4 +285,30 @@ public class CristinProjectPatchJsonCreator {
         }
     }
 
+    private void addResponsibleInstitutionsIfPresent() {
+        if (input.has(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)) {
+            var responsibleInstitutions = input.get(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH);
+            if (responsibleInstitutions.isNull()) {
+                output.putNull(INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH);
+                return;
+            }
+            var cristinOrganizations = new ArrayList<CristinOrganization>();
+            for (JsonNode responsibleInstitution : responsibleInstitutions) {
+                var organization = extractOrganization(responsibleInstitution);
+                var cristinOrganization = extractCristinOrganization(organization);
+                cristinOrganizations.add(cristinOrganization);
+            }
+
+            output.set(INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH, OBJECT_MAPPER.valueToTree(cristinOrganizations));
+        }
+    }
+
+    private CristinOrganization extractCristinOrganization(Organization organization) {
+        return fromOrganizationContainingUnitIfPresent(organization)
+                   .orElse(fromOrganizationContainingInstitution(organization));
+    }
+
+    private Organization extractOrganization(JsonNode institution) {
+        return new Organization.Builder().withId(URI.create(institution.get(ID).asText())).build();
+    }
 }

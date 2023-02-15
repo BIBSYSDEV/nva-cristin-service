@@ -11,6 +11,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_CONTACT_INFO;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
@@ -140,7 +141,7 @@ class UpdateCristinProjectHandlerTest {
     }
 
     @ParameterizedTest(name = "Allowing null value for field {0}")
-    @ValueSource(strings = {"funding", "relatedProjects"})
+    @ValueSource(strings = {"funding", "relatedProjects", "institutionsResponsibleForResearch"})
     void shouldAllowFieldsWhichCanBeNullable(String fieldName) throws IOException {
         var input = OBJECT_MAPPER.createObjectNode().putNull(fieldName);
         var gatewayResponse = sendQuery(input.toString());
@@ -244,7 +245,9 @@ class UpdateCristinProjectHandlerTest {
             Arguments.of(METHOD, notADescription(METHOD),
                          format(NOT_A_VALID_KEY_VALUE_FIELD, METHOD)),
             Arguments.of(EQUIPMENT, notADescription(EQUIPMENT),
-                         format(NOT_A_VALID_KEY_VALUE_FIELD, EQUIPMENT))
+                         format(NOT_A_VALID_KEY_VALUE_FIELD, EQUIPMENT)),
+            Arguments.of(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH, notAnOrganization(),
+                         format(ILLEGAL_VALUE_FOR_PROPERTY, NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH))
         );
     }
 
@@ -298,6 +301,15 @@ class UpdateCristinProjectHandlerTest {
     private static JsonNode notADescription(String fieldName) {
         var input = OBJECT_MAPPER.createObjectNode();
         input.put(fieldName, randomString());
+        return input;
+    }
+
+    private static JsonNode notAnOrganization() {
+        var input = OBJECT_MAPPER.createObjectNode();
+        var objectField = OBJECT_MAPPER.createObjectNode().put(randomString(), randomString());
+        var array = OBJECT_MAPPER.createArrayNode();
+        array.add(objectField);
+        input.set(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH, array);
         return input;
     }
 
