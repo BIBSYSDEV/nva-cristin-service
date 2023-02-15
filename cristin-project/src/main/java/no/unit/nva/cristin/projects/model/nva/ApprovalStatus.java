@@ -12,7 +12,7 @@ public enum ApprovalStatus {
     APPLIED("Applied"),
     APPROVED("Approved"),
     DECLINED("Declined"),
-    REJECTION("Rejection");
+    REJECTED("Rejected");
 
     public static final String ERROR_MESSAGE_TEMPLATE = "Supplied ApprovalStatus is not valid expected one of: %s";
     public static final String DELIMITER = ", ";
