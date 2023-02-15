@@ -7,19 +7,15 @@ import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTACT_INFO;
-import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_ACADEMIC_SUMMARY;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_CONTACT_INFO;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_POPULAR_SCIENTIFIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
-import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNamesMap;
 import static no.unit.nva.cristin.projects.model.cristin.CristinContactInfo.CRISTIN_CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
@@ -32,9 +28,8 @@ import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST_OF_IDENTIFIERS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_KEY_VALUE_FIELD;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.TITLE_MUST_HAVE_A_LANGUAGE;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE;
-import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.UNSUPPORTED_FIELDS_IN_PAYLOAD;
-import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomStatus;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
@@ -62,7 +57,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -87,6 +81,7 @@ class UpdateCristinProjectHandlerTest {
     private static final Map<String, String> validPath = Map.of(PROJECT_IDENTIFIER, randomIntegerAsString());
     public static final String PATCH_REQUEST_JSON = "nvaApiPatchRequest.json";
     public static final String CRISTIN_PATCH_REQUEST_JSON = "cristinPatchRequest.json";
+    public static final String UNSUPPORTED_FIELD = "unsupportedField";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private Context context;
@@ -125,22 +120,6 @@ class UpdateCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
-    @Test
-    void shouldReturnBadRequestWhenNoSupportedFieldsArePresent() throws IOException {
-        var jsonObject = OBJECT_MAPPER.createObjectNode();
-        jsonObject.put(CRISTIN_ACADEMIC_SUMMARY, randomNamesMap().toString());
-        jsonObject.put(ALTERNATIVE_TITLES, randomNamesMap().toString());
-        jsonObject.put(CRISTIN_POPULAR_SCIENTIFIC_SUMMARY, randomNamesMap().toString());
-        jsonObject.put(STATUS, randomStatus().toString());
-        var gatewayResponse = sendQuery(jsonObject.toString());
-
-        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-
-        var keys = new ArrayList<>();
-        jsonObject.fieldNames().forEachRemaining(keys::add);
-        assertThat(gatewayResponse.getBody(), containsString(format(UNSUPPORTED_FIELDS_IN_PAYLOAD, keys)));
-    }
-
     @ParameterizedTest(name = "Exception for field {0} with message {2}")
     @MethodSource("badRequestProvider")
     void shouldReturnBadRequestOnInvalidJson(String field, JsonNode input, String exceptionMessage) throws IOException {
@@ -165,6 +144,16 @@ class UpdateCristinProjectHandlerTest {
     @ValueSource(strings = {"funding", "relatedProjects", "institutionsResponsibleForResearch"})
     void shouldAllowFieldsWhichCanBeNullable(String fieldName) throws IOException {
         var input = OBJECT_MAPPER.createObjectNode().putNull(fieldName);
+        var gatewayResponse = sendQuery(input.toString());
+
+        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldSilentlyIgnoreUnsupportedFieldsInPayload() throws IOException {
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.put(START_DATE, randomInstant().toString());
+        input.put(UNSUPPORTED_FIELD, randomString());
         var gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());

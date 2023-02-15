@@ -19,7 +19,7 @@ public class CristinApprovalStatusBuilder implements EnumBuilder<CristinApproval
     public static final String CRISTIN_DECLINED = "DECLINED";
     public static final String DECLINED = "Declined";
     public static final String CRISTIN_REJECTION = "REJECTION";
-    public static final String REJECTION = "Rejection";
+    public static final String REJECTED = "Rejected";
 
     @Override
     public ApprovalStatus build(CristinApproval cristinApproval) {
@@ -45,6 +45,6 @@ public class CristinApprovalStatusBuilder implements EnumBuilder<CristinApproval
                       CRISTIN_APPLIED, APPLIED,
                       CRISTIN_APPROVED, APPROVED,
                       CRISTIN_DECLINED, DECLINED,
-                      CRISTIN_REJECTION, REJECTION);
+                      CRISTIN_REJECTION, REJECTED);
     }
 }
