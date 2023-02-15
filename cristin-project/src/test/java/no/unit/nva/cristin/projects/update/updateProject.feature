@@ -75,7 +75,12 @@ Feature: API tests for Cristin Project Update
         'organization': 'Universitetet i Oslo',
         'email': 'navn.navnesen@uio.no',
         'phone': null
-      }
+      },
+      'institutionsResponsibleForResearch': [
+        {
+          'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
+        }
+      ]
     }
     """
     Given url CRISTIN_BASE
