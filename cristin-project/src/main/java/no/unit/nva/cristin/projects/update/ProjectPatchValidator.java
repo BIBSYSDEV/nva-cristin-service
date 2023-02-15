@@ -17,6 +17,7 @@ import java.util.List;
 import static java.lang.String.format;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
@@ -48,6 +49,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     public static final String MUST_BE_A_LIST_OF_IDENTIFIERS = "RelatedProjects must be a list of identifiers, "
                                                                + "numeric or URI";
     public static final String NOT_A_VALID_KEY_VALUE_FIELD = "%s not a valid key value field";
+    public static final String NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS = "%s not a valid list of key value fields";
 
     /**
      * Validate changes to Project, both nullable fields and values.
@@ -71,6 +73,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         validateDescription(input, POPULAR_SCIENTIFIC_SUMMARY);
         validateDescription(input, METHOD);
         validateDescription(input, EQUIPMENT);
+        validateExtraLanguages(input);
     }
 
     private static void validateTitleAndLanguage(ObjectNode input) throws BadRequestException {
@@ -185,8 +188,29 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     private void validateDescription(ObjectNode input, String fieldName) throws BadRequestException {
         if (input.has(fieldName)) {
             var description = input.get(fieldName);
-            attempt(() -> OBJECT_MAPPER.convertValue(description, new TypeReference<Map<String, String>>(){}))
-                .orElseThrow(failure -> new BadRequestException(format(NOT_A_VALID_KEY_VALUE_FIELD, fieldName)));
+            attempt(() -> convertToMap(description)).orElseThrow(failure -> notAMapException(fieldName));
         }
+    }
+
+    private BadRequestException notAMapException(String fieldName) {
+        return new BadRequestException(format(NOT_A_VALID_KEY_VALUE_FIELD, fieldName));
+    }
+
+    public static Map<String, String> convertToMap(JsonNode node) {
+        return OBJECT_MAPPER.convertValue(node, new TypeReference<>() {});
+    }
+
+    private void validateExtraLanguages(ObjectNode input) throws BadRequestException {
+        if (input.has(ALTERNATIVE_TITLES) && !input.get(ALTERNATIVE_TITLES).isNull()) {
+            var alternativeTitles = input.get(ALTERNATIVE_TITLES);
+            validateIsArray(alternativeTitles, ALTERNATIVE_TITLES);
+            for (JsonNode title : alternativeTitles) {
+                attempt(() -> convertToMap(title)).orElseThrow(failure -> notAListOfMapsException());
+            }
+        }
+    }
+
+    private BadRequestException notAListOfMapsException() {
+        return new BadRequestException(format(NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS, ALTERNATIVE_TITLES));
     }
 }

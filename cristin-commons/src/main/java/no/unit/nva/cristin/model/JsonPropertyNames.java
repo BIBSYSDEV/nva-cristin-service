@@ -29,8 +29,6 @@ public class JsonPropertyNames {
     public static final String FIRST_NAME = "firstName";
     public static final String LAST_NAME = "lastName";
     public static final String STATUS = "status";
-    public static final String CRISTIN_ACADEMIC_SUMMARY = "academic_summary";
-    public static final String CRISTIN_POPULAR_SCIENTIFIC_SUMMARY = "popular_scientific_summary";
     public static final String PART_OF = "partOf";
     public static final String HAS_PART = "hasPart";
     public static final String ACRONYM = "acronym";

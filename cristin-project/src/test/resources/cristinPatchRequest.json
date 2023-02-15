@@ -1,6 +1,8 @@
 {
   "title": {
-    "en": "Updated Title"
+    "en": "Updated Title",
+    "nb": "Tittel på bokmål",
+    "nn": null
   },
   "coordinating_institution": {
     "unit": {
@@ -57,5 +59,6 @@
   "equipment": {
     "en": "Some equipment",
     "nn": null
-  }
+  },
+  "main_language": "en"
 }

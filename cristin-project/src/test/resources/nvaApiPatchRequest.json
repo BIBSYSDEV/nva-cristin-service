@@ -55,5 +55,13 @@
   "equipment": {
     "en": "Some equipment",
     "nn": null
-  }
+  },
+  "alternativeTitles": [
+    {
+      "nb": "Tittel på bokmål"
+    },
+    {
+      "nn": null
+    }
+  ]
 }

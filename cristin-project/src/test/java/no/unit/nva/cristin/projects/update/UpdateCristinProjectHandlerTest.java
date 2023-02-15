@@ -6,6 +6,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAY
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
@@ -22,6 +23,7 @@ import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.KEYWORDS
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST_OF_IDENTIFIERS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_KEY_VALUE_FIELD;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.TITLE_MUST_HAVE_A_LANGUAGE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE;
@@ -212,7 +214,9 @@ class UpdateCristinProjectHandlerTest {
             Arguments.of(METHOD, notADescription(METHOD),
                          format(NOT_A_VALID_KEY_VALUE_FIELD, METHOD)),
             Arguments.of(EQUIPMENT, notADescription(EQUIPMENT),
-                         format(NOT_A_VALID_KEY_VALUE_FIELD, EQUIPMENT))
+                         format(NOT_A_VALID_KEY_VALUE_FIELD, EQUIPMENT)),
+            Arguments.of(ALTERNATIVE_TITLES, notAListOfMaps(),
+                         format(NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS, ALTERNATIVE_TITLES))
         );
     }
 
@@ -266,6 +270,14 @@ class UpdateCristinProjectHandlerTest {
     private static JsonNode notADescription(String fieldName) {
         var input = OBJECT_MAPPER.createObjectNode();
         input.put(fieldName, randomString());
+        return input;
+    }
+
+    private static JsonNode notAListOfMaps() {
+        var input = OBJECT_MAPPER.createObjectNode();
+        var array = OBJECT_MAPPER.createArrayNode();
+        array.add(randomString());
+        input.set(ALTERNATIVE_TITLES, array);
         return input;
     }
 

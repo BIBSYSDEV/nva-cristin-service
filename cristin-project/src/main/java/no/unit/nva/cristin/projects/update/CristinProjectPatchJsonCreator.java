@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
@@ -16,18 +17,16 @@ import no.unit.nva.model.Organization;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
-import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_END_DATE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
@@ -39,6 +38,9 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_MAIN_LANGUAGE;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_RELATED_PROJECTS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
@@ -46,6 +48,7 @@ import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.convertToMap;
 import static no.unit.nva.language.LanguageConstants.UNDEFINED_LANGUAGE;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.CustomInstantSerializer.addMillisToInstantString;
@@ -88,24 +91,32 @@ public class CristinProjectPatchJsonCreator {
     }
 
     private void addTitleAndLanguageIfPresent() {
+        var cristinTitles = new HashMap<String, String>();
+
         if (input.has(LANGUAGE)) {
             var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
             var title = input.get(TITLE);
-            if (nonNull(language) && nonNull(title)) {
-                updateLanguage(language, title);
-            } else if (nonNull(language) && isSupportedLanguage(language)) {
-                eraseLanguage(language);
+            if (nonNull(language)) {
+                output.put(CRISTIN_MAIN_LANGUAGE, language.getIso6391Code());
+            }
+            if (nonNull(language) && isSupportedLanguage(language)) {
+                if (nonNull(title)) {
+                    cristinTitles.put(language.getIso6391Code(), title.asText());
+                } else {
+                    cristinTitles.put(language.getIso6391Code(), null);
+                }
             }
         }
-    }
 
-    private void updateLanguage(Language language, JsonNode title) {
-        output.set(TITLE, OBJECT_MAPPER.valueToTree(Map.of(language.getIso6391Code(), title.asText())));
-    }
+        if (input.has(ALTERNATIVE_TITLES) && !input.get(ALTERNATIVE_TITLES).isNull()) {
+            var alternativeTitles = input.get(ALTERNATIVE_TITLES);
+            for (JsonNode title : alternativeTitles) {
+                var map = convertToMap(title);
+                cristinTitles.putAll(map);
+            }
+        }
 
-    private void eraseLanguage(Language language) {
-        var languageToBeErased = OBJECT_MAPPER.createObjectNode().putNull(language.getIso6391Code());
-        output.set(TITLE, languageToBeErased);
+        output.putPOJO(TITLE, cristinTitles);
     }
 
     private boolean isSupportedLanguage(Language language) {
