@@ -40,6 +40,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PHONE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
@@ -110,10 +111,8 @@ public class CristinProjectPatchJsonCreator {
         if (input.has(LANGUAGE)) {
             var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
             var title = input.get(TITLE);
-            if (nonNull(language)) {
-                output.put(CRISTIN_MAIN_LANGUAGE, language.getIso6391Code());
-            }
             if (nonNull(language) && isSupportedLanguage(language)) {
+                output.put(CRISTIN_MAIN_LANGUAGE, language.getIso6391Code());
                 if (nonNull(title)) {
                     cristinTitles.put(language.getIso6391Code(), title.asText());
                 } else {
