@@ -22,6 +22,8 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
@@ -38,6 +40,7 @@ import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.core.attempt.Try.attempt;
 
 
+@SuppressWarnings("PMD.GodClass")
 public class ProjectPatchValidator extends PatchValidator implements Validator<ObjectNode> {
 
     public static final String TITLE_MUST_HAVE_A_LANGUAGE = "Title must have a language associated";
@@ -73,6 +76,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         validateDescription(input, POPULAR_SCIENTIFIC_SUMMARY);
         validateDescription(input, METHOD);
         validateDescription(input, EQUIPMENT);
+        validateResearchResponsibleOrganizationsIfPresent(input);
         validateExtraLanguages(input);
     }
 
@@ -190,6 +194,27 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
             var description = input.get(fieldName);
             attempt(() -> convertToMap(description)).orElseThrow(failure -> notAMapException(fieldName));
         }
+    }
+
+    private void validateResearchResponsibleOrganizationsIfPresent(ObjectNode input) throws BadRequestException {
+        if (input.has(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)
+            && !input.get(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH).isNull()) {
+            var organizations = input.get(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH);
+            validateIsArray(organizations, NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH);
+            try {
+                parseOrganizations(organizations);
+            } catch (Exception e) {
+                throw invalidOrganizationsException();
+            }
+        }
+    }
+
+    private BadRequestException invalidOrganizationsException() {
+        return new BadRequestException(format(ILLEGAL_VALUE_FOR_PROPERTY, NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH));
+    }
+
+    private void parseOrganizations(JsonNode organizations) {
+        organizations.forEach(node -> extractLastPathElement(URI.create(node.get(ID).asText())));
     }
 
     private BadRequestException notAMapException(String fieldName) {

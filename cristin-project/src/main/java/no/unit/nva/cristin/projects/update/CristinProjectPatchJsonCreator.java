@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
+import no.unit.nva.cristin.model.CristinOrganization;
 import java.util.HashMap;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
@@ -23,30 +24,40 @@ import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CONTACT_INFO;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTRIBUTORS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COORDINATING_INSTITUTION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_CONTACT_INFO;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_START_DATE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.EMAIL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PHONE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import static no.unit.nva.cristin.projects.model.cristin.CristinContactInfo.CRISTIN_CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_MAIN_LANGUAGE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_RELATED_PROJECTS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
+import static no.unit.nva.cristin.projects.model.nva.ContactInfo.CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.convertToMap;
 import static no.unit.nva.language.LanguageConstants.UNDEFINED_LANGUAGE;
@@ -87,6 +98,9 @@ public class CristinProjectPatchJsonCreator {
         addPopularScientificSummaryIfPresent();
         addMethodIfPresent();
         addEquipmentIfPresent();
+        addContactInfoIfPresent();
+        addResponsibleInstitutionsIfPresent();
+
         return this;
     }
 
@@ -130,8 +144,7 @@ public class CristinProjectPatchJsonCreator {
                             Organization.class))
                             .orElseThrow();
 
-            var cristinOrganization = fromOrganizationContainingUnitIfPresent(coordinatingInstitution)
-                                          .orElse(fromOrganizationContainingInstitution(coordinatingInstitution));
+            var cristinOrganization = extractCristinOrganization(coordinatingInstitution);
             output.set(CRISTIN_COORDINATING_INSTITUTION, OBJECT_MAPPER.valueToTree(cristinOrganization));
         }
     }
@@ -256,4 +269,56 @@ public class CristinProjectPatchJsonCreator {
         }
     }
 
+    private void addContactInfoIfPresent() {
+        if (input.has(CONTACT_INFO) && !input.get(CONTACT_INFO).isNull()) {
+            var contactInfoInput = input.get(CONTACT_INFO);
+            var contactInfoOutput = OBJECT_MAPPER.createObjectNode();
+
+            addNullableStringField(contactInfoInput, contactInfoOutput, CONTACT_PERSON, CRISTIN_CONTACT_PERSON);
+            addNullableStringField(contactInfoInput, contactInfoOutput, ORGANIZATION, INSTITUTION);
+            addNullableStringField(contactInfoInput, contactInfoOutput, EMAIL, EMAIL);
+            addNullableStringField(contactInfoInput, contactInfoOutput, PHONE, PHONE);
+
+            output.set(CRISTIN_CONTACT_INFO, contactInfoOutput);
+        }
+    }
+
+    private void addNullableStringField(JsonNode input, ObjectNode newField, String fieldName,
+                                        String cristinFieldName) {
+        if (input.has(fieldName)) {
+            var nodeValue = input.get(fieldName);
+            if (nodeValue.isNull()) {
+                newField.putNull(cristinFieldName);
+            } else {
+                newField.put(cristinFieldName, nodeValue.asText());
+            }
+        }
+    }
+
+    private void addResponsibleInstitutionsIfPresent() {
+        if (input.has(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)) {
+            var responsibleInstitutions = input.get(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH);
+            if (responsibleInstitutions.isNull()) {
+                output.putNull(INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH);
+                return;
+            }
+            var cristinOrganizations = new ArrayList<CristinOrganization>();
+            for (JsonNode responsibleInstitution : responsibleInstitutions) {
+                var organization = extractOrganization(responsibleInstitution);
+                var cristinOrganization = extractCristinOrganization(organization);
+                cristinOrganizations.add(cristinOrganization);
+            }
+
+            output.set(INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH, OBJECT_MAPPER.valueToTree(cristinOrganizations));
+        }
+    }
+
+    private CristinOrganization extractCristinOrganization(Organization organization) {
+        return fromOrganizationContainingUnitIfPresent(organization)
+                   .orElse(fromOrganizationContainingInstitution(organization));
+    }
+
+    private Organization extractOrganization(JsonNode institution) {
+        return new Organization.Builder().withId(URI.create(institution.get(ID).asText())).build();
+    }
 }

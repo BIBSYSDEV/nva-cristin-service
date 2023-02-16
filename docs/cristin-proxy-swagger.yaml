@@ -1953,6 +1953,25 @@ components:
           $ref: '#/components/schemas/Languages'
         equipment:
           $ref: '#/components/schemas/Languages'
+        contactInfo:
+          type: object
+          properties:
+            contactPerson:
+              type: string
+              description: Either text value or null to erase
+            organization:
+              type: string
+              description: Either text value or null to erase
+            email:
+              type: string
+              description: Either text value or null to erase
+            phone:
+              type: string
+              description: Either text value or null to erase
+        institutionsResponsibleForResearch:
+          type: array
+          items:
+            $ref: '#/components/schemas/Organization'
     Problem:
       type: object
       properties:
@@ -2873,6 +2892,13 @@ components:
           en: 'Some method'
         equipment:
           en: 'Some equipment'
+        contactInfo:
+          contactPerson: 'Helge Testesen'
+          organization: 'Agricultural University of Iceland'
+          email: 'helge@test.no'
+          phone: '44223355'
+        institutionsResponsibleForResearch:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'

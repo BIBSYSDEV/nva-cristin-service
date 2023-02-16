@@ -60,5 +60,18 @@
     "en": "Some equipment",
     "nn": null
   },
+  "contact_info": {
+    "contact_person": "Helge Testesen",
+    "institution": "Agricultural University of Iceland",
+    "email": "helge@test.no",
+    "phone": null
+  },
+  "institutions_responsible_for_research": [
+    {
+      "unit": {
+        "cristin_unit_id": "192.0.0.0"
+      }
+    }
+  ],
   "main_language": "en"
 }
