@@ -80,6 +80,14 @@ Feature: API tests for Cristin Project Update
         {
           'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
         }
+      ],
+      'alternativeTitles': [
+        {
+          'nb': 'Tittel på norsk'
+        },
+        {
+          'nn': null
+        }
       ]
     }
     """
