@@ -105,6 +105,7 @@ public class CristinProjectPatchJsonCreator {
         return this;
     }
 
+    @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
     private void addTitleAndLanguageIfPresent() {
         var cristinTitles = new HashMap<String, String>();
 
@@ -115,8 +116,6 @@ public class CristinProjectPatchJsonCreator {
                 output.put(CRISTIN_MAIN_LANGUAGE, language.getIso6391Code());
                 if (nonNull(title)) {
                     cristinTitles.put(language.getIso6391Code(), title.asText());
-                } else {
-                    cristinTitles.put(language.getIso6391Code(), null);
                 }
             }
         }
