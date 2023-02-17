@@ -32,6 +32,8 @@ import java.util.stream.Collectors;
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.basicAuthHeader;
+import static no.unit.nva.cristin.model.Constants.BAD_BOT_BYPASS;
+import static no.unit.nva.cristin.model.Constants.LET_ME_IN;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
@@ -64,7 +66,10 @@ public class ApiClient {
      */
     public CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
         return client.sendAsync(
-            HttpRequest.newBuilder(uri).GET().build(),
+            HttpRequest.newBuilder(uri)
+                .GET()
+                .header(BAD_BOT_BYPASS, LET_ME_IN)
+                .build(),
             BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
@@ -75,10 +80,11 @@ public class ApiClient {
      */
     public CompletableFuture<HttpResponse<String>> authenticatedFetchGetResultAsync(URI uri) {
         return client.sendAsync(
-                HttpRequest.newBuilder(uri).GET()
-                        .headers(AUTHORIZATION, basicAuthHeader())
-                        .build(),
-                BodyHandlers.ofString(StandardCharsets.UTF_8));
+            HttpRequest.newBuilder(uri).GET()
+                .header(AUTHORIZATION, basicAuthHeader())
+                .header(BAD_BOT_BYPASS, LET_ME_IN)
+                .build(),
+            BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
     /**
@@ -109,7 +115,9 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
+                                      .header(BAD_BOT_BYPASS, LET_ME_IN)
+                                      .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 

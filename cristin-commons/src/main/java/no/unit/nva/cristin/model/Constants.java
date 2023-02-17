@@ -62,6 +62,8 @@ public class Constants {
     public static final String HASHTAG = "#";
     public static final String SLASH_DELIMITER = "/";
     public static final String CRISTIN_INSTITUTION_HEADER = "Cristin-Representing-Institution";
+    public static final String BAD_BOT_BYPASS = "UiO-BadBotBypass";
+    public static final String LET_ME_IN = "LetMeIn";
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,
