@@ -52,6 +52,11 @@ public class ApiClient {
     public static final int WAITING_TIME = 500; //500 milliseconds
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
     public static final String AUTHORIZATION = "Authorization";
+    public static final String FORBIDDEN_THIS_MIGHT_BE_AN_CONFIGURATION_ERROR =
+        "Upstream returned 403 Forbidden. This might be an configuration error or missing or incorrect upstream "
+        + "allow/bypass header";
+    public static final String RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER =
+        "Upstream returned 403 Forbidden. Try again later";
 
     private final transient HttpClient client;
 
@@ -221,6 +226,9 @@ public class ApiClient {
             throw new BadRequestException(ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST);
         } else if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             throw new UnauthorizedException();
+        } else if (statusCode == HttpURLConnection.HTTP_FORBIDDEN) {
+            logger.warn(FORBIDDEN_THIS_MIGHT_BE_AN_CONFIGURATION_ERROR);
+            throw new BadGatewayException(RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER);
         } else if (remoteServerHasInternalProblems(statusCode)) {
             logBackendFetchFail(uriAsString, statusCode);
             throw new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
