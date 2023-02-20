@@ -66,5 +66,13 @@
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/192.0.0.0"
     }
+  ],
+  "alternativeTitles": [
+    {
+      "nb": "Tittel på bokmål"
+    },
+    {
+      "nn": null
+    }
   ]
 }

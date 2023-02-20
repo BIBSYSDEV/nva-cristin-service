@@ -1,6 +1,8 @@
 {
   "title": {
-    "en": "Updated Title"
+    "en": "Updated Title",
+    "nb": "Tittel på bokmål",
+    "nn": null
   },
   "coordinating_institution": {
     "unit": {
@@ -70,5 +72,6 @@
         "cristin_unit_id": "192.0.0.0"
       }
     }
-  ]
+  ],
+  "main_language": "en"
 }

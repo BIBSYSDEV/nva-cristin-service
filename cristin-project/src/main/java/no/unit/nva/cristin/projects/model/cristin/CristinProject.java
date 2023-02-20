@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
-import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_ACADEMIC_SUMMARY;
-import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_POPULAR_SCIENTIFIC_SUMMARY;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused", "PMD.ExcessivePublicCount", "PMD.GodClass"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -38,11 +36,15 @@ public class CristinProject implements JsonSerializable {
     public static final String APPROVALS = "approvals";
     public static final String EXEMPT_FROM_PUBLIC_DISCLOSURE = "exempt_from_public_disclosure";
     public static final String PROJECT_FUNDING_SOURCES = "project_funding_sources";
+    public static final String CRISTIN_ACADEMIC_SUMMARY = "academic_summary";
+    public static final String CRISTIN_POPULAR_SCIENTIFIC_SUMMARY = "popular_scientific_summary";
+    public static final String CRISTIN_MAIN_LANGUAGE = "main_language";
 
     private String cristinProjectId;
     private Boolean publishable;
     private Boolean published;
     private Map<String, String> title;
+    @JsonProperty(CRISTIN_MAIN_LANGUAGE)
     private String mainLanguage;
     @JsonSerialize(using = CustomInstantSerializer.class)
     private Instant startDate;
