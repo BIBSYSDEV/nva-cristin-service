@@ -38,6 +38,8 @@ sourceSets {
 }
 test{
     environment "COGNITO_URI", "https://example.congito.org"
+    environment "UPSTREAM_ALLOW_CLIENT_HEADER_KEY", "Hello"
+    environment "UPSTREAM_ALLOW_CLIENT_HEADER_VALUE", "World"
 }
 
 

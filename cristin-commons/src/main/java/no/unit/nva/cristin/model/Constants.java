@@ -62,6 +62,10 @@ public class Constants {
     public static final String HASHTAG = "#";
     public static final String SLASH_DELIMITER = "/";
     public static final String CRISTIN_INSTITUTION_HEADER = "Cristin-Representing-Institution";
+    public static final String UPSTREAM_ALLOW_CLIENT_HEADER_KEY =
+        ENVIRONMENT.readEnv("UPSTREAM_ALLOW_CLIENT_HEADER_KEY");
+    public static final String UPSTREAM_ALLOW_CLIENT_HEADER_VALUE =
+        ENVIRONMENT.readEnv("UPSTREAM_ALLOW_CLIENT_HEADER_VALUE");
 
     public enum QueryType {
         QUERY_USING_GRANT_ID,

@@ -33,6 +33,8 @@ import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.basicAuthHeader;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.UPSTREAM_ALLOW_CLIENT_HEADER_KEY;
+import static no.unit.nva.cristin.model.Constants.UPSTREAM_ALLOW_CLIENT_HEADER_VALUE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
@@ -64,7 +66,10 @@ public class ApiClient {
      */
     public CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
         return client.sendAsync(
-            HttpRequest.newBuilder(uri).GET().build(),
+            HttpRequest.newBuilder(uri)
+                .GET()
+                .header(UPSTREAM_ALLOW_CLIENT_HEADER_KEY, UPSTREAM_ALLOW_CLIENT_HEADER_VALUE)
+                .build(),
             BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
@@ -75,10 +80,11 @@ public class ApiClient {
      */
     public CompletableFuture<HttpResponse<String>> authenticatedFetchGetResultAsync(URI uri) {
         return client.sendAsync(
-                HttpRequest.newBuilder(uri).GET()
-                        .headers(AUTHORIZATION, basicAuthHeader())
-                        .build(),
-                BodyHandlers.ofString(StandardCharsets.UTF_8));
+            HttpRequest.newBuilder(uri).GET()
+                .header(AUTHORIZATION, basicAuthHeader())
+                .header(UPSTREAM_ALLOW_CLIENT_HEADER_KEY, UPSTREAM_ALLOW_CLIENT_HEADER_VALUE)
+                .build(),
+            BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
     /**
@@ -87,7 +93,9 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public HttpResponse<String> fetchGetResult(URI uri) throws ApiGatewayException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
+                                      .header(UPSTREAM_ALLOW_CLIENT_HEADER_KEY, UPSTREAM_ALLOW_CLIENT_HEADER_VALUE)
+                                      .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
@@ -98,8 +106,9 @@ public class ApiClient {
      */
     public HttpResponse<String> fetchGetResultWithAuthentication(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
-                .headers(AUTHORIZATION, basicAuthHeader())
-                .build();
+                                      .header(AUTHORIZATION, basicAuthHeader())
+                                      .header(UPSTREAM_ALLOW_CLIENT_HEADER_KEY, UPSTREAM_ALLOW_CLIENT_HEADER_VALUE)
+                                      .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
@@ -109,7 +118,9 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
+                                      .header(UPSTREAM_ALLOW_CLIENT_HEADER_KEY, UPSTREAM_ALLOW_CLIENT_HEADER_VALUE)
+                                      .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
