@@ -4,8 +4,8 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_BAD_REQUEST_RESPONSE;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_INSTITUTION_HEADER;
-import static no.unit.nva.cristin.model.Constants.UPSTREAM_ALLOW_CLIENT_HEADER_KEY;
-import static no.unit.nva.cristin.model.Constants.UPSTREAM_ALLOW_CLIENT_HEADER_VALUE;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE;
 import com.google.common.net.MediaType;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -38,7 +38,8 @@ public class PostApiClient extends ApiClient {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                                       .uri(uri)
                                       .header(CONTENT_TYPE, APPLICATION_JSON)
-                                      .header(UPSTREAM_ALLOW_CLIENT_HEADER_KEY, UPSTREAM_ALLOW_CLIENT_HEADER_VALUE)
+                                      .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME,
+                                              CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
                                       .POST(HttpRequest.BodyPublishers.ofString(body))
                                       .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
@@ -55,7 +56,7 @@ public class PostApiClient extends ApiClient {
                               .uri(uri)
                               .header(CONTENT_TYPE, APPLICATION_JSON)
                               .header(CRISTIN_INSTITUTION_HEADER, cristinInstitutionNumber)
-                              .header(UPSTREAM_ALLOW_CLIENT_HEADER_KEY, UPSTREAM_ALLOW_CLIENT_HEADER_VALUE)
+                              .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
                               .POST(HttpRequest.BodyPublishers.ofString(body))
                               .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
@@ -68,7 +69,7 @@ public class PostApiClient extends ApiClient {
         HttpRequest request = HttpRequest.newBuilder()
                                   .uri(uri)
                                   .header(CONTENT_TYPE, APPLICATION_JSON)
-                                  .header(UPSTREAM_ALLOW_CLIENT_HEADER_KEY, UPSTREAM_ALLOW_CLIENT_HEADER_VALUE)
+                                  .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
                                   .POST(HttpRequest.BodyPublishers.ofString(body))
                                   .build();
         return client.sendAsync(request, BodyHandlers.ofString());

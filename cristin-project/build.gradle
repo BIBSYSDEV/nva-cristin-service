@@ -39,7 +39,7 @@ sourceSets {
 
 test{
     environment "COGNITO_URI", "https://example.cognito.org"
-    environment "UPSTREAM_ALLOW_CLIENT_HEADER_KEY", "Hello"
-    environment "UPSTREAM_ALLOW_CLIENT_HEADER_VALUE", "World"
+    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
+    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
 }
 
