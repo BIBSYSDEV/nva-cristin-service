@@ -14,7 +14,6 @@ import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.RestRequestHandler;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
@@ -26,8 +25,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -106,8 +103,8 @@ class QueryCristinProjectHandlerTest {
     private static final String URI_WITH_TEN_NUMBER_OF_RESULTS =
             "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=1&results=10";
     private static final String ALLOW_ALL_ORIGIN = "*";
-    private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "api_response_non_enriched_projects.json";
-    private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "api_query_response_no_projects_found.json";
+    private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "nvaApiGetResponseNonEnrichedProjects.json";
+    private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "nvaApiGetQueryResponseNoProjectsFound.json";
     private static final String SAMPLE_NVA_ORGANIZATION =
             "https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0";
     private static final String SAMPLE_NVA_ORGANIZATION_ENCODED =
@@ -116,8 +113,8 @@ class QueryCristinProjectHandlerTest {
             "hps:/api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0";
     private static final String ILLEGAL_NVA_ORGANIZATION_ENCODED =
             URLEncoder.encode(ILLEGAL_NVA_ORGANIZATION, StandardCharsets.UTF_8);
-    private static final String API_QUERY_RESPONSE_WITH_FUNDING_JSON =
-        IoUtils.stringFromResources(Path.of("api_query_response_with_funding.json"));
+    private static final String API_QUERY_RESPONSE_JSON =
+        IoUtils.stringFromResources(Path.of("nvaApiGetQueryResponse.json"));
     public static final String FUNDING_SAMPLE = "NRE:1234";
     public static final String BIOBANK_SAMPLE = String.valueOf(randomInteger());
     public static final String KEYWORD_SAMPLE = randomString();
@@ -723,7 +720,7 @@ class QueryCristinProjectHandlerTest {
     }
 
     private static Stream<? extends Arguments> queryResponseWithFundingFileReader() {
-        return Stream.of(Arguments.of(API_QUERY_RESPONSE_WITH_FUNDING_JSON));
+        return Stream.of(Arguments.of(API_QUERY_RESPONSE_JSON));
     }
 
 
