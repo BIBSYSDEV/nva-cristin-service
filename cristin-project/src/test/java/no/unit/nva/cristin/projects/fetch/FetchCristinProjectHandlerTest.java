@@ -62,12 +62,12 @@ public class FetchCristinProjectHandlerTest {
 
     private static final String CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON =
         "cristinGetProjectIdNotFoundResponse.json";
-    private static final String API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON =
-            "api_response_one_cristin_project_to_nva_project_with_funding.json";
+    private static final String API_RESPONSE_ONE_PROJECT_JSON =
+        "nvaApiGetResponseOneNvaProject.json";
     private static final String CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON =
         "cristinProjectWithoutInstitutionAndParticipants.json";
     private static final String API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON =
-        "api_response_get_project_with_missing_fields.json";
+        "nvaApiGetResponseWithMissingFields.json";
     private static final String NOT_AN_ID = "Not an ID";
     private static final String DEFAULT_IDENTIFIER = "9999";
     private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
@@ -129,7 +129,7 @@ public class FetchCristinProjectHandlerTest {
     @Test
     void handlerReturnsNvaProjectFromTransformedCristinProjectWhenIdIsFound() throws Exception {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
-        String expected = getBodyFromResource(API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON);
+        String expected = getBodyFromResource(API_RESPONSE_ONE_PROJECT_JSON);
         assertEquals(OBJECT_MAPPER.readValue(expected, NvaProject.class),
                 gatewayResponse.getBodyObject(NvaProject.class));
     }
@@ -282,7 +282,7 @@ public class FetchCristinProjectHandlerTest {
 
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
         final NvaProject expectedNvaProject = OBJECT_MAPPER.readValue(
-                getBodyFromResource(API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON), NvaProject.class);
+            getBodyFromResource(API_RESPONSE_ONE_PROJECT_JSON), NvaProject.class);
         final List<Funding> funding = notRandomFunding();
         expectedNvaProject.setFunding(funding);
         final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);

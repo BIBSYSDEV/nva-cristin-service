@@ -65,7 +65,7 @@ class CreateCristinProjectHandlerTest {
     public static final String ILLEGAL_CONTRIBUTOR_ROLE = "illegalContributorRole";
     public static final int FIRST_CONTRIBUTOR = 0;
     public static final String INVALIDVALUE = "INVALIDVALUE";
-    public static final String API_REQUEST_ONE_NVA_PROJECT_JSON = "api_request_one_nva_project.json";
+    public static final String API_REQUEST_ONE_NVA_PROJECT_JSON = "nvaApiPostRequestOneProject.json";
     public static final String CLINICAL_TRIAL_PHASE_JSON_FIELD = "\"clinicalTrialPhase\": \"%s\"";
     public static final String SUPPLIED_CLINICAL_TRIAL_PHASE_IS_NOT_VALID = "Supplied ClinicalTrialPhase is not valid";
     public static final String HEALTH_PROJECT_TYPE_JSON_FIELD = "\"type\": \"%s\"";
