@@ -18,6 +18,8 @@ env:
   BACKEND_CLIENT_ID_SECRET: ${{ secrets.COGNITO_BACKEND_CLIENT_ID_SECRET }}
   CRISTIN_EMPLOYMENT_TEST_PERSON_IDENTIFIER: "538786"
   COGNITO_AUTHENTICATION_DOMAIN: "nva-dev.auth.eu-west-1.amazoncognito.com"
+  CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME: "Hello"
+  CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE: "World"
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest

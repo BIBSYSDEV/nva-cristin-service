@@ -39,6 +39,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAT
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.common.client.ApiClient.RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER;
 import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
@@ -48,6 +49,7 @@ import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -344,6 +346,21 @@ public class FetchCristinProjectHandlerTest {
                 GatewayResponse.fromOutputStream(outputStream, NvaProject.class);
         final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
         assertEquals(expectedSummary, actualNvaProject.getAcademicSummary());
+    }
+
+    @Test
+    void shouldReturnBadGatewayWhenUpstreamReturnForbiddenIndicationMissingAllowHeader()
+        throws Exception {
+
+        cristinApiClientStub = spy(cristinApiClientStub);
+        var payload = getBodyFromResource(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON);
+        doReturn(new HttpResponseFaker(payload, 403)).when(cristinApiClientStub).fetchGetResult(any(URI.class));
+
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
+        var gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_GATEWAY));
+        assertThat(gatewayResponse.getBody(), containsString(RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER));
     }
 
     private String randomLanguageCode() {

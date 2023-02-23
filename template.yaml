@@ -23,6 +23,8 @@ Globals:
         COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
         COGNITO_CLIENT_APP_ID: !Ref CognitoUserPoolAppClientId
         COGNITO_AUTHENTICATION_DOMAIN: !Ref CognitoAuthenticationDomain
+        CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME: !Ref CristinBotFilterBypassHeaderName
+        CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE: !Ref CristinBotFilterBypassHeaderValue
   Api:
     Cors:
       AllowOrigin: "'*'"
@@ -68,6 +70,14 @@ Parameters:
     Type: 'AWS::SSM::Parameter::Value<String>'
     Description: Cognito UserPool ARN for the stage
     Default: CognitoAuthenticationDomain
+  CristinBotFilterBypassHeaderName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: CristinBotFilterBypassHeaderName
+    Description: Header name of http request header to use to bypass bot filter in requests to Cristin API.
+  CristinBotFilterBypassHeaderValue:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: CristinBotFilterBypassHeaderValue
+    Description: Header value of http request header to use to bypass bot filter in requests to Cristin API.
 
 Resources:
 
