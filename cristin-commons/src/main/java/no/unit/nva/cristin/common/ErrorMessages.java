@@ -48,6 +48,8 @@ public class ErrorMessages {
         "This endpoint does not support query parameters";
     public static final String ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI =
         "The requested resource '%s' was not found";
+    public static final String ERROR_MESSAGE_TEMPLATE_REQUIRED_MISSING =
+        "Required path argument(s) missing [%s]";
     public static final String ERROR_MESSAGE_INVALID_PAYLOAD = "Supplied payload is not valid";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER = "Invalid path parameter for '%s'";
     public static final String INVALID_URI_MESSAGE = "Must be valid URI";
@@ -56,9 +58,19 @@ public class ErrorMessages {
         "No supported fields in payload, not doing anything";
     public static final String ONLY_SUPPORT_BOOLEAN_VALUES = "Valid values are true or false";
     public static final String UPSTREAM_BAD_REQUEST_RESPONSE = "Upstream returned 400 with response body: ";
+    public static final String UPSTREAM_RETURNED_BAD_REQUEST =
+        "Upstream returned 400 (Bad Request). That might indicate bad query parameters";
 
-    public static final String UPSTREAM_RETURNED_BAD_REQUEST = "Upstream returned 400 (Bad Request)."
-        + "That might indicate bad query parameters";
+    /**
+     * Formats and emits a message with valid parameter names.
+     *
+     * @param missing list of valid parameter names
+     * @return formatted string containing a list of valid parameters
+     */
+    public static String requiredMissingMessage(Set<String>missing) {
+        return String.format(ERROR_MESSAGE_TEMPLATE_REQUIRED_MISSING, prettifyList(missing));
+
+    }
 
     /**
      * Formats and emits a message with valid parameter names.
