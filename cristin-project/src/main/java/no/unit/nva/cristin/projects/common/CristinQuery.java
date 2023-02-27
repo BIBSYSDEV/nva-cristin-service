@@ -68,11 +68,11 @@ import nva.commons.core.paths.UriWrapper;
 @SuppressWarnings({"Unused", "LooseCoupling"})
 public class CristinQuery {
 
-    private final Map<QueryParameterKey, String> queryParameters;
-    private final Map<QueryParameterKey, String> pathParameters;
-    private final Set<QueryParameterKey> otherRequiredKeys;
-    private boolean hasIdentity;
-    private boolean isNvaQuery;
+    private final transient Map<QueryParameterKey, String> queryParameters;
+    private final transient Map<QueryParameterKey, String> pathParameters;
+    private final transient Set<QueryParameterKey> otherRequiredKeys;
+    private transient boolean hasIdentity;
+    private transient boolean isNvaQuery;
 
     private CristinQuery() {
         queryParameters = new ConcurrentHashMap<>();
@@ -258,9 +258,9 @@ public class CristinQuery {
 
         private static final String PARAMETER_PAGE_DEFAULT_VALUE = "1";
         private static final String PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
-        private final Set<String> invalidKeys = new HashSet<>(0);
+        private final transient Set<String> invalidKeys = new HashSet<>(0);
 
-        private final CristinQuery cristinQuery;
+        private final transient CristinQuery cristinQuery;
 
         /**
          * Constructor of CristinQuery.Builder.
