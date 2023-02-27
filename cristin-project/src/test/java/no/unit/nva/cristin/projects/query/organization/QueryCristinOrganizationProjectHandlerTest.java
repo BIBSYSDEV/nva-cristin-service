@@ -9,7 +9,7 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETERS_KEYS;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETER_NVA_KEYS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
@@ -61,7 +61,7 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     private static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     private static final String BIOBANK_SAMPLE = String.valueOf(randomInteger());
-    private static final String DUMMY_ORGANIZATION_IDENTIFIER = "100.3.2.1";
+    private static final String DUMMY_ORGANIZATION_IDENTIFIER = "4.3.2.1";
     private static final String DUMMY_UNIT_ID = "184.12.60.0";
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String FUNDING_SAMPLE = "NRE:1234";
@@ -103,7 +103,7 @@ class QueryCristinOrganizationProjectHandlerTest {
         GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS_KEYS)));
+        assertThat(actualDetail, containsString(validQueryParameterNamesMessage(VALID_QUERY_PARAMETER_NVA_KEYS)));
     }
 
     @Test

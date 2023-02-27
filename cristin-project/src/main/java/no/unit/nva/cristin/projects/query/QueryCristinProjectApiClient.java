@@ -3,7 +3,6 @@ package no.unit.nva.cristin.projects.query;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import java.net.URI;
 import java.net.http.HttpResponse;
-import java.util.Map;
 import no.unit.nva.cristin.model.Constants.QueryParameterKey;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
@@ -18,19 +17,14 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
      * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
      * for serialization to the client.
      *
-     * @param requestQueryParameters Request parameters from client containing title and language
+     * @param cristinQuery CristinQuery from client containing title and language
      * @return a SearchResponse filled with transformed Cristin Projects and metadata
      * @throws ApiGatewayException if some errors happen we should return this to client
      */
     public SearchResponse<NvaProject> queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(
-        Map<String, String> requestQueryParameters) throws ApiGatewayException {
+        CristinQuery cristinQuery) throws ApiGatewayException {
 
         final var startRequestTime = System.currentTimeMillis();
-        final var cristinQuery =
-            new CristinQuery.Builder()
-                .fromQueryParameters(requestQueryParameters)
-                .validate()
-                .build();
 
         final var response = queryProjects(cristinQuery);
         var cristinProjects =

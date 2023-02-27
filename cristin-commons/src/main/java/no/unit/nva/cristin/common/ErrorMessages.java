@@ -32,6 +32,8 @@ public class ErrorMessages {
     public static final String ERROR_MESSAGE_DEPTH_INVALID = "Parameter 'depth' has invalid value. "
             + "Must be 'top' or 'full'";
     public static final String ERROR_MESSAGE_INVALID_VALUE = "Parameter '%s' has invalid value. ";
+
+    public static final String ERROR_MESSAGE_INVALID_NUMBER = "Parameter '%s' has invalid value. Must be a number.";
     public static final String ERROR_MESSAGE_INVALID_VALUE_WITH_RANGE =
         "Parameter '%s' has invalid value. Supported values are: ";
 
