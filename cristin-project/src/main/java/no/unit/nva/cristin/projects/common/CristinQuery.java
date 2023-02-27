@@ -75,7 +75,7 @@ public class CristinQuery {
     private final transient Map<QueryParameterKey, String> queryParameters;
     private final transient Map<QueryParameterKey, String> pathParameters;
     private final transient Set<QueryParameterKey> otherRequiredKeys;
-    private transient boolean hasIdentity;
+//    private transient boolean identityExpected;
     private transient boolean isNvaQuery;
 
     private CristinQuery() {
@@ -314,7 +314,7 @@ public class CristinQuery {
             return
                 requiredMissing()
                     .stream()
-                    .map(QueryParameterKey::getKey)
+                    .map(qpk -> cristinQuery.isNvaQuery ? qpk.getNvaKey() : qpk.getKey())
                     .collect(Collectors.toSet());
         }
 
@@ -348,11 +348,8 @@ public class CristinQuery {
          */
         public Builder withRequiredParameters(QueryParameterKey... requiredParameters) {
             var tmpSet = Set.of(requiredParameters);
-            cristinQuery.hasIdentity = !cristinQuery.pathParameters.isEmpty();
-            cristinQuery.otherRequiredKeys.addAll(
-                tmpSet.stream()
-                    .filter(key -> !cristinQuery.pathParameters.containsKey(key))
-                    .collect(Collectors.toSet()));
+//            cristinQuery.identityExpected = tmpSet.contains(PATH_ORGANISATION) || tmpSet.contains(PATH_PROJECT);
+            cristinQuery.otherRequiredKeys.addAll(tmpSet);
             return this;
         }
 
@@ -623,8 +620,8 @@ public class CristinQuery {
         }
 
         private void setPath(String key, String value) {
+            cristinQuery.isNvaQuery = true;
             if (nonNull(value)) {
-                cristinQuery.isNvaQuery = true;
                 var qpKey = QueryParameterKey.fromString(key,value);
                 switch (qpKey) {
                     case IDENTITY:
@@ -696,7 +693,7 @@ public class CristinQuery {
         }
 
         private boolean oneOrMoreOptionalIsMissing() {
-            return oneOrMoreOptionalUnassigned().size() == oneOrMoreOptional().size() && !cristinQuery.hasIdentity;
+            return oneOrMoreOptionalUnassigned().size() == oneOrMoreOptional().size() && !requiredMissing().isEmpty();
         }
 
         private Set<QueryParameterKey> oneOrMoreOptionalUnassigned() {
@@ -707,17 +704,21 @@ public class CristinQuery {
         }
 
         private Set<QueryParameterKey> oneOrMoreOptional() {
-            return VALID_QUERY_PARAMETERS.stream()
+            return
+                VALID_QUERY_PARAMETERS.stream()
                        .filter(key -> !required().contains(key))
                        .collect(Collectors.toSet());
         }
 
         private Set<QueryParameterKey> required() {
-            return cristinQuery.otherRequiredKeys;
+            return
+                Stream.concat(cristinQuery.otherRequiredKeys.stream(), cristinQuery.pathParameters.keySet().stream())
+                    .collect(Collectors.toSet());
         }
 
         private Set<QueryParameterKey> requiredMissing() {
-            return required().stream()
+            return
+                required().stream()
                        .filter(key -> !cristinQuery.queryParameters.containsKey(key))
                        .filter(key -> !cristinQuery.pathParameters.containsKey(key))
                        .collect(Collectors.toSet());

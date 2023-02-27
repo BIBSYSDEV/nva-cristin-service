@@ -61,7 +61,7 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     private static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     private static final String BIOBANK_SAMPLE = String.valueOf(randomInteger());
-    private static final String DUMMY_ORGANIZATION_IDENTIFIER = "100.3.2.1";
+    private static final String DUMMY_ORGANIZATION_IDENTIFIER = "4.3.2.1";
     private static final String DUMMY_UNIT_ID = "184.12.60.0";
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String FUNDING_SAMPLE = "NRE:1234";
