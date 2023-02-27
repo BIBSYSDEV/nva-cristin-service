@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects.common;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidPathParameterMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessageWithRange;
 import static no.unit.nva.cristin.common.ErrorMessages.requiredMissingMessage;
@@ -11,6 +12,7 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey;
@@ -42,8 +44,10 @@ import static no.unit.nva.cristin.model.Constants.QueryParameterKey.STATUS;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.TITLE;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.USER;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETERS;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETERS_KEYS;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETER_KEYS;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETER_NVA_KEYS;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -289,7 +293,7 @@ public class CristinQuery {
         public Builder validate() throws BadRequestException {
             assignDefaultValues();
             for (Entry<QueryParameterKey, String> entry : cristinQuery.pathParameters.entrySet()) {
-                throwInvalidParamererValue(entry.getKey(), entry.getValue());
+                throwInvalidPathValue(entry.getKey(), entry.getValue());
             }
             for (Entry<QueryParameterKey, String> entry : cristinQuery.queryParameters.entrySet()) {
                 throwInvalidParamererValue(entry.getKey(), entry.getValue());
@@ -298,10 +302,10 @@ public class CristinQuery {
                 throw new BadRequestException(requiredMissingMessage(getMissingKeys()));
             }
             if (oneOrMoreOptionalIsMissing()) {
-                throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS_KEYS));
+                throw new BadRequestException(validQueryParameterNamesMessage(validKeys()));
             }
             if (!invalidKeys.isEmpty()) {
-                throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS_KEYS));
+                throw new BadRequestException(validQueryParameterNamesMessage(validKeys()));
             }
             return this;
         }
@@ -467,7 +471,13 @@ public class CristinQuery {
          * Setter a participant of the project by Cristin id, name or part of the name.
          */
         public Builder withParentUnitId(String parentUnitId) {
-            cristinQuery.setPath(PATH_ORGANISATION,parentUnitId);
+            if (nonNull(parentUnitId)) {
+                var unitId = parentUnitId;
+                if (parentUnitId.matches(PATTERN_IS_URL)) {
+                    unitId = getUnitIdFromOrganization(parentUnitId);
+                }
+                cristinQuery.setPath(PATH_ORGANISATION, unitId);
+            }
             return this;
         }
 
@@ -614,6 +624,7 @@ public class CristinQuery {
 
         private void setPath(String key, String value) {
             if (nonNull(value)) {
+                cristinQuery.isNvaQuery = true;
                 var qpKey = QueryParameterKey.fromString(key,value);
                 switch (qpKey) {
                     case IDENTITY:
@@ -717,8 +728,14 @@ public class CristinQuery {
         }
 
         private String getUnitIdFromOrganization(String organizationId) {
-            return extractLastPathElement(URI.create(organizationId));
+            var unitId = attempt(() -> URI.create(organizationId)).or(() -> null).get();
+            return extractLastPathElement(unitId);
         }
+
+        private Set<String> validKeys() {
+            return cristinQuery.isNvaQuery ? VALID_QUERY_PARAMETER_NVA_KEYS: VALID_QUERY_PARAMETER_KEYS;
+        }
+
 
         private void throwInvalidParamererValue(QueryParameterKey key, String value) throws BadRequestException {
             if (invalidQueryParameter(key, value)) {
@@ -732,8 +749,18 @@ public class CristinQuery {
                         invalidQueryParametersMessage(keyname, key.getErrorMessage());
                 } else {
                     errorMessage =
-                        invalidQueryParametersMessage(keyname, value);
+                        validQueryParameterNamesMessage(validKeys());
                 }
+                throw new BadRequestException(errorMessage);
+            }
+        }
+
+        private void throwInvalidPathValue(QueryParameterKey key, String value) throws BadRequestException {
+            if (invalidQueryParameter(key, value)) {
+                final var keyName = cristinQuery.isNvaQuery ? key.getNvaKey() : key.getKey();
+                String errorMessage = nonNull(key.getErrorMessage())
+                        ? key.getErrorMessage()
+                        : invalidPathParameterMessage(keyName);
                 throw new BadRequestException(errorMessage);
             }
         }

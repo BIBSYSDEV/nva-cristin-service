@@ -2,6 +2,7 @@ package no.unit.nva.cristin.model;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
@@ -83,7 +84,8 @@ public class Constants {
     public enum QueryParameterKey {
         INVALID(null),
         IDENTITY("identifier", "projects", PATTERN_IS_STRING_NON_EMPTY),
-        PATH_ORGANISATION("parent_unit_id", "organization", ORGANIZATION_IDENTIFIER_PATTERN),
+        PATH_ORGANISATION("parent_unit_id", "organization", ORGANIZATION_IDENTIFIER_PATTERN,
+                          ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS,true),
         PATH_PROJECT("projects", "project", PATTERN_IS_NUMBER6),
         BIOBANK("biobank"),
         FUNDING("funding"),
@@ -102,12 +104,10 @@ public class Constants {
         PROJECT_PARTICIPANT("participant"),
         PROJECT_UNIT("unit"),
         QUERY("query",null, PATTERN_IS_STRING_NON_EMPTY,
-              ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE,
-              true),
+              ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE,true),
         STATUS("status", PATTERN_IS_STATUS, true),
         TITLE("title",null, PATTERN_IS_TITLE,
-              ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE,
-              true),
+              ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE,true),
         USER("user"),
         PAGE_CURRENT("page", null, PATTERN_IS_NUMBER6),
         PAGE_ITEMS_PER_PAGE("per_page", "results", PATTERN_IS_NUMBER6),
@@ -120,10 +120,16 @@ public class Constants {
                 .filter(f -> f.ordinal() > IGNORE_PATH_PARAMETER_INDEX)
                 .collect(Collectors.toSet());
 
-        public static final Set<String> VALID_QUERY_PARAMETERS_KEYS =
+        public static final Set<String> VALID_QUERY_PARAMETER_KEYS =
             VALID_QUERY_PARAMETERS.stream()
                 .sorted()
                 .map(QueryParameterKey::getKey)
+                .collect(Collectors.toSet());
+
+        public static final Set<String> VALID_QUERY_PARAMETER_NVA_KEYS =
+            VALID_QUERY_PARAMETERS.stream()
+                .sorted()
+                .map(QueryParameterKey::getNvaKey)
                 .collect(Collectors.toSet());
 
         private final String pattern;

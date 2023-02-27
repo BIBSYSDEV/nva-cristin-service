@@ -19,7 +19,7 @@ import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_MODI
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_PARTICIPANT;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_UNIT;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.USER;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETERS_KEYS;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETER_KEYS;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Set;
@@ -103,7 +103,7 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
     @Override
     protected void validateQueryParameterKeys(RequestInfo requestInfo) throws BadRequestException {
         if (!VALID_QUERY_PARAM_NO_VALIDATION.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS_KEYS));
+            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETER_KEYS));
         }
     }
 }

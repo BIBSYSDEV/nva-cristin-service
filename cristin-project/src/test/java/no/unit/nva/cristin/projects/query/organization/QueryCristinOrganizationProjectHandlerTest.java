@@ -9,7 +9,7 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETERS_KEYS;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETER_NVA_KEYS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
@@ -103,7 +103,7 @@ class QueryCristinOrganizationProjectHandlerTest {
         GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS_KEYS)));
+        assertThat(actualDetail, containsString(validQueryParameterNamesMessage(VALID_QUERY_PARAMETER_NVA_KEYS)));
     }
 
     @Test
