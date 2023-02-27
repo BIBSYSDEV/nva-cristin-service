@@ -1,0 +1,12 @@
+[ {
+  "cristin_unit_id" : "185.53.18.14",
+  "unit_name" : {
+    "en" : "Department of Medical Biochemistry",
+    "nb" : "Avdeling for medisinsk biokjemi"
+  },
+  "institution" : {
+    "acronym" : "UIO"
+  },
+  "url" : "https://api.cristin-test.uio.no/v2/units/185.53.18.14",
+  "acronym" : "KLM-MBK"
+} ]
