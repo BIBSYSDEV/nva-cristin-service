@@ -3,17 +3,17 @@ package no.unit.nva.cristin.projects.query.organization;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.http.HttpClient;
+import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 import no.unit.nva.commons.json.JsonUtils;
-import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.cristin.projects.query.QueryCristinProjectHandler;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
-import nva.commons.core.paths.UriWrapper;
+import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -32,10 +32,6 @@ import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
-import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
@@ -45,16 +41,13 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
 import static no.unit.nva.cristin.projects.query.organization.QueryCristinOrganizationProjectHandler.VALID_QUERY_PARAMETERS;
-import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
-import static nva.commons.core.paths.UriWrapper.HTTPS;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -70,8 +63,6 @@ class QueryCristinOrganizationProjectHandlerTest {
     public static final String INVALID_KEY = "invalid";
     public static final String INVALID_VALUE = "value";
     private static final String EMPTY_LIST_STRING = "[]";
-    private static final String ZERO_VALUE = "0";
-    public static final String QUERY = "query";
     public static final String START_DATE = "start_date";
     public static final String DUMMY_UNIT_ID = "184.12.60.0";
     public static final String FUNDING_SAMPLE = "NRE:1234";
@@ -87,73 +78,75 @@ class QueryCristinOrganizationProjectHandlerTest {
     @BeforeEach
     void setUp() {
         context = mock(Context.class);
-        cristinApiClient = new QueryCristinOrganizationProjectApiClient();
+        HttpClient mockHttpClient = mock(HttpClient.class);
+        cristinApiClient = new QueryCristinOrganizationProjectApiClient(mockHttpClient);
         output = new ByteArrayOutputStream();
         handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
     }
 
     @Test
     void shouldReturnBadRequestResponseOnMissingPathParam() throws IOException {
-        InputStream inputStream = generateHandlerRequestWithoutOrganizationIdentifier();
+        var inputStream = generateHandlerRequestWithoutOrganizationIdentifier();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
-        String actualDetail = getProblemDetail(gatewayResponse);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
+        var actualDetail = getProblemDetail(gatewayResponse);
+
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS));
     }
 
     @Test
     void shouldReturnBadRequestResponseOnInvalidQueryParameters() throws IOException {
-        InputStream inputStream = generateHandlerDummyRequestWithIllegalQueryParameters();
+        var inputStream = generateHandlerDummyRequestWithIllegalQueryParameters();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
-        String actualDetail = getProblemDetail(gatewayResponse);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
+        var actualDetail = getProblemDetail(gatewayResponse);
+
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS)));
     }
 
     @Test
-    void shouldReturnOKAndEmptyResponseOnValidDummyInput() throws IOException {
-        InputStream inputStream = generateHandlerDummyRequest();
-        handler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse =
-                GatewayResponse.fromOutputStream(output, SearchResponse.class);
-        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-    }
+    void shouldReturnResponseWithCorrectNumberOfResultsOnValidInput() throws Exception {
+        var cristinListOfProjects = IoUtils.stringFromResources(Path.of("cristinQueryProjectsResponse.json"));
+        var cristinProject = IoUtils.stringFromResources(Path.of("cristinGetProjectResponse.json"));
+        var httpQueryResponse = new HttpResponseFaker(cristinListOfProjects, HttpURLConnection.HTTP_OK);
+        var enrichedHttpResponse = new HttpResponseFaker(cristinProject, HttpURLConnection.HTTP_OK);
 
-    @Test
-    void shouldReturnOKAndIdInResponseOnValidDummyInput() throws IOException {
-        InputStream inputStream = generateHandlerDummyRequest();
-        handler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse =
-                GatewayResponse.fromOutputStream(output, SearchResponse.class);
-        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-        final SearchResponse searchResponse = gatewayResponse.getBodyObject(SearchResponse.class);
+        cristinApiClient = spy(cristinApiClient);
+        doReturn(httpQueryResponse).when(cristinApiClient).listProjects(any());
+        doReturn(CompletableFuture.completedFuture(enrichedHttpResponse)).when(cristinApiClient)
+            .fetchGetResultAsync(any());
+        handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
+        handler.handleRequest(generateHandlerDummyRequest(), output, context);
 
-        String idStart = getServiceUri(DUMMY_ORGANIZATION_IDENTIFIER).toString();
-        assertTrue(searchResponse.getId().toString().startsWith(idStart));
+        var response = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        var responseBody = response.getBodyObject(SearchResponse.class);
+
+        assertThat(response.getStatusCode(), equalTo(HTTP_OK));
+        assertThat(responseBody.getHits().size(), equalTo(5));
     }
 
     @Test
     void shouldReturnSearchResponseWithEmptyHitsWhenBackendFetchIsEmpty() throws ApiGatewayException, IOException {
 
-        QueryCristinOrganizationProjectApiClient apiClient = spy(cristinApiClient);
-        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
-                generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(apiClient).listProjects(any());
-        doReturn(Collections.emptyList()).when(apiClient).fetchQueryResultsOneByOne(any());
-        handler = new QueryCristinOrganizationProjectHandler(apiClient, new Environment());
+        cristinApiClient = spy(cristinApiClient);
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK)).when(cristinApiClient)
+            .listProjects(any());
+        doReturn(Collections.emptyList()).when(cristinApiClient).fetchQueryResultsOneByOne(any());
+        handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
         handler.handleRequest(generateHandlerDummyRequest(), output, context);
-        GatewayResponse<SearchResponse> response = GatewayResponse.fromOutputStream(output, SearchResponse.class);
-        SearchResponse<NvaProject> searchResponse = response.getBodyObject(SearchResponse.class);
+        var response = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        var searchResponse = response.getBodyObject(SearchResponse.class);
+
         assertThat(0, equalTo(searchResponse.getHits().size()));
     }
 
     @Test
     void shouldAddParamsToCristinQueryForFilteringAndReturnOk() throws IOException, ApiGatewayException {
         cristinApiClient = spy(cristinApiClient);
-        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING,
-                HttpURLConnection.HTTP_OK, generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
-                .when(cristinApiClient).listProjects(any());
+        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK))
+            .when(cristinApiClient).listProjects(any());
         handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
         var queryParams = Map.of("funding", FUNDING_SAMPLE,
                 "biobank", BIOBANK_SAMPLE,
@@ -218,26 +211,6 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
         return gatewayResponse.getBodyObject(Problem.class).getDetail();
-    }
-
-    private java.net.http.HttpHeaders generateHeaders(String totalCount, String link) {
-        return java.net.http.HttpHeaders.of(HttpResponseFaker.headerMap(totalCount, link), HttpResponseFaker.filter());
-    }
-
-    private URI getServiceUri(String identifier) {
-        return new UriWrapper(HTTPS,
-                DOMAIN_NAME).addChild(BASE_PATH)
-                .addChild(ORGANIZATION_PATH)
-                .addChild(identifier)
-                .addChild(PROJECTS_PATH)
-                .getUri();
-    }
-
-    private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
-        return new HandlerRequestBuilder<Void>(Constants.OBJECT_MAPPER)
-                .withBody(null)
-                .withQueryParameters(map)
-                .build();
     }
 
 }
