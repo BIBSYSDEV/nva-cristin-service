@@ -7,6 +7,8 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAT
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -181,11 +183,22 @@ public class Constants {
             return encode;
         }
 
-        public static QueryParameterKey fromString(String paramName) {
-            return Arrays.stream(QueryParameterKey.values())
-                       .filter(equalTo(paramName))
+        public static QueryParameterKey fromString(String paramName, String value) {
+            var result = Arrays.stream(QueryParameterKey.values())
+                             .filter(equalTo(paramName)).collect(Collectors.toSet());
+            return result.size() == 1
+                       ? result.stream().findFirst().get()
+                       : result.stream()
+                       .filter(hasValidValue(value))
                        .findFirst()
                        .orElse(INVALID);
+        }
+
+        private static Predicate<QueryParameterKey> hasValidValue(String value) {
+            return f -> {
+                var encoded = f.isEncode() ? URLDecoder.decode(value, StandardCharsets.UTF_8) : value;
+                return encoded.matches(f.getPattern());
+            };
         }
 
         private static Predicate<QueryParameterKey> equalTo(String name) {

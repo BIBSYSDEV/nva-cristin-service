@@ -624,7 +624,7 @@ public class CristinQuery {
         private void setPath(String key, String value) {
             cristinQuery.isNvaQuery = true;
             if (nonNull(value)) {
-                var qpKey = QueryParameterKey.fromString(key);
+                var qpKey = QueryParameterKey.fromString(key,value);
                 switch (qpKey) {
                     case IDENTITY:
                     case PATH_PROJECT:
@@ -641,7 +641,7 @@ public class CristinQuery {
         }
 
         private void setValue(String key, String value) {
-            var qpKey = QueryParameterKey.fromString(key);
+            var qpKey = QueryParameterKey.fromString(key,value);
             if (!key.equals(qpKey.getKey()) && !cristinQuery.isNvaQuery && qpKey != INVALID) {
                 cristinQuery.isNvaQuery = true;
             }
