@@ -85,7 +85,7 @@ public class CristinQuery {
         var results =
             queryParameters.entrySet().stream()
                 .filter(this::nvaParameterFilter)
-                .collect(Collectors.toMap(this::toNvaQueryName, this::toQueryValue));
+                .collect(Collectors.toMap(this::toNvaQueryName, this::toNvaQueryValue));
         return new TreeMap<>(results);
     }
 
@@ -98,7 +98,7 @@ public class CristinQuery {
         var results =
             Stream.of(queryParameters.entrySet(), pathParameters.entrySet())
                 .flatMap(Collection::stream)
-                .collect(Collectors.toMap(this::toCristinQueryName, this::toQueryValue));
+                .collect(Collectors.toMap(this::toCristinQueryName, this::toCristinQueryValue));
         return new TreeMap<>(results);
     }
 
@@ -190,9 +190,15 @@ public class CristinQuery {
         return entry.getKey().getNvaKey();
     }
 
-    private String toQueryValue(Map.Entry<QueryParameterKey, String> entry) {
+    private String toNvaQueryValue(Map.Entry<QueryParameterKey, String> entry) {
+        var value = entry.getValue();
+        return entry.getKey().isEncode()
+            ? encodeUTF(value)
+            : value;
+    }
 
-        var value = !isNvaQuery && entry.getKey().equals(STATUS)
+    private String toCristinQueryValue(Map.Entry<QueryParameterKey, String> entry) {
+        var value = entry.getKey().equals(STATUS)
             ? ProjectStatus.valueOf(entry.getValue()).getCristinStatus()
             : entry.getValue();
         return entry.getKey().isEncode()
