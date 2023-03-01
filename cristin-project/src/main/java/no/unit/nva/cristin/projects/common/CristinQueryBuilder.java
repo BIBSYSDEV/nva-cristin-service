@@ -396,7 +396,8 @@ public class CristinQueryBuilder {
     private void setPath(String key, String value) {
         cristinQuery.isNvaQuery = true;
         var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
-        if (key.equals(IDENTITY.getNvaKey()) || key.equals(PATH_PROJECT.getNvaKey())) {
+        if (key.equals(IDENTITY.getNvaKey()) || key.equals(IDENTITY.getKey())
+            || key.equals(PATH_PROJECT.getNvaKey()) || key.equals(PATH_PROJECT.getKey())) {
             withPathIdentity(nonNullValue);
         } else if (key.equals(PATH_ORGANISATION.getNvaKey())) {
             withPathOrganization(nonNullValue);

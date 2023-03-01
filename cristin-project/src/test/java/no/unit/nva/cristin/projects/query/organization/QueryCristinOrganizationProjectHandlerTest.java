@@ -126,14 +126,13 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     @Test
     void shouldReturnOKAndIdInResponseOnValidDummyInput() throws IOException {
-        InputStream inputStream = generateHandlerDummyRequest();
+        var  inputStream = generateHandlerDummyRequest();
         handler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse =
-                GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-        final SearchResponse searchResponse = gatewayResponse.getBodyObject(SearchResponse.class);
+        final var searchResponse = gatewayResponse.getBodyObject(SearchResponse.class);
 
-        String idStart = getServiceUri(DUMMY_ORGANIZATION_IDENTIFIER).toString();
+        var idStart = getServiceUri(DUMMY_ORGANIZATION_IDENTIFIER).toString();
         assertTrue(searchResponse.getId().toString().startsWith(idStart));
     }
 
