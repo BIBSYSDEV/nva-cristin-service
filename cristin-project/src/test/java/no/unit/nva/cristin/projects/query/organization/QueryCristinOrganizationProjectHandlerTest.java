@@ -165,15 +165,12 @@ class QueryCristinOrganizationProjectHandlerTest {
 
         handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
         var queryParams =
-//            Map.of("funding", FUNDING_SAMPLE,
-//                   "biobank", BIOBANK_SAMPLE,
-//                   "keyword", KEYWORD_SAMPLE,
-//                   "results", "5",
-//                   "unit", DUMMY_UNIT_ID,
-//                   "sort", START_DATE);
-            Map.of("results", "5",
-                "unit", DUMMY_UNIT_ID,
-                "sort", START_DATE);
+            Map.of("funding", FUNDING_SAMPLE,
+                   "biobank", BIOBANK_SAMPLE,
+                   "keyword", KEYWORD_SAMPLE,
+                   "results", "5",
+                   "unit", DUMMY_UNIT_ID,
+                   "sort", START_DATE);
         handler.handleRequest(generateHandlerProRealisticRequest(queryParams), output, context);
         var captor = ArgumentCaptor.forClass(URI.class);
 
