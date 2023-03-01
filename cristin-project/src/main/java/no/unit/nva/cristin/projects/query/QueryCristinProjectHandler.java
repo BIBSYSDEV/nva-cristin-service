@@ -50,9 +50,10 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
             throws ApiGatewayException {
 
         final var cristinQuery =
-            new CristinQuery.Builder()
+            CristinQuery.builder()
                 .fromRequestInfo(requestInfo)
                 .withRequiredParameters(REQUIRED_QUERY_PARAMETER)
+                .asNvaQuery()
                 .validate()
                 .build();
         return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(cristinQuery);

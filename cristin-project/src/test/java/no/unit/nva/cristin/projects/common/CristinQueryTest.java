@@ -5,6 +5,8 @@ import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_CURRENT
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;
+
+import no.unit.nva.cristin.model.Constants;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import org.junit.jupiter.api.Test;
 
@@ -36,16 +38,19 @@ public class CristinQueryTest {
     private static final String BIOBANK = "533895";
     private static final String APPROVAL_REFERENCE_ID = "2017/1593";
     private static final String APPROVED_BY = "REK";
+    public static final Constants.QueryParameterKey[] QUERY_PARAMETER_KEYS =
+        {PAGE_CURRENT, PAGE_ITEMS_PER_PAGE, LANGUAGE};
 
     @Test
     void buildReturnsUriWithCustomParameterValuesWhenCustomParameterValuesAreSupplied() throws BadRequestException {
         var cristinQuery =
-            new CristinQuery.Builder()
+            CristinQuery.builder()
                 .withTitle(RANDOM_TITLE)
                 .withLanguage(LANGUAGE_NB)
                 .withItemsPerPage(PER_PAGE)
                 .withItemsFromPage(FROM_PAGE)
                 .withParentUnitId(PARENT_UNIT_ID)
+                .withRequiredParameters(QUERY_PARAMETER_KEYS)
                 .validate().build();
         var uriString = cristinQuery.toURI().toString();
         assertEquals(QUERY_CRISTIN_PROJECTS_EXAMPLE_URI, uriString);
@@ -60,7 +65,7 @@ public class CristinQueryTest {
     @Test
     void buildReturnsUriWithExtendedListOfParameters() throws BadRequestException {
         URI uri =
-            new CristinQuery.Builder()
+            CristinQuery.builder()
                 .withItemSort(SAMPLE_SORT)
                 .withInstitution(SAMPLE_INSTITUTION_ID)
                 .withProjectManager(SAMPLE_PROJECT_MANAGER)
@@ -72,7 +77,7 @@ public class CristinQueryTest {
                 .withBiobank(BIOBANK)
                 .withApprovedBy(APPROVED_BY)
                 .withApprovalReferenceId(APPROVAL_REFERENCE_ID)
-                .withRequiredParameters(PAGE_CURRENT,PAGE_ITEMS_PER_PAGE,LANGUAGE)
+                .withRequiredParameters(QUERY_PARAMETER_KEYS)
                 .validate().build()
                 .toURI();
         assertEquals(QUERY_SAMPLE_WITH_MULTIPLE_PARAMETERS, uri.toString());

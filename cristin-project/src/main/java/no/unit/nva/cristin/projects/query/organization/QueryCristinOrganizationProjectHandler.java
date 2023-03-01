@@ -81,10 +81,12 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
             throws ApiGatewayException {
 
         var cristinQuery =
-            new CristinQuery.Builder()
+            CristinQuery.builder()
                 .fromRequestInfo(requestInfo)
                 .withRequiredParameters(PATH_ORGANISATION, LANGUAGE, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE)
-                .validate().build();
+                .asNvaQuery()
+                .validate()
+                .build();
 
         return cristinApiClient.listOrganizationProjects(cristinQuery);
     }

@@ -23,7 +23,7 @@ public class QueryCristinProjectApiClientTest {
     @Test
     void getsCristinUriWithTitleParamWhenCallingUriBuilderWithTitleQueryRequested() throws Exception {
         final var cristinQuery =
-            new CristinQuery.Builder()
+            CristinQuery.builder()
                 .withQuery(RANDOM_TITLE)
                 .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
@@ -40,7 +40,7 @@ public class QueryCristinProjectApiClientTest {
     @Test
     void getsCristinUriWithNoQueryParamWhenCallingUriBuilderWithTitleQueryRequested() throws Exception {
         final var params =
-            new CristinQuery.Builder()
+            CristinQuery.builder()
                 .withTitle(RANDOM_TITLE)
                 .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
@@ -56,7 +56,7 @@ public class QueryCristinProjectApiClientTest {
     @Test
     void getsCristinUriWithProjectCodeParamWhenCallingUriBuilderWithGrantIdQueryRequested() throws Exception {
         final var sourceCristinQuery =
-            new CristinQuery.Builder()
+            CristinQuery.builder()
                 .withQuery(GRANT_ID_EXAMPLE)
                 .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
@@ -69,12 +69,12 @@ public class QueryCristinProjectApiClientTest {
         assertEquals(expectedUri, actualUri);
 
         final var fromCristinParameters =
-            new CristinQuery.Builder()
+            CristinQuery.builder()
                 .fromQueryParameters(sourceCristinQuery.toParameters())
                 .validate()
                 .build();
         final var fromNvaParameters =
-            new CristinQuery.Builder()
+            CristinQuery.builder()
                 .fromQueryParameters(sourceCristinQuery.toNvaParameters())
                 .validate()
                 .build();
@@ -82,7 +82,7 @@ public class QueryCristinProjectApiClientTest {
     }
 
     protected URI generateCristinQueryProjectsUrl(Map<String, String> parameters) throws BadRequestException {
-        return new CristinQuery.Builder()
+        return CristinQuery.builder()
                    .fromQueryParameters(parameters)
                    .validate()
                    .build()

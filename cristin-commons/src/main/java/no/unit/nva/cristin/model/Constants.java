@@ -1,25 +1,24 @@
 package no.unit.nva.cristin.model;
 
-import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_NUMBER;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
-import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.core.Environment;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.ErrorMessages.*;
+import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 
 public class Constants {
 
@@ -44,12 +43,12 @@ public class Constants {
 
     public static final String BASE_PATH = ENVIRONMENT.readEnv("BASE_PATH");
     public static final String DOMAIN_NAME = ENVIRONMENT.readEnvOpt("DOMAIN_NAME")
-                                                 .orElse("api.dev.nva.aws.unit.no");
+        .orElse("api.dev.nva.aws.unit.no");
     public static final String FIRST_PAGE = "1";
     public static final String DEFAULT_NUMBER_OF_RESULTS = "5";
 
     public static final List<MediaType> DEFAULT_RESPONSE_MEDIA_TYPES = List.of(MediaType.JSON_UTF_8,
-                                                                               MediaTypes.APPLICATION_JSON_LD);
+        MediaTypes.APPLICATION_JSON_LD);
     public static final String ORGANIZATION_PATH = "organization";
     public static final String PERSON_CONTEXT = "https://example.org/person-context.json";
     public static final String PERSON_PATH_NVA = "person";
@@ -87,7 +86,7 @@ public class Constants {
         INVALID(null),
         IDENTITY("identifier", "projects", PATTERN_IS_STRING_NON_EMPTY),
         PATH_ORGANISATION("parent_unit_id", "organization", ORGANIZATION_IDENTIFIER_PATTERN,
-                          ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS, true),
+            ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS, true),
         PATH_PROJECT("projects", "project", PATTERN_IS_NUMBER6),
         BIOBANK("biobank"),
         FUNDING("funding"),
@@ -106,15 +105,17 @@ public class Constants {
         PROJECT_PARTICIPANT("participant"),
         PROJECT_UNIT("unit"),
         QUERY("query", null, PATTERN_IS_STRING_NON_EMPTY,
-              ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE, true),
+            invalidQueryParametersMessage("query", ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)
+            , true),
         STATUS("status", PATTERN_IS_STATUS, true),
         TITLE("title", null, PATTERN_IS_TITLE,
-              ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE, true),
+            invalidQueryParametersMessage("title", ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)
+            , true),
         USER("user"),
         PAGE_CURRENT("page", null, PATTERN_IS_NUMBER6,
-                     ERROR_MESSAGE_INVALID_NUMBER, false),
+            ERROR_MESSAGE_INVALID_NUMBER, false),
         PAGE_ITEMS_PER_PAGE("per_page", "results",
-                            PATTERN_IS_NUMBER6, ERROR_MESSAGE_INVALID_NUMBER, false),
+            PATTERN_IS_NUMBER6, ERROR_MESSAGE_INVALID_NUMBER, false),
         PAGE_SORT("sort");
 
         public final static int IGNORE_PATH_PARAMETER_INDEX = 3;
@@ -183,15 +184,15 @@ public class Constants {
             return encode;
         }
 
-        public static QueryParameterKey fromString(String paramName, String value) {
+        public static QueryParameterKey keyFromString(String paramName, String value) {
             var result = Arrays.stream(QueryParameterKey.values())
-                             .filter(equalTo(paramName)).collect(Collectors.toSet());
+                .filter(equalTo(paramName)).collect(Collectors.toSet());
             return result.size() == 1
-                       ? result.stream().findFirst().get()
-                       : result.stream()
-                       .filter(hasValidValue(value))
-                       .findFirst()
-                       .orElse(INVALID);
+                ? result.stream().findFirst().get()
+                : result.stream()
+                .filter(hasValidValue(value))
+                .findFirst()
+                .orElse(INVALID);
         }
 
         private static Predicate<QueryParameterKey> hasValidValue(String value) {
@@ -207,8 +208,8 @@ public class Constants {
 
         public String getValue(Map<String, String> queryParams) {
             return queryParams.containsKey(getNvaKey())
-                       ? queryParams.get(getNvaKey())
-                       : queryParams.get(getKey());
+                ? queryParams.get(getNvaKey())
+                : queryParams.get(getKey());
         }
     }
 }
