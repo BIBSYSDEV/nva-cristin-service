@@ -6,10 +6,7 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -110,7 +107,9 @@ public class CristinQueryBuilder {
      */
     public CristinQueryBuilder withRequiredParameters(QueryParameterKey... requiredParameters) {
         var tmpSet = Set.of(requiredParameters);
-        cristinQuery.isNvaQuery = cristinQuery.isNvaQuery || tmpSet.contains(PATH_ORGANISATION) || tmpSet.contains(PATH_PROJECT);
+        cristinQuery.isNvaQuery = cristinQuery.isNvaQuery
+            || tmpSet.contains(PATH_ORGANISATION)
+            || tmpSet.contains(PATH_PROJECT);
         cristinQuery.otherRequiredKeys.addAll(tmpSet);
         return this;
     }
@@ -342,7 +341,9 @@ public class CristinQueryBuilder {
      * Setter status of projects.
      */
     public CristinQueryBuilder withStatus(String status) {
-        var statusKind = attempt(() -> ProjectStatus.valueOf(status.toUpperCase()).name()).orElse((e) -> EMPTY_STRING);
+        var statusKind = attempt(() ->
+            ProjectStatus.valueOf(status.toUpperCase(Locale.getDefault())).name())
+            .orElse((e) -> EMPTY_STRING);
         cristinQuery.setValue(STATUS, statusKind);
         return this;
     }
@@ -525,7 +526,7 @@ public class CristinQueryBuilder {
                 errorMessage =
                     invalidQueryParametersMessageWithRange(key.getKey(), Arrays.toString(ProjectStatus.values()));
             } else if (nonNull(key.getErrorMessage())) {
-                 errorMessage =  String.format(key.getErrorMessage(),keyName);
+                errorMessage = String.format(key.getErrorMessage(), keyName);
             } else {
                 errorMessage =
                     invalidQueryParametersMessage(keyName, EMPTY_STRING);
