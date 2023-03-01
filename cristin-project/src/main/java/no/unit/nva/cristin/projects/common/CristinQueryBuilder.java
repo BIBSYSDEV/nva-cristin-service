@@ -342,12 +342,8 @@ public class CristinQueryBuilder {
      * Setter status of projects.
      */
     public CristinQueryBuilder withStatus(String status) {
-        if (nonNull(status)) {
-            var statuskind = ProjectStatus.valueOf(status.toUpperCase());
-            cristinQuery.setValue(STATUS, statuskind.name());
-        } else {
-            cristinQuery.setValue(STATUS, EMPTY_STRING);
-        }
+        var statusKind = attempt(() -> ProjectStatus.valueOf(status.toUpperCase()).name()).orElse((e) -> EMPTY_STRING);
+        cristinQuery.setValue(STATUS, statusKind);
         return this;
     }
 
