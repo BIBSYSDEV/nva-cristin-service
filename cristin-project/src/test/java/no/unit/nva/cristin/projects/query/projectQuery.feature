@@ -130,9 +130,10 @@ Feature: API tests for Cristin projects query
     Then status 200
     * def contentType = responseHeaders['Content-Type'][0]
     And match contentType == EXPECTED_JSON_MEDIA_TYPE
-    And match response.status == 200
+    And match response.nextResults == '#present'
+    And match response.previousResults == '#present'
+    And match response.firstRecord == '#present'
     And match response.hits == '#[5]'
-    And match response.requestId == '#notnull'
 
   Scenario: Query returns correct pagination values and URIs
     Given path '/project/'
@@ -178,7 +179,6 @@ Feature: API tests for Cristin projects query
   Scenario Outline: Query accepts status parameter value case independent
     Given path '/project/'
     And param query = queryString
-    And param organization = organizationId
     And param status = <SAMPLE_STATUS>
     When method GET
     Then status 200

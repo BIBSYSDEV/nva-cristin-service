@@ -6,7 +6,10 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -340,7 +343,8 @@ public class CristinQueryBuilder {
      */
     public CristinQueryBuilder withStatus(String status) {
         if (nonNull(status)) {
-            cristinQuery.setValue(STATUS, status.toUpperCase(Locale.getDefault()));
+            var statuskind = ProjectStatus.valueOf(status.toUpperCase());
+            cristinQuery.setValue(STATUS, statuskind.name());
         } else {
             cristinQuery.setValue(STATUS, EMPTY_STRING);
         }
