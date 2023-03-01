@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects.common;
 
+import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
@@ -13,8 +14,7 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.*;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.IGNORE_PATH_PARAMETER_INDEX;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.LANGUAGE;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.*;
 
 @SuppressWarnings({"Unused", "LooseCoupling"})
 public class CristinQuery {
@@ -191,9 +191,13 @@ public class CristinQuery {
     }
 
     private String toQueryValue(Map.Entry<QueryParameterKey, String> entry) {
-        return entry.getKey().isEncode()
-            ? encodeUTF(entry.getValue())
+
+        var value = !isNvaQuery && entry.getKey().equals(STATUS)
+            ? ProjectStatus.valueOf(entry.getValue()).getCristinStatus()
             : entry.getValue();
+        return entry.getKey().isEncode()
+            ? encodeUTF(value)
+            : value;
     }
 
     private boolean nvaParameterFilter(Map.Entry<QueryParameterKey, String> entry) {
