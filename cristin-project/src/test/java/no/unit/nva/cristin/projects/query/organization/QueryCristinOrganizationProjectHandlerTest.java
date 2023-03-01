@@ -21,6 +21,7 @@ import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.paths.UriWrapper.HTTPS;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -164,12 +165,15 @@ class QueryCristinOrganizationProjectHandlerTest {
 
         handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
         var queryParams =
-            Map.of("funding", FUNDING_SAMPLE,
-                   "biobank", BIOBANK_SAMPLE,
-                   "keyword", KEYWORD_SAMPLE,
-                   "results", "5",
-                   "unit", DUMMY_UNIT_ID,
-                   "sort", START_DATE);
+//            Map.of("funding", FUNDING_SAMPLE,
+//                   "biobank", BIOBANK_SAMPLE,
+//                   "keyword", KEYWORD_SAMPLE,
+//                   "results", "5",
+//                   "unit", DUMMY_UNIT_ID,
+//                   "sort", START_DATE);
+            Map.of("results", "5",
+                "unit", DUMMY_UNIT_ID,
+                "sort", START_DATE);
         handler.handleRequest(generateHandlerProRealisticRequest(queryParams), output, context);
         var captor = ArgumentCaptor.forClass(URI.class);
 
@@ -223,7 +227,7 @@ class QueryCristinOrganizationProjectHandlerTest {
     private InputStream generateHandlerRequestWithInvalidOrganizationIdentifier() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
             .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-            .withPathParameters(Map.of(ORGANIZATION_PATH, "1.2.3"))
+            .withPathParameters(Map.of(ORGANIZATION_PATH, "1.2.3", PROJECTS_PATH, EMPTY_STRING))
             .build();
     }
 
