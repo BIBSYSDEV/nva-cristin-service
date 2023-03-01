@@ -118,8 +118,8 @@ class QueryCristinOrganizationHandlerTest {
         final var second = getCristinUri("2012.9.20.0", UNITS_PATH);
         doReturn(getOrganization("org_2012_9_20_0.json")).when(cristinApiClient).getOrganization(second);
 
-        var fakeQueryResponse = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE));
-        var fakeHttpResponse = new HttpResponseFaker(fakeQueryResponse, HTTP_OK);
+        var fakeQueryResponseResource = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE));
+        var fakeHttpResponse = new HttpResponseFaker(fakeQueryResponseResource, HTTP_OK);
         doReturn(getTry(fakeHttpResponse)).when(cristinApiClient).sendRequestMultipleTimes(any());
 
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());

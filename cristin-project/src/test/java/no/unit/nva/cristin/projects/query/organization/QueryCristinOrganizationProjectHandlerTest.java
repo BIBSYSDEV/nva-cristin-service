@@ -68,7 +68,8 @@ class QueryCristinOrganizationProjectHandlerTest {
     public static final String FUNDING_SAMPLE = "NRE:1234";
     public static final String BIOBANK_SAMPLE = String.valueOf(randomInteger());
     public static final String KEYWORD_SAMPLE = randomString();
-
+    public static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_RESOURCE = "cristinQueryProjectsResponse.json";
+    public static final String CRISTIN_GET_PROJECT_RESPONSE_JSON_RESOURCE = "cristinGetProjectResponse.json";
 
     private QueryCristinOrganizationProjectHandler handler;
     private ByteArrayOutputStream output;
@@ -108,14 +109,14 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     @Test
     void shouldReturnResponseWithCorrectNumberOfResultsOnValidInput() throws Exception {
-        var cristinListOfProjects = IoUtils.stringFromResources(Path.of("cristinQueryProjectsResponse.json"));
-        var cristinProject = IoUtils.stringFromResources(Path.of("cristinGetProjectResponse.json"));
-        var httpQueryResponse = new HttpResponseFaker(cristinListOfProjects, HttpURLConnection.HTTP_OK);
-        var enrichedHttpResponse = new HttpResponseFaker(cristinProject, HttpURLConnection.HTTP_OK);
+        var cristinListOfProjects = getStringFromResources(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_RESOURCE);
+        var cristinProject = getStringFromResources(CRISTIN_GET_PROJECT_RESPONSE_JSON_RESOURCE);
+        var fakeHttpQueryResponse = new HttpResponseFaker(cristinListOfProjects, HttpURLConnection.HTTP_OK);
+        var fakeHttpEnrichResponse = new HttpResponseFaker(cristinProject, HttpURLConnection.HTTP_OK);
 
         cristinApiClient = spy(cristinApiClient);
-        doReturn(httpQueryResponse).when(cristinApiClient).listProjects(any());
-        doReturn(CompletableFuture.completedFuture(enrichedHttpResponse)).when(cristinApiClient)
+        doReturn(fakeHttpQueryResponse).when(cristinApiClient).listProjects(any());
+        doReturn(CompletableFuture.completedFuture(fakeHttpEnrichResponse)).when(cristinApiClient)
             .fetchGetResultAsync(any());
         handler = new QueryCristinOrganizationProjectHandler(cristinApiClient, new Environment());
         handler.handleRequest(generateHandlerDummyRequest(), output, context);
@@ -139,7 +140,7 @@ class QueryCristinOrganizationProjectHandlerTest {
         var response = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         var searchResponse = response.getBodyObject(SearchResponse.class);
 
-        assertThat(0, equalTo(searchResponse.getHits().size()));
+        assertThat(searchResponse.getHits().size(), equalTo(0));
     }
 
     @Test
@@ -175,6 +176,10 @@ class QueryCristinOrganizationProjectHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                 SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
+    private String getStringFromResources(String cristinQueryProjectsResponseJsonResource) {
+        return IoUtils.stringFromResources(Path.of(cristinQueryProjectsResponseJsonResource));
     }
 
     private InputStream generateHandlerDummyRequestWithIllegalQueryParameters() throws JsonProcessingException {
