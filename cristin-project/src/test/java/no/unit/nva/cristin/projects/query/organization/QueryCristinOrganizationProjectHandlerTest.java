@@ -223,7 +223,7 @@ class QueryCristinOrganizationProjectHandlerTest {
     private InputStream generateHandlerRequestWithInvalidOrganizationIdentifier() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
             .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-            .withPathParameters(Map.of(ORGANIZATION_PATH, "323.3"))
+            .withPathParameters(Map.of(ORGANIZATION_PATH, "1.2.3"))
             .build();
     }
 

@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.*;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.*;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static nva.commons.core.attempt.Try.attempt;
 
 @SuppressWarnings({"Unused", "LooseCoupling"})
 public class CristinQuery {
@@ -46,6 +48,11 @@ public class CristinQuery {
             .addChild(id)
             .addQueryParameters(Map.of(LANGUAGE.getKey(), language))
             .getUri();
+    }
+
+    public static String getUnitIdFromOrganization(String organizationId) {
+        var unitId = attempt(() -> URI.create(organizationId)).or(() -> null).get();
+        return extractLastPathElement(unitId);
     }
 
     /**
@@ -198,11 +205,14 @@ public class CristinQuery {
     }
 
     private String toCristinQueryValue(Map.Entry<QueryParameterKey, String> entry) {
-        var value = entry.getKey().equals(STATUS)
-            ? ProjectStatus.valueOf(entry.getValue()).getCristinStatus()
+        var value = entry.getKey().isEncode()
+            ? encodeUTF(entry.getValue())
             : entry.getValue();
-        return entry.getKey().isEncode()
-            ? encodeUTF(value)
+
+        return entry.getKey().equals(STATUS)
+            ? ProjectStatus.valueOf(value).getCristinStatus()
+            : entry.getKey().equals(PROJECT_ORGANIZATION) && entry.getValue().matches(PATTERN_IS_URL)
+            ? getUnitIdFromOrganization(value)
             : value;
     }
 

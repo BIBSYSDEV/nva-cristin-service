@@ -5,7 +5,6 @@ import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
-import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,7 +16,7 @@ import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.*;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static no.unit.nva.cristin.projects.common.CristinQuery.getUnitIdFromOrganization;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -477,10 +476,7 @@ public class CristinQueryBuilder {
                 .collect(Collectors.toSet());
     }
 
-    private String getUnitIdFromOrganization(String organizationId) {
-        var unitId = attempt(() -> URI.create(organizationId)).or(() -> null).get();
-        return extractLastPathElement(unitId);
-    }
+
 
     private QueryParameterKey grantOrTitleKey(String query) {
         return Utils.isPositiveInteger(query) ? GRANT_ID : TITLE;
