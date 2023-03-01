@@ -7,6 +7,7 @@ Feature: API tests for Cristin projects query
     * def queryString = 'covid'
     * def projectIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/project\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
+    * def EXPECTED_JSON_MEDIA_TYPE = 'application/json; charset=utf-8'
     * def organizationId = 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
 
     Given url CRISTIN_BASE
@@ -123,15 +124,14 @@ Feature: API tests for Cristin projects query
       | 'page'      | 'hello'             |
       | 'results'   | 'hello'             |
 
-  Scenario: Query with missing query parameter returns Bad Request
+  Scenario: Query with missing query parameter do returns results
     Given path '/project/'
     And method GET
-    Then status 400
+    Then status 200
     * def contentType = responseHeaders['Content-Type'][0]
-    And match contentType == PROBLEM_JSON_MEDIA_TYPE
-    And match response.title == 'Bad Request'
-    And match response.status == 400
-    And match response.detail == "Parameter 'query' has invalid value. May only contain alphanumeric characters, dash, comma, period and whitespace"
+    And match contentType == EXPECTED_JSON_MEDIA_TYPE
+    And match response.status == 200
+    And match response.hits == '#[5]'
     And match response.requestId == '#notnull'
 
   Scenario: Query returns correct pagination values and URIs
@@ -141,8 +141,8 @@ Feature: API tests for Cristin projects query
     And param page = '2'
     When method GET
     Then status 200
-    * def nextResultsPath = CRISTIN_BASE + '/project?query=' + queryString + '&language=nb&page=3&results=5'
-    * def previousResultsPath = CRISTIN_BASE + '/project?query=' + queryString + '&language=nb&page=1&results=5'
+    * def nextResultsPath = CRISTIN_BASE + '/project?language=nb&page=3&title=' + queryString + '&results=5'
+    * def previousResultsPath = CRISTIN_BASE + '/project?language=nb&page=1&title=' + queryString + '&results=5'
     And match response.nextResults == nextResultsPath
     And match response.previousResults == previousResultsPath
     And match response.firstRecord == 6
@@ -213,6 +213,6 @@ Feature: API tests for Cristin projects query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Upstream returned 400 (Bad Request).That might indicate bad query parameters'
+    And match response.detail == 'Upstream returned 400 (Bad Request). That might indicate bad query parameters'
 
 

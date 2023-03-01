@@ -226,6 +226,20 @@ class QueryCristinProjectHandlerTest {
 //    }
 
     @Test
+    void trippyQueryNameIsOK() throws Exception {
+        InputStream input = requestWithQueryParameters(
+            Map.of(
+                JsonPropertyNames.QUERY, RANDOM_TITLE + " å " + RANDOM_TITLE,
+                JsonPropertyNames.ORGANIZATION, "https%3A%2F%2Fapi.dev.nva.aws.unit.no%2Fcristin%2Forganization%2F20202.0.0.0"
+            ));
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,Object.class);
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
     void handlerSetsDefaultValueForMissingOptionalLanguageParameterAndReturnOk() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(JsonPropertyNames.QUERY, RANDOM_TITLE));
 

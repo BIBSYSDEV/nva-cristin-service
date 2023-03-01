@@ -76,7 +76,7 @@ public class Constants {
     private static final String PATTERN_IS_NUMBER6 = "[1-9]\\d*";
     public static final String PATTERN_IS_DATE = "(\\d){4}-(\\d){2}-(\\d){2}[T]*[(\\d){2}:(\\d){2}:(\\d){2,6}Z]*";
     private static final String PATTERN_IS_STRING_NON_EMPTY = ".+";
-    private static final String PATTERN_IS_TITLE = "^[\\w-,\\. ]+$";
+    private static final String PATTERN_IS_TITLE = "^[æøåÆØÅ\\w-,\\. ]+$";
     private static final String PATTERN_IS_LANGUAGE = "(en|nb|nn|\\,)+";
     private static final String PATTERN_IS_STATUS = "(?i)CONCLUDED|ACTIVE|NOT[ +]*STARTED";
     public static final String PATTERN_IS_URL =

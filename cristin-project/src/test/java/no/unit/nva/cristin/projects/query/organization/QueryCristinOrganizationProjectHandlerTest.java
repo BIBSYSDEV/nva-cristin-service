@@ -3,8 +3,7 @@ package no.unit.nva.cristin.projects.query.organization;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_TEMPLATE_REQUIRED_MISSING;
-import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.common.ErrorMessages.*;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
@@ -94,6 +93,16 @@ class QueryCristinOrganizationProjectHandlerTest {
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(ERROR_MESSAGE_TEMPLATE_REQUIRED_MISSING.substring(0,34)));
+    }
+
+    @Test
+    void shouldReturnBadRequestResponseOnInvalidPathParamValue() throws IOException {
+        InputStream inputStream = generateHandlerRequestWithInvalidOrganizationIdentifier();
+        handler.handleRequest(inputStream, output, context);
+        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
+        String actualDetail = getProblemDetail(gatewayResponse);
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS));
     }
 
     @Test
@@ -209,6 +218,14 @@ class QueryCristinOrganizationProjectHandlerTest {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
                 .build();
+    }
+
+
+    private InputStream generateHandlerRequestWithInvalidOrganizationIdentifier() throws JsonProcessingException {
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+            .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+            .withPathParameters(Map.of(ORGANIZATION_PATH, "323.3"))
+            .build();
     }
 
     private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
