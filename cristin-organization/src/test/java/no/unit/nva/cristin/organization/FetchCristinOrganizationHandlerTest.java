@@ -45,6 +45,7 @@ import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,8 +60,14 @@ class FetchCristinOrganizationHandlerTest {
 
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     public static final String IDENTIFIER = "identifier";
-    public static final String IDENTIFIER_VALUE = "1.0.0.0";
+    public static final String NON_EXISTING_IDENTIFIER = "1.0.0.0";
     public static final String ORGANIZATION_NOT_FOUND_MESSAGE = "cannot be dereferenced";
+    public static final String LIST_OF_UNITS_JSON_FILE = "list_of_unit_185_53_18_14.json";
+    public static final String CRISTIN_UNITS_URI = "https://api.cristin-test.uio.no/v2/units?id=185.53.18.14&lang=en,"
+                                                   + "nb,nn";
+    public static final String ENGLISH_LANGUAGE_KEY = "en";
+    public static final String DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY = "Department of Medical Biochemistry";
+
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
     private ByteArrayOutputStream output;
@@ -81,11 +88,11 @@ class FetchCristinOrganizationHandlerTest {
             throws IOException, ApiGatewayException {
 
         cristinApiClient = spy(cristinApiClient);
-        doThrow(new NotFoundException(NOT_FOUND_MESSAGE_TEMPLATE + IDENTIFIER_VALUE))
+        doThrow(new NotFoundException(NOT_FOUND_MESSAGE_TEMPLATE + NON_EXISTING_IDENTIFIER))
                 .when(cristinApiClient).getOrganization(any());
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
-        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(NON_EXISTING_IDENTIFIER), output, context);
         var gatewayResponse = parseFailureResponse();
 
         assertEquals(HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
@@ -94,7 +101,7 @@ class FetchCristinOrganizationHandlerTest {
 
         var actualDetail = getProblemDetail(gatewayResponse);
         assertThat(actualDetail, containsString(ORGANIZATION_NOT_FOUND_MESSAGE));
-        assertThat(actualDetail, containsString(IDENTIFIER_VALUE));
+        assertThat(actualDetail, containsString(NON_EXISTING_IDENTIFIER));
     }
 
     @Test
@@ -148,7 +155,7 @@ class FetchCristinOrganizationHandlerTest {
 
         fetchCristinOrganizationHandler =
                 new FetchCristinOrganizationHandler(serviceThrowingException, new Environment());
-        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(NON_EXISTING_IDENTIFIER), output, context);
 
         var gatewayResponse = parseFailureResponse();
         var actualDetail = getProblemDetail(gatewayResponse);
@@ -159,11 +166,7 @@ class FetchCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnOrganizationHierarchy() throws IOException, ApiGatewayException {
-
-        when(mockHttpClient.sendAsync(any(), any())).thenThrow(new RuntimeException("This should Not happen!"));
-        output = new ByteArrayOutputStream();
         cristinApiClient = spy(cristinApiClient);
-
         final var level1 = getCristinUri("185.90.0.0", UNITS_PATH);
         doReturn(getSubSubUnit("unit_18_90_0_0.json"))
                 .when(cristinApiClient).getSubSubUnitDtoWithMultipleEfforts(level1);
@@ -183,7 +186,7 @@ class FetchCristinOrganizationHandlerTest {
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
         final var identifier = "185.53.18.14";
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(identifier), output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output,Organization.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getHeaders(), hasKey(CONTENT_TYPE));
@@ -191,8 +194,10 @@ class FetchCristinOrganizationHandlerTest {
 
         var expectedId = getNvaApiId(identifier, ORGANIZATION_PATH);
         var actualOrganization = gatewayResponse.getBodyObject(Organization.class);
+
         assertEquals(actualOrganization.getId(), expectedId);
-        assertThat(actualOrganization.getName().get("en"), containsString("Department of Medical Biochemistry"));
+        assertThat(actualOrganization.getName().get(ENGLISH_LANGUAGE_KEY),
+                   containsString(DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY));
     }
 
 
@@ -202,26 +207,21 @@ class FetchCristinOrganizationHandlerTest {
         CompletableFuture futureNotFound =
             CompletableFuture.completedFuture(fakeHttpResponse);
         when(mockHttpClient.sendAsync(any(), any())).thenReturn(futureNotFound);
-        cristinApiClient = new CristinOrganizationApiClient(mockHttpClient);
-        output = new ByteArrayOutputStream();
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
-
-        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(IDENTIFIER_VALUE), output, context);
-
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(NON_EXISTING_IDENTIFIER), output, context);
         var gatewayResponse = parseFailureResponse();
+
         assertEquals(HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
     }
 
 
     @Test
-    void shouldReturnOrganizationFlatHierarchy() throws IOException, ApiGatewayException {
-        when(mockHttpClient.sendAsync(any(), any())).thenThrow(new RuntimeException("This should Not happen!"));
+    void shouldReturnOrganizationFlatHierarchy() throws IOException {
+        var resource = stringFromResources(LIST_OF_UNITS_JSON_FILE);
+        var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
+        var cristinUri = URI.create(CRISTIN_UNITS_URI);
         cristinApiClient = spy(cristinApiClient);
-
-        var resource = stringFromResources("list_of_unit_185_53_18_14.json");
-        var responseFaker = new HttpResponseFaker(resource, HTTP_OK);
-        var cristinUri = URI.create("https://api.cristin-test.uio.no/v2/units?id=185.53.18.14&lang=en,nb,nn");
-        doReturn(Try.of(responseFaker)).when(cristinApiClient).sendRequestMultipleTimes(cristinUri);
+        doReturn(Try.of(fakeHttpResponse)).when(cristinApiClient).sendRequestMultipleTimes(cristinUri);
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
         final var identifier = "185.53.18.14";
@@ -229,17 +229,18 @@ class FetchCristinOrganizationHandlerTest {
                 .handleRequest(generateHandlerRequestWithAdditionalQueryParameters(identifier, NONE), output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,Organization.class);
 
-        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
         assertThat(gatewayResponse.getHeaders(), hasKey(CONTENT_TYPE));
         assertThat(gatewayResponse.getHeaders(), hasKey(ACCESS_CONTROL_ALLOW_ORIGIN));
 
         var expectedId = getNvaApiId(identifier, ORGANIZATION_PATH);
         var actualOrganization = gatewayResponse.getBodyObject(Organization.class);
 
-        assertEquals(actualOrganization.getId(), expectedId);
-        assertThat(actualOrganization.getName().get("en"), containsString("Department of Medical Biochemistry"));
-        assertEquals(actualOrganization.getHasPart(), null);
-        assertEquals(actualOrganization.getPartOf(), null);
+        assertThat(actualOrganization.getId(), equalTo(expectedId));
+        assertThat(actualOrganization.getName().get(ENGLISH_LANGUAGE_KEY),
+                   containsString(DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY));
+        assertThat(actualOrganization.getHasPart(), equalTo(null));
+        assertThat(actualOrganization.getPartOf(), equalTo(null));
     }
 
 
