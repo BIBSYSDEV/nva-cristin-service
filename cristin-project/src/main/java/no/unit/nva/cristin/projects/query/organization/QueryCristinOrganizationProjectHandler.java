@@ -79,16 +79,21 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
     @Override
     protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
+        try {
+            var cristinQuery =
+                CristinQuery.builder()
+                    .fromRequestInfo(requestInfo)
+                    .withRequiredParameters(PATH_ORGANISATION, LANGUAGE, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE)
+                    .asNvaQuery()
+                    .validate()
+                    .build();
 
-        var cristinQuery =
-            CristinQuery.builder()
-                .fromRequestInfo(requestInfo)
-                .withRequiredParameters(PATH_ORGANISATION, LANGUAGE, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE)
-                .asNvaQuery()
-                .validate()
-                .build();
-
-        return cristinApiClient.listOrganizationProjects(cristinQuery);
+            return cristinApiClient.listOrganizationProjects(cristinQuery);
+        } catch (Exception ex) {
+            context.getLogger().log(requestInfo.toString());
+            context.getLogger().log(ex.getMessage());
+            throw ex;
+        }
     }
 
     /**

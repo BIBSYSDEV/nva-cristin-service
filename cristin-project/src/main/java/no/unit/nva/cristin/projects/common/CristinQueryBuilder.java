@@ -57,8 +57,6 @@ public class CristinQueryBuilder {
     public CristinQueryBuilder validate() throws BadRequestException {
         assignDefaultValues();
         for (Map.Entry<QueryParameterKey, String> entry : cristinQuery.pathParameters.entrySet()) {
-            System.out.println(entry.getKey());
-            System.out.println(entry.getValue());
             throwInvalidPathValue(entry.getKey(), entry.getValue());
         }
         for (Map.Entry<QueryParameterKey, String> entry : cristinQuery.queryParameters.entrySet()) {
