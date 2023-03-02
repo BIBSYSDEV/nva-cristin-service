@@ -34,6 +34,7 @@ import nva.commons.core.paths.UriWrapper;
 
 @SuppressWarnings({"Unused", "LooseCoupling"})
 public class CristinQuery {
+
     protected final transient Map<QueryParameterKey, String> pathParameters;
     protected final transient Map<QueryParameterKey, String> queryParameters;
     protected final transient Set<QueryParameterKey> otherRequiredKeys;
@@ -58,10 +59,10 @@ public class CristinQuery {
      */
     public static URI fromIdAndLanguage(String id, String language) {
         return UriWrapper.fromUri(CRISTIN_API_URL)
-            .addChild(PROJECTS_PATH)
-            .addChild(id)
-            .addQueryParameters(Map.of(LANGUAGE.getKey(), language))
-            .getUri();
+                   .addChild(PROJECTS_PATH)
+                   .addChild(id)
+                   .addQueryParameters(Map.of(LANGUAGE.getKey(), language))
+                   .getUri();
     }
 
     public static String getUnitIdFromOrganization(String organizationId) {
@@ -75,14 +76,15 @@ public class CristinQuery {
      * @return an URI to Cristin/NVA Projects with parameters.
      */
     public URI toNvaURI() {
-        return
+        final var uri =
             new UriWrapper(HTTPS, DOMAIN_NAME)
                 .addChild(BASE_PATH)
                 .addChild(getNvaPathAsArray())
                 .addQueryParameters(toNvaParameters())
                 .getUri();
+        System.out.println(uri);
+        return uri;
     }
-
 
     /**
      * Builds URI to search Cristin projects based on parameters supplied to the builder methods.
@@ -90,11 +92,13 @@ public class CristinQuery {
      * @return an URI to NVA (default) Projects with parameters.
      */
     public URI toURI() {
-        return
+        final var uri =
             UriWrapper.fromUri(CRISTIN_API_URL)
                 .addChild(PROJECTS_PATH)
                 .addQueryParameters(toParameters())
                 .getUri();
+        System.out.println(uri);
+        return uri;
     }
 
     /**
@@ -173,9 +177,9 @@ public class CristinQuery {
         return
             queryParameters.entrySet().stream()
                 .allMatch(e -> e.getValue().equals(other.getValue(e.getKey())))
-                &&
-                pathParameters.entrySet().stream()
-                    .allMatch(e -> e.getValue().equals(other.getValue(e.getKey())));
+            &&
+            pathParameters.entrySet().stream()
+                .allMatch(e -> e.getValue().equals(other.getValue(e.getKey())));
     }
 
     /**
@@ -187,7 +191,6 @@ public class CristinQuery {
     public boolean containsKey(QueryParameterKey key) {
         return queryParameters.containsKey(key) || pathParameters.containsKey(key);
     }
-
 
     private String[] getNvaPathAsArray() {
         final var pathSize = this.pathParameters.size();
@@ -201,7 +204,7 @@ public class CristinQuery {
     }
 
     private String getString(int pathSize, Entry<QueryParameterKey, String> entry) {
-        var isProjects = entry.getKey().equals(PATH_PROJECT) && pathSize > 1 ;
+        var isProjects = entry.getKey().equals(PATH_PROJECT) && pathSize > 1;
         return isProjects ? entry.getKey().getKey() : entry.getKey().getNvaKey();
     }
 
@@ -220,14 +223,14 @@ public class CristinQuery {
     private String toNvaQueryValue(Map.Entry<QueryParameterKey, String> entry) {
         var value = entry.getValue();
         return entry.getKey().isEncode()
-            ? encodeUTF(value)
-            : value;
+                   ? encodeUTF(value)
+                   : value;
     }
 
     private String toCristinQueryValue(Map.Entry<QueryParameterKey, String> entry) {
         var value = entry.getKey().isEncode()
-            ? encodeUTF(entry.getValue())
-            : entry.getValue();
+                        ? encodeUTF(entry.getValue())
+                        : entry.getValue();
 
         if (entry.getKey().equals(STATUS)) {
             return ProjectStatus.valueOf(value).getCristinStatus();
