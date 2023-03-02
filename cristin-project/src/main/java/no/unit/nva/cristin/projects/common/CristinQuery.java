@@ -209,11 +209,12 @@ public class CristinQuery {
             ? encodeUTF(entry.getValue())
             : entry.getValue();
 
-        return entry.getKey().equals(STATUS)
-            ? ProjectStatus.valueOf(value).getCristinStatus()
-            : entry.getKey().equals(PROJECT_ORGANIZATION) && entry.getValue().matches(PATTERN_IS_URL)
-            ? getUnitIdFromOrganization(value)
-            : value;
+        if (entry.getKey().equals(STATUS)) {
+            return ProjectStatus.valueOf(value).getCristinStatus();
+        }
+        return entry.getKey().equals(PROJECT_ORGANIZATION) && entry.getValue().matches(PATTERN_IS_URL)
+                   ? getUnitIdFromOrganization(value)
+                   : value;
     }
 
     private boolean nvaParameterFilter(Map.Entry<QueryParameterKey, String> entry) {

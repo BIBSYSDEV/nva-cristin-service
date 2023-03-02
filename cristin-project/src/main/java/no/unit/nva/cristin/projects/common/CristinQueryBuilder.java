@@ -57,6 +57,8 @@ public class CristinQueryBuilder {
     public CristinQueryBuilder validate() throws BadRequestException {
         assignDefaultValues();
         for (Map.Entry<QueryParameterKey, String> entry : cristinQuery.pathParameters.entrySet()) {
+            System.out.println(entry.getKey());
+            System.out.println(entry.getValue());
             throwInvalidPathValue(entry.getKey(), entry.getValue());
         }
         for (Map.Entry<QueryParameterKey, String> entry : cristinQuery.queryParameters.entrySet()) {
@@ -287,7 +289,8 @@ public class CristinQueryBuilder {
      * Setter Identity.
      */
     public CristinQueryBuilder withPathIdentity(String identity) {
-        if (nonNull(identity)) {
+        System.out.println("withPathIdentity " + identity);
+        if (nonNull(identity) && !identity.isBlank()) {
             if (identity.matches(PATH_PROJECT.getPattern())) {
                 cristinQuery.setPath(PATH_PROJECT, identity);
             } else if (identity.matches(PATH_ORGANISATION.getPattern())) {
@@ -303,6 +306,7 @@ public class CristinQueryBuilder {
      * Setter Organization.
      */
     public CristinQueryBuilder withPathOrganization(String organization) {
+        System.out.println("withPathOrganization " + organization);
         if (nonNull(organization)) {
             if (organization.matches(PROJECT_ORGANIZATION.getPattern())) {
                 cristinQuery.setValue(PROJECT_ORGANIZATION,organization);
@@ -498,7 +502,9 @@ public class CristinQueryBuilder {
 
     private Set<QueryParameterKey> required() {
         return
-            Stream.concat(cristinQuery.otherRequiredKeys.stream(), cristinQuery.pathParameters.keySet().stream())
+            Stream.concat(
+                    cristinQuery.otherRequiredKeys.stream(),
+                    cristinQuery.pathParameters.keySet().stream())
                 .collect(Collectors.toSet());
     }
 
@@ -524,8 +530,7 @@ public class CristinQueryBuilder {
             } else if (nonNull(key.getErrorMessage())) {
                 errorMessage = String.format(key.getErrorMessage(), keyName);
             } else {
-                errorMessage =
-                    invalidQueryParametersMessage(keyName, EMPTY_STRING);
+                errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
             }
             throw new BadRequestException(errorMessage);
         }

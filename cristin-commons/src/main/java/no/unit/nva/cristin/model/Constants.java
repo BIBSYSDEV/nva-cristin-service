@@ -2,6 +2,7 @@ package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
+import java.util.StringJoiner;
 import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.core.Environment;
@@ -211,6 +212,17 @@ public class Constants {
             return queryParams.containsKey(getNvaKey())
                 ? queryParams.get(getNvaKey())
                 : queryParams.get(getKey());
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", QueryParameterKey.class.getSimpleName() + "[", "]")
+                       .add("pattern='" + pattern + "'")
+                       .add("cristinKey='" + cristinKey + "'")
+                       .add("nvaKey='" + nvaKey + "'")
+                       .add("encode=" + encode)
+                       .add("errorMessage='" + errorMessage + "'")
+                       .toString();
         }
     }
 }
