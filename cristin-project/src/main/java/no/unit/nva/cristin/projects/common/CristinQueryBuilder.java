@@ -1,24 +1,60 @@
 package no.unit.nva.cristin.projects.common;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidPathParameterMessage;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessageWithRange;
+import static no.unit.nva.cristin.common.ErrorMessages.requiredMissingMessage;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
+import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.BIOBANK;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.FUNDING;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.FUNDING_SOURCE;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.GRANT_ID;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.IDENTITY;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.INSTITUTION;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.INVALID;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.LANGUAGE;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.LEVELS;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.NAME;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_CURRENT;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_SORT;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PATH_ORGANISATION;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PATH_PROJECT;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_APPROVAL_REFERENCE_ID;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_APPROVED_BY;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_KEYWORD;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_MANAGER;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_MODIFIED_SINCE;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_ORGANIZATION;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_PARTICIPANT;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_UNIT;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.QUERY;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.STATUS;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.TITLE;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.USER;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETERS;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETER_KEYS;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.VALID_QUERY_PARAMETER_NVA_KEYS;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.keyFromString;
+import static no.unit.nva.cristin.projects.common.CristinQuery.getUnitIdFromOrganization;
+import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
+import static nva.commons.core.attempt.Try.attempt;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.common.ErrorMessages.*;
-import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
-import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.*;
-import static no.unit.nva.cristin.projects.common.CristinQuery.getUnitIdFromOrganization;
-import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
-import static nva.commons.core.attempt.Try.attempt;
 
 /**
  * Builds Cristin query parameters using builder methods and NVA input parameters.
@@ -57,7 +93,7 @@ public class CristinQueryBuilder {
     public CristinQueryBuilder validate() throws BadRequestException {
         assignDefaultValues();
         for (var entry : cristinQuery.pathParameters.entrySet()) {
-            System.out.printf("%s - %s%n", entry.getKey(), entry.getValue() );
+            System.out.printf("%s - %s", entry.getKey(), entry.getValue() );
             throwInvalidPathValue(entry.getKey(), entry.getValue());
         }
         for (var entry : cristinQuery.queryParameters.entrySet()) {
@@ -398,6 +434,7 @@ public class CristinQueryBuilder {
 
     private void setPath(String key, String value) {
         cristinQuery.isNvaQuery = true;
+        System.out.printf("setPath -> %s - %s", key, value);
         var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
         if (key.equals(IDENTITY.getNvaKey()) || key.equals(IDENTITY.getKey())
             || key.equals(PATH_PROJECT.getNvaKey()) || key.equals(PATH_PROJECT.getKey())) {
@@ -410,6 +447,7 @@ public class CristinQueryBuilder {
     }
 
     private void setValue(String key, String value) {
+        System.out.printf("setValue -> %s - %s", key, value);
         var qpKey = keyFromString(key,value);
         if (!key.equals(qpKey.getKey()) && !cristinQuery.isNvaQuery && qpKey != INVALID) {
             cristinQuery.isNvaQuery = true;
