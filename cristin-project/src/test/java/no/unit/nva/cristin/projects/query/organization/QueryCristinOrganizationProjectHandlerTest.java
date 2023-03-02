@@ -93,7 +93,7 @@ class QueryCristinOrganizationProjectHandlerTest {
         GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(ERROR_MESSAGE_TEMPLATE_REQUIRED_MISSING.substring(0,34)));
+        assertThat(actualDetail, containsString(ERROR_MESSAGE_TEMPLATE_REQUIRED_MISSING.substring(0, 34)));
     }
 
     @Test
@@ -121,13 +121,13 @@ class QueryCristinOrganizationProjectHandlerTest {
         InputStream inputStream = generateHandlerDummyRequest();
         handler.handleRequest(inputStream, output, context);
         GatewayResponse<SearchResponse> gatewayResponse =
-                GatewayResponse.fromOutputStream(output, SearchResponse.class);
+            GatewayResponse.fromOutputStream(output, SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
     @Test
     void shouldReturnOKAndIdInResponseOnValidDummyInput() throws IOException {
-        var  inputStream = generateHandlerDummyRequest();
+        var inputStream = generateHandlerDummyRequest();
         handler.handleRequest(inputStream, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
@@ -190,42 +190,41 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     private InputStream generateHandlerDummyRequestWithIllegalQueryParameters() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
-                .withQueryParameters(Map.of(INVALID_KEY, INVALID_VALUE))
-                .build();
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                   .withQueryParameters(Map.of(INVALID_KEY, INVALID_VALUE))
+                   .build();
     }
 
     private InputStream generateHandlerDummyRequest() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
-                .withQueryParameters(Map.of(PAGE, SAMPLE_PAGE))
-                .withQueryParameters(Map.of(NUMBER_OF_RESULTS, SAMPLE_RESULTS_SIZE))
-                .build();
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                   .withQueryParameters(Map.of(PAGE, SAMPLE_PAGE))
+                   .withQueryParameters(Map.of(NUMBER_OF_RESULTS, SAMPLE_RESULTS_SIZE))
+                   .build();
     }
 
     private InputStream generateHandlerProRealisticRequest(Map<String, String> queryParametersMap)
-            throws JsonProcessingException {
+        throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
-                .withQueryParameters(queryParametersMap)
-                .build();
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                   .withQueryParameters(queryParametersMap)
+                   .build();
     }
 
     private InputStream generateHandlerRequestWithoutOrganizationIdentifier() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .build();
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .build();
     }
-
 
     private InputStream generateHandlerRequestWithInvalidOrganizationIdentifier() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-            .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-            .withPathParameters(Map.of(ORGANIZATION_PATH, "1.2.3", PROJECTS_PATH, EMPTY_STRING))
-            .build();
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withPathParameters(Map.of(ORGANIZATION_PATH, "1.2.3", PROJECTS_PATH, EMPTY_STRING))
+                   .build();
     }
 
     private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
@@ -237,12 +236,11 @@ class QueryCristinOrganizationProjectHandlerTest {
     }
 
     private URI getServiceUri(String identifier) {
-        return new UriWrapper(HTTPS,
-                DOMAIN_NAME).addChild(BASE_PATH)
-                .addChild(ORGANIZATION_PATH)
-                .addChild(identifier)
-                .addChild(PROJECTS_PATH)
-                .getUri();
+        return new UriWrapper(HTTPS, DOMAIN_NAME)
+                   .addChild(BASE_PATH)
+                   .addChild(ORGANIZATION_PATH)
+                   .addChild(identifier)
+                   .addChild(PROJECTS_PATH)
+                   .getUri();
     }
-
 }

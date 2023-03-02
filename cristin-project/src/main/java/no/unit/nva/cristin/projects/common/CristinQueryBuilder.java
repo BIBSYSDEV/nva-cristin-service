@@ -56,10 +56,10 @@ public class CristinQueryBuilder {
      */
     public CristinQueryBuilder validate() throws BadRequestException {
         assignDefaultValues();
-        for (Map.Entry<QueryParameterKey, String> entry : cristinQuery.pathParameters.entrySet()) {
+        for (var entry : cristinQuery.pathParameters.entrySet()) {
             throwInvalidPathValue(entry.getKey(), entry.getValue());
         }
-        for (Map.Entry<QueryParameterKey, String> entry : cristinQuery.queryParameters.entrySet()) {
+        for (var entry : cristinQuery.queryParameters.entrySet()) {
             throwInvalidParamererValue(entry.getKey(), entry.getValue());
         }
         if (!requiredMissing().isEmpty()) {
@@ -287,7 +287,7 @@ public class CristinQueryBuilder {
      * Setter Identity.
      */
     public CristinQueryBuilder withPathIdentity(String identity) {
-        System.out.println("withPathIdentity " + identity);
+        System.out.println("withPathIdentity -> " + identity);
         if (nonNull(identity) && !identity.isBlank()) {
             if (identity.matches(PATH_PROJECT.getPattern())) {
                 cristinQuery.setPath(PATH_PROJECT, identity);
@@ -304,7 +304,7 @@ public class CristinQueryBuilder {
      * Setter Organization.
      */
     public CristinQueryBuilder withPathOrganization(String organization) {
-        System.out.println("withPathOrganization " + organization);
+        System.out.println("withPathOrganization -> " + organization);
         if (nonNull(organization)) {
             if (organization.matches(PROJECT_ORGANIZATION.getPattern())) {
                 cristinQuery.setValue(PROJECT_ORGANIZATION,organization);
@@ -540,6 +540,10 @@ public class CristinQueryBuilder {
             final var errorMessage = nonNull(key.getErrorMessage())
                 ? key.getErrorMessage()
                 : invalidPathParameterMessage(keyName);
+            System.out.println(keyName);
+            System.out.println(key.getErrorMessage().equals(errorMessage));
+            System.out.println(errorMessage);
+
             throw new BadRequestException(errorMessage);
         }
     }
