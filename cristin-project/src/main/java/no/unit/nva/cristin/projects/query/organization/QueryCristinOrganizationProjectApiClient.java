@@ -32,6 +32,7 @@ public class QueryCristinOrganizationProjectApiClient extends CristinProjectApiC
         var endRequestTime = System.currentTimeMillis();
 
         URI id = cristinQuery.toNvaURI();
+        System.out.println(id);
 
         return new SearchResponse<NvaProject>(id)
                    .withContext(PROJECT_SEARCH_CONTEXT_URL)

@@ -3,8 +3,12 @@ package no.unit.nva.cristin.projects.query;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.*;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.LANGUAGE;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.QUERY;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
@@ -125,33 +129,32 @@ class QueryCristinProjectHandlerTest {
     private ByteArrayOutputStream output;
     private QueryCristinProjectHandler handler;
 
-
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
         return Stream.of(
             Arguments.of(LINK_EXAMPLE_VALUE,
-                exampleUriFromPageAndResults("201", "1"),
-                exampleUriFromPageAndResults("199", "1"),
-                "200", "1"),
+                         exampleUriFromPageAndResults("201", "1"),
+                         exampleUriFromPageAndResults("199", "1"),
+                         "200", "1"),
             Arguments.of(LINK_EXAMPLE_VALUE,
-                exampleUriFromPageAndResults("6", "3"),
-                exampleUriFromPageAndResults("4", "3"),
-                "5", "3"),
+                         exampleUriFromPageAndResults("6", "3"),
+                         exampleUriFromPageAndResults("4", "3"),
+                         "5", "3"),
             Arguments.of(LINK_EXAMPLE_VALUE,
-                EMPTY_STRING,
-                exampleUriFromPageAndResults("24", "10"),
-                "25", "10"),
+                         EMPTY_STRING,
+                         exampleUriFromPageAndResults("24", "10"),
+                         "25", "10"),
             Arguments.of(LINK_EXAMPLE_VALUE,
-                exampleUriFromPageAndResults("2", "5"),
-                EMPTY_STRING,
-                "1", "5"),
+                         exampleUriFromPageAndResults("2", "5"),
+                         EMPTY_STRING,
+                         "1", "5"),
             Arguments.of(LINK_EXAMPLE_VALUE,
-                exampleUriFromPageAndResults("10", "7"),
-                exampleUriFromPageAndResults("8", "7"),
-                "9", "7"),
+                         exampleUriFromPageAndResults("10", "7"),
+                         exampleUriFromPageAndResults("8", "7"),
+                         "9", "7"),
             Arguments.of(Constants.REL_NEXT,
-                exampleUriFromPageAndResults("2", "5"),
-                EMPTY_STRING,
-                "1", "5")
+                         exampleUriFromPageAndResults("2", "5"),
+                         EMPTY_STRING,
+                         "1", "5")
         );
     }
 
@@ -211,19 +214,19 @@ class QueryCristinProjectHandlerTest {
         assertEquals(expected, actual);
     }
 
-//    @Test
-//    void handlerThrowsBadRequestWhenMissingTitleQueryParameter() throws IOException {
-//        InputStream input = requestWithQueryParameters(Map.of(JsonPropertyNames.LANGUAGE, LANGUAGE_NB));
-//
-//        handler.handleRequest(input, output, context);
-//        var gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
-//
-//        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-//        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-//        assertThat(gatewayResponse.getBody(),
-//                containsString(ErrorMessages.invalidQueryParametersMessage(JsonPropertyNames.QUERY,
-//                        ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
-//    }
+    //    @Test
+    //    void handlerThrowsBadRequestWhenMissingTitleQueryParameter() throws IOException {
+    //        InputStream input = requestWithQueryParameters(Map.of(JsonPropertyNames.LANGUAGE, LANGUAGE_NB));
+    //
+    //        handler.handleRequest(input, output, context);
+    //        var gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
+    //
+    //        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    //        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    //        assertThat(gatewayResponse.getBody(),
+    //                containsString(ErrorMessages.invalidQueryParametersMessage(JsonPropertyNames.QUERY,
+    //                        ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
+    //    }
 
     @Test
     void trippyQueryNameIsOK() throws Exception {
@@ -267,8 +270,11 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-            containsString(ErrorMessages.invalidQueryParametersMessage(JsonPropertyNames.QUERY,
-                ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
+                   containsString(
+                       invalidQueryParametersMessage(
+                           JsonPropertyNames.QUERY,
+                           ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE))
+        );
     }
 
     @Test
@@ -281,8 +287,11 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-            containsString(ErrorMessages.invalidQueryParametersMessage(TITLE.getKey(),
-                ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
+                   containsString(
+                       invalidQueryParametersMessage(
+                           TITLE.getKey(),
+                           ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE))
+        );
     }
 
     @Test
@@ -297,7 +306,8 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-            containsString(String.format(ErrorMessages.ERROR_MESSAGE_INVALID_VALUE, JsonPropertyNames.LANGUAGE)));
+                   containsString(
+                       String.format(ErrorMessages.ERROR_MESSAGE_INVALID_VALUE, JsonPropertyNames.LANGUAGE)));
     }
 
     @Test
@@ -369,7 +379,7 @@ class QueryCristinProjectHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(),
-            containsString(String.format(ErrorMessages.ERROR_MESSAGE_INVALID_VALUE, JsonPropertyNames.PAGE)));
+                   containsString(String.format(ErrorMessages.ERROR_MESSAGE_INVALID_VALUE, JsonPropertyNames.PAGE)));
     }
 
     @ParameterizedTest(name = "Handler returns firstRecord {0} when record has pagination {1} and is on page {2}")
@@ -392,7 +402,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         Integer actual = Constants.OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
-            .getFirstRecord();
+                             .getFirstRecord();
         assertEquals(expected, actual);
     }
 
@@ -409,8 +419,8 @@ class QueryCristinProjectHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
-            containsString(String.format(ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE,
-                TOTAL_COUNT_EXAMPLE_VALUE)));
+                   containsString(String.format(ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE,
+                                                TOTAL_COUNT_EXAMPLE_VALUE)));
     }
 
     @Test
@@ -430,7 +440,7 @@ class QueryCristinProjectHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
-            containsString(String.format(ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, ZERO_VALUE)));
+                   containsString(String.format(ErrorMessages.ERROR_MESSAGE_PAGE_OUT_OF_SCOPE, ZERO_VALUE)));
     }
 
     @ParameterizedTest(
@@ -480,8 +490,8 @@ class QueryCristinProjectHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(),
-            containsString(String.format(ErrorMessages.ERROR_MESSAGE_INVALID_VALUE,
-                JsonPropertyNames.NUMBER_OF_RESULTS)));
+                   containsString(String.format(ErrorMessages.ERROR_MESSAGE_INVALID_VALUE,
+                                                JsonPropertyNames.NUMBER_OF_RESULTS)));
     }
 
     @ParameterizedTest(
@@ -506,12 +516,12 @@ class QueryCristinProjectHandlerTest {
 
         String actualNext =
             Optional.ofNullable(Constants.OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
-                .getNextResults()).orElse(new URI(EMPTY_STRING)).toString();
+                                    .getNextResults()).orElse(new URI(EMPTY_STRING)).toString();
         assertEquals(expectedNext, actualNext);
 
         String actualPrevious =
             Optional.ofNullable(Constants.OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
-                .getPreviousResults()).orElse(new URI(EMPTY_STRING)).toString();
+                                    .getPreviousResults()).orElse(new URI(EMPTY_STRING)).toString();
         assertEquals(expectedPrevious, actualPrevious);
     }
 
@@ -537,7 +547,6 @@ class QueryCristinProjectHandlerTest {
     void handlerReturnsProjectsFromTitleSearchWhenSuppliedWithQueryStringIncludingNumber() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-
         doReturn(new HttpResponseFaker(
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any());
@@ -545,7 +554,7 @@ class QueryCristinProjectHandlerTest {
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
 
         InputStream input = requestWithQueryParameters(Map.of(JsonPropertyNames.QUERY,
-            GRANT_ID_EXAMPLE + RANDOM_TITLE));
+                                                              GRANT_ID_EXAMPLE + RANDOM_TITLE));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
@@ -642,9 +651,9 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(body.getDetail(),
-            containsString(
-                ErrorMessages.invalidQueryParametersMessageWithRange(JsonPropertyNames.STATUS,
-                    Arrays.toString(ProjectStatus.values()))));
+                   containsString(
+                       ErrorMessages.invalidQueryParametersMessageWithRange(JsonPropertyNames.STATUS,
+                                                                            Arrays.toString(ProjectStatus.values()))));
     }
 
     @ParameterizedTest(
@@ -669,12 +678,12 @@ class QueryCristinProjectHandlerTest {
         cristinApiClientStub = spy(cristinApiClientStub);
         handler = new QueryCristinProjectHandler(cristinApiClientStub, new Environment());
         var queryParams = Map.of("query", "hello",
-            "funding", FUNDING_SAMPLE,
-            "biobank", BIOBANK_SAMPLE,
-            "keyword", KEYWORD_SAMPLE,
-            "results", "5",
-            "unit", UNIT_ID_SAMPLE,
-            "sort", START_DATE);
+                                 "funding", FUNDING_SAMPLE,
+                                 "biobank", BIOBANK_SAMPLE,
+                                 "keyword", KEYWORD_SAMPLE,
+                                 "results", "5",
+                                 "unit", UNIT_ID_SAMPLE,
+                                 "sort", START_DATE);
         var input = requestWithQueryParameters(queryParams);
         handler.handleRequest(input, output, context);
         var captor = ArgumentCaptor.forClass(URI.class);
@@ -691,7 +700,7 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualURI, containsString(PROJECT_SORT + "=" + START_DATE));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
-            SearchResponse.class);
+                                                               SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
@@ -751,12 +760,11 @@ class QueryCristinProjectHandlerTest {
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
-
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
         return new HandlerRequestBuilder<Void>(Constants.OBJECT_MAPPER)
-            .withBody(null)
-            .withQueryParameters(map)
-            .build();
+                   .withBody(null)
+                   .withQueryParameters(map)
+                   .build();
     }
 
     private String getBodyFromResource(String resource) {

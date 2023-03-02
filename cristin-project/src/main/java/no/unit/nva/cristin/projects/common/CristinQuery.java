@@ -1,22 +1,36 @@
 package no.unit.nva.cristin.projects.common;
 
-import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
-import nva.commons.core.paths.UriWrapper;
-
+import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
+import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.IGNORE_PATH_PARAMETER_INDEX;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.LANGUAGE;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PATH_PROJECT;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_ORGANIZATION;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.STATUS;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.model.Constants.*;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.*;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
-import static nva.commons.core.attempt.Try.attempt;
+import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
+import nva.commons.core.paths.UriWrapper;
 
 @SuppressWarnings({"Unused", "LooseCoupling"})
 public class CristinQuery {
@@ -105,6 +119,7 @@ public class CristinQuery {
         var results =
             Stream.of(queryParameters.entrySet(), pathParameters.entrySet())
                 .flatMap(Collection::stream)
+                .filter(f -> f.getKey() != PATH_PROJECT)
                 .collect(Collectors.toMap(this::toCristinQueryName, this::toCristinQueryValue));
         return new TreeMap<>(results);
     }
@@ -126,6 +141,7 @@ public class CristinQuery {
      * @param value to assign
      */
     public void setValue(QueryParameterKey key, String value) {
+        System.out.printf("setValue -> %-19s - %s\n\r", key.name(), value);
         if (nonNull(value)) {
             queryParameters.put(key, key.isEncode() ? decodeUTF(value) : value);
         }
@@ -138,9 +154,8 @@ public class CristinQuery {
      * @param value to assign
      */
     public void setPath(QueryParameterKey key, String value) {
-        if (nonNull(value)) {
-            pathParameters.put(key, key.isEncode() ? decodeUTF(value) : value);
-        }
+        System.out.printf("setPath  -> %-19s - %s\n\r", key.name(), value);
+        pathParameters.put(key, key.isEncode() ? decodeUTF(value) : value);
     }
 
     /**
@@ -173,20 +188,25 @@ public class CristinQuery {
         return queryParameters.containsKey(key) || pathParameters.containsKey(key);
     }
 
+
     private String[] getNvaPathAsArray() {
-        var pathParams =
+        final var pathSize = this.pathParameters.size();
+        return
             this.pathParameters
                 .entrySet()
                 .stream()
-                .flatMap(entry -> Stream.of(entry.getKey().getNvaKey(), entry.getValue()))
-                .collect(Collectors.toList());
+                .sorted(byOrdinalDesc())
+                .flatMap(entry -> Stream.of(getString(pathSize, entry), entry.getValue()))
+                .toArray(String[]::new);
+    }
 
-        if (pathParams.isEmpty()) {
-            pathParams.add(PROJECT_PATH_NVA);
-        } else if (!pathParams.contains(PROJECT_PATH_NVA)) {
-            pathParams.add(PROJECTS_PATH);
-        }
-        return pathParams.toArray(new String[0]);
+    private String getString(int pathSize, Entry<QueryParameterKey, String> entry) {
+        var isProjects = entry.getKey().equals(PATH_PROJECT) && pathSize > 1 ;
+        return isProjects ? entry.getKey().getKey() : entry.getKey().getNvaKey();
+    }
+
+    private Comparator<Entry<QueryParameterKey, String>> byOrdinalDesc() {
+        return Comparator.comparingInt(k -> k.getKey().ordinal());
     }
 
     private String toCristinQueryName(Map.Entry<QueryParameterKey, String> entry) {

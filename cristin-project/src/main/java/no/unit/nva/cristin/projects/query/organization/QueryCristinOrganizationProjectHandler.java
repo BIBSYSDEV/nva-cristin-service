@@ -11,6 +11,7 @@ import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_CURRENT
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_SORT;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PATH_ORGANISATION;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PATH_PROJECT;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_APPROVAL_REFERENCE_ID;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_APPROVED_BY;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_KEYWORD;
@@ -82,7 +83,7 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
         var cristinQuery =
             CristinQuery.builder()
                 .fromRequestInfo(requestInfo)
-                .withRequiredParameters(PATH_ORGANISATION, LANGUAGE, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE)
+                .withRequiredParameters(PATH_ORGANISATION, PATH_PROJECT, LANGUAGE, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE)
                 .asNvaQuery()
                 .validate()
                 .build();

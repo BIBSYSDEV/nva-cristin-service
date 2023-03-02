@@ -93,7 +93,6 @@ public class CristinQueryBuilder {
     public CristinQueryBuilder validate() throws BadRequestException {
         assignDefaultValues();
         for (var entry : cristinQuery.pathParameters.entrySet()) {
-            System.out.printf("%s - %s", entry.getKey(), entry.getValue() );
             throwInvalidPathValue(entry.getKey(), entry.getValue());
         }
         for (var entry : cristinQuery.queryParameters.entrySet()) {
@@ -332,7 +331,7 @@ public class CristinQueryBuilder {
                 cristinQuery.setPath(PATH_ORGANISATION, identity);
             }
         } else {
-            cristinQuery.setValue(PATH_PROJECT, EMPTY_STRING);
+            cristinQuery.setValue(IDENTITY, EMPTY_STRING);
         }
         return this;
     }
@@ -341,7 +340,6 @@ public class CristinQueryBuilder {
      * Setter Organization.
      */
     public CristinQueryBuilder withPathOrganization(String organization) {
-        System.out.println("withPathOrganization -> " + organization);
         if (nonNull(organization)) {
             if (organization.matches(PROJECT_ORGANIZATION.getPattern())) {
                 cristinQuery.setValue(PROJECT_ORGANIZATION,organization);
@@ -353,6 +351,15 @@ public class CristinQueryBuilder {
         }
         return this;
     }
+
+    /**
+     * Setter Project(identity) .
+     */
+    public CristinQueryBuilder withPathProject(String project) {
+        cristinQuery.setPath(PATH_PROJECT, project);
+        return this;
+    }
+
 
     /**
      * Setter project manager by Cristin id, name or part of the name.
@@ -417,6 +424,9 @@ public class CristinQueryBuilder {
     private void assignDefaultValues() {
         requiredMissing().forEach(key -> {
             switch (key) {
+                case PATH_PROJECT:
+                    cristinQuery.setPath(key, EMPTY_STRING);
+                    break;
                 case LANGUAGE:
                     cristinQuery.setValue(key, DEFAULT_LANGUAGE_CODE);
                     break;
@@ -434,20 +444,21 @@ public class CristinQueryBuilder {
 
     private void setPath(String key, String value) {
         cristinQuery.isNvaQuery = true;
-        System.out.printf("setPath -> %s - %s", key, value);
         var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
-        if (key.equals(IDENTITY.getNvaKey()) || key.equals(IDENTITY.getKey())
-            || key.equals(PATH_PROJECT.getNvaKey()) || key.equals(PATH_PROJECT.getKey())) {
+
+        if (key.equals(IDENTITY.getNvaKey())) {
             withPathIdentity(nonNullValue);
         } else if (key.equals(PATH_ORGANISATION.getNvaKey())) {
             withPathOrganization(nonNullValue);
+        } else if (key.equals(PATH_PROJECT.getNvaKey()) || key.equals(PATH_PROJECT.getKey())) {
+            withPathProject(nonNullValue);
         } else {
+            System.out.printf("CQB::INVALID_KEY -> [%s]-[%s]\n\r", key, value);
             invalidKeys.add(key);
         }
     }
 
     private void setValue(String key, String value) {
-        System.out.printf("setValue -> %s - %s", key, value);
         var qpKey = keyFromString(key,value);
         if (!key.equals(qpKey.getKey()) && !cristinQuery.isNvaQuery && qpKey != INVALID) {
             cristinQuery.isNvaQuery = true;
@@ -507,6 +518,10 @@ public class CristinQueryBuilder {
 
     private boolean invalidQueryParameter(QueryParameterKey key, String value) {
         return isNull(value) || !value.matches(key.getPattern());
+    }
+
+    private boolean invalidPathParameter(QueryParameterKey key, String value) {
+        return !(value.isBlank() || value.matches(key.getPattern()));
     }
 
     private Set<String> getMissingKeys() {
@@ -574,15 +589,12 @@ public class CristinQueryBuilder {
     }
 
     private void throwInvalidPathValue(QueryParameterKey key, String value) throws BadRequestException {
-        if (invalidQueryParameter(key, value)) {
+        if (invalidPathParameter(key, value)) {
             final var keyName = cristinQuery.isNvaQuery ? key.getNvaKey() : key.getKey();
             final var errorMessage = nonNull(key.getErrorMessage())
                 ? key.getErrorMessage()
                 : invalidPathParameterMessage(keyName);
-            System.out.println(keyName);
-            System.out.println(key.getErrorMessage().equals(errorMessage));
-            System.out.println(errorMessage);
-
+            System.out.printf("Failed: [%s]-[%s]\n\r", keyName,errorMessage);
             throw new BadRequestException(errorMessage);
         }
     }

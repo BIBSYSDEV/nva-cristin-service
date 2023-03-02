@@ -76,7 +76,7 @@ public class Constants {
 
     private static final String PATTERN_IS_NUMBER6 = "[1-9]\\d*";
     public static final String PATTERN_IS_DATE = "(\\d){4}-(\\d){2}-(\\d){2}[T]*[(\\d){2}:(\\d){2}:(\\d){2,6}Z]*";
-    private static final String PATTERN_IS_STRING_NON_EMPTY = ".+";
+    private static final String PATTERN_IS_NON_EMPTY = ".+";
     private static final String PATTERN_IS_TITLE = "^[æøåÆØÅ\\w-,\\. ]+$";
     private static final String PATTERN_IS_LANGUAGE = "(en|nb|nn|\\,)+";
     private static final String PATTERN_IS_STATUS = "(?i)CONCLUDED|ACTIVE|NOT[ +]*STARTED";
@@ -85,7 +85,7 @@ public class Constants {
 
     public enum QueryParameterKey {
         INVALID(null),
-        IDENTITY("identifier", "projects", PATTERN_IS_STRING_NON_EMPTY),
+        IDENTITY("identifier", null, PATTERN_IS_NON_EMPTY),
         PATH_ORGANISATION("parent_unit_id", "organization", ORGANIZATION_IDENTIFIER_PATTERN,
             ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS, true),
         PATH_PROJECT("projects", "project", PATTERN_IS_NUMBER6),
@@ -106,9 +106,9 @@ public class Constants {
         PROJECT_MODIFIED_SINCE("modified_since", null, PATTERN_IS_DATE),
         PROJECT_PARTICIPANT("participant"),
         PROJECT_UNIT("unit"),
-        QUERY("query", null, PATTERN_IS_STRING_NON_EMPTY,
-            invalidQueryParametersMessage("query", ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE),
-            true),
+        QUERY("query", null, PATTERN_IS_NON_EMPTY,
+              invalidQueryParametersMessage("query", ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE),
+              true),
         STATUS("status", PATTERN_IS_STATUS, true),
         TITLE("title", null, PATTERN_IS_TITLE,
             invalidQueryParametersMessage("title", ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE),
@@ -146,7 +146,7 @@ public class Constants {
         private final String errorMessage;
 
         QueryParameterKey(String cristinKey) {
-            this(cristinKey, null, PATTERN_IS_STRING_NON_EMPTY, null, false);
+            this(cristinKey, null, PATTERN_IS_NON_EMPTY, null, false);
         }
 
         QueryParameterKey(String cristinKey, String pattern, boolean encode) {
@@ -216,12 +216,9 @@ public class Constants {
 
         @Override
         public String toString() {
-            return new StringJoiner(", ", QueryParameterKey.class.getSimpleName() + "[", "]")
-                       .add("pattern='" + pattern + "'")
-                       .add("cristinKey='" + cristinKey + "'")
-                       .add("nvaKey='" + nvaKey + "'")
-                       .add("encode=" + encode)
-                       .add("errorMessage='" + errorMessage + "'")
+            return new StringJoiner(", ", "Key[", "]")
+                       .add(String.valueOf(ordinal()))
+                       .add(name())
                        .toString();
         }
     }

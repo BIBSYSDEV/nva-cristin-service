@@ -53,6 +53,7 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
         URI uri = cristinQuery.toURI();
         HttpResponse<String> response = fetchQueryResults(uri);
         var id = cristinQuery.toNvaURI();
+        System.out.println(id);
         checkHttpStatusCode(id, response.statusCode());
         return response;
     }

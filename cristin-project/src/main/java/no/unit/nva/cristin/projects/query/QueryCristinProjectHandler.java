@@ -4,6 +4,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesM
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.LANGUAGE;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_CURRENT;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PATH_PROJECT;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
 
     public static final Set<String> VALID_QUERY_PARAMETERS = QueryParameterKey.VALID_QUERY_PARAMETER_NVA_KEYS;
     public static final QueryParameterKey[] REQUIRED_QUERY_PARAMETER =
-        {PAGE_CURRENT, PAGE_ITEMS_PER_PAGE, LANGUAGE};
+        {PATH_PROJECT, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE, LANGUAGE};
 
     private final transient QueryCristinProjectApiClient cristinApiClient;
 
