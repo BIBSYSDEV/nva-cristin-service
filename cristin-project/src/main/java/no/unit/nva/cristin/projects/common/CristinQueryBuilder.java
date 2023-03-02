@@ -57,6 +57,7 @@ public class CristinQueryBuilder {
     public CristinQueryBuilder validate() throws BadRequestException {
         assignDefaultValues();
         for (var entry : cristinQuery.pathParameters.entrySet()) {
+            System.out.printf("%s - %s%n", entry.getKey(), entry.getValue() );
             throwInvalidPathValue(entry.getKey(), entry.getValue());
         }
         for (var entry : cristinQuery.queryParameters.entrySet()) {
