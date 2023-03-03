@@ -136,7 +136,9 @@ public class CristinQuery {
      * @return String content raw
      */
     public String getValue(QueryParameterKey key) {
-        return queryParameters.get(key);
+        return queryParameters.containsKey(key)
+                   ? queryParameters.get(key)
+                   : pathParameters.get(key);
     }
 
     /**
