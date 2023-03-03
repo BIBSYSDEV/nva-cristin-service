@@ -325,13 +325,15 @@ public class CristinQueryBuilder {
     public CristinQueryBuilder withPathIdentity(String identity) {
         System.out.println("withPathIdentity -> " + identity);
         if (nonNull(identity) && !identity.isBlank()) {
-            if (identity.matches(PATH_PROJECT.getPattern())) {
-                cristinQuery.setPath(PATH_PROJECT, identity);
-            } else if (identity.matches(PATH_ORGANISATION.getPattern())) {
+            if (identity.matches(PATH_ORGANISATION.getPattern()) || required().contains(PATH_ORGANISATION)) {
                 cristinQuery.setPath(PATH_ORGANISATION, identity);
+            } else if (identity.matches(PATH_PROJECT.getPattern()) || required().contains(PATH_PROJECT)) {
+                cristinQuery.setPath(PATH_PROJECT, identity);
+            } else {
+                cristinQuery.setPath(IDENTITY, identity);
             }
         } else {
-            cristinQuery.setValue(IDENTITY, EMPTY_STRING);
+            cristinQuery.setPath(IDENTITY, EMPTY_STRING);
         }
         return this;
     }
@@ -424,6 +426,12 @@ public class CristinQueryBuilder {
     private void assignDefaultValues() {
         requiredMissing().forEach(key -> {
             switch (key) {
+                case PATH_ORGANISATION:
+                    if (cristinQuery.containsKey(IDENTITY)) {
+                        cristinQuery.setPath(key, cristinQuery.getValue(IDENTITY));
+                        cristinQuery.pathParameters.remove(IDENTITY);
+                    }
+                    break;
                 case PATH_PROJECT:
                     cristinQuery.setPath(key, EMPTY_STRING);
                     break;
