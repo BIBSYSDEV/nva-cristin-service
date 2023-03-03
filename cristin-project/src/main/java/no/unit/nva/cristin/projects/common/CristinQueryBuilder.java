@@ -507,6 +507,7 @@ public class CristinQueryBuilder {
                 withStatus(value);
                 break;
             default:
+                System.out.printf("CQB::INVALID_KEY -> [%s]-[%s]\n\r", key, value);
                 invalidKeys.add(key);
                 break;
         }
