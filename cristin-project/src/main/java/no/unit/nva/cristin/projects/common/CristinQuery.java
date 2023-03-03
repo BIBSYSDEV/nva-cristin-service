@@ -14,6 +14,7 @@ import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PATH_PROJECT
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PROJECT_ORGANIZATION;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.STATUS;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -158,8 +159,9 @@ public class CristinQuery {
      * @param value to assign
      */
     public void setPath(QueryParameterKey key, String value) {
-        System.out.printf("setPath  -> %-19s - %s\n\r", key.name(), value);
-        pathParameters.put(key, key.isEncode() ? decodeUTF(value) : value);
+        var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
+        System.out.printf("setPath  -> %-19s - %s\n\r", key.name(), nonNullValue);
+        pathParameters.put(key, key.isEncode() ? decodeUTF(nonNullValue) : nonNullValue);
     }
 
     /**
