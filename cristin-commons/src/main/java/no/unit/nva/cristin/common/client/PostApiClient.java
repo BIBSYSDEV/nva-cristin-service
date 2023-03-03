@@ -4,6 +4,8 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_BAD_REQUEST_RESPONSE;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_INSTITUTION_HEADER;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE;
 import com.google.common.net.MediaType;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -34,10 +36,12 @@ public class PostApiClient extends ApiClient {
         throws GatewayTimeoutException, FailedHttpRequestException {
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
-            .uri(uri)
-            .header(CONTENT_TYPE, APPLICATION_JSON)
-            .POST(HttpRequest.BodyPublishers.ofString(body))
-            .build();
+                                      .uri(uri)
+                                      .header(CONTENT_TYPE, APPLICATION_JSON)
+                                      .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME,
+                                              CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                                      .POST(HttpRequest.BodyPublishers.ofString(body))
+                                      .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
@@ -52,6 +56,7 @@ public class PostApiClient extends ApiClient {
                               .uri(uri)
                               .header(CONTENT_TYPE, APPLICATION_JSON)
                               .header(CRISTIN_INSTITUTION_HEADER, cristinInstitutionNumber)
+                              .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
                               .POST(HttpRequest.BodyPublishers.ofString(body))
                               .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
@@ -62,10 +67,11 @@ public class PostApiClient extends ApiClient {
      */
     public CompletableFuture<HttpResponse<String>> postAsync(URI uri, String body) {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(uri)
-            .header(CONTENT_TYPE, APPLICATION_JSON)
-            .POST(HttpRequest.BodyPublishers.ofString(body))
-            .build();
+                                  .uri(uri)
+                                  .header(CONTENT_TYPE, APPLICATION_JSON)
+                                  .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                                  .POST(HttpRequest.BodyPublishers.ofString(body))
+                                  .build();
         return client.sendAsync(request, BodyHandlers.ofString());
     }
 

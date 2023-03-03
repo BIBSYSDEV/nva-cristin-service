@@ -73,6 +73,10 @@ public class Constants {
     public static final String HASHTAG = "#";
     public static final String SLASH_DELIMITER = "/";
     public static final String CRISTIN_INSTITUTION_HEADER = "Cristin-Representing-Institution";
+    public static final String CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME =
+        ENVIRONMENT.readEnv("CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME");
+    public static final String CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE =
+        ENVIRONMENT.readEnv("CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE");
 
     private static final String PATTERN_IS_NUMBER6 = "[1-9]\\d*";
     public static final String PATTERN_IS_DATE = "(\\d){4}-(\\d){2}-(\\d){2}[T]*[(\\d){2}:(\\d){2}:(\\d){2,6}Z]*";
