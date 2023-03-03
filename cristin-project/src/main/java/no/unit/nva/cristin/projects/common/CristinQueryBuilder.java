@@ -123,7 +123,6 @@ public class CristinQueryBuilder {
      * Adds parameters from path.
      * */
     public CristinQueryBuilder fromPathParameters(Map<String, String> parameters) {
-        System.out.println(String.join("/",parameters.keySet()));
         parameters.forEach(this::setPath);
         return this;
     }
@@ -427,7 +426,6 @@ public class CristinQueryBuilder {
      */
 
     private void assignDefaultValues() {
-        System.out.println("assignDefaultValues");
         requiredMissing().forEach(key -> {
             switch (key) {
                 case PATH_ORGANISATION:
@@ -449,7 +447,7 @@ public class CristinQueryBuilder {
                     cristinQuery.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
                     break;
                 default:
-                    System.out.println("key not processed " + key);
+                    System.out.println("Unknown key " + key);
                     break;
             }
         });

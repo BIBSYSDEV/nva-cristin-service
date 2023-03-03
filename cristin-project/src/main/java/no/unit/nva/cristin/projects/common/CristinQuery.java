@@ -83,7 +83,7 @@ public class CristinQuery {
                 .addChild(getNvaPathAsArray())
                 .addQueryParameters(toNvaParameters())
                 .getUri();
-        System.out.println(uri);
+        System.out.printf("NvaURI %s \n\r", uri);
         return uri;
     }
 
@@ -98,7 +98,7 @@ public class CristinQuery {
                 .addChild(PROJECTS_PATH)
                 .addQueryParameters(toParameters())
                 .getUri();
-        System.out.println(uri);
+        System.out.printf("URI    %s \n\r", uri);
         return uri;
     }
 
@@ -148,7 +148,6 @@ public class CristinQuery {
      * @param value to assign
      */
     public void setValue(QueryParameterKey key, String value) {
-        System.out.printf("CQ::setValue -> %-19s - %s\n\r", key.name(), value);
         if (nonNull(value)) {
             queryParameters.put(key, key.isEncode() ? decodeUTF(value) : value);
         }
@@ -162,7 +161,6 @@ public class CristinQuery {
      */
     public void setPath(QueryParameterKey key, String value) {
         var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
-        System.out.printf("setPath  -> %-19s - %s\n\r", key.name(), nonNullValue);
         pathParameters.put(key, key.isEncode() ? decodeUTF(nonNullValue) : nonNullValue);
     }
 
