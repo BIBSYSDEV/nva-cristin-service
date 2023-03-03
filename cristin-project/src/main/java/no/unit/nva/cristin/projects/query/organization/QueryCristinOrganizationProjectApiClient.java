@@ -9,6 +9,7 @@ import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.common.CristinQuery.CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,14 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.paths.UriWrapper;
 
 public class QueryCristinOrganizationProjectApiClient extends CristinProjectApiClient {
+
+    public QueryCristinOrganizationProjectApiClient() {
+        super();
+    }
+
+    public QueryCristinOrganizationProjectApiClient(HttpClient httpClient) {
+        super(httpClient);
+    }
 
     /**
      * Searches for an Organizations projects for a given parent_unit.

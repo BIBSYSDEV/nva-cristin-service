@@ -6,12 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.attempt.Try;
@@ -25,12 +25,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Collections;
 import java.util.Map;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
@@ -63,14 +60,14 @@ class QueryCristinOrganizationHandlerTest {
 
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     private static final String CRISTIN_QUERY_RESPONSE = "cristin_query_response_sample.json";
-    QueryCristinOrganizationHandler queryCristinOrganizationHandler;
+    private QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private ByteArrayOutputStream output;
     private Context context;
 
     @BeforeEach
     void setUp() throws NotFoundException, FailedHttpRequestException {
         context = mock(Context.class);
-        CristinOrganizationApiClient cristinApiClient = mock(CristinOrganizationApiClient.class);
+        var cristinApiClient = mock(CristinOrganizationApiClient.class);
         when(cristinApiClient.queryOrganizations(any())).thenReturn(emptySearchResponse());
         output = new ByteArrayOutputStream();
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
@@ -89,10 +86,10 @@ class QueryCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnBadRequestResponseOnMissingQueryParam() throws IOException {
-        InputStream inputStream = generateHandlerRequestWithMissingQueryParameter();
+        var inputStream = generateHandlerRequestWithMissingQueryParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
-        String actualDetail = getProblemDetail(gatewayResponse);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
+        var actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(invalidQueryParametersMessage(
                 QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
@@ -100,62 +97,57 @@ class QueryCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnEmptyResponseOnStrangeQuery() throws IOException {
-        InputStream inputStream = generateHandlerRequestWithStrangeQueryParameter();
+        var inputStream = generateHandlerRequestWithStrangeQueryParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
 
-        SearchResponse<Organization> actual = gatewayResponse.getBodyObject(SearchResponse.class);
+        var actual = gatewayResponse.getBodyObject(SearchResponse.class);
         assertEquals(0, actual.getHits().size());
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @Test
-    void shouldReturnResponseOnQuery() throws IOException, ApiGatewayException {
+    void shouldReturnResponseOnQuery() throws Exception {
+        var mockHttpClient = mock(HttpClient.class);
+        var cristinApiClient = new CristinOrganizationApiClient(mockHttpClient);
+        cristinApiClient = spy(cristinApiClient);
 
-        HttpClient httpClient = HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.ALWAYS)
-                .connectTimeout(Duration.ofSeconds(30))
-                .build();
+        final var first = getCristinUri("185.53.18.14", UNITS_PATH);
+        doReturn(getOrganization("org_18_53_18_14.json")).when(cristinApiClient).getOrganization(first);
+        final var second = getCristinUri("2012.9.20.0", UNITS_PATH);
+        doReturn(getOrganization("org_2012_9_20_0.json")).when(cristinApiClient).getOrganization(second);
 
-        output = new ByteArrayOutputStream();
-        CristinOrganizationApiClient cristinApiClient = new CristinOrganizationApiClient(httpClient);
-        CristinOrganizationApiClient mySpy = spy(cristinApiClient);
+        var fakeQueryResponseResource = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE));
+        var fakeHttpResponse = new HttpResponseFaker(fakeQueryResponseResource, HTTP_OK);
+        doReturn(getTry(fakeHttpResponse)).when(cristinApiClient).sendRequestMultipleTimes(any());
 
-        final URI first = getCristinUri("185.53.18.14", UNITS_PATH);
-        doReturn(getOrganization("org_18_53_18_14.json")).when(mySpy).getOrganization(first);
-        final URI second = getCristinUri("2012.9.20.0", UNITS_PATH);
-        doReturn(getOrganization("org_2012_9_20_0.json")).when(mySpy).getOrganization(second);
-        HttpResponse<String> mockHttpResponse = mock(HttpResponse.class);
-        when(mockHttpResponse.statusCode()).thenReturn(HTTP_OK);
-        when(mockHttpResponse.body()).thenReturn(IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE)));
-        when(mockHttpResponse.headers())
-                .thenReturn(java.net.http.HttpHeaders.of(Collections.emptyMap(), (s1,s2) -> true));
-        doReturn(getTry(mockHttpResponse)).when(mySpy).sendRequestMultipleTimes(any());
-
-
-        output = new ByteArrayOutputStream();
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
+        InputStream inputStream = generateValidHandlerRequest();
+        queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
 
-        InputStream inputStream = new HandlerRequestBuilder<InputStream>(restApiMapper)
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                                                               SearchResponse.class);
+        var actual = gatewayResponse.getBodyObject(SearchResponse.class);
+
+        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(2, actual.getHits().size());
+        assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+    private InputStream generateValidHandlerRequest() throws JsonProcessingException {
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
                 .withQueryParameters(Map.of("query", "Department of Medical Biochemistry","depth","full"))
                 .build();
-        queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
-
-        SearchResponse<Organization> actual = gatewayResponse.getBodyObject(SearchResponse.class);
-        assertEquals(2, actual.getHits().size());
-        assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
     @Test
     void shouldReturnBadRequestOnIllegalDepth() throws IOException {
-        InputStream inputStream = generateHandlerRequestWithIllegalDepthParameter();
+        var inputStream = generateHandlerRequestWithIllegalDepthParameter();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
-        String actualDetail = getProblemDetail(gatewayResponse);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
+        var actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(ERROR_MESSAGE_DEPTH_INVALID));
     }
@@ -165,7 +157,7 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     private Organization getOrganization(String subUnitFile) throws JsonProcessingException {
-        return  OBJECT_MAPPER.readValue(IoUtils.stringFromResources(Path.of(subUnitFile)), Organization.class);
+        return OBJECT_MAPPER.readValue(IoUtils.stringFromResources(Path.of(subUnitFile)), Organization.class);
     }
 
     private InputStream generateHandlerRequestWithMissingQueryParameter() throws JsonProcessingException {

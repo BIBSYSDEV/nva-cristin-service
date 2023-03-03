@@ -12,7 +12,7 @@
     "unit_name": {
       "en": "Faculty of Medicine"
     },
-    "url": "https://api.cristin.no/v2/units/185.50.0.0"
+    "url": "https://api.cristin-test.uio.no/v2/units/185.50.0.0"
   },
   "parent_units": [
     {

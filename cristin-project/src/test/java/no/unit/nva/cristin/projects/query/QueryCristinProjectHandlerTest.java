@@ -104,7 +104,8 @@ class QueryCristinProjectHandlerTest {
             "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=1&results=10";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "nvaApiGetResponseNonEnrichedProjects.json";
-    private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON = "nvaApiGetQueryResponseNoProjectsFound.json";
+    private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON =
+        "nvaApiGetQueryResponseNoProjectsFound.json";
     private static final String SAMPLE_NVA_ORGANIZATION =
             "https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0";
     private static final String SAMPLE_NVA_ORGANIZATION_ENCODED =
