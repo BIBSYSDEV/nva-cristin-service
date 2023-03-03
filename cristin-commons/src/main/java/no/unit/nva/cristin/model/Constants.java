@@ -188,6 +188,7 @@ public class Constants {
 
         public static QueryParameterKey keyFromString(String paramName, String value) {
             var result = Arrays.stream(QueryParameterKey.values())
+                 .filter(f -> f.ordinal() > IGNORE_PATH_PARAMETER_INDEX)
                 .filter(equalTo(paramName)).collect(Collectors.toSet());
             return result.size() == 1
                 ? result.stream().findFirst().get()

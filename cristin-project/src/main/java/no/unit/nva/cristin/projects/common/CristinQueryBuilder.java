@@ -115,9 +115,8 @@ public class CristinQueryBuilder {
      * Adds query and path parameters from requestInfo.
      */
     public CristinQueryBuilder fromRequestInfo(RequestInfo requestInfo) {
-        fromPathParameters(requestInfo.getPathParameters());
-        fromQueryParameters(requestInfo.getQueryParameters());
-        return this;
+        return fromPathParameters(requestInfo.getPathParameters())
+                   .fromQueryParameters(requestInfo.getQueryParameters());
     }
 
     /**
@@ -515,7 +514,7 @@ public class CristinQueryBuilder {
                 withStatus(value);
                 break;
             default:
-                System.out.printf("CQB::SETVALUE::INVALID_KEY -> [%s]-[%s]\n\r", key, value);
+                System.out.printf("CQB::SETVALUE::INVALID_KEY -> [%s]-[%s]-[%s]\n\r", qpKey.name(), key, value);
                 invalidKeys.add(key);
                 break;
         }
