@@ -123,6 +123,7 @@ public class CristinQueryBuilder {
      * Adds parameters from path.
      * */
     public CristinQueryBuilder fromPathParameters(Map<String, String> parameters) {
+        System.out.println(String.join("/",parameters.keySet()));
         parameters.forEach(this::setPath);
         return this;
     }
@@ -324,9 +325,9 @@ public class CristinQueryBuilder {
     public CristinQueryBuilder withPathIdentity(String identity) {
         System.out.println("withPathIdentity -> " + identity);
         if (nonNull(identity) && !identity.isBlank()) {
-            if (identity.matches(PATH_ORGANISATION.getPattern()) || required().contains(PATH_ORGANISATION)) {
+            if (identity.matches(PATH_ORGANISATION.getPattern())) {
                 cristinQuery.setPath(PATH_ORGANISATION, identity);
-            } else if (identity.matches(PATH_PROJECT.getPattern()) || required().contains(PATH_PROJECT)) {
+            } else if (identity.matches(PATH_PROJECT.getPattern())) {
                 cristinQuery.setPath(PATH_PROJECT, identity);
             } else {
                 cristinQuery.setPath(IDENTITY, identity);
@@ -341,6 +342,8 @@ public class CristinQueryBuilder {
      * Setter Organization.
      */
     public CristinQueryBuilder withPathOrganization(String organization) {
+        System.out.println("withPathOrganization -> " + organization);
+
         if (nonNull(organization)) {
             if (organization.matches(PROJECT_ORGANIZATION.getPattern())) {
                 cristinQuery.setValue(PROJECT_ORGANIZATION,organization);
@@ -357,6 +360,7 @@ public class CristinQueryBuilder {
      * Setter Project(identity) .
      */
     public CristinQueryBuilder withPathProject(String project) {
+        System.out.println("withPathProject -> " + project);
         cristinQuery.setPath(PATH_PROJECT, project);
         return this;
     }
@@ -423,6 +427,7 @@ public class CristinQueryBuilder {
      */
 
     private void assignDefaultValues() {
+        System.out.println("assignDefaultValues");
         requiredMissing().forEach(key -> {
             switch (key) {
                 case PATH_ORGANISATION:
@@ -444,6 +449,7 @@ public class CristinQueryBuilder {
                     cristinQuery.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
                     break;
                 default:
+                    System.out.println("key not processed " + key);
                     break;
             }
         });

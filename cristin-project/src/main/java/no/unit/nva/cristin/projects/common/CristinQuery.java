@@ -146,7 +146,7 @@ public class CristinQuery {
      * @param value to assign
      */
     public void setValue(QueryParameterKey key, String value) {
-        System.out.printf("setValue -> %-19s - %s\n\r", key.name(), value);
+        System.out.printf("CQ::setValue -> %-19s - %s\n\r", key.name(), value);
         if (nonNull(value)) {
             queryParameters.put(key, key.isEncode() ? decodeUTF(value) : value);
         }
