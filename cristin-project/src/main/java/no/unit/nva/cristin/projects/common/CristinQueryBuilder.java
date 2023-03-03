@@ -453,7 +453,7 @@ public class CristinQueryBuilder {
         } else if (key.equals(PATH_PROJECT.getNvaKey()) || key.equals(PATH_PROJECT.getKey())) {
             withPathProject(nonNullValue);
         } else {
-            System.out.printf("CQB::INVALID_KEY -> [%s]-[%s]\n\r", key, value);
+            System.out.printf("CQB::SETPATH::INVALID_KEY -> [%s]-[%s]\n\r", key, value);
             invalidKeys.add(key);
         }
     }
@@ -507,7 +507,7 @@ public class CristinQueryBuilder {
                 withStatus(value);
                 break;
             default:
-                System.out.printf("CQB::INVALID_KEY -> [%s]-[%s]\n\r", key, value);
+                System.out.printf("CQB::SETVALUE::INVALID_KEY -> [%s]-[%s]\n\r", key, value);
                 invalidKeys.add(key);
                 break;
         }
