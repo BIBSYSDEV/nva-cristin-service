@@ -8,6 +8,7 @@ dependencies {
     implementation libs.nva.core
     implementation libs.nva.language
     implementation libs.aws.lambda.java.core
+    implementation project(path: ':cristin-project')
 
     testImplementation libs.junit.jupiter.api
     testImplementation libs.nva.testutils

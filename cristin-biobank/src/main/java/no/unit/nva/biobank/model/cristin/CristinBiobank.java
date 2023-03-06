@@ -1,6 +1,9 @@
 package no.unit.nva.biobank.model.cristin;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Set;
+import no.unit.nva.biobank.model.nva.Biobank;
+import no.unit.nva.biobank.model.nva.Biobank.Builder;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 
@@ -67,7 +70,7 @@ public final class CristinBiobank {
     private final CristinAssocProjectForBiobank assocProject;
 
     @JsonProperty(CRISTIN_BIOBANK_EXTERNAL_SOURCES)
-    private final CristinExternalSource externalSources;
+    private final Set<CristinExternalSource> externalSources;
 
     @JsonProperty(CRISTIN_BIOBANK_APPROVALS)
     private final CristinBiobankApprovals approvals;
@@ -109,7 +112,7 @@ public final class CristinBiobank {
                           CristinOrganization coordinatinInstitution,
                           @JsonProperty(CRISTIN_BIOBANK_COORDINATOR) CristinCoordinator coordinator,
                           @JsonProperty(CRISTIN_BIOBANK_ASSOC_PROJECT) CristinAssocProjectForBiobank assocProject,
-                          @JsonProperty(CRISTIN_BIOBANK_EXTERNAL_SOURCES) CristinExternalSource externalSources,
+                          @JsonProperty(CRISTIN_BIOBANK_EXTERNAL_SOURCES) Set<CristinExternalSource> externalSources,
                           @JsonProperty(CRISTIN_BIOBANK_APPROVALS) CristinBiobankApprovals approvals,
                           @JsonProperty(CRISTIN_BIOBANK_MATERIALS) List<CristinBiobankMaterial> materials) {
         this.biobankId = cristinBiobankId;
@@ -129,6 +132,9 @@ public final class CristinBiobank {
         this.materials = materials;
     }
 
+    public Set<CristinExternalSource> getExternalSources() {
+        return externalSources;
+    }
 
     public String getBiobankId() {
         return biobankId;
@@ -178,9 +184,7 @@ public final class CristinBiobank {
         return assocProject;
     }
 
-    public CristinExternalSource getExternalSources() {
-        return externalSources;
-    }
+
 
     public CristinBiobankApprovals getApprovals() {
         return approvals;
@@ -190,7 +194,9 @@ public final class CristinBiobank {
         return materials;
     }
 
-
+    public Biobank toBiobank() {
+        return new Builder(this).build();
+    }
 
 
 
