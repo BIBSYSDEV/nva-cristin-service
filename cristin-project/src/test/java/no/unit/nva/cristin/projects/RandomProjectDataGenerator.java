@@ -35,6 +35,7 @@ import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
+import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.FUNDING_SOURCES;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.VALUE;
@@ -46,6 +47,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RandomProjectDataGenerator {
@@ -73,6 +75,7 @@ public class RandomProjectDataGenerator {
     private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
     public static final String SOME_UNIT_IDENTIFIER = "185.90.0.0";
     public static final String EMAIL_DOMAIN = "@email.no";
+    public static final String PATH_DELIMITER = "/";
 
     /**
      * Create a NvaProject containing random data.
@@ -224,7 +227,8 @@ public class RandomProjectDataGenerator {
     }
 
     private static Funding randomFunding() {
-        return new Funding(new FundingSource(randomNamesMap(), randomString()), randomString());
+        return new Funding(getNvaApiUri(FUNDING_SOURCES + PATH_DELIMITER + randomString()), randomString(),
+                           randomNamesMap());
     }
 
     private static Map<String, String> randomSummary() {

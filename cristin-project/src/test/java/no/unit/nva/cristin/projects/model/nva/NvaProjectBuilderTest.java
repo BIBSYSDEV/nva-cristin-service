@@ -1,5 +1,7 @@
 package no.unit.nva.cristin.projects.model.nva;
 
+import java.util.List;
+import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import org.junit.jupiter.api.Test;
 
@@ -41,6 +43,9 @@ public class NvaProjectBuilderTest {
     public static final String ORGANIZATION_IDENTIFIER = "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0"
                                                          + ".0.0";
     public static final String MEDICAL_DEPARTMENT = "Medical Department";
+    public static final String URI_ENCODED_FUNDING_SOURCE_URI = "https://api.dev.nva.aws.unit"
+                                                                + ".no/cristin/funding-sources/EC%2FFP7";
+    public static final String FUNDING_SOURCE_CODE = "EC/FP7";
 
     @Test
     void shouldReturnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
@@ -55,6 +60,7 @@ public class NvaProjectBuilderTest {
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }
 
+    // TODO: Compare with json tree from file instead
     @Test
     void shouldMapAllSupportedFieldsFoundInCristinJson() {
         var cristinProject =
@@ -101,4 +107,21 @@ public class NvaProjectBuilderTest {
         assertThat(deserialized, equalTo(nvaProject));
     }
 
+    @Test
+    void shouldUrlEncodeFundingSourceWithEntities() {
+        var cristinFunding = new CristinFundingSource();
+        cristinFunding.setFundingSourceCode(FUNDING_SOURCE_CODE);
+        var cristinProject = new CristinProject();
+        addRequiredFields(cristinProject);
+        cristinProject.setProjectFundingSources(List.of(cristinFunding));
+        var nvaProject = new NvaProjectBuilder(cristinProject).build();
+
+        var actual = nvaProject.getFunding().get(0).getSource().toString();
+
+        assertThat(actual, equalTo(URI_ENCODED_FUNDING_SOURCE_URI));
+    }
+
+    private void addRequiredFields(CristinProject cristinProject) {
+        cristinProject.setStatus(ProjectStatus.ACTIVE.getCristinStatus());
+    }
 }
