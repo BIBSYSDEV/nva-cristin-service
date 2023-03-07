@@ -69,16 +69,10 @@ class CristinProjectBuilderTest {
         assertThat(actual, equalTo(expected));
     }
 
-    // TODO: Remove fields from this method when they are POSTable to Cristin
     private void addFieldsNotSupportedByToCristinProject(NvaProject expected, NvaProject actual) {
         actual.setCreated(expected.getCreated());
         actual.setLastModified(expected.getLastModified());
-        actual.setContactInfo(expected.getContactInfo());
         actual.setFundingAmount(expected.getFundingAmount());
-        actual.setProjectCategories(expected.getProjectCategories());
-        actual.setKeywords(expected.getKeywords());
-        actual.setExternalSources(expected.getExternalSources());
-        actual.setRelatedProjects(expected.getRelatedProjects());
     }
 
     private Set<String> addFieldsToIgnoreListNotSupportedByCristinPost() {
