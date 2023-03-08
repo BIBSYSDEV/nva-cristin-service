@@ -80,6 +80,17 @@ public class CristinProjectBuilder {
         return cristinProject;
     }
 
+    public static void removeFieldsNotSupportedByPost(CristinProject cristinProject) {
+        cristinProject.setProjectCategories(removeLabels(cristinProject.getProjectCategories()));
+        cristinProject.setKeywords(removeLabels(cristinProject.getKeywords()));
+    }
+
+    private static List<CristinTypedLabel> removeLabels(List<CristinTypedLabel> typedLabels) {
+        return typedLabels.stream()
+                   .map(category -> new CristinTypedLabel(category.getCode(), null))
+                   .collect(Collectors.toList());
+    }
+
     private List<CristinApproval> extractApprovals(List<Approval> approvals) {
         return approvals.stream().map(this::toCristinApproval).collect(Collectors.toList());
     }
