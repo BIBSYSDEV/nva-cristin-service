@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.basicAuthHeader;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME;
@@ -138,8 +139,10 @@ public class ApiClient {
         try {
             return client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8));
         } catch (HttpTimeoutException timeoutException) {
+            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), timeoutException);
             throw new GatewayTimeoutException();
         } catch (IOException | InterruptedException otherException) {
+            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), otherException);
             throw new FailedHttpRequestException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
     }
