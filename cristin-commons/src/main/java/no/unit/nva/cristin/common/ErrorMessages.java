@@ -36,7 +36,7 @@ public class ErrorMessages {
         "Parameter '%s' has invalid value. Supported values are: ";
 
     public static final String ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE =
-            "Remote service responded with status: %s when client called uri: %s";
+            "Remote service responded with status: %s when client called uri: %s. Body from upstream returned: %s";
     public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
             "Page requested is out of scope. Query contains %s results";
     public static final String ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE =

@@ -85,6 +85,6 @@ public class PostApiClient extends ApiClient {
         if (statusCode == HTTP_BAD_REQUEST) {
             throw new BadRequestException(UPSTREAM_BAD_REQUEST_RESPONSE + body);
         }
-        checkHttpStatusCode(uri, statusCode);
+        checkHttpStatusCode(uri, statusCode, body);
     }
 }
