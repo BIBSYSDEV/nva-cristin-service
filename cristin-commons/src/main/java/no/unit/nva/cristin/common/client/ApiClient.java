@@ -174,7 +174,7 @@ public class ApiClient {
     }
 
     protected void logError(String message, String data, Exception failure) {
-        logger.error(String.format(message, data, failure.getMessage()));
+        logger.error(String.format(message, data, failure.getClass().getCanonicalName() + ": " + failure.getMessage()));
     }
 
     /**
