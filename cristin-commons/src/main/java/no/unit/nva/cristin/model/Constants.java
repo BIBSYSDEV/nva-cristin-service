@@ -144,7 +144,7 @@ public class Constants {
             invalidQueryParametersMessage("query",
                                           ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE),
               true),
-        STATUS("status", PATTERN_IS_STATUS, true),
+        STATUS("status", null, PATTERN_IS_STATUS, null,true),
         TITLE(
             "title",
             null,
@@ -194,10 +194,6 @@ public class Constants {
 
         QueryParameterKey(String cristinKey) {
             this(cristinKey, null, PATTERN_IS_NON_EMPTY, null, false);
-        }
-
-        QueryParameterKey(String cristinKey, String pattern, boolean encode) {
-            this(cristinKey, null, pattern, null, encode);
         }
 
         QueryParameterKey(String cristinKey, String nvaKey, String pattern) {

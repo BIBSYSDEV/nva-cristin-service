@@ -65,6 +65,7 @@ public class CristinQueryBuilder {
     private static final String PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
     private final transient Set<String> invalidKeys = new HashSet<>(0);
     private final transient CristinQuery cristinQuery;
+    private transient boolean notValidated = true;
 
     /**
      * Constructor of CristinQuery.Builder.
@@ -81,8 +82,12 @@ public class CristinQueryBuilder {
 
     /**
      * Builder of CristinQuery.
+     * @throws BadRequestException if parameters are invalid or missing
      */
-    public CristinQuery build() {
+    public CristinQuery build() throws BadRequestException {
+        if (notValidated) {
+            validate();
+        }
         return cristinQuery;
     }
 
@@ -107,6 +112,7 @@ public class CristinQueryBuilder {
         if (!invalidKeys.isEmpty()) {
             throw new BadRequestException(validQueryParameterNamesMessage(validKeys()));
         }
+        notValidated = false;
         return this;
     }
 
