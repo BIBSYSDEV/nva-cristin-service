@@ -1,12 +1,12 @@
 package no.unit.nva.cristin.projects.common;
 
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.LANGUAGE;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_CURRENT;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
+import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
+import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_CURRENT;
+import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;
 
-import no.unit.nva.cristin.model.Constants;
+import no.unit.nva.cristin.model.QueryParameterKey;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +38,7 @@ public class CristinQueryTest {
     private static final String BIOBANK = "533895";
     private static final String APPROVAL_REFERENCE_ID = "2017/1593";
     private static final String APPROVED_BY = "REK";
-    public static final Constants.QueryParameterKey[] QUERY_PARAMETER_KEYS =
+    public static final QueryParameterKey[] QUERY_PARAMETER_KEYS =
         {PAGE_CURRENT, PAGE_ITEMS_PER_PAGE, LANGUAGE};
 
     @Test

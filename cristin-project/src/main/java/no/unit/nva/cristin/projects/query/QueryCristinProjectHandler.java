@@ -1,15 +1,15 @@
 package no.unit.nva.cristin.projects.query;
 
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.LANGUAGE;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_CURRENT;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PATH_PROJECT;
+import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
+import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_CURRENT;
+import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
+import static no.unit.nva.cristin.model.QueryParameterKey.PATH_PROJECT;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Set;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
-import no.unit.nva.cristin.model.Constants.QueryParameterKey;
+import no.unit.nva.cristin.model.QueryParameterKey;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.CristinQuery;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;

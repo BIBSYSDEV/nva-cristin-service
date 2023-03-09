@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.projects.query;
 
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.LANGUAGE;
+import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
 import java.net.http.HttpResponse;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
