@@ -77,14 +77,11 @@ public class CristinQuery {
      * @return an URI to Cristin/NVA Projects with parameters.
      */
     public URI toNvaURI() {
-        final var uri =
-            new UriWrapper(HTTPS, DOMAIN_NAME)
-                .addChild(BASE_PATH)
-                .addChild(getNvaPathAsArray())
-                .addQueryParameters(toNvaParameters())
-                .getUri();
-        System.out.printf("NvaURI %s \n\r", uri);
-        return uri;
+        return new UriWrapper(HTTPS, DOMAIN_NAME)
+            .addChild(BASE_PATH)
+            .addChild(getNvaPathAsArray())
+            .addQueryParameters(toNvaParameters())
+            .getUri();
     }
 
     /**
@@ -93,13 +90,14 @@ public class CristinQuery {
      * @return an URI to NVA (default) Projects with parameters.
      */
     public URI toURI() {
-        final var uri =
-            UriWrapper.fromUri(CRISTIN_API_URL)
-                .addChild(PROJECTS_PATH)
-                .addQueryParameters(toParameters())
-                .getUri();
-        System.out.printf("URI    %s \n\r", uri);
-        return uri;
+        var children = containsKey(PATH_PROJECT)
+            ? new String[]{PATH_PROJECT.getKey(), getValue(PATH_PROJECT)}
+            : new String[]{PATH_PROJECT.getKey()};
+
+        return UriWrapper.fromUri(CRISTIN_API_URL)
+                   .addChild(children)
+                   .addQueryParameters(toParameters())
+                   .getUri();
     }
 
     /**

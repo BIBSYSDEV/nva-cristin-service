@@ -85,7 +85,7 @@ class QueryCristinProjectHandlerTest {
     public static final String GRANT_ID_EXAMPLE = "1234567";
     public static final String WHITESPACE = " ";
     public static final String URI_WITH_ESCAPED_WHITESPACE =
-        "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=1&results=5&title=reindeer+reindeer";
+        "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=1&results=5&title=reindeer+reindeer%253A";
     public static final String INVALID_QUERY_PARAM_KEY = "invalid";
     public static final String INVALID_QUERY_PARAM_VALUE = "value";
     public static final String PROBLEM_JSON = APPLICATION_PROBLEM_JSON.toString();
@@ -213,26 +213,12 @@ class QueryCristinProjectHandlerTest {
         var actual = Constants.OBJECT_MAPPER.readTree(gatewayResponse.getBody());
         assertEquals(expected, actual);
     }
-
-    //    @Test
-    //    void handlerThrowsBadRequestWhenMissingTitleQueryParameter() throws IOException {
-    //        InputStream input = requestWithQueryParameters(Map.of(JsonPropertyNames.LANGUAGE, LANGUAGE_NB));
-    //
-    //        handler.handleRequest(input, output, context);
-    //        var gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
-    //
-    //        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-    //        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-    //        assertThat(gatewayResponse.getBody(),
-    //                containsString(ErrorMessages.invalidQueryParametersMessage(JsonPropertyNames.QUERY,
-    //                        ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
-    //    }
-
+    
     @Test
-    void trippyQueryNameIsOK() throws Exception {
+    void handlerReturnsOkWhenTitleContainsAeOeAacolon() throws Exception {
         InputStream input = requestWithQueryParameters(
             Map.of(
-                JsonPropertyNames.QUERY, RANDOM_TITLE + " å " + RANDOM_TITLE,
+                JsonPropertyNames.QUERY, RANDOM_TITLE + " æØå: " + RANDOM_TITLE,
                 JsonPropertyNames.ORGANIZATION,
                 "https%3A%2F%2Fapi.dev.nva.aws.unit.no%2Fcristin%2Forganization%2F20202.0.0.0"
             ));
@@ -585,7 +571,7 @@ class QueryCristinProjectHandlerTest {
     @Test
     void handlerReturnsCristinProjectsWhenQueryContainsTitleWithWhitespace() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
-            JsonPropertyNames.QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE,
+            JsonPropertyNames.QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE + ":",
             JsonPropertyNames.LANGUAGE, LANGUAGE_NB));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);

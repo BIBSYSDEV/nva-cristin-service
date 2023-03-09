@@ -1,9 +1,8 @@
 package no.unit.nva.cristin.projects.query;
 
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
-import java.net.URI;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.LANGUAGE;
 import java.net.http.HttpResponse;
-import no.unit.nva.cristin.model.Constants.QueryParameterKey;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
 import no.unit.nva.cristin.projects.common.CristinQuery;
@@ -25,36 +24,26 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
         CristinQuery cristinQuery) throws ApiGatewayException {
 
         final var startRequestTime = System.currentTimeMillis();
-
         final var response = queryProjects(cristinQuery);
-        var cristinProjects =
-            getEnrichedProjectsUsingQueryResponse(response, cristinQuery.getValue(QueryParameterKey.LANGUAGE));
-
-        if (cristinProjects.isEmpty()) { // && queryParameterKey == GRANT_ID) {
-            cristinProjects = getEnrichedProjectsUsingQueryResponse(
-                queryProjects(cristinQuery),
-                cristinQuery.getValue(QueryParameterKey.LANGUAGE));
-        }
-
+        final var cristinProjects = getEnrichedProjectsUsingQueryResponse(response, cristinQuery.getValue(LANGUAGE));
         final var nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
-        final var endRequestTime = System.currentTimeMillis();
+        final var processingTime = calculateProcessingTime(startRequestTime, System.currentTimeMillis());
+
         final var id = cristinQuery.toNvaURI();
 
         return new SearchResponse<NvaProject>(id)
                    .withContext(PROJECT_SEARCH_CONTEXT_URL)
                    .withHits(nvaProjects)
                    .usingHeadersAndQueryParams(response.headers(), cristinQuery.toNvaParameters())
-                   .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime));
+                   .withProcessingTime(processingTime);
     }
 
     protected HttpResponse<String> queryProjects(CristinQuery cristinQuery)
         throws ApiGatewayException {
 
-        URI uri = cristinQuery.toURI();
-        HttpResponse<String> response = fetchQueryResults(uri);
-        var id = cristinQuery.toNvaURI();
-        System.out.println(id);
-        checkHttpStatusCode(id, response.statusCode());
+        HttpResponse<String> response = fetchQueryResults(cristinQuery.toURI());
+        checkHttpStatusCode(cristinQuery.toNvaURI(), response.statusCode());
+
         return response;
     }
 }

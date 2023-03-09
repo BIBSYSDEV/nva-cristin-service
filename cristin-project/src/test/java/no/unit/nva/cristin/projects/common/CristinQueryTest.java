@@ -57,9 +57,14 @@ public class CristinQueryTest {
     }
 
     @Test
-    void buildReturnsUriWithIdAndLanguageWhenIdAndLanguageParametersAreSupplied() {
+    void buildReturnsUriWithIdAndLanguageWhenIdAndLanguageParametersAreSupplied() throws BadRequestException {
         URI uri = CristinQuery.fromIdAndLanguage(ID, LANGUAGE_NB);
+        var uri2 = CristinQuery.builder()
+                       .withPathIdentity(ID)
+                       .withLanguage(LANGUAGE_NB)
+                       .validate().build().toURI();
         assertEquals(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI, uri.toString());
+        assertEquals(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI, uri2.toString());
     }
 
     @Test

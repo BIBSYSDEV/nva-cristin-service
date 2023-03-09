@@ -14,7 +14,7 @@ import static no.unit.nva.cristin.model.Constants.QueryParameterKey.BIOBANK;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.FUNDING;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.FUNDING_SOURCE;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.GRANT_ID;
-import static no.unit.nva.cristin.model.Constants.QueryParameterKey.IDENTITY;
+import static no.unit.nva.cristin.model.Constants.QueryParameterKey.PATH_IDENTITY;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.INSTITUTION;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.INVALID;
 import static no.unit.nva.cristin.model.Constants.QueryParameterKey.LANGUAGE;
@@ -205,10 +205,6 @@ public class CristinQueryBuilder {
         return this;
     }
 
-    public CristinQueryBuilder withIdentity(String identifier) {
-        return withPathIdentity(identifier);
-    }
-
     /**
      * Setter coordinating institution by cristin id, acronym, name, or part of the name.
      */
@@ -253,10 +249,7 @@ public class CristinQueryBuilder {
      * Preferred language.
      */
     public CristinQueryBuilder withLanguage(String language) {
-        var langOrDefault = nonNull(language)
-            ? language
-            : DEFAULT_LANGUAGE_CODE;
-        cristinQuery.setValue(LANGUAGE, langOrDefault);
+        cristinQuery.setValue(LANGUAGE, language);
         return this;
     }
 
@@ -322,17 +315,16 @@ public class CristinQueryBuilder {
      * Setter Identity.
      */
     public CristinQueryBuilder withPathIdentity(String identity) {
-        System.out.println("withPathIdentity -> " + identity);
         if (nonNull(identity) && !identity.isBlank()) {
             if (identity.matches(PATH_ORGANISATION.getPattern())) {
                 cristinQuery.setPath(PATH_ORGANISATION, identity);
             } else if (identity.matches(PATH_PROJECT.getPattern())) {
                 cristinQuery.setPath(PATH_PROJECT, identity);
             } else {
-                cristinQuery.setPath(IDENTITY, identity);
+                cristinQuery.setPath(PATH_IDENTITY, identity);
             }
         } else {
-            cristinQuery.setPath(IDENTITY, EMPTY_STRING);
+            cristinQuery.setPath(PATH_IDENTITY, EMPTY_STRING);
         }
         return this;
     }
@@ -341,8 +333,6 @@ public class CristinQueryBuilder {
      * Setter Organization.
      */
     public CristinQueryBuilder withPathOrganization(String organization) {
-        System.out.println("withPathOrganization -> " + organization);
-
         if (nonNull(organization)) {
             if (organization.matches(PROJECT_ORGANIZATION.getPattern())) {
                 cristinQuery.setValue(PROJECT_ORGANIZATION,organization);
@@ -359,7 +349,6 @@ public class CristinQueryBuilder {
      * Setter Project(identity) .
      */
     public CristinQueryBuilder withPathProject(String project) {
-        System.out.println("withPathProject -> " + project);
         cristinQuery.setPath(PATH_PROJECT, project);
         return this;
     }
@@ -429,9 +418,9 @@ public class CristinQueryBuilder {
         requiredMissing().forEach(key -> {
             switch (key) {
                 case PATH_ORGANISATION:
-                    if (cristinQuery.containsKey(IDENTITY)) {
-                        cristinQuery.setPath(key, cristinQuery.getValue(IDENTITY));
-                        cristinQuery.pathParameters.remove(IDENTITY);
+                    if (cristinQuery.containsKey(PATH_IDENTITY)) {
+                        cristinQuery.setPath(key, cristinQuery.getValue(PATH_IDENTITY));
+                        cristinQuery.pathParameters.remove(PATH_IDENTITY);
                     }
                     break;
                 case PATH_PROJECT:
@@ -447,7 +436,6 @@ public class CristinQueryBuilder {
                     cristinQuery.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
                     break;
                 default:
-                    System.out.println("Unknown key " + key);
                     break;
             }
         });
@@ -457,14 +445,13 @@ public class CristinQueryBuilder {
         cristinQuery.isNvaQuery = true;
         var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
 
-        if (key.equals(IDENTITY.getNvaKey())) {
+        if (key.equals(PATH_IDENTITY.getNvaKey())) {
             withPathIdentity(nonNullValue);
         } else if (key.equals(PATH_ORGANISATION.getNvaKey())) {
             withPathOrganization(nonNullValue);
         } else if (key.equals(PATH_PROJECT.getNvaKey()) || key.equals(PATH_PROJECT.getKey())) {
             withPathProject(nonNullValue);
         } else {
-            System.out.printf("CQB::SETPATH::INVALID_KEY -> [%s]-[%s]\n\r", key, value);
             invalidKeys.add(key);
         }
     }
@@ -475,12 +462,12 @@ public class CristinQueryBuilder {
             cristinQuery.isNvaQuery = true;
         }
         switch (qpKey) {
+            case PATH_IDENTITY:
+            case PATH_PROJECT:
+                withPathIdentity(value);
+                break;
             case PATH_ORGANISATION:
                 withPathOrganization(value);
-                break;
-            case PATH_PROJECT:
-            case IDENTITY:
-                withPathIdentity(value);
                 break;
             case PROJECT_ORGANIZATION:
                 withOrganization(value);
@@ -490,6 +477,7 @@ public class CristinQueryBuilder {
             case FUNDING_SOURCE:
             case GRANT_ID:
             case INSTITUTION:
+            case LANGUAGE:
             case LEVELS:
             case NAME:
             case PAGE_CURRENT:
@@ -502,14 +490,9 @@ public class CristinQueryBuilder {
             case PROJECT_MODIFIED_SINCE:
             case PROJECT_PARTICIPANT:
             case PROJECT_UNIT:
+            case TITLE:
             case USER:
                 cristinQuery.setValue(qpKey, value);
-                break;
-            case TITLE:
-                withTitle(value);
-                break;
-            case LANGUAGE:
-                withLanguage(value);
                 break;
             case QUERY:
                 withQuery(value);
@@ -518,7 +501,6 @@ public class CristinQueryBuilder {
                 withStatus(value);
                 break;
             default:
-                System.out.printf("CQB::SETVALUE::INVALID_KEY -> [%s]-[%s]-[%s]\n\r", qpKey.name(), key, value);
                 invalidKeys.add(key);
                 break;
         }
@@ -606,7 +588,6 @@ public class CristinQueryBuilder {
             final var errorMessage = nonNull(key.getErrorMessage())
                 ? key.getErrorMessage()
                 : invalidPathParameterMessage(keyName);
-            System.out.printf("Failed: [%s]-[%s]\n\r", keyName,errorMessage);
             throw new BadRequestException(errorMessage);
         }
     }

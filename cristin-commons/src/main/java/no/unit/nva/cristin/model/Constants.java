@@ -93,7 +93,7 @@ public class Constants {
 
     public enum QueryParameterKey {
         INVALID(null),
-        IDENTITY("identifier", null, PATTERN_IS_NON_EMPTY),
+        PATH_IDENTITY("identifier", null, PATTERN_IS_NON_EMPTY),
         PATH_ORGANISATION(
             "parent_unit_id",
             "organization",

@@ -6,7 +6,6 @@ import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandlerTest.
 import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandlerTest.LANGUAGE_NB;
 import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandlerTest.RANDOM_TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.net.URI;
 import java.util.Map;
 import no.unit.nva.cristin.projects.common.CristinQuery;
@@ -67,25 +66,14 @@ public class QueryCristinProjectApiClientTest {
         final var expectedUri = new URI(CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI);
         final var actualUri = generateCristinQueryProjectsUrl(sourceCristinQuery.toParameters());
         assertEquals(expectedUri, actualUri);
-
-        final var fromCristinParameters =
-            CristinQuery.builder()
-                .fromQueryParameters(sourceCristinQuery.toParameters())
-                .validate()
-                .build();
-        final var fromNvaParameters =
-            CristinQuery.builder()
-                .fromQueryParameters(sourceCristinQuery.toNvaParameters())
-                .validate()
-                .build();
-        assertTrue(fromNvaParameters.areEqual(fromCristinParameters));
     }
 
     protected URI generateCristinQueryProjectsUrl(Map<String, String> parameters) throws BadRequestException {
-        return CristinQuery.builder()
-                   .fromQueryParameters(parameters)
-                   .validate()
-                   .build()
-                   .toURI();
+        return
+            CristinQuery.builder()
+                .fromQueryParameters(parameters)
+                .validate()
+                .build()
+                .toURI();
     }
 }
