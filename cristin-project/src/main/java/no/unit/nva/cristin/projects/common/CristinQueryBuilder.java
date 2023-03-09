@@ -290,6 +290,7 @@ public class CristinQueryBuilder {
         if (nonNull(organization)) {
             cristinQuery.setValue(PROJECT_ORGANIZATION, organization);
         } else {
+            // this will trigger correct errormessage
             cristinQuery.setValue(QUERY, EMPTY_STRING);
         }
         return this;

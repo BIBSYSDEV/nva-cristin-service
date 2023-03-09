@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CristinProjectCristinQueryBuilderTest {
+class CristinProjectBuilderTest {
 
     public static final String ONE_CRISTIN_PROJECT = "cristinGetProjectResponse.json";
 

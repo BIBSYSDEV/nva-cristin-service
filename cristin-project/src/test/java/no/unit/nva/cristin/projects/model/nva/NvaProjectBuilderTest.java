@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class NvaProjectCristinQueryBuilderTest {
+public class NvaProjectBuilderTest {
 
     private static final String API_RESPONSE_ONE_NVA_PROJECT_JSON =
         "nvaApiGetResponseOneNvaProject.json";
