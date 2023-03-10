@@ -12,12 +12,12 @@ import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
 import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_SORT;
 import static no.unit.nva.cristin.model.QueryParameterKey.PATH_ORGANISATION;
 import static no.unit.nva.cristin.model.QueryParameterKey.PATH_PROJECT;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_APPROVAL_REFERENCE_ID;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_APPROVED_BY;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_KEYWORD;
+import static no.unit.nva.cristin.model.QueryParameterKey.APPROVAL_REFERENCE_ID;
+import static no.unit.nva.cristin.model.QueryParameterKey.APPROVED_BY;
+import static no.unit.nva.cristin.model.QueryParameterKey.KEYWORD;
 import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_MANAGER;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_MODIFIED_SINCE;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_PARTICIPANT;
+import static no.unit.nva.cristin.model.QueryParameterKey.MODIFIED_SINCE;
+import static no.unit.nva.cristin.model.QueryParameterKey.PARTICIPANT;
 import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_UNIT;
 import static no.unit.nva.cristin.model.QueryParameterKey.USER;
 import static no.unit.nva.cristin.model.QueryParameterKey.VALID_QUERY_PARAMETER_KEYS;
@@ -25,6 +25,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Set;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
+import no.unit.nva.cristin.model.QueryParameterKey;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.CristinQuery;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -40,11 +41,14 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
 
     public static final Set<String> VALID_QUERY_PARAM_NO_VALIDATION =
             Set.of(INSTITUTION.getNvaKey(), PROJECT_MANAGER.getNvaKey(),
-                   PROJECT_PARTICIPANT.getNvaKey(), PROJECT_KEYWORD.getNvaKey(),
+                   PARTICIPANT.getNvaKey(), KEYWORD.getNvaKey(),
                    FUNDING_SOURCE.getNvaKey(), FUNDING.getNvaKey(),
-                   PROJECT_APPROVAL_REFERENCE_ID.getNvaKey(), PROJECT_APPROVED_BY.getNvaKey(),
+                   APPROVAL_REFERENCE_ID.getNvaKey(), APPROVED_BY.getNvaKey(),
                    PAGE_SORT.getNvaKey(), PROJECT_UNIT.getNvaKey(), USER.getNvaKey(), LANGUAGE.getNvaKey(),
-                   LEVELS.getNvaKey(), BIOBANK.getNvaKey(), PROJECT_MODIFIED_SINCE.getNvaKey());
+                   LEVELS.getNvaKey(), BIOBANK.getNvaKey(), MODIFIED_SINCE.getNvaKey());
+
+    public static final QueryParameterKey[] REQUIRED_QUERY_PARAMETER =
+        {PATH_ORGANISATION, PATH_PROJECT, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE, LANGUAGE};
 
     private final transient QueryCristinOrganizationProjectApiClient cristinApiClient;
 
@@ -83,7 +87,7 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
         var cristinQuery =
             CristinQuery.builder()
                 .fromRequestInfo(requestInfo)
-                .withRequiredParameters(PATH_ORGANISATION, PATH_PROJECT, LANGUAGE, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE)
+                .withRequiredParameters(REQUIRED_QUERY_PARAMETER)
                 .asNvaQuery()
                 .validate()
                 .build();

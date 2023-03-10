@@ -9,6 +9,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.requiredMissingMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
+import java.util.Map.Entry;
 import no.unit.nva.cristin.model.QueryParameterKey;
 import static no.unit.nva.cristin.model.QueryParameterKey.BIOBANK;
 import static no.unit.nva.cristin.model.QueryParameterKey.FUNDING;
@@ -25,13 +26,13 @@ import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
 import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_SORT;
 import static no.unit.nva.cristin.model.QueryParameterKey.PATH_ORGANISATION;
 import static no.unit.nva.cristin.model.QueryParameterKey.PATH_PROJECT;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_APPROVAL_REFERENCE_ID;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_APPROVED_BY;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_KEYWORD;
+import static no.unit.nva.cristin.model.QueryParameterKey.APPROVAL_REFERENCE_ID;
+import static no.unit.nva.cristin.model.QueryParameterKey.APPROVED_BY;
+import static no.unit.nva.cristin.model.QueryParameterKey.KEYWORD;
 import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_MANAGER;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_MODIFIED_SINCE;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_ORGANIZATION;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_PARTICIPANT;
+import static no.unit.nva.cristin.model.QueryParameterKey.MODIFIED_SINCE;
+import static no.unit.nva.cristin.model.QueryParameterKey.ORGANIZATION;
+import static no.unit.nva.cristin.model.QueryParameterKey.PARTICIPANT;
 import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_UNIT;
 import static no.unit.nva.cristin.model.QueryParameterKey.QUERY;
 import static no.unit.nva.cristin.model.QueryParameterKey.STATUS;
@@ -63,8 +64,8 @@ public class CristinQueryBuilder {
 
     private static final String PARAMETER_PAGE_DEFAULT_VALUE = "1";
     private static final String PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
-    private final transient Set<String> invalidKeys = new HashSet<>(0);
-    private final transient CristinQuery cristinQuery;
+    private transient final Set<String> invalidKeys = new HashSet<>(0);
+    private transient final CristinQuery cristinQuery;
     private transient boolean notValidated = true;
 
     /**
@@ -98,10 +99,10 @@ public class CristinQueryBuilder {
     public CristinQueryBuilder validate() throws BadRequestException {
         assignDefaultValues();
         for (var entry : cristinQuery.pathParameters.entrySet()) {
-            throwInvalidPathValue(entry.getKey(), entry.getValue());
+            throwInvalidPathValue(entry);
         }
         for (var entry : cristinQuery.queryParameters.entrySet()) {
-            throwInvalidParamererValue(entry.getKey(), entry.getValue());
+            throwInvalidParamererValue(entry);
         }
         if (!requiredMissing().isEmpty()) {
             throw new BadRequestException(requiredMissingMessage(getMissingKeys()));
@@ -115,7 +116,6 @@ public class CristinQueryBuilder {
         notValidated = false;
         return this;
     }
-
 
     /**
      * Adds query and path parameters from requestInfo.
@@ -166,7 +166,7 @@ public class CristinQueryBuilder {
      * Setter code for the authority that evaluated a project approval.
      */
     public CristinQueryBuilder withApprovedBy(String approvedby) {
-        cristinQuery.setValue(PROJECT_APPROVED_BY, approvedby);
+        cristinQuery.setValue(APPROVED_BY, approvedby);
         return this;
     }
 
@@ -174,15 +174,19 @@ public class CristinQueryBuilder {
      * Setter reference id of project approval.
      */
     public CristinQueryBuilder withApprovalReferenceId(String approvalReferenceId) {
-        cristinQuery.setValue(PROJECT_APPROVAL_REFERENCE_ID, approvalReferenceId);
+        cristinQuery.setValue(APPROVAL_REFERENCE_ID, approvalReferenceId);
         return this;
     }
 
     /**
-     * Setter Biobank id.
+     * Setter Biobank id. [withDuplicates]
      */
     public CristinQueryBuilder withBiobank(String biobank) {
-        cristinQuery.setValue(BIOBANK, biobank);
+        var biobanks =
+            cristinQuery.containsKey(BIOBANK)
+                ? cristinQuery.getValue(BIOBANK) + "," + biobank
+                : biobank;
+        cristinQuery.setValue(BIOBANK, biobanks);
         return this;
     }
 
@@ -201,7 +205,6 @@ public class CristinQueryBuilder {
         cristinQuery.setValue(FUNDING_SOURCE, fundingSource);
         return this;
     }
-
 
     /**
      * Builder GRANT ID..
@@ -244,10 +247,14 @@ public class CristinQueryBuilder {
     }
 
     /**
-     * Setter search by keyword.
+     * Setter search by keyword. [withDuplicates]
      */
     public CristinQueryBuilder withKeyword(String keyword) {
-        cristinQuery.setValue(PROJECT_KEYWORD, keyword);
+        var keywords =
+            cristinQuery.containsKey(KEYWORD)
+                ? cristinQuery.getValue(KEYWORD) + "," + keyword
+                : keyword;
+        cristinQuery.setValue(KEYWORD, keywords);
         return this;
     }
 
@@ -271,7 +278,7 @@ public class CristinQueryBuilder {
      * Setter only those projects that have been modified since this date will be returned.
      */
     public CristinQueryBuilder withModifiedSince(String modifiedSince) {
-        cristinQuery.setValue(PROJECT_MODIFIED_SINCE, modifiedSince);
+        cristinQuery.setValue(MODIFIED_SINCE, modifiedSince);
         return this;
     }
 
@@ -288,7 +295,7 @@ public class CristinQueryBuilder {
      */
     public CristinQueryBuilder withOrganization(String organization) {
         if (nonNull(organization)) {
-            cristinQuery.setValue(PROJECT_ORGANIZATION, organization);
+            cristinQuery.setValue(ORGANIZATION, organization);
         } else {
             // this will trigger correct errormessage
             cristinQuery.setValue(QUERY, EMPTY_STRING);
@@ -311,10 +318,14 @@ public class CristinQueryBuilder {
     }
 
     /**
-     * Setter a participant of the project by Cristin id, name or part of the name.
+     * Setter a participant of the project by Cristin id, name or part of the name. [withDuplicates]
      */
     public CristinQueryBuilder withParticipant(String participant) {
-        cristinQuery.setValue(PROJECT_PARTICIPANT, participant);
+        var participants =
+            cristinQuery.containsKey(PARTICIPANT)
+                ? cristinQuery.getValue(PARTICIPANT) + "," + participant
+                : participant;
+        cristinQuery.setValue(PARTICIPANT, participants);
         return this;
     }
 
@@ -341,8 +352,8 @@ public class CristinQueryBuilder {
      */
     public CristinQueryBuilder withPathOrganization(String organization) {
         if (nonNull(organization)) {
-            if (organization.matches(PROJECT_ORGANIZATION.getPattern())) {
-                cristinQuery.setValue(PROJECT_ORGANIZATION,organization);
+            if (organization.matches(ORGANIZATION.getPattern())) {
+                cristinQuery.setValue(ORGANIZATION, organization);
             } else {
                 cristinQuery.setPath(PATH_ORGANISATION, organization);
             }
@@ -463,6 +474,9 @@ public class CristinQueryBuilder {
         }
     }
 
+    /**
+     * Set Value by key, Key is validated.
+     */
     private void setValue(String key, String value) {
         var qpKey = keyFromString(key,value);
         if (!key.equals(qpKey.getKey()) && !cristinQuery.isNvaQuery && qpKey != INVALID) {
@@ -476,36 +490,42 @@ public class CristinQueryBuilder {
             case PATH_ORGANISATION:
                 withPathOrganization(value);
                 break;
-            case PROJECT_ORGANIZATION:
+            case ORGANIZATION:
                 withOrganization(value);
                 break;
             case BIOBANK:
-            case FUNDING:
-            case FUNDING_SOURCE:
-            case GRANT_ID:
-            case INSTITUTION:
-            case LANGUAGE:
-            case LEVELS:
-            case NAME:
-            case PAGE_CURRENT:
-            case PAGE_ITEMS_PER_PAGE:
-            case PAGE_SORT:
-            case PROJECT_APPROVAL_REFERENCE_ID:
-            case PROJECT_APPROVED_BY:
-            case PROJECT_KEYWORD:
-            case PROJECT_MANAGER:
-            case PROJECT_MODIFIED_SINCE:
-            case PROJECT_PARTICIPANT:
-            case PROJECT_UNIT:
-            case TITLE:
-            case USER:
-                cristinQuery.setValue(qpKey, value);
+                withBiobank(value);
+                break;
+            case KEYWORD:
+                withKeyword(value);
+                break;
+            case PARTICIPANT:
+                withParticipant(value);
                 break;
             case QUERY:
                 withQuery(value);
                 break;
             case STATUS:
                 withStatus(value);
+                break;
+            case APPROVAL_REFERENCE_ID:
+            case APPROVED_BY:
+            case FUNDING:
+            case FUNDING_SOURCE:
+            case GRANT_ID:
+            case INSTITUTION:
+            case LANGUAGE:
+            case LEVELS:
+            case MODIFIED_SINCE:
+            case NAME:
+            case PROJECT_MANAGER:
+            case PROJECT_UNIT:
+            case TITLE:
+            case USER:
+            case PAGE_CURRENT:
+            case PAGE_ITEMS_PER_PAGE:
+            case PAGE_SORT:
+                cristinQuery.setValue(qpKey, value);
                 break;
             default:
                 invalidKeys.add(key);
@@ -532,8 +552,6 @@ public class CristinQueryBuilder {
                 .map(qpk -> cristinQuery.isNvaQuery ? qpk.getNvaKey() : qpk.getKey())
                 .collect(Collectors.toSet());
     }
-
-
 
     private QueryParameterKey grantOrTitleKey(String query) {
         return Utils.isPositiveInteger(query) ? GRANT_ID : TITLE;
@@ -573,8 +591,9 @@ public class CristinQueryBuilder {
         return cristinQuery.isNvaQuery ? VALID_QUERY_PARAMETER_NVA_KEYS : VALID_QUERY_PARAMETER_KEYS;
     }
 
-    private void throwInvalidParamererValue(QueryParameterKey key, String value) throws BadRequestException {
-        if (invalidQueryParameter(key, value)) {
+    private void throwInvalidParamererValue(Entry<QueryParameterKey, String> entry) throws BadRequestException {
+        final var key = entry.getKey();
+        if (invalidQueryParameter(key, entry.getValue())) {
             final var keyName = cristinQuery.isNvaQuery ? key.getNvaKey() : key.getKey();
             String errorMessage;
             if (key == STATUS) {
@@ -589,12 +608,14 @@ public class CristinQueryBuilder {
         }
     }
 
-    private void throwInvalidPathValue(QueryParameterKey key, String value) throws BadRequestException {
-        if (invalidPathParameter(key, value)) {
+    private void throwInvalidPathValue(Entry<QueryParameterKey, String> entry) throws BadRequestException {
+        final var key = entry.getKey();
+        if (invalidPathParameter(key, entry.getValue())) {
             final var keyName = cristinQuery.isNvaQuery ? key.getNvaKey() : key.getKey();
-            final var errorMessage = nonNull(key.getErrorMessage())
-                ? key.getErrorMessage()
-                : invalidPathParameterMessage(keyName);
+            final var errorMessage =
+                nonNull(key.getErrorMessage())
+                    ? key.getErrorMessage()
+                    : invalidPathParameterMessage(keyName);
             throw new BadRequestException(errorMessage);
         }
     }

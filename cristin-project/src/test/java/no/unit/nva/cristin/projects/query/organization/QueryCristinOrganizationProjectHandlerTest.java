@@ -5,6 +5,7 @@ import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_TEMPLATE_REQUIRED_MISSING;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
@@ -159,11 +160,11 @@ class QueryCristinOrganizationProjectHandlerTest {
         verify(cristinApiClient).listProjects(captor.capture());
         var actualURI = captor.getValue().toString();
         assertThat(actualURI, containsString("page=5"));
-        assertThat(actualURI, containsString(BIOBANK_ID + "=" + BIOBANK_SAMPLE));
-        assertThat(actualURI, containsString(FUNDING + "=" + FUNDING_SAMPLE));
-        assertThat(actualURI, containsString(PROJECT_KEYWORD + "=" + KEYWORD_SAMPLE));
-        assertThat(actualURI, containsString(PROJECT_UNIT + "=" + DUMMY_UNIT_ID));
-        assertThat(actualURI, containsString(PROJECT_SORT + "=" + START_DATE));
+        assertThat(actualURI, containsString(BIOBANK_ID + EQUAL_OPERATOR + BIOBANK_SAMPLE));
+        assertThat(actualURI, containsString(FUNDING + EQUAL_OPERATOR + FUNDING_SAMPLE));
+        assertThat(actualURI, containsString(PROJECT_KEYWORD + EQUAL_OPERATOR + KEYWORD_SAMPLE));
+        assertThat(actualURI, containsString(PROJECT_UNIT + EQUAL_OPERATOR + DUMMY_UNIT_ID));
+        assertThat(actualURI, containsString(PROJECT_SORT + EQUAL_OPERATOR + START_DATE));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                 SearchResponse.class);

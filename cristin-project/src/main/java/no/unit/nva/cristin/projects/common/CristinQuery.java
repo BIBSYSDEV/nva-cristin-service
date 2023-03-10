@@ -4,14 +4,19 @@ import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
+import java.util.Arrays;
 import no.unit.nva.cristin.model.QueryParameterKey;
+import static no.unit.nva.cristin.model.QueryParameterKey.BIOBANK;
 import static no.unit.nva.cristin.model.QueryParameterKey.IGNORE_PATH_PARAMETER_INDEX;
+import static no.unit.nva.cristin.model.QueryParameterKey.KEYWORD;
 import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
+import static no.unit.nva.cristin.model.QueryParameterKey.PARTICIPANT;
 import static no.unit.nva.cristin.model.QueryParameterKey.PATH_PROJECT;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_ORGANIZATION;
+import static no.unit.nva.cristin.model.QueryParameterKey.ORGANIZATION;
 import static no.unit.nva.cristin.model.QueryParameterKey.STATUS;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
@@ -36,9 +41,9 @@ import nva.commons.core.paths.UriWrapper;
 @SuppressWarnings({"Unused", "LooseCoupling"})
 public class CristinQuery {
 
-    protected final transient Map<QueryParameterKey, String> pathParameters;
-    protected final transient Map<QueryParameterKey, String> queryParameters;
-    protected final transient Set<QueryParameterKey> otherRequiredKeys;
+    protected transient final Map<QueryParameterKey, String> pathParameters;
+    protected transient final Map<QueryParameterKey, String> queryParameters;
+    protected transient final Set<QueryParameterKey> otherRequiredKeys;
     protected transient boolean isNvaQuery;
 
     protected CristinQuery() {
@@ -228,6 +233,11 @@ public class CristinQuery {
     }
 
     private String toCristinQueryValue(Map.Entry<QueryParameterKey, String> entry) {
+        if (entry.getKey().equals(BIOBANK) || entry.getKey().equals(KEYWORD) || entry.getKey().equals(PARTICIPANT)) {
+            final var key = entry.getKey().getKey() + EQUAL_OPERATOR;
+            return Arrays.stream(entry.getValue().split(","))
+                       .collect(Collectors.joining("&" + key));
+        }
         var value = entry.getKey().isEncode()
                         ? encodeUTF(entry.getValue())
                         : entry.getValue();
@@ -235,7 +245,7 @@ public class CristinQuery {
         if (entry.getKey().equals(STATUS)) {
             return ProjectStatus.valueOf(value).getCristinStatus();
         }
-        return entry.getKey().equals(PROJECT_ORGANIZATION) && entry.getValue().matches(PATTERN_IS_URL)
+        return entry.getKey().equals(ORGANIZATION) && entry.getValue().matches(PATTERN_IS_URL)
                    ? getUnitIdFromOrganization(value)
                    : value;
     }

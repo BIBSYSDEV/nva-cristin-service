@@ -6,6 +6,7 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
+import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
 import static no.unit.nva.cristin.model.QueryParameterKey.QUERY;
 import static no.unit.nva.cristin.model.QueryParameterKey.TITLE;
@@ -677,13 +678,13 @@ class QueryCristinProjectHandlerTest {
         verify(cristinApiClientStub).fetchQueryResults(captor.capture());
         var actualURI = captor.getValue().toString();
         assertThat(actualURI, containsString("page=5"));
-        assertThat(actualURI, containsString(BIOBANK_ID + "=" + BIOBANK_SAMPLE));
-        assertThat(actualURI, containsString(FUNDING + "=" + FUNDING_SAMPLE));
-        assertThat(actualURI, containsString(LANGUAGE.getKey() + "=" + NB));
+        assertThat(actualURI, containsString(BIOBANK_ID + EQUAL_OPERATOR + BIOBANK_SAMPLE));
+        assertThat(actualURI, containsString(FUNDING + EQUAL_OPERATOR + FUNDING_SAMPLE));
+        assertThat(actualURI, containsString(LANGUAGE.getKey() + EQUAL_OPERATOR + NB));
         assertThat(actualURI, containsString(TITLE.getKey() + "=hello"));
-        assertThat(actualURI, containsString(PROJECT_KEYWORD + "=" + KEYWORD_SAMPLE));
-        assertThat(actualURI, containsString(PROJECT_UNIT + "=" + UNIT_ID_SAMPLE));
-        assertThat(actualURI, containsString(PROJECT_SORT + "=" + START_DATE));
+        assertThat(actualURI, containsString(PROJECT_KEYWORD + EQUAL_OPERATOR + KEYWORD_SAMPLE));
+        assertThat(actualURI, containsString(PROJECT_UNIT + EQUAL_OPERATOR + UNIT_ID_SAMPLE));
+        assertThat(actualURI, containsString(PROJECT_SORT + EQUAL_OPERATOR + START_DATE));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                                                                SearchResponse.class);

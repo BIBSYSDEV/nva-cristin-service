@@ -64,10 +64,10 @@ public class ErrorMessages {
         "Upstream returned 400 (Bad Request). That might indicate bad query parameters";
 
     /**
-     * Formats and emits a message with valid parameter names.
+     * Formats and emits a message with required parameter names.
      *
-     * @param missing list of valid parameter names
-     * @return formatted string containing a list of valid parameters
+     * @param missing list of required parameter names
+     * @return formatted string containing a list of required parameters
      */
     public static String requiredMissingMessage(Set<String> missing) {
         return String.format(ERROR_MESSAGE_TEMPLATE_REQUIRED_MISSING, prettifyList(missing));

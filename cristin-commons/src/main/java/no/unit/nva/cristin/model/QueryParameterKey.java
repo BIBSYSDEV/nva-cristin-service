@@ -4,8 +4,21 @@ import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_NUMBER;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
 import static no.unit.nva.cristin.common.ErrorMessages.INVALID_URI_MESSAGE;
-import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
+import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
+import static no.unit.nva.cristin.model.Constants.PATTERN_IS_DATE;
+import static no.unit.nva.cristin.model.Constants.PATTERN_IS_LANGUAGE;
+import static no.unit.nva.cristin.model.Constants.PATTERN_IS_NON_EMPTY;
+import static no.unit.nva.cristin.model.Constants.PATTERN_IS_NUMBER;
+import static no.unit.nva.cristin.model.Constants.PATTERN_IS_TITLE;
+import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
+import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
+import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
+import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
+import static no.unit.nva.cristin.model.QueryParameterKey.QueryParameterConstant.ERROR_MESSAGE_INVALID_CHARACTERS;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -18,73 +31,67 @@ import java.util.stream.Collectors;
 
 public enum QueryParameterKey {
     INVALID(null),
-    PATH_IDENTITY("identifier", null, Constants.PATTERN_IS_NON_EMPTY),
-    PATH_ORGANISATION("parent_unit_id",
-        "organization",
+    PATH_IDENTITY(JsonPropertyNames.IDENTIFIER, null, PATTERN_IS_NON_EMPTY),
+    PATH_ORGANISATION(PARENT_UNIT_ID,
+        JsonPropertyNames.ORGANIZATION,
         ORGANIZATION_IDENTIFIER_PATTERN,
         ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS,
         true),
-    PATH_PROJECT("projects","project",Constants.PATTERN_IS_NUMBER),
-    BIOBANK("biobank"),
-    FUNDING("funding"),
-    FUNDING_SOURCE("funding_source"),
-    GRANT_ID("project_code",null,Constants.PATTERN_IS_NUMBER),
-    INSTITUTION("institution"),
-    LANGUAGE("lang","language",Constants.PATTERN_IS_LANGUAGE),
-    LEVELS("levels","depth",Constants.PATTERN_IS_NUMBER),
-    NAME("name"),
-    PROJECT_APPROVAL_REFERENCE_ID("approval_reference_id"),
-    PROJECT_APPROVED_BY("approved_by"),
-    PROJECT_KEYWORD("keyword"),
-    PROJECT_ORGANIZATION("parent_unit_id",
-        "organization",
-        Constants.PATTERN_IS_URL,
-        INVALID_URI_MESSAGE,
-        true),
-    PROJECT_MANAGER("project_manager"),
-    PROJECT_MODIFIED_SINCE("modified_since",null,Constants.PATTERN_IS_DATE),
-    PROJECT_PARTICIPANT("participant"),
-    PROJECT_UNIT("unit"),
-    QUERY("query",
+    PATH_PROJECT(PROJECTS_PATH, PROJECT_PATH_NVA, PATTERN_IS_NUMBER),
+    APPROVAL_REFERENCE_ID(JsonPropertyNames.PROJECT_APPROVAL_REFERENCE_ID),
+    APPROVED_BY(JsonPropertyNames.PROJECT_APPROVED_BY),
+    BIOBANK(JsonPropertyNames.BIOBANK_ID),
+    FUNDING(JsonPropertyNames.FUNDING),
+    FUNDING_SOURCE(JsonPropertyNames.FUNDING_SOURCE),
+    GRANT_ID("project_code", null, PATTERN_IS_NUMBER),
+    INSTITUTION(JsonPropertyNames.INSTITUTION),
+    KEYWORD(JsonPropertyNames.PROJECT_KEYWORD),
+    LANGUAGE(QUERY_PARAMETER_LANGUAGE, JsonPropertyNames.LANGUAGE, PATTERN_IS_LANGUAGE),
+    LEVELS(JsonPropertyNames.LEVELS, JsonPropertyNames.DEPTH, PATTERN_IS_NUMBER),
+    MODIFIED_SINCE(JsonPropertyNames.PROJECT_MODIFIED_SINCE, null, PATTERN_IS_DATE),
+    NAME(JsonPropertyNames.TITLE,
+         CRISTIN_QUERY_NAME_PARAM,
+         PATTERN_IS_TITLE,
+         String.format(ERROR_MESSAGE_INVALID_CHARACTERS,JsonPropertyNames.TITLE),
+         true),
+    ORGANIZATION(PARENT_UNIT_ID,JsonPropertyNames.ORGANIZATION,PATTERN_IS_URL,INVALID_URI_MESSAGE,true),
+    PARTICIPANT(JsonPropertyNames.PROJECT_PARTICIPANT),
+    PROJECT_MANAGER(JsonPropertyNames.PROJECT_MANAGER),
+    PROJECT_UNIT(JsonPropertyNames.UNIT),
+    QUERY(JsonPropertyNames.QUERY,
+          null,
+          PATTERN_IS_NON_EMPTY,
+          String.format(ERROR_MESSAGE_INVALID_CHARACTERS,JsonPropertyNames.QUERY),
+          true),
+    STATUS(JsonPropertyNames.STATUS, null, Constants.PATTERN_IS_STATUS, null, true),
+    TITLE(JsonPropertyNames.TITLE,
         null,
-        Constants.PATTERN_IS_NON_EMPTY,
-        invalidQueryParametersMessage("query",
-                                      ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE),
+        PATTERN_IS_TITLE,
+        String.format(ERROR_MESSAGE_INVALID_CHARACTERS, JsonPropertyNames.TITLE),
         true),
-    STATUS("status", null, Constants.PATTERN_IS_STATUS, null, true),
-    TITLE("title",
-        null,
-        Constants.PATTERN_IS_TITLE,
-        invalidQueryParametersMessage("title",
-                                      ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE),
-        true),
-    USER("user"),
-    PAGE_CURRENT("page",
-        null,
-        Constants.PATTERN_IS_NUMBER,
+    USER(JsonPropertyNames.USER),
+    PAGE_CURRENT(JsonPropertyNames.PAGE, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, false),
+    PAGE_ITEMS_PER_PAGE(CRISTIN_PER_PAGE_PARAM,
+        JsonPropertyNames.NUMBER_OF_RESULTS,
+        PATTERN_IS_NUMBER,
         ERROR_MESSAGE_INVALID_NUMBER,
         false),
-    PAGE_ITEMS_PER_PAGE("per_page",
-        "results",
-        Constants.PATTERN_IS_NUMBER,
-        ERROR_MESSAGE_INVALID_NUMBER,
-        false),
-    PAGE_SORT("sort");
+    PAGE_SORT(JsonPropertyNames.PROJECT_SORT);
 
     public final static int IGNORE_PATH_PARAMETER_INDEX = 3;
 
-    public static final Set<QueryParameterKey> VALID_QUERY_PARAMETERS =
+    public final static Set<QueryParameterKey> VALID_QUERY_PARAMETERS =
         Arrays.stream(QueryParameterKey.values())
             .filter(QueryParameterKey::ignorePathKeys)
             .collect(Collectors.toSet());
 
-    public static final Set<String> VALID_QUERY_PARAMETER_KEYS =
+    public final static Set<String> VALID_QUERY_PARAMETER_KEYS =
         VALID_QUERY_PARAMETERS.stream()
             .sorted()
             .map(QueryParameterKey::getKey)
             .collect(Collectors.toSet());
 
-    public static final Set<String> VALID_QUERY_PARAMETER_NVA_KEYS =
+    public final static Set<String> VALID_QUERY_PARAMETER_NVA_KEYS =
         VALID_QUERY_PARAMETERS.stream()
             .sorted()
             .map(QueryParameterKey::getNvaKey)
@@ -97,7 +104,7 @@ public enum QueryParameterKey {
     private final String errorMessage;
 
     QueryParameterKey(String cristinKey) {
-        this(cristinKey, null, Constants.PATTERN_IS_NON_EMPTY, null, false);
+        this(cristinKey, null, PATTERN_IS_NON_EMPTY, null, false);
     }
 
     QueryParameterKey(String cristinKey, String nvaKey, String pattern) {
@@ -133,6 +140,21 @@ public enum QueryParameterKey {
         return encode;
     }
 
+    public String getValue(Map<String, String> queryParams) {
+        return queryParams.containsKey(getNvaKey())
+                   ? queryParams.get(getNvaKey())
+                   : queryParams.get(getKey());
+    }
+
+    @Override
+    public String toString() {
+        return
+            new StringJoiner(":", "Key[", "]")
+                .add(String.valueOf(ordinal()))
+                .add(name())
+                .toString();
+    }
+
     public static QueryParameterKey keyFromString(String paramName, String value) {
         var result = Arrays.stream(QueryParameterKey.values())
                          .filter(QueryParameterKey::ignorePathKeys)
@@ -161,18 +183,8 @@ public enum QueryParameterKey {
         return f.ordinal() > IGNORE_PATH_PARAMETER_INDEX;
     }
 
-    public String getValue(Map<String, String> queryParams) {
-        return queryParams.containsKey(getNvaKey())
-                   ? queryParams.get(getNvaKey())
-                   : queryParams.get(getKey());
+    public static class QueryParameterConstant {
+        public static final String ERROR_MESSAGE_INVALID_CHARACTERS =
+            ERROR_MESSAGE_INVALID_VALUE + ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
     }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", "Key[", "]")
-                   .add(String.valueOf(ordinal()))
-                   .add(name())
-                   .toString();
-    }
-
 }
