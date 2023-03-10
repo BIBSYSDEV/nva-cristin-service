@@ -37,7 +37,7 @@ public class FetchPersonInstitutionInfoClient extends ApiClient {
         URI cristinUri = generateCristinUri(personId, orgId);
         HttpResponse<String> response = fetchGetResult(cristinUri);
         URI idUri = generateIdUri(personId, orgId);
-        checkHttpStatusCode(idUri, response.statusCode());
+        checkHttpStatusCode(idUri, response.statusCode(), response.body());
 
         return getDeserializedResponse(response, CristinPersonInstitutionInfo.class);
     }

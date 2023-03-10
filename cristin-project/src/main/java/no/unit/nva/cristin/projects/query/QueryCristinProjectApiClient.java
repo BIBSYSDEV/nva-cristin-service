@@ -70,7 +70,7 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
                       .orElseThrow();
         HttpResponse<String> response = fetchQueryResults(uri);
         URI id = createIdUriFromParams(parameters, PROJECT);
-        checkHttpStatusCode(id, response.statusCode());
+        checkHttpStatusCode(id, response.statusCode(), response.body());
         return response;
     }
 

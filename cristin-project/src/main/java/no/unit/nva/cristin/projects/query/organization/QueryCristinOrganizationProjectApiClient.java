@@ -63,7 +63,7 @@ public class QueryCristinOrganizationProjectApiClient extends CristinProjectApiC
 
     protected HttpResponse<String> listProjects(URI uri) throws ApiGatewayException {
         HttpResponse<String> response = fetchQueryResults(uri);
-        checkHttpStatusCode(uri, response.statusCode());
+        checkHttpStatusCode(uri, response.statusCode(), response.body());
         return response;
     }
 

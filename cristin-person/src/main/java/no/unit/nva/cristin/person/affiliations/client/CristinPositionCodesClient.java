@@ -47,7 +47,7 @@ public class CristinPositionCodesClient extends ApiClient {
      */
     public PositionCodes generateQueryResponse(Boolean positionStatus) throws ApiGatewayException {
         var response = fetchQueryResults(createUpstreamUri());
-        checkHttpStatusCode(createIdUri(), response.statusCode());
+        checkHttpStatusCode(createIdUri(), response.statusCode(), response.body());
         var cristinPositionCodes =
             asList(getDeserializedResponse(response, CristinPositionCode[].class));
         cristinPositionCodes = filterPositionCodeIfRequested(cristinPositionCodes, positionStatus);
