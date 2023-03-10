@@ -41,9 +41,9 @@ import nva.commons.core.paths.UriWrapper;
 @SuppressWarnings({"Unused", "LooseCoupling"})
 public class CristinQuery {
 
-    protected transient final Map<QueryParameterKey, String> pathParameters;
-    protected transient final Map<QueryParameterKey, String> queryParameters;
-    protected transient final Set<QueryParameterKey> otherRequiredKeys;
+    protected final transient Map<QueryParameterKey, String> pathParameters;
+    protected final transient Map<QueryParameterKey, String> queryParameters;
+    protected final transient Set<QueryParameterKey> otherRequiredKeys;
     protected transient boolean isNvaQuery;
 
     protected CristinQuery() {

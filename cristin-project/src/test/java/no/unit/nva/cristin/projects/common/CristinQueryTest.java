@@ -16,7 +16,8 @@ public class CristinQueryTest {
     private static final String APPROVED_BY = "REK";
     private static final String BIOBANK = "533895";
     private static final String FROM_PAGE = "2";
-    private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI ="https://api.cristin-test.uio.no/v2/projects/1234?lang=nb";
+    private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI =
+        "https://api.cristin-test.uio.no/v2/projects/1234?lang=nb";
     private static final String ID = "1234";
     private static final String KEYWORD = "nature";
     private static final String LANGUAGE_NB = "nb";

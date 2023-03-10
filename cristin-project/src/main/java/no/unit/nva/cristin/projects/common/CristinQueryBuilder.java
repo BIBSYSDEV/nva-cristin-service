@@ -64,8 +64,8 @@ public class CristinQueryBuilder {
 
     private static final String PARAMETER_PAGE_DEFAULT_VALUE = "1";
     private static final String PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
-    private transient final Set<String> invalidKeys = new HashSet<>(0);
-    private transient final CristinQuery cristinQuery;
+    private final transient Set<String> invalidKeys = new HashSet<>(0);
+    private final transient CristinQuery cristinQuery;
     private transient boolean notValidated = true;
 
     /**

@@ -42,7 +42,7 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
         throws ApiGatewayException {
 
         HttpResponse<String> response = fetchQueryResults(cristinQuery.toURI());
-        checkHttpStatusCode(cristinQuery.toNvaURI(), response.statusCode());
+        checkHttpStatusCode(cristinQuery.toNvaURI(), response.statusCode(),response.body());
 
         return response;
     }

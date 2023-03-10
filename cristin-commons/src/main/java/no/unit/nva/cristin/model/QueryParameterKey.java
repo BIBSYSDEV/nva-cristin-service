@@ -23,7 +23,6 @@ import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
@@ -78,20 +77,20 @@ public enum QueryParameterKey {
         false),
     PAGE_SORT(JsonPropertyNames.PROJECT_SORT);
 
-    public final static int IGNORE_PATH_PARAMETER_INDEX = 3;
+    public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
 
-    public final static Set<QueryParameterKey> VALID_QUERY_PARAMETERS =
+    public static final Set<QueryParameterKey> VALID_QUERY_PARAMETERS =
         Arrays.stream(QueryParameterKey.values())
             .filter(QueryParameterKey::ignorePathKeys)
             .collect(Collectors.toSet());
 
-    public final static Set<String> VALID_QUERY_PARAMETER_KEYS =
+    public static final Set<String> VALID_QUERY_PARAMETER_KEYS =
         VALID_QUERY_PARAMETERS.stream()
             .sorted()
             .map(QueryParameterKey::getKey)
             .collect(Collectors.toSet());
 
-    public final static Set<String> VALID_QUERY_PARAMETER_NVA_KEYS =
+    public static final Set<String> VALID_QUERY_PARAMETER_NVA_KEYS =
         VALID_QUERY_PARAMETERS.stream()
             .sorted()
             .map(QueryParameterKey::getNvaKey)
@@ -138,12 +137,6 @@ public enum QueryParameterKey {
 
     public boolean isEncode() {
         return encode;
-    }
-
-    public String getValue(Map<String, String> queryParams) {
-        return queryParams.containsKey(getNvaKey())
-                   ? queryParams.get(getNvaKey())
-                   : queryParams.get(getKey());
     }
 
     @Override
