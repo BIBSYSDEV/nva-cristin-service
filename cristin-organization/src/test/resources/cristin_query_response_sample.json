@@ -7,7 +7,7 @@
     "institution": {
       "acronym": "UIO"
     },
-    "url": "https://api.cristin.no/v2/units/185.53.18.14",
+    "url": "https://api.cristin-test.uio.no/v2/units/185.53.18.14",
     "acronym": "KLM-MBK"
   },
   {
@@ -18,7 +18,7 @@
     "institution": {
       "acronym": "OUS"
     },
-    "url": "https://api.cristin.no/v2/units/2012.9.20.0",
+    "url": "https://api.cristin-test.uio.no/v2/units/2012.9.20.0",
     "acronym": "MBK"
   }
 ]

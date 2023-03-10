@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
-import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUMMARY;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused", "PMD.ExcessivePublicCount", "PMD.GodClass"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -33,11 +31,21 @@ public class CristinProject implements JsonSerializable {
     public static final String CRISTIN_EXTERNAL_SOURCES = "external_sources";
     public static final String CRISTIN_RELATED_PROJECTS = "related_projects";
     public static final String INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH = "institutions_responsible_for_research";
+    public static final String HEALTH_PROJECT_TYPE = "health_project_type";
+    public static final String HEALTH_PROJECT_TYPE_NAME = "health_project_type_name";
+    public static final String CLINICAL_TRIAL_PHASE = "clinical_trial_phase";
+    public static final String APPROVALS = "approvals";
+    public static final String EXEMPT_FROM_PUBLIC_DISCLOSURE = "exempt_from_public_disclosure";
+    public static final String PROJECT_FUNDING_SOURCES = "project_funding_sources";
+    public static final String CRISTIN_ACADEMIC_SUMMARY = "academic_summary";
+    public static final String CRISTIN_POPULAR_SCIENTIFIC_SUMMARY = "popular_scientific_summary";
+    public static final String CRISTIN_MAIN_LANGUAGE = "main_language";
 
     private String cristinProjectId;
     private Boolean publishable;
     private Boolean published;
     private Map<String, String> title;
+    @JsonProperty(CRISTIN_MAIN_LANGUAGE)
     private String mainLanguage;
     @JsonSerialize(using = CustomInstantSerializer.class)
     private Instant startDate;
@@ -47,13 +55,14 @@ public class CristinProject implements JsonSerializable {
     private CristinDateInfo created;
     private CristinDateInfo lastModified;
     private CristinOrganization coordinatingInstitution;
+    @JsonProperty(PROJECT_FUNDING_SOURCES)
     private List<CristinFundingSource> projectFundingSources;
     private CristinContactInfo contactInfo;
     private CristinFundingAmount totalFundingAmount;
     private List<CristinPerson> participants;
-    @JsonProperty(ACADEMIC_SUMMARY)
+    @JsonProperty(CRISTIN_ACADEMIC_SUMMARY)
     private Map<String, String> academicSummary;
-    @JsonProperty(POPULAR_SCIENTIFIC_SUMMARY)
+    @JsonProperty(CRISTIN_POPULAR_SCIENTIFIC_SUMMARY)
     private Map<String, String> popularScientificSummary;
     @JsonProperty(METHOD)
     private Map<String, String> method;
@@ -69,6 +78,16 @@ public class CristinProject implements JsonSerializable {
     private List<String> relatedProjects;
     @JsonProperty(INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)
     private List<CristinOrganization> institutionsResponsibleForResearch;
+    @JsonProperty(HEALTH_PROJECT_TYPE)
+    private String healthProjectType;
+    @JsonProperty(HEALTH_PROJECT_TYPE_NAME)
+    private Map<String, String> healthProjectTypeName;
+    @JsonProperty(CLINICAL_TRIAL_PHASE)
+    private String clinicalTrialPhase;
+    @JsonProperty(APPROVALS)
+    private List<CristinApproval> approvals;
+    @JsonProperty(EXEMPT_FROM_PUBLIC_DISCLOSURE)
+    private Boolean exemptFromPublicDisclosure;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -262,6 +281,46 @@ public class CristinProject implements JsonSerializable {
         this.institutionsResponsibleForResearch = institutionsResponsibleForResearch;
     }
 
+    public String getHealthProjectType() {
+        return healthProjectType;
+    }
+
+    public void setHealthProjectType(String healthProjectType) {
+        this.healthProjectType = healthProjectType;
+    }
+
+    public Map<String, String> getHealthProjectTypeName() {
+        return nonEmptyOrDefault(healthProjectTypeName);
+    }
+
+    public void setHealthProjectTypeName(Map<String, String> healthProjectTypeName) {
+        this.healthProjectTypeName = healthProjectTypeName;
+    }
+
+    public String getClinicalTrialPhase() {
+        return clinicalTrialPhase;
+    }
+
+    public void setClinicalTrialPhase(String clinicalTrialPhase) {
+        this.clinicalTrialPhase = clinicalTrialPhase;
+    }
+
+    public List<CristinApproval> getApprovals() {
+        return nonEmptyOrDefault(approvals);
+    }
+
+    public void setApprovals(List<CristinApproval> approvals) {
+        this.approvals = approvals;
+    }
+
+    public Boolean getExemptFromPublicDisclosure() {
+        return exemptFromPublicDisclosure;
+    }
+
+    public void setExemptFromPublicDisclosure(Boolean exemptFromPublicDisclosure) {
+        this.exemptFromPublicDisclosure = exemptFromPublicDisclosure;
+    }
+
     /**
      * Verifies CristinProject has enough data to be considered as valid.
      *
@@ -309,7 +368,12 @@ public class CristinProject implements JsonSerializable {
                && Objects.equals(getKeywords(), that.getKeywords())
                && Objects.equals(getExternalSources(), that.getExternalSources())
                && Objects.equals(getRelatedProjects(), that.getRelatedProjects())
-               && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch());
+               && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch())
+               && Objects.equals(getHealthProjectType(), that.getHealthProjectType())
+               && Objects.equals(getHealthProjectTypeName(), that.getHealthProjectTypeName())
+               && Objects.equals(getClinicalTrialPhase(), that.getClinicalTrialPhase())
+               && Objects.equals(getApprovals(), that.getApprovals())
+               && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure());
     }
 
     @Override
@@ -320,7 +384,9 @@ public class CristinProject implements JsonSerializable {
                             getTotalFundingAmount(), getParticipants(), getAcademicSummary(),
                             getPopularScientificSummary(),
                             getMethod(), getEquipment(), getProjectCategories(), getKeywords(), getExternalSources(),
-                            getRelatedProjects(), getInstitutionsResponsibleForResearch());
+                            getRelatedProjects(), getInstitutionsResponsibleForResearch(), getHealthProjectType(),
+                            getHealthProjectTypeName(), getClinicalTrialPhase(), getApprovals(),
+                            getExemptFromPublicDisclosure());
     }
 
     @Override

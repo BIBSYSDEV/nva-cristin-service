@@ -44,7 +44,7 @@ public class QueryPersonEmploymentClient extends ApiClient {
         HttpResponse<String> response = fetchQueryResults(cristinUri);
         URI idUri = generateIdUri(identifier);
         checkResponseForBadRequestIndicatingNotFoundIdentifier(response.statusCode());
-        checkHttpStatusCode(idUri, response.statusCode());
+        checkHttpStatusCode(idUri, response.statusCode(), response.body());
         long requestTime = calculateProcessingTime(startRequestTime, System.currentTimeMillis());
         List<CristinPersonEmployment> cristinEmployments =
             asList(getDeserializedResponse(response, CristinPersonEmployment[].class));

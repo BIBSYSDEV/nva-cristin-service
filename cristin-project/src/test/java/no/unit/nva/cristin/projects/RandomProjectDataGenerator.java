@@ -1,11 +1,18 @@
 package no.unit.nva.cristin.projects;
 
+import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
+import no.unit.nva.cristin.projects.model.nva.ApplicationCode;
+import no.unit.nva.cristin.projects.model.nva.Approval;
+import no.unit.nva.cristin.projects.model.nva.ApprovalAuthority;
+import no.unit.nva.cristin.projects.model.nva.ApprovalStatus;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.model.DateInfo;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 import no.unit.nva.cristin.projects.model.nva.FundingSource;
+import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
+import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
@@ -23,21 +30,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import nva.commons.core.paths.UriWrapper;
 
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.VALUE;
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringFields;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
+import static no.unit.nva.testutils.RandomDataGenerator.randomBoolean;
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
-import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -103,13 +110,34 @@ public class RandomProjectDataGenerator {
                                           .withExternalSources(List.of(randomExternalSource()))
                                           .withRelatedProjects(List.of(randomRelatedProjects()))
                                           .withInstitutionsResponsibleForResearch(List.of(randomOrganization()))
+                                          .withHealthProjectData(randomHealthProjectData())
+                                          .withApprovals(randomApprovals())
+                                          .withExemptFromPublicDisclosure(randomBoolean())
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
     }
 
+    /**
+     * List of approvals with random data.
+     */
+    public static List<Approval> randomApprovals() {
+        return List.of(new Approval(randomInstant(),
+                                    randomElement(ApprovalAuthority.values()),
+                                    randomElement(ApprovalStatus.values()),
+                                    randomElement(ApplicationCode.values()),
+                                    randomString(),
+                                    randomNamesMap()));
+    }
+
+    private static HealthProjectData randomHealthProjectData() {
+        return new HealthProjectData(randomElement(HealthProjectType.values()),
+                                     randomNamesMap(),
+                                     randomElement(ClinicalTrialPhase.values()));
+    }
+
     private static URI randomRelatedProjects() {
-        return UriWrapper.fromUri(randomUri()).addChild(randomInteger(99999).toString()).getUri();
+        return semiRandomProjectId(randomInteger(99999).toString());
     }
 
     private static ExternalSource randomExternalSource() {
@@ -164,6 +192,10 @@ public class RandomProjectDataGenerator {
         return getNvaApiId(identifier, ORGANIZATION_PATH);
     }
 
+    private static URI semiRandomProjectId(String identifier) {
+        return getNvaApiId(identifier, PROJECT_PATH_NVA);
+    }
+
     public static List<NvaContributor> randomContributors() {
         return IntStream.rangeClosed(0, randomInteger(5))
                 .mapToObj(i -> randomContributor()).collect(Collectors.toList());
@@ -182,10 +214,11 @@ public class RandomProjectDataGenerator {
     }
 
     private static Person randomPerson() {
-        return new Person(semiRandomPersonId(randomString()), randomString(), randomString());
+        return new Person(semiRandomPersonId(randomString()), randomString(), randomString(),
+                          randomString() + EMAIL_DOMAIN, randomString());
     }
 
-    private static List<Funding> randomFundings() {
+    public static List<Funding> randomFundings() {
         return IntStream.rangeClosed(0, randomInteger(7))
                 .mapToObj(i -> randomFunding()).collect(Collectors.toList());
     }

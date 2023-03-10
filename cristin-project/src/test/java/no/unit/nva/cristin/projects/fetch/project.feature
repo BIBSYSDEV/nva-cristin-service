@@ -146,3 +146,18 @@ Feature: API tests for Cristin Project retrieve and search
     And match response == '#object'
     And match response.institutionsResponsibleForResearch[0].id == '#present'
     And match response.institutionsResponsibleForResearch[0].name == '#present'
+
+  Scenario: Fetch returns project with additional health data and approvals
+    Given path '/project/538881'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.healthProjectData == '#present'
+    And match response.healthProjectData.type == 'Drugstudy'
+    And match response.healthProjectData.label == '#present'
+    And match response.healthProjectData.clinicalTrialPhase == 'PhaseIII'
+    And match response.approvals[0].authority == 'RegionalEthicalCommittees'
+    And match response.approvals[0].status == 'Approved'
+    And match response.approvals[0].applicationCode == 'EthicalApproval'
+    And match response.approvals[0].identifier == '2017/800'
+    And match response.approvals[0].authorityName == '#present'

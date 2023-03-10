@@ -64,7 +64,7 @@ public class FetchCristinProjectApiClient extends CristinProjectApiClient {
                       .orElseThrow();
 
         var response = fetchGetResult(uri);
-        checkHttpStatusCode(UriUtils.getNvaApiId(id, PROJECT), response.statusCode());
+        checkHttpStatusCode(UriUtils.getNvaApiId(id, PROJECT), response.statusCode(), response.body());
 
         return getDeserializedResponse(response, CristinProject.class);
     }

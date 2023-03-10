@@ -31,8 +31,11 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.basicAuthHeader;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
@@ -50,6 +53,11 @@ public class ApiClient {
     public static final int WAITING_TIME = 500; //500 milliseconds
     public static final String LOG_INTERRUPTION = "InterruptedException while waiting to resend HTTP request";
     public static final String AUTHORIZATION = "Authorization";
+    public static final String FORBIDDEN_THIS_MIGHT_BE_AN_CONFIGURATION_ERROR =
+        "Upstream returned 403 Forbidden. This might be an configuration error or missing or incorrect upstream "
+        + "allow/bypass header";
+    public static final String RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER =
+        "Upstream returned 403 Forbidden. Try again later";
 
     private final transient HttpClient client;
 
@@ -64,7 +72,10 @@ public class ApiClient {
      */
     public CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
         return client.sendAsync(
-            HttpRequest.newBuilder(uri).GET().build(),
+            HttpRequest.newBuilder(uri)
+                .GET()
+                .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                .build(),
             BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
@@ -75,10 +86,11 @@ public class ApiClient {
      */
     public CompletableFuture<HttpResponse<String>> authenticatedFetchGetResultAsync(URI uri) {
         return client.sendAsync(
-                HttpRequest.newBuilder(uri).GET()
-                        .headers(AUTHORIZATION, basicAuthHeader())
-                        .build(),
-                BodyHandlers.ofString(StandardCharsets.UTF_8));
+            HttpRequest.newBuilder(uri).GET()
+                .header(AUTHORIZATION, basicAuthHeader())
+                .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                .build(),
+            BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
     /**
@@ -87,7 +99,10 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public HttpResponse<String> fetchGetResult(URI uri) throws ApiGatewayException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
+                                      .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME,
+                                              CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                                      .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
@@ -98,8 +113,10 @@ public class ApiClient {
      */
     public HttpResponse<String> fetchGetResultWithAuthentication(URI uri) throws ApiGatewayException {
         HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
-                .headers(AUTHORIZATION, basicAuthHeader())
-                .build();
+                                      .header(AUTHORIZATION, basicAuthHeader())
+                                      .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME,
+                                              CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                                      .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
@@ -109,7 +126,10 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri)).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
+                                      .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME,
+                                              CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                                      .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 
@@ -119,8 +139,10 @@ public class ApiClient {
         try {
             return client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8));
         } catch (HttpTimeoutException timeoutException) {
+            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), timeoutException);
             throw new GatewayTimeoutException();
         } catch (IOException | InterruptedException otherException) {
+            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), otherException);
             throw new FailedHttpRequestException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
     }
@@ -152,7 +174,7 @@ public class ApiClient {
     }
 
     protected void logError(String message, String data, Exception failure) {
-        logger.error(String.format(message, data, failure.getMessage()));
+        logger.error(String.format(message, data, failure.getClass().getCanonicalName() + ": " + failure.getMessage()));
     }
 
     /**
@@ -191,14 +213,14 @@ public class ApiClient {
 
     private boolean isSuccessfulRequest(HttpResponse<String> response) {
         try {
-            checkHttpStatusCode(response.uri(), response.statusCode());
+            checkHttpStatusCode(response.uri(), response.statusCode(), response.body());
             return true;
         } catch (Exception ex) {
             return false;
         }
     }
 
-    protected void checkHttpStatusCode(URI uri, int statusCode)
+    protected void checkHttpStatusCode(URI uri, int statusCode, String body)
             throws NotFoundException, BadGatewayException, BadRequestException, UnauthorizedException {
 
         String uriAsString = Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
@@ -210,11 +232,14 @@ public class ApiClient {
             throw new BadRequestException(ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST);
         } else if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             throw new UnauthorizedException();
+        } else if (statusCode == HttpURLConnection.HTTP_FORBIDDEN) {
+            logger.warn(FORBIDDEN_THIS_MIGHT_BE_AN_CONFIGURATION_ERROR);
+            throw new BadGatewayException(RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER);
         } else if (remoteServerHasInternalProblems(statusCode)) {
-            logBackendFetchFail(uriAsString, statusCode);
+            logBackendFetchFail(uriAsString, statusCode, body);
             throw new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         } else if (errorIsUnknown(statusCode)) {
-            logBackendFetchFail(uriAsString, statusCode);
+            logBackendFetchFail(uriAsString, statusCode, body);
             throw new RuntimeException();
         }
     }
@@ -224,8 +249,8 @@ public class ApiClient {
             && !remoteServerHasInternalProblems(statusCode);
     }
 
-    private void logBackendFetchFail(String uri, int statusCode) {
-        logger.error(String.format(ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE, statusCode, uri));
+    private void logBackendFetchFail(String uri, int statusCode, String body) {
+        logger.error(String.format(ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE, statusCode, uri, body));
     }
 
     private boolean responseIsFailure(int statusCode) {

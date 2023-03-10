@@ -1,0 +1,77 @@
+{
+  "title": {
+    "en": "Updated Title",
+    "nb": "Tittel på bokmål",
+    "nn": null
+  },
+  "coordinating_institution": {
+    "unit": {
+      "cristin_unit_id": "20202.0.0.0"
+    }
+  },
+  "participants": [
+    {
+      "cristin_person_id": "538786",
+      "url": "https://api.cristin-test.uio.no/v2/persons/538786",
+      "roles": [
+        {
+          "role_code": "PRO_MANAGER"
+        }
+      ]
+    }
+  ],
+  "start_date": "2022-10-09T00:00:00.001Z",
+  "end_date": "2030-12-31T00:00:00.001Z",
+  "project_funding_sources": [
+    {
+      "funding_source_code": "NFR",
+      "project_code": "1234/PO"
+    }
+  ],
+  "keywords": [
+    {
+      "code": "5686"
+    },
+    {
+      "code": "4245"
+    }
+  ],
+  "project_categories": [
+    {
+      "code": "PHD"
+    }
+  ],
+  "related_projects": [
+    "483302"
+  ],
+  "academic_summary": {
+    "en": "Some academic summary",
+    "nn": null
+  },
+  "popular_scientific_summary": {
+    "en": "Some popular scientific summary",
+    "nn": null
+  },
+  "method": {
+    "en": "Some method",
+    "nn": null
+  },
+  "equipment": {
+    "en": "Some equipment",
+    "nn": null
+  },
+  "contact_info": {
+    "contact_person": "Helge Testesen",
+    "institution": "Agricultural University of Iceland",
+    "email": "helge@test.no",
+    "phone": null
+  },
+  "institutions_responsible_for_research": [
+    {
+      "unit": {
+        "cristin_unit_id": "192.0.0.0"
+      }
+    }
+  ],
+  "main_language": "en"
+}

@@ -13,12 +13,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NvaProjectBuilderTest {
 
-    private static final String API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_WITH_FUNDING_JSON =
-        "api_response_one_cristin_project_to_nva_project_with_funding.json";
+    private static final String API_RESPONSE_ONE_NVA_PROJECT_JSON =
+        "nvaApiGetResponseOneNvaProject.json";
     private static final String cristinGetProject = stringFromResources(Path.of("cristinGetProjectResponse.json"));
     private static final String CREATED_DATE = "2019-12-31T09:45:17Z";
     private static final String MODIFIED_DATE = "2019-12-31T09:48:20Z";
@@ -44,7 +45,7 @@ public class NvaProjectBuilderTest {
     @Test
     void shouldReturnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
         String expected = stringFromResources(
-                Path.of(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_WITH_FUNDING_JSON));
+                Path.of(API_RESPONSE_ONE_NVA_PROJECT_JSON));
         CristinProject cristinProject =
             attempt(() -> OBJECT_MAPPER.readValue(cristinGetProject, CristinProject.class)).get();
         NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
@@ -85,12 +86,13 @@ public class NvaProjectBuilderTest {
                    equalTo(ORGANIZATION_IDENTIFIER));
         assertThat(nvaProject.getInstitutionsResponsibleForResearch().get(0).getName().get(ENGLISH_LANGUAGE_KEY),
                    equalTo(MEDICAL_DEPARTMENT));
+        assertThat(nvaProject.getContributors().get(0).getIdentity().getEmail(), notNullValue());
     }
 
     @Test
     void shouldSerializeAndDeserializeNvaProjectIntoSameObject() {
         var nvaJson =
-            stringFromResources(Path.of(API_RESPONSE_ONE_CRISTIN_PROJECT_TO_NVA_PROJECT_WITH_FUNDING_JSON));
+            stringFromResources(Path.of(API_RESPONSE_ONE_NVA_PROJECT_JSON));
         var nvaProject =
             attempt(() -> OBJECT_MAPPER.readValue(nvaJson, NvaProject.class)).get();
         var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(nvaProject)).orElseThrow();

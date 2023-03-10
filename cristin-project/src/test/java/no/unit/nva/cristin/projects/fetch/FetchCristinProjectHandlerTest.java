@@ -39,15 +39,17 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAT
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.common.client.ApiClient.RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER;
 import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.fetch.FetchCristinProjectClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_ACADEMIC_SUMMARY;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,12 +62,12 @@ public class FetchCristinProjectHandlerTest {
 
     private static final String CRISTIN_GET_PROJECT_ID_NOT_FOUND_RESPONSE_JSON =
         "cristinGetProjectIdNotFoundResponse.json";
-    private static final String API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON =
-            "api_response_one_cristin_project_to_nva_project_with_funding.json";
+    private static final String API_RESPONSE_ONE_PROJECT_JSON =
+        "nvaApiGetResponseOneNvaProject.json";
     private static final String CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON =
         "cristinProjectWithoutInstitutionAndParticipants.json";
     private static final String API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON =
-        "api_response_get_project_with_missing_fields.json";
+        "nvaApiGetResponseWithMissingFields.json";
     private static final String NOT_AN_ID = "Not an ID";
     private static final String DEFAULT_IDENTIFIER = "9999";
     private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
@@ -127,7 +129,7 @@ public class FetchCristinProjectHandlerTest {
     @Test
     void handlerReturnsNvaProjectFromTransformedCristinProjectWhenIdIsFound() throws Exception {
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
-        String expected = getBodyFromResource(API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON);
+        String expected = getBodyFromResource(API_RESPONSE_ONE_PROJECT_JSON);
         assertEquals(OBJECT_MAPPER.readValue(expected, NvaProject.class),
                 gatewayResponse.getBodyObject(NvaProject.class));
     }
@@ -280,7 +282,7 @@ public class FetchCristinProjectHandlerTest {
 
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
         final NvaProject expectedNvaProject = OBJECT_MAPPER.readValue(
-                getBodyFromResource(API_RESPONSE_ONE_PROJECT_WITH_FUNDING_JSON), NvaProject.class);
+            getBodyFromResource(API_RESPONSE_ONE_PROJECT_JSON), NvaProject.class);
         final List<Funding> funding = notRandomFunding();
         expectedNvaProject.setFunding(funding);
         final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
@@ -346,6 +348,21 @@ public class FetchCristinProjectHandlerTest {
         assertEquals(expectedSummary, actualNvaProject.getAcademicSummary());
     }
 
+    @Test
+    void shouldReturnBadGatewayWhenUpstreamReturnForbiddenIndicationMissingAllowHeader()
+        throws Exception {
+
+        cristinApiClientStub = spy(cristinApiClientStub);
+        var payload = getBodyFromResource(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON);
+        doReturn(new HttpResponseFaker(payload, 403)).when(cristinApiClientStub).fetchGetResult(any(URI.class));
+
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
+        var gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_GATEWAY));
+        assertThat(gatewayResponse.getBody(), containsString(RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER));
+    }
+
     private String randomLanguageCode() {
         return "lalaland";
     }
@@ -359,7 +376,7 @@ public class FetchCristinProjectHandlerTest {
         JsonNode cristinProjectSource =
                 OBJECT_MAPPER.readTree(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
         ObjectNode summaryNode = JsonNodeFactory.instance.objectNode().put(language, summary);
-        ((ObjectNode) cristinProjectSource).set(ACADEMIC_SUMMARY, summaryNode);
+        ((ObjectNode) cristinProjectSource).set(CRISTIN_ACADEMIC_SUMMARY, summaryNode);
         return new FetchCristinProjectClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
     }
 

@@ -3,12 +3,13 @@ package no.unit.nva.cristin.projects.model.nva;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import no.unit.nva.commons.json.JsonSerializable;
 import nva.commons.core.JacocoGenerated;
 
 import java.util.Objects;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-public class Funding {
+public class Funding implements JsonSerializable {
 
     public static final String SOURCE = "source";
     public static final String CODE = "code";
@@ -51,4 +52,8 @@ public class Funding {
         return Objects.hash(getSource(), getCode());
     }
 
+    @Override
+    public String toString() {
+        return toJsonString();
+    }
 }

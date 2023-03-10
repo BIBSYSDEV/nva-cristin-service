@@ -7,6 +7,8 @@ dependencies {
 
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
+
+    testImplementation project(":cristin-testing")
 }
 
 tasks.named('test') {
@@ -31,4 +33,6 @@ sourceSets {
 
 test{
     environment "COGNITO_URI", "https://example.cognito.org"
+    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
+    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
 }

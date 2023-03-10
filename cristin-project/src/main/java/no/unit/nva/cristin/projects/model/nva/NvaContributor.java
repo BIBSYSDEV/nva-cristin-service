@@ -6,13 +6,14 @@ import static no.unit.nva.utils.ContributorRoleMapping.getCristinRole;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.model.Organization;
 
-public class NvaContributor {
+public class NvaContributor implements JsonSerializable {
 
     private String type;
     private Person identity;
@@ -108,4 +109,8 @@ public class NvaContributor {
         return extractUnitIdentifier(getAffiliation()).isPresent();
     }
 
+    @Override
+    public String toString() {
+        return toJsonString();
+    }
 }
