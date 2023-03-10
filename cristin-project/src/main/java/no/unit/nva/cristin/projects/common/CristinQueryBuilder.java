@@ -9,36 +9,33 @@ import static no.unit.nva.cristin.common.ErrorMessages.requiredMissingMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
-import java.util.Map.Entry;
-import no.unit.nva.cristin.model.QueryParameterKey;
+import static no.unit.nva.cristin.model.QueryParameterKey.APPROVAL_REFERENCE_ID;
+import static no.unit.nva.cristin.model.QueryParameterKey.APPROVED_BY;
 import static no.unit.nva.cristin.model.QueryParameterKey.BIOBANK;
 import static no.unit.nva.cristin.model.QueryParameterKey.FUNDING;
 import static no.unit.nva.cristin.model.QueryParameterKey.FUNDING_SOURCE;
 import static no.unit.nva.cristin.model.QueryParameterKey.GRANT_ID;
-import static no.unit.nva.cristin.model.QueryParameterKey.PATH_IDENTITY;
 import static no.unit.nva.cristin.model.QueryParameterKey.INSTITUTION;
 import static no.unit.nva.cristin.model.QueryParameterKey.INVALID;
+import static no.unit.nva.cristin.model.QueryParameterKey.KEYWORD;
 import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
 import static no.unit.nva.cristin.model.QueryParameterKey.LEVELS;
+import static no.unit.nva.cristin.model.QueryParameterKey.MODIFIED_SINCE;
 import static no.unit.nva.cristin.model.QueryParameterKey.NAME;
+import static no.unit.nva.cristin.model.QueryParameterKey.ORGANIZATION;
 import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_CURRENT;
 import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
 import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_SORT;
+import static no.unit.nva.cristin.model.QueryParameterKey.PARTICIPANT;
+import static no.unit.nva.cristin.model.QueryParameterKey.PATH_IDENTITY;
 import static no.unit.nva.cristin.model.QueryParameterKey.PATH_ORGANISATION;
 import static no.unit.nva.cristin.model.QueryParameterKey.PATH_PROJECT;
-import static no.unit.nva.cristin.model.QueryParameterKey.APPROVAL_REFERENCE_ID;
-import static no.unit.nva.cristin.model.QueryParameterKey.APPROVED_BY;
-import static no.unit.nva.cristin.model.QueryParameterKey.KEYWORD;
 import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_MANAGER;
-import static no.unit.nva.cristin.model.QueryParameterKey.MODIFIED_SINCE;
-import static no.unit.nva.cristin.model.QueryParameterKey.ORGANIZATION;
-import static no.unit.nva.cristin.model.QueryParameterKey.PARTICIPANT;
 import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_UNIT;
 import static no.unit.nva.cristin.model.QueryParameterKey.QUERY;
 import static no.unit.nva.cristin.model.QueryParameterKey.STATUS;
 import static no.unit.nva.cristin.model.QueryParameterKey.TITLE;
 import static no.unit.nva.cristin.model.QueryParameterKey.USER;
-import static no.unit.nva.cristin.model.QueryParameterKey.VALID_QUERY_PARAMETERS;
 import static no.unit.nva.cristin.model.QueryParameterKey.VALID_QUERY_PARAMETER_KEYS;
 import static no.unit.nva.cristin.model.QueryParameterKey.VALID_QUERY_PARAMETER_NVA_KEYS;
 import static no.unit.nva.cristin.model.QueryParameterKey.keyFromString;
@@ -49,10 +46,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.model.QueryParameterKey;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -106,9 +105,6 @@ public class CristinQueryBuilder {
         }
         if (!requiredMissing().isEmpty()) {
             throw new BadRequestException(requiredMissingMessage(getMissingKeys()));
-        }
-        if (oneOrMoreOptionalIsMissing()) {
-            throw new BadRequestException(validQueryParameterNamesMessage(validKeys()));
         }
         if (!invalidKeys.isEmpty()) {
             throw new BadRequestException(validQueryParameterNamesMessage(validKeys()));
@@ -533,10 +529,6 @@ public class CristinQueryBuilder {
         }
     }
 
-    private boolean oneOrMoreOptionalIsMissing() {
-        return oneOrMoreOptionalUnassigned().size() == oneOrMoreOptional().size() && !requiredMissing().isEmpty();
-    }
-
     private boolean invalidQueryParameter(QueryParameterKey key, String value) {
         return isNull(value) || !value.matches(key.getPattern());
     }
@@ -555,20 +547,6 @@ public class CristinQueryBuilder {
 
     private QueryParameterKey grantOrTitleKey(String query) {
         return Utils.isPositiveInteger(query) ? GRANT_ID : TITLE;
-    }
-
-    private Set<QueryParameterKey> oneOrMoreOptional() {
-        return
-            VALID_QUERY_PARAMETERS.stream()
-                .filter(key -> !required().contains(key))
-                .collect(Collectors.toSet());
-    }
-
-    private Set<QueryParameterKey> oneOrMoreOptionalUnassigned() {
-        return VALID_QUERY_PARAMETERS.stream()
-            .filter(key -> !cristinQuery.containsKey(key)
-                && !required().contains(key))
-            .collect(Collectors.toSet());
     }
 
     private Set<QueryParameterKey> required() {
