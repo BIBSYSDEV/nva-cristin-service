@@ -87,7 +87,7 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
     private HttpResponse<String> queryOrganizationPersons(Map<String, String> parameters) throws ApiGatewayException {
         var uri = generateOrganizationPersonsUrl(parameters);
         var response = fetchQueryResults(uri);
-        checkHttpStatusCode(getServiceUri(parameters), response.statusCode());
+        checkHttpStatusCode(getServiceUri(parameters), response.statusCode(), response.body());
         return response;
     }
 
@@ -95,7 +95,7 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
             throws ApiGatewayException {
         var uri = generateOrganizationPersonsUrl(parameters);
         var response = fetchGetResultWithAuthentication(uri);
-        checkHttpStatusCode(getServiceUri(parameters), response.statusCode());
+        checkHttpStatusCode(getServiceUri(parameters), response.statusCode(), response.body());
         return response;
     }
 

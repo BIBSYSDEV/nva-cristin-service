@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.basicAuthHeader;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME;
@@ -138,8 +139,10 @@ public class ApiClient {
         try {
             return client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8));
         } catch (HttpTimeoutException timeoutException) {
+            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), timeoutException);
             throw new GatewayTimeoutException();
         } catch (IOException | InterruptedException otherException) {
+            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), otherException);
             throw new FailedHttpRequestException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
     }
@@ -171,7 +174,7 @@ public class ApiClient {
     }
 
     protected void logError(String message, String data, Exception failure) {
-        logger.error(String.format(message, data, failure.getMessage()));
+        logger.error(String.format(message, data, failure.getClass().getCanonicalName() + ": " + failure.getMessage()));
     }
 
     /**
@@ -210,14 +213,14 @@ public class ApiClient {
 
     private boolean isSuccessfulRequest(HttpResponse<String> response) {
         try {
-            checkHttpStatusCode(response.uri(), response.statusCode());
+            checkHttpStatusCode(response.uri(), response.statusCode(), response.body());
             return true;
         } catch (Exception ex) {
             return false;
         }
     }
 
-    protected void checkHttpStatusCode(URI uri, int statusCode)
+    protected void checkHttpStatusCode(URI uri, int statusCode, String body)
             throws NotFoundException, BadGatewayException, BadRequestException, UnauthorizedException {
 
         String uriAsString = Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
@@ -233,10 +236,10 @@ public class ApiClient {
             logger.warn(FORBIDDEN_THIS_MIGHT_BE_AN_CONFIGURATION_ERROR);
             throw new BadGatewayException(RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER);
         } else if (remoteServerHasInternalProblems(statusCode)) {
-            logBackendFetchFail(uriAsString, statusCode);
+            logBackendFetchFail(uriAsString, statusCode, body);
             throw new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         } else if (errorIsUnknown(statusCode)) {
-            logBackendFetchFail(uriAsString, statusCode);
+            logBackendFetchFail(uriAsString, statusCode, body);
             throw new RuntimeException();
         }
     }
@@ -246,8 +249,8 @@ public class ApiClient {
             && !remoteServerHasInternalProblems(statusCode);
     }
 
-    private void logBackendFetchFail(String uri, int statusCode) {
-        logger.error(String.format(ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE, statusCode, uri));
+    private void logBackendFetchFail(String uri, int statusCode, String body) {
+        logger.error(String.format(ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE, statusCode, uri, body));
     }
 
     private boolean responseIsFailure(int statusCode) {
