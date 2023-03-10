@@ -147,7 +147,7 @@ public class CristinPersonApiClient extends ApiClient {
         var uri = generateQueryPersonsUrl(parameters);
         var response = fetchQueryResults(uri);
         var id = createIdUriFromParams(parameters, PERSON_PATH_NVA);
-        checkHttpStatusCode(id, response.statusCode());
+        checkHttpStatusCode(id, response.statusCode(), response.body());
         return response;
     }
 
@@ -191,7 +191,7 @@ public class CristinPersonApiClient extends ApiClient {
         var uri = generateQueryPersonsUrl(parameters);
         var response = fetchGetResultWithAuthentication(uri);
         var id = createIdUriFromParams(parameters, PERSON_PATH_NVA);
-        checkHttpStatusCode(id, response.statusCode());
+        checkHttpStatusCode(id, response.statusCode(), response.body());
         return response;
     }
 
@@ -250,14 +250,14 @@ public class CristinPersonApiClient extends ApiClient {
     protected CristinPerson getCristinPersonWithAuthentication(String identifier) throws ApiGatewayException {
         var uri = getCorrectUriForIdentifier(identifier);
         var response = fetchGetResultWithAuthentication(uri);
-        checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode());
+        checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
         return getDeserializedResponse(response, CristinPerson.class);
     }
 
     protected CristinPerson getCristinPerson(String identifier) throws ApiGatewayException {
         var uri = getCorrectUriForIdentifier(identifier);
         var response = fetchGetResult(uri);
-        checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode());
+        checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
         return getDeserializedResponse(response, CristinPerson.class);
     }
 
@@ -284,7 +284,7 @@ public class CristinPersonApiClient extends ApiClient {
     private List<CristinPerson> queryUpstreamUsingIdentityNumber(String identifier) throws ApiGatewayException {
         var queryUri = CristinPersonQuery.fromNationalIdentityNumber(identifier);
         var queryResponse = fetchQueryResults(queryUri);
-        checkHttpStatusCode(idUriForIdentityNumber(), queryResponse.statusCode());
+        checkHttpStatusCode(idUriForIdentityNumber(), queryResponse.statusCode(), queryResponse.body());
         return asList(getDeserializedResponse(queryResponse, CristinPerson[].class));
     }
 
@@ -299,7 +299,7 @@ public class CristinPersonApiClient extends ApiClient {
 
         var fetchUri = extractFirstUriFromListOfCristinPersons(cristinPersons);
         var fetchResponse = fetchGetResult(fetchUri);
-        checkHttpStatusCode(idUriForIdentityNumber(), fetchResponse.statusCode());
+        checkHttpStatusCode(idUriForIdentityNumber(), fetchResponse.statusCode(), fetchResponse.body());
         return getDeserializedResponse(fetchResponse, CristinPerson.class);
     }
 

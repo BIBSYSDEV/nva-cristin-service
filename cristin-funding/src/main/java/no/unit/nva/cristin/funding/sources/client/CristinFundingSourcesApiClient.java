@@ -38,7 +38,7 @@ public class CristinFundingSourcesApiClient extends ApiClient {
 
         var response = fetchQueryResults(uri);
 
-        checkHttpStatusCode(uri, response.statusCode());
+        checkHttpStatusCode(uri, response.statusCode(), response.body());
 
         try {
             return List.of(fromJson(response.body(), CristinFundingSource[].class));

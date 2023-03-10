@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.create;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder.removeFieldsNotSupportedByPost;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +39,7 @@ public class CreateCristinProjectApiClient extends PostApiClient {
 
     private String generatePayloadFromRequest(NvaProject nvaProject) {
         var cristinProject = nvaProject.toCristinProject();
+        removeFieldsNotSupportedByPost(cristinProject);
         return attempt(() -> OBJECT_MAPPER_NON_EMPTY.writeValueAsString(cristinProject)).orElseThrow();
     }
 

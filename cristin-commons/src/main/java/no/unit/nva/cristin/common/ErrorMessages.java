@@ -9,28 +9,28 @@ import java.util.stream.Collectors;
 public class ErrorMessages {
 
     public static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
-        "Error fetching cristin project with id: %s . Exception Message: %s";
+            "Error fetching cristin project with id: %s . Exception Message: %s";
     public static final String ERROR_MESSAGE_BACKEND_FETCH_FAILED =
-        "The request failed because of a problem with the upstream server";
+            "The request failed because of a problem with the upstream server";
     public static final String ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
-        "Project matching id %s does not have valid data";
+            "Project matching id %s does not have valid data";
     public static final String ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED =
-        "Query failed from params: %s with exception: %s";
+            "Query failed from params: %s with exception: %s";
     public static final String ERROR_MESSAGE_READING_RESPONSE_FAIL =
-        "Error when reading response with body: %s, causing exception: %s";
+            "Error when reading response with body: %s, causing exception: %s";
     public static final String ERROR_MESSAGE_SERVER_ERROR =
-        "Internal server error. Contact application administrator.";
+            "Internal server error. Contact application administrator.";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER =
-        "Invalid path parameter for identifier, needs to be a number";
+            "Invalid path parameter for identifier, needs to be a number";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID =
-        "Invalid path parameter for identifier, needs to be a number or an ORCID";
+            "Invalid path parameter for identifier, needs to be a number or an ORCID";
     public static final String ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS =
-        "Invalid path parameter for identifier,"
-        + " needs to be organization identifier matching pattern /(?:\\d+.){3}\\d+/, e.g. (100.0.0.0)";
+            "Invalid path parameter for identifier,"
+                    + " needs to be organization identifier matching pattern /(?:\\d+.){3}\\d+/, e.g. (100.0.0.0)";
     public static final String ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE =
-        "May only contain alphanumeric characters, dash, comma, period and whitespace";
+            "May only contain alphanumeric characters, dash, comma, period and whitespace";
     public static final String ERROR_MESSAGE_DEPTH_INVALID = "Parameter 'depth' has invalid value. "
-                                                             + "Must be 'top' or 'full'";
+            + "Must be 'top' or 'full'";
     public static final String ERROR_MESSAGE_INVALID_VALUE = "Parameter '%s' has invalid value. ";
 
     public static final String ERROR_MESSAGE_INVALID_NUMBER = "Parameter '%s' has invalid value. Must be a number.";
@@ -38,12 +38,12 @@ public class ErrorMessages {
         "Parameter '%s' has invalid value. Supported values are: ";
 
     public static final String ERROR_MESSAGE_BACKEND_FAILED_WITH_STATUSCODE =
-        "Remote service responded with status: %s when client called uri: %s";
+            "Remote service responded with status: %s when client called uri: %s. Body from upstream returned: %s";
     public static final String ERROR_MESSAGE_PAGE_OUT_OF_SCOPE =
-        "Page requested is out of scope. Query contains %s results";
+            "Page requested is out of scope. Query contains %s results";
     public static final String ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE =
         "%s contains no supported Accept header values. Supported values are: application/json; charset=utf-8, "
-        + "application/ld+json";
+            + "application/ld+json";
     public static final String ERROR_MESSAGE_TEMPLATE_INVALID_QUERY_PARAMETERS =
         "Invalid query parameter supplied. Valid parameters: %s";
     public static final String ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP =
@@ -62,6 +62,8 @@ public class ErrorMessages {
     public static final String UPSTREAM_BAD_REQUEST_RESPONSE = "Upstream returned 400 with response body: ";
     public static final String UPSTREAM_RETURNED_BAD_REQUEST =
         "Upstream returned 400 (Bad Request). That might indicate bad query parameters";
+    public static final String ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION =
+        "Remote service responded with error when client called uri: %s. Exception from upstream returned: %s";
 
     /**
      * Formats and emits a message with required parameter names.
@@ -85,9 +87,8 @@ public class ErrorMessages {
 
     /**
      * Creates a error message containing which parameter that has invalid value and what the value is supposed to be.
-     *
      * @param queryParameterName name of parameter with invalid value
-     * @param validValues        what values are allowed for this parameter
+     * @param validValues what values are allowed for this parameter
      * @return formatted string containing a message with allowed values for this parameter
      */
     public static String invalidQueryParametersMessage(String queryParameterName, String validValues) {
@@ -96,18 +97,18 @@ public class ErrorMessages {
 
     /**
      * Creates a error message containing which parameter that has invalid value and what the value is supposed to be.
-     *
      * @param queryParameterName name of parameter with invalid value
-     * @param validValues        what values are allowed for this parameter
+     * @param validValues what values are allowed for this parameter
      * @return formatted string containing a message with allowed values for this parameter
      */
     public static String invalidQueryParametersMessageWithRange(String queryParameterName, String validValues) {
         return String.format(ERROR_MESSAGE_INVALID_VALUE_WITH_RANGE + validValues, queryParameterName);
     }
 
+
+
     /**
      * Creates a error message containing which path parameter that has invalid value.
-     *
      * @param pathParameterName name of parameter with invalid value
      * @return formatted string containing a message with allowed values for this path parameter
      */
@@ -126,12 +127,11 @@ public class ErrorMessages {
     }
 
     private static String prettifyList(Set<String> queryParameters) {
-        return
-            queryParameters.size() > 1
+        return queryParameters.size() > 1
                 ? queryParameters.stream().sorted()
-                      .map(parameterName -> "'" + parameterName + "'")
-                      .collect(Collectors.joining(", ", "[", "]"))
+                    .map(parameterName -> "'" + parameterName + "'")
+                    .collect(Collectors.joining(", ", "[", "]"))
                 : queryParameters.stream()
-                      .collect(Collectors.joining("", "'", "'"));
+                    .collect(Collectors.joining("", "'", "'"));
     }
 }

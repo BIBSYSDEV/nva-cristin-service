@@ -384,6 +384,29 @@ class CreateCristinProjectHandlerTest {
         assertThat(capturedCristinProject.getExemptFromPublicDisclosure(), equalTo(IS_EXEMPT_FROM_PUBLIC_DISCLOSURE));
     }
 
+    @Test
+    void shouldRemoveFieldsNotSupportedByPostToUpstream() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+
+        mockUpstreamUsingRequest(nvaProject);
+        executeRequest(nvaProject);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+
+        var projectCategory = capturedCristinProject.getProjectCategories().get(0);
+        var keyword = capturedCristinProject.getKeywords().get(0);
+
+        assertThat(projectCategory.getName(), equalTo(null));
+        assertThat(keyword.getName(), equalTo(null));
+    }
+
     private CristinProject captureCristinProjectFromApiClient(CreateCristinProjectApiClient apiClient,
                                                               NvaProject nvaProject) throws Exception {
         mockUpstreamUsingRequest(nvaProject);

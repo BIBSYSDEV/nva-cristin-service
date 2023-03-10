@@ -116,12 +116,18 @@ Feature: API tests for Cristin Project retrieve and search
           'type': '5686'
         },
         {
-          'type': '4245'
+          'type': '4245',
+          'label': {
+            'en': 'Some label'
+          }
         }
       ],
       'projectCategories': [
         {
-          'type': 'PHD'
+          'type': 'PHD',
+          'label': {
+            'en': 'Some label'
+          }
         }
       ],
       'relatedProjects': [
