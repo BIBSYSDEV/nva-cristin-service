@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -54,7 +55,6 @@ import static nva.commons.core.attempt.Try.of;
 public class CristinOrganizationApiClient extends ApiClient {
 
     public static final String CRISTIN_LEVELS_PARAM = "levels";
-    public static final String CRISTIN_PER_PAGE_PARAM = "per_page";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
     public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
     public static final int SINGLE_HIT = 1;
