@@ -38,6 +38,7 @@ import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
@@ -73,7 +74,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     public static final int PERSON_COUNT = 5;
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String ZERO_VALUE = "0";
-    public static final String EQUAL_OPERATOR = "=";
+
     public static final String SORT_VALUE = "id desc";
 
     private ListCristinOrganizationPersonsHandler handler;

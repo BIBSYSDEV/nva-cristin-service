@@ -1,10 +1,44 @@
 package no.unit.nva.cristin.projects.query.organization;
 
+import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static java.net.HttpURLConnection.HTTP_OK;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_TEMPLATE_REQUIRED_MISSING;
+import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
+import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
+import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandler.VALID_QUERY_PARAMETERS;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
@@ -18,41 +52,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.Collections;
-import java.util.Map;
-
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
-import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
-import static java.net.HttpURLConnection.HTTP_OK;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
-import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
-import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
-import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
-import static no.unit.nva.cristin.projects.query.organization.QueryCristinOrganizationProjectHandler.VALID_QUERY_PARAMETERS;
-import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
-import static no.unit.nva.testutils.RandomDataGenerator.randomString;
-import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 
 class QueryCristinOrganizationProjectHandlerTest {
 
@@ -93,7 +92,7 @@ class QueryCristinOrganizationProjectHandlerTest {
         var actualDetail = getProblemDetail(gatewayResponse);
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS));
+        assertThat(actualDetail, containsString(ERROR_MESSAGE_TEMPLATE_REQUIRED_MISSING.substring(0,34)));
     }
 
     @Test
@@ -160,18 +159,12 @@ class QueryCristinOrganizationProjectHandlerTest {
 
         verify(cristinApiClient).listProjects(captor.capture());
         var actualURI = captor.getValue().toString();
-        assertThat(actualURI,
-                containsString("page=5"));
-        assertThat(actualURI,
-                containsString("&" + BIOBANK_ID + "=" + BIOBANK_SAMPLE));
-        assertThat(actualURI,
-                containsString("&" + FUNDING + "=" + FUNDING_SAMPLE));
-        assertThat(actualURI,
-                containsString("&" + PROJECT_KEYWORD + "=" + KEYWORD_SAMPLE));
-        assertThat(actualURI,
-                containsString("&" + PROJECT_UNIT + "=" + DUMMY_UNIT_ID));
-        assertThat(actualURI,
-                containsString("&" + PROJECT_SORT + "=" + START_DATE));
+        assertThat(actualURI, containsString("page=5"));
+        assertThat(actualURI, containsString(BIOBANK_ID + EQUAL_OPERATOR + BIOBANK_SAMPLE));
+        assertThat(actualURI, containsString(FUNDING + EQUAL_OPERATOR + FUNDING_SAMPLE));
+        assertThat(actualURI, containsString(PROJECT_KEYWORD + EQUAL_OPERATOR + KEYWORD_SAMPLE));
+        assertThat(actualURI, containsString(PROJECT_UNIT + EQUAL_OPERATOR + DUMMY_UNIT_ID));
+        assertThat(actualURI, containsString(PROJECT_SORT + EQUAL_OPERATOR + START_DATE));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                 SearchResponse.class);

@@ -1,79 +1,59 @@
 package no.unit.nva.cristin.projects.common;
 
+import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
+import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
+import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
+import java.util.Arrays;
+import no.unit.nva.cristin.model.QueryParameterKey;
+import static no.unit.nva.cristin.model.QueryParameterKey.BIOBANK;
+import static no.unit.nva.cristin.model.QueryParameterKey.IGNORE_PATH_PARAMETER_INDEX;
+import static no.unit.nva.cristin.model.QueryParameterKey.KEYWORD;
+import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
+import static no.unit.nva.cristin.model.QueryParameterKey.PARTICIPANT;
+import static no.unit.nva.cristin.model.QueryParameterKey.PATH_PROJECT;
+import static no.unit.nva.cristin.model.QueryParameterKey.ORGANIZATION;
+import static no.unit.nva.cristin.model.QueryParameterKey.STATUS;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
+import static nva.commons.core.attempt.Try.attempt;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.core.paths.UriWrapper;
 
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
-import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
-import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING_SOURCE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.INSTITUTION;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LEVELS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVAL_REFERENCE_ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_APPROVED_BY;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_MANAGER;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_MODIFIED_SINCE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_PARTICIPANT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
-import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.USER;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
-
+@SuppressWarnings({"Unused", "LooseCoupling"})
 public class CristinQuery {
 
-    private static final String CRISTIN_QUERY_PARAMETER_PROJECT_CODE_KEY = "project_code";
-    private static final String CRISTIN_QUERY_PARAMETER_TITLE_KEY = "title";
-    private static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
-    private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
-    private static final String CRISTIN_QUERY_PARAMETER_PAGE_DEFAULT_VALUE = "1";
-    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY = "per_page";
-    public static final String CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID = "parent_unit_id";
-    private static final String CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
-    private static final String CRISTIN_API_PROJECTS_PATH = "projects";
-    private static final String CRISTIN_QUERY_PARAMETER_STATUS = "status";
-    private static final String CRISTIN_QUERY_PARAMETER_INSTITUTION = "institution";
-    private static final String CRISTIN_QUERY_PARAMETER_PROJECT_MANAGER = "project_manager";
-    private static final String CRISTIN_QUERY_PARAMETER_PARTICIPANT = "participant";
-    private static final String CRISTIN_QUERY_PARAMETER_KEYWORD = "keyword";
-    private static final String CRISTIN_QUERY_PARAMETER_FUNDING_SOURCE = "funding_source";
-    private static final String CRISTIN_QUERY_PARAMETER_APPROVAL_REFERENCE_ID = "approval_reference_id";
-    private static final String CRISTIN_QUERY_PARAMETER_SORT = "sort";
-    private static final String CRISTIN_QUERY_PARAMETER_UNIT = "unit";
-    private static final String CRISTIN_QUERY_PARAMETER_USER = "user";
-    private static final String CRISTIN_QUERY_PARAMETER_APPROVED_BY = "approved_by";
-    private static final String CRISTIN_QUERY_PARAMETER_FUNDING = "funding";
-    private static final String CRISTIN_QUERY_PARAMETER_LEVELS = "levels";
-    private static final String CRISTIN_QUERY_PARAMETER_MODIFIED_SINCE = "modified_since";
-    private static final String CRISTIN_QUERY_PARAMETER_BIOBANK = "biobank";
+    protected final transient Map<QueryParameterKey, String> pathParameters;
+    protected final transient Map<QueryParameterKey, String> queryParameters;
+    protected final transient Set<QueryParameterKey> otherRequiredKeys;
+    protected transient boolean isNvaQuery;
 
+    protected CristinQuery() {
+        queryParameters = new ConcurrentHashMap<>();
+        pathParameters = new ConcurrentHashMap<>();
+        otherRequiredKeys = new HashSet<>();
+    }
 
-
-    private final transient Map<String, String> cristinQueryParameters;
-
-    /**
-     * Creates a object used to generate URI to connect to Cristin Projects.
-     */
-    public CristinQuery() {
-        cristinQueryParameters = new ConcurrentHashMap<>();
-        cristinQueryParameters.put(
-            CRISTIN_QUERY_PARAMETER_PAGE_KEY,
-            CRISTIN_QUERY_PARAMETER_PAGE_DEFAULT_VALUE);
-        cristinQueryParameters.put(
-            CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY,
-            CRISTIN_QUERY_PARAMETER_PER_PAGE_DEFAULT_VALUE);
+    public static CristinQueryBuilder builder() {
+        return new CristinQueryBuilder();
     }
 
     /**
@@ -85,259 +65,200 @@ public class CristinQuery {
      */
     public static URI fromIdAndLanguage(String id, String language) {
         return UriWrapper.fromUri(CRISTIN_API_URL)
-                .addChild(CRISTIN_API_PROJECTS_PATH)
-                .addChild(id)
-                .addQueryParameters(Map.of(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language))
-                .getUri();
+                   .addChild(PROJECTS_PATH)
+                   .addChild(id)
+                   .addQueryParameters(Map.of(LANGUAGE.getKey(), language))
+                   .getUri();
     }
 
-    public CristinQuery withGrantId(String grantId) {
-        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PROJECT_CODE_KEY, grantId);
-        return this;
-    }
-
-    public CristinQuery withTitle(String title) {
-        cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_TITLE_KEY, title);
-        return this;
-    }
-
-    /**
-     * Preferred language.
-     */
-    public CristinQuery withLanguage(String language) {
-        if (nonNull(language)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY, language);
-        }
-        return this;
-    }
-
-    /**
-     * Start of pagination.
-     */
-    public CristinQuery withFromPage(String page) {
-        if (nonNull(page)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PAGE_KEY, page);
-        }
-        return this;
-    }
-
-    /**
-     * Items per page.
-     */
-    public CristinQuery withItemsPerPage(String itemsPerPage) {
-        if (nonNull(itemsPerPage)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PER_PAGE_KEY, itemsPerPage);
-        }
-        return this;
-    }
-
-    /**
-     * Organization to start searching from. Includes sublevels if requested.
-     */
-    public CristinQuery withParentUnitId(String parentUnitId) {
-        if (nonNull(parentUnitId)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PARENT_UNIT_ID, getUnitIdFromOrganization(parentUnitId));
-        }
-        return this;
-    }
-
-    private String getUnitIdFromOrganization(String organizationId) {
-        return extractLastPathElement(URI.create(organizationId));
-    }
-
-    /**
-     * Requested status of projects.
-     */
-    public CristinQuery withStatus(String status) {
-        if (nonNull(status)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_STATUS, getEncodedStatusParameter(status));
-        }
-        return this;
-    }
-
-    private String getEncodedStatusParameter(String status) {
-        return URLEncoder.encode(ProjectStatus.getNvaStatus(status).getCristinStatus(), StandardCharsets.UTF_8);
-    }
-
-    /**
-     * Requested coordinating institution by cristin id, acronym, name, or part of the name.
-     */
-
-    public CristinQuery withInstitution(String institution) {
-        if (nonNull(institution)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_INSTITUTION, institution);
-        }
-        return this;
-    }
-
-    /**
-     * Requested project manager by Cristin id, name or part of the name.
-     */
-    public CristinQuery withProjectManager(String projectManager) {
-        if (nonNull(projectManager)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PROJECT_MANAGER, projectManager);
-        }
-        return this;
-    }
-
-    /**
-     * Requested a participant of the project by Cristin id, name or part of the name.
-     */
-    public CristinQuery withParticipant(String participant) {
-        if (nonNull(participant)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_PARTICIPANT, participant);
-        }
-        return this;
-    }
-
-    /**
-     * Requested search by keyword.
-     */
-    public CristinQuery withKeyword(String keyword) {
-        if (nonNull(keyword)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_KEYWORD, keyword);
-        }
-        return this;
-    }
-
-    /**
-     * Requested funding source code.
-     */
-    public CristinQuery withFundingSource(String fundingSource) {
-        if (nonNull(fundingSource)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_FUNDING_SOURCE, fundingSource);
-        }
-        return this;
-    }
-
-    /**
-     * Requested reference id of project approval.
-     */
-    public CristinQuery withApprovalReferenceId(String approvalReferenceId) {
-        if (nonNull(approvalReferenceId)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_APPROVAL_REFERENCE_ID, approvalReferenceId);
-        }
-        return this;
-    }
-
-    /**
-     * Requested sorting on 'start_date' and/or 'end_date'.
-     */
-    public CristinQuery withSort(String sort) {
-        if (nonNull(sort)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_SORT, sort);
-        }
-        return this;
-    }
-
-    /**
-     * Requested unit id.
-     */
-    public CristinQuery withUnit(String unit) {
-        if (nonNull(unit)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_UNIT, unit);
-        }
-        return this;
-    }
-
-    /**
-     * Requested a person's username in Cristin together with the institution id separated by ':'.
-     */
-    public CristinQuery withUser(String user) {
-        if (nonNull(user)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_USER, user);
-        }
-        return this;
-    }
-
-    /**
-     * Requested code for the authority that evaluated a project approval.
-     */
-    public CristinQuery withApprovedBy(String approvedby) {
-        if (nonNull(approvedby)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_APPROVED_BY, approvedby);
-        }
-        return this;
-    }
-
-    /**
-     * Requested funding source code e.g: NFR, and project_code together separated by ':'
-     */
-    public CristinQuery withFunding(String funding) {
-        if (nonNull(funding)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_FUNDING, funding);
-        }
-        return this;
-    }
-
-    /**
-     * Requested how many levels down from 'parent_unit_id' will be included in the search.
-     */
-    public CristinQuery withLevels(String levels) {
-        if (nonNull(levels)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_LEVELS, levels);
-        }
-        return this;
-    }
-
-    /**
-     * Requested only those projects that have been modified since this date will be returned.
-     */
-    public CristinQuery withModifiedSince(String modifiedSince) {
-        if (nonNull(modifiedSince)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_MODIFIED_SINCE, modifiedSince);
-        }
-        return this;
-    }
-
-    /**
-     * Requested Biobank id.
-     */
-    public CristinQuery withBiobank(String biobank) {
-        if (nonNull(biobank)) {
-            cristinQueryParameters.put(CRISTIN_QUERY_PARAMETER_BIOBANK, biobank);
-        }
-        return this;
+    public static String getUnitIdFromOrganization(String organizationId) {
+        var unitId = attempt(() -> URI.create(organizationId)).or(() -> null).get();
+        return extractLastPathElement(unitId);
     }
 
     /**
      * Builds URI to search Cristin projects based on parameters supplied to the builder methods.
      *
-     * @return an URI to Cristin Projects with parameters
+     * @return an URI to Cristin/NVA Projects with parameters.
      */
-    public URI toURI() {
-        return UriWrapper.fromUri(CRISTIN_API_URL)
-                .addChild(CRISTIN_API_PROJECTS_PATH)
-                .addQueryParameters(cristinQueryParameters)
-                .getUri();
-
+    public URI toNvaURI() {
+        return new UriWrapper(HTTPS, DOMAIN_NAME)
+            .addChild(BASE_PATH)
+            .addChild(getNvaPathAsArray())
+            .addQueryParameters(toNvaParameters())
+            .getUri();
     }
 
     /**
-     * Builds Cristin query parameters using builder methods and NVA input parameters.
+     * Builds URI to search Cristin projects based on parameters supplied to the builder methods.
+     *
+     * @return an URI to NVA (default) Projects with parameters.
      */
-    public CristinQuery generateQueryParameters(Map<String, String> parameters) {
-        withLanguage(parameters.get(LANGUAGE));
-        withFromPage(parameters.get(PAGE));
-        withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
-        withParentUnitId(parameters.get(ORGANIZATION));
-        withStatus(parameters.get(STATUS));
-        withInstitution(parameters.get(INSTITUTION));
-        withProjectManager(parameters.get(PROJECT_MANAGER));
-        withParticipant(parameters.get(PROJECT_PARTICIPANT));
-        withKeyword(parameters.get(PROJECT_KEYWORD));
-        withFundingSource(parameters.get(FUNDING_SOURCE));
-        withFunding(parameters.get(FUNDING));
-        withApprovalReferenceId(parameters.get(PROJECT_APPROVAL_REFERENCE_ID));
-        withApprovedBy(parameters.get(PROJECT_APPROVED_BY));
-        withSort(parameters.get(PROJECT_SORT));
-        withModifiedSince(parameters.get(PROJECT_MODIFIED_SINCE));
-        withUnit(parameters.get(PROJECT_UNIT));
-        withUser(parameters.get(USER));
-        withLevels(parameters.get(LEVELS));
-        withBiobank(parameters.get(BIOBANK_ID));
+    public URI toURI() {
+        var children = containsKey(PATH_PROJECT)
+            ? new String[]{PATH_PROJECT.getKey(), getValue(PATH_PROJECT)}
+            : new String[]{PATH_PROJECT.getKey()};
 
+        return UriWrapper.fromUri(CRISTIN_API_URL)
+                   .addChild(children)
+                   .addQueryParameters(toParameters())
+                   .getUri();
+    }
 
-        return this;
+    /**
+     * NVA Query Parameters with string Keys.
+     *
+     * @return Map
+     */
+    public Map<String, String> toNvaParameters() {
+        var results =
+            queryParameters.entrySet().stream()
+                .filter(this::nvaParameterFilter)
+                .collect(Collectors.toMap(this::toNvaQueryName, this::toNvaQueryValue));
+        return new TreeMap<>(results);
+    }
+
+    /**
+     * Cristin Query Parameters with string Keys.
+     *
+     * @return Map of String and String
+     */
+    public Map<String, String> toParameters() {
+        var results =
+            Stream.of(queryParameters.entrySet(), pathParameters.entrySet())
+                .flatMap(Collection::stream)
+                .filter(f -> f.getKey() != PATH_PROJECT)
+                .collect(Collectors.toMap(this::toCristinQueryName, this::toCristinQueryValue));
+        return new TreeMap<>(results);
+    }
+
+    /**
+     * Get value from Query Parameter Map with key.
+     *
+     * @param key to look up.
+     * @return String content raw
+     */
+    public String getValue(QueryParameterKey key) {
+        return queryParameters.containsKey(key)
+                   ? queryParameters.get(key)
+                   : pathParameters.get(key);
+    }
+
+    /**
+     * Add a key value pair to Query Parameter Map.
+     *
+     * @param key   to add to.
+     * @param value to assign
+     */
+    public void setValue(QueryParameterKey key, String value) {
+        if (nonNull(value)) {
+            queryParameters.put(key, key.isEncode() ? decodeUTF(value) : value);
+        }
+    }
+
+    /**
+     * Builds URI to search Cristin projects based on parameters supplied to the builder methods.
+     *
+     * @param key   to add to.
+     * @param value to assign
+     */
+    public void setPath(QueryParameterKey key, String value) {
+        var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
+        pathParameters.put(key, key.isEncode() ? decodeUTF(nonNullValue) : nonNullValue);
+    }
+
+    /**
+     * Compares content of queryParameters in CristinQuery.
+     *
+     * @param other CristinQuery to compare
+     * @return true if content of Maps are equal
+     */
+    public boolean areEqual(CristinQuery other) {
+        if (queryParameters.size() != other.queryParameters.size()
+            || pathParameters.size() != other.pathParameters.size()) {
+            return false;
+        }
+
+        return
+            queryParameters.entrySet().stream()
+                .allMatch(e -> e.getValue().equals(other.getValue(e.getKey())))
+            &&
+            pathParameters.entrySet().stream()
+                .allMatch(e -> e.getValue().equals(other.getValue(e.getKey())));
+    }
+
+    /**
+     * Query Parameter map contain key.
+     *
+     * @param key to check
+     * @return true if map contains key.
+     */
+    public boolean containsKey(QueryParameterKey key) {
+        return queryParameters.containsKey(key) || pathParameters.containsKey(key);
+    }
+
+    private String[] getNvaPathAsArray() {
+        final var pathSize = this.pathParameters.size();
+        return
+            this.pathParameters
+                .entrySet()
+                .stream()
+                .sorted(byOrdinalDesc())
+                .flatMap(entry -> Stream.of(getString(pathSize, entry), entry.getValue()))
+                .toArray(String[]::new);
+    }
+
+    private String getString(int pathSize, Entry<QueryParameterKey, String> entry) {
+        var isProjects = entry.getKey().equals(PATH_PROJECT) && pathSize > 1;
+        return isProjects ? entry.getKey().getKey() : entry.getKey().getNvaKey();
+    }
+
+    private Comparator<Entry<QueryParameterKey, String>> byOrdinalDesc() {
+        return Comparator.comparingInt(k -> k.getKey().ordinal());
+    }
+
+    private String toCristinQueryName(Map.Entry<QueryParameterKey, String> entry) {
+        return entry.getKey().getKey();
+    }
+
+    private String toNvaQueryName(Map.Entry<QueryParameterKey, String> entry) {
+        return entry.getKey().getNvaKey();
+    }
+
+    private String toNvaQueryValue(Map.Entry<QueryParameterKey, String> entry) {
+        var value = entry.getValue();
+        return entry.getKey().isEncode()
+                   ? encodeUTF(value)
+                   : value;
+    }
+
+    private String toCristinQueryValue(Map.Entry<QueryParameterKey, String> entry) {
+        if (entry.getKey().equals(BIOBANK) || entry.getKey().equals(KEYWORD) || entry.getKey().equals(PARTICIPANT)) {
+            final var key = entry.getKey().getKey() + EQUAL_OPERATOR;
+            return Arrays.stream(entry.getValue().split(","))
+                       .collect(Collectors.joining("&" + key));
+        }
+        var value = entry.getKey().isEncode()
+                        ? encodeUTF(entry.getValue())
+                        : entry.getValue();
+
+        if (entry.getKey().equals(STATUS)) {
+            return ProjectStatus.valueOf(value).getCristinStatus();
+        }
+        return entry.getKey().equals(ORGANIZATION) && entry.getValue().matches(PATTERN_IS_URL)
+                   ? getUnitIdFromOrganization(value)
+                   : value;
+    }
+
+    private boolean nvaParameterFilter(Map.Entry<QueryParameterKey, String> entry) {
+        return entry.getKey().ordinal() > IGNORE_PATH_PARAMETER_INDEX;
+    }
+
+    private String decodeUTF(String encoded) {
+        return URLDecoder.decode(encoded, StandardCharsets.UTF_8);
+    }
+
+    private String encodeUTF(String unencoded) {
+        return URLEncoder.encode(unencoded, StandardCharsets.UTF_8).replace("%20", "+");
     }
 }
