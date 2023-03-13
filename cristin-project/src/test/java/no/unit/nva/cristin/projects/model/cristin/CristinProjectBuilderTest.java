@@ -61,7 +61,7 @@ class CristinProjectBuilderTest {
     void shouldParseAndDecodeDifferentValuesForFundingSources(String input, String expected) {
         var nvaProject = randomNvaProject();
         var funding = new Funding(URI.create(input), null, null);
-        nvaProject.setFunding(List.of(funding));
+        nvaProject.setNewFunding(List.of(funding));
         var cristinProject = new CristinProjectBuilder(nvaProject).build();
         var cristinFunding = cristinProject.getProjectFundingSources().get(0);
         var actual = cristinFunding.getFundingSourceCode();

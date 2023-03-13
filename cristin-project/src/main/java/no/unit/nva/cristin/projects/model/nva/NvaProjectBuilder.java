@@ -120,7 +120,8 @@ public class NvaProjectBuilder {
                    .withLanguage(LanguageMapper.toUri(cristinProject.getMainLanguage()))
                    .withStartDate(cristinProject.getStartDate())
                    .withEndDate(cristinProject.getEndDate())
-                   .withFunding(extractFunding())
+                   .withFunding(extractOldFunding())
+                   .withNewFunding(extractFunding())
                    .withCoordinatingInstitution(extractCoordinatingInstitution())
                    .withContributors(extractContributors())
                    .withStatus(extractProjectStatus())
@@ -267,10 +268,22 @@ public class NvaProjectBuilder {
                 .orElse(emptyList());
     }
 
+    private List<OldFunding> extractOldFunding() {
+        return cristinProject.getProjectFundingSources().stream()
+                   .map(this::createOldFunding)
+                   .collect(Collectors.toList());
+    }
+
     private List<Funding> extractFunding() {
         return cristinProject.getProjectFundingSources().stream()
                 .map(this::createFunding)
                 .collect(Collectors.toList());
+    }
+
+    private OldFunding createOldFunding(CristinFundingSource cristinFunding) {
+        var nvaFundingSource = new FundingSource(cristinFunding.getFundingSourceName(),
+                                                 cristinFunding.getFundingSourceCode());
+        return new OldFunding(nvaFundingSource, cristinFunding.getProjectCode());
     }
 
     private Funding createFunding(CristinFundingSource cristinFunding) {

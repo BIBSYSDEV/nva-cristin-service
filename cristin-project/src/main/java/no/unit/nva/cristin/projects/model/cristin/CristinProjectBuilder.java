@@ -62,7 +62,7 @@ public class CristinProjectBuilder {
         cristinProject.setEndDate(nvaProject.getEndDate());
         cristinProject.setAcademicSummary(extractSummary(nvaProject.getAcademicSummary()));
         cristinProject.setPopularScientificSummary(extractSummary(nvaProject.getPopularScientificSummary()));
-        cristinProject.setProjectFundingSources(extractFundings(nvaProject.getFunding()));
+        cristinProject.setProjectFundingSources(extractFundings(nvaProject.getNewFunding()));
         cristinProject.setParticipants(extractContributors(nvaProject.getContributors()));
         cristinProject.setCoordinatingInstitution(extractCristinOrganization(nvaProject.getCoordinatingInstitution()));
         cristinProject.setMethod(extractSummary(nvaProject.getMethod()));
