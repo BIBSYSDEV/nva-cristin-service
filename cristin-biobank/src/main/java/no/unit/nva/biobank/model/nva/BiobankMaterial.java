@@ -1,33 +1,32 @@
 package no.unit.nva.biobank.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.Map;
 import no.unit.nva.biobank.model.cristin.CristinBiobankMaterial;
+import no.unit.nva.commons.json.JsonSerializable;
+import nva.commons.core.JacocoGenerated;
 
-public class BiobankMaterial {
-    public static final String MATERIAL_CODE = "materialCode";
-    public static final String OTHER_MATERIAL_DESC = "otherMaterialDescription";
+public class BiobankMaterial implements JsonSerializable {
+    @JsonProperty
+    private String code;
+    @JsonProperty
+    @JsonPropertyOrder(alphabetic = true)
+    private Map<String, String> name;
 
-    @JsonProperty(MATERIAL_CODE)
-    private final String materialCode;
-    @JsonProperty(OTHER_MATERIAL_DESC)
-    private final String otherMaterialDescription;
-
-    public BiobankMaterial(String materialCode,
-                                  String otherMaterialDescription) {
-        this.materialCode = materialCode;
-        this.otherMaterialDescription = otherMaterialDescription;
-    }
+    @JacocoGenerated
+    public BiobankMaterial() {}
 
     public BiobankMaterial(CristinBiobankMaterial cristinMaterial) {
-        this.materialCode = cristinMaterial.getMaterialCode();
-        this.otherMaterialDescription = cristinMaterial.getOtherMaterialDescription();
+        this.code = cristinMaterial.getMaterialCode();
+        this.name = cristinMaterial.getMaterialName();
     }
 
-    public String getMaterialCode() {
-        return materialCode;
+    public String getCode() {
+        return code;
     }
 
-    public String getOtherMaterialDescription() {
-        return otherMaterialDescription;
+    public Map<String, String> getName() {
+        return name;
     }
 }

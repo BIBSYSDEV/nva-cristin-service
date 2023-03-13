@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.model;
+package no.unit.nva.cristin.projects.common;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
@@ -18,17 +18,17 @@ import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
-import static no.unit.nva.cristin.model.QueryParameterKey.QueryParameterConstant.ERROR_MESSAGE_INVALID_CHARACTERS;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QueryParameterConstant.ERROR_MESSAGE_INVALID_CHARACTERS;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import no.unit.nva.cristin.model.Constants;
+import no.unit.nva.cristin.model.IParameterKey;
+import no.unit.nva.cristin.model.JsonPropertyNames;
 
-public enum QueryParameterKey {
+public enum ParameterKeyProject implements IParameterKey {
     INVALID(null),
     PATH_IDENTITY(JsonPropertyNames.IDENTIFIER, null, PATTERN_IS_NON_EMPTY),
     PATH_ORGANISATION(PARENT_UNIT_ID,
@@ -79,21 +79,21 @@ public enum QueryParameterKey {
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
 
-    public static final Set<QueryParameterKey> VALID_QUERY_PARAMETERS =
-        Arrays.stream(QueryParameterKey.values())
-            .filter(QueryParameterKey::ignorePathKeys)
+    public static final Set<ParameterKeyProject> VALID_QUERY_PARAMETERS =
+        Arrays.stream(ParameterKeyProject.values())
+            .filter(ParameterKeyProject::ignorePathKeys)
             .collect(Collectors.toSet());
 
     public static final Set<String> VALID_QUERY_PARAMETER_KEYS =
         VALID_QUERY_PARAMETERS.stream()
             .sorted()
-            .map(QueryParameterKey::getKey)
+            .map(ParameterKeyProject::getKey)
             .collect(Collectors.toSet());
 
     public static final Set<String> VALID_QUERY_PARAMETER_NVA_KEYS =
         VALID_QUERY_PARAMETERS.stream()
             .sorted()
-            .map(QueryParameterKey::getNvaKey)
+            .map(ParameterKeyProject::getNvaKey)
             .collect(Collectors.toSet());
 
     private final String pattern;
@@ -102,16 +102,16 @@ public enum QueryParameterKey {
     private final boolean encode;
     private final String errorMessage;
 
-    QueryParameterKey(String cristinKey) {
+    ParameterKeyProject(String cristinKey) {
         this(cristinKey, null, PATTERN_IS_NON_EMPTY, null, false);
     }
 
-    QueryParameterKey(String cristinKey, String nvaKey, String pattern) {
+    ParameterKeyProject(String cristinKey, String nvaKey, String pattern) {
         this(cristinKey, nvaKey, pattern, null, false);
     }
 
-    QueryParameterKey(String cristinKey, String nvaKey, String pattern, String errorMessage,
-                      boolean encode) {
+    ParameterKeyProject(String cristinKey, String nvaKey, String pattern, String errorMessage,
+                        boolean encode) {
         this.cristinKey = cristinKey;
         this.nvaKey = nonNull(nvaKey) ? nvaKey : cristinKey;
         this.pattern = pattern;
@@ -148,31 +148,21 @@ public enum QueryParameterKey {
                 .toString();
     }
 
-    public static QueryParameterKey keyFromString(String paramName, String value) {
-        var result = Arrays.stream(QueryParameterKey.values())
-                         .filter(QueryParameterKey::ignorePathKeys)
-                         .filter(equalTo(paramName))
+    public static ParameterKeyProject keyFromString(String paramName, String value) {
+        var result = Arrays.stream(ParameterKeyProject.values())
+                         .filter(ParameterKeyProject::ignorePathKeys)
+                         .filter(IParameterKey.equalTo(paramName))
                          .collect(Collectors.toSet());
         return result.size() == 1
                    ? result.stream().findFirst().get()
                    : result.stream()
-                         .filter(hasValidValue(value))
+                         .filter(IParameterKey.hasValidValue(value))
                          .findFirst()
                          .orElse(INVALID);
     }
 
-    private static Predicate<QueryParameterKey> hasValidValue(String value) {
-        return f -> {
-            var encoded = f.isEncode() ? URLDecoder.decode(value, StandardCharsets.UTF_8) : value;
-            return encoded.matches(f.getPattern());
-        };
-    }
 
-    private static Predicate<QueryParameterKey> equalTo(String name) {
-        return key -> name.equals(key.getKey()) || name.equals(key.getNvaKey());
-    }
-
-    private static boolean ignorePathKeys(QueryParameterKey f) {
+    private static boolean ignorePathKeys(ParameterKeyProject f) {
         return f.ordinal() > IGNORE_PATH_PARAMETER_INDEX;
     }
 

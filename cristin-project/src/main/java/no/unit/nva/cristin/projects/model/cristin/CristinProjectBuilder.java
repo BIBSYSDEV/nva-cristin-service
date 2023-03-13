@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects.model.cristin;
 
 import java.net.URI;
 import java.util.Optional;
+import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;

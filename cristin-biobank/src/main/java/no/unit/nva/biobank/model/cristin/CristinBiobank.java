@@ -1,155 +1,85 @@
 package no.unit.nva.biobank.model.cristin;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import no.unit.nva.biobank.model.nva.Biobank;
 import no.unit.nva.biobank.model.nva.Biobank.Builder;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
-
-import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
+import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
+import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 
 @SuppressWarnings("PMD.ExcessiveParameterList")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public final class CristinBiobank {
-    //Here be more params
-    private static final String CRISTIN_BIOBANK_ID = "cristin_biobank_id";
-    private static final String CRISTIN_NAME_FIELD = "name";
+/*
+    https://api.cristin-test.uio.no/v2/doc/index.html#GETbiobanks
+ */
 
-    private static final String CRISTIN_BIOBANK_COORDINATING_INSTITUTION = "institution";
-
-    private static final String CRISTIN_BIOBANK_LAST_MODIFIED = "last_modified";
-    private static final String CRISTIN_BIOBANK_ASSOC_PROJECT = "associated_project";
-    private static final String CRISTIN_BIOBANK_TYPE = "type";
-    private static final String CRISTIN_BIOBANK_MAIN_LANGUAGE_KEY = "main_language";
-    private static final String CRISTIN_BIOBANK_START_DATE = "start_date";
-    private static final String CRISTIN_BIOBANK_STORED_UNTIL_DATE = "stored_until_date";
-    private static final String CRISTIN_BIOBANK_STATUS = "status";
-    private static final String CRISTIN_BIOBANK_CREATED = "created";
-    private static final String CRISTIN_BIOBANK_COORDINATOR = "coordinator";
-    private static final String CRISTIN_BIOBANK_EXTERNAL_SOURCES = "external_sources";
-    private static final String CRISTIN_BIOBANK_APPROVALS = "approvals";
-    private static final String CRISTIN_BIOBANK_MATERIALS = "biobank_material";
-
-
-
-    @JsonProperty(CRISTIN_BIOBANK_ID)
-    private final String biobankId;
-
-    @JsonProperty(CRISTIN_BIOBANK_TYPE)
-    private final String type;
-    @JsonProperty(CRISTIN_NAME_FIELD)
-
-    private final Map<String, String> name;
-    @JsonProperty(CRISTIN_BIOBANK_MAIN_LANGUAGE_KEY)
-    private final String language;
-
-    @JsonProperty(CRISTIN_BIOBANK_START_DATE)
-    private final Instant startDate;
-
-    @JsonProperty(CRISTIN_BIOBANK_STORED_UNTIL_DATE)
-    private final Instant storeUntilDate;
-
-    @JsonProperty(CRISTIN_BIOBANK_STATUS)
-    private final String status;
-    @JsonProperty(CRISTIN_BIOBANK_CREATED)
-    private final CristinTimeStampFromSource created;
-    @JsonProperty(CRISTIN_BIOBANK_LAST_MODIFIED)
-    private final CristinTimeStampFromSource lastModified;
-
-    @JsonProperty(CRISTIN_BIOBANK_COORDINATING_INSTITUTION)
-    private final CristinOrganization coordinatinInstitution;
-
-    @JsonProperty(CRISTIN_BIOBANK_COORDINATOR)
-    private final CristinCoordinator coordinator;
+    @JsonProperty
+    private String cristinBiobankId;
+    @JsonProperty
+    private String type;
+    @JsonProperty
+    private Map<String, String> name;
+    @JsonProperty
+    private String mainLanguage;
+    @JsonProperty
+    private Instant startDate;
+    @JsonProperty
+    private Instant storeUntilDate;
+    @JsonProperty
+    private String status;
+    @JsonProperty
+    private CristinDateInfo created;
+    @JsonProperty
+    private CristinDateInfo lastModified;
+    @JsonProperty
+    private CristinOrganization coordinatingInstitution;
+    @JsonProperty
+    private Map<String, String> statusName;
+    @JsonProperty
+    private Map<String, String> typeName;
+    @JsonProperty
+    private CristinPerson coordinator;
+    @JsonProperty
+    private Set<CristinExternalSource> externalSources;
+    @JsonProperty
+    private List<CristinApproval> approvals;
+    @JsonProperty
+    private List<CristinBiobankMaterial> biobankMaterials;
+    @JsonProperty
+    private String biobankId;
+    @JsonProperty
+    private CristinAssociatedProject associatedProject;
 
 
-    @JsonProperty(CRISTIN_BIOBANK_ASSOC_PROJECT)
-    private final CristinAssocProjectForBiobank assocProject;
-
-    @JsonProperty(CRISTIN_BIOBANK_EXTERNAL_SOURCES)
-    private final Set<CristinExternalSource> externalSources;
-
-    @JsonProperty(CRISTIN_BIOBANK_APPROVALS)
-    private final CristinBiobankApprovals approvals;
-
-
-    @JsonProperty(CRISTIN_BIOBANK_MATERIALS)
-    private final List<CristinBiobankMaterial> materials;
-
-
-    /**
-     * Constructor
-     * @param cristinBiobankId - cristin id code
-     * @param type - type
-     * @param cristinBiobankLanguage - code of the language
-     * @param name - names mapped with languages
-     * @param startDate - timestamp
-     * @param cristinBiobankStoreUntilDate - timestamp
-     * @param status -status
-     * @param created - - timestamp and source of creation short name code
-     * @param cristinBiobankLastModified - timestamp and source of modification short name code
-     * @param coordinatinInstitution - Information about coordinating institution organization and unit (uri)
-     * @param coordinator - Id of coordinator (person URI)
-     * @param assocProject - Id of the project (URI)
-     * @param externalSources - source short name and reference id
-     * @param approvals - approval parameters
-     * @param materials - material code and description
-     */
-    public CristinBiobank(@JsonProperty(CRISTIN_BIOBANK_ID) String cristinBiobankId,
-                          @JsonProperty(CRISTIN_BIOBANK_TYPE) String type,
-                          @JsonProperty(CRISTIN_BIOBANK_MAIN_LANGUAGE_KEY) String cristinBiobankLanguage,
-                          @JsonProperty(CRISTIN_NAME_FIELD) Map<String, String> name,
-                          @JsonProperty(CRISTIN_BIOBANK_START_DATE) Instant startDate,
-                          @JsonProperty(CRISTIN_BIOBANK_STORED_UNTIL_DATE) Instant cristinBiobankStoreUntilDate,
-                          @JsonProperty(CRISTIN_BIOBANK_STATUS) String status,
-                          @JsonProperty(CRISTIN_BIOBANK_CREATED) CristinTimeStampFromSource created,
-                          @JsonProperty(CRISTIN_BIOBANK_LAST_MODIFIED)
-                          CristinTimeStampFromSource cristinBiobankLastModified,
-                          @JsonProperty(CRISTIN_BIOBANK_COORDINATING_INSTITUTION)
-                          CristinOrganization coordinatinInstitution,
-                          @JsonProperty(CRISTIN_BIOBANK_COORDINATOR) CristinCoordinator coordinator,
-                          @JsonProperty(CRISTIN_BIOBANK_ASSOC_PROJECT) CristinAssocProjectForBiobank assocProject,
-                          @JsonProperty(CRISTIN_BIOBANK_EXTERNAL_SOURCES) Set<CristinExternalSource> externalSources,
-                          @JsonProperty(CRISTIN_BIOBANK_APPROVALS) CristinBiobankApprovals approvals,
-                          @JsonProperty(CRISTIN_BIOBANK_MATERIALS) List<CristinBiobankMaterial> materials) {
-        this.biobankId = cristinBiobankId;
-        this.type = type;
-        this.language = cristinBiobankLanguage;
-        this.name = Collections.unmodifiableMap(name);
-        this.startDate = startDate;
-        this.storeUntilDate = cristinBiobankStoreUntilDate;
-        this.status = status;
-        this.created = created;
-        this.lastModified = cristinBiobankLastModified;
-        this.coordinatinInstitution = coordinatinInstitution;
-        this.coordinator = coordinator;
-        this.assocProject = assocProject;
-        this.externalSources = externalSources;
-        this.approvals = approvals;
-        this.materials = materials;
+    public CristinBiobank() {
     }
 
-    public Set<CristinExternalSource> getExternalSources() {
-        return externalSources;
-    }
-
-    public String getBiobankId() {
-        return biobankId;
-    }
-
-    public Map<String, String> getName() {
-        return name;
+    public String getCristinBiobankId() {
+        return cristinBiobankId;
     }
 
     public String getType() {
         return type;
     }
 
-    public String getLanguage() {
-        return language;
+    public Map<String, String> getName() {
+        return name;
+    }
+
+    public String getMainLanguage() {
+        return mainLanguage;
     }
 
     public Instant getStartDate() {
@@ -164,40 +94,89 @@ public final class CristinBiobank {
         return status;
     }
 
-    public CristinTimeStampFromSource getCreated() {
+    public CristinDateInfo getCreated() {
         return created;
     }
 
-    public CristinTimeStampFromSource getLastModified() {
+    public CristinDateInfo getLastModified() {
         return lastModified;
     }
 
-    public CristinOrganization getCoordinatinInstitution() {
-        return coordinatinInstitution;
+    public CristinOrganization getCoordinatingInstitution() {
+        return coordinatingInstitution;
     }
 
-    public CristinCoordinator getCoordinator() {
+    public Map<String, String> getStatusName() {
+        return statusName;
+    }
+
+    public Map<String, String> getTypeName() {
+        return typeName;
+    }
+
+    public CristinPerson getCoordinator() {
         return coordinator;
     }
 
-    public CristinAssocProjectForBiobank getAssocProject() {
-        return assocProject;
+    public Set<CristinExternalSource> getExternalSources() {
+        return externalSources;
     }
 
-
-
-    public CristinBiobankApprovals getApprovals() {
+    public List<CristinApproval> getApprovals() {
         return approvals;
     }
 
-    public List<CristinBiobankMaterial> getMaterials() {
-        return materials;
+    public List<CristinBiobankMaterial> getBiobankMaterials() {
+        return biobankMaterials;
+    }
+
+    public String getBiobankId() {
+        return biobankId;
+    }
+
+    public CristinAssociatedProject getAssociatedProject() {
+        return associatedProject;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CristinBiobank)) {
+            return false;
+        }
+        CristinBiobank that = (CristinBiobank) o;
+        return Objects.equals(getCristinBiobankId(), that.getCristinBiobankId())
+               && Objects.equals(getType(), that.getType())
+               && Objects.equals(getName(), that.getName())
+               && Objects.equals(getMainLanguage(), that.getMainLanguage())
+               && Objects.equals(getStartDate(), that.getStartDate())
+               && Objects.equals(getStoreUntilDate(), that.getStoreUntilDate())
+               && Objects.equals(getStatus(), that.getStatus())
+               && Objects.equals(getCreated(), that.getCreated())
+               && Objects.equals(getLastModified(), that.getLastModified())
+               && Objects.equals(getCoordinatingInstitution(), that.getCoordinatingInstitution())
+               && Objects.equals(getStatusName(), that.getStatusName())
+               && Objects.equals(getTypeName(), that.getTypeName())
+               && Objects.equals(getCoordinator(), that.getCoordinator())
+               && Objects.equals(getExternalSources(), that.getExternalSources())
+               && Objects.equals(getApprovals(), that.getApprovals())
+               && Objects.equals(getBiobankId(), that.getBiobankId())
+               && Objects.equals(getAssociatedProject(), that.getAssociatedProject())
+               && Objects.equals(getBiobankMaterials(), that.getBiobankMaterials());
+    }
+
+    @Override
+    public int hashCode() {
+        return
+            Objects.hash(getCristinBiobankId(), getType(), getName(), getMainLanguage(), getStartDate(),
+                         getStoreUntilDate(), getStatus(), getCreated(), getLastModified(),getAssociatedProject(),
+                         getStatusName(), getTypeName(), getCoordinatingInstitution(), getCoordinator(),
+                         getExternalSources(), getApprovals(), getBiobankMaterials(), getBiobankId());
     }
 
     public Biobank toBiobank() {
         return new Builder(this).build();
     }
-
-
-
 }

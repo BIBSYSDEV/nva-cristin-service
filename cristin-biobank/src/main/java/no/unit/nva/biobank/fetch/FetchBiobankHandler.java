@@ -3,9 +3,8 @@ package no.unit.nva.biobank.fetch;
 import static no.unit.nva.biobank.client.CristinBiobankApiClient.defaultClient;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import no.unit.nva.biobank.client.CristinBiobankApiClient;
+import no.unit.nva.biobank.model.QueryBiobank;
 import no.unit.nva.biobank.model.nva.Biobank;
 import no.unit.nva.cristin.common.handler.CristinHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -15,7 +14,6 @@ import nva.commons.core.JacocoGenerated;
 
 public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
 
-    private static final String CODE_PATH_PARAMETER_NAME = "identifier";
     private final transient CristinBiobankApiClient cristinClient;
 
     @JacocoGenerated
@@ -29,14 +27,15 @@ public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
     }
 
     @Override
-    protected Biobank processInput(Void input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
-
-        var urlEncodedIdentifier = requestInfo.getPathParameter(CODE_PATH_PARAMETER_NAME);
-        var identifier = URLDecoder.decode(urlEncodedIdentifier, StandardCharsets.UTF_8);
-        var cristinFundingSource = cristinClient.fetchBiobank(identifier);
-
-        return cristinFundingSource.toBiobank();
+    protected Biobank processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        var query = (QueryBiobank)
+            QueryBiobank
+                .builder()
+                .fromRequestInfo(requestInfo).build();
+        return
+            cristinClient
+                .fetchBiobank(query)
+                .toBiobank();
     }
 
     @Override
