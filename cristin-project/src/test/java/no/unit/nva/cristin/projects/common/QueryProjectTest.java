@@ -1,16 +1,15 @@
 package no.unit.nva.cristin.projects.common;
 
-import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
-import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_CURRENT;
-import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LANGUAGE;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PAGE_CURRENT;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PAGE_ITEMS_PER_PAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;
 
-import no.unit.nva.cristin.model.QueryParameterKey;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import org.junit.jupiter.api.Test;
 
-public class CristinQueryTest {
+public class QueryProjectTest {
 
     private static final String APPROVAL_REFERENCE_ID = "2017/1593";
     private static final String APPROVED_BY = "REK";
@@ -38,12 +37,12 @@ public class CristinQueryTest {
     private static final String SAMPLE_PROJECT_MANAGER = "st";
     private static final String SAMPLE_SORT = "start_date";
     private static final String SAMPLE_UNIT = "184.12.60.0";
-    public static final QueryParameterKey[] QUERY_PARAMETER_KEYS = {PAGE_CURRENT, PAGE_ITEMS_PER_PAGE, LANGUAGE};
+    public static final ParameterKeyProject[] QUERY_PARAMETER_KEYS = {PAGE_CURRENT, PAGE_ITEMS_PER_PAGE, LANGUAGE};
 
     @Test
     void buildReturnsUriWithCustomParameterValuesWhenCustomParameterValuesAreSupplied() throws BadRequestException {
         var cristinQuery =
-            CristinQuery.builder()
+            QueryProject.builder()
                 .withTitle(RANDOM_TITLE)
                 .withLanguage(LANGUAGE_NB)
                 .withItemsPerPage(PER_PAGE)
@@ -57,19 +56,17 @@ public class CristinQueryTest {
 
     @Test
     void buildReturnsUriWithIdAndLanguageWhenIdAndLanguageParametersAreSupplied() throws BadRequestException {
-        URI uri = CristinQuery.fromIdAndLanguage(ID, LANGUAGE_NB);
-        var uri2 = CristinQuery.builder()
+        var uri = QueryProject.builder()
                        .withPathIdentity(ID)
                        .withLanguage(LANGUAGE_NB)
                        .validate().build().toURI();
         assertEquals(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI, uri.toString());
-        assertEquals(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI, uri2.toString());
     }
 
     @Test
     void buildReturnsUriWithExtendedListOfParameters() throws BadRequestException {
         URI uri =
-            CristinQuery.builder()
+            QueryProject.builder()
                 .withItemSort(SAMPLE_SORT)
                 .withInstitution(SAMPLE_INSTITUTION_ID)
                 .withProjectManager(SAMPLE_PROJECT_MANAGER)

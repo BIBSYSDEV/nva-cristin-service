@@ -8,7 +8,7 @@ import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandlerTest.
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;
 import java.util.Map;
-import no.unit.nva.cristin.projects.common.CristinQuery;
+import no.unit.nva.cristin.projects.common.QueryProject;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ public class QueryCristinProjectApiClientTest {
     @Test
     void getsCristinUriWithTitleParamWhenCallingUriBuilderWithTitleQueryRequested() throws Exception {
         final var cristinQuery =
-            CristinQuery.builder()
+            QueryProject.builder()
                 .withQuery(RANDOM_TITLE)
                 .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
@@ -39,7 +39,7 @@ public class QueryCristinProjectApiClientTest {
     @Test
     void getsCristinUriWithNoQueryParamWhenCallingUriBuilderWithTitleQueryRequested() throws Exception {
         final var params =
-            CristinQuery.builder()
+            QueryProject.builder()
                 .withTitle(RANDOM_TITLE)
                 .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
@@ -55,7 +55,7 @@ public class QueryCristinProjectApiClientTest {
     @Test
     void getsCristinUriWithProjectCodeParamWhenCallingUriBuilderWithGrantIdQueryRequested() throws Exception {
         final var sourceCristinQuery =
-            CristinQuery.builder()
+            QueryProject.builder()
                 .withQuery(GRANT_ID_EXAMPLE)
                 .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
@@ -70,7 +70,7 @@ public class QueryCristinProjectApiClientTest {
 
     protected URI generateCristinQueryProjectsUrl(Map<String, String> parameters) throws BadRequestException {
         return
-            CristinQuery.builder()
+            QueryProject.builder()
                 .fromQueryParameters(parameters)
                 .validate()
                 .build()

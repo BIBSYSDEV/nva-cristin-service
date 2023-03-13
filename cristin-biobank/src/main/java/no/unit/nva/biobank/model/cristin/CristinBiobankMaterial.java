@@ -1,28 +1,51 @@
 package no.unit.nva.biobank.model.cristin;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import java.beans.ConstructorProperties;
+import java.util.Map;
+import java.util.Objects;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinBiobankMaterial {
 
-    public static final String CRISTIN_MATERIAL_CODE = "material_code";
-    public static final String CRISTIN_OTHER_MATERIAL_DESC = "other_material_description";
-
-    @JsonProperty(CRISTIN_MATERIAL_CODE)
     private final String materialCode;
-    @JsonProperty(CRISTIN_OTHER_MATERIAL_DESC)
-    private final String otherMaterialDescription;
+    private final Map<String, String> materialName;
 
-    public CristinBiobankMaterial(String materialCode,
-                                  String otherMaterialDescription) {
+    @ConstructorProperties({"materialCode","materialName"})
+    public CristinBiobankMaterial(String materialCode, Map<String, String> materialName) {
         this.materialCode = materialCode;
-        this.otherMaterialDescription = otherMaterialDescription;
+        this.materialName = materialName;
     }
 
     public String getMaterialCode() {
         return materialCode;
     }
 
-    public String getOtherMaterialDescription() {
-        return otherMaterialDescription;
+    public Map<String, String> getMaterialName() {
+        return materialName;
+    }
+
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CristinBiobankMaterial)) {
+            return false;
+        }
+        CristinBiobankMaterial that = (CristinBiobankMaterial) o;
+        return Objects.equals(getMaterialCode(), that.getMaterialCode())
+               && Objects.equals(getMaterialName(), that.getMaterialName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getMaterialCode(), getMaterialName());
     }
 }

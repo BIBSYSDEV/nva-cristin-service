@@ -7,9 +7,9 @@ import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_D
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
-import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
-import static no.unit.nva.cristin.model.QueryParameterKey.QUERY;
-import static no.unit.nva.cristin.model.QueryParameterKey.TITLE;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LANGUAGE;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QUERY;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
@@ -637,10 +637,11 @@ class QueryCristinProjectHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(body.getDetail(),
-                   containsString(
-                       ErrorMessages.invalidQueryParametersMessageWithRange(JsonPropertyNames.STATUS,
-                                                                            Arrays.toString(ProjectStatus.values()))));
+        var value = ErrorMessages.invalidQueryParametersMessageWithRange(
+            JsonPropertyNames.STATUS,
+            Arrays.toString(ProjectStatus.values())
+        );
+        assertThat(body.getDetail(),containsString(value));
     }
 
     @ParameterizedTest(

@@ -80,7 +80,7 @@ public class CristinProjectApiClient extends ApiClient {
     }
 
     public URI generateGetProjectUri(String id, String language) {
-        return CristinQuery.fromIdAndLanguage(id, language);
+        return QueryProject.fromIdAndLanguage(id, language);
     }
 
     private List<CristinProject> mapValidResponsesToCristinProjects(List<HttpResponse<String>> responses) {

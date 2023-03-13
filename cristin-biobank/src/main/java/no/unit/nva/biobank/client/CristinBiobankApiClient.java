@@ -1,63 +1,69 @@
 package no.unit.nva.biobank.client;
 
-import java.io.IOException;
-import java.net.URI;
+import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import java.net.http.HttpClient;
-import java.util.List;
-import no.unit.nva.biobank.common.EnvironmentKeys;
+import java.net.http.HttpResponse;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import no.unit.nva.biobank.model.QueryBiobank;
 import no.unit.nva.biobank.model.cristin.CristinBiobank;
+import no.unit.nva.biobank.model.nva.Biobank;
 import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.model.SearchResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.BadGatewayException;
-import nva.commons.apigateway.exceptions.NotFoundException;
-import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
-import nva.commons.core.paths.UriWrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CristinBiobankApiClient extends ApiClient {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CristinBiobankApiClient.class);
-
-    private final transient URI cristinBaseUri;
 
     @JacocoGenerated
     public static CristinBiobankApiClient defaultClient() {
         var httpClient = HttpClient.newBuilder().build();
-        var cristinBaseUri = URI.create(new Environment().readEnv(EnvironmentKeys.ENV_KEY_CRISTIN_API_URL));
-        return new CristinBiobankApiClient(httpClient, cristinBaseUri);
+        return new CristinBiobankApiClient(httpClient);
     }
 
-    public CristinBiobankApiClient(HttpClient client, URI cristinBaseUri) {
+    public CristinBiobankApiClient(HttpClient client) {
         super(client);
-        this.cristinBaseUri = cristinBaseUri;
     }
 
-    public List<CristinBiobank> queryBiobanks() throws ApiGatewayException {
-        URI uri = getBiobanksUri();
-
-        var response = fetchQueryResults(uri);
-
-        checkHttpStatusCode(uri, response.statusCode());
-
-        try {
-            return List.of(fromJson(response.body(), CristinBiobank[].class));
-        } catch (IOException e) {
-            LOGGER.error("Unable to deserialize JSON", e);
-            throw new BadGatewayException("Malformed response from Cristin!");
-        }
+    public CristinBiobank fetchBiobank(QueryBiobank query) throws ApiGatewayException {
+        var response = queryBiobank(query);
+        return getDeserializedResponse(response, CristinBiobank.class);
     }
 
-    public CristinBiobank fetchBiobank(String identifier) throws ApiGatewayException {
-        var fundingSources = queryBiobanks();
+    /**
+     * Creates a wrapper object containing CristinBiobank transformed to Biobank with additional metadata. Is used
+     * for serialization to the client.
+     *
+     * @param query QueryProject from client containing title and language
+     * @return a SearchResponse filled with transformed Cristin Biobank and metadata
+     * @throws ApiGatewayException if some errors happen we should return this to client
+     */
+    public SearchResponse<Biobank> queryBiobankWithMetadata(QueryBiobank query) throws ApiGatewayException {
 
-        return fundingSources.stream()
-            .filter(biobank -> biobank.getBiobankId().equals(identifier))
-            .findFirst()
-            .orElseThrow(() -> new NotFoundException("Biobank not found: " + identifier));
+        final var startRequestTime = System.currentTimeMillis();
+        final var response = queryBiobank(query);
+        final var nvaBiobanks =
+            Arrays.stream(getDeserializedResponse(response, CristinBiobank[].class))
+                .map(CristinBiobank::toBiobank)
+                .collect(Collectors.toList());
+
+        final var processingTime = calculateProcessingTime(startRequestTime, System.currentTimeMillis());
+        final var id = query.toNvaURI();
+
+        return
+            new SearchResponse<Biobank>(id)
+                .withContext(PROJECT_SEARCH_CONTEXT_URL)
+                .withHits(nvaBiobanks)
+                .usingHeadersAndQueryParams(response.headers(), query.toNvaParameters())
+                .withProcessingTime(processingTime);
     }
 
-    private URI getBiobanksUri() {
-        return UriWrapper.fromUri(this.cristinBaseUri).addChild("biobank", "sources").getUri();
+    protected HttpResponse<String> queryBiobank(QueryBiobank query) throws ApiGatewayException {
+
+        HttpResponse<String> response = fetchQueryResults(query.toURI());
+        checkHttpStatusCode(query.toNvaURI(), response.statusCode(),response.body());
+
+        return response;
     }
+
 }

@@ -1,11 +1,22 @@
 package no.unit.nva.biobank.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
+import static no.unit.nva.cristin.model.Constants.PERSONS_PATH;
+import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
+import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
+import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.TYPE;
+import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.VALUE;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import java.beans.ConstructorProperties;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
@@ -14,19 +25,20 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import no.unit.nva.biobank.model.cristin.CristinAssocProjectForBiobank;
+import java.util.stream.Stream;
+
 import no.unit.nva.biobank.model.cristin.CristinBiobank;
-import no.unit.nva.biobank.model.cristin.CristinBiobankApprovals;
 import no.unit.nva.biobank.model.cristin.CristinBiobankMaterial;
-import no.unit.nva.biobank.model.cristin.CristinCoordinator;
-import no.unit.nva.biobank.model.cristin.CristinTimeStampFromSource;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinUnit;
+import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
+import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.nva.ExternalSource;
 import no.unit.nva.model.DateInfo;
+import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings({"PMD.ExcessiveParameterList", "PMD.TooManyFields"})
 @JsonInclude(NON_NULL)
@@ -34,48 +46,84 @@ import no.unit.nva.model.DateInfo;
 public class Biobank implements JsonSerializable {
 
     @JsonProperty(CONTEXT)
-    private URI context;
-    @JsonProperty
-    private URI id;
-    @JsonProperty
-    private String identifier;
-    @JsonProperty
-    private BiobankType biobankType;
-    @JsonProperty
-    private Map<String, String> name;
-    @JsonProperty
-    private String mainLanguage;
-    @JsonProperty
-    private Instant storeUntilDate;
-    @JsonProperty
-    private Instant startDate;
-    @JsonProperty
-    private String status;
-    @JsonProperty
-    private DateInfo created;
-    @JsonProperty
-    private DateInfo lastModified;
-    @JsonProperty
-    private URI coordinatingInstitution;
-    @JsonProperty
-    private URI coordinatingInstitutionUnit;
-    @JsonProperty
-    private URI coordinator;
-    @JsonProperty
-    private URI assocProject;
-    @JsonProperty
-    private Set<ExternalSource> externalSources;
-    @JsonProperty
-    private BiobankApprovals approvals;
-    @JsonProperty
-    private List<BiobankMaterial> biobankMaterials;
+    private final URI context;
+    private final URI id;
+    @JsonPropertyOrder(alphabetic = true)
+    private final List<Map<String, String>> identifiers;
+    private final BiobankType biobankType;
+    private final Map<String, String> name;
+    private final String mainLanguage;
+    private final Instant storeUntilDate;
+    private final Instant startDate;
+    private final String status;
+    private final DateInfo created;
+    private final DateInfo lastModified;
+    private final URI coordinatingOrganization;
+    private final URI coordinatingUnit;
+    private final URI coordinator;
+    private final AssociatedProject project;
+    private final Set<ExternalSource> externalSources;
+    private final List<BiobankApproval> approvals;
+    private final List<BiobankMaterial> biobankMaterials;
+
+    @ConstructorProperties({"id", "identifiers", "biobankType", "name", "mainLanguage", "storeUntilDate", "startDate", "status",
+        "created", "lastModified", "coordinatingOrganization", "coordinatingUnit", "coordinator", "project", "externalSources",
+        "approvals", "biobankMaterials"})
+    public Biobank(URI id, List<Map<String, String>> identifiers, BiobankType biobankType, Map<String, String> name,
+                   String mainLanguage, Instant storeUntilDate,Instant startDate, String status, DateInfo created,
+                   DateInfo lastModified, URI coordinatingOrganization,URI coordinatingUnit, URI coordinator,
+                   AssociatedProject project, Set<ExternalSource> externalSources,List<BiobankApproval> approvals,
+                   List<BiobankMaterial> biobankMaterials) {
+        this.context = URI.create("https://bibsysdev.github.io/src/biobank-context.json");
+        this.approvals = approvals;
+        this.biobankMaterials = biobankMaterials;
+        this.biobankType = biobankType;
+        this.coordinatingOrganization = coordinatingOrganization;
+        this.coordinatingUnit = coordinatingUnit;
+        this.coordinator = coordinator;
+        this.created = created;
+        this.externalSources = externalSources;
+        this.id = id;
+        this.identifiers = identifiers;
+        this.lastModified = lastModified;
+        this.mainLanguage = mainLanguage;
+        this.name = name;
+        this.project = project;
+        this.startDate = startDate;
+        this.status = status;
+        this.storeUntilDate = storeUntilDate;
+    }
+
+    public Biobank(CristinBiobank cristinBiobank) {
+        this(getNvaApiId(cristinBiobank.getCristinBiobankId(), BIOBANK_ID),
+            withCristinIdentifier(cristinBiobank),
+            BiobankType.valueOf(cristinBiobank.getType()),
+            cristinBiobank.getName(),
+            cristinBiobank.getMainLanguage(),
+            cristinBiobank.getStoreUntilDate(),
+            cristinBiobank.getStartDate(),
+            cristinBiobank.getStatus(),
+            toDateInfoOrNull(cristinBiobank.getCreated()),
+            toDateInfoOrNull(cristinBiobank.getLastModified()),
+            withCoordinatingOrganization(cristinBiobank.getCoordinatingInstitution()),
+            withCoordinatinUnit(cristinBiobank.getCoordinatingInstitution()),
+            getNvaApiId(cristinBiobank.getCoordinator().getCristinPersonId(), PERSONS_PATH),
+            toProjectOrNull(cristinBiobank),
+            withExternalSources(cristinBiobank.getExternalSources()),
+            withApprovals(cristinBiobank.getApprovals()),
+            withBiobankMaterials(cristinBiobank.getBiobankMaterials()));
+    }
 
     public URI getId() {
         return id;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public URI getContext() {
+        return context;
+    }
+
+    public List<Map<String, String>> getIdentifiers() {
+        return nonEmptyOrDefault(identifiers);
     }
 
     public BiobankType getBiobankType() {
@@ -110,27 +158,27 @@ public class Biobank implements JsonSerializable {
         return lastModified;
     }
 
-    public URI getCoordinatingInstitution() {
-        return coordinatingInstitution;
+    public URI getCoordinatingOrganization() {
+        return coordinatingOrganization;
     }
 
-    public URI getCoordinatingInstitutionUnit() {
-        return coordinatingInstitutionUnit;
+    public URI getCoordinatingUnit() {
+        return coordinatingUnit;
     }
 
     public URI getCoordinator() {
         return coordinator;
     }
 
-    public URI getAssocProject() {
-        return assocProject;
+    public AssociatedProject getProject() {
+        return project;
     }
 
-    public Set<ExternalSource> getExternalSource() {
+    public Set<ExternalSource> getExternalSources() {
         return externalSources;
     }
 
-    public BiobankApprovals getApprovals() {
+    public List<BiobankApproval> getApprovals() {
         return approvals;
     }
 
@@ -139,6 +187,7 @@ public class Biobank implements JsonSerializable {
     }
 
     @Override
+    @JacocoGenerated
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -149,7 +198,7 @@ public class Biobank implements JsonSerializable {
         Biobank biobank = (Biobank) o;
         return Objects.equals(context, biobank.context)
                && Objects.equals(getId(), biobank.getId())
-               && Objects.equals(getIdentifier(), biobank.getIdentifier())
+               && Objects.equals(getIdentifiers(), biobank.getIdentifiers())
                && Objects.equals(getBiobankType(), biobank.getBiobankType())
                && Objects.equals(getName(), biobank.getName())
                && Objects.equals(getMainLanguage(), biobank.getMainLanguage())
@@ -158,179 +207,87 @@ public class Biobank implements JsonSerializable {
                && Objects.equals(getStatus(), biobank.getStatus())
                && Objects.equals(getCreated(), biobank.getCreated())
                && Objects.equals(getLastModified(), biobank.getLastModified())
-               && Objects.equals(getCoordinatingInstitution(),
-                                 biobank.getCoordinatingInstitution())
-               && Objects.equals(getCoordinatingInstitutionUnit(),
-                                 biobank.getCoordinatingInstitutionUnit())
+               && Objects.equals(getCoordinatingOrganization(), biobank.getCoordinatingOrganization())
+               && Objects.equals(getCoordinatingUnit(), biobank.getCoordinatingUnit())
                && Objects.equals(getCoordinator(), biobank.getCoordinator())
-               && Objects.equals(getAssocProject(), biobank.getAssocProject())
-               && Objects.equals(getExternalSource(), biobank.getExternalSource())
+               && Objects.equals(getProject(), biobank.getProject())
+               && Objects.equals(getExternalSources(), biobank.getExternalSources())
                && Objects.equals(getApprovals(), biobank.getApprovals())
                && Objects.equals(getBiobankMaterials(), biobank.getBiobankMaterials());
     }
 
     @Override
+    @JacocoGenerated
     public int hashCode() {
-        return Objects.hash(context, getId(), getIdentifier(), getBiobankType(), getName(), getMainLanguage(),
+        return Objects.hash(context, getId(), getIdentifiers(), getBiobankType(), getName(), getMainLanguage(),
                             getStoreUntilDate(), getStartDate(), getStatus(), getCreated(), getLastModified(),
-                            getCoordinatingInstitution(), getCoordinatingInstitutionUnit(), getCoordinator(),
-                            getAssocProject(), getExternalSource(), getApprovals(), getBiobankMaterials());
+                            getCoordinatingOrganization(), getCoordinatingUnit(), getCoordinator(),
+                            getProject(), getExternalSources(), getApprovals(), getBiobankMaterials());
     }
 
-    public static final class Builder {
-
-        private static final String BIOBANK_PATH = "biobank";
-        private static final String INSTITUTIONS_PATH = "institution";
-        private static final String PERSONS_PATH = "person";
-        private static final String PROJECT_PATH = "project";
-        private static final String UNITS_PATH = "organization";
-        private final Biobank biobank;
-
-        private Builder() {
-            biobank = new Biobank();
-        }
-
-        public Builder(CristinBiobank cristinBiobank) {
-            this();
-            setApprovals(cristinBiobank.getApprovals())
-                .setAssocProject(cristinBiobank.getAssocProject())
-                .setBiobankMaterials(cristinBiobank.getMaterials())
-                .setBiobankType(BiobankType.valueOf(cristinBiobank.getType()))
-                .setCoordinatinInstitutionUnit(cristinBiobank.getCoordinatinInstitution())
-                .setCoordinatingInstitution(cristinBiobank.getCoordinatinInstitution())
-                .setCoordinator(cristinBiobank.getCoordinator())
-                .setCreated(cristinBiobank.getCreated())
-                .setExternalSources(cristinBiobank.getExternalSources())
-                //  .setIdentifier()
-                .setId(cristinBiobank.getBiobankId())
-                .setLastModified(cristinBiobank.getLastModified())
-                .setMainLanguage(cristinBiobank.getLanguage())
-                .setName(cristinBiobank.getName())
-                .setStartDate(cristinBiobank.getStartDate())
-                .setStatus(cristinBiobank.getStatus())
-                .setStoreUntilDate(cristinBiobank.getStoreUntilDate());
-        }
-
-        public Biobank build() {
-            return biobank;
-        }
-
-        public Builder setId(String biobankId) {
-            biobank.id = getNvaApiId(biobankId, BIOBANK_PATH);
-            return this;
-        }
-
-        public Builder setIdentifier(String identifier) {
-            biobank.identifier = identifier;
-            return this;
-        }
-
-        public Builder setBiobankType(BiobankType biobankType) {
-            biobank.biobankType = biobankType;
-            return this;
-        }
-
-        public Builder setName(Map<String, String> name) {
-            biobank.name = name;
-            return this;
-        }
-
-        public Builder setMainLanguage(String mainLanguage) {
-            biobank.mainLanguage = mainLanguage;
-            return this;
-        }
-
-        public Builder setStoreUntilDate(Instant storeUntilDate) {
-            biobank.storeUntilDate = storeUntilDate;
-            return this;
-        }
-
-        public Builder setStartDate(Instant startDate) {
-            biobank.startDate = startDate;
-            return this;
-        }
-
-        public Builder setStatus(String status) {
-            biobank.status = status;
-            return this;
-        }
-
-        public Builder setCreated(CristinTimeStampFromSource created) {
-            biobank.created =
-                Optional.ofNullable(created)
-                    .map(date -> new DateInfo(created.getSourceShortName(),created.getDate()))
-                    .orElse(null);
-            return this;
-        }
-
-        public Builder setLastModified(CristinTimeStampFromSource lastModified) {
-            biobank.lastModified =
-                Optional.ofNullable(lastModified)
-                    .map(date -> new DateInfo(lastModified.getSourceShortName(), lastModified.getDate()))
-                    .orElse(null);
-            return this;
-        }
-
-        public Builder setCoordinatingInstitution(CristinOrganization cristinOrganization) {
-            biobank.coordinatingInstitution =
-                Optional.ofNullable(cristinOrganization)
-                    .map(CristinOrganization::getInstitution)
-                    .map(CristinInstitution::getCristinInstitutionId)
-                    .map(instId -> getNvaApiId(instId, INSTITUTIONS_PATH))
-                    .orElse(null);
-            return this;
-        }
-
-        public Builder setCoordinatinInstitutionUnit(CristinOrganization cristinOrganization) {
-            biobank.coordinatingInstitutionUnit =
-                Optional.ofNullable(cristinOrganization)
-                    .map(CristinOrganization::getInstitutionUnit)
-                    .map(CristinUnit::getCristinUnitId)
-                    .map(instId -> getNvaApiId(instId, UNITS_PATH))
-                    .orElse(null);
-            return this;
-        }
-
-        public Builder setCoordinator(CristinCoordinator coordinator) {
-            biobank.coordinator =
-                Optional.ofNullable(coordinator)
-                    .map(CristinCoordinator::getCristinPersonIdentifier)
-                    .map(instId -> getNvaApiId(instId, PERSONS_PATH))
-                    .orElse(null);
-            return this;
-        }
-
-        public Builder setAssocProject(CristinAssocProjectForBiobank assocProject) {
-            biobank.assocProject =
-                Optional.ofNullable(assocProject)
-                    .map(CristinAssocProjectForBiobank::getCristinProjectIdentificator)
-                    .map(instId -> getNvaApiId(instId, PROJECT_PATH))
-                    .orElse(null);
-            return this;
-        }
-
-        public Builder setExternalSources(Set<CristinExternalSource> externalSources) {
-            biobank.externalSources =
-                externalSources.stream()
-                    .map(es -> new ExternalSource(es.getSourceReferenceId(),es.getSourceShortName()))
-                    .collect(Collectors.toSet());
-            return this;
-        }
-
-        public Builder setApprovals(CristinBiobankApprovals approvals) {
-            biobank.approvals =
-                Optional.ofNullable(approvals)
-                    .map(BiobankApprovals::new)
-                    .orElse(null);
-            return this;
-        }
-
-        public Builder setBiobankMaterials(List<CristinBiobankMaterial> materials) {
-            biobank.biobankMaterials =
-                materials.stream()
-                    .map(BiobankMaterial::new)
-                    .collect(Collectors.toUnmodifiableList());
-            return this;
-        }
+    @Override
+    @JacocoGenerated
+    public String toString() {
+        return this.toJsonString();
     }
+
+    private static List<Map<String, String>> withCristinIdentifier(CristinBiobank cristinBiobank) {
+        var id = nonNull(cristinBiobank.getCristinBiobankId())
+            ? Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinBiobank.getCristinBiobankId())
+            : null;
+        var biobank = nonNull(cristinBiobank.getBiobankId())
+            ? Map.of(TYPE, "FHI-BiobankRegistry", VALUE, cristinBiobank.getBiobankId())
+            : null;
+
+        return Stream.of(id,biobank).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
+    }
+
+    private static URI withCoordinatingOrganization(CristinOrganization cristinOrganization) {
+        return
+            Optional.ofNullable(cristinOrganization)
+                .map(CristinOrganization::getInstitution)
+                .map(CristinInstitution::getCristinInstitutionId)
+                .map(instId -> getNvaApiId(String.format("%s.0.0.0", instId), UNITS_PATH))
+                .orElse(null);
+    }
+
+    private static URI withCoordinatinUnit(CristinOrganization cristinOrganization) {
+        return
+            Optional.ofNullable(cristinOrganization)
+                .map(CristinOrganization::getInstitutionUnit)
+                .map(CristinUnit::getCristinUnitId)
+                .map(instId -> getNvaApiId(instId, UNITS_PATH))
+                .orElse(null);
+    }
+
+    private static Set<ExternalSource> withExternalSources(Set<CristinExternalSource> externalSources) {
+        return
+            externalSources.stream()
+                .map(es -> new ExternalSource(es.getSourceReferenceId(), es.getSourceShortName()))
+                .collect(Collectors.toSet());
+    }
+
+    private static List<BiobankApproval> withApprovals(List<CristinApproval> approvals) {
+        return
+            approvals.stream()
+                .map(BiobankApproval::new)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    private static List<BiobankMaterial> withBiobankMaterials(List<CristinBiobankMaterial> materials) {
+        return
+            materials.stream()
+                .map(BiobankMaterial::new)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    private static AssociatedProject toProjectOrNull(CristinBiobank cristinBiobank) {
+        return nonNull(cristinBiobank.getAssociatedProject())
+            ? new AssociatedProject(cristinBiobank.getAssociatedProject()) : null;
+    }
+
+    private static DateInfo toDateInfoOrNull(CristinDateInfo cristinBiobank) {
+        return nonNull(cristinBiobank) ? cristinBiobank.toDateInfo() : null;
+    }
+
 }
