@@ -1,11 +1,11 @@
 {
   "@context": "https://bibsysdev.github.io/src/project-search-context.json",
-  "id": "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=1&results=5",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=1&results=5&title=reindeer",
   "size": 135,
-  "searchString": "query=reindeer&language=nb&page=1&results=5",
+  "searchString": "language=nb&page=1&results=5&title=reindeer",
   "processingTime": 1000,
   "firstRecord": 1,
-  "nextResults": "https://api.dev.nva.aws.unit.no/cristin/project?query=reindeer&language=nb&page=2&results=5",
+  "nextResults": "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=2&title=reindeer&results=5",
   "previousResults": null,
   "hits": [
     {
@@ -43,8 +43,8 @@
         {
           "type": "ProjectManager",
           "identity": {
-            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "firstName": "Ola",
             "lastName": "Nordmann",
             "email": "ola.nordmann@example.org",
@@ -174,8 +174,8 @@
         {
           "type": "ProjectManager",
           "identity": {
-            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "firstName": "Ola",
             "lastName": "Nordmann",
             "email": "ola.nordmann@example.org",
@@ -244,8 +244,8 @@
       ],
       "institutionsResponsibleForResearch": [
         {
-          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "name": {
             "en": "Medical Department"
           }
@@ -305,8 +305,8 @@
         {
           "type": "ProjectManager",
           "identity": {
-            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "firstName": "Ola",
             "lastName": "Nordmann",
             "email": "ola.nordmann@example.org",
@@ -375,8 +375,8 @@
       ],
       "institutionsResponsibleForResearch": [
         {
-          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "name": {
             "en": "Medical Department"
           }
@@ -436,8 +436,8 @@
         {
           "type": "ProjectManager",
           "identity": {
-            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "firstName": "Ola",
             "lastName": "Nordmann",
             "email": "ola.nordmann@example.org",
@@ -506,8 +506,8 @@
       ],
       "institutionsResponsibleForResearch": [
         {
-          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "name": {
             "en": "Medical Department"
           }
@@ -567,8 +567,8 @@
         {
           "type": "ProjectManager",
           "identity": {
-            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "type": "Person",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
             "firstName": "Ola",
             "lastName": "Nordmann",
             "email": "ola.nordmann@example.org",
