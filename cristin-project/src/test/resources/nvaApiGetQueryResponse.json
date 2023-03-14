@@ -24,6 +24,7 @@
       "endDate": "2021-05-01T00:00:00Z",
       "funding": [
         {
+          "type": "Funding",
           "source": {
             "type": "FundingSource",
             "names": {
@@ -32,16 +33,6 @@
             "code": "NFR"
           },
           "code": "654321"
-        }
-      ],
-      "newFunding": [
-        {
-          "type": "Funding",
-          "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
-          "identifier": "654321",
-          "labels": {
-            "en": "Research Council of Norway (RCN)"
-          }
         }
       ],
       "coordinatingInstitution": {
@@ -167,6 +158,7 @@
       "endDate": "2021-05-01T00:00:00Z",
       "funding": [
         {
+          "type": "Funding",
           "source": {
             "type": "FundingSource",
             "names": {
@@ -175,16 +167,6 @@
             "code": "NFR"
           },
           "code": "654321"
-        }
-      ],
-      "newFunding": [
-        {
-          "type": "Funding",
-          "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
-          "identifier": "654321",
-          "labels": {
-            "en": "Research Council of Norway (RCN)"
-          }
         }
       ],
       "coordinatingInstitution": {
@@ -310,6 +292,7 @@
       "endDate": "2021-05-01T00:00:00Z",
       "funding": [
         {
+          "type": "Funding",
           "source": {
             "type": "FundingSource",
             "names": {
@@ -318,16 +301,6 @@
             "code": "NFR"
           },
           "code": "654321"
-        }
-      ],
-      "newFunding": [
-        {
-          "type": "Funding",
-          "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
-          "identifier": "654321",
-          "labels": {
-            "en": "Research Council of Norway (RCN)"
-          }
         }
       ],
       "coordinatingInstitution": {
@@ -453,6 +426,7 @@
       "endDate": "2021-05-01T00:00:00Z",
       "funding": [
         {
+          "type": "Funding",
           "source": {
             "type": "FundingSource",
             "names": {
@@ -461,16 +435,6 @@
             "code": "NFR"
           },
           "code": "654321"
-        }
-      ],
-      "newFunding": [
-        {
-          "type": "Funding",
-          "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
-          "identifier": "654321",
-          "labels": {
-            "en": "Research Council of Norway (RCN)"
-          }
         }
       ],
       "coordinatingInstitution": {
@@ -596,6 +560,7 @@
       "endDate": "2021-05-01T00:00:00Z",
       "funding": [
         {
+          "type": "Funding",
           "source": {
             "type": "FundingSource",
             "names": {
@@ -604,16 +569,6 @@
             "code": "NFR"
           },
           "code": "654321"
-        }
-      ],
-      "newFunding": [
-        {
-          "type": "Funding",
-          "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
-          "identifier": "654321",
-          "labels": {
-            "en": "Research Council of Norway (RCN)"
-          }
         }
       ],
       "coordinatingInstitution": {

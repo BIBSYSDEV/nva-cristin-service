@@ -46,9 +46,7 @@ public class NvaProject implements JsonSerializable {
     @JsonProperty
     private Instant endDate;
     @JsonProperty
-    private List<OldFunding> funding;
-    @JsonProperty
-    private List<Funding> newFunding;
+    private List<Funding> funding;
     @JsonProperty
     private Organization coordinatingInstitution;
     @JsonProperty
@@ -175,20 +173,12 @@ public class NvaProject implements JsonSerializable {
         this.endDate = endDate;
     }
 
-    public List<OldFunding> getFunding() {
+    public List<Funding> getFunding() {
         return nonEmptyOrDefault(funding);
     }
 
-    public void setFunding(List<OldFunding> funding) {
+    public void setFunding(List<Funding> funding) {
         this.funding = funding;
-    }
-
-    public List<Funding> getNewFunding() {
-        return nonEmptyOrDefault(newFunding);
-    }
-
-    public void setNewFunding(List<Funding> newFunding) {
-        this.newFunding = newFunding;
     }
 
     public Organization getCoordinatingInstitution() {
@@ -378,7 +368,6 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getStartDate(), that.getStartDate())
                && Objects.equals(getEndDate(), that.getEndDate())
                && Objects.equals(getFunding(), that.getFunding())
-               && Objects.equals(getNewFunding(), that.getNewFunding())
                && Objects.equals(getCoordinatingInstitution(), that.getCoordinatingInstitution())
                && Objects.equals(getContributors(), that.getContributors())
                && getStatus() == that.getStatus()
@@ -405,7 +394,7 @@ public class NvaProject implements JsonSerializable {
     @Override
     public int hashCode() {
         return Objects.hash(getContext(), getId(), getType(), getIdentifiers(), getTitle(), getLanguage(),
-                            getAlternativeTitles(), getStartDate(), getEndDate(), getFunding(), getNewFunding(),
+                            getAlternativeTitles(), getStartDate(), getEndDate(), getFunding(),
                             getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
                             getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
@@ -477,13 +466,8 @@ public class NvaProject implements JsonSerializable {
             return this;
         }
 
-        public Builder withFunding(List<OldFunding> funding) {
+        public Builder withFunding(List<Funding> funding) {
             nvaProject.setFunding(funding);
-            return this;
-        }
-
-        public Builder withNewFunding(List<Funding> newFunding) {
-            nvaProject.setNewFunding(newFunding);
             return this;
         }
 

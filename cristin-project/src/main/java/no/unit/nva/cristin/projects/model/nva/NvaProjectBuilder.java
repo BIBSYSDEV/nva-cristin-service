@@ -1,8 +1,6 @@
 package no.unit.nva.cristin.projects.model.nva;
 
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinApplicationCodeBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinApprovalAuthorityBuilder;
@@ -40,7 +38,6 @@ import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
-import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.StringUtils.isNotBlank;
 
 public class NvaProjectBuilder {
@@ -50,7 +47,6 @@ public class NvaProjectBuilder {
 
     public static final String TYPE = "type";
     public static final String VALUE = "value";
-    public static final String FUNDING_SOURCES = "funding-sources";
 
     private final transient CristinProject cristinProject;
     private transient String context;
@@ -120,8 +116,7 @@ public class NvaProjectBuilder {
                    .withLanguage(LanguageMapper.toUri(cristinProject.getMainLanguage()))
                    .withStartDate(cristinProject.getStartDate())
                    .withEndDate(cristinProject.getEndDate())
-                   .withFunding(extractOldFunding())
-                   .withNewFunding(extractFunding())
+                   .withFunding(extractFunding())
                    .withCoordinatingInstitution(extractCoordinatingInstitution())
                    .withContributors(extractContributors())
                    .withStatus(extractProjectStatus())
@@ -268,37 +263,16 @@ public class NvaProjectBuilder {
                 .orElse(emptyList());
     }
 
-    private List<OldFunding> extractOldFunding() {
-        return cristinProject.getProjectFundingSources().stream()
-                   .map(this::createOldFunding)
-                   .collect(Collectors.toList());
-    }
-
     private List<Funding> extractFunding() {
         return cristinProject.getProjectFundingSources().stream()
                 .map(this::createFunding)
                 .collect(Collectors.toList());
     }
 
-    private OldFunding createOldFunding(CristinFundingSource cristinFunding) {
-        var nvaFundingSource = new FundingSource(cristinFunding.getFundingSourceName(),
-                                                 cristinFunding.getFundingSourceCode());
-        return new OldFunding(nvaFundingSource, cristinFunding.getProjectCode());
-    }
-
     private Funding createFunding(CristinFundingSource cristinFunding) {
-        var source = extractFundingSource(cristinFunding);
-        var identifier = cristinFunding.getProjectCode();
-        var labels = cristinFunding.getFundingSourceName();
-
-        return new Funding(source, identifier, labels);
-    }
-
-    private URI extractFundingSource(CristinFundingSource cristinFunding) {
-        var urlEncodedSourceIdentifier = URLEncoder.encode(cristinFunding.getFundingSourceCode(),
-                                                           StandardCharsets.UTF_8);
-        var uriString = getNvaApiUri(FUNDING_SOURCES).toString();
-        return URI.create(uriString + "/" + urlEncodedSourceIdentifier);
+        FundingSource nvaFundingSource =
+                new FundingSource(cristinFunding.getFundingSourceName(), cristinFunding.getFundingSourceCode());
+        return new Funding(nvaFundingSource, cristinFunding.getProjectCode());
     }
 
     public NvaProjectBuilder withContext(String context) {
