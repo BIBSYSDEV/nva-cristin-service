@@ -34,7 +34,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
-import static no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder.extractFundingSourceCode;
+import static no.unit.nva.cristin.projects.model.nva.Funding.CODE;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.core.attempt.Try.attempt;
@@ -44,8 +44,7 @@ import static nva.commons.core.attempt.Try.attempt;
 public class ProjectPatchValidator extends PatchValidator implements Validator<ObjectNode> {
 
     public static final String TITLE_MUST_HAVE_A_LANGUAGE = "Title must have a language associated";
-    public static final String FUNDING_MISSING_REQUIRED_FIELDS_OR_NOT_VALID = "Funding missing required fields or not"
-                                                                              + " valid";
+    public static final String FUNDING_MISSING_REQUIRED_FIELDS = "Funding missing required fields";
     public static final String MUST_BE_A_LIST = "Field %s must be a list";
     public static final String KEYWORDS_MISSING_REQUIRED_FIELD_TYPE = "Keywords missing required field 'type'";
     public static final String PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE = "ProjectCategories missing required "
@@ -130,8 +129,10 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     }
 
     private static void validateFunding(JsonNode funding) throws BadRequestException {
-        attempt(() -> extractFundingSourceCode(URI.create(funding.get(SOURCE).textValue())))
-            .orElseThrow(fail -> new BadRequestException(FUNDING_MISSING_REQUIRED_FIELDS_OR_NOT_VALID));
+        if (!funding.has(SOURCE) || funding.get(SOURCE).isNull()
+            || !funding.get(SOURCE).has(CODE) || funding.get(SOURCE).get(CODE).isNull()) {
+            throw new BadRequestException(FUNDING_MISSING_REQUIRED_FIELDS);
+        }
     }
 
     private void validateKeywordsIfPresent(ObjectNode input) throws BadRequestException {

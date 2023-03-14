@@ -15,7 +15,6 @@ import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.cristin.projects.model.nva.OldFunding;
 import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.TypedLabel;
@@ -36,7 +35,6 @@ import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
-import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.FUNDING_SOURCES;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.TYPE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.VALUE;
@@ -47,9 +45,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
-import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class RandomProjectDataGenerator {
@@ -71,14 +67,12 @@ public class RandomProjectDataGenerator {
             ".institutionsResponsibleForResearch.hasPart",
             ".institutionsResponsibleForResearch.partOf",
             ".institutionsResponsibleForResearch.acronym",
-            ".institutionsResponsibleForResearch.context",
-            ".funding"
+            ".institutionsResponsibleForResearch.context"
     );
     private static final String NORWEGIAN = "nb";
     private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
     public static final String SOME_UNIT_IDENTIFIER = "185.90.0.0";
     public static final String EMAIL_DOMAIN = "@email.no";
-    public static final String PATH_DELIMITER = "/";
 
     /**
      * Create a NvaProject containing random data.
@@ -88,7 +82,6 @@ public class RandomProjectDataGenerator {
     public static NvaProject randomNvaProject() {
         final String identifier = randomInteger().toString();
         final URI language = LanguageMapper.toUri(NORWEGIAN);
-        final var fundings = randomFundings();
         final NvaProject nvaProject = new NvaProject.Builder()
                                           // .withContext(PROJECT_CONTEXT)
                                           .withType(PROJECT_TYPE)
@@ -103,8 +96,7 @@ public class RandomProjectDataGenerator {
                                           .withEndDate(randomInstant())
                                           .withAcademicSummary(randomSummary())
                                           .withPopularScientificSummary(randomSummary())
-                                          .withNewFunding(fundings)
-                                          .withFunding(fundingsToLegacyFundings(fundings))
+                                          .withFunding(randomFundings())
                                           .withContributors(randomContributors())
                                           .withCoordinatingInstitution(randomOrganization())
                                           .withCreated(randomDateInfo())
@@ -124,13 +116,6 @@ public class RandomProjectDataGenerator {
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
-    }
-
-    private static List<OldFunding> fundingsToLegacyFundings(List<Funding> fundings) {
-        return fundings.stream().map(funding -> {
-            var sourceCode = extractLastPathElement(funding.getSource());
-            return new OldFunding(new FundingSource(funding.getLabels(), sourceCode), funding.getIdentifier());
-        }).collect(Collectors.toList());
     }
 
     /**
@@ -239,8 +224,7 @@ public class RandomProjectDataGenerator {
     }
 
     private static Funding randomFunding() {
-        return new Funding(getNvaApiUri(FUNDING_SOURCES + PATH_DELIMITER + randomString()), randomString(),
-                           randomNamesMap());
+        return new Funding(new FundingSource(randomNamesMap(), randomString()), randomString());
     }
 
     private static Map<String, String> randomSummary() {

@@ -104,8 +104,11 @@ Feature: API tests for Cristin Project retrieve and search
       'funding': [
         {
           'type': 'Funding',
-          'source': 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR',
-          'identifier': '1234'
+          'source': {
+            'type': 'FundingSource',
+            'code': 'NFR'
+          },
+          'code': '1234'
         }
       ],
       'keywords': [
