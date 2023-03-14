@@ -18,10 +18,8 @@
   ],
   "funding": [
     {
-      "source": {
-        "code": "NFR"
-      },
-      "code": "1234/PO"
+      "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
+      "identifier": "1234/PO"
     }
   ],
   "keywords": [
