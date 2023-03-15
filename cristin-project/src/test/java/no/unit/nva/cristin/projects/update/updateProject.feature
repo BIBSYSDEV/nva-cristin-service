@@ -32,10 +32,8 @@ Feature: API tests for Cristin Project Update
       ],
       'funding': [
         {
-          'source': {
-            'code': 'NFR'
-          },
-          'code': '1234'
+          'source': 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR',
+          'identifier': '1234'
         }
       ],
       'keywords': [
