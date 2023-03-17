@@ -1,24 +1,30 @@
 package no.unit.nva.biobank.model.cristin;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import no.unit.nva.commons.json.JsonSerializable;
+import nva.commons.core.JacocoGenerated;
+
+import java.beans.ConstructorProperties;
 import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
-import java.util.StringJoiner;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CristinAssociatedProject {
+public class CristinAssociatedProject implements JsonSerializable {
 
-    @JsonProperty
-    private String cristinProjectId;
-    @JsonProperty
-    private Map<String,String> title;
-    @JsonProperty
-    private URI url;
+    private final String cristinProjectId;
+    private final Map<String, String> title;
+    private final URI url;
+
+    @ConstructorProperties({"cristinProjectId", "title", "url"})
+    public CristinAssociatedProject(String cristinProjectId, Map<String, String> title, URI url) {
+        this.cristinProjectId = cristinProjectId;
+        this.title = title;
+        this.url = url;
+    }
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -32,19 +38,8 @@ public class CristinAssociatedProject {
         return url;
     }
 
-    public void setCristinProjectId(String cristinProjectId) {
-        this.cristinProjectId = cristinProjectId;
-    }
-
-    public void setTitle(Map<String, String> title) {
-        this.title = title;
-    }
-
-    public void setUrl(URI url) {
-        this.url = url;
-    }
-
     @Override
+    @JacocoGenerated
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -54,21 +49,20 @@ public class CristinAssociatedProject {
         }
         CristinAssociatedProject that = (CristinAssociatedProject) o;
         return Objects.equals(getCristinProjectId(), that.getCristinProjectId())
-               && Objects.equals(getTitle(), that.getTitle())
-               && Objects.equals(getUrl(), that.getUrl());
+            && Objects.equals(getTitle(), that.getTitle())
+            && Objects.equals(getUrl(), that.getUrl());
     }
 
     @Override
+    @JacocoGenerated
     public int hashCode() {
         return Objects.hash(getCristinProjectId(), getTitle(), getUrl());
     }
 
     @Override
+    @JacocoGenerated
     public String toString() {
-        return new StringJoiner(", ", CristinAssociatedProject.class.getSimpleName() + "[", "]")
-                   .add("cristinProjectId='" + cristinProjectId + "'")
-                   .add("title=" + title)
-                   .add("url=" + url)
-                   .toString();
+        return this.toJsonString();
     }
+
 }

@@ -1,27 +1,29 @@
 package no.unit.nva.biobank.model.nva;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.time.Instant;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
 import nva.commons.core.JacocoGenerated;
 
+import java.beans.ConstructorProperties;
+import java.time.Instant;
+import java.util.Objects;
+
 public class BiobankApproval implements JsonSerializable {
 
-    @JsonProperty
-    private Instant approvedDate;
-    @JsonProperty
-    private String approvedBy;
-    @JsonProperty
-    private String approvedStatus;
-    @JsonProperty
-    private String applicationCode;
-    @JsonProperty
-    private String approvalReferenceId;
+    private final Instant approvedDate;
+    private final String approvedBy;
+    private final String approvedStatus;
+    private final String applicationCode;
+    private final String approvalReferenceId;
 
-    @JacocoGenerated
-    public BiobankApproval() {
+    @ConstructorProperties({"approvedDate","approvedBy","approvedStatus","applicationCode","approvalReferenceId"})
+    public BiobankApproval(Instant approvedDate, String approvedBy, String approvedStatus, String applicationCode,
+                           String approvalReferenceId) {
+        this.approvedDate = approvedDate;
+        this.approvedBy = approvedBy;
+        this.approvedStatus = approvedStatus;
+        this.applicationCode = applicationCode;
+        this.approvalReferenceId = approvalReferenceId;
     }
 
     /**
@@ -54,5 +56,34 @@ public class BiobankApproval implements JsonSerializable {
 
     public String getApprovalReferenceId() {
         return approvalReferenceId;
+    }
+
+    @Override
+    @JacocoGenerated
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BiobankApproval)) {
+            return false;
+        }
+        BiobankApproval that = (BiobankApproval) o;
+        return Objects.equals(getApprovedDate(), that.getApprovedDate())
+            && Objects.equals(getApprovedBy(), that.getApprovedBy())
+            && Objects.equals(getApprovedStatus(), that.getApprovedStatus())
+            && Objects.equals(getApplicationCode(), that.getApplicationCode())
+            && Objects.equals(getApprovalReferenceId(), that.getApprovalReferenceId());
+    }
+
+    @Override
+    @JacocoGenerated
+    public int hashCode() {
+        return Objects.hash(getApprovedDate(), getApprovedBy(), getApprovedStatus(), getApplicationCode(),
+            getApprovalReferenceId());
+    }
+
+    @Override
+    public String toString() {
+        return this.toJsonString();
     }
 }

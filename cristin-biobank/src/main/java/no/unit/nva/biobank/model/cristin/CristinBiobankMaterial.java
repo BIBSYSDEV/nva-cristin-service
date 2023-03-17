@@ -1,9 +1,10 @@
 package no.unit.nva.biobank.model.cristin;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+import java.beans.ConstructorProperties;
 import java.util.Map;
 import java.util.Objects;
 
@@ -11,12 +12,13 @@ import java.util.Objects;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinBiobankMaterial {
 
-    @JsonProperty
-    private String materialCode;
-    @JsonProperty
-    private Map<String, String> materialName;
+    private final String materialCode;
+    private final Map<String, String> materialName;
 
-    public CristinBiobankMaterial() {
+    @ConstructorProperties({"materialCode","materialName"})
+    public CristinBiobankMaterial(String materialCode, Map<String, String> materialName) {
+        this.materialCode = materialCode;
+        this.materialName = materialName;
     }
 
     public String getMaterialCode() {
@@ -26,6 +28,8 @@ public class CristinBiobankMaterial {
     public Map<String, String> getMaterialName() {
         return materialName;
     }
+
+
 
     @Override
     public boolean equals(Object o) {

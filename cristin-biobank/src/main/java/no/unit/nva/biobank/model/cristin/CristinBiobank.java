@@ -1,65 +1,79 @@
 package no.unit.nva.biobank.model.cristin;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import no.unit.nva.biobank.model.nva.Biobank;
-import no.unit.nva.biobank.model.nva.Biobank.Builder;
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import nva.commons.core.JacocoGenerated;
+
+import java.beans.ConstructorProperties;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @SuppressWarnings({"PMD.ExcessiveParameterList","PMD.TooManyFields"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CristinBiobank {
+public class CristinBiobank implements JsonSerializable {
     // https://api.cristin-test.uio.no/v2/doc/index.html#GETbiobanks
 
-    @JsonProperty
-    private String cristinBiobankId;
-    @JsonProperty
-    private String type;
-    @JsonProperty
-    private Map<String, String> name;
-    @JsonProperty
-    private String mainLanguage;
-    @JsonProperty
-    private Instant startDate;
-    @JsonProperty
-    private Instant storeUntilDate;
-    @JsonProperty
-    private String status;
-    @JsonProperty
-    private CristinDateInfo created;
-    @JsonProperty
-    private CristinDateInfo lastModified;
-    @JsonProperty
-    private CristinOrganization coordinatingInstitution;
-    @JsonProperty
-    private Map<String, String> statusName;
-    @JsonProperty
-    private Map<String, String> typeName;
-    @JsonProperty
-    private CristinPerson coordinator;
-    @JsonProperty
-    private Set<CristinExternalSource> externalSources;
-    @JsonProperty
-    private List<CristinApproval> approvals;
-    @JsonProperty
-    private List<CristinBiobankMaterial> biobankMaterials;
-    @JsonProperty
-    private String biobankId;
-    @JsonProperty
-    private CristinAssociatedProject associatedProject;
+    private final String cristinBiobankId;
+    private final String type;
+    private final Map<String, String> name;
+    private final String mainLanguage;
+    private final Instant startDate;
+    private final Instant storeUntilDate;
+    private final String status;
+    private final CristinDateInfo created;
+    private final CristinDateInfo lastModified;
+    private final CristinOrganization coordinatingInstitution;
+    private final Map<String, String> statusName;
+    private final Map<String, String> typeName;
+    private final CristinPerson coordinator;
+    private final Set<CristinExternalSource> externalSources;
+    private final List<CristinApproval> approvals;
+    private final List<CristinBiobankMaterial> biobankMaterials;
+    private final String biobankId;
+    private final CristinAssociatedProject associatedProject;
 
+
+    @ConstructorProperties({"cristinBiobankId", "type", "name", "mainLanguage", "startDate", "storeUntilDate", "status",
+        "created", "lastModified", "coordinatingInstitution", "statusName", "typeName", "coordinator", "externalSources",
+        "approvals", "biobankMaterials", "biobankId", "associatedProject"})
+    public CristinBiobank(String cristinBiobankId, String type, Map<String, String> name, String mainLanguage,
+                          Instant startDate, Instant storeUntilDate, String status, CristinDateInfo created,
+                          CristinDateInfo lastModified, CristinOrganization coordinatingInstitution,
+                          Map<String, String> statusName, Map<String, String> typeName, CristinPerson coordinator,
+                          Set<CristinExternalSource> externalSources, List<CristinApproval> approvals,
+                          List<CristinBiobankMaterial> biobankMaterials, String biobankId,
+                          CristinAssociatedProject associatedProject) {
+        this.cristinBiobankId = cristinBiobankId;
+        this.type = type;
+        this.name = name;
+        this.mainLanguage = mainLanguage;
+        this.startDate = startDate;
+        this.storeUntilDate = storeUntilDate;
+        this.status = status;
+        this.created = created;
+        this.lastModified = lastModified;
+        this.coordinatingInstitution = coordinatingInstitution;
+        this.statusName = statusName;
+        this.typeName = typeName;
+        this.coordinator = coordinator;
+        this.externalSources = externalSources;
+        this.approvals = approvals;
+        this.biobankMaterials = biobankMaterials;
+        this.biobankId = biobankId;
+        this.associatedProject = associatedProject;
+    }
 
     public String getCristinBiobankId() {
         return cristinBiobankId;
@@ -133,79 +147,8 @@ public class CristinBiobank {
         return associatedProject;
     }
 
-    public void setCristinBiobankId(String cristinBiobankId) {
-        this.cristinBiobankId = cristinBiobankId;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setName(Map<String, String> name) {
-        this.name = name;
-    }
-
-    public void setMainLanguage(String mainLanguage) {
-        this.mainLanguage = mainLanguage;
-    }
-
-    public void setStartDate(Instant startDate) {
-        this.startDate = startDate;
-    }
-
-    public void setStoreUntilDate(Instant storeUntilDate) {
-        this.storeUntilDate = storeUntilDate;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setCreated(CristinDateInfo created) {
-        this.created = created;
-    }
-
-    public void setLastModified(CristinDateInfo lastModified) {
-        this.lastModified = lastModified;
-    }
-
-    public void setCoordinatingInstitution(CristinOrganization coordinatingInstitution) {
-        this.coordinatingInstitution = coordinatingInstitution;
-    }
-
-    public void setStatusName(Map<String, String> statusName) {
-        this.statusName = statusName;
-    }
-
-    public void setTypeName(Map<String, String> typeName) {
-        this.typeName = typeName;
-    }
-
-    public void setCoordinator(CristinPerson coordinator) {
-        this.coordinator = coordinator;
-    }
-
-    public void setExternalSources(Set<CristinExternalSource> externalSources) {
-        this.externalSources = externalSources;
-    }
-
-    public void setApprovals(List<CristinApproval> approvals) {
-        this.approvals = approvals;
-    }
-
-    public void setBiobankMaterials(List<CristinBiobankMaterial> biobankMaterials) {
-        this.biobankMaterials = biobankMaterials;
-    }
-
-    public void setBiobankId(String biobankId) {
-        this.biobankId = biobankId;
-    }
-
-    public void setAssociatedProject(CristinAssociatedProject associatedProject) {
-        this.associatedProject = associatedProject;
-    }
-
     @Override
+    @JacocoGenerated
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -235,6 +178,7 @@ public class CristinBiobank {
     }
 
     @Override
+    @JacocoGenerated
     public int hashCode() {
         return
             Objects.hash(getCristinBiobankId(), getType(), getName(), getMainLanguage(), getStartDate(),
@@ -243,7 +187,13 @@ public class CristinBiobank {
                          getExternalSources(), getApprovals(), getBiobankMaterials(), getBiobankId());
     }
 
+    @Override
+    @JacocoGenerated
+    public String toString() {
+        return this.toJsonString();
+    }
+
     public Biobank toBiobank() {
-        return new Builder(this).build();
+        return new Biobank(this);
     }
 }

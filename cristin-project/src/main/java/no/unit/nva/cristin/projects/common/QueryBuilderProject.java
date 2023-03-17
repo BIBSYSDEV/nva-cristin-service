@@ -1,52 +1,24 @@
 package no.unit.nva.cristin.projects.common;
 
+import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.model.QueryBuilder;
+import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
+import nva.commons.apigateway.exceptions.BadRequestException;
+
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessageWithRange;
 import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.CristinQuery.getUnitIdFromOrganization;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVAL_REFERENCE_ID;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVED_BY;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.BIOBANK;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING_SOURCE;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.GRANT_ID;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.INSTITUTION;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.INVALID;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.KEYWORD;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LANGUAGE;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LEVELS;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.MODIFIED_SINCE;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.NAME;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.ORGANIZATION;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PAGE_CURRENT;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PAGE_ITEMS_PER_PAGE;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PAGE_SORT;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PARTICIPANT;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PATH_IDENTITY;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PATH_ORGANISATION;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PATH_PROJECT;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PROJECT_MANAGER;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PROJECT_UNIT;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QUERY;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.STATUS;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.TITLE;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.USER;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_KEYS;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.keyFromString;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.*;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map.Entry;
-import java.util.Set;
-import no.unit.nva.cristin.common.Utils;
-import no.unit.nva.cristin.model.QueryBuilder;
-import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
-import nva.commons.apigateway.RestRequestHandler;
-import nva.commons.apigateway.exceptions.BadRequestException;
 
 public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
 

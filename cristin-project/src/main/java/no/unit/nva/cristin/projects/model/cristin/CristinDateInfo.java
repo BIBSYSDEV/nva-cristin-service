@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import no.unit.nva.model.DateInfo;
+
 import java.time.Instant;
 import java.util.Objects;
 
@@ -52,6 +54,11 @@ public class CristinDateInfo {
     @Override
     public int hashCode() {
         return Objects.hash(getSourceShortName(), getDate());
+    }
+
+
+    public DateInfo toDateInfo() {
+        return new DateInfo(sourceShortName,date);
     }
 
 }
