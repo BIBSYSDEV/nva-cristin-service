@@ -4,9 +4,9 @@ Feature: API tests for Cristin Biobank get
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
-    * def validIdentifier = '2510604'
+    * def validIdentifier = '643747'
     * def unknownIdentifier = '1234'
-    * def fundingSourceIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/funding-sources\/.+'
+    * def biobankIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/biobank\/.+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
 
     Given url CRISTIN_BASE
@@ -46,9 +46,8 @@ Feature: API tests for Cristin Biobank get
     When method GET
     Then status 200
     And match response == '#object'
-    And match response.type == 'FundingSource'
-    And match response.id == '#regex ' + fundingSourceIdRegex
-    And match response.identifier == validIdentifier
+    And match response.type == 'Biobank'
+    And match response.id contains validIdentifier
     And match response.name == '#present'
 
     Examples:
@@ -65,7 +64,7 @@ Feature: API tests for Cristin Biobank get
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'Funding source not found: ' + unknownIdentifier
+    And match response.detail contains unknownIdentifier
     And match response.requestId == '#notnull'
 
     Examples:

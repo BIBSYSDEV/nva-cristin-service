@@ -32,6 +32,7 @@ public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
             QueryBiobank
                 .builder()
                 .fromRequestInfo(requestInfo).build();
+        context.getLogger().log(query.toURI().toString());
         return
             cristinClient
                 .fetchBiobank(query)
