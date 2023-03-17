@@ -7,7 +7,6 @@ import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
-import static no.unit.nva.utils.UriUtils.addLanguage;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.time.Duration;
@@ -57,12 +56,10 @@ public class CristinPositionCodesClient extends ApiClient {
     }
 
     private static URI createUpstreamUri() {
-        var uri = UriWrapper.fromUri(CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
             .addChild(PERSON_PATH)
             .addChild(AFFILIATIONS_POSITIONS)
             .getUri();
-
-        return addLanguage(uri);
     }
 
     private static URI createIdUri() {

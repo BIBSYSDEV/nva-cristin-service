@@ -66,10 +66,9 @@ public class FetchFromIdentityNumberHandlerTest {
         "nvaApiGetPersonResponse.json";
     private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
     private static final String VALID_CRISTIN_NATIONAL_ID_URI = "https://api.cristin-test.uio"
-                                                                + ".no/v2/persons?national_id=07117631634&lang=en,nb,"
-                                                                + "nn";
+                                                                + ".no/v2/persons?national_id=07117631634";
     private static final String URI_FIRST_HIT_FROM_CRISTIN = "https://api.cristin-test.uio"
-                                                             + ".no/v2/persons/359084?lang=en,nb,nn";
+                                                             + ".no/v2/persons/359084";
     private final Environment environment = new Environment();
     private CristinPersonApiClient apiClient;
     private Context context;

@@ -73,7 +73,7 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.hits[0].hasPart  == '#present'
 
   Scenario: GET organization for known organization returns list of search results without depth
-    Given  path '/organization'
+    Given path '/organization'
     And param query = existingOrganizationIdentifier
     And param depth = 'none'
     When method GET
@@ -81,3 +81,11 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.hits == '#array'
     And match response.hits[0].partOf == '#notpresent'
     And match response.hits[0].hasPart  == '#notpresent'
+
+  Scenario: GET organization for known organization returns name in multiple languages as default
+    Given path '/organization/' + existingOrganizationIdentifier
+    And param depth = 'none'
+    When method GET
+    Then status 200
+    And match response.name.en == '#present'
+    And match response.name.nb == '#present'
