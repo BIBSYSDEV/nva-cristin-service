@@ -1414,6 +1414,48 @@ paths:
         502:
           $ref: '#/components/responses/502'
 
+  /biobank/{identifier}:
+    parameters:
+      - name: identifier
+        in: path
+        description: Identifier of biobank
+        required: true
+        schema:
+          type: string
+        example: '1234567'
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchBiobankFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Biobank
+      summary: Fetch a biobank by identifier
+      description: Returns the biobank with the given identifier
+      operationId: FetchBiobank
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiobankNew'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/BiobankNewSample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/BiobankNew'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/BiobankNewSample'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 components:
   responses:
     400:
