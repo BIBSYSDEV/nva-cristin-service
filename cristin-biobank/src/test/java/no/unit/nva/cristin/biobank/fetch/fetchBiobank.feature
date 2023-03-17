@@ -4,8 +4,8 @@ Feature: API tests for Cristin Biobank get
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
-    * def validIdentifier = 'OTHER'
-    * def unknownIdentifier = 'NOT_KNOWN_FOR_SURE'
+    * def validIdentifier = '2510604'
+    * def unknownIdentifier = '1234'
     * def fundingSourceIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/funding-sources\/.+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
 

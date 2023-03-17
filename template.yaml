@@ -192,6 +192,20 @@ Resources:
             Path: /project/{identifier}/
             Method: patch
 
+  NvaCristinOneBiobankFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-biobank
+      Handler: no.unit.nva.biobank.fetch.FetchBiobankHandler::handleRequest
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinOneBiobankEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /biobank/{identifier}
+            Method: get
+
   NvaCristinQueryOrganizationFunction:
     Type: AWS::Serverless::Function
     Properties:
