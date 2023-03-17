@@ -1,10 +1,15 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.IGNORE_LIST;
@@ -21,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CristinProjectBuilderTest {
 
     public static final String ONE_CRISTIN_PROJECT = "cristinGetProjectResponse.json";
+    public static final String URI_ENCODED_FUNDING_SOURCE_URI = "https://api.dev.nva.aws.unit"
+                                                                + ".no/cristin/funding-sources/EC%2FFP7";
 
     @Test
     void projectShouldBeLossLessConvertedAndEqualAfterConvertedToCristinAndBack() {
@@ -49,16 +56,23 @@ class CristinProjectBuilderTest {
         assertThat(deserialized, equalTo(cristinProject));
     }
 
-    // TODO: Remove fields from this method when they are POSTable to Cristin
+    @ParameterizedTest
+    @CsvSource({"NFR,NFR", "EC%2FFP7,EC/FP7", URI_ENCODED_FUNDING_SOURCE_URI + ",EC/FP7"})
+    void shouldParseAndDecodeDifferentValuesForFundingSources(String input, String expected) {
+        var nvaProject = randomNvaProject();
+        var funding = new Funding(URI.create(input), null, null);
+        nvaProject.setNewFunding(List.of(funding));
+        var cristinProject = new CristinProjectBuilder(nvaProject).build();
+        var cristinFunding = cristinProject.getProjectFundingSources().get(0);
+        var actual = cristinFunding.getFundingSourceCode();
+
+        assertThat(actual, equalTo(expected));
+    }
+
     private void addFieldsNotSupportedByToCristinProject(NvaProject expected, NvaProject actual) {
         actual.setCreated(expected.getCreated());
         actual.setLastModified(expected.getLastModified());
-        actual.setContactInfo(expected.getContactInfo());
         actual.setFundingAmount(expected.getFundingAmount());
-        actual.setProjectCategories(expected.getProjectCategories());
-        actual.setKeywords(expected.getKeywords());
-        actual.setExternalSources(expected.getExternalSources());
-        actual.setRelatedProjects(expected.getRelatedProjects());
     }
 
     private Set<String> addFieldsToIgnoreListNotSupportedByCristinPost() {

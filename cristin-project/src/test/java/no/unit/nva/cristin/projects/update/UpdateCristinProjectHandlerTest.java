@@ -23,7 +23,7 @@ import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
 import static no.unit.nva.cristin.projects.model.nva.ContactInfo.CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
-import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.FUNDING_MISSING_REQUIRED_FIELDS;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.FUNDING_MISSING_REQUIRED_FIELDS_OR_NOT_VALID;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.KEYWORDS_MISSING_REQUIRED_FIELD_TYPE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST_OF_IDENTIFIERS;
@@ -231,7 +231,7 @@ class UpdateCristinProjectHandlerTest {
     private static Stream<Arguments> badRequestProvider() {
         return Stream.of(
             Arguments.of(FUNDING, notAnArray(FUNDING), format(MUST_BE_A_LIST, FUNDING)),
-            Arguments.of(FUNDING, fundingWithoutRequiredFields(), FUNDING_MISSING_REQUIRED_FIELDS),
+            Arguments.of(FUNDING, fundingWithoutRequiredFields(), FUNDING_MISSING_REQUIRED_FIELDS_OR_NOT_VALID),
             Arguments.of(LANGUAGE, languageNotSupported(), format(ILLEGAL_VALUE_FOR_PROPERTY, LANGUAGE)),
             Arguments.of(LANGUAGE, titlePresentButNotLanguage(), TITLE_MUST_HAVE_A_LANGUAGE),
             Arguments.of(LANGUAGE, languageNotAValidValue(), COULD_NOT_PARSE_LANGUAGE_FIELD),

@@ -11,7 +11,6 @@ import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.nva.Funding;
-import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.language.Language;
 import no.unit.nva.model.Organization;
@@ -58,6 +57,7 @@ import static no.unit.nva.cristin.projects.model.cristin.CristinProject.INSTITUT
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder.extractFundingSourceCode;
 import static no.unit.nva.cristin.projects.model.nva.ContactInfo.CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.convertToMap;
@@ -194,10 +194,10 @@ public class CristinProjectPatchJsonCreator {
 
     private CristinFundingSource oneFundingToCristinFunding(JsonNode fundingSource) {
         var cristinFundingSource = new CristinFundingSource();
-        var sourceCode = fundingSource.get(SOURCE).get(FundingSource.CODE).asText();
+        var sourceCode = extractFundingSourceCode(URI.create(fundingSource.get(SOURCE).textValue()));
         cristinFundingSource.setFundingSourceCode(sourceCode);
-        if (fundingSource.has(Funding.CODE)) {
-            var projectCode = fundingSource.get(Funding.CODE).asText();
+        if (fundingSource.has(Funding.IDENTIFIER)) {
+            var projectCode = fundingSource.get(Funding.IDENTIFIER).asText();
             cristinFundingSource.setProjectCode(projectCode);
         }
 
