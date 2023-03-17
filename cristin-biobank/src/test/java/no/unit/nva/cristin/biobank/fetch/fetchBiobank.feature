@@ -25,7 +25,7 @@ Feature: API tests for Cristin Biobank get
       'Access-Control-Request-Headers': 'Content-Type, Authorization'
     }
   """
-    Given path '/funding-sources/' + validIdentifier
+    Given path '/biobank/' + validIdentifier
     When method OPTIONS
     Then status 200
     And match responseHeaders['Access-Control-Allow-Origin'][0] == '*'
@@ -42,7 +42,7 @@ Feature: API tests for Cristin Biobank get
 
   Scenario Outline: Get returns valid data and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
-    Given path '/funding-sources/' + validIdentifier
+    Given path '/biobank/' + validIdentifier
     When method GET
     Then status 200
     And match response == '#object'
@@ -58,7 +58,7 @@ Feature: API tests for Cristin Biobank get
 
   Scenario Outline: Get returns not found for unknown identifier and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
-    Given path '/funding-sources/' + unknownIdentifier
+    Given path '/biobank/' + unknownIdentifier
     When method GET
     Then status 404
     * def contentType = responseHeaders['Content-Type'][0]

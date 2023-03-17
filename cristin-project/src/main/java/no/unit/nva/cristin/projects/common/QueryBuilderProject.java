@@ -65,7 +65,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
                     }
                     break;
                 case PATH_PROJECT:
-                    query.setPath(key, RestRequestHandler.EMPTY_STRING);
+                    query.setPath(key, EMPTY_STRING);
                     break;
                 case LANGUAGE:
                     query.setValue(key, DEFAULT_LANGUAGE_CODE);
@@ -85,7 +85,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
     @Override
     protected void setPath(String key, String value) {
         asNvaQuery();
-        var nonNullValue = nonNull(value) ? value : RestRequestHandler.EMPTY_STRING;
+        var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
 
         if (key.equals(PATH_IDENTITY.getNvaKey())) {
             withPathIdentity(nonNullValue);
@@ -315,7 +315,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
             query.setValue(ORGANIZATION, organization);
         } else {
             // this will trigger correct errormessage
-            query.setValue(QUERY, RestRequestHandler.EMPTY_STRING);
+            query.setValue(QUERY, EMPTY_STRING);
         }
         return this;
     }
@@ -359,7 +359,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
                 query.setPath(PATH_IDENTITY, identity);
             }
         } else {
-            query.setPath(PATH_IDENTITY, RestRequestHandler.EMPTY_STRING);
+            query.setPath(PATH_IDENTITY, EMPTY_STRING);
         }
         return this;
     }
@@ -375,7 +375,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
                 query.setPath(PATH_ORGANISATION, organization);
             }
         } else {
-            query.setValue(PATH_ORGANISATION, RestRequestHandler.EMPTY_STRING);
+            query.setValue(PATH_ORGANISATION, EMPTY_STRING);
         }
         return this;
     }
@@ -405,7 +405,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
             var key = grantOrTitleKey(queryValue);
             query.setValue(key, queryValue);
         } else {
-            query.setValue(QUERY, RestRequestHandler.EMPTY_STRING);
+            query.setValue(QUERY, EMPTY_STRING);
         }
         return this;
     }
@@ -416,7 +416,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
     public QueryBuilderProject withStatus(String status) {
         var statusKind = attempt(() ->
                                      ProjectStatus.valueOf(status.toUpperCase(Locale.getDefault())).name())
-                             .orElse((e) -> RestRequestHandler.EMPTY_STRING);
+                             .orElse((e) -> EMPTY_STRING);
         query.setValue(STATUS, statusKind);
         return this;
     }

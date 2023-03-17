@@ -17,13 +17,11 @@ import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
 
-@SuppressWarnings("PMD.ExcessiveParameterList")
+@SuppressWarnings({"PMD.ExcessiveParameterList","PMD.TooManyFields"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public final class CristinBiobank {
-/*
-    https://api.cristin-test.uio.no/v2/doc/index.html#GETbiobanks
- */
+public class CristinBiobank {
+    // https://api.cristin-test.uio.no/v2/doc/index.html#GETbiobanks
 
     @JsonProperty
     private String cristinBiobankId;
@@ -62,9 +60,6 @@ public final class CristinBiobank {
     @JsonProperty
     private CristinAssociatedProject associatedProject;
 
-
-    public CristinBiobank() {
-    }
 
     public String getCristinBiobankId() {
         return cristinBiobankId;
@@ -136,6 +131,78 @@ public final class CristinBiobank {
 
     public CristinAssociatedProject getAssociatedProject() {
         return associatedProject;
+    }
+
+    public void setCristinBiobankId(String cristinBiobankId) {
+        this.cristinBiobankId = cristinBiobankId;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setName(Map<String, String> name) {
+        this.name = name;
+    }
+
+    public void setMainLanguage(String mainLanguage) {
+        this.mainLanguage = mainLanguage;
+    }
+
+    public void setStartDate(Instant startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setStoreUntilDate(Instant storeUntilDate) {
+        this.storeUntilDate = storeUntilDate;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setCreated(CristinDateInfo created) {
+        this.created = created;
+    }
+
+    public void setLastModified(CristinDateInfo lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public void setCoordinatingInstitution(CristinOrganization coordinatingInstitution) {
+        this.coordinatingInstitution = coordinatingInstitution;
+    }
+
+    public void setStatusName(Map<String, String> statusName) {
+        this.statusName = statusName;
+    }
+
+    public void setTypeName(Map<String, String> typeName) {
+        this.typeName = typeName;
+    }
+
+    public void setCoordinator(CristinPerson coordinator) {
+        this.coordinator = coordinator;
+    }
+
+    public void setExternalSources(Set<CristinExternalSource> externalSources) {
+        this.externalSources = externalSources;
+    }
+
+    public void setApprovals(List<CristinApproval> approvals) {
+        this.approvals = approvals;
+    }
+
+    public void setBiobankMaterials(List<CristinBiobankMaterial> biobankMaterials) {
+        this.biobankMaterials = biobankMaterials;
+    }
+
+    public void setBiobankId(String biobankId) {
+        this.biobankId = biobankId;
+    }
+
+    public void setAssociatedProject(CristinAssociatedProject associatedProject) {
+        this.associatedProject = associatedProject;
     }
 
     @Override

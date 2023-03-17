@@ -119,22 +119,27 @@ public enum ParameterKeyProject implements IParameterKey {
         this.errorMessage = errorMessage;
     }
 
+    @Override
     public String getNvaKey() {
         return nvaKey;
     }
 
+    @Override
     public String getKey() {
         return cristinKey;
     }
 
+    @Override
     public String getPattern() {
         return pattern;
     }
 
+    @Override
     public String getErrorMessage() {
         return errorMessage;
     }
 
+    @Override
     public boolean isEncode() {
         return encode;
     }

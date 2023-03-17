@@ -20,9 +20,6 @@ public class CristinAssociatedProject {
     @JsonProperty
     private URI url;
 
-    public CristinAssociatedProject() {
-    }
-
     public String getCristinProjectId() {
         return cristinProjectId;
     }
@@ -33,6 +30,18 @@ public class CristinAssociatedProject {
 
     public URI getUrl() {
         return url;
+    }
+
+    public void setCristinProjectId(String cristinProjectId) {
+        this.cristinProjectId = cristinProjectId;
+    }
+
+    public void setTitle(Map<String, String> title) {
+        this.title = title;
+    }
+
+    public void setUrl(URI url) {
+        this.url = url;
     }
 
     @Override

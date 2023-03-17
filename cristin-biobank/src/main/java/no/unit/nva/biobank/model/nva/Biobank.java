@@ -80,8 +80,6 @@ public class Biobank implements JsonSerializable {
     @JsonProperty
     private List<BiobankMaterial> biobankMaterials;
 
-    public Biobank() {
-    }
 
     public URI getId() {
         return id;
@@ -154,6 +152,7 @@ public class Biobank implements JsonSerializable {
     public List<BiobankMaterial> getBiobankMaterials() {
         return biobankMaterials;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -230,24 +229,24 @@ public class Biobank implements JsonSerializable {
         public Builder(CristinBiobank cristinBiobank) {
             this();
             biobank.context = URI.create("https://bibsysdev.github.io/src/biobank-context.json");
-            setMainLanguage(cristinBiobank.getMainLanguage())
-                .setApprovals(cristinBiobank.getApprovals())
-                .setBioBankId(cristinBiobank.getBiobankId())
-                .setBiobankMaterials(cristinBiobank.getBiobankMaterials())
-                .setBiobankType(BiobankType.valueOf(cristinBiobank.getType()))
-                .setCoordinatinUnit(cristinBiobank.getCoordinatingInstitution())
-                .setCoordinatingOrganization(cristinBiobank.getCoordinatingInstitution())
-                .setCoordinator(cristinBiobank.getCoordinator())
-                .setCreated(cristinBiobank.getCreated())
-                .setCristinBioBankId(cristinBiobank.getCristinBiobankId())
-                .setExternalSources(cristinBiobank.getExternalSources())
-                .setIdentifiers(createCristinIdentifier(cristinBiobank))
-                .setLastModified(cristinBiobank.getLastModified())
-                .setName(cristinBiobank.getName())
-                .setProject(cristinBiobank.getAssociatedProject())
-                .setStartDate(cristinBiobank.getStartDate())
-                .setStatus(cristinBiobank.getStatus())
-                .setStoreUntilDate(cristinBiobank.getStoreUntilDate())
+            withMainLanguage(cristinBiobank.getMainLanguage())
+                .withApprovals(cristinBiobank.getApprovals())
+                .withBioBankId(cristinBiobank.getBiobankId())
+                .withBiobankMaterials(cristinBiobank.getBiobankMaterials())
+                .withBiobankType(BiobankType.valueOf(cristinBiobank.getType()))
+                .withCoordinatinUnit(cristinBiobank.getCoordinatingInstitution())
+                .withCoordinatingOrganization(cristinBiobank.getCoordinatingInstitution())
+                .withCoordinator(cristinBiobank.getCoordinator())
+                .withCreated(cristinBiobank.getCreated())
+                .withCristinBioBankId(cristinBiobank.getCristinBiobankId())
+                .withExternalSources(cristinBiobank.getExternalSources())
+                .withIdentifiers(createCristinIdentifier(cristinBiobank))
+                .withLastModified(cristinBiobank.getLastModified())
+                .withName(cristinBiobank.getName())
+                .withProject(cristinBiobank.getAssociatedProject())
+                .withStartDate(cristinBiobank.getStartDate())
+                .withStatus(cristinBiobank.getStatus())
+                .withStoreUntilDate(cristinBiobank.getStoreUntilDate())
             ;
         }
 
@@ -256,68 +255,68 @@ public class Biobank implements JsonSerializable {
             return biobank;
         }
 
-        public Builder setCristinBioBankId(String cristinBioBankId) {
+        public Builder withCristinBioBankId(String cristinBioBankId) {
             if (nonNull(cristinBioBankId)) {
                 biobank.id = getNvaApiId(cristinBioBankId, BIOBANK_PATH);
             }
             return this;
         }
 
-        public Builder setProject(CristinAssociatedProject associatedProject) {
+        public Builder withProject(CristinAssociatedProject associatedProject) {
             if (nonNull(associatedProject)) {
                 biobank.project = new AssociatedProject(associatedProject);
             }
             return this;
         }
 
-        public Builder setIdentifiers(List<Map<String, String>> cristinIdentifier) {
+        public Builder withIdentifiers(List<Map<String, String>> cristinIdentifier) {
             biobank.identifiers = cristinIdentifier;
             return this;
         }
 
-        private Builder setBioBankId(String biobankId) {
+        private Builder withBioBankId(String biobankId) {
             if (nonNull(biobankId)) {
                 biobank.getIdentifiers().add(Map.of("FHI-BiobankRegistry", biobankId));
             }
             return this;
         }
 
-        public Builder setCoordinator(CristinPerson coordinator) {
+        public Builder withCoordinator(CristinPerson coordinator) {
             biobank.coordinator = getNvaApiId(coordinator.getCristinPersonId(), PERSONS_PATH);
             return this;
         }
 
-        public Builder setBiobankType(BiobankType biobankType) {
+        public Builder withBiobankType(BiobankType biobankType) {
             biobank.biobankType = biobankType;
             return this;
         }
 
-        public Builder setName(Map<String, String> name) {
+        public Builder withName(Map<String, String> name) {
             biobank.name = name;
             return this;
         }
 
-        public Builder setMainLanguage(String mainLanguage) {
+        public Builder withMainLanguage(String mainLanguage) {
             biobank.mainLanguage = mainLanguage;
             return this;
         }
 
-        public Builder setStoreUntilDate(Instant storeUntilDate) {
+        public Builder withStoreUntilDate(Instant storeUntilDate) {
             biobank.storeUntilDate = storeUntilDate;
             return this;
         }
 
-        public Builder setStartDate(Instant startDate) {
+        public Builder withStartDate(Instant startDate) {
             biobank.startDate = startDate;
             return this;
         }
 
-        public Builder setStatus(String status) {
+        public Builder withStatus(String status) {
             biobank.status = status;
             return this;
         }
 
-        public Builder setCreated(CristinDateInfo created) {
+        public Builder withCreated(CristinDateInfo created) {
             biobank.created =
                 Optional.ofNullable(created)
                     .map(date -> new DateInfo(created.getSourceShortName(), created.getDate()))
@@ -325,7 +324,7 @@ public class Biobank implements JsonSerializable {
             return this;
         }
 
-        public Builder setLastModified(CristinDateInfo lastModified) {
+        public Builder withLastModified(CristinDateInfo lastModified) {
             biobank.lastModified =
                 Optional.ofNullable(lastModified)
                     .map(date -> new DateInfo(lastModified.getSourceShortName(), lastModified.getDate()))
@@ -333,7 +332,7 @@ public class Biobank implements JsonSerializable {
             return this;
         }
 
-        public Builder setCoordinatingOrganization(CristinOrganization cristinOrganization) {
+        public Builder withCoordinatingOrganization(CristinOrganization cristinOrganization) {
             biobank.coordinatingOrganization =
                 Optional.ofNullable(cristinOrganization)
                     .map(CristinOrganization::getInstitution)
@@ -343,7 +342,7 @@ public class Biobank implements JsonSerializable {
             return this;
         }
 
-        public Builder setCoordinatinUnit(CristinOrganization cristinOrganization) {
+        public Builder withCoordinatinUnit(CristinOrganization cristinOrganization) {
             biobank.coordinatingUnit =
                 Optional.ofNullable(cristinOrganization)
                     .map(CristinOrganization::getInstitutionUnit)
@@ -353,7 +352,7 @@ public class Biobank implements JsonSerializable {
             return this;
         }
 
-        public Builder setExternalSources(Set<CristinExternalSource> externalSources) {
+        public Builder withExternalSources(Set<CristinExternalSource> externalSources) {
             biobank.externalSources =
                 externalSources.stream()
                     .map(es -> new ExternalSource(es.getSourceReferenceId(), es.getSourceShortName()))
@@ -361,7 +360,7 @@ public class Biobank implements JsonSerializable {
             return this;
         }
 
-        public Builder setApprovals(List<CristinApproval> approvals) {
+        public Builder withApprovals(List<CristinApproval> approvals) {
             biobank.approvals =
                 approvals.stream()
                     .map(BiobankApproval::new)
@@ -369,7 +368,7 @@ public class Biobank implements JsonSerializable {
             return this;
         }
 
-        public Builder setBiobankMaterials(List<CristinBiobankMaterial> materials) {
+        public Builder withBiobankMaterials(List<CristinBiobankMaterial> materials) {
             biobank.biobankMaterials =
                 materials.stream()
                     .map(BiobankMaterial::new)
