@@ -49,6 +49,7 @@ import static no.unit.nva.cristin.projects.common.ParameterKeyProject.keyFromStr
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 
+@SuppressWarnings({"PMD.GodClass"})
 public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
 
     public QueryBuilderProject() {
