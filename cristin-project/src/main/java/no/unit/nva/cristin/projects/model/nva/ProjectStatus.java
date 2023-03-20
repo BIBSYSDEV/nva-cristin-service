@@ -29,7 +29,8 @@ public enum ProjectStatus {
      */
     public static ProjectStatus fromCristinStatus(String name) {
         return stream(values())
-                .filter(nameType -> nameType.getCristinStatus().equalsIgnoreCase(name))
+                .filter(nameType -> nameType.getCristinStatus().equalsIgnoreCase(name)
+                                    || nameType.name().equalsIgnoreCase(name))
                 .findAny()
                 .orElseThrow(() -> returnException(name));
     }
