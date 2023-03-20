@@ -112,6 +112,9 @@ public class Biobank implements JsonSerializable {
             toExternalSources(cristinBiobank.getExternalSources()),
             toApprovals(cristinBiobank.getApprovals()),
             toBiobankMaterials(cristinBiobank.getBiobankMaterials()));
+
+        //   cristinBiobank.getTypeName()
+        //   cristinBiobank.getStatusName()
     }
 
     public URI getId() {
