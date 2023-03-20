@@ -46,8 +46,8 @@ public class CristinBiobank implements JsonSerializable {
 
 
     @ConstructorProperties({"cristinBiobankId", "type", "name", "mainLanguage", "startDate", "storeUntilDate", "status",
-        "created", "lastModified", "coordinatingInstitution", "statusName", "typeName", "coordinator", "externalSources",
-        "approvals", "biobankMaterials", "biobankId", "associatedProject"})
+        "created", "lastModified", "coordinatingInstitution", "statusName", "typeName", "coordinator",
+        "externalSources", "approvals", "biobankMaterials", "biobankId", "associatedProject"})
     public CristinBiobank(String cristinBiobankId, String type, Map<String, String> name, String mainLanguage,
                           Instant startDate, Instant storeUntilDate, String status, CristinDateInfo created,
                           CristinDateInfo lastModified, CristinOrganization coordinatingInstitution,
@@ -147,6 +147,10 @@ public class CristinBiobank implements JsonSerializable {
         return associatedProject;
     }
 
+    public Biobank toBiobank() {
+        return new Biobank(this);
+    }
+
     @Override
     @JacocoGenerated
     public boolean equals(Object o) {
@@ -191,9 +195,5 @@ public class CristinBiobank implements JsonSerializable {
     @JacocoGenerated
     public String toString() {
         return this.toJsonString();
-    }
-
-    public Biobank toBiobank() {
-        return new Biobank(this);
     }
 }
