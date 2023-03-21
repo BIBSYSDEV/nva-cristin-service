@@ -141,7 +141,7 @@ public class FetchCristinProjectHandlerTest {
         cristinApiClientStub = spy(cristinApiClientStub);
 
         doThrow(new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED)).when(cristinApiClientStub)
-            .getProject(any(), any());
+            .getProject(any());
         handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
@@ -154,7 +154,7 @@ public class FetchCristinProjectHandlerTest {
     void handlerReturnsServerErrorExceptionWhenBackendThrowsGenericException() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doThrow(RuntimeException.class).when(cristinApiClientStub).getProject(any(), any());
+        doThrow(RuntimeException.class).when(cristinApiClientStub).getProject(any());
         handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
@@ -192,12 +192,6 @@ public class FetchCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(
             String.format(ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, DEFAULT_IDENTIFIER)));
-    }
-
-    @Test
-    void getsCorrectUriWhenCallingGetProjectUriBuilder() throws Exception {
-        assertEquals(new URI(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI),
-            cristinApiClientStub.generateGetProjectUri(DEFAULT_IDENTIFIER, ENGLISH_LANGUAGE));
     }
 
     @Test

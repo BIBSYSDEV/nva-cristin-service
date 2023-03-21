@@ -191,7 +191,7 @@ class QueryCristinProjectHandlerTest {
     void handlerThrowsInternalErrorWhenQueryingProjectsFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
         doThrow(RuntimeException.class).when(cristinApiClientStub)
-            .getEnrichedProjectsUsingQueryResponse(any(), any());
+            .getEnrichedProjectsUsingQueryResponse(any());
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
 
         var gatewayResponse = sendDefaultQuery();
@@ -219,7 +219,7 @@ class QueryCristinProjectHandlerTest {
     void handlerReturnsOkWhenTitleContainsAeOeAacolon() throws Exception {
         InputStream input = requestWithQueryParameters(
             Map.of(
-                JsonPropertyNames.QUERY, RANDOM_TITLE + " æØå: " + RANDOM_TITLE,
+                JsonPropertyNames.QUERY, RANDOM_TITLE + " æøå: " + RANDOM_TITLE,
                 JsonPropertyNames.ORGANIZATION,
                 "https%3A%2F%2Fapi.dev.nva.aws.unit.no%2Fcristin%2Forganization%2F20202.0.0.0"
             ));

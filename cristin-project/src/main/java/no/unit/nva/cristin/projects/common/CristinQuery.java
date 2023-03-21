@@ -13,7 +13,6 @@ import no.unit.nva.cristin.model.QueryParameterKey;
 import static no.unit.nva.cristin.model.QueryParameterKey.BIOBANK;
 import static no.unit.nva.cristin.model.QueryParameterKey.IGNORE_PATH_PARAMETER_INDEX;
 import static no.unit.nva.cristin.model.QueryParameterKey.KEYWORD;
-import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
 import static no.unit.nva.cristin.model.QueryParameterKey.PARTICIPANT;
 import static no.unit.nva.cristin.model.QueryParameterKey.PATH_PROJECT;
 import static no.unit.nva.cristin.model.QueryParameterKey.ORGANIZATION;
@@ -60,14 +59,12 @@ public class CristinQuery {
      * Creates a URI to Cristin project with specific ID and language.
      *
      * @param id       Project ID to lookup in Cristin
-     * @param language what language we want some of the result fields to be in
      * @return an URI to Cristin Projects with ID and language parameters
      */
-    public static URI fromIdAndLanguage(String id, String language) {
+    public static URI fromIdentifier(String id) {
         return UriWrapper.fromUri(CRISTIN_API_URL)
                    .addChild(PROJECTS_PATH)
                    .addChild(id)
-                   .addQueryParameters(Map.of(LANGUAGE.getKey(), language))
                    .getUri();
     }
 

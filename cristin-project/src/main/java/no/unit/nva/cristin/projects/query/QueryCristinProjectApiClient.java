@@ -1,7 +1,6 @@
 package no.unit.nva.cristin.projects.query;
 
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
-import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
 import java.net.http.HttpResponse;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
@@ -25,7 +24,7 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
 
         final var startRequestTime = System.currentTimeMillis();
         final var response = queryProjects(cristinQuery);
-        final var cristinProjects = getEnrichedProjectsUsingQueryResponse(response, cristinQuery.getValue(LANGUAGE));
+        final var cristinProjects = getEnrichedProjectsUsingQueryResponse(response);
         final var nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         final var processingTime = calculateProcessingTime(startRequestTime, System.currentTimeMillis());
 

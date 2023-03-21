@@ -47,14 +47,13 @@ public class FetchCristinProjectHandler extends CristinHandler<Void, NvaProject>
 
         validateThatSuppliedQueryParamsIsSupported(requestInfo);
 
-        var language = getValidLanguage(requestInfo);
         var id = getValidIdentifier(requestInfo);
 
         try {
-            return getTransformedProjectFromCristin(id, language);
+            return getTransformedProjectFromCristin(id);
         } catch (UnauthorizedException unauthorizedException) {
             verifyRequesterCanEditProjects(requestInfo);
-            return authenticatedGetTransformedProjectFromCristin(id, language);
+            return authenticatedGetTransformedProjectFromCristin(id);
         }
     }
 
@@ -69,14 +68,14 @@ public class FetchCristinProjectHandler extends CristinHandler<Void, NvaProject>
         return HttpURLConnection.HTTP_OK;
     }
 
-    private NvaProject getTransformedProjectFromCristin(String id, String language) throws ApiGatewayException {
-        return cristinApiClient.queryOneCristinProjectUsingIdIntoNvaProject(id, language);
+    private NvaProject getTransformedProjectFromCristin(String id) throws ApiGatewayException {
+        return cristinApiClient.queryOneCristinProjectUsingIdIntoNvaProject(id);
     }
 
-    private NvaProject authenticatedGetTransformedProjectFromCristin(String id, String language)
+    private NvaProject authenticatedGetTransformedProjectFromCristin(String id)
             throws ApiGatewayException {
         return new FetchCristinProjectApiClient(CristinAuthenticator.getHttpClient())
-                .queryOneCristinProjectUsingIdIntoNvaProject(id, language);
+                .queryOneCristinProjectUsingIdIntoNvaProject(id);
     }
 
 }
