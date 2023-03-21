@@ -12,17 +12,14 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.HttpURLConnection;
-import java.util.Set;
 
-import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.common.Utils.getValidIdentifier;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
 
 public class FetchCristinProjectHandler extends CristinHandler<Void, NvaProject> {
 
-    public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(LANGUAGE);
-
+    public static final String ERROR_MESSAGE_CLIENT_SENT_UNSUPPORTED_QUERY_PARAM =
+        "This endpoint does not support query parameters";
     private final transient FetchCristinProjectApiClient cristinApiClient;
 
     @SuppressWarnings("unused")
@@ -45,8 +42,7 @@ public class FetchCristinProjectHandler extends CristinHandler<Void, NvaProject>
     protected NvaProject processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 
-        validateThatSuppliedQueryParamsIsSupported(requestInfo);
-
+        validateQueryParameters(requestInfo);
         var id = getValidIdentifier(requestInfo);
 
         try {
@@ -57,9 +53,9 @@ public class FetchCristinProjectHandler extends CristinHandler<Void, NvaProject>
         }
     }
 
-    private void validateThatSuppliedQueryParamsIsSupported(RequestInfo requestInfo) throws BadRequestException {
-        if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
-            throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
+    private void validateQueryParameters(RequestInfo requestInfo) throws BadRequestException {
+        if (!requestInfo.getQueryParameters().keySet().isEmpty()) {
+            throw new BadRequestException(ERROR_MESSAGE_CLIENT_SENT_UNSUPPORTED_QUERY_PARAM);
         }
     }
 
