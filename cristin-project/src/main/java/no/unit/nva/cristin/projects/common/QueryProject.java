@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.model.CristinQuery;
+import no.unit.nva.cristin.model.KeyEncoding;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.core.paths.UriWrapper;
 
@@ -50,7 +51,7 @@ public class QueryProject extends CristinQuery<ParameterKeyProject> {
             return Arrays.stream(entry.getValue().split(","))
                        .collect(Collectors.joining("&" + key));
         }
-        var value = entry.getKey().isEncode()
+        var value = entry.getKey().encoding() == KeyEncoding.ENCODE_DECODE
                         ? encodeUTF(entry.getValue())
                         : entry.getValue();
 

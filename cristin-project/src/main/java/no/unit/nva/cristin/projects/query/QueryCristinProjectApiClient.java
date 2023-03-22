@@ -1,16 +1,21 @@
 package no.unit.nva.cristin.projects.query;
 
-import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LANGUAGE;
-import java.net.http.HttpResponse;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
 import no.unit.nva.cristin.projects.common.QueryProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.http.HttpResponse;
+
+import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LANGUAGE;
 
 public class QueryCristinProjectApiClient extends CristinProjectApiClient {
 
+    private static final Logger logger = LoggerFactory.getLogger(QueryCristinProjectApiClient.class);
 
     /**
      * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
@@ -40,6 +45,8 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
 
     protected HttpResponse<String> queryProjects(QueryProject queryProject)
         throws ApiGatewayException {
+        logger.info(queryProject.toURI().toString());
+        logger.info(queryProject.toNvaURI().toString());
 
         HttpResponse<String> response = fetchQueryResults(queryProject.toURI());
         checkHttpStatusCode(queryProject.toNvaURI(), response.statusCode(), response.body());

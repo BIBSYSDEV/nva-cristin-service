@@ -2,11 +2,14 @@ package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
-import java.util.List;
-import java.util.regex.Pattern;
 import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.core.Environment;
+
+import java.util.List;
+import java.util.regex.Pattern;
+
+import static no.unit.nva.cristin.common.Utils.forceUTF8;
 
 public class Constants {
 
@@ -50,7 +53,7 @@ public class Constants {
     public static final String PATTERN_IS_NON_EMPTY = ".+";
     public static final String PATTERN_IS_NUMBER = "[1-9]\\d*";
     public static final String PATTERN_IS_STATUS = "(?i)CONCLUDED|ACTIVE|NOT[ +]*STARTED";
-    public static final String PATTERN_IS_TITLE = "^[æøåÆØÅ\\w-,\\.: ]+$";
+    public static final String PATTERN_IS_TITLE = forceUTF8("^[æøåÆØÅ\\w-,\\.: ]+$");
     public static final String PATTERN_IS_URL =
         "(http(s):\\/\\/.)[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)";
 

@@ -23,14 +23,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nva.commons.core.paths.UriWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings({"Unused", "LooseCoupling"})
 public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
 
+    protected static final Logger logger = LoggerFactory.getLogger(CristinQuery.class);
     protected final transient Map<T, String> pathParameters;
     protected final transient Map<T, String> queryParameters;
     protected final transient Set<T> otherRequiredKeys;
-    protected transient boolean useNvaQuery;
 
     protected CristinQuery() {
         queryParameters = new ConcurrentHashMap<>();
@@ -117,7 +119,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      */
     public void setValue(T key, String value) {
         if (nonNull(value)) {
-            queryParameters.put(key, key.isEncode() ? decodeUTF(value) : value);
+            queryParameters.put(key, key.encoding() != KeyEncoding.NONE ? decodeUTF(value) : value);
         }
     }
 
@@ -129,7 +131,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      */
     public void setPath(T key, String value) {
         var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
-        pathParameters.put(key, key.isEncode() ? decodeUTF(nonNullValue) : nonNullValue);
+        pathParameters.put(key, key.encoding() != KeyEncoding.NONE ? decodeUTF(nonNullValue) : nonNullValue);
     }
 
     public String removeValue(T key) {
@@ -169,10 +171,6 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
         return queryParameters.containsKey(key) || pathParameters.containsKey(key);
     }
 
-    public boolean isNvaQuery() {
-        return useNvaQuery;
-    }
-
     private String[] getNvaPathAsArray() {
         final var pathSize = this.pathParameters.size();
         return
@@ -181,6 +179,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
                 .stream()
                 .sorted(byOrdinalDesc())
                 .flatMap(entry -> Stream.of(getNvaPathItem(pathSize, entry), entry.getValue()))
+                .filter(entry -> !entry.isEmpty())
                 .toArray(String[]::new);
     }
 
@@ -198,13 +197,13 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
 
     protected String toNvaQueryValue(Entry<T, String> entry) {
         var value = entry.getValue();
-        return entry.getKey().isEncode()
+        return entry.getKey().encoding() == KeyEncoding.ENCODE_DECODE
                    ? encodeUTF(value)
                    : value;
     }
 
     protected String toCristinQueryValue(Entry<T, String> entry) {
-        return entry.getKey().isEncode()
+        return entry.getKey().encoding() == KeyEncoding.ENCODE_DECODE
                    ? encodeUTF(entry.getValue())
                    : entry.getValue();
     }
@@ -234,7 +233,9 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
     //    }
 
     protected String decodeUTF(String encoded) {
-        return URLDecoder.decode(encoded, StandardCharsets.UTF_8);
+        String decode = URLDecoder.decode(encoded, StandardCharsets.UTF_8);
+        logger.info("decoded " + decode);
+        return decode;
     }
 
     protected String encodeUTF(String unencoded) {

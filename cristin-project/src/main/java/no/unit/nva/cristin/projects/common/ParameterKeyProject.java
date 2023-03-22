@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.IParameterKey;
 import no.unit.nva.cristin.model.JsonPropertyNames;
+import no.unit.nva.cristin.model.KeyEncoding;
 
 public enum ParameterKeyProject implements IParameterKey {
     INVALID(null),
@@ -35,7 +36,7 @@ public enum ParameterKeyProject implements IParameterKey {
         JsonPropertyNames.ORGANIZATION,
         ORGANIZATION_IDENTIFIER_PATTERN,
         ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS,
-        true),
+        KeyEncoding.DECODE),
     PATH_PROJECT(PROJECTS_PATH, PROJECT_PATH_NVA, PATTERN_IS_NUMBER),
     APPROVAL_REFERENCE_ID(JsonPropertyNames.PROJECT_APPROVAL_REFERENCE_ID),
     APPROVED_BY(JsonPropertyNames.PROJECT_APPROVED_BY),
@@ -52,8 +53,8 @@ public enum ParameterKeyProject implements IParameterKey {
          CRISTIN_QUERY_NAME_PARAM,
          PATTERN_IS_TITLE,
          String.format(ERROR_MESSAGE_INVALID_CHARACTERS,JsonPropertyNames.TITLE),
-         true),
-    ORGANIZATION(PARENT_UNIT_ID,JsonPropertyNames.ORGANIZATION,PATTERN_IS_URL,INVALID_URI_MESSAGE,true),
+        KeyEncoding.ENCODE_DECODE),
+    ORGANIZATION(PARENT_UNIT_ID,JsonPropertyNames.ORGANIZATION,PATTERN_IS_URL,INVALID_URI_MESSAGE,KeyEncoding.DECODE),
     PARTICIPANT(JsonPropertyNames.PROJECT_PARTICIPANT),
     PROJECT_MANAGER(JsonPropertyNames.PROJECT_MANAGER),
     PROJECT_UNIT(JsonPropertyNames.UNIT),
@@ -61,20 +62,20 @@ public enum ParameterKeyProject implements IParameterKey {
           null,
           PATTERN_IS_NON_EMPTY,
           String.format(ERROR_MESSAGE_INVALID_CHARACTERS,JsonPropertyNames.QUERY),
-          true),
-    STATUS(JsonPropertyNames.STATUS, null, Constants.PATTERN_IS_STATUS, null, true),
+        KeyEncoding.ENCODE_DECODE),
+    STATUS(JsonPropertyNames.STATUS, null, Constants.PATTERN_IS_STATUS, null, KeyEncoding.DECODE),
     TITLE(JsonPropertyNames.TITLE,
         null,
         PATTERN_IS_TITLE,
         String.format(ERROR_MESSAGE_INVALID_CHARACTERS, JsonPropertyNames.TITLE),
-        true),
+        KeyEncoding.ENCODE_DECODE),
     USER(JsonPropertyNames.USER),
-    PAGE_CURRENT(JsonPropertyNames.PAGE, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, false),
+    PAGE_CURRENT(JsonPropertyNames.PAGE, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE),
     PAGE_ITEMS_PER_PAGE(CRISTIN_PER_PAGE_PARAM,
         JsonPropertyNames.NUMBER_OF_RESULTS,
         PATTERN_IS_NUMBER,
         ERROR_MESSAGE_INVALID_NUMBER,
-        false),
+        KeyEncoding.NONE),
     PAGE_SORT(JsonPropertyNames.PROJECT_SORT);
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
@@ -99,19 +100,19 @@ public enum ParameterKeyProject implements IParameterKey {
     private final String pattern;
     private final String cristinKey;
     private final String nvaKey;
-    private final boolean encode;
+    private final KeyEncoding encode;
     private final String errorMessage;
 
     ParameterKeyProject(String cristinKey) {
-        this(cristinKey, null, PATTERN_IS_NON_EMPTY, null, false);
+        this(cristinKey, null, PATTERN_IS_NON_EMPTY, null, KeyEncoding.NONE);
     }
 
     ParameterKeyProject(String cristinKey, String nvaKey, String pattern) {
-        this(cristinKey, nvaKey, pattern, null, false);
+        this(cristinKey, nvaKey, pattern, null, KeyEncoding.NONE);
     }
 
     ParameterKeyProject(String cristinKey, String nvaKey, String pattern, String errorMessage,
-                        boolean encode) {
+                        KeyEncoding encode) {
         this.cristinKey = cristinKey;
         this.nvaKey = nonNull(nvaKey) ? nvaKey : cristinKey;
         this.pattern = pattern;
@@ -140,7 +141,7 @@ public enum ParameterKeyProject implements IParameterKey {
     }
 
     @Override
-    public boolean isEncode() {
+    public KeyEncoding encoding() {
         return encode;
     }
 

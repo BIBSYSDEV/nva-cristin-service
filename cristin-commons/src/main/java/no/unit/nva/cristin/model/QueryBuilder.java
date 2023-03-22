@@ -33,7 +33,7 @@ public abstract class QueryBuilder<T extends Enum<T> & IParameterKey> {
      * <samp>new CristinQuery.Builder()<br>
      * .fromRequestInfo(requestInfo)<br>
      * .withRequiredParameters(IDENTITY,PAGE_CURRENT,PAGE_ITEMS_PER_PAGE)<br>
-     * .validate()<br>.build()
+     * .build()
      * </samp>
      */
     public QueryBuilder(CristinQuery<T> query) {
@@ -97,13 +97,6 @@ public abstract class QueryBuilder<T extends Enum<T> & IParameterKey> {
         return this;
     }
 
-    /**
-     * Sets default query param set.
-     */
-    public QueryBuilder<T> asNvaQuery() {
-        query.useNvaQuery = true;
-        return this;
-    }
 
     /**
      * Defines which parameters are required.
@@ -116,65 +109,53 @@ public abstract class QueryBuilder<T extends Enum<T> & IParameterKey> {
         return this;
     }
 
+    /**
+     * Sample code for assignDefaultValues.
+     * <p>Usage:</p>
+     * <samp>requiredMissing().forEach(key -> { <br>
+     *     switch (key) {<br>
+     *         case LANGUAGE:<br>
+     *             query.setValue(key, DEFAULT_LANGUAGE_CODE);<br>
+     *             break;<br>
+     *         default:<br>
+     *             break;<br>
+     *     }});<br>
+     * </samp>
+     */
     protected abstract void assignDefaultValues();
-    //    {
-    //        requiredMissing().forEach(key -> {
-    //            switch (key) {
-    //                case LANGUAGE:
-    //                    query.setValue(key, DEFAULT_LANGUAGE_CODE);
-    //                    break;
-    //                case PAGE_CURRENT:
-    //                    query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
-    //                    break;
-    //                case PAGE_ITEMS_PER_PAGE:
-    //                    query.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
-    //                    break;
-    //                default:
-    //                    break;
-    //            }
-    //        });
-    //    }
-
-    protected abstract void setPath(String key, String value);
-    //    {
-    //        query.isNvaQuery = true;
-    //        var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
-    //
-    //        if (key.equals(PATH_IDENTITY.getNvaKey())) {
-    //            withPathIdentity(nonNullValue);
-    //        } else if (key.equals(PATH_ORGANISATION.getNvaKey())) {
-    //            withPathOrganization(nonNullValue);
-    //        } else if (key.equals(PATH_PROJECT.getNvaKey()) || key.equals(PATH_PROJECT.getKey())) {
-    //            withPathProject(nonNullValue);
-    //        } else {
-    //            invalidKeys.add(key);
-    //        }
-    //    }
 
     /**
-     * Set Value by key, Key is validated.
+     * Sample code for setPath.
+     * <p>Usage:</p>
+     * <samp>var nonNullValue = nonNull(value) ? value : EMPTY_STRING;<br>
+     * if (key.equals(PATH_IDENTITY.getNvaKey())) {<br>
+     *     withPathIdentity(nonNullValue);<br>
+     * } else if (key.equals(PATH_PROJECT.getNvaKey()) || key.equals(PATH_PROJECT.getKey())) {<br>
+     *     withPathProject(nonNullValue);<br>
+     * } else {<br>
+     *     invalidKeys.add(key);<br>
+     * }<br>
+     * </samp>
+     */
+    protected abstract void setPath(String key, String value);
+
+    /**
+     * Sample code for setValue.
+     * <p>Usage:</p>
+     * <samp>var qpKey = keyFromString(key,value);<br>
+     * if(qpKey.equals(INVALID)) {<br>
+     *     invalidKeys.add(key);<br>
+     * } else {<br>
+     *     query.setValue(qpKey, value);<br>
+     * }<br>
+     * </samp>
      */
     protected abstract void setValue(String key, String value);
-    //    {
-    //        var qpKey = keyFromString(key,value);
-    //        if (!key.equals(qpKey.getKey()) && !query.isNvaQuery && qpKey != INVALID) {
-    //            query.isNvaQuery = true;
-    //        }
-    //        if(qpKey.equals(INVALID)) {
-    //            invalidKeys.add(key);
-    //        } else {
-    //            query.setValue(qpKey, value);
-    //        }
-    //    }
 
+    /**
+        returns T.VALID_QUERY_PARAMETER_NVA_KEYS
+     */
     protected abstract Set<String> validKeys();
-    //    {
-    //        return query.isNvaQuery ? T.VALID_QUERY_PARAMETER_NVA_KEYS : T.VALID_QUERY_PARAMETER_KEYS;
-    //    }
-
-    protected void removeKey(T key) {
-        query.removeValue(key);
-    }
 
     protected boolean invalidQueryParameter(T key, String value) {
         return isNull(value) || !value.matches(key.getPattern());
@@ -188,7 +169,7 @@ public abstract class QueryBuilder<T extends Enum<T> & IParameterKey> {
         return
             requiredMissing()
                 .stream()
-                .map(qpk -> query.useNvaQuery ? qpk.getNvaKey() : qpk.getKey())
+                .map(IParameterKey::getNvaKey)
                 .collect(Collectors.toSet());
     }
 
@@ -211,7 +192,7 @@ public abstract class QueryBuilder<T extends Enum<T> & IParameterKey> {
     protected void throwInvalidParamererValue(Entry<T, String> entry) throws BadRequestException {
         final var key = entry.getKey();
         if (invalidQueryParameter(key, entry.getValue())) {
-            final var keyName = query.useNvaQuery ? key.getNvaKey() : key.getKey();
+            final var keyName =  key.getNvaKey();
             String errorMessage;
             if (nonNull(key.getErrorMessage())) {
                 errorMessage = String.format(key.getErrorMessage(), keyName);
@@ -225,7 +206,7 @@ public abstract class QueryBuilder<T extends Enum<T> & IParameterKey> {
     protected void throwInvalidPathValue(Entry<T, String> entry) throws BadRequestException {
         final var key = entry.getKey();
         if (invalidPathParameter(key, entry.getValue())) {
-            final var keyName = query.useNvaQuery ? key.getNvaKey() : key.getKey();
+            final var keyName = key.getNvaKey();
             final var errorMessage =
                 nonNull(key.getErrorMessage())
                     ? key.getErrorMessage()

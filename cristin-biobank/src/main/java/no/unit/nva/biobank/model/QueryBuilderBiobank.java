@@ -4,7 +4,6 @@ import static java.util.Objects.nonNull;
 import static no.unit.nva.biobank.model.ParameterKeyBiobank.INVALID;
 import static no.unit.nva.biobank.model.ParameterKeyBiobank.PATH_BIOBANK;
 import static no.unit.nva.biobank.model.ParameterKeyBiobank.PATH_IDENTITY;
-import static no.unit.nva.biobank.model.ParameterKeyBiobank.VALID_QUERY_PARAMETER_KEYS;
 import static no.unit.nva.biobank.model.ParameterKeyBiobank.VALID_QUERY_PARAMETER_NVA_KEYS;
 import static no.unit.nva.biobank.model.ParameterKeyBiobank.keyFromString;
 import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
@@ -60,8 +59,9 @@ public class QueryBuilderBiobank extends QueryBuilder<ParameterKeyBiobank> {
 
     @Override
     protected Set<String> validKeys() {
-        return query.isNvaQuery() ? VALID_QUERY_PARAMETER_NVA_KEYS : VALID_QUERY_PARAMETER_KEYS;
+        return VALID_QUERY_PARAMETER_NVA_KEYS;
     }
+
 
     public QueryBuilderBiobank withPathIdentity(String identity) {
         return withPathBiobank(identity);

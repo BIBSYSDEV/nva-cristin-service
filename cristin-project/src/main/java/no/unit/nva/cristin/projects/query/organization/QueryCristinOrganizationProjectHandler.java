@@ -88,8 +88,6 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
             QueryProject.builder()
                 .fromRequestInfo(requestInfo)
                 .withRequiredParameters(REQUIRED_QUERY_PARAMETER)
-                .asNvaQuery()
-                .validate()
                 .build();
 
         return cristinApiClient.listOrganizationProjects(cristinQuery);

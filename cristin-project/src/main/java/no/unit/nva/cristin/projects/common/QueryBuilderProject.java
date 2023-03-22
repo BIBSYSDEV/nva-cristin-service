@@ -56,7 +56,6 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
 
     @Override
     protected void setPath(String key, String value) {
-        asNvaQuery();
         var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
 
         if (key.equals(PATH_IDENTITY.getNvaKey())) {
@@ -73,9 +72,6 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
     @Override
     protected void setValue(String key, String value) {
         var qpKey = keyFromString(key,value);
-        if (!key.equals(qpKey.getKey()) && !query.isNvaQuery() && qpKey != INVALID) {
-            asNvaQuery();
-        }
         switch (qpKey) {
             case PATH_IDENTITY:
             case PATH_PROJECT:
@@ -129,14 +125,14 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
 
     @Override
     protected Set<String> validKeys() {
-        return query.isNvaQuery() ? VALID_QUERY_PARAMETER_NVA_KEYS : VALID_QUERY_PARAMETER_KEYS;
+        return VALID_QUERY_PARAMETER_NVA_KEYS;
     }
 
     @Override
     protected void throwInvalidParamererValue(Entry<ParameterKeyProject, String> entry) throws BadRequestException {
         final var key = entry.getKey();
         if (invalidQueryParameter(key, entry.getValue())) {
-            final var keyName = query.isNvaQuery() ? key.getNvaKey() : key.getKey();
+            final var keyName =  key.getNvaKey();
             String errorMessage;
             if (key == STATUS) {
                 errorMessage =

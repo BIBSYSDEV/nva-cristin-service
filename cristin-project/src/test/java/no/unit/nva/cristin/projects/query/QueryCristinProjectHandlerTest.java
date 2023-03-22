@@ -6,6 +6,7 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
+import static no.unit.nva.cristin.common.Utils.forceUTF8;
 import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LANGUAGE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QUERY;
@@ -217,12 +218,11 @@ class QueryCristinProjectHandlerTest {
     
     @Test
     void handlerReturnsOkWhenTitleContainsAeOeAacolon() throws Exception {
-        InputStream input = requestWithQueryParameters(
-            Map.of(
-                JsonPropertyNames.QUERY, RANDOM_TITLE + " æØå: " + RANDOM_TITLE,
-                JsonPropertyNames.ORGANIZATION,
-                "https%3A%2F%2Fapi.dev.nva.aws.unit.no%2Fcristin%2Forganization%2F20202.0.0.0"
-            ));
+        var map = Map.of(
+            JsonPropertyNames.QUERY, forceUTF8(RANDOM_TITLE + " æØÆØÅå: " + RANDOM_TITLE),
+            JsonPropertyNames.ORGANIZATION,"https%3A%2F%2Fapi.dev.nva.aws.unit.no%2Fcristin%2Forganization%2F20202.0.0.0"
+        );
+        InputStream input = requestWithQueryParameters(map);
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, Object.class);
 
@@ -608,7 +608,7 @@ class QueryCristinProjectHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(SAMPLE_NVA_ORGANIZATION_ENCODED));
+        assertThat(gatewayResponse.getBody(), containsString(SAMPLE_NVA_ORGANIZATION));
     }
 
     @Test

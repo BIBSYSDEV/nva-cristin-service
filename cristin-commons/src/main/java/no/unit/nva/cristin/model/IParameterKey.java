@@ -14,11 +14,11 @@ public interface IParameterKey {
 
     String getErrorMessage();
 
-    boolean isEncode();
+    KeyEncoding encoding();
 
     static Predicate<IParameterKey> hasValidValue(String value) {
         return f -> {
-            var encoded = f.isEncode() ? URLDecoder.decode(value, StandardCharsets.UTF_8) : value;
+            var encoded = f.encoding() == KeyEncoding.ENCODE_DECODE ? URLDecoder.decode(value, StandardCharsets.UTF_8) : value;
             return encoded.matches(f.getPattern());
         };
     }

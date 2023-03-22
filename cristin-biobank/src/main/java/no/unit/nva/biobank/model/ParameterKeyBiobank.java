@@ -14,20 +14,21 @@ import java.util.stream.Collectors;
 import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.IParameterKey;
 import no.unit.nva.cristin.model.JsonPropertyNames;
+import no.unit.nva.cristin.model.KeyEncoding;
 
 public enum ParameterKeyBiobank implements IParameterKey {
     INVALID(null),
     PATH_IDENTITY(JsonPropertyNames.IDENTIFIER, null, PATTERN_IS_NUMBER),
     PATH_BIOBANK("biobanks", JsonPropertyNames.BIOBANK_ID, PATTERN_IS_NUMBER),
     LANGUAGE(QUERY_PARAMETER_LANGUAGE, JsonPropertyNames.LANGUAGE, PATTERN_IS_LANGUAGE),
-    STATUS(JsonPropertyNames.STATUS, null, Constants.PATTERN_IS_STATUS, null, true),
+    STATUS(JsonPropertyNames.STATUS, null, Constants.PATTERN_IS_STATUS, null, KeyEncoding.DECODE),
     USER(JsonPropertyNames.USER),
-    PAGE_CURRENT(JsonPropertyNames.PAGE, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, false),
+    PAGE_CURRENT(JsonPropertyNames.PAGE, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE),
     PAGE_ITEMS_PER_PAGE(CRISTIN_PER_PAGE_PARAM,
         JsonPropertyNames.NUMBER_OF_RESULTS,
         PATTERN_IS_NUMBER,
         ERROR_MESSAGE_INVALID_NUMBER,
-        false),
+        KeyEncoding.NONE),
     PAGE_SORT(JsonPropertyNames.PROJECT_SORT);
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 2;
@@ -43,29 +44,23 @@ public enum ParameterKeyBiobank implements IParameterKey {
             .map(ParameterKeyBiobank::getNvaKey)
             .collect(Collectors.toSet());
 
-    public static final Set<String> VALID_QUERY_PARAMETER_KEYS =
-        VALID_QUERY_PARAMETERS.stream()
-            .sorted()
-            .map(ParameterKeyBiobank::getKey)
-            .collect(Collectors.toSet());
-
 
     private final String pattern;
     private final String cristinKey;
     private final String nvaKey;
-    private final boolean encode;
+    private final KeyEncoding encode;
     private final String errorMessage;
 
     ParameterKeyBiobank(String cristinKey) {
-        this(cristinKey, null, PATTERN_IS_NON_EMPTY, null, false);
+        this(cristinKey, null, PATTERN_IS_NON_EMPTY, null, KeyEncoding.NONE);
     }
 
     ParameterKeyBiobank(String cristinKey, String nvaKey, String pattern) {
-        this(cristinKey, nvaKey, pattern, null, false);
+        this(cristinKey, nvaKey, pattern, null, KeyEncoding.NONE);
     }
 
     ParameterKeyBiobank(String cristinKey, String nvaKey, String pattern, String errorMessage,
-                        boolean encode) {
+                        KeyEncoding encode) {
         this.cristinKey = cristinKey;
         this.nvaKey = nonNull(nvaKey) ? nvaKey : cristinKey;
         this.pattern = pattern;
@@ -94,7 +89,7 @@ public enum ParameterKeyBiobank implements IParameterKey {
     }
 
     @Override
-    public boolean isEncode() {
+    public KeyEncoding encoding() {
         return encode;
     }
 

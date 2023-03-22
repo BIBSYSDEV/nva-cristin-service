@@ -54,7 +54,6 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
             QueryProject.builder()
                 .fromRequestInfo(requestInfo)
                 .withRequiredParameters(REQUIRED_QUERY_PARAMETER)
-                .asNvaQuery()
                 .build();
         return cristinApiClient.queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(cristinQuery);
     }
