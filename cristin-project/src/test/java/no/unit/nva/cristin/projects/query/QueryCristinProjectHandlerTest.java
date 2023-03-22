@@ -6,6 +6,7 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
+import static no.unit.nva.cristin.common.Utils.forceUTF8;
 import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
 import static no.unit.nva.cristin.model.QueryParameterKey.QUERY;
@@ -219,7 +220,7 @@ class QueryCristinProjectHandlerTest {
     void handlerReturnsOkWhenTitleContainsAeOeAacolon() throws Exception {
         InputStream input = requestWithQueryParameters(
             Map.of(
-                JsonPropertyNames.QUERY, RANDOM_TITLE + " æØå: " + RANDOM_TITLE,
+                JsonPropertyNames.QUERY, forceUTF8(RANDOM_TITLE + " æØå: " + RANDOM_TITLE),
                 JsonPropertyNames.ORGANIZATION,
                 "https%3A%2F%2Fapi.dev.nva.aws.unit.no%2Fcristin%2Forganization%2F20202.0.0.0"
             ));
