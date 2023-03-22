@@ -23,7 +23,7 @@ import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 @SuppressWarnings({"PMD.TooManyFields", "unused", "PMD.ExcessivePublicCount", "PMD.GodClass"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinProject implements JsonSerializable {
-
+    // https://api.cristin-test.uio.no/v2/doc/index.html#GETprojects
     public static final String METHOD = "method";
     public static final String EQUIPMENT = "equipment";
     public static final String CRISTIN_PROJECT_CATEGORIES = "project_categories";

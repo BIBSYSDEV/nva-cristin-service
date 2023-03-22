@@ -83,6 +83,7 @@ public class BiobankApproval implements JsonSerializable {
     }
 
     @Override
+    @JacocoGenerated
     public String toString() {
         return this.toJsonString();
     }

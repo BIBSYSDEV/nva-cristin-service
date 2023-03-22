@@ -96,7 +96,7 @@ public class Biobank implements JsonSerializable {
 
     public Biobank(CristinBiobank cristinBiobank) {
         this(getNvaApiId(cristinBiobank.getCristinBiobankId(), BIOBANK_ID),
-            withCristinIdentifier(cristinBiobank),
+            toCristinIdentifier(cristinBiobank),
             BiobankType.valueOf(cristinBiobank.getType()),
             cristinBiobank.getName(),
             cristinBiobank.getMainLanguage(),
@@ -105,13 +105,16 @@ public class Biobank implements JsonSerializable {
             cristinBiobank.getStatus(),
             toDateInfoOrNull(cristinBiobank.getCreated()),
             toDateInfoOrNull(cristinBiobank.getLastModified()),
-            withCoordinatingOrganization(cristinBiobank.getCoordinatingInstitution()),
-            withCoordinatinUnit(cristinBiobank.getCoordinatingInstitution()),
+            toCoordinatingOrganization(cristinBiobank.getCoordinatingInstitution()),
+            toCoordinatinUnit(cristinBiobank.getCoordinatingInstitution()),
             getNvaApiId(cristinBiobank.getCoordinator().getCristinPersonId(), PERSONS_PATH),
             toProjectOrNull(cristinBiobank),
-            withExternalSources(cristinBiobank.getExternalSources()),
-            withApprovals(cristinBiobank.getApprovals()),
-            withBiobankMaterials(cristinBiobank.getBiobankMaterials()));
+            toExternalSources(cristinBiobank.getExternalSources()),
+            toApprovals(cristinBiobank.getApprovals()),
+            toBiobankMaterials(cristinBiobank.getBiobankMaterials()));
+
+        //   cristinBiobank.getTypeName()
+        //   cristinBiobank.getStatusName()
     }
 
     public URI getId() {
@@ -231,7 +234,7 @@ public class Biobank implements JsonSerializable {
         return this.toJsonString();
     }
 
-    private static List<Map<String, String>> withCristinIdentifier(CristinBiobank cristinBiobank) {
+    private static List<Map<String, String>> toCristinIdentifier(CristinBiobank cristinBiobank) {
         var id = nonNull(cristinBiobank.getCristinBiobankId())
             ? Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinBiobank.getCristinBiobankId())
             : null;
@@ -242,7 +245,7 @@ public class Biobank implements JsonSerializable {
         return Stream.of(id,biobank).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
     }
 
-    private static URI withCoordinatingOrganization(CristinOrganization cristinOrganization) {
+    private static URI toCoordinatingOrganization(CristinOrganization cristinOrganization) {
         return
             Optional.ofNullable(cristinOrganization)
                 .map(CristinOrganization::getInstitution)
@@ -251,7 +254,7 @@ public class Biobank implements JsonSerializable {
                 .orElse(null);
     }
 
-    private static URI withCoordinatinUnit(CristinOrganization cristinOrganization) {
+    private static URI toCoordinatinUnit(CristinOrganization cristinOrganization) {
         return
             Optional.ofNullable(cristinOrganization)
                 .map(CristinOrganization::getInstitutionUnit)
@@ -260,21 +263,21 @@ public class Biobank implements JsonSerializable {
                 .orElse(null);
     }
 
-    private static Set<ExternalSource> withExternalSources(Set<CristinExternalSource> externalSources) {
+    private static Set<ExternalSource> toExternalSources(Set<CristinExternalSource> externalSources) {
         return
             externalSources.stream()
                 .map(es -> new ExternalSource(es.getSourceReferenceId(), es.getSourceShortName()))
                 .collect(Collectors.toSet());
     }
 
-    private static List<BiobankApproval> withApprovals(List<CristinApproval> approvals) {
+    private static List<BiobankApproval> toApprovals(List<CristinApproval> approvals) {
         return
             approvals.stream()
                 .map(BiobankApproval::new)
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    private static List<BiobankMaterial> withBiobankMaterials(List<CristinBiobankMaterial> materials) {
+    private static List<BiobankMaterial> toBiobankMaterials(List<CristinBiobankMaterial> materials) {
         return
             materials.stream()
                 .map(BiobankMaterial::new)

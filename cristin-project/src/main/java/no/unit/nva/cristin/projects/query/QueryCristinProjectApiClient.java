@@ -21,7 +21,7 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
      * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
      * for serialization to the client.
      *
-     * @param queryProject QueryProjectOld from client containing title and language
+     * @param queryProject QueryProject from client containing title and language
      * @return a SearchResponse filled with transformed Cristin Projects and metadata
      * @throws ApiGatewayException if some errors happen we should return this to client
      */
