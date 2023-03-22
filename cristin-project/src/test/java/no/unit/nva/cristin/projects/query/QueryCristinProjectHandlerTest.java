@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_D
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.QueryParameterKey.QUERY;
 import static no.unit.nva.cristin.model.QueryParameterKey.TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
@@ -25,6 +26,7 @@ import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,6 +35,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
@@ -43,6 +46,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -124,6 +129,8 @@ class QueryCristinProjectHandlerTest {
     public static final String START_DATE = "start_date";
     public static final String NB = "nb";
     public static final String BAD_PARAM_FOR_SORT = "cristin id";
+    public static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON = "cristinQueryProjectsResponse.json";
+    public static final String CRISTIN_GET_PROJECT_RESPONSE_JSON = "cristinGetProjectResponse.json";
 
     private final Environment environment = new Environment();
     private QueryCristinProjectApiClient cristinApiClientStub;
@@ -177,8 +184,8 @@ class QueryCristinProjectHandlerTest {
     @MethodSource("queryResponseWithFundingFileReader")
     void handlerReturnsExpectedBodyWhenRequestInputIsValid(String expected) throws IOException {
         String actual = sendDefaultQuery().getBody();
-        final var expectedSearchResponse = Constants.OBJECT_MAPPER.readValue(expected, SearchResponse.class);
-        final var actualSearchResponse = Constants.OBJECT_MAPPER.readValue(actual, SearchResponse.class);
+        final var expectedSearchResponse = OBJECT_MAPPER.readValue(expected, SearchResponse.class);
+        final var actualSearchResponse = OBJECT_MAPPER.readValue(actual, SearchResponse.class);
         assertEquals(expectedSearchResponse, actualSearchResponse);
     }
 
@@ -211,8 +218,8 @@ class QueryCristinProjectHandlerTest {
             .when(cristinApiClientStub).fetchGetResultAsync(any());
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
         var gatewayResponse = sendDefaultQuery();
-        var expected = Constants.OBJECT_MAPPER.readTree(getBodyFromResource(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON));
-        var actual = Constants.OBJECT_MAPPER.readTree(gatewayResponse.getBody());
+        var expected = OBJECT_MAPPER.readTree(getBodyFromResource(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON));
+        var actual = OBJECT_MAPPER.readTree(gatewayResponse.getBody());
         assertEquals(expected, actual);
     }
 
@@ -313,7 +320,7 @@ class QueryCristinProjectHandlerTest {
         var expected = getBodyFromResource(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON);
         var actual = sendDefaultQuery().getBody();
 
-        assertEquals(Constants.OBJECT_MAPPER.readTree(expected), Constants.OBJECT_MAPPER.readTree(actual));
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }
 
     @Test
@@ -390,7 +397,7 @@ class QueryCristinProjectHandlerTest {
         ));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
-        Integer actual = Constants.OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
+        Integer actual = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
                              .getFirstRecord();
         assertEquals(expected, actual);
     }
@@ -504,12 +511,12 @@ class QueryCristinProjectHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         String actualNext =
-            Optional.ofNullable(Constants.OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
+            Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
                                     .getNextResults()).orElse(new URI(EMPTY_STRING)).toString();
         assertEquals(expectedNext, actualNext);
 
         String actualPrevious =
-            Optional.ofNullable(Constants.OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
+            Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
                                     .getPreviousResults()).orElse(new URI(EMPTY_STRING)).toString();
         assertEquals(expectedPrevious, actualPrevious);
     }
@@ -645,6 +652,29 @@ class QueryCristinProjectHandlerTest {
                                                                             Arrays.toString(ProjectStatus.values()))));
     }
 
+    @Test
+    void shouldAddLangToHttpRequestBeforeSendingToCristin() throws Exception {
+        var cristinProjects = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON));
+        var oneCristinProject = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON));
+        HttpResponse<String> queryResponse = new HttpResponseFaker(cristinProjects, HTTP_OK);
+        HttpResponse<String> getResponse = new HttpResponseFaker(oneCristinProject, HTTP_OK);
+        var mockHttpClient = mock(HttpClient.class);
+        when(mockHttpClient.<String>send(any(), any())).thenReturn(queryResponse);
+        when(mockHttpClient.<String>sendAsync(any(), any())).thenReturn(CompletableFuture.completedFuture(getResponse));
+        var apiClient = new QueryCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new QueryCristinProjectHandler(apiClient, environment);
+        sendDefaultQuery();
+
+        var captor = ArgumentCaptor.forClass(HttpRequest.class);
+        verify(mockHttpClient).send(captor.capture(), any());
+
+        var expected = "https://api.cristin-test.uio.no/v2/projects?page=1&per_page=5&title=reindeer&lang=en,nb,nn";
+        var actual = captor.getValue().uri().toString();
+
+        assertThat(actual, equalTo(expected));
+    }
+
     @ParameterizedTest(
         name = "Handler accepts query parameter status in any case {0}")
     @CsvSource({"ACTIVE", "CONCLUDED", "NOTSTARTED", "active", "concluded", "notstarted", "nOtsTaRtEd"})
@@ -730,9 +760,7 @@ class QueryCristinProjectHandlerTest {
     }
 
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
-        InputStream input = requestWithQueryParameters(Map.of(
-            JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB));
+        InputStream input = requestWithQueryParameters(Map.of(JsonPropertyNames.QUERY, RANDOM_TITLE));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
@@ -749,7 +777,7 @@ class QueryCristinProjectHandlerTest {
     }
 
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
-        return new HandlerRequestBuilder<Void>(Constants.OBJECT_MAPPER)
+        return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                    .withBody(null)
                    .withQueryParameters(map)
                    .build();

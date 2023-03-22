@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects.query;
 
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
+import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
@@ -10,6 +11,13 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 
 public class QueryCristinProjectApiClient extends CristinProjectApiClient {
 
+    public QueryCristinProjectApiClient() {
+        super();
+    }
+
+    public QueryCristinProjectApiClient(HttpClient client) {
+        super(client);
+    }
 
     /**
      * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
