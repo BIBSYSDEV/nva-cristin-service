@@ -7,7 +7,6 @@ import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMes
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessageWithRange;
 import static no.unit.nva.cristin.common.ErrorMessages.requiredMissingMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
-import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.QueryParameterKey.APPROVAL_REFERENCE_ID;
 import static no.unit.nva.cristin.model.QueryParameterKey.APPROVED_BY;
@@ -18,7 +17,6 @@ import static no.unit.nva.cristin.model.QueryParameterKey.GRANT_ID;
 import static no.unit.nva.cristin.model.QueryParameterKey.INSTITUTION;
 import static no.unit.nva.cristin.model.QueryParameterKey.INVALID;
 import static no.unit.nva.cristin.model.QueryParameterKey.KEYWORD;
-import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
 import static no.unit.nva.cristin.model.QueryParameterKey.LEVELS;
 import static no.unit.nva.cristin.model.QueryParameterKey.MODIFIED_SINCE;
 import static no.unit.nva.cristin.model.QueryParameterKey.NAME;
@@ -255,14 +253,6 @@ public class CristinQueryBuilder {
     }
 
     /**
-     * Preferred language.
-     */
-    public CristinQueryBuilder withLanguage(String language) {
-        cristinQuery.setValue(LANGUAGE, language);
-        return this;
-    }
-
-    /**
      * Setter how many levels down from 'parent_unit_id' will be included in the search.
      */
     public CristinQueryBuilder withLevels(String levels) {
@@ -440,9 +430,6 @@ public class CristinQueryBuilder {
                 case PATH_PROJECT:
                     cristinQuery.setPath(key, EMPTY_STRING);
                     break;
-                case LANGUAGE:
-                    cristinQuery.setValue(key, DEFAULT_LANGUAGE_CODE);
-                    break;
                 case PAGE_CURRENT:
                     cristinQuery.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
                     break;
@@ -510,7 +497,6 @@ public class CristinQueryBuilder {
             case FUNDING_SOURCE:
             case GRANT_ID:
             case INSTITUTION:
-            case LANGUAGE:
             case LEVELS:
             case MODIFIED_SINCE:
             case NAME:

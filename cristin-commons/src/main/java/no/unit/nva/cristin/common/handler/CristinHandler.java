@@ -10,8 +10,6 @@ import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 
 public abstract class CristinHandler<I, O> extends ApiGatewayHandler<I, O> {
 
-    public static final String DEFAULT_LANGUAGE_CODE = "nb";
-
     public CristinHandler(Class<I> iclass, Environment environment) {
         super(iclass, environment);
     }

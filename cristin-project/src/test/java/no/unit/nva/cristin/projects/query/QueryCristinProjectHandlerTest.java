@@ -291,22 +291,6 @@ class QueryCristinProjectHandlerTest {
     }
 
     @Test
-    void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(
-            JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, INVALID_LANGUAGE));
-
-        handler.handleRequest(input, output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
-
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(),
-                   containsString(
-                       String.format(ErrorMessages.ERROR_MESSAGE_INVALID_VALUE, JsonPropertyNames.LANGUAGE)));
-    }
-
-    @Test
     void readerThrowsIoExceptionWhenReadingInvalidJson() {
         Executable action = () -> ApiClient.fromJson(INVALID_JSON, CristinProject.class);
         assertThrows(IOException.class, action);
@@ -601,8 +585,7 @@ class QueryCristinProjectHandlerTest {
     void handlerReturnsCristinProjectsWhenQueryContainsOrganizationUri() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE,
-            JsonPropertyNames.ORGANIZATION, SAMPLE_NVA_ORGANIZATION_ENCODED,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB));
+            JsonPropertyNames.ORGANIZATION, SAMPLE_NVA_ORGANIZATION_ENCODED));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
@@ -614,8 +597,7 @@ class QueryCristinProjectHandlerTest {
     void handlerReturnsBadRequestWhenOrganizationUriIsInvalid() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE,
-            JsonPropertyNames.ORGANIZATION, ILLEGAL_NVA_ORGANIZATION_ENCODED,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB));
+            JsonPropertyNames.ORGANIZATION, ILLEGAL_NVA_ORGANIZATION_ENCODED));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
@@ -663,17 +645,6 @@ class QueryCristinProjectHandlerTest {
         var actual = captor.getValue().uri().toString();
 
         assertThat(actual, equalTo(expected));
-    }
-
-    @Test
-    void shouldAllowLanguageParamForBackwardsCompatibilityEvenIfRedundant() throws Exception {
-        InputStream input = requestWithQueryParameters(Map.of(
-            JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB));
-        handler.handleRequest(input, output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
-
-        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
     @ParameterizedTest(

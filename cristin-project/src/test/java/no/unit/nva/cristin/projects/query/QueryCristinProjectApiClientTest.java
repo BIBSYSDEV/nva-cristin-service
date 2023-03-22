@@ -15,16 +15,15 @@ import org.junit.jupiter.api.Test;
 public class QueryCristinProjectApiClientTest {
 
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
-        "https://api.cristin-test.uio.no/v2/projects?lang=nb&page=1&per_page=5&title=reindeer";
+        "https://api.cristin-test.uio.no/v2/projects?page=1&per_page=5&title=reindeer";
     private static final String CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI =
-        "https://api.cristin-test.uio.no/v2/projects?lang=nb&page=1&per_page=5&project_code=1234567";
+        "https://api.cristin-test.uio.no/v2/projects?page=1&per_page=5&project_code=1234567";
 
     @Test
     void getsCristinUriWithTitleParamWhenCallingUriBuilderWithTitleQueryRequested() throws Exception {
         final var cristinQuery =
             CristinQuery.builder()
                 .withQuery(RANDOM_TITLE)
-                .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
                 .withItemsPerPage(DEFAULT_NUMBER_OF_RESULTS)
                 .validate()
@@ -41,7 +40,6 @@ public class QueryCristinProjectApiClientTest {
         final var params =
             CristinQuery.builder()
                 .withTitle(RANDOM_TITLE)
-                .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
                 .withItemsPerPage(DEFAULT_NUMBER_OF_RESULTS)
                 .validate()
@@ -57,7 +55,6 @@ public class QueryCristinProjectApiClientTest {
         final var sourceCristinQuery =
             CristinQuery.builder()
                 .withQuery(GRANT_ID_EXAMPLE)
-                .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
                 .withItemsPerPage(DEFAULT_NUMBER_OF_RESULTS)
                 .validate()

@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects.common;
 
-import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
 import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_CURRENT;
 import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,11 +23,11 @@ public class CristinQueryTest {
     private static final String PARENT_UNIT_ID = "185.90.0.0";
     private static final String PER_PAGE = "10";
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
-        "https://api.cristin-test.uio.no/v2/projects?lang=nb&page=2&parent_unit_id=185.90.0.0"
+        "https://api.cristin-test.uio.no/v2/projects?page=2&parent_unit_id=185.90.0.0"
         + "&per_page=10&title=reindeer";
     private static final String QUERY_SAMPLE_WITH_MULTIPLE_PARAMETERS =
         "https://api.cristin-test.uio.no/v2/projects?approval_reference_id=2017/1593&approved_by=REK&biobank=533895"
-        + "&biobank=533895&funding_source=NFR&institution=uib&keyword=nature&keyword=nature&lang=nb&levels=7&page=1"
+        + "&biobank=533895&funding_source=NFR&institution=uib&keyword=nature&keyword=nature&levels=7&page=1"
         + "&participant=St&participant=St&per_page=5&project_manager=st&sort=start_date&unit=184.12.60.0";
     private static final String RANDOM_TITLE = "reindeer";
     private static final String SAMPLE_FUNDING_SOURCE = "NFR";
@@ -38,14 +37,13 @@ public class CristinQueryTest {
     private static final String SAMPLE_PROJECT_MANAGER = "st";
     private static final String SAMPLE_SORT = "start_date";
     private static final String SAMPLE_UNIT = "184.12.60.0";
-    public static final QueryParameterKey[] QUERY_PARAMETER_KEYS = {PAGE_CURRENT, PAGE_ITEMS_PER_PAGE, LANGUAGE};
+    public static final QueryParameterKey[] QUERY_PARAMETER_KEYS = {PAGE_CURRENT, PAGE_ITEMS_PER_PAGE};
 
     @Test
     void buildReturnsUriWithCustomParameterValuesWhenCustomParameterValuesAreSupplied() throws BadRequestException {
         var cristinQuery =
             CristinQuery.builder()
                 .withTitle(RANDOM_TITLE)
-                .withLanguage(LANGUAGE_NB)
                 .withItemsPerPage(PER_PAGE)
                 .withItemsFromPage(FROM_PAGE)
                 .withParentUnitId(PARENT_UNIT_ID)

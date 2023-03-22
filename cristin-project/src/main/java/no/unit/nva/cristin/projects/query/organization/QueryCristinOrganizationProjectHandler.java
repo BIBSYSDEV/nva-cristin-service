@@ -5,7 +5,6 @@ import static no.unit.nva.cristin.model.QueryParameterKey.BIOBANK;
 import static no.unit.nva.cristin.model.QueryParameterKey.FUNDING;
 import static no.unit.nva.cristin.model.QueryParameterKey.FUNDING_SOURCE;
 import static no.unit.nva.cristin.model.QueryParameterKey.INSTITUTION;
-import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
 import static no.unit.nva.cristin.model.QueryParameterKey.LEVELS;
 import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_CURRENT;
 import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
@@ -44,7 +43,7 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
                    PARTICIPANT.getNvaKey(), KEYWORD.getNvaKey(),
                    FUNDING_SOURCE.getNvaKey(), FUNDING.getNvaKey(),
                    APPROVAL_REFERENCE_ID.getNvaKey(), APPROVED_BY.getNvaKey(),
-                   PAGE_SORT.getNvaKey(), PROJECT_UNIT.getNvaKey(), USER.getNvaKey(), LANGUAGE.getNvaKey(),
+                   PAGE_SORT.getNvaKey(), PROJECT_UNIT.getNvaKey(), USER.getNvaKey(),
                    LEVELS.getNvaKey(), BIOBANK.getNvaKey(), MODIFIED_SINCE.getNvaKey());
 
     public static final QueryParameterKey[] REQUIRED_QUERY_PARAMETER =

@@ -10,14 +10,12 @@ import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
 import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_DATE;
-import static no.unit.nva.cristin.model.Constants.PATTERN_IS_LANGUAGE;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_NON_EMPTY;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_NUMBER;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_TITLE;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
-import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
 import static no.unit.nva.cristin.model.QueryParameterKey.QueryParameterConstant.ERROR_MESSAGE_INVALID_CHARACTERS;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import java.net.URLDecoder;
@@ -45,7 +43,6 @@ public enum QueryParameterKey {
     GRANT_ID("project_code", null, PATTERN_IS_NUMBER),
     INSTITUTION(JsonPropertyNames.INSTITUTION),
     KEYWORD(JsonPropertyNames.PROJECT_KEYWORD),
-    LANGUAGE(QUERY_PARAMETER_LANGUAGE, JsonPropertyNames.LANGUAGE, PATTERN_IS_LANGUAGE),
     LEVELS(JsonPropertyNames.LEVELS, JsonPropertyNames.DEPTH, PATTERN_IS_NUMBER),
     MODIFIED_SINCE(JsonPropertyNames.PROJECT_MODIFIED_SINCE, null, PATTERN_IS_DATE),
     NAME(JsonPropertyNames.TITLE,
