@@ -44,7 +44,14 @@ public class Utils {
     public static final String USER_TOP_LEVEL_CRISTIN_ORGANIZATION = "User has top level cristin organization {}";
 
     public static String forceUTF8(String value) {
-        return new String(value.getBytes(), StandardCharsets.UTF_8);
+        var forcedUTF8 = nonNull(value)
+            ? new String(value.getBytes(), StandardCharsets.UTF_8)
+            : EMPTY_STRING;
+        var isUTF8 =  !forcedUTF8.isBlank()  && forcedUTF8.length() != value.length();
+
+        return isUTF8
+            ? forcedUTF8
+            : value;
     }
 
     /**
