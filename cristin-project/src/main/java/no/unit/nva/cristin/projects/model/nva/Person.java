@@ -138,11 +138,11 @@ public class Person {
 
     public static final class Builder {
 
-        private URI id;
-        private String firstName;
-        private String lastName;
-        private String email;
-        private String phone;
+        private transient URI id;
+        private transient String firstName;
+        private transient String lastName;
+        private transient String email;
+        private transient String phone;
 
         public Builder withId(URI id) {
             this.id = id;

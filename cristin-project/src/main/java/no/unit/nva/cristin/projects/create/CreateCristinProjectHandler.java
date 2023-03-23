@@ -2,13 +2,9 @@ package no.unit.nva.cristin.projects.create;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
-import java.net.URI;
 import no.unit.nva.Validator;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.cristin.projects.model.nva.Person;
-import no.unit.nva.model.Organization;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
@@ -20,15 +16,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
-import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
-import static nva.commons.core.paths.UriWrapper.fromUri;
 
 public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, NvaProject> {
 
@@ -74,34 +66,14 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
         Validator<NvaProject> validator = new CreateCristinProjectValidator();
         validator.validate(input);
-        addRegistrarDataToInput(input, requestInfo);
+        addCreatorDataToInput(input, requestInfo);
 
         return apiClient.createProjectInCristin(input);
     }
 
-    private void addRegistrarDataToInput(NvaProject input, RequestInfo requestInfo) {
-        var registrar = new NvaContributor();
-        registrar.setIdentity(getIdentity(requestInfo));
-        registrar.setAffiliation(getAffiliation(requestInfo));
-
-        input.getContributors().add(registrar);
-    }
-
-    private Organization getAffiliation(RequestInfo requestInfo) {
-        var affiliation = createIdUriFromRequest(extractOrgIdentifier(requestInfo));
-        return new Organization.Builder().withId(affiliation).build();
-    }
-
-    private Person getIdentity(RequestInfo requestInfo) {
-        var identity = createIdUriFromRequest(extractCristinIdentifier(requestInfo));
-        return new Person.Builder().withId(identity).build();
-    }
-
-    private URI createIdUriFromRequest(String identifier) {
-        return fromUri(DOMAIN_NAME)
-                   .addChild(BASE_PATH)
-                   .addChild(PERSON_PATH_NVA)
-                   .addChild(identifier).getUri();
+    private void addCreatorDataToInput(NvaProject input, RequestInfo requestInfo) {
+        var creator = new ProjectCreatorAppender(requestInfo).getCreator();
+        input.setCreator(creator);
     }
 
     /**

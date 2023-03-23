@@ -76,8 +76,13 @@ public class CristinProjectBuilder {
         cristinProject.setRelatedProjects(extractRelatedProjects(nvaProject.getRelatedProjects()));
         cristinProject.setContactInfo(extractContactInfo(nvaProject.getContactInfo()));
         cristinProject.setExemptFromPublicDisclosure(nvaProject.getExemptFromPublicDisclosure());
+        cristinProject.setCreator(extractCreator(nvaProject.getCreator()));
 
         return cristinProject;
+    }
+
+    private CristinPerson extractCreator(NvaContributor creator) {
+        return Optional.ofNullable(creator).map(NvaContributor::toCristinPersonWithRoles).orElse(null);
     }
 
     public static void removeFieldsNotSupportedByPost(CristinProject cristinProject) {
