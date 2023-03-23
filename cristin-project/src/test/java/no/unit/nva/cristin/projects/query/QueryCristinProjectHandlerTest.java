@@ -215,7 +215,7 @@ class QueryCristinProjectHandlerTest {
         var actual = Constants.OBJECT_MAPPER.readTree(gatewayResponse.getBody());
         assertEquals(expected, actual);
     }
-    
+
     @Test
     void handlerReturnsOkWhenTitleContainsAeOeAacolon() throws Exception {
         var map = Map.of(
@@ -229,6 +229,19 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
+
+    @Test
+    void handlerReturnsOkWhenTitleContainsgjennomgaatt() throws Exception {
+        InputStream input = requestWithQueryParameters(
+            Map.of(JsonPropertyNames.QUERY, forceUTF8("gjennomgått akutt")));
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Object.class);
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+
 
     @Test
     void handlerSetsDefaultValueForMissingOptionalLanguageParameterAndReturnOk() throws Exception {

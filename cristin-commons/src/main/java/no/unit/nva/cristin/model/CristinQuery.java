@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.model;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.Utils.forceUTF8;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
@@ -53,10 +54,10 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      */
     public URI toNvaURI() {
         return new UriWrapper(HTTPS, DOMAIN_NAME)
-                   .addChild(BASE_PATH)
-                   .addChild(getNvaPathAsArray())
-                   .addQueryParameters(toNvaParameters())
-                   .getUri();
+            .addChild(BASE_PATH)
+            .addChild(getNvaPathAsArray())
+            .addQueryParameters(toNvaParameters())
+            .getUri();
     }
 
     /**
@@ -131,14 +132,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      */
     public void setPath(T key, String value) {
         var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
-        pathParameters.put(key, key.encoding() != KeyEncoding.NONE ? decodeUTF(nonNullValue) : nonNullValue);
-    }
-
-    public String removeValue(T key) {
-        return
-            queryParameters.containsKey(key)
-                ? queryParameters.remove(key)
-                : pathParameters.remove(key);
+        pathParameters.put(key, key.isEncode() ? decodeUTF(nonNullValue) : nonNullValue);
     }
 
     /**
@@ -233,7 +227,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
     //    }
 
     protected String decodeUTF(String encoded) {
-        String decode = URLDecoder.decode(encoded, StandardCharsets.UTF_8);
+        String decode = forceUTF8(URLDecoder.decode(encoded, StandardCharsets.UTF_8));
         logger.info("decoded " + decode);
         return decode;
     }
