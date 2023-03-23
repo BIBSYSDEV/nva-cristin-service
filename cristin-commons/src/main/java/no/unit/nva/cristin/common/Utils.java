@@ -8,6 +8,7 @@ import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,17 @@ public class Utils {
         "Could not retrieve user's cristin organization identifier";
     public static final String USER_IS_INTERNAL_BACKEND = "User is internal backend";
     public static final String USER_TOP_LEVEL_CRISTIN_ORGANIZATION = "User has top level cristin organization {}";
+
+    public static String forceUTF8(String value) {
+        var forcedUTF8 = nonNull(value)
+            ? new String(value.getBytes(), StandardCharsets.UTF_8)
+            : EMPTY_STRING;
+        var isUTF8 =  !forcedUTF8.isBlank()  && forcedUTF8.length() != value.length();
+
+        return isUTF8
+            ? forcedUTF8
+            : value;
+    }
 
     /**
      * Check if a string supplied is a positive integer.

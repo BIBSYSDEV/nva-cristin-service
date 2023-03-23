@@ -1828,23 +1828,17 @@ components:
           type: array
           description: Fundings for this project
           items:
-            $ref: '#/components/schemas/FundingPost'
+            $ref: '#/components/schemas/FundingPostPatch'
         keywords:
           type: array
           description: Project keywords
           items:
-            properties:
-              code:
-                type: string
-                description: Keyword code
+            $ref: '#/components/schemas/TypedLabelPostPatch'
         projectCategories:
           type: array
           description: Project categories
           items:
-            properties:
-              code:
-                type: string
-                description: project category code
+            $ref: '#/components/schemas/TypedLabelPostPatch'
         relatedProjects:
           type: array
           items:
@@ -1921,17 +1915,7 @@ components:
           type: array
           description: List of fundings for the project
           items:
-            type: object
-            properties:
-              source:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    description: Code of the funding source
-              code:
-                type: string
-                description: Project code of the funding related to this source
+            $ref: '#/components/schemas/FundingPostPatch'
         keywords:
           type: array
           items:
@@ -2074,26 +2058,19 @@ components:
       type: object
       description: Funding
       properties:
-        code:
-          type: string
         type:
           type: string
           pattern: 'Funding'
           description: Always Funding
         source:
-          $ref: '#/components/schemas/FundingSource'
-    FundingSource:
-      type: object
-      description: Funding source
-      properties:
-        type:
           type: string
-          pattern: 'FundingSource'
-          description: Always FundingSource
-        names:
+          description: The source of the funding formatted as an uri
+          format: uri
+        identifier:
+          type: string
+          description: The project code for the funding
+        labels:
           $ref: '#/components/schemas/Languages'
-        code:
-          type: string
     Approvals:
       type: array
       required: [ date, authority, status ]
@@ -2172,7 +2149,7 @@ components:
             description: 'Reference ID used by the approval authority for this approval.'
           authorityName:
             $ref: '#/components/schemas/Languages'
-    FundingPost:
+    FundingPostPatch:
       type: object
       description: Funding creation
       properties:
@@ -2180,18 +2157,13 @@ components:
           type: string
           pattern: 'Funding'
           description: Always Funding
-        code:
-          type: string
-          description: Project code of the funding
         source:
-          properties:
-            type:
-              type: string
-              pattern: 'FundingSource'
-              description: Always FundingSource
-            code:
-              type: string
-              description: Code of the funding source, like NFR
+          type: string
+          description: The source of the funding formatted as an uri or an alternative url encoded code
+          format: uri
+        identifier:
+          type: string
+          description: The project code for the funding
     TypedLabelPostPatch:
       type: object
       properties:
@@ -2658,12 +2630,10 @@ components:
             endDate: '2017-12-31T00:00:00Z'
             funding:
               - type: 'Funding'
-                source:
-                  type: "FundingSource"
-                  names:
-                    nb: "Egen institusjon"
-                  code: "EI"
-                code: "1234556"
+                source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
+                identifier: '1234556'
+                labels:
+                  nb: 'Egen Institusjon'
             coordinatingInstitution:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
@@ -2765,12 +2735,10 @@ components:
         endDate: '2017-12-31T00:00:00Z'
         funding:
           - type: 'Funding'
-            source:
-              type: "FundingSource"
-              names:
-                nb: "Egen institusjon"
-              code: "EI"
-            code: "134455"
+            source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
+            identifier: '1234556'
+            labels:
+              nb: 'Egen Institusjon'
         coordinatingInstitution:
           id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
           type: 'Organization'
@@ -2872,9 +2840,8 @@ components:
               type: 'Person'
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/538786'
         funding:
-          - source:
-              code: 'NFR'
-            code: '1234/PO'
+          - source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
+            identifier: '1234556'
         keywords:
           - type: '4837'
           - type: '5686'
@@ -2961,10 +2928,8 @@ components:
             identifier: '2017/800'
         funding:
           - type: 'Funding'
-            source:
-              type: 'FundingSource'
-              code: 'NFR'
-            code: '1234'
+            source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR'
+            identifier: '1234556'
         keywords:
           - code: '4245'
           - code: '5686'
@@ -3384,12 +3349,10 @@ components:
             endDate: '2017-12-31T00:00:00Z'
             funding:
               - type: 'Funding'
-                source:
-                  type: "FundingSource"
-                  names:
-                    nb: "Egen institusjon"
-                  code: "EI"
-                code: "134455"
+                source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
+                identifier: '1234556'
+                labels:
+                  nb: 'Egen Institusjon'
             coordinatingInstitution:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'

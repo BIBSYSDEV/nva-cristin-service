@@ -1,6 +1,8 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.nva.Approval;
@@ -31,6 +33,7 @@ import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 public class CristinProjectBuilder {
 
     public static final String DEFAULT_TITLE_LANGUAGE_KEY = "nb";
+    public static final String PATH_DELIMITER = "/";
 
     private final transient CristinProject cristinProject;
     private final transient NvaProject nvaProject;
@@ -59,7 +62,7 @@ public class CristinProjectBuilder {
         cristinProject.setEndDate(nvaProject.getEndDate());
         cristinProject.setAcademicSummary(extractSummary(nvaProject.getAcademicSummary()));
         cristinProject.setPopularScientificSummary(extractSummary(nvaProject.getPopularScientificSummary()));
-        cristinProject.setProjectFundingSources(extractFundings(nvaProject.getFunding()));
+        cristinProject.setProjectFundingSources(extractFundings(nvaProject.getNewFunding()));
         cristinProject.setParticipants(extractContributors(nvaProject.getContributors()));
         cristinProject.setCoordinatingInstitution(extractCristinOrganization(nvaProject.getCoordinatingInstitution()));
         cristinProject.setMethod(extractSummary(nvaProject.getMethod()));
@@ -189,9 +192,9 @@ public class CristinProjectBuilder {
 
     private CristinFundingSource getCristinFundingSource(Funding funding) {
         CristinFundingSource cristinFundingSource = new CristinFundingSource();
-        cristinFundingSource.setFundingSourceCode(funding.getSource().getCode());
-        cristinFundingSource.setFundingSourceName(funding.getSource().getNames());
-        cristinFundingSource.setProjectCode(funding.getCode());
+        cristinFundingSource.setFundingSourceCode(extractFundingSourceCode(funding.getSource()));
+        cristinFundingSource.setFundingSourceName(funding.getLabels());
+        cristinFundingSource.setProjectCode(funding.getIdentifier());
         return cristinFundingSource;
     }
 
@@ -219,5 +222,18 @@ public class CristinProjectBuilder {
     private static CristinExternalSource toCristinExternalSource(ExternalSource externalSource) {
         return new CristinExternalSource(externalSource.getName(),
                                          externalSource.getIdentifier());
+    }
+
+    /**
+     * Extracts funding source code from URI giving a valid Cristin source code.
+     */
+    public static String extractFundingSourceCode(URI source) {
+        if (isNull(source)) {
+            return null;
+        }
+        var sourceAsText = source.toString();
+        var lastElementIndexStart = sourceAsText.lastIndexOf(PATH_DELIMITER) + 1;
+        var rawSourceCode = sourceAsText.substring(lastElementIndexStart);
+        return URLDecoder.decode(rawSourceCode, StandardCharsets.UTF_8);
     }
 }
