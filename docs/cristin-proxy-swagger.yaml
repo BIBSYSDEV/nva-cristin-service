@@ -1443,13 +1443,13 @@ paths:
                 $ref: '#/components/schemas/BiobankNew'
               examples:
                 objectExample:
-                  $ref: '#/components/examples/BiobankNewSample'
+                  $ref: '#/components/examples/BiobankExample'
             application/ld+json:
               schema:
                 $ref: '#/components/schemas/BiobankNew'
               examples:
                 objectExample:
-                  $ref: '#/components/examples/BiobankNewSample'
+                  $ref: '#/components/examples/BiobankExample'
         404:
           $ref: '#/components/responses/404'
         500:
@@ -2526,7 +2526,133 @@ components:
           description: the identifier (code) for the funding source
         name:
           $ref: '#/components/schemas/Languages'
-
+    BioBanks:
+      type: object
+      required:
+        - type
+        - '@Context'
+        - id
+        - sources
+      properties:
+        type:
+          type: string
+          description: Always BioBanks
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          type: string
+          description: URI to the query
+        sources:
+          type: array
+          description: The list of BioBanks
+          items:
+            $ref: '#/components/schemas/BiobankNew'
+    BiobankNew:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        type:
+          type: string
+          pattern: 'Biobank'
+          description: The type of the returned object, always Biobank
+        identifiers:
+          type: array
+          description: Identifiers for this Biobank
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'CristinIdentifier'
+                description: Name of identifier, always CristinIdentifier
+              value:
+                type: integer
+                format: int32
+                description: Cristin ID of project
+        name:
+          type: array
+          description: Names in alternative languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        mainLanguage:
+          type: string
+          description: Main Language
+        storeUntilDate:
+          type: string
+          format: date-time
+        startDate:
+          type: string
+          format: date-time
+        status:
+          type: string
+        created:
+          type: object
+          properties:
+            sourceShortName:
+              type: string
+              description: Short name of the source that created the entry
+            date:
+              type: string
+              format: date-time
+              description: Date the entry was created
+        lastModified:
+          type: object
+          properties:
+            sourceShortName:
+              type: string
+              description: Short name of the source that created the entry
+            date:
+              type: string
+              format: date-time
+              description: Date the entry was created
+        coordinatingOrganization:
+          $ref: '#/components/schemas/Organization'
+        coordinatingUnit:
+          $ref: '#/components/schemas/Organization'
+        coordinator:
+          $ref: '#/components/schemas/Person'
+        project:
+          type: object
+          properties:
+            cristinProjectId:
+              type: string
+              description: The type of object. Here always ExternalSource
+            title:
+              type: array
+              description: Title in alternative languages
+              items:
+                $ref: '#/components/schemas/Languages'
+            url:
+              $ref: '#/components/schemas/Project'
+        externalSources:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The type of object. Here always ExternalSource
+              identifier:
+                type: string
+                description: The source reference identifier as it is in upstream
+              name:
+                type: string
+                description: The name of the source in short form
+        approvals:
+          $ref: '#/components/schemas/Approvals'
+        biobankMaterials:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
+              label:
+                $ref: '#/components/schemas/Languages'
     PersonEmploymentQuery:
       type: object
       properties:
@@ -3300,7 +3426,64 @@ components:
         startDate: '2008-01-01T00:00:00Z'
         endDate: '2019-12-31T00:00:00Z'
         fullTimeEquivalentPercentage: 100.0
-
+    BiobankExample:
+      value:
+        {
+          "type": "Biobank",
+          "id": "https://api.dev.nva.aws.unit.no/cristin/biobank/2510604",
+          "identifiers": [ {
+            "type": "CristinIdentifier",
+            "value": "2510604"
+          }
+          ],
+          "biobankType": "SPECIFICBIOBANK",
+          "name": {
+            "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
+          },
+          "mainLanguage": "nb",
+          "startDate": "2021-03-15T12:00:00Z",
+          "status": "ACTIVE",
+          "created": {
+            "sourceShortName": "REK",
+            "date": "2021-05-14T21:54:35Z"
+          },
+          "lastModified": {
+            "sourceShortName": "REK",
+            "date": "2022-11-28T21:45:17Z"
+          },
+          "coordinatingOrganization": "https://api.dev.nva.aws.unit.no/cristin/units/2012.0.0.0",
+          "coordinatingUnit": "https://api.dev.nva.aws.unit.no/cristin/units/2012.0.0.0",
+          "coordinator": "https://api.dev.nva.aws.unit.no/cristin/persons/58388",
+          "project": {
+            "cristinProjectId": "2510603",
+            "title": {
+              "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
+            },
+            "url": "https://api.dev.nva.aws.unit.no/cristin/project/2510603"
+          },
+          "externalSources": [ {
+            "type": "ExternalSource",
+            "identifier": "REK mappenr 1",
+            "name": "REK"
+          }
+          ],
+          "approvals": [ {
+            "approvedDate": "2021-05-11T21:50:45Z",
+            "approvedBy": "REK",
+            "approvedStatus": "Approved",
+            "applicationCode": "BIOBANK",
+            "approvalReferenceId": "247285"
+          }
+          ],
+          "biobankMaterials": [ {
+            "type": "24",
+            "label": {
+              "en": "Other material"
+            }
+          }
+          ],
+          "@context": "https://bibsysdev.github.io/src/biobank-context.json"
+        }
     OrganizationPersonsExample:
       value:
         '@context': 'https://example.org/person-search-context.json'

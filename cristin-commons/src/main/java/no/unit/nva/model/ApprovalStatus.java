@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects.model.nva;
+package no.unit.nva.model;
 
 import static java.util.Arrays.stream;
 import com.fasterxml.jackson.annotation.JsonCreator;

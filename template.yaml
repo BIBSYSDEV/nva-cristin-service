@@ -516,7 +516,6 @@ Resources:
     Properties:
       CodeUri: cristin-biobank
       Handler: no.unit.nva.biobank.fetch.FetchBiobankHandler::handleRequest
-      Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinFetchBiobankEvent:
           Type: Api

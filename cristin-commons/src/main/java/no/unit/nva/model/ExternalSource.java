@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects.model.nva;
+package no.unit.nva.model;
 
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;

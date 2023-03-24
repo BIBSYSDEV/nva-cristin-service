@@ -18,7 +18,7 @@ public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
 
     @JacocoGenerated
     public FetchBiobankHandler() {
-        this(defaultClient(), new Environment());
+        this(defaultClient, new Environment());
     }
 
     public FetchBiobankHandler(CristinBiobankApiClient cristinClient, Environment environment) {
@@ -29,18 +29,19 @@ public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
     @Override
     protected Biobank processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         var query = (QueryBiobank)
-            QueryBiobank
-                .builder()
-                .fromRequestInfo(requestInfo).build();
-        context.getLogger().log(query.toURI().toString());
+                        QueryBiobank.builder()
+                            .fromRequestInfo(requestInfo).build();
+        context.getLogger()
+            .log(query.toURI().toString());
         return
-            cristinClient
-                .fetchBiobank(query)
-                .toBiobank();
+            cristinClient.fetchBiobank(query).toBiobank();
     }
 
     @Override
     protected Integer getSuccessStatusCode(Void input, Biobank output) {
         return HttpURLConnection.HTTP_OK;
     }
+
+
+
 }

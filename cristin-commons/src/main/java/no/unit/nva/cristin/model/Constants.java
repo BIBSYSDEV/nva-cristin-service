@@ -9,14 +9,12 @@ import nva.commons.core.Environment;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static no.unit.nva.cristin.common.Utils.forceUTF8;
 
 public class Constants {
 
     public static final Environment ENVIRONMENT = new Environment();
     public static final List<MediaType> DEFAULT_RESPONSE_MEDIA_TYPES =
         List.of(MediaType.JSON_UTF_8,MediaTypes.APPLICATION_JSON_LD);
-
     public static final ObjectMapper OBJECT_MAPPER = JsonUtils.dtoObjectMapper;
     public static final Pattern ORCID_PATTERN = Pattern.compile("[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9|Xx]");
     public static final String ALL_QUERY_PARAMETER_LANGUAGES = "en,nb,nn";
@@ -24,17 +22,15 @@ public class Constants {
     public static final String CRISTIN_API_URL = ENVIRONMENT.readEnv("CRISTIN_API_URL");
     public static final String CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME =
         ENVIRONMENT.readEnv("CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME");
-
     public static final String CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE =
         ENVIRONMENT.readEnv("CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE");
-
+    public static final String CRISTIN_IDENTIFIER_TYPE = "CristinIdentifier";
     public static final String CRISTIN_INSTITUTION_HEADER = "Cristin-Representing-Institution";
     public static final String CRISTIN_QUERY_NAME_PARAM = "name";
     public static final String CRISTIN_PER_PAGE_PARAM = "per_page";
     public static final String DEFAULT_NUMBER_OF_RESULTS = "5";
     public static final String DOMAIN_NAME =
         ENVIRONMENT.readEnvOpt("DOMAIN_NAME").orElse("api.dev.nva.aws.unit.no");
-
     public static final String EMPLOYMENT_ID = "employmentId";
     public static final String EQUAL_OPERATOR = "=";
     public static final String FIRST_PAGE = "1";
@@ -53,10 +49,9 @@ public class Constants {
     public static final String PATTERN_IS_NON_EMPTY = ".+";
     public static final String PATTERN_IS_NUMBER = "[1-9]\\d*";
     public static final String PATTERN_IS_STATUS = "(?i)CONCLUDED|ACTIVE|NOT[ +]*STARTED";
-    public static final String PATTERN_IS_TITLE = forceUTF8("^[æøåÆØÅ\\w-,\\.:; ]+$");
+    public static final String PATTERN_IS_TITLE = "^[æøåÆØÅ\\w-,\\.:; ]+$";
     public static final String PATTERN_IS_URL =
         "(http(s):\\/\\/.)[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)";
-
     public static final String PERSONS_PATH = "persons";
     public static final String PERSON_CONTEXT = "https://example.org/person-context.json";
     public static final String PERSON_ID = "id";
@@ -69,14 +64,18 @@ public class Constants {
     public static final String PROJECT_PATH_NVA = "project";
     public static final String PROJECT_SEARCH_CONTEXT_URL =
         "https://bibsysdev.github.io/src/project-search-context.json";
-
     public static final String QUERY_PARAMETER_LANGUAGE = "lang";
     public static final String REL_NEXT = "rel=\"next\"";
     public static final String REL_PREV = "rel=\"prev\"";
     public static final String SLASH_DELIMITER = "/";
     public static final String SORT = "sort";
+    public static final String STRING_COMMA = ",";
+    public static final String STRING_SPACE = " ";
     public static final String TOP = "top";
     public static final String UNITS_PATH = "units";
     public static final String UNIT_ID = "id";
     public static final String X_TOTAL_COUNT = "x-total-count";
+    public static final String TYPE = "type";
+    public static final String VALUE = "value";
+    public static final String FHI_BIOBANK_REGISTRY = "FHI-BiobankRegistry";
 }

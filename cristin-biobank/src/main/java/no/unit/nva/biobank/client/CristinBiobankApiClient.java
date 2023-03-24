@@ -3,6 +3,7 @@ package no.unit.nva.biobank.client;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import no.unit.nva.biobank.model.QueryBiobank;
@@ -16,32 +17,35 @@ import nva.commons.core.JacocoGenerated;
 public class CristinBiobankApiClient extends ApiClient {
 
     @JacocoGenerated
-    public static CristinBiobankApiClient defaultClient() {
-        var httpClient = HttpClient.newBuilder().build();
-        return new CristinBiobankApiClient(httpClient);
-    }
+    public static CristinBiobankApiClient defaultClient =
+        new CristinBiobankApiClient(
+            HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.ALWAYS)
+                .connectTimeout(Duration.ofSeconds(30))
+                .build()
+        );
 
     public CristinBiobankApiClient(HttpClient client) {
         super(client);
     }
 
     public CristinBiobank fetchBiobank(QueryBiobank query) throws ApiGatewayException {
-        var response = queryBiobank(query);
-        return getDeserializedResponse(response, CristinBiobank.class);
+        return getDeserializedResponse(httpRequestWithStatusCheck(query), CristinBiobank.class);
     }
 
     /**
-     * Creates a wrapper object containing CristinBiobank transformed to Biobank with additional metadata. Is used
-     * for serialization to the client.
+     * Creates a wrapper object containing CristinBiobank transformed to Biobank with additional metadata. Is used for
+     * serialization to the client.
      *
-     * @param query QueryProject from client containing title and language
-     * @return a SearchResponse filled with transformed Cristin Biobank and metadata
+     * @param query from client containing title and language
+     * @return a search response filled with transformed Cristin Biobank and metadata
      * @throws ApiGatewayException if some errors happen we should return this to client
      */
-    public SearchResponse<Biobank> queryBiobankWithMetadata(QueryBiobank query) throws ApiGatewayException {
+    @JacocoGenerated
+    public SearchResponse<Biobank> fetchBiobanksWithParameters(QueryBiobank query) throws ApiGatewayException {
 
         final var startRequestTime = System.currentTimeMillis();
-        final var response = queryBiobank(query);
+        final var response = httpRequestWithStatusCheck(query);
         final var nvaBiobanks =
             Arrays.stream(getDeserializedResponse(response, CristinBiobank[].class))
                 .map(CristinBiobank::toBiobank)
@@ -58,12 +62,11 @@ public class CristinBiobankApiClient extends ApiClient {
                 .withProcessingTime(processingTime);
     }
 
-    protected HttpResponse<String> queryBiobank(QueryBiobank query) throws ApiGatewayException {
+    protected HttpResponse<String> httpRequestWithStatusCheck(QueryBiobank query) throws ApiGatewayException {
 
         HttpResponse<String> response = fetchQueryResults(query.toURI());
-        checkHttpStatusCode(query.toNvaURI(), response.statusCode(),response.body());
+        checkHttpStatusCode(query.toNvaURI(), response.statusCode(), response.body());
 
         return response;
     }
-
 }

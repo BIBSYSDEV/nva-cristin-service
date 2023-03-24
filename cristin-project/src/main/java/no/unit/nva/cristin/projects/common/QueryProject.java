@@ -1,9 +1,6 @@
 package no.unit.nva.cristin.projects.common;
 
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
-import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
-import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
-import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
+import static no.unit.nva.cristin.model.Constants.*;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.BIOBANK;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.IGNORE_PATH_PARAMETER_INDEX;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.KEYWORD;
@@ -22,8 +19,10 @@ import no.unit.nva.cristin.model.KeyEncoding;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.core.paths.UriWrapper;
 
+/**
+ *   Parameter definistions  <a href="https://api.cristin-test.uio.no/v2/doc/index.html#GETprojects">...</a>.
+ */
 public class QueryProject extends CristinQuery<ParameterKeyProject> {
-    // https://api.cristin-test.uio.no/v2/doc/index.html#GETprojects
 
     public static QueryBuilderProject builder() {
         return new QueryBuilderProject();
@@ -49,7 +48,7 @@ public class QueryProject extends CristinQuery<ParameterKeyProject> {
     protected String toCristinQueryValue(Entry<ParameterKeyProject, String> entry) {
         if (entry.getKey().equals(BIOBANK) || entry.getKey().equals(KEYWORD) || entry.getKey().equals(PARTICIPANT)) {
             final var key = entry.getKey().getKey() + EQUAL_OPERATOR;
-            return Arrays.stream(entry.getValue().split(","))
+            return Arrays.stream(entry.getValue().split(STRING_COMMA))
                        .collect(Collectors.joining("&" + key));
         }
         var value = entry.getKey().encoding() == KeyEncoding.ENCODE_DECODE
@@ -61,7 +60,7 @@ public class QueryProject extends CristinQuery<ParameterKeyProject> {
         }
         return entry.getKey().equals(ORGANIZATION) && entry.getValue().matches(PATTERN_IS_URL)
                    ? getUnitIdFromOrganization(value)
-                   : value;
+                   : value.replace(STRING_SPACE,STRING_COMMA);
     }
 
     @Override

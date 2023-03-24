@@ -6,8 +6,11 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.model.CristinApproval;
+import no.unit.nva.cristin.model.CristinDateInfo;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
+import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -23,7 +26,7 @@ import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 @SuppressWarnings({"PMD.TooManyFields", "unused", "PMD.ExcessivePublicCount", "PMD.GodClass"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinProject implements JsonSerializable {
-    // https://api.cristin-test.uio.no/v2/doc/index.html#GETprojects
+
     public static final String METHOD = "method";
     public static final String EQUIPMENT = "equipment";
     public static final String CRISTIN_PROJECT_CATEGORIES = "project_categories";

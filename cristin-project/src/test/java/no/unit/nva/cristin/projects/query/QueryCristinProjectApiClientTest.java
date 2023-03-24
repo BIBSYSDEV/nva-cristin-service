@@ -3,7 +3,6 @@ package no.unit.nva.cristin.projects.query;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandlerTest.GRANT_ID_EXAMPLE;
-import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandlerTest.LANGUAGE_NB;
 import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandlerTest.RANDOM_TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;
@@ -15,16 +14,15 @@ import org.junit.jupiter.api.Test;
 public class QueryCristinProjectApiClientTest {
 
     private static final String QUERY_CRISTIN_PROJECTS_EXAMPLE_URI =
-        "https://api.cristin-test.uio.no/v2/projects?lang=nb&page=1&per_page=5&title=reindeer";
+        "https://api.cristin-test.uio.no/v2/projects?page=1&per_page=5&title=reindeer";
     private static final String CRISTIN_API_GRANT_ID_SEARCH_EXAMPLE_URI =
-        "https://api.cristin-test.uio.no/v2/projects?lang=nb&page=1&per_page=5&project_code=1234567";
+        "https://api.cristin-test.uio.no/v2/projects?page=1&per_page=5&project_code=1234567";
 
     @Test
     void getsCristinUriWithTitleParamWhenCallingUriBuilderWithTitleQueryRequested() throws Exception {
         final var cristinQuery =
             QueryProject.builder()
                 .withQuery(RANDOM_TITLE)
-                .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
                 .withItemsPerPage(DEFAULT_NUMBER_OF_RESULTS)
                 .validate()
@@ -41,7 +39,6 @@ public class QueryCristinProjectApiClientTest {
         final var params =
             QueryProject.builder()
                 .withTitle(RANDOM_TITLE)
-                .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
                 .withItemsPerPage(DEFAULT_NUMBER_OF_RESULTS)
                 .validate()
@@ -57,7 +54,6 @@ public class QueryCristinProjectApiClientTest {
         final var sourceCristinQuery =
             QueryProject.builder()
                 .withQuery(GRANT_ID_EXAMPLE)
-                .withLanguage(LANGUAGE_NB)
                 .withItemsFromPage(FIRST_PAGE)
                 .withItemsPerPage(DEFAULT_NUMBER_OF_RESULTS)
                 .validate()

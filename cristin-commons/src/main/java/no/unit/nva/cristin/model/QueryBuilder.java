@@ -6,7 +6,9 @@ import static no.unit.nva.cristin.common.ErrorMessages.invalidPathParameterMessa
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.requiredMissingMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.model.CristinQuery.logger;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -192,13 +194,14 @@ public abstract class QueryBuilder<T extends Enum<T> & IParameterKey> {
     protected void throwInvalidParamererValue(Entry<T, String> entry) throws BadRequestException {
         final var key = entry.getKey();
         if (invalidQueryParameter(key, entry.getValue())) {
-            final var keyName =  key.getNvaKey();
+            final var keyName = key.getNvaKey();
             String errorMessage;
             if (nonNull(key.getErrorMessage())) {
                 errorMessage = String.format(key.getErrorMessage(), keyName);
             } else {
                 errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
             }
+            logger.info("INVALID PARAMETER VALUE [" + entry.getValue() + "]");
             throw new BadRequestException(errorMessage);
         }
     }
@@ -211,6 +214,8 @@ public abstract class QueryBuilder<T extends Enum<T> & IParameterKey> {
                 nonNull(key.getErrorMessage())
                     ? key.getErrorMessage()
                     : invalidPathParameterMessage(keyName);
+            logger.info("INVALID PATH VALUE [" + entry.getValue() + "]");
+
             throw new BadRequestException(errorMessage);
         }
     }
