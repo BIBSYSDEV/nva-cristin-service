@@ -202,29 +202,45 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
                    : entry.getValue();
     }
 
+    /**
+     * Sample code for getNvaPathItem.
+     * <p>Usage:</p>
+     * <samp>    var isProjects = entry.getKey().equals(PATH_PROJECT) && pathSize > 1;<br>
+     *     return isProjects ? entry.getKey().getKey() : entry.getKey().getNvaKey();<br>
+     * </samp>
+     */
     protected abstract String getNvaPathItem(int pathSize, Entry<T, String> entry);
-    //    {
-    //        var isProjects = entry.getKey().equals(PATH_PROJECT) && pathSize > 1;
-    //        return isProjects ? entry.getKey().getKey() : entry.getKey().getNvaKey();
-    //    }
 
+
+    /**
+     * Sample code for ignoreNvaPathParameters.
+     * <p>Usage:</p>
+     * <samp>return entry.getKey().ordinal() > IGNORE_PATH_PARAMETER_INDEX;<br>
+     * </samp>
+     */
     protected abstract boolean ignoreNvaPathParameters(Entry<T, String> entry);
-    //    {
-    //        return entry.getKey().ordinal() > IGNORE_PATH_PARAMETER_INDEX;
-    //    }
 
+
+    /**
+     * Sample code for ignorePathParameters.
+     * <p>Usage:</p>
+     * <samp>return f.getKey() != PATH_PROJECT;<br>
+     * </samp>
+     */
     protected abstract boolean ignorePathParameters(Entry<T, String> f);
-    //    {
-    //        return f.getKey() != PATH_PROJECT;
-    //    }
 
+
+    /**
+     * Sample code for getCristinPath.
+     * <p>Usage:</p>
+     * <samp>var children = containsKey(PATH_PROJECT)<br>
+     *     ? new String[]{PATH_PROJECT.getKey(), getValue(PATH_PROJECT)}<br>
+     *     : new String[]{PATH_PROJECT.getKey()};<br>
+     * return children;<br>
+     * </samp>
+     */
     protected abstract String[] getCristinPath();
-    //    {
-    //        var children = containsKey(PATH_PROJECT)
-    //            ? new String[]{PATH_PROJECT.getKey(), getValue(PATH_PROJECT)}
-    //            : new String[]{PATH_PROJECT.getKey()};
-    //        return children;
-    //    }
+
 
     protected String decodeUTF(String encoded) {
         String decode = forceUTF8(URLDecoder.decode(encoded, StandardCharsets.UTF_8));

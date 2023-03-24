@@ -9,6 +9,7 @@ import static no.unit.nva.utils.UriUtils.nvaIdentifierToCristinIdentifier;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
+import java.security.Security;
 import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.model.Organization;
@@ -24,6 +25,7 @@ public class CristinInstitution {
     private String url;
 
     public CristinInstitution() {
+
     }
 
     public CristinInstitution(String identifier) {

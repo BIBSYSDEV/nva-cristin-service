@@ -75,6 +75,8 @@ public class Constants {
     public static final String REL_PREV = "rel=\"prev\"";
     public static final String SLASH_DELIMITER = "/";
     public static final String SORT = "sort";
+    public static final String STRING_COMMA = ",";
+    public static final String STRING_SPACE = " ";
     public static final String TOP = "top";
     public static final String UNITS_PATH = "units";
     public static final String UNIT_ID = "id";
