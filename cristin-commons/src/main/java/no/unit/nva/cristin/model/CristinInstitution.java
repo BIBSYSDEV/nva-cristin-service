@@ -2,14 +2,13 @@ package no.unit.nva.cristin.model;
 
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.nvaIdentifierToCristinIdentifier;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
-import java.security.Security;
 import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.model.Organization;

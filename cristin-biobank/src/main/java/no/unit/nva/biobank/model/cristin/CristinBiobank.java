@@ -7,9 +7,9 @@ import no.unit.nva.biobank.model.nva.Biobank;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
-import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
-import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
-import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import no.unit.nva.cristin.model.CristinApproval;
+import no.unit.nva.cristin.model.CristinDateInfo;
+import no.unit.nva.cristin.model.CristinPerson;
 import nva.commons.core.JacocoGenerated;
 
 import java.beans.ConstructorProperties;
@@ -23,7 +23,6 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinBiobank implements JsonSerializable {
-    // https://api.cristin-test.uio.no/v2/doc/index.html#GETbiobanks
 
     private final String cristinBiobankId;
     private final String type;
@@ -44,7 +43,10 @@ public class CristinBiobank implements JsonSerializable {
     private final String biobankId;
     private final CristinAssociatedProject associatedProject;
 
-
+    /**
+     * Cristin Biobank documentation.
+     * <a href="https://api.cristin-test.uio.no/v2/doc/index.html#GETbiobanks">...</a>
+     */
     @ConstructorProperties({"cristinBiobankId", "type", "name", "mainLanguage", "startDate", "storeUntilDate", "status",
         "created", "lastModified", "coordinatingInstitution", "statusName", "typeName", "coordinator",
         "externalSources", "approvals", "biobankMaterials", "biobankId", "associatedProject"})

@@ -1,12 +1,10 @@
-package no.unit.nva.cristin.projects.model.cristin;
+package no.unit.nva.cristin.model;
 
 import static no.unit.nva.cristin.model.JsonPropertyNames.UNIT;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Objects;
-import no.unit.nva.cristin.model.CristinInstitution;
-import no.unit.nva.cristin.model.CristinUnit;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated

@@ -3,6 +3,7 @@ package no.unit.nva.biobank.client;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import no.unit.nva.biobank.model.QueryBiobank;
@@ -16,10 +17,13 @@ import nva.commons.core.JacocoGenerated;
 public class CristinBiobankApiClient extends ApiClient {
 
     @JacocoGenerated
-    public static CristinBiobankApiClient defaultClient() {
-        var httpClient = HttpClient.newBuilder().build();
-        return new CristinBiobankApiClient(httpClient);
-    }
+    public static CristinBiobankApiClient defaultClient =
+        new CristinBiobankApiClient(
+            HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.ALWAYS)
+                .connectTimeout(Duration.ofSeconds(30))
+                .build()
+        );
 
     public CristinBiobankApiClient(HttpClient client) {
         super(client);
@@ -31,13 +35,14 @@ public class CristinBiobankApiClient extends ApiClient {
     }
 
     /**
-     * Creates a wrapper object containing CristinBiobank transformed to Biobank with additional metadata. Is used
-     * for serialization to the client.
+     * Creates a wrapper object containing CristinBiobank transformed to Biobank with additional metadata. Is used for
+     * serialization to the client.
      *
-     * @param query QueryProject from client containing title and language
-     * @return a SearchResponse filled with transformed Cristin Biobank and metadata
+     * @param query from client containing title and language
+     * @return a search response filled with transformed Cristin Biobank and metadata
      * @throws ApiGatewayException if some errors happen we should return this to client
      */
+    @JacocoGenerated
     public SearchResponse<Biobank> queryBiobankWithMetadata(QueryBiobank query) throws ApiGatewayException {
 
         final var startRequestTime = System.currentTimeMillis();
@@ -61,9 +66,8 @@ public class CristinBiobankApiClient extends ApiClient {
     protected HttpResponse<String> queryBiobank(QueryBiobank query) throws ApiGatewayException {
 
         HttpResponse<String> response = fetchQueryResults(query.toURI());
-        checkHttpStatusCode(query.toNvaURI(), response.statusCode(),response.body());
+        checkHttpStatusCode(query.toNvaURI(), response.statusCode(), response.body());
 
         return response;
     }
-
 }

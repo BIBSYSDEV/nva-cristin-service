@@ -16,7 +16,7 @@ import java.util.Map;
 import no.unit.nva.biobank.client.CristinBiobankApiClient;
 import no.unit.nva.biobank.fetch.FetchBiobankHandler;
 import no.unit.nva.biobank.model.nva.Biobank;
-import no.unit.nva.cristin.biobank.CristinBiobankClientStub;
+import no.unit.nva.cristin.biobank.CristinBiobankClientMock;
 import no.unit.nva.stubs.FakeContext;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -28,14 +28,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 @WireMockTest(httpsEnabled = true)
 public class FetchBiobankHandlerTest {
 
-    private static final String EXISTING_BIOBANK_IDENTIFIER = "2510604";
     private final Context context = new FakeContext();
     private FetchBiobankHandler handlerUnderTest;
     private ByteArrayOutputStream output;
-    private CristinBiobankApiClient cristinClient = new CristinBiobankClientStub();
+    private final CristinBiobankApiClient biobankClientMock = new CristinBiobankClientMock();
+
     @BeforeEach
     public void beforeEach(WireMockRuntimeInfo runtimeInfo) {
-        this.handlerUnderTest = new FetchBiobankHandler(cristinClient, new Environment());
+        this.handlerUnderTest = new FetchBiobankHandler(biobankClientMock, new Environment());
         this.output = new ByteArrayOutputStream();
 
     }
@@ -76,7 +76,7 @@ public class FetchBiobankHandlerTest {
 
     }
 
-    @ParameterizedTest(name = "Should fail fetch biobank with Id {0} ")
+    @ParameterizedTest(name = "Should fail fetch biobank with invalid Id {0} ")
     @ValueSource(strings = { "03747"})
     public void shouldReturnFailureWhenBiobankIdIsInvalid(String biobankId) throws IOException {
         var input = new HandlerRequestBuilder<Void>(dtoObjectMapper)

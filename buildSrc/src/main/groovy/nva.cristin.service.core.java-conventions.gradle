@@ -24,6 +24,12 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+compileJava.options.encoding = 'utf-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'utf-8'
+}
+
 tasks.named('test') {
     useJUnitPlatform()
     failFast = true

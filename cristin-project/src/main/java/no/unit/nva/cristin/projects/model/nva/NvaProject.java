@@ -16,8 +16,10 @@ import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.Organization;
 import no.unit.nva.model.DateInfo;
+import no.unit.nva.model.TypedLabel;
 
 @SuppressWarnings({"PMD.ExcessivePublicCount","PMD.TooManyFields"})
 @JsonInclude(ALWAYS)

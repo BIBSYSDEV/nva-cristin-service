@@ -10,6 +10,7 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.utils.UriUtils.createNvaProjectId;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -19,16 +20,17 @@ public class AssociatedProject implements JsonSerializable {
     private final Map<String,String> title;
     private final URI url;
 
+    @JacocoGenerated
     @ConstructorProperties({"cristinProjectId","title","url"})
     public AssociatedProject(String cristinProjectId, Map<String, String> title, URI url) {
         this.cristinProjectId = cristinProjectId;
-        this.title = title;
+        this.title = nonEmptyOrDefault(title);
         this.url = url;
     }
 
     public AssociatedProject(CristinAssociatedProject project) {
         this.cristinProjectId = project.getCristinProjectId();
-        this.title = project.getTitle();
+        this.title = nonEmptyOrDefault(project.getTitle());
         this.url = createNvaProjectId(cristinProjectId);
     }
 

@@ -7,9 +7,9 @@ import static no.unit.nva.cristin.model.Constants.PERSONS_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
-import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.CRISTIN_IDENTIFIER_TYPE;
-import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.TYPE;
-import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.VALUE;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_IDENTIFIER_TYPE;
+import static no.unit.nva.cristin.model.Constants.TYPE;
+import static no.unit.nva.cristin.model.Constants.VALUE;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,14 +30,16 @@ import java.util.stream.Stream;
 import no.unit.nva.biobank.model.cristin.CristinBiobank;
 import no.unit.nva.biobank.model.cristin.CristinBiobankMaterial;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinUnit;
-import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
-import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
-import no.unit.nva.cristin.projects.model.nva.ExternalSource;
+import no.unit.nva.cristin.model.CristinApproval;
+import no.unit.nva.cristin.model.CristinDateInfo;
+import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.DateInfo;
+import no.unit.nva.model.TypedLabel;
 import nva.commons.core.JacocoGenerated;
 
 @SuppressWarnings({"PMD.ExcessiveParameterList", "PMD.TooManyFields"})
@@ -64,16 +66,17 @@ public class Biobank implements JsonSerializable {
     private final AssociatedProject project;
     private final Set<ExternalSource> externalSources;
     private final List<BiobankApproval> approvals;
-    private final List<BiobankMaterial> biobankMaterials;
+    private final List<TypedLabel> biobankMaterials;
 
-    @ConstructorProperties({"id", "identifiers", "biobankType", "name", "mainLanguage", "storeUntilDate", "startDate", "status",
-        "created", "lastModified", "coordinatingOrganization", "coordinatingUnit", "coordinator", "project", "externalSources",
-        "approvals", "biobankMaterials"})
+
+    @ConstructorProperties({"id", "identifiers", "biobankType", "name", "mainLanguage", "storeUntilDate", "startDate",
+        "status","created", "lastModified", "coordinatingOrganization", "coordinatingUnit", "coordinator", "project",
+        "externalSources","approvals", "biobankMaterials"})
     public Biobank(URI id, List<Map<String, String>> identifiers, BiobankType biobankType, Map<String, String> name,
                    String mainLanguage, Instant storeUntilDate,Instant startDate, String status, DateInfo created,
                    DateInfo lastModified, URI coordinatingOrganization,URI coordinatingUnit, URI coordinator,
                    AssociatedProject project, Set<ExternalSource> externalSources,List<BiobankApproval> approvals,
-                   List<BiobankMaterial> biobankMaterials) {
+                   List<TypedLabel> biobankMaterials) {
         this.context = URI.create("https://bibsysdev.github.io/src/biobank-context.json");
         this.approvals = approvals;
         this.biobankMaterials = biobankMaterials;
@@ -95,7 +98,8 @@ public class Biobank implements JsonSerializable {
     }
 
     public Biobank(CristinBiobank cristinBiobank) {
-        this(getNvaApiId(cristinBiobank.getCristinBiobankId(), BIOBANK_ID),
+        this(
+            getNvaApiId(cristinBiobank.getCristinBiobankId(), BIOBANK_ID),
             toCristinIdentifier(cristinBiobank),
             BiobankType.valueOf(cristinBiobank.getType()),
             cristinBiobank.getName(),
@@ -106,15 +110,13 @@ public class Biobank implements JsonSerializable {
             toDateInfoOrNull(cristinBiobank.getCreated()),
             toDateInfoOrNull(cristinBiobank.getLastModified()),
             toCoordinatingOrganization(cristinBiobank.getCoordinatingInstitution()),
-            toCoordinatinUnit(cristinBiobank.getCoordinatingInstitution()),
+            toCoordinatingUnit(cristinBiobank.getCoordinatingInstitution()),
             getNvaApiId(cristinBiobank.getCoordinator().getCristinPersonId(), PERSONS_PATH),
             toProjectOrNull(cristinBiobank),
             toExternalSources(cristinBiobank.getExternalSources()),
             toApprovals(cristinBiobank.getApprovals()),
-            toBiobankMaterials(cristinBiobank.getBiobankMaterials()));
-
-        //   cristinBiobank.getTypeName()
-        //   cristinBiobank.getStatusName()
+            toBiobankMaterials(cristinBiobank.getBiobankMaterials())
+        );
     }
 
     public URI getId() {
@@ -185,7 +187,7 @@ public class Biobank implements JsonSerializable {
         return approvals;
     }
 
-    public List<BiobankMaterial> getBiobankMaterials() {
+    public List<TypedLabel> getBiobankMaterials() {
         return biobankMaterials;
     }
 
@@ -235,14 +237,16 @@ public class Biobank implements JsonSerializable {
     }
 
     private static List<Map<String, String>> toCristinIdentifier(CristinBiobank cristinBiobank) {
-        var id = nonNull(cristinBiobank.getCristinBiobankId())
+        var cristinBiobankIdOrNull = nonNull(cristinBiobank.getCristinBiobankId())
             ? Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinBiobank.getCristinBiobankId())
             : null;
-        var biobank = nonNull(cristinBiobank.getBiobankId())
-            ? Map.of(TYPE, "FHI-BiobankRegistry", VALUE, cristinBiobank.getBiobankId())
+        var biobankIdOrNull = nonNull(cristinBiobank.getBiobankId())
+            ? Map.of(TYPE, Constants.FHI_BIOBANK_REGISTRY, VALUE, cristinBiobank.getBiobankId())
             : null;
 
-        return Stream.of(id,biobank).filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
+        return Stream.of(cristinBiobankIdOrNull,biobankIdOrNull)
+                   .filter(Objects::nonNull)
+                   .collect(Collectors.toUnmodifiableList());
     }
 
     private static URI toCoordinatingOrganization(CristinOrganization cristinOrganization) {
@@ -250,16 +254,16 @@ public class Biobank implements JsonSerializable {
             Optional.ofNullable(cristinOrganization)
                 .map(CristinOrganization::getInstitution)
                 .map(CristinInstitution::getCristinInstitutionId)
-                .map(instId -> getNvaApiId(String.format("%s.0.0.0", instId), UNITS_PATH))
+                .map(unitId -> getNvaApiId(String.format("%s.0.0.0", unitId), UNITS_PATH))
                 .orElse(null);
     }
 
-    private static URI toCoordinatinUnit(CristinOrganization cristinOrganization) {
+    private static URI toCoordinatingUnit(CristinOrganization cristinOrganization) {
         return
             Optional.ofNullable(cristinOrganization)
                 .map(CristinOrganization::getInstitutionUnit)
                 .map(CristinUnit::getCristinUnitId)
-                .map(instId -> getNvaApiId(instId, UNITS_PATH))
+                .map(unitId -> getNvaApiId(unitId, UNITS_PATH))
                 .orElse(null);
     }
 
@@ -267,7 +271,7 @@ public class Biobank implements JsonSerializable {
         return
             externalSources.stream()
                 .map(es -> new ExternalSource(es.getSourceReferenceId(), es.getSourceShortName()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     private static List<BiobankApproval> toApprovals(List<CristinApproval> approvals) {
@@ -277,10 +281,10 @@ public class Biobank implements JsonSerializable {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    private static List<BiobankMaterial> toBiobankMaterials(List<CristinBiobankMaterial> materials) {
+    private static List<TypedLabel> toBiobankMaterials(List<CristinBiobankMaterial> materials) {
         return
             materials.stream()
-                .map(BiobankMaterial::new)
+                .map(item -> new TypedLabel(item.getMaterialCode(),item.getMaterialName()))
                 .collect(Collectors.toUnmodifiableList());
     }
 

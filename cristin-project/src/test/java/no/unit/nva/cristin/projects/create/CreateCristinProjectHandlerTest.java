@@ -39,7 +39,7 @@ import java.nio.file.Path;
 import java.util.List;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
 import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
-import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
+import no.unit.nva.cristin.model.CristinDateInfo;
 import no.unit.nva.cristin.projects.model.cristin.CristinHealthProjectTypeBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.Approval;

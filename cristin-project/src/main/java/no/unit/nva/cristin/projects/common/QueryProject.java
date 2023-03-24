@@ -19,8 +19,10 @@ import no.unit.nva.cristin.model.KeyEncoding;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.core.paths.UriWrapper;
 
+/**
+ *   Parameter definistions  <a href="https://api.cristin-test.uio.no/v2/doc/index.html#GETprojects">...</a>.
+ */
 public class QueryProject extends CristinQuery<ParameterKeyProject> {
-    // https://api.cristin-test.uio.no/v2/doc/index.html#GETprojects
 
     public static QueryBuilderProject builder() {
         return new QueryBuilderProject();

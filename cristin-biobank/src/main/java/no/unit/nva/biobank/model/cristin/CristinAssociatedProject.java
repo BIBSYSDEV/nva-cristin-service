@@ -1,5 +1,6 @@
 package no.unit.nva.biobank.model.cristin;
 
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -22,7 +23,7 @@ public class CristinAssociatedProject implements JsonSerializable {
     @ConstructorProperties({"cristinProjectId", "title", "url"})
     public CristinAssociatedProject(String cristinProjectId, Map<String, String> title, URI url) {
         this.cristinProjectId = cristinProjectId;
-        this.title = title;
+        this.title =  nonEmptyOrDefault(title);
         this.url = url;
     }
 

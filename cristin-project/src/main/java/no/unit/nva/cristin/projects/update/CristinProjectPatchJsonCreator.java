@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import no.unit.nva.cristin.model.CristinOrganization;
 import java.util.HashMap;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
-import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;

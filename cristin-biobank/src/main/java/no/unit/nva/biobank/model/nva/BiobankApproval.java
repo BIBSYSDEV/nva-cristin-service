@@ -1,7 +1,8 @@
 package no.unit.nva.biobank.model.nva;
 
 import no.unit.nva.commons.json.JsonSerializable;
-import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
+import no.unit.nva.cristin.model.CristinApproval;
+import no.unit.nva.model.ApprovalStatus;
 import nva.commons.core.JacocoGenerated;
 
 import java.beans.ConstructorProperties;
@@ -12,13 +13,14 @@ public class BiobankApproval implements JsonSerializable {
 
     private final Instant approvedDate;
     private final String approvedBy;
-    private final String approvedStatus;
+    private final ApprovalStatus approvedStatus;
     private final String applicationCode;
     private final String approvalReferenceId;
 
+    @JacocoGenerated
     @ConstructorProperties({"approvedDate","approvedBy","approvedStatus","applicationCode","approvalReferenceId"})
-    public BiobankApproval(Instant approvedDate, String approvedBy, String approvedStatus, String applicationCode,
-                           String approvalReferenceId) {
+    public BiobankApproval(Instant approvedDate, String approvedBy, ApprovalStatus approvedStatus,
+                           String applicationCode, String approvalReferenceId) {
         this.approvedDate = approvedDate;
         this.approvedBy = approvedBy;
         this.approvedStatus = approvedStatus;
@@ -33,7 +35,7 @@ public class BiobankApproval implements JsonSerializable {
     public BiobankApproval(CristinApproval cristinApproval) {
         this.approvedDate = cristinApproval.getApprovedDate();
         this.approvedBy = cristinApproval.getApprovedBy();
-        this.approvedStatus = cristinApproval.getApprovalStatus();
+        this.approvedStatus = ApprovalStatus.fromValue(cristinApproval.getApprovalStatus());
         this.applicationCode = cristinApproval.getApplicationCode();
         this.approvalReferenceId = cristinApproval.getApprovalReferenceId();
     }
@@ -46,7 +48,7 @@ public class BiobankApproval implements JsonSerializable {
         return approvedBy;
     }
 
-    public String getApprovedStatus() {
+    public ApprovalStatus getApprovedStatus() {
         return approvedStatus;
     }
 
