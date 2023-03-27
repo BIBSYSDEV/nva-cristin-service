@@ -1,6 +1,11 @@
 package no.unit.nva.cristin.projects.common;
 
-import static no.unit.nva.cristin.model.Constants.*;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
+import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
+import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
+import static no.unit.nva.cristin.model.Constants.STRING_COMMA;
+import static no.unit.nva.cristin.model.Constants.STRING_SPACE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.BIOBANK;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.IGNORE_PATH_PARAMETER_INDEX;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.KEYWORD;

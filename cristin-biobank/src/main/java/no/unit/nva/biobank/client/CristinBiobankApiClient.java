@@ -17,14 +17,14 @@ import nva.commons.core.JacocoGenerated;
 public class CristinBiobankApiClient extends ApiClient {
 
     @JacocoGenerated
-    public static CristinBiobankApiClient defaultClient =
-        new CristinBiobankApiClient(
+    public static CristinBiobankApiClient defaultClient() {
+        return new CristinBiobankApiClient(
             HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
                 .connectTimeout(Duration.ofSeconds(30))
                 .build()
         );
-
+    }
     public CristinBiobankApiClient(HttpClient client) {
         super(client);
     }

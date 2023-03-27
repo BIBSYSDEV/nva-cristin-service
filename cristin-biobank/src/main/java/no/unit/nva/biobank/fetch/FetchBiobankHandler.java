@@ -1,6 +1,5 @@
 package no.unit.nva.biobank.fetch;
 
-import static no.unit.nva.biobank.client.CristinBiobankApiClient.defaultClient;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import no.unit.nva.biobank.client.CristinBiobankApiClient;
@@ -18,7 +17,7 @@ public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
 
     @JacocoGenerated
     public FetchBiobankHandler() {
-        this(defaultClient, new Environment());
+        this(CristinBiobankApiClient.defaultClient(), new Environment());
     }
 
     public FetchBiobankHandler(CristinBiobankApiClient cristinClient, Environment environment) {

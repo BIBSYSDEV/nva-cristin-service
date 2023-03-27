@@ -159,7 +159,7 @@ public class Biobank implements JsonSerializable {
         return lastModified;
     }
 
-    public URI getCoordinatingUnit() {
+    public URI getCoordinatingOrganization() {
         return coordinatingOrganization;
     }
 
@@ -204,7 +204,7 @@ public class Biobank implements JsonSerializable {
                && Objects.equals(getStatus(), biobank.getStatus())
                && Objects.equals(getCreated(), biobank.getCreated())
                && Objects.equals(getLastModified(), biobank.getLastModified())
-               && Objects.equals(getCoordinatingUnit(), biobank.getCoordinatingUnit())
+               && Objects.equals(getCoordinatingOrganization(), biobank.getCoordinatingOrganization())
                && Objects.equals(getCoordinator(), biobank.getCoordinator())
                && Objects.equals(getProject(), biobank.getProject())
                && Objects.equals(getExternalSources(), biobank.getExternalSources())
@@ -217,7 +217,7 @@ public class Biobank implements JsonSerializable {
     public int hashCode() {
         return Objects.hash(context, getId(), getIdentifiers(), getBiobankType(), getName(), getMainLanguage(),
                             getStoreUntilDate(), getStartDate(), getStatus(), getCreated(), getLastModified(),
-                            getCoordinatingUnit(), getCoordinator(), getProject(), getExternalSources(),
+                            getCoordinatingOrganization(), getCoordinator(), getProject(), getExternalSources(),
                             getApprovals(), getBiobankMaterials()
         );
     }
