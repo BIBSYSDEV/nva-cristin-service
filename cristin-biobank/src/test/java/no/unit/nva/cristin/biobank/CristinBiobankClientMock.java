@@ -39,7 +39,7 @@ public class CristinBiobankClientMock extends CristinBiobankApiClient {
                        .filter(s -> s.contains(biobankid))
                        .findFirst()
                        .orElse(null);
-        if (nonNull(body)){
+        if (nonNull(body)) {
             checkHttpStatusCode(query.toURI(), 200, body);
         } else {
             checkHttpStatusCode(query.toURI(), 404, notfoundBody);
