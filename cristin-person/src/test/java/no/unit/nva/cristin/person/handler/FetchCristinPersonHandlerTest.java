@@ -4,7 +4,6 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Optional;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
@@ -260,11 +259,10 @@ public class FetchCristinPersonHandlerTest {
     void shouldAddLangToHttpRequestBeforeSendingToCristin() throws Exception {
         var cristinPerson = OBJECT_MAPPER.readValue(
             stringFromResources(Path.of(CRISTIN_GET_PERSON_RESPONSE_JSON)), CristinPerson.class);
-        HttpResponse<String> response = new HttpResponseFaker(cristinPerson.toString(), HTTP_OK);
+        var response = new HttpResponseFaker(cristinPerson.toString(), HTTP_OK);
         var mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(response);
-        apiClient = new CristinPersonApiClient(mockHttpClient);
-        apiClient = spy(apiClient);
+        apiClient = spy(new CristinPersonApiClient(mockHttpClient));
         handler = new FetchCristinPersonHandler(apiClient, environment);
         sendQuery(null, VALID_PATH_PARAM);
 

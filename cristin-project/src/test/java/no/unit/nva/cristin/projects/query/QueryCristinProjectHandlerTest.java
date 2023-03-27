@@ -663,8 +663,7 @@ class QueryCristinProjectHandlerTest {
         var mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(queryResponse);
         when(mockHttpClient.<String>sendAsync(any(), any())).thenReturn(CompletableFuture.completedFuture(getResponse));
-        var apiClient = new QueryCristinProjectApiClient(mockHttpClient);
-        apiClient = spy(apiClient);
+        var apiClient = spy( new QueryCristinProjectApiClient(mockHttpClient));
         handler = new QueryCristinProjectHandler(apiClient, environment);
         sendDefaultQuery();
 
@@ -780,8 +779,7 @@ class QueryCristinProjectHandlerTest {
 
     private GatewayResponse<SearchResponse> sendBadParameterRequestQuery() throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(
-            JsonPropertyNames.QUERY,
-            RANDOM_TITLE,
+            JsonPropertyNames.QUERY, RANDOM_TITLE,
             PROJECT_SORT, BAD_PARAM_FOR_SORT));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
