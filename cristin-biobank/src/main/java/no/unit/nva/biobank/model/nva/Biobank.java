@@ -3,20 +3,19 @@ package no.unit.nva.biobank.model.nva;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
-import static no.unit.nva.cristin.model.Constants.FHI_BIOBANK_REGISTRY;
-import static no.unit.nva.cristin.model.Constants.PERSONS_PATH;
-import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
-import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_IDENTIFIER_TYPE;
+import static no.unit.nva.cristin.model.Constants.FHI_BIOBANK_REGISTRY;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.TYPE;
 import static no.unit.nva.cristin.model.Constants.VALUE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import java.beans.ConstructorProperties;
 import java.net.URI;
 import java.time.Instant;
@@ -27,17 +26,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import no.unit.nva.biobank.model.cristin.CristinBiobank;
 import no.unit.nva.biobank.model.cristin.CristinBiobankMaterial;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.model.CristinApproval;
+import no.unit.nva.cristin.model.CristinDateInfo;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinUnit;
-import no.unit.nva.cristin.model.CristinApproval;
-import no.unit.nva.cristin.model.CristinDateInfo;
-import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.DateInfo;
+import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.TypedLabel;
 import nva.commons.core.JacocoGenerated;
 
@@ -107,7 +105,7 @@ public class Biobank implements JsonSerializable {
             toDateInfoOrNull(cristinBiobank.getCreated()),
             toDateInfoOrNull(cristinBiobank.getLastModified()),
             toCoordinatingUnit(cristinBiobank.getCoordinatingInstitution()),
-            getNvaApiId(cristinBiobank.getCoordinator().getCristinPersonId(), PERSONS_PATH),
+            getNvaApiId(cristinBiobank.getCoordinator().getCristinPersonId(), PERSON_PATH_NVA),
             toProjectOrNull(cristinBiobank),
             toExternalSources(cristinBiobank.getExternalSources()),
             toApprovals(cristinBiobank.getApprovals()),
@@ -249,7 +247,7 @@ public class Biobank implements JsonSerializable {
             Optional.ofNullable(cristinOrganization)
                 .map(CristinOrganization::getInstitutionUnit)
                 .map(CristinUnit::getCristinUnitId)
-                .map(unitId -> getNvaApiId(unitId, UNITS_PATH))
+                .map(unitId -> getNvaApiId(unitId, ORGANIZATION_PATH))
                 .orElse(null);
     }
 
