@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMes
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessageWithRange;
 import static no.unit.nva.cristin.common.ErrorMessages.requiredMissingMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.common.Utils.forceUTF8;
 import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.QueryParameterKey.APPROVAL_REFERENCE_ID;
@@ -55,6 +56,8 @@ import no.unit.nva.cristin.model.QueryParameterKey;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds Cristin query parameters using builder methods and NVA input parameters.
@@ -66,6 +69,8 @@ public class CristinQueryBuilder {
     private final transient Set<String> invalidKeys = new HashSet<>(0);
     private final transient CristinQuery cristinQuery;
     private transient boolean notValidated = true;
+
+    private static final Logger logger = LoggerFactory.getLogger(CristinQueryBuilder.class);
 
     /**
      * Constructor of CristinQuery.Builder.
@@ -474,35 +479,37 @@ public class CristinQueryBuilder {
      * Set Value by key, Key is validated.
      */
     private void setValue(String key, String value) {
-        var qpKey = keyFromString(key,value);
+
+        var valueUTF8 =  forceUTF8(value);
+        var qpKey = keyFromString(key,valueUTF8);
         if (!key.equals(qpKey.getKey()) && !cristinQuery.isNvaQuery && qpKey != INVALID) {
             cristinQuery.isNvaQuery = true;
         }
         switch (qpKey) {
             case PATH_IDENTITY:
             case PATH_PROJECT:
-                withPathIdentity(value);
+                withPathIdentity(valueUTF8);
                 break;
             case PATH_ORGANISATION:
-                withPathOrganization(value);
+                withPathOrganization(valueUTF8);
                 break;
             case ORGANIZATION:
-                withOrganization(value);
+                withOrganization(valueUTF8);
                 break;
             case BIOBANK:
-                withBiobank(value);
+                withBiobank(valueUTF8);
                 break;
             case KEYWORD:
-                withKeyword(value);
+                withKeyword(valueUTF8);
                 break;
             case PARTICIPANT:
-                withParticipant(value);
+                withParticipant(valueUTF8);
                 break;
             case QUERY:
-                withQuery(value);
+                withQuery(valueUTF8);
                 break;
             case STATUS:
-                withStatus(value);
+                withStatus(valueUTF8);
                 break;
             case APPROVAL_REFERENCE_ID:
             case APPROVED_BY:
@@ -521,7 +528,7 @@ public class CristinQueryBuilder {
             case PAGE_CURRENT:
             case PAGE_ITEMS_PER_PAGE:
             case PAGE_SORT:
-                cristinQuery.setValue(qpKey, value);
+                cristinQuery.setValue(qpKey, valueUTF8);
                 break;
             default:
                 invalidKeys.add(key);
@@ -582,6 +589,7 @@ public class CristinQueryBuilder {
             } else {
                 errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
             }
+            logger.warn("INVALID PARAMETER VALUE [" + entry.getValue() + "]" );
             throw new BadRequestException(errorMessage);
         }
     }
@@ -594,6 +602,8 @@ public class CristinQueryBuilder {
                 nonNull(key.getErrorMessage())
                     ? key.getErrorMessage()
                     : invalidPathParameterMessage(keyName);
+            logger.warn("INVALID PATH VALUE [" + entry.getValue() + "]" );
+
             throw new BadRequestException(errorMessage);
         }
     }

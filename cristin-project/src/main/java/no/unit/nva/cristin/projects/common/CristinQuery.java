@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects.common;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.Utils.forceUTF8;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
@@ -9,6 +10,7 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import java.util.Arrays;
+
 import no.unit.nva.cristin.model.QueryParameterKey;
 import static no.unit.nva.cristin.model.QueryParameterKey.BIOBANK;
 import static no.unit.nva.cristin.model.QueryParameterKey.IGNORE_PATH_PARAMETER_INDEX;
@@ -43,7 +45,7 @@ public class CristinQuery {
     protected final transient Map<QueryParameterKey, String> pathParameters;
     protected final transient Map<QueryParameterKey, String> queryParameters;
     protected final transient Set<QueryParameterKey> otherRequiredKeys;
-    protected transient boolean isNvaQuery;
+    protected transient boolean isNvaQuery = true;
 
     protected CristinQuery() {
         queryParameters = new ConcurrentHashMap<>();
@@ -92,7 +94,7 @@ public class CristinQuery {
      * @return an URI to NVA (default) Projects with parameters.
      */
     public URI toURI() {
-        var children = containsKey(PATH_PROJECT)
+        final var children = containsKey(PATH_PROJECT)
             ? new String[]{PATH_PROJECT.getKey(), getValue(PATH_PROJECT)}
             : new String[]{PATH_PROJECT.getKey()};
 
@@ -235,16 +237,13 @@ public class CristinQuery {
             return Arrays.stream(entry.getValue().split(","))
                        .collect(Collectors.joining("&" + key));
         }
-        var value = entry.getKey().isEncode()
-                        ? encodeUTF(entry.getValue())
-                        : entry.getValue();
-
+        var value = entry.getValue();
         if (entry.getKey().equals(STATUS)) {
             return ProjectStatus.valueOf(value).getCristinStatus();
         }
         return entry.getKey().equals(ORGANIZATION) && entry.getValue().matches(PATTERN_IS_URL)
                    ? getUnitIdFromOrganization(value)
-                   : value;
+                   : value.replace(" ", "+");
     }
 
     private boolean nvaParameterFilter(Map.Entry<QueryParameterKey, String> entry) {
@@ -252,7 +251,7 @@ public class CristinQuery {
     }
 
     private String decodeUTF(String encoded) {
-        return URLDecoder.decode(encoded, StandardCharsets.UTF_8);
+        return forceUTF8(URLDecoder.decode(encoded, StandardCharsets.UTF_8));
     }
 
     private String encodeUTF(String unencoded) {
