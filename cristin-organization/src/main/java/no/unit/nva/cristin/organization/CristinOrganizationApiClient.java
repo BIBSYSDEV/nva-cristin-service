@@ -9,7 +9,6 @@ import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.dto.SubUnitDto;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.NotFoundException;
@@ -43,7 +42,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
-import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
@@ -97,7 +95,7 @@ public class CristinOrganizationApiClient extends ApiClient {
      */
     public Organization getFlatOrganization(String identifier) throws ApiGatewayException {
         URI cristinUri = getCristinOrganizationByIdentifierUri(identifier);
-        HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(cristinUri)).get();
+        HttpResponse<String> response = sendRequestMultipleTimes(cristinUri).get();
         return isSuccessful(response.statusCode()) ? extractOrganization(identifier, response) : null;
     }
 
@@ -195,7 +193,7 @@ public class CristinOrganizationApiClient extends ApiClient {
     }
 
     protected SearchResponse<Organization> query(URI uri) throws NotFoundException, FailedHttpRequestException {
-        HttpResponse<String> response = sendRequestMultipleTimes(addLanguage(uri)).get();
+        HttpResponse<String> response = sendRequestMultipleTimes(uri).get();
         if (isSuccessful(response.statusCode())) {
             try {
                 List<Organization> organizations = getOrganizations(response);
@@ -273,7 +271,6 @@ public class CristinOrganizationApiClient extends ApiClient {
     protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri) throws ApiGatewayException {
 
         SubSubUnitDto subsubUnitDto = of(subunitUri)
-                .map(UriUtils::addLanguage)
                 .flatMap(this::sendRequestMultipleTimes)
                 .map((HttpResponse<String> response) -> throwExceptionIfNotSuccessful(response, subunitUri))
                 .map(HttpResponse::body)

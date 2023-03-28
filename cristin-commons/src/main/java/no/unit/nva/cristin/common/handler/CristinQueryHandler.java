@@ -12,7 +12,6 @@ import java.util.Set;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
-import static no.unit.nva.cristin.common.ErrorMessages.INVALID_URI_MESSAGE;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
@@ -39,7 +38,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     protected String getValidPage(RequestInfo requestInfo) throws BadRequestException {
-        String page = getQueryParameter(requestInfo, PAGE).orElse(FIRST_PAGE);
+        var page = requestInfo.getQueryParameterOpt(PAGE).orElse(FIRST_PAGE);
         if (Utils.isPositiveInteger(page)) {
             return page;
         }
@@ -47,7 +46,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     protected String getValidNumberOfResults(RequestInfo requestInfo) throws BadRequestException {
-        String results = getQueryParameter(requestInfo, NUMBER_OF_RESULTS).orElse(DEFAULT_NUMBER_OF_RESULTS);
+        var results = requestInfo.getQueryParameterOpt(NUMBER_OF_RESULTS).orElse(DEFAULT_NUMBER_OF_RESULTS);
         if (Utils.isPositiveInteger(results)) {
             return results;
         }
@@ -55,7 +54,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     protected String getValidQuery(RequestInfo requestInfo) throws BadRequestException {
-        return getQueryParameter(requestInfo, QUERY)
+        return requestInfo.getQueryParameterOpt(QUERY)
                 .filter(this::isValidQueryString)
                 .map(UriUtils::escapeWhiteSpace)
                 .orElseThrow(() -> new BadRequestException(invalidQueryParametersMessage(
@@ -63,7 +62,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     protected String getValidName(RequestInfo requestInfo) throws BadRequestException {
-        return getQueryParameter(requestInfo, NAME)
+        return requestInfo.getQueryParameterOpt(NAME)
                 .filter(this::isValidQueryString)
                 .map(UriUtils::escapeWhiteSpace)
                 .orElseThrow(() -> new BadRequestException(
@@ -71,18 +70,9 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     }
 
     protected Optional<String> getValidOrganization(RequestInfo requestInfo) {
-        return getQueryParameter(requestInfo, ORGANIZATION)
+        return requestInfo.getQueryParameterOpt(ORGANIZATION)
                 .filter(this::isValidQueryString)
                 .map(UriUtils::escapeWhiteSpace);
-    }
-
-    protected String getValidOrganizationUri(RequestInfo requestInfo) throws BadRequestException {
-        return getQueryParameter(requestInfo, ORGANIZATION)
-                .map(UriUtils::decodeUri)
-                .filter(UriUtils::isValidURI)
-                .orElseThrow(() -> new BadRequestException(
-                        invalidQueryParametersMessage(ORGANIZATION, INVALID_URI_MESSAGE)));
-
     }
 
     private boolean isValidQueryString(String str) {

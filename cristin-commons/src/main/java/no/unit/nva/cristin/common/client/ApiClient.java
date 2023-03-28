@@ -4,7 +4,6 @@ import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.exception.UnauthorizedException;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -38,6 +37,7 @@ import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEAD
 import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.utils.UriUtils.addLanguage;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -72,7 +72,7 @@ public class ApiClient {
      */
     public CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
         return client.sendAsync(
-            HttpRequest.newBuilder(uri)
+            HttpRequest.newBuilder(addLanguage(uri))
                 .GET()
                 .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
                 .build(),
@@ -86,7 +86,8 @@ public class ApiClient {
      */
     public CompletableFuture<HttpResponse<String>> authenticatedFetchGetResultAsync(URI uri) {
         return client.sendAsync(
-            HttpRequest.newBuilder(uri).GET()
+            HttpRequest.newBuilder(addLanguage(uri))
+                .GET()
                 .header(AUTHORIZATION, basicAuthHeader())
                 .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
                 .build(),
@@ -99,7 +100,7 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public HttpResponse<String> fetchGetResult(URI uri) throws ApiGatewayException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
+        HttpRequest httpRequest = HttpRequest.newBuilder(addLanguage(uri))
                                       .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME,
                                               CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
                                       .build();
@@ -112,7 +113,7 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public HttpResponse<String> fetchGetResultWithAuthentication(URI uri) throws ApiGatewayException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
+        HttpRequest httpRequest = HttpRequest.newBuilder(addLanguage(uri))
                                       .header(AUTHORIZATION, basicAuthHeader())
                                       .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME,
                                               CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
@@ -126,7 +127,7 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public HttpResponse<String> fetchQueryResults(URI uri) throws ApiGatewayException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(UriUtils.addLanguage(uri))
+        HttpRequest httpRequest = HttpRequest.newBuilder(addLanguage(uri))
                                       .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME,
                                               CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
                                       .build();

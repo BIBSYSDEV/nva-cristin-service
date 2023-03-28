@@ -99,11 +99,11 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
     }
 
     private Optional<String> getNameIfPresent(RequestInfo requestInfo) {
-        return getQueryParameter(requestInfo, NAME).map(UriUtils::escapeWhiteSpace);
+        return requestInfo.getQueryParameterOpt(NAME).map(UriUtils::escapeWhiteSpace);
     }
 
     private Optional<String> getSortIfPresent(RequestInfo requestInfo) {
-        return getQueryParameter(requestInfo, SORT).map(UriUtils::escapeWhiteSpace);
+        return requestInfo.getQueryParameterOpt(SORT).map(UriUtils::escapeWhiteSpace);
     }
 
     /**
