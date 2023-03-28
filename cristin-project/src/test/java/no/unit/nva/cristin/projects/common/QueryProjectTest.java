@@ -1,11 +1,9 @@
 package no.unit.nva.cristin.projects.common;
 
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LANGUAGE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PAGE_CURRENT;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PAGE_ITEMS_PER_PAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.net.URI;
-
 import nva.commons.apigateway.exceptions.BadRequestException;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +14,7 @@ public class QueryProjectTest {
     private static final String BIOBANK = "533895";
     private static final String FROM_PAGE = "2";
     private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI =
-        "https://api.cristin-test.uio.no/v2/projects/1234?lang=nb";
+        "https://api.cristin-test.uio.no/v2/projects/1234";
     private static final String ID = "1234";
     private static final String KEYWORD = "nature";
     private static final String LANGUAGE_NB = "nb";
@@ -37,7 +35,7 @@ public class QueryProjectTest {
     private static final String SAMPLE_PROJECT_MANAGER = "st";
     private static final String SAMPLE_SORT = "start_date";
     private static final String SAMPLE_UNIT = "184.12.60.0";
-    public static final ParameterKeyProject[] QUERY_PARAMETER_KEYS = {PAGE_CURRENT, PAGE_ITEMS_PER_PAGE, LANGUAGE};
+    public static final ParameterKeyProject[] QUERY_PARAMETER_KEYS = {PAGE_CURRENT, PAGE_ITEMS_PER_PAGE };
 
     @Test
     void buildReturnsUriWithCustomParameterValuesWhenCustomParameterValuesAreSupplied() throws BadRequestException {
@@ -56,11 +54,12 @@ public class QueryProjectTest {
 
     @Test
     void buildReturnsUriWithIdAndLanguageWhenIdAndLanguageParametersAreSupplied() throws BadRequestException {
-        var uri = QueryProject.builder()
+        URI uri = QueryProject.fromIdentifier(ID);
+        var uri2 = QueryProject.builder()
                        .withPathIdentity(ID)
-                       .withLanguage(LANGUAGE_NB)
                        .validate().build().toURI();
         assertEquals(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI, uri.toString());
+        assertEquals(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI, uri2.toString());
     }
 
     @Test

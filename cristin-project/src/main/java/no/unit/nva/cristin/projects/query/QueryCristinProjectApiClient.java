@@ -1,5 +1,8 @@
 package no.unit.nva.cristin.projects.query;
 
+import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
 import no.unit.nva.cristin.projects.common.QueryProject;
@@ -16,6 +19,13 @@ import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LANGUAGE;
 public class QueryCristinProjectApiClient extends CristinProjectApiClient {
 
     private static final Logger logger = LoggerFactory.getLogger(QueryCristinProjectApiClient.class);
+    public QueryCristinProjectApiClient() {
+        super();
+    }
+
+    public QueryCristinProjectApiClient(HttpClient client) {
+        super(client);
+    }
 
     /**
      * Creates a wrapper object containing Cristin Projects transformed to NvaProjects with additional metadata. Is used
@@ -30,7 +40,7 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
 
         final var startRequestTime = System.currentTimeMillis();
         final var response = queryProjects(queryProject);
-        final var cristinProjects = getEnrichedProjectsUsingQueryResponse(response, queryProject.getValue(LANGUAGE));
+        final var cristinProjects = getEnrichedProjectsUsingQueryResponse(response);
         final var nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         final var processingTime = calculateProcessingTime(startRequestTime, System.currentTimeMillis());
 

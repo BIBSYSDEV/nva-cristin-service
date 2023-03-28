@@ -48,7 +48,7 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
                    LEVELS.getNvaKey(), BIOBANK.getNvaKey(), MODIFIED_SINCE.getNvaKey());
 
     public static final ParameterKeyProject[] REQUIRED_QUERY_PARAMETER =
-        {PATH_ORGANISATION, PATH_PROJECT, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE, LANGUAGE};
+        {PATH_ORGANISATION, PATH_PROJECT, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE };
 
     private final transient QueryCristinOrganizationProjectApiClient cristinApiClient;
 
