@@ -239,7 +239,9 @@ public class NvaProjectBuilder {
 
     private List<Map<String, String>> createCristinIdentifier() {
         return nonNull(cristinProject.getCristinProjectId())
-                ? singletonList(Map.of(Constants.TYPE, Constants.CRISTIN_IDENTIFIER_TYPE, Constants.VALUE, cristinProject.getCristinProjectId()))
+                ? singletonList(Map.of(
+                    Constants.TYPE, Constants.CRISTIN_IDENTIFIER_TYPE,
+                    Constants.VALUE, cristinProject.getCristinProjectId()))
                 : emptyList();
     }
 

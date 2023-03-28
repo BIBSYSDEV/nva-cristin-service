@@ -5,6 +5,7 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
+import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
@@ -44,6 +45,20 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
     public static String getUnitIdFromOrganization(String organizationId) {
         var unitId = attempt(() -> URI.create(organizationId)).or(() -> null).get();
         return extractLastPathElement(unitId);
+    }
+
+    /**
+     * Creates a URI to Cristin project with specific ID and language.
+     *
+     * @param id       Project ID to lookup in Cristin
+     * @return an URI to Cristin Projects with ID
+     */
+    public static URI fromIdentifier(String id) {
+        return
+            UriWrapper.fromUri(CRISTIN_API_URL)
+                .addChild(PROJECTS_PATH)
+                .addChild(id)
+                .getUri();
     }
 
     /**
@@ -140,7 +155,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      * @param other CristinQuery to compare
      * @return true if content of Maps are equal
      */
-    public boolean areEqual(CristinQuery other) {
+    public boolean areEqual(CristinQuery<T> other) {
         if (queryParameters.size() != other.queryParameters.size()
             || pathParameters.size() != other.pathParameters.size()) {
             return false;
