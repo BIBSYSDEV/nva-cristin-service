@@ -149,7 +149,25 @@
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
         }
-      } ]
+      } ],
+      "creator": {
+        "type": "ProjectCreator",
+        "identity": {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
+          "type": "Person",
+          "firstName": "Ola",
+          "lastName": "Nordmann",
+          "email": "ola.nordmann@example.org",
+          "phone": "12345678"
+        },
+        "affiliation": {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+          "type": "Organization",
+          "name": {
+            "en": "Medical Department"
+          }
+        }
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -292,7 +310,25 @@
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
         }
-      } ]
+      } ],
+      "creator": {
+        "type": "ProjectCreator",
+        "identity": {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
+          "type": "Person",
+          "firstName": "Ola",
+          "lastName": "Nordmann",
+          "email": "ola.nordmann@example.org",
+          "phone": "12345678"
+        },
+        "affiliation": {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+          "type": "Organization",
+          "name": {
+            "en": "Medical Department"
+          }
+        }
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -435,7 +471,25 @@
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
         }
-      } ]
+      } ],
+      "creator": {
+        "type": "ProjectCreator",
+        "identity": {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
+          "type": "Person",
+          "firstName": "Ola",
+          "lastName": "Nordmann",
+          "email": "ola.nordmann@example.org",
+          "phone": "12345678"
+        },
+        "affiliation": {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+          "type": "Organization",
+          "name": {
+            "en": "Medical Department"
+          }
+        }
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -578,7 +632,25 @@
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
         }
-      } ]
+      } ],
+      "creator": {
+        "type": "ProjectCreator",
+        "identity": {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
+          "type": "Person",
+          "firstName": "Ola",
+          "lastName": "Nordmann",
+          "email": "ola.nordmann@example.org",
+          "phone": "12345678"
+        },
+        "affiliation": {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+          "type": "Organization",
+          "name": {
+            "en": "Medical Department"
+          }
+        }
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -721,7 +793,25 @@
         "authorityName" : {
           "en" : "Regional committees for medical and health research ethics"
         }
-      } ]
+      } ],
+      "creator": {
+        "type": "ProjectCreator",
+        "identity": {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
+          "type": "Person",
+          "firstName": "Ola",
+          "lastName": "Nordmann",
+          "email": "ola.nordmann@example.org",
+          "phone": "12345678"
+        },
+        "affiliation": {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+          "type": "Organization",
+          "name": {
+            "en": "Medical Department"
+          }
+        }
+      }
     }
   ]
 }

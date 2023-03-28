@@ -81,6 +81,9 @@ public class FetchCristinProjectHandlerTest {
     public static final String NOT_LEGAL_STATUS = "not_legal_status";
     public static final String INVALID_QUERY_PARAM_KEY = "invalid";
     public static final String INVALID_QUERY_PARAM_VALUE = "value";
+    public static final URI CRISTIN_PERSON_ID = URI.create("https://api.dev.nva.aws.unit.no/cristin/person/123456");
+    public static final URI CRISTIN_ORG_ID =
+        URI.create("https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0");
 
     private FetchCristinProjectApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -363,6 +366,17 @@ public class FetchCristinProjectHandlerTest {
 
         assertThat(gatewayResponse.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_GATEWAY));
         assertThat(gatewayResponse.getBody(), containsString(RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER));
+    }
+
+    @Test
+    void shouldHaveCreatorInResponsePayload() throws Exception {
+        var responseBody = sendQueryWithId(DEFAULT_IDENTIFIER).getBodyObject(NvaProject.class);
+
+        var actualIdentity = responseBody.getCreator().getIdentity().getId();
+        var actualAffiliation = responseBody.getCreator().getAffiliation().getId();
+
+        assertThat(actualIdentity, equalTo(CRISTIN_PERSON_ID));
+        assertThat(actualAffiliation, equalTo(CRISTIN_ORG_ID));
     }
 
     private String randomLanguageCode() {

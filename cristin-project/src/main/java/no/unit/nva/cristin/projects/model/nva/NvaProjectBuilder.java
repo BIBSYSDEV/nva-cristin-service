@@ -145,7 +145,14 @@ public class NvaProjectBuilder {
                    .withHealthProjectData(extractHealthProjectData(cristinProject))
                    .withApprovals(extractApprovals(cristinProject.getApprovals()))
                    .withExemptFromPublicDisclosure(cristinProject.getExemptFromPublicDisclosure())
+                   .withCreator(extractCreator(cristinProject.getCreator()))
                    .build();
+    }
+
+    private NvaContributor extractCreator(CristinPerson creator) {
+        return Stream.ofNullable(creator)
+                   .flatMap(NvaProjectBuilder::generateRoleBasedContribution).findAny()
+                   .orElse(null);
     }
 
     private List<Approval> extractApprovals(List<CristinApproval> cristinApprovals) {
