@@ -4,7 +4,6 @@ import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Try;
@@ -34,6 +33,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.utils.UriUtils.PERSON;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class CristinPersonApiClient extends ApiClient {
@@ -206,7 +206,6 @@ public class CristinPersonApiClient extends ApiClient {
         return responses.stream()
                 .map(attempt(response -> getDeserializedResponse(response, CristinPerson.class)))
                 .map(Try::orElseThrow)
-                //.filter(CristinPerson::hasValidContent) // TODO: What is minimum data needed for a Cristin Person?
                 .collect(Collectors.toList());
     }
 
@@ -250,14 +249,14 @@ public class CristinPersonApiClient extends ApiClient {
     protected CristinPerson getCristinPersonWithAuthentication(String identifier) throws ApiGatewayException {
         var uri = getCorrectUriForIdentifier(identifier);
         var response = fetchGetResultWithAuthentication(uri);
-        checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
+        checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
         return getDeserializedResponse(response, CristinPerson.class);
     }
 
     protected CristinPerson getCristinPerson(String identifier) throws ApiGatewayException {
         var uri = getCorrectUriForIdentifier(identifier);
         var response = fetchGetResult(uri);
-        checkHttpStatusCode(UriUtils.getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
+        checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
         return getDeserializedResponse(response, CristinPerson.class);
     }
 
