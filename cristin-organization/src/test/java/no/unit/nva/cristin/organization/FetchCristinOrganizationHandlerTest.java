@@ -63,8 +63,7 @@ class FetchCristinOrganizationHandlerTest {
     public static final String NON_EXISTING_IDENTIFIER = "1.0.0.0";
     public static final String ORGANIZATION_NOT_FOUND_MESSAGE = "cannot be dereferenced";
     public static final String LIST_OF_UNITS_JSON_FILE = "list_of_unit_185_53_18_14.json";
-    public static final String CRISTIN_UNITS_URI = "https://api.cristin-test.uio.no/v2/units?id=185.53.18.14&lang=en,"
-                                                   + "nb,nn";
+    public static final String CRISTIN_UNITS_URI = "https://api.cristin-test.uio.no/v2/units?id=185.53.18.14";
     public static final String ENGLISH_LANGUAGE_KEY = "en";
     public static final String DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY = "Department of Medical Biochemistry";
 

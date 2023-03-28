@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person.handler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
+import java.net.http.HttpRequest;
 import java.util.Optional;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
@@ -15,7 +16,6 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
-import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +29,7 @@ import java.net.http.HttpConnectTimeoutException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
+import org.mockito.ArgumentCaptor;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Arrays.asList;
@@ -46,6 +47,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.ioutils.IoUtils.stringFromResources;
+import static nva.commons.core.paths.UriWrapper.fromUri;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -68,10 +70,10 @@ public class FetchCristinPersonHandlerTest {
     private static final Map<String, String> ZERO_QUERY_PARAMS = Collections.emptyMap();
     private static final String EMPTY_STRING = "";
     private static final String EXPECTED_CRISTIN_URI_WITH_IDENTIFIER =
-        "https://api.cristin-test.uio.no/v2/persons/12345?lang=en,nb,nn";
+        "https://api.cristin-test.uio.no/v2/persons/12345";
     private static final Map<String, String> VALID_ORCID_PATH_PARAM = Map.of(ID, "1234-1234-1234-1234");
     private static final String EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER =
-        String.format("%s/persons/ORCID:1234-1234-1234-1234?lang=en,nb,nn", CRISTIN_API_URL);
+        String.format("%s/persons/ORCID:1234-1234-1234-1234", CRISTIN_API_URL);
     private static final int EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS = 2;
     private static final String CRISTIN_GET_PERSON_RESPONSE_JSON = "cristinGetPersonResponse.json";
     private static final String CRISTIN_QUERY_EMPLOYMENT_RESPONSE_JSON = "cristinQueryEmploymentResponse.json";
@@ -165,7 +167,7 @@ public class FetchCristinPersonHandlerTest {
         apiClient = spy(apiClient);
         handler = new FetchCristinPersonHandler(apiClient, environment);
         sendQuery(null, VALID_PATH_PARAM);
-        verify(apiClient).fetchGetResult(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER).getUri());
+        verify(apiClient).fetchGetResult(fromUri(EXPECTED_CRISTIN_URI_WITH_IDENTIFIER).getUri());
     }
 
     @Test
@@ -182,7 +184,7 @@ public class FetchCristinPersonHandlerTest {
         apiClient = spy(apiClient);
         handler = new FetchCristinPersonHandler(apiClient, environment);
         sendQuery(null, VALID_ORCID_PATH_PARAM);
-        verify(apiClient).fetchGetResult(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER).getUri());
+        verify(apiClient).fetchGetResult(fromUri(EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER).getUri());
     }
 
     @Test
@@ -251,6 +253,26 @@ public class FetchCristinPersonHandlerTest {
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(ninObject, equalTo(null));
+    }
+
+    @Test
+    void shouldAddLangToHttpRequestBeforeSendingToCristin() throws Exception {
+        var cristinPerson = OBJECT_MAPPER.readValue(
+            stringFromResources(Path.of(CRISTIN_GET_PERSON_RESPONSE_JSON)), CristinPerson.class);
+        var response = new HttpResponseFaker(cristinPerson.toString(), HTTP_OK);
+        var mockHttpClient = mock(HttpClient.class);
+        when(mockHttpClient.<String>send(any(), any())).thenReturn(response);
+        apiClient = spy(new CristinPersonApiClient(mockHttpClient));
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        sendQuery(null, VALID_PATH_PARAM);
+
+        var captor = ArgumentCaptor.forClass(HttpRequest.class);
+        verify(mockHttpClient).send(captor.capture(), any());
+
+        var expected = "https://api.cristin-test.uio.no/v2/persons/12345?lang=en,nb,nn";
+        var actual = captor.getValue().uri().toString();
+
+        assertThat(actual, equalTo(expected));
     }
 
     private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {

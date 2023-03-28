@@ -142,8 +142,8 @@ Feature: API tests for Cristin projects query
     And param page = '2'
     When method GET
     Then status 200
-    * def nextResultsPath = CRISTIN_BASE + '/project?language=nb&page=3&title=' + queryString + '&results=5'
-    * def previousResultsPath = CRISTIN_BASE + '/project?language=nb&page=1&title=' + queryString + '&results=5'
+    * def nextResultsPath = CRISTIN_BASE + '/project?page=3&title=' + queryString + '&results=5'
+    * def previousResultsPath = CRISTIN_BASE + '/project?page=1&title=' + queryString + '&results=5'
     And match response.nextResults == nextResultsPath
     And match response.previousResults == previousResultsPath
     And match response.firstRecord == 6
