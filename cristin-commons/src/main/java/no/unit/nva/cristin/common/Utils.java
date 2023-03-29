@@ -1,25 +1,5 @@
 package no.unit.nva.cristin.common;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.net.URI;
-import no.unit.nva.cristin.model.Constants;
-import no.unit.nva.utils.AccessUtils;
-import no.unit.nva.utils.UriUtils;
-import nva.commons.apigateway.RequestInfo;
-import nva.commons.apigateway.exceptions.BadRequestException;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import nva.commons.apigateway.exceptions.ForbiddenException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
@@ -31,6 +11,23 @@ import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import no.unit.nva.cristin.model.Constants;
+import no.unit.nva.utils.AccessUtils;
+import no.unit.nva.utils.UriUtils;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.apigateway.exceptions.ForbiddenException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Utils {
 
@@ -43,16 +40,6 @@ public class Utils {
     public static final String USER_IS_INTERNAL_BACKEND = "User is internal backend";
     public static final String USER_TOP_LEVEL_CRISTIN_ORGANIZATION = "User has top level cristin organization {}";
 
-    public static String forceUTF8(String value) {
-        var forcedUTF8 = nonNull(value)
-            ? new String(value.getBytes(), StandardCharsets.UTF_8)
-            : EMPTY_STRING;
-        var isUTF8 =  !forcedUTF8.isBlank()  && forcedUTF8.length() != value.length();
-
-        return isUTF8
-            ? forcedUTF8
-            : value;
-    }
 
     /**
      * Check if a string supplied is a positive integer.

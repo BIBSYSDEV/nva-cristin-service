@@ -1,0 +1,75 @@
+{
+  "cristin_biobank_id" : "2510604",
+  "type" : "SPECIFICBIOBANK",
+  "name" : {
+    "nb" : "Utvikling av test for å måle stress og smerte hos premature barn"
+  },
+  "main_language" : "nb",
+  "start_date" : "2021-03-15T12:00:00.000Z",
+  "stored_until_date" : "2025-12-31T12:00:00.000Z",
+  "status" : "ACTIVE",
+  "created" : {
+    "source_short_name" : "REK",
+    "date" : "2021-05-14T21:54:35.000Z"
+  },
+  "last_modified" : {
+    "source_short_name" : "REK",
+    "date" : "2022-11-28T21:45:17.000Z"
+  },
+  "coordinating_institution" : {
+    "institution" : {
+      "cristin_institution_id" : "2012",
+      "institution_name" : {
+        "en" : "Oslo University Hospital"
+      },
+      "url" : "https://api.cristin.no/v2/institutions/2012"
+    },
+    "unit" : {
+      "cristin_unit_id" : "2012.0.0.0",
+      "unit_name" : {
+        "en" : "Oslo University Hospital"
+      },
+      "url" : "https://api.cristin.no/v2/units/2012.0.0.0"
+    }
+  },
+  "status_name" : {
+    "en" : "Active"
+  },
+  "type_name" : {
+    "en" : "Specific research biobank"
+  },
+  "coordinator" : {
+    "cristin_person_id" : "58388",
+    "first_name" : "Svetlana",
+    "surname" : "Zykova",
+    "url" : "https://api.cristin.no/v2/persons/58388"
+  },
+  "associated_project" : {
+    "cristin_project_id" : "2510603",
+    "title" : {
+      "nb" : "Utvikling av test for å måle stress og smerte hos premature barn"
+    },
+    "url" : "https://api.cristin.no/v2/projects/2510603"
+  },
+  "external_sources" : [ {
+    "source_short_name" : "REK",
+    "source_reference_id" : "REK mappenr 1"
+  } ],
+  "approvals" : [ {
+    "approved_date" : "2021-05-11T21:50:45.000Z",
+    "approved_by" : "REK",
+    "approved_by_name" : {
+      "en" : "Regional committees for medical and health research ethics"
+    },
+    "approval_status" : "APPROVED",
+    "application_code" : "BIOBANK",
+    "approval_reference_id" : "247285"
+  } ],
+  "biobank_materials" : [ {
+    "material_code" : "24",
+    "material_name" : {
+      "en" : "Other material"
+    },
+    "other_material_description" : "spytt"
+  } ]
+}
