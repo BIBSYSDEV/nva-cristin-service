@@ -6,9 +6,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.invalidPathParameterMessa
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.requiredMissingMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
-import static no.unit.nva.cristin.model.CristinQuery.logger;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,12 +15,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds Cristin query parameters using builder methods and NVA input parameters.
  */
 public abstract class QueryBuilder<T extends Enum<T> & IParameterKey> {
 
+    protected final transient Logger logger = LoggerFactory.getLogger(QueryBuilder.class);
     protected static final String PARAMETER_PAGE_DEFAULT_VALUE = "1";
     protected static final String PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
     protected final transient Set<String> invalidKeys = new HashSet<>(0);

@@ -3,7 +3,6 @@ package no.unit.nva.cristin.projects.common;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessageWithRange;
-import static no.unit.nva.cristin.model.Constants.ALL_QUERY_PARAMETER_LANGUAGES;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.CristinQuery.getUnitIdFromOrganization;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVAL_REFERENCE_ID;
@@ -65,9 +64,6 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
                 case PATH_PROJECT:
                     query.setPath(key, EMPTY_STRING);
                     break;
-                case LANGUAGE:
-                    query.setValue(key, ALL_QUERY_PARAMETER_LANGUAGES);
-                    break;
                 case PAGE_CURRENT:
                     query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
                     break;
@@ -115,6 +111,9 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
             case KEYWORD:
                 withKeyword(value);
                 break;
+            case LANGUAGE:
+                logger.info("Ignoring language parameter -> " + value);
+                break;
             case PARTICIPANT:
                 withParticipant(value);
                 break;
@@ -130,7 +129,6 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
             case FUNDING_SOURCE:
             case GRANT_ID:
             case INSTITUTION:
-            case LANGUAGE:
             case LEVELS:
             case MODIFIED_SINCE:
             case NAME:

@@ -301,7 +301,7 @@ class QueryCristinProjectHandlerTest {
     }
 
     @Test
-    void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
+    void handlerReturnsOkWhenReceivingInvalidLanguageQueryParam() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
             JsonPropertyNames.LANGUAGE, INVALID_LANGUAGE));
@@ -309,11 +309,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(),
-                   containsString(
-                       String.format(ErrorMessages.ERROR_MESSAGE_INVALID_VALUE, JsonPropertyNames.LANGUAGE)));
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
     @Test

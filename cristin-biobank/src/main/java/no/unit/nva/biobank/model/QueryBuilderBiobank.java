@@ -2,11 +2,11 @@ package no.unit.nva.biobank.model;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.biobank.model.ParameterKeyBiobank.INVALID;
+import static no.unit.nva.biobank.model.ParameterKeyBiobank.LANGUAGE;
 import static no.unit.nva.biobank.model.ParameterKeyBiobank.PATH_BIOBANK;
 import static no.unit.nva.biobank.model.ParameterKeyBiobank.PATH_IDENTITY;
 import static no.unit.nva.biobank.model.ParameterKeyBiobank.VALID_QUERY_PARAMETER_NVA_KEYS;
 import static no.unit.nva.biobank.model.ParameterKeyBiobank.keyFromString;
-import static no.unit.nva.cristin.model.Constants.ALL_QUERY_PARAMETER_LANGUAGES;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import java.util.Set;
 import no.unit.nva.cristin.model.QueryBuilder;
@@ -21,9 +21,6 @@ public class QueryBuilderBiobank extends QueryBuilder<ParameterKeyBiobank> {
     protected void assignDefaultValues() {
         requiredMissing().forEach(key -> {
             switch (key) {
-                case LANGUAGE:
-                    query.setValue(key, ALL_QUERY_PARAMETER_LANGUAGES);
-                    break;
                 case PAGE_CURRENT:
                     query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
                     break;
@@ -52,6 +49,8 @@ public class QueryBuilderBiobank extends QueryBuilder<ParameterKeyBiobank> {
         var parameterKey = keyFromString(key, value);
         if (parameterKey.equals(INVALID)) {
             invalidKeys.add(key);
+        } else if (parameterKey.equals(LANGUAGE)) {
+            logger.info("Ignoring language parameter -> " + value);
         } else {
             query.setValue(parameterKey, value);
         }
