@@ -1,28 +1,22 @@
 package no.unit.nva.cristin.projects.common;
 
-import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
-import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.STRING_COMMA;
 import static no.unit.nva.cristin.model.Constants.STRING_SPACE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.BIOBANK;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.IGNORE_PATH_PARAMETER_INDEX;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.KEYWORD;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LANGUAGE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.ORGANIZATION;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PARTICIPANT;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PATH_PROJECT;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.STATUS;
-import java.net.URI;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.model.CristinQuery;
 import no.unit.nva.cristin.model.KeyEncoding;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
-import nva.commons.core.paths.UriWrapper;
 
 /**
  *   Parameter definistions  <a href="https://api.cristin-test.uio.no/v2/doc/index.html#GETprojects">...</a>.
@@ -31,22 +25,6 @@ public class QueryProject extends CristinQuery<ParameterKeyProject> {
 
     public static QueryBuilderProject builder() {
         return new QueryBuilderProject();
-    }
-
-    /**
-     * Creates a URI to Cristin project with specific ID and language.
-     *
-     * @param id       Project ID to lookup in Cristin
-     * @param language what language we want some of the result fields to be in
-     * @return an URI to Cristin Projects with ID and language parameters
-     */
-    public static URI fromIdAndLanguage(String id, String language) {
-        return
-            UriWrapper.fromUri(CRISTIN_API_URL)
-                .addChild(PROJECTS_PATH)
-                .addChild(id)
-                .addQueryParameters(Map.of(LANGUAGE.getKey(), language))
-                .getUri();
     }
 
     @Override

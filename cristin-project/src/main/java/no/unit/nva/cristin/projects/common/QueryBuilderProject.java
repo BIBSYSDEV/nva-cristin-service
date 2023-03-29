@@ -1,19 +1,9 @@
 package no.unit.nva.cristin.projects.common;
 
-import no.unit.nva.cristin.common.Utils;
-import no.unit.nva.cristin.model.QueryBuilder;
-import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
-import nva.commons.apigateway.exceptions.BadRequestException;
-
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessageWithRange;
-import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
+import static no.unit.nva.cristin.model.Constants.ALL_QUERY_PARAMETER_LANGUAGES;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.CristinQuery.getUnitIdFromOrganization;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVAL_REFERENCE_ID;
@@ -46,6 +36,14 @@ import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUER
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.keyFromString;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map.Entry;
+import java.util.Set;
+import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.model.QueryBuilder;
+import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
+import nva.commons.apigateway.exceptions.BadRequestException;
 
 @SuppressWarnings({"PMD.GodClass"})
 public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
@@ -68,7 +66,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
                     query.setPath(key, EMPTY_STRING);
                     break;
                 case LANGUAGE:
-                    query.setValue(key, DEFAULT_LANGUAGE_CODE);
+                    query.setValue(key, ALL_QUERY_PARAMETER_LANGUAGES);
                     break;
                 case PAGE_CURRENT:
                     query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);

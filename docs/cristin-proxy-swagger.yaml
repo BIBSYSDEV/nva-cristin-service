@@ -3430,15 +3430,13 @@ components:
             "sourceShortName": "REK",
             "date": "2022-11-28T21:45:17Z"
           },
-          "coordinatingOrganization": "https://api.dev.nva.aws.unit.no/cristin/units/2012.0.0.0",
-          "coordinatingUnit": "https://api.dev.nva.aws.unit.no/cristin/units/2012.0.0.0",
-          "coordinator": "https://api.dev.nva.aws.unit.no/cristin/persons/58388",
+          "coordinatingOrganization": "https://api.dev.nva.aws.unit.no/cristin/organization/2012.0.0.0",
+          "coordinator": "https://api.dev.nva.aws.unit.no/cristin/person/58388",
           "project": {
-            "cristinProjectId": "2510603",
+            "id": "https://api.dev.nva.aws.unit.no/cristin/project/2510603",
             "title": {
               "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
-            },
-            "url": "https://api.dev.nva.aws.unit.no/cristin/project/2510603"
+            }
           },
           "externalSources": [ {
             "type": "ExternalSource",

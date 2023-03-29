@@ -16,34 +16,27 @@ import static no.unit.nva.utils.UriUtils.createNvaProjectId;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssociatedProject implements JsonSerializable {
 
-    private final String cristinProjectId;
+    private final URI id;
     private final Map<String,String> title;
-    private final URI url;
 
     @JacocoGenerated
-    @ConstructorProperties({"cristinProjectId","title","url"})
-    public AssociatedProject(String cristinProjectId, Map<String, String> title, URI url) {
-        this.cristinProjectId = cristinProjectId;
+    @ConstructorProperties({ "id", "title" })
+    public AssociatedProject(URI id,  Map<String, String> title) {
+        this.id = id;
         this.title = nonEmptyOrDefault(title);
-        this.url = url;
     }
 
     public AssociatedProject(CristinAssociatedProject project) {
-        this.cristinProjectId = project.getCristinProjectId();
+        this.id = createNvaProjectId(project.getCristinProjectId());
         this.title = nonEmptyOrDefault(project.getTitle());
-        this.url = createNvaProjectId(cristinProjectId);
     }
 
-    public String getCristinProjectId() {
-        return cristinProjectId;
+    public URI getId() {
+        return id;
     }
 
     public Map<String, String> getTitle() {
         return title;
-    }
-
-    public URI getUrl() {
-        return url;
     }
 
     @Override
@@ -56,15 +49,14 @@ public class AssociatedProject implements JsonSerializable {
             return false;
         }
         AssociatedProject that = (AssociatedProject) o;
-        return Objects.equals(getCristinProjectId(), that.getCristinProjectId())
-               && Objects.equals(getTitle(), that.getTitle())
-               && Objects.equals(getUrl(), that.getUrl());
+        return Objects.equals(getTitle(), that.getTitle())
+               && Objects.equals(getId(), that.getId());
     }
 
     @Override
     @JacocoGenerated
     public int hashCode() {
-        return Objects.hash(getCristinProjectId(), getTitle(), getUrl());
+        return Objects.hash(getTitle(), getId());
     }
 
     @Override

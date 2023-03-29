@@ -10,8 +10,12 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
+
+    private static final Logger logger = LoggerFactory.getLogger(FetchBiobankHandler.class);
 
     private final transient CristinBiobankApiClient cristinClient;
 
@@ -30,8 +34,7 @@ public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
         var query = (QueryBiobank)
                         QueryBiobank.builder()
                             .fromRequestInfo(requestInfo).build();
-        context.getLogger()
-            .log(query.toURI().toString());
+        logger.info("FETCH biobank -> " + query.toURI().toString());
         return
             cristinClient.fetchBiobank(query).toBiobank();
     }
