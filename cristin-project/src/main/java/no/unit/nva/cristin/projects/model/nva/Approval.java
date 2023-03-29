@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.model.ApprovalStatus;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Approval implements JsonSerializable {

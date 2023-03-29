@@ -7,6 +7,7 @@ import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;

@@ -3,25 +3,30 @@ package no.unit.nva.cristin.projects.model.nva;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinApplicationCodeBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinApprovalAuthorityBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinApprovalStatusBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
-import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
+import no.unit.nva.cristin.model.CristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
-import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
-import no.unit.nva.cristin.projects.model.cristin.CristinExternalSource;
+import no.unit.nva.cristin.model.CristinDateInfo;
+import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingAmount;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinHealthProjectTypeBuilder;
-import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.cristin.CristinRole;
+import no.unit.nva.cristin.model.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
+import no.unit.nva.model.ApprovalStatus;
+import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.Organization;
+import no.unit.nva.model.DateInfo;
+import no.unit.nva.model.TypedLabel;
 import nva.commons.core.language.LanguageMapper;
 
 import java.util.Collections;
@@ -45,11 +50,8 @@ import static nva.commons.core.StringUtils.isNotBlank;
 
 public class NvaProjectBuilder {
 
-    public static final String CRISTIN_IDENTIFIER_TYPE = "CristinIdentifier";
     public static final String PROJECT_TYPE = "Project";
 
-    public static final String TYPE = "type";
-    public static final String VALUE = "value";
     public static final String FUNDING_SOURCES = "funding-sources";
 
     private final transient CristinProject cristinProject;
@@ -244,7 +246,9 @@ public class NvaProjectBuilder {
 
     private List<Map<String, String>> createCristinIdentifier() {
         return nonNull(cristinProject.getCristinProjectId())
-                ? singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()))
+                ? singletonList(Map.of(
+                    Constants.TYPE, Constants.CRISTIN_IDENTIFIER_TYPE,
+                    Constants.VALUE, cristinProject.getCristinProjectId()))
                 : emptyList();
     }
 

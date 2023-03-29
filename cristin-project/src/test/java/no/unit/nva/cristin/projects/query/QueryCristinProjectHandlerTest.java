@@ -6,17 +6,17 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
-import static no.unit.nva.cristin.common.Utils.forceUTF8;
 import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.model.QueryParameterKey.QUERY;
-import static no.unit.nva.cristin.model.QueryParameterKey.TITLE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
-import static no.unit.nva.cristin.model.QueryParameterKey.VALID_QUERY_PARAMETER_NVA_KEYS;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.ORGANIZATION;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QUERY;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.TITLE;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS;
 import static no.unit.nva.cristin.projects.query.QueryCristinProjectClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.TOTAL_COUNT_EXAMPLE_VALUE;
@@ -127,7 +127,6 @@ class QueryCristinProjectHandlerTest {
     public static final String KEYWORD_SAMPLE = randomString();
     public static final String UNIT_ID_SAMPLE = "184.12.60.0";
     public static final String START_DATE = "start_date";
-    public static final String NB = "nb";
     public static final String BAD_PARAM_FOR_SORT = "cristin id";
     public static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON = "cristinQueryProjectsResponse.json";
     public static final String CRISTIN_GET_PROJECT_RESPONSE_JSON = "cristinGetProjectResponse.json";
@@ -225,12 +224,11 @@ class QueryCristinProjectHandlerTest {
 
     @Test
     void handlerReturnsOkWhenTitleContainsAeOeAacolon() throws Exception {
-        InputStream input = requestWithQueryParameters(
-            Map.of(
-                JsonPropertyNames.QUERY, forceUTF8(RANDOM_TITLE + " æØå: ;., " + RANDOM_TITLE),
-                JsonPropertyNames.ORGANIZATION,
-                "https%3A%2F%2Fapi.dev.nva.aws.unit.no%2Fcristin%2Forganization%2F20202.0.0.0"
-            ));
+        var map = Map.of(
+            QUERY.getNvaKey(), RANDOM_TITLE + " æØÆØÅå: " + RANDOM_TITLE,
+            ORGANIZATION.getNvaKey(),"https%3A%2F%2Fapi.dev.nva.aws.unit.no%2Fcristin%2Forganization%2F20202.0.0.0"
+        );
+        InputStream input = requestWithQueryParameters(map);
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, Object.class);
 
@@ -241,7 +239,7 @@ class QueryCristinProjectHandlerTest {
     @Test
     void handlerReturnsOkWhenTitleContainsgjennomgaatt() throws Exception {
         InputStream input = requestWithQueryParameters(
-            Map.of(JsonPropertyNames.QUERY, forceUTF8("gjennomgått akutt")));
+            Map.of(JsonPropertyNames.QUERY, "gjennomgått akutt"));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, Object.class);
 
@@ -303,7 +301,7 @@ class QueryCristinProjectHandlerTest {
     }
 
     @Test
-    void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
+    void handlerReturnsOkWhenReceivingInvalidLanguageQueryParam() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
             JsonPropertyNames.LANGUAGE, INVALID_LANGUAGE));
@@ -311,11 +309,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(),
-                   containsString(
-                       String.format(ErrorMessages.ERROR_MESSAGE_INVALID_VALUE, JsonPropertyNames.LANGUAGE)));
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
     @Test
@@ -619,7 +613,7 @@ class QueryCristinProjectHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(SAMPLE_NVA_ORGANIZATION_ENCODED));
+        assertThat(gatewayResponse.getBody(), containsString(SAMPLE_NVA_ORGANIZATION));
     }
 
     @Test
@@ -648,10 +642,11 @@ class QueryCristinProjectHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(body.getDetail(),
-                   containsString(
-                       ErrorMessages.invalidQueryParametersMessageWithRange(JsonPropertyNames.STATUS,
-                                                                            Arrays.toString(ProjectStatus.values()))));
+        var value = ErrorMessages.invalidQueryParametersMessageWithRange(
+            JsonPropertyNames.STATUS,
+            Arrays.toString(ProjectStatus.values())
+        );
+        assertThat(body.getDetail(),containsString(value));
     }
 
     @Test
@@ -663,7 +658,7 @@ class QueryCristinProjectHandlerTest {
         var mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(queryResponse);
         when(mockHttpClient.<String>sendAsync(any(), any())).thenReturn(CompletableFuture.completedFuture(getResponse));
-        var apiClient = spy( new QueryCristinProjectApiClient(mockHttpClient));
+        var apiClient = spy(new QueryCristinProjectApiClient(mockHttpClient));
         handler = new QueryCristinProjectHandler(apiClient, environment);
         sendDefaultQuery();
 
