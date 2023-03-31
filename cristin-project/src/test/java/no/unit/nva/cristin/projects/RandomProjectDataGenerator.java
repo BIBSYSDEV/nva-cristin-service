@@ -10,12 +10,10 @@ import no.unit.nva.model.DateInfo;
 import no.unit.nva.model.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.FundingAmount;
-import no.unit.nva.cristin.projects.model.nva.FundingSource;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.cristin.projects.model.nva.OldFunding;
 import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.model.TypedLabel;
@@ -104,7 +102,7 @@ public class RandomProjectDataGenerator {
                                           .withAcademicSummary(randomSummary())
                                           .withPopularScientificSummary(randomSummary())
                                           .withNewFunding(fundings)
-                                          .withFunding(fundingsToLegacyFundings(fundings))
+                                          .withFunding(fundings)
                                           .withContributors(randomContributors())
                                           .withCoordinatingInstitution(randomOrganization())
                                           .withCreated(randomDateInfo())
@@ -124,13 +122,6 @@ public class RandomProjectDataGenerator {
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
-    }
-
-    private static List<OldFunding> fundingsToLegacyFundings(List<Funding> fundings) {
-        return fundings.stream().map(funding -> {
-            var sourceCode = extractLastPathElement(funding.getSource());
-            return new OldFunding(new FundingSource(funding.getLabels(), sourceCode), funding.getIdentifier());
-        }).collect(Collectors.toList());
     }
 
     /**

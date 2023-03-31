@@ -77,5 +77,11 @@
       "en": "Drug study"
     },
     "clinicalTrialPhase": "PhaseIII"
-  }
+  },
+  "funding": [
+    {
+      "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
+      "identifier": "1234/PO"
+    }
+  ]
 }

@@ -385,7 +385,7 @@ class CreateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldRemoveFieldsNotSupportedByPostToUpstream() throws Exception {
+    void shouldRemoveNameFieldsNotSupportedByPostToUpstream() throws Exception {
         var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
         apiClient = spy(apiClient);
         handler = new CreateCristinProjectHandler(apiClient, environment);
