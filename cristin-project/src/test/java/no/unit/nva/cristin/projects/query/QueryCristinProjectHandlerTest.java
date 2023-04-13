@@ -663,7 +663,7 @@ class QueryCristinProjectHandlerTest {
         var mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(queryResponse);
         when(mockHttpClient.<String>sendAsync(any(), any())).thenReturn(CompletableFuture.completedFuture(getResponse));
-        var apiClient = spy( new QueryCristinProjectApiClient(mockHttpClient));
+        var apiClient = spy(new QueryCristinProjectApiClient(mockHttpClient));
         handler = new QueryCristinProjectHandler(apiClient, environment);
         sendDefaultQuery();
 

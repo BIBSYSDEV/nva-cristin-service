@@ -145,23 +145,10 @@
     "cristin_person_id": "123456",
     "first_name": "Ola",
     "surname": "Nordmann",
-    "url": "https://api.cristin.no/v2/persons/123456",
-    "email": "ola.nordmann@example.org",
-    "phone": "12345678",
     "roles": [
       {
-        "role_code": "PRO_CREATOR",
-        "institution": {
-          "cristin_institution_id": "1234",
-          "institution_name": {
-            "en": "University"
-          }
-        },
         "unit": {
-          "cristin_unit_id": "1234.0.0.0",
-          "unit_name": {
-            "en": "Medical Department"
-          }
+          "cristin_unit_id": "1234.0.0.0"
         }
       }
     ]

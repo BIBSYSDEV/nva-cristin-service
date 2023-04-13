@@ -51,6 +51,7 @@ public class NvaProjectBuilder {
     public static final String TYPE = "type";
     public static final String VALUE = "value";
     public static final String FUNDING_SOURCES = "funding-sources";
+    public static final String PRO_CREATOR = "PRO_CREATOR";
 
     private final transient CristinProject cristinProject;
     private transient String context;
@@ -150,6 +151,12 @@ public class NvaProjectBuilder {
     }
 
     private NvaContributor extractCreator(CristinPerson creator) {
+
+        Optional.ofNullable(creator)
+            .map(CristinPerson::getRoles)
+            .orElse(emptyList())
+            .forEach(role -> role.setRoleCode(PRO_CREATOR));
+
         return Stream.ofNullable(creator)
                    .flatMap(NvaProjectBuilder::generateRoleBasedContribution).findAny()
                    .orElse(null);

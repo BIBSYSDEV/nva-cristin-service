@@ -589,7 +589,7 @@ public class CristinQueryBuilder {
             } else {
                 errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
             }
-            logger.warn("INVALID PARAMETER VALUE [" + entry.getValue() + "]" );
+            logger.warn("INVALID PARAMETER VALUE [" + entry.getValue() + "]");
             throw new BadRequestException(errorMessage);
         }
     }
@@ -602,7 +602,7 @@ public class CristinQueryBuilder {
                 nonNull(key.getErrorMessage())
                     ? key.getErrorMessage()
                     : invalidPathParameterMessage(keyName);
-            logger.warn("INVALID PATH VALUE [" + entry.getValue() + "]" );
+            logger.warn("INVALID PATH VALUE [" + entry.getValue() + "]");
 
             throw new BadRequestException(errorMessage);
         }
