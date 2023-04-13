@@ -1,0 +1,77 @@
+{
+  "cristin_biobank_id" : "643747",
+  "type" : "GENERALBIOBANK",
+  "name" : {
+    "nb" : "GeriDRUG"
+  },
+  "main_language" : "nb",
+  "start_date" : "2019-03-06T00:00:00.000Z",
+  "status" : "ACTIVE",
+  "created" : {
+    "source_short_name" : "REK",
+    "date" : "2019-02-22T21:00:07.000Z"
+  },
+  "last_modified" : {
+    "source_short_name" : "REK",
+    "date" : "2019-02-22T21:00:07.000Z"
+  },
+  "coordinating_institution" : {
+    "institution" : {
+      "cristin_institution_id" : "1936",
+      "institution_name" : {
+        "en" : "Bergen Hospital Trust - Haukeland University Hospital"
+      },
+      "url" : "https://api.cristin-test.uio.no/v2/institutions/1936"
+    },
+    "unit" : {
+      "cristin_unit_id" : "1936.0.0.0",
+      "unit_name" : {
+        "en" : "Bergen Hospital Trust - Haukeland University Hospital"
+      },
+      "url" : "https://api.cristin-test.uio.no/v2/units/1936.0.0.0"
+    }
+  },
+  "status_name" : {
+    "en" : "Not yet started"
+  },
+  "type_name" : {
+    "en" : "General research biobank"
+  },
+  "coordinator" : {
+    "cristin_person_id" : "115753",
+    "first_name" : "Bettina",
+    "surname" : "Riedel",
+    "url" : "https://api.cristin-test.uio.no/v2/persons/115753"
+  },
+  "external_sources" : [ {
+    "source_short_name" : "REK",
+    "source_reference_id" : "2018/1415"
+  } ],
+  "approvals" : [ {
+    "approved_date" : "2019-03-06T00:00:00.000Z",
+    "approved_by" : "REK",
+    "approved_by_name" : {
+      "en" : "Regional committees for medical and health research ethics"
+    },
+    "approval_status" : "APPROVED",
+    "application_code" : "BIOBANK",
+    "approval_reference_id" : "2018/1415"
+  } ],
+  "biobank_materials" : [ {
+    "material_code" : "1",
+    "material_name" : {
+      "en" : "Whole blood"
+    }
+  }, {
+    "material_code" : "2",
+    "material_name" : {
+      "en" : "Serum"
+    }
+  }, {
+    "material_code" : "3",
+    "material_name" : {
+      "en" : "Plasma"
+    }
+  } ],
+  "biobank_id" : "BBR-3295"
+}

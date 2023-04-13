@@ -16,7 +16,10 @@ import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.Organization;
+import no.unit.nva.model.DateInfo;
+import no.unit.nva.model.TypedLabel;
 
 @SuppressWarnings({"PMD.ExcessivePublicCount","PMD.TooManyFields"})
 @JsonInclude(ALWAYS)
@@ -46,7 +49,7 @@ public class NvaProject implements JsonSerializable {
     @JsonProperty
     private Instant endDate;
     @JsonProperty
-    private List<OldFunding> funding;
+    private List<Funding> funding;
     @JsonProperty
     private List<Funding> newFunding;
     @JsonProperty
@@ -178,11 +181,11 @@ public class NvaProject implements JsonSerializable {
         this.endDate = endDate;
     }
 
-    public List<OldFunding> getFunding() {
+    public List<Funding> getFunding() {
         return nonEmptyOrDefault(funding);
     }
 
-    public void setFunding(List<OldFunding> funding) {
+    public void setFunding(List<Funding> funding) {
         this.funding = funding;
     }
 
@@ -489,7 +492,7 @@ public class NvaProject implements JsonSerializable {
             return this;
         }
 
-        public Builder withFunding(List<OldFunding> funding) {
+        public Builder withFunding(List<Funding> funding) {
             nvaProject.setFunding(funding);
             return this;
         }

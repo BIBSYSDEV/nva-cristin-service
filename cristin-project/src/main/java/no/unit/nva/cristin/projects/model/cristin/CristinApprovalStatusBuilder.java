@@ -3,7 +3,8 @@ package no.unit.nva.cristin.projects.model.cristin;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.projects.model.nva.EnumBuilder.mapValuesReversed;
 import java.util.Map;
-import no.unit.nva.cristin.projects.model.nva.ApprovalStatus;
+import no.unit.nva.cristin.model.CristinApproval;
+import no.unit.nva.model.ApprovalStatus;
 import no.unit.nva.cristin.projects.model.nva.EnumBuilder;
 
 public class CristinApprovalStatusBuilder implements EnumBuilder<CristinApproval, ApprovalStatus> {

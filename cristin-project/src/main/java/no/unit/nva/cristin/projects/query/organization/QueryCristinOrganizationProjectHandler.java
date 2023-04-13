@@ -1,33 +1,33 @@
 package no.unit.nva.cristin.projects.query.organization;
 
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
-import static no.unit.nva.cristin.model.QueryParameterKey.BIOBANK;
-import static no.unit.nva.cristin.model.QueryParameterKey.FUNDING;
-import static no.unit.nva.cristin.model.QueryParameterKey.FUNDING_SOURCE;
-import static no.unit.nva.cristin.model.QueryParameterKey.INSTITUTION;
-import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
-import static no.unit.nva.cristin.model.QueryParameterKey.LEVELS;
-import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_CURRENT;
-import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_ITEMS_PER_PAGE;
-import static no.unit.nva.cristin.model.QueryParameterKey.PAGE_SORT;
-import static no.unit.nva.cristin.model.QueryParameterKey.PATH_ORGANISATION;
-import static no.unit.nva.cristin.model.QueryParameterKey.PATH_PROJECT;
-import static no.unit.nva.cristin.model.QueryParameterKey.APPROVAL_REFERENCE_ID;
-import static no.unit.nva.cristin.model.QueryParameterKey.APPROVED_BY;
-import static no.unit.nva.cristin.model.QueryParameterKey.KEYWORD;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_MANAGER;
-import static no.unit.nva.cristin.model.QueryParameterKey.MODIFIED_SINCE;
-import static no.unit.nva.cristin.model.QueryParameterKey.PARTICIPANT;
-import static no.unit.nva.cristin.model.QueryParameterKey.PROJECT_UNIT;
-import static no.unit.nva.cristin.model.QueryParameterKey.USER;
-import static no.unit.nva.cristin.model.QueryParameterKey.VALID_QUERY_PARAMETER_KEYS;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVAL_REFERENCE_ID;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVED_BY;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.BIOBANK;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING_SOURCE;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.INSTITUTION;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.KEYWORD;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LANGUAGE;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.LEVELS;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.MODIFIED_SINCE;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PAGE_CURRENT;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PAGE_ITEMS_PER_PAGE;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PAGE_SORT;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PARTICIPANT;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PATH_ORGANISATION;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PATH_PROJECT;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PROJECT_MANAGER;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PROJECT_UNIT;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.USER;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_KEYS;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Set;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
-import no.unit.nva.cristin.model.QueryParameterKey;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.projects.common.CristinQuery;
+import no.unit.nva.cristin.projects.common.ParameterKeyProject;
+import no.unit.nva.cristin.projects.common.QueryProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
@@ -47,8 +47,8 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
                    PAGE_SORT.getNvaKey(), PROJECT_UNIT.getNvaKey(), USER.getNvaKey(), LANGUAGE.getNvaKey(),
                    LEVELS.getNvaKey(), BIOBANK.getNvaKey(), MODIFIED_SINCE.getNvaKey());
 
-    public static final QueryParameterKey[] REQUIRED_QUERY_PARAMETER =
-        {PATH_ORGANISATION, PATH_PROJECT, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE};
+    public static final ParameterKeyProject[] REQUIRED_QUERY_PARAMETER =
+        {PATH_ORGANISATION, PATH_PROJECT, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE };
 
     private final transient QueryCristinOrganizationProjectApiClient cristinApiClient;
 
@@ -84,12 +84,10 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
     @Override
     protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
-        var cristinQuery =
-            CristinQuery.builder()
+        var cristinQuery = (QueryProject)
+            QueryProject.builder()
                 .fromRequestInfo(requestInfo)
                 .withRequiredParameters(REQUIRED_QUERY_PARAMETER)
-                .asNvaQuery()
-                .validate()
                 .build();
 
         return cristinApiClient.listOrganizationProjects(cristinQuery);

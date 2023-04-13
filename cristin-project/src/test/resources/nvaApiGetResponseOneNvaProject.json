@@ -15,14 +15,12 @@
   "endDate": "2021-05-01T00:00:00Z",
   "funding": [
     {
-      "source": {
-        "type": "FundingSource",
-        "names": {
-          "en": "Research Council of Norway (RCN)"
-        },
-        "code": "NFR"
-      },
-      "code": "654321"
+      "type": "Funding",
+      "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
+      "identifier": "654321",
+      "labels": {
+        "en": "Research Council of Norway (RCN)"
+      }
     }
   ],
   "newFunding": [
