@@ -683,6 +683,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: creator
+          in: query
+          description: Creator identifier
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
