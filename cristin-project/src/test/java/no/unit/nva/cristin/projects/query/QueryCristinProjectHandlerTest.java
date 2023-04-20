@@ -746,6 +746,20 @@ class QueryCristinProjectHandlerTest {
         assertThat(gatewayResponse.getBody(), containsString(UPSTREAM_RETURNED_BAD_REQUEST));
     }
 
+    @Test
+    void shouldReturnOkWhenProjectCreatorHasMissingOrganizationInRoles() throws Exception {
+        var serializedCristinProject = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON));
+        var deserialized = OBJECT_MAPPER.readValue(serializedCristinProject, CristinProject.class);
+        deserialized.getCreator().setRoles(null);
+
+        cristinApiClientStub =
+            new QueryCristinProjectClientStub(OBJECT_MAPPER.writeValueAsString(deserialized));
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        var gatewayResponse = sendDefaultQuery();
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
         cristinApiClientStub = spy(cristinApiClientStub);
         doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HTTP_OK, generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))

@@ -153,15 +153,17 @@ public class NvaProjectBuilder {
     }
 
     private NvaContributor extractCreator(CristinPerson creator) {
+        return Optional.ofNullable(creator)
+            .stream().peek(this::addRoleDataIfMissing)
+            .flatMap(NvaProjectBuilder::generateRoleBasedContribution).findAny().orElse(null);
+    }
 
-        Optional.ofNullable(creator)
-            .map(CristinPerson::getRoles)
-            .orElse(emptyList())
-            .forEach(role -> role.setRoleCode(PRO_CREATOR));
-
-        return Stream.ofNullable(creator)
-                   .flatMap(NvaProjectBuilder::generateRoleBasedContribution).findAny()
-                   .orElse(null);
+    private void addRoleDataIfMissing(CristinPerson cristinPerson) {
+        if (isNull(cristinPerson.getRoles())) {
+            cristinPerson.setRoles(emptyList());
+        } else {
+            cristinPerson.getRoles().forEach(role -> role.setRoleCode(PRO_CREATOR));
+        }
     }
 
     private List<Approval> extractApprovals(List<CristinApproval> cristinApprovals) {
