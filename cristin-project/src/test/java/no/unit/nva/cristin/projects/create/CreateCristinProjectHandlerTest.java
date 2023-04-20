@@ -457,6 +457,31 @@ class CreateCristinProjectHandlerTest {
         assertThat(actualOrg, equalTo(extractLastPathElement(CRISTIN_ORG_ID)));
     }
 
+    @Test
+    void shouldAddCreatorDataToOutputPayloadEvenWithMissingOrganization() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        mockUpstreamUsingRequest(nvaProject);
+        var input = inputWithClientIdentifierButNoClientOrganization(nvaProject);
+
+        handler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+
+        var creator = capturedCristinProject.getCreator();
+        var actualPerson = creator.getCristinPersonId();
+        var actualOrg = creator.getRoles();
+
+        assertThat(actualPerson, equalTo(extractLastPathElement(CRISTIN_PERSON_ID)));
+        assertThat(actualOrg, equalTo(null));
+    }
+
     private InputStream inputWithClientIdentifiers(NvaProject nvaProject) throws JsonProcessingException {
         var customer = randomUri();
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
@@ -466,6 +491,16 @@ class CreateCristinProjectHandlerTest {
                         .withTopLevelCristinOrgId(CRISTIN_ORG_ID)
                         .withAccessRights(customer, EDIT_OWN_INSTITUTION_PROJECTS)
                         .build();
+    }
+
+    private InputStream inputWithClientIdentifierButNoClientOrganization(NvaProject nvaProject) throws JsonProcessingException {
+        var customer = randomUri();
+        return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
+                   .withBody(nvaProject)
+                   .withCurrentCustomer(customer)
+                   .withPersonCristinId(CRISTIN_PERSON_ID)
+                   .withAccessRights(customer, EDIT_OWN_INSTITUTION_PROJECTS)
+                   .build();
     }
 
     private CristinProject captureCristinProjectFromApiClient(CreateCristinProjectApiClient apiClient,

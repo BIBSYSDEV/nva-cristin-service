@@ -88,7 +88,14 @@ public class CristinProjectBuilder {
     }
 
     private CristinPerson extractCreator(NvaContributor creator) {
-        return Optional.ofNullable(creator).map(NvaContributor::toCristinPersonWithRoles).orElse(null);
+        if (nonNull(creator)) {
+            if (nonNull(creator.getAffiliation())) {
+                return creator.toCristinPersonWithRoles();
+            } else {
+                return creator.getIdentity().toCristinPersonWithoutRoles();
+            }
+        }
+        return null;
     }
 
     public static void removeFieldsNotSupportedByPost(CristinProject cristinProject) {
