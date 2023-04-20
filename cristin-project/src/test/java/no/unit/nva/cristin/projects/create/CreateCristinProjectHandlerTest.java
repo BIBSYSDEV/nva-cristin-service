@@ -482,6 +482,28 @@ class CreateCristinProjectHandlerTest {
         assertThat(actualOrg, equalTo(null));
     }
 
+    @Test
+    void shouldNotAddCreatorDataToOutputWhenPersonIdentifierIsMissing() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        mockUpstreamUsingRequest(nvaProject);
+        var input = requestWithBodyAndRole(nvaProject);
+
+        handler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+
+        var creator = capturedCristinProject.getCreator();
+
+        assertThat(creator, equalTo(null));
+    }
+
     private InputStream inputWithClientIdentifiers(NvaProject nvaProject) throws JsonProcessingException {
         var customer = randomUri();
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
