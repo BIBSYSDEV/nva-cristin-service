@@ -155,7 +155,20 @@ public class NvaProjectBuilder {
     private NvaContributor extractCreator(CristinPerson creator) {
         return Optional.ofNullable(creator)
             .stream().peek(this::addRoleDataIfMissing)
-            .flatMap(NvaProjectBuilder::generateRoleBasedContribution).findAny().orElse(null);
+            .flatMap(NvaProjectBuilder::generateRoleBasedContribution)
+                   .findAny()
+                   .or(() -> creatorWithoutAffiliation(creator))
+                   .orElse(null);
+    }
+
+    private Optional<NvaContributor> creatorWithoutAffiliation(CristinPerson creator) {
+        return Optional.ofNullable(creator)
+                   .filter(presentCreator -> nonNull(presentCreator.getCristinPersonId()))
+                   .map(presentCreator -> {
+                       var creatorWithoutAffiliation = new NvaContributor();
+                       creatorWithoutAffiliation.setIdentity(Person.fromCristinPerson(presentCreator));
+                       return creatorWithoutAffiliation;
+                   });
     }
 
     private void addRoleDataIfMissing(CristinPerson cristinPerson) {

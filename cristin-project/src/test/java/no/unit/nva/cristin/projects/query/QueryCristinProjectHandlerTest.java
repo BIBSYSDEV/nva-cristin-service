@@ -40,6 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import java.io.ByteArrayOutputStream;
@@ -55,6 +56,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -65,6 +67,7 @@ import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -747,7 +750,7 @@ class QueryCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldReturnOkWhenProjectCreatorHasMissingOrganizationInRoles() throws Exception {
+    void shouldReturnOkWithOnlyCreatorPersonIdWhenProjectCreatorHasMissingOrganizationInRoles() throws Exception {
         var serializedCristinProject = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON));
         var deserialized = OBJECT_MAPPER.readValue(serializedCristinProject, CristinProject.class);
         deserialized.getCreator().setRoles(null);
@@ -757,6 +760,13 @@ class QueryCristinProjectHandlerTest {
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
         var gatewayResponse = sendDefaultQuery();
 
+        List<NvaProject> responseHits =
+            OBJECT_MAPPER.convertValue(gatewayResponse.getBodyObject(SearchResponse.class).getHits(),
+                                       new TypeReference<>() {});
+
+        var creatorPersonId = responseHits.get(0).getCreator().getIdentity().getId().toString();
+
+        assertThat(creatorPersonId, containsString(CREATOR_IDENTIFIER));
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
