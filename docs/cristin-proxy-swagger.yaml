@@ -1846,16 +1846,8 @@ components:
                     type: string
                     pattern: '.*'
                     description: Phone number
-
               affiliation:
                 $ref: '#/components/schemas/Organization'
-        status:
-          type: string
-          enum:
-            - NOTSTARTED
-            - ACTIVE
-            - CONCLUDED
-          description: Project status, based on start_date and end_date.
         academicSummary:
           $ref: '#/components/schemas/Languages'
         popularScientificSummary:
@@ -3019,8 +3011,6 @@ components:
           affiliation:
             id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             type: 'Organization'
-            name:
-              'nb': 'OsloMet - storbyuniversitetet'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -3101,7 +3091,6 @@ components:
             affiliation:
               type: 'Organization'
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-        status: CONCLUDED
         academicSummary:
           en: "Summary in an academic manner"
         popularScientificSummary:
@@ -3128,10 +3117,10 @@ components:
             source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR'
             identifier: '1234556'
         keywords:
-          - code: '4245'
-          - code: '5686'
+          - type: '4245'
+          - type: '5686'
         projectCategories:
-          - code: 'PHD'
+          - type: 'PHD'
         relatedProjects:
           - 'https://api.dev.nva.aws.unit.no/cristin/project/21500'
         contactInfo:
