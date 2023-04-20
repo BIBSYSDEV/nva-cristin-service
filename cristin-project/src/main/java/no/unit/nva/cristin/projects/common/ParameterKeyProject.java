@@ -16,6 +16,7 @@ import static no.unit.nva.cristin.model.Constants.PATTERN_IS_NUMBER;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_TITLE;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
+import static no.unit.nva.cristin.model.Constants.PROJECT_CREATOR_PARAM;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.QUERY_PARAMETER_LANGUAGE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QueryParameterConstant.ERROR_MESSAGE_INVALID_CHARACTERS;
@@ -76,7 +77,8 @@ public enum ParameterKeyProject implements IParameterKey {
         PATTERN_IS_NUMBER,
         ERROR_MESSAGE_INVALID_NUMBER,
         KeyEncoding.NONE),
-    PAGE_SORT(JsonPropertyNames.PROJECT_SORT);
+    PAGE_SORT(JsonPropertyNames.PROJECT_SORT),
+    CREATOR(PROJECT_CREATOR_PARAM, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE);
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
 
