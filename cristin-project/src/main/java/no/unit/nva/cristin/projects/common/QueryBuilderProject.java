@@ -8,6 +8,7 @@ import static no.unit.nva.cristin.model.CristinQuery.getUnitIdFromOrganization;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVAL_REFERENCE_ID;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVED_BY;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.BIOBANK;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.CREATOR;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING_SOURCE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.GRANT_ID;
@@ -140,6 +141,9 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
             case PAGE_ITEMS_PER_PAGE:
             case PAGE_SORT:
                 query.setValue(qpKey, value);
+                break;
+            case CREATOR:
+                withCreator(value);
                 break;
             default:
                 invalidKeys.add(key);
@@ -434,6 +438,14 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
      */
     public QueryBuilderProject withUser(String user) {
         query.setValue(USER, user);
+        return this;
+    }
+
+    /**
+     * Setter a project creator's identifier.
+     */
+    public QueryBuilderProject withCreator(String creator) {
+        query.setValue(CREATOR, creator);
         return this;
     }
 

@@ -168,6 +168,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: creator
+          in: query
+          description: Creator identifier
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -674,6 +680,12 @@ paths:
         - name: biobank
           in: query
           description: Biobank id. 'biobank' can be used more than once.
+          required: false
+          schema:
+            type: string
+        - name: creator
+          in: query
+          description: Creator identifier
           required: false
           schema:
             type: string

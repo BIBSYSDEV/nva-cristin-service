@@ -8,6 +8,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQ
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.PROJECT_CREATOR_PARAM;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
@@ -130,6 +131,7 @@ class QueryCristinProjectHandlerTest {
     public static final String BAD_PARAM_FOR_SORT = "cristin id";
     public static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON = "cristinQueryProjectsResponse.json";
     public static final String CRISTIN_GET_PROJECT_RESPONSE_JSON = "cristinGetProjectResponse.json";
+    public static final String CREATOR_IDENTIFIER = "12345";
 
     private final Environment environment = new Environment();
     private QueryCristinProjectApiClient cristinApiClientStub;
@@ -709,7 +711,8 @@ class QueryCristinProjectHandlerTest {
                                  "keyword", KEYWORD_SAMPLE,
                                  "results", "5",
                                  "unit", UNIT_ID_SAMPLE,
-                                 "sort", START_DATE);
+                                 "sort", START_DATE,
+                                 "creator", CREATOR_IDENTIFIER);
         var input = requestWithQueryParameters(queryParams);
         handler.handleRequest(input, output, context);
         var captor = ArgumentCaptor.forClass(URI.class);
@@ -723,6 +726,7 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualURI, containsString(PROJECT_KEYWORD + EQUAL_OPERATOR + KEYWORD_SAMPLE));
         assertThat(actualURI, containsString(PROJECT_UNIT + EQUAL_OPERATOR + UNIT_ID_SAMPLE));
         assertThat(actualURI, containsString(PROJECT_SORT + EQUAL_OPERATOR + START_DATE));
+        assertThat(actualURI, containsString(PROJECT_CREATOR_PARAM + EQUAL_OPERATOR + CREATOR_IDENTIFIER));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                                                                SearchResponse.class);
