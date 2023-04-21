@@ -70,7 +70,8 @@ public class RandomProjectDataGenerator {
             ".institutionsResponsibleForResearch.partOf",
             ".institutionsResponsibleForResearch.acronym",
             ".institutionsResponsibleForResearch.context",
-            ".funding"
+            ".funding",
+            ".creator"
     );
     private static final String NORWEGIAN = "nb";
     private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};

@@ -57,9 +57,9 @@ public class NvaContributor implements JsonSerializable {
             return false;
         }
         NvaContributor that = (NvaContributor) o;
-        return getType().equals(that.getType())
-            && getIdentity().equals(that.getIdentity())
-            && getAffiliation().equals(that.getAffiliation());
+        return Objects.equals(getType(), that.getType())
+               && Objects.equals(getIdentity(), that.getIdentity())
+               && Objects.equals(getAffiliation(), that.getAffiliation());
     }
 
     /**

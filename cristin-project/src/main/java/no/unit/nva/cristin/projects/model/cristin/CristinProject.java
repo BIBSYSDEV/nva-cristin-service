@@ -43,6 +43,7 @@ public class CristinProject implements JsonSerializable {
     public static final String CRISTIN_ACADEMIC_SUMMARY = "academic_summary";
     public static final String CRISTIN_POPULAR_SCIENTIFIC_SUMMARY = "popular_scientific_summary";
     public static final String CRISTIN_MAIN_LANGUAGE = "main_language";
+    public static final String CREATOR = "creator";
 
     private String cristinProjectId;
     private Boolean publishable;
@@ -91,6 +92,8 @@ public class CristinProject implements JsonSerializable {
     private List<CristinApproval> approvals;
     @JsonProperty(EXEMPT_FROM_PUBLIC_DISCLOSURE)
     private Boolean exemptFromPublicDisclosure;
+    @JsonProperty(CREATOR)
+    private CristinPerson creator;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -324,6 +327,14 @@ public class CristinProject implements JsonSerializable {
         this.exemptFromPublicDisclosure = exemptFromPublicDisclosure;
     }
 
+    public CristinPerson getCreator() {
+        return creator;
+    }
+
+    public void setCreator(CristinPerson creator) {
+        this.creator = creator;
+    }
+
     /**
      * Verifies CristinProject has enough data to be considered as valid.
      *
@@ -376,7 +387,8 @@ public class CristinProject implements JsonSerializable {
                && Objects.equals(getHealthProjectTypeName(), that.getHealthProjectTypeName())
                && Objects.equals(getClinicalTrialPhase(), that.getClinicalTrialPhase())
                && Objects.equals(getApprovals(), that.getApprovals())
-               && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure());
+               && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure())
+               && Objects.equals(getCreator(), that.getCreator());
     }
 
     @Override
@@ -389,7 +401,7 @@ public class CristinProject implements JsonSerializable {
                             getMethod(), getEquipment(), getProjectCategories(), getKeywords(), getExternalSources(),
                             getRelatedProjects(), getInstitutionsResponsibleForResearch(), getHealthProjectType(),
                             getHealthProjectTypeName(), getClinicalTrialPhase(), getApprovals(),
-                            getExemptFromPublicDisclosure());
+                            getExemptFromPublicDisclosure(), getCreator());
     }
 
     @Override

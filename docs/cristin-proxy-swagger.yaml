@@ -1748,6 +1748,32 @@ components:
                 - PhaseIV
         approvals:
           $ref: '#/components/schemas/Approvals'
+        creator:
+          type: object
+          description: Project Creator
+          properties:
+            type:
+              type: string
+              description: Type. Always ProjectCreator
+            identity:
+              type: object
+              properties:
+                id:
+                  $ref: '#/components/schemas/Id'
+                type:
+                  type: string
+                  pattern: 'Person'
+                  description: Type of identity. Always Person
+                firstName:
+                  type: string
+                  pattern: '.+'
+                  description: First name
+                lastName:
+                  type: string
+                  pattern: '.+'
+                  description: Last name
+            affiliation:
+              $ref: '#/components/schemas/Organization'
     ProjectPost:
       type: object
       properties:
@@ -1820,16 +1846,8 @@ components:
                     type: string
                     pattern: '.*'
                     description: Phone number
-
               affiliation:
                 $ref: '#/components/schemas/Organization'
-        status:
-          type: string
-          enum:
-            - NOTSTARTED
-            - ACTIVE
-            - CONCLUDED
-          description: Project status, based on start_date and end_date.
         academicSummary:
           $ref: '#/components/schemas/Languages'
         popularScientificSummary:
@@ -2983,6 +3001,16 @@ components:
             identifier: '2017/800'
             authorityName:
               en: 'Regional committees for medical and health research ethics'
+        creator:
+          type: 'ProjectCreator'
+          identity:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+            type: 'Person'
+            firstName: 'Ola'
+            lastName: 'Nordmann'
+          affiliation:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+            type: 'Organization'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -3063,7 +3091,6 @@ components:
             affiliation:
               type: 'Organization'
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-        status: CONCLUDED
         academicSummary:
           en: "Summary in an academic manner"
         popularScientificSummary:
@@ -3090,10 +3117,10 @@ components:
             source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR'
             identifier: '1234556'
         keywords:
-          - code: '4245'
-          - code: '5686'
+          - type: '4245'
+          - type: '5686'
         projectCategories:
-          - code: 'PHD'
+          - type: 'PHD'
         relatedProjects:
           - 'https://api.dev.nva.aws.unit.no/cristin/project/21500'
         contactInfo:
