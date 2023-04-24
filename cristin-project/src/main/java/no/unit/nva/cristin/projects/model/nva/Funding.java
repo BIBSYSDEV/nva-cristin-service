@@ -2,14 +2,12 @@ package no.unit.nva.cristin.projects.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Map;
 import no.unit.nva.commons.json.JsonSerializable;
 
 import java.util.Objects;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Funding implements JsonSerializable {
 
     public static final String SOURCE = "source";
