@@ -41,6 +41,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
 import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -312,7 +313,7 @@ public class NvaProjectBuilder {
         var identifier = cristinFunding.getProjectCode();
         var labels = cristinFunding.getFundingSourceName();
 
-        return new Funding(source, identifier, labels);
+        return new Funding(UNCONFIRMED_FUNDING, source, identifier, labels);
     }
 
     private URI extractFundingSource(CristinFundingSource cristinFunding) {

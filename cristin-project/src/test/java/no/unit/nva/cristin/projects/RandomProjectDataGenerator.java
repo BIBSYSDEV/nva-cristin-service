@@ -34,6 +34,7 @@ import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_IDENTIFIER_TYPE;
+import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.FUNDING_SOURCES;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.PROJECT_TYPE;
 import static no.unit.nva.cristin.model.Constants.TYPE;
@@ -45,7 +46,6 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -231,7 +231,8 @@ public class RandomProjectDataGenerator {
     }
 
     private static Funding randomFunding() {
-        return new Funding(getNvaApiUri(FUNDING_SOURCES + PATH_DELIMITER + randomString()), randomString(),
+        return new Funding(UNCONFIRMED_FUNDING, getNvaApiUri(FUNDING_SOURCES + PATH_DELIMITER + randomString()),
+                           randomString(),
                            randomNamesMap());
     }
 

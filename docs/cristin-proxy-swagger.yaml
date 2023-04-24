@@ -2109,6 +2109,10 @@ components:
       type: object
       description: Funding
       properties:
+        type:
+          type: string
+          pattern: 'UnconfirmedFunding'
+          description: Always UnconfirmedFunding
         source:
           type: string
           description: The source of the funding formatted as an uri
@@ -2798,7 +2802,8 @@ components:
             startDate: '2012-01-09T00:00:00Z'
             endDate: '2017-12-31T00:00:00Z'
             funding:
-              - source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
+              - type: 'UnconfirmedFunding'
+                source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
                 identifier: '1234556'
                 labels:
                   nb: 'Egen Institusjon'
@@ -2902,7 +2907,8 @@ components:
         startDate: '2012-01-09T00:00:00Z'
         endDate: '2017-12-31T00:00:00Z'
         funding:
-          - source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
+          - type: 'UnconfirmedFunding'
+            source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
             identifier: '1234556'
             labels:
               nb: 'Egen Institusjon'
@@ -3578,7 +3584,8 @@ components:
             startDate: '2012-01-09T00:00:00Z'
             endDate: '2017-12-31T00:00:00Z'
             funding:
-              - source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
+              - type: 'UnconfirmedFunding'
+                source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
                 identifier: '1234556'
                 labels:
                   nb: 'Egen Institusjon'

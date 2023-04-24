@@ -24,6 +24,7 @@
       "endDate": "2021-05-01T00:00:00Z",
       "funding": [
         {
+          "type": "UnconfirmedFunding",
           "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
           "identifier": "654321",
           "labels": {
@@ -33,6 +34,7 @@
       ],
       "newFunding": [
         {
+          "type": "UnconfirmedFunding",
           "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
           "identifier": "654321",
           "labels": {
@@ -176,6 +178,7 @@
       "endDate": "2021-05-01T00:00:00Z",
       "funding": [
         {
+          "type": "UnconfirmedFunding",
           "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
           "identifier": "654321",
           "labels": {
@@ -185,6 +188,7 @@
       ],
       "newFunding": [
         {
+          "type": "UnconfirmedFunding",
           "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
           "identifier": "654321",
           "labels": {
@@ -328,6 +332,7 @@
       "endDate": "2021-05-01T00:00:00Z",
       "funding": [
         {
+          "type": "UnconfirmedFunding",
           "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
           "identifier": "654321",
           "labels": {
@@ -337,6 +342,7 @@
       ],
       "newFunding": [
         {
+          "type": "UnconfirmedFunding",
           "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
           "identifier": "654321",
           "labels": {
@@ -480,6 +486,7 @@
       "endDate": "2021-05-01T00:00:00Z",
       "funding": [
         {
+          "type": "UnconfirmedFunding",
           "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
           "identifier": "654321",
           "labels": {
@@ -489,6 +496,7 @@
       ],
       "newFunding": [
         {
+          "type": "UnconfirmedFunding",
           "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
           "identifier": "654321",
           "labels": {
@@ -632,6 +640,7 @@
       "endDate": "2021-05-01T00:00:00Z",
       "funding": [
         {
+          "type": "UnconfirmedFunding",
           "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
           "identifier": "654321",
           "labels": {
@@ -641,6 +650,7 @@
       ],
       "newFunding": [
         {
+          "type": "UnconfirmedFunding",
           "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
           "identifier": "654321",
           "labels": {

@@ -44,6 +44,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.projects.fetch.FetchCristinProjectClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.fetch.FetchCristinProjectHandler.ERROR_MESSAGE_CLIENT_SENT_UNSUPPORTED_QUERY_PARAM;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.FUNDING_SOURCES;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -381,7 +382,7 @@ public class FetchCristinProjectHandlerTest {
         final var source = UriWrapper.fromUri(getNvaApiUri(FUNDING_SOURCES)).addChild("NFR").getUri();
         final var identifier = "654321";
         final var labels = Map.of("en", "Research Council of Norway (RCN)");
-        return List.of(new Funding(source, identifier, labels));
+        return List.of(new Funding(UNCONFIRMED_FUNDING, source, identifier, labels));
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String identifier) throws IOException {
