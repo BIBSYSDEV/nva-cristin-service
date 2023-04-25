@@ -244,10 +244,12 @@ public class RandomProjectDataGenerator {
      * Creates a random organization.
      */
     public static Organization randomOrganization() {
+        var labels = randomNamesMap();
         return new Organization.Builder()
-                .withId(semiRandomOrganizationId(randomString()))
-                .withName(randomNamesMap())
-                .build();
+                   .withId(semiRandomOrganizationId(randomString()))
+                   .withName(labels)
+                   .withLabels(labels)
+                   .build();
     }
 
     public static List<Map<String, String>> randomListOfTitles(URI usedLanguage) {
