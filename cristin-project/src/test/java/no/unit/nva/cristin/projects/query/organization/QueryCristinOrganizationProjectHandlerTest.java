@@ -14,7 +14,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
-import static no.unit.nva.cristin.projects.query.QueryCristinProjectHandler.VALID_QUERY_PARAMETERS;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
@@ -103,7 +103,7 @@ class QueryCristinOrganizationProjectHandlerTest {
         var actualDetail = getProblemDetail(gatewayResponse);
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS)));
+        assertThat(actualDetail, containsString(validQueryParameterNamesMessage(VALID_QUERY_PARAMETER_NVA_KEYS)));
     }
 
     @Test

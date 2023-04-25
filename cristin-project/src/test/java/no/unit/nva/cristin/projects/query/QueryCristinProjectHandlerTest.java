@@ -7,14 +7,17 @@ import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_D
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
-import static no.unit.nva.cristin.model.QueryParameterKey.LANGUAGE;
-import static no.unit.nva.cristin.model.QueryParameterKey.QUERY;
-import static no.unit.nva.cristin.model.QueryParameterKey.TITLE;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.PROJECT_CREATOR_PARAM;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.ORGANIZATION;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QUERY;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.TITLE;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS;
 import static no.unit.nva.cristin.projects.query.QueryCristinProjectClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.TOTAL_COUNT_EXAMPLE_VALUE;
@@ -25,6 +28,7 @@ import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,8 +37,10 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import java.io.ByteArrayOutputStream;
@@ -43,11 +49,14 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -58,6 +67,7 @@ import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -86,7 +96,7 @@ class QueryCristinProjectHandlerTest {
     public static final String GRANT_ID_EXAMPLE = "1234567";
     public static final String WHITESPACE = " ";
     public static final String URI_WITH_ESCAPED_WHITESPACE =
-        "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=1&results=5&title=reindeer+reindeer%253A";
+        "https://api.dev.nva.aws.unit.no/cristin/project?page=1&results=5&title=reindeer+reindeer%253A";
     public static final String INVALID_QUERY_PARAM_KEY = "invalid";
     public static final String INVALID_QUERY_PARAM_VALUE = "value";
     public static final String PROBLEM_JSON = APPLICATION_PROBLEM_JSON.toString();
@@ -99,9 +109,9 @@ class QueryCristinProjectHandlerTest {
     private static final String SECOND_PAGE = "2";
     private static final String TEN_RESULTS = "10";
     private static final String URI_WITH_PAGE_NUMBER_VALUE_OF_TWO =
-        "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=2&results=5&title=reindeer";
+        "https://api.dev.nva.aws.unit.no/cristin/project?page=2&results=5&title=reindeer";
     private static final String URI_WITH_TEN_NUMBER_OF_RESULTS =
-        "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=1&results=10&title=reindeer";
+        "https://api.dev.nva.aws.unit.no/cristin/project?page=1&results=10&title=reindeer";
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "nvaApiGetResponseNonEnrichedProjects.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON =
@@ -121,8 +131,10 @@ class QueryCristinProjectHandlerTest {
     public static final String KEYWORD_SAMPLE = randomString();
     public static final String UNIT_ID_SAMPLE = "184.12.60.0";
     public static final String START_DATE = "start_date";
-    public static final String NB = "nb";
     public static final String BAD_PARAM_FOR_SORT = "cristin id";
+    public static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON = "cristinQueryProjectsResponse.json";
+    public static final String CRISTIN_GET_PROJECT_RESPONSE_JSON = "cristinGetProjectResponse.json";
+    public static final String CREATOR_IDENTIFIER = "12345";
 
     private final Environment environment = new Environment();
     private QueryCristinProjectApiClient cristinApiClientStub;
@@ -160,7 +172,7 @@ class QueryCristinProjectHandlerTest {
     }
 
     private static String exampleUriFromPageAndResults(String page, String results) {
-        String url = "https://api.dev.nva.aws.unit.no/cristin/project?language=nb&page=%s&title=reindeer&results=%s";
+        String url = "https://api.dev.nva.aws.unit.no/cristin/project?page=%s&title=reindeer&results=%s";
         return String.format(url, page, results);
     }
 
@@ -176,8 +188,8 @@ class QueryCristinProjectHandlerTest {
     @MethodSource("queryResponseWithFundingFileReader")
     void handlerReturnsExpectedBodyWhenRequestInputIsValid(String expected) throws IOException {
         String actual = sendDefaultQuery().getBody();
-        final var expectedSearchResponse = Constants.OBJECT_MAPPER.readValue(expected, SearchResponse.class);
-        final var actualSearchResponse = Constants.OBJECT_MAPPER.readValue(actual, SearchResponse.class);
+        final var expectedSearchResponse = OBJECT_MAPPER.readValue(expected, SearchResponse.class);
+        final var actualSearchResponse = OBJECT_MAPPER.readValue(actual, SearchResponse.class);
         assertEquals(expectedSearchResponse, actualSearchResponse);
     }
 
@@ -191,7 +203,7 @@ class QueryCristinProjectHandlerTest {
     void handlerThrowsInternalErrorWhenQueryingProjectsFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
         doThrow(RuntimeException.class).when(cristinApiClientStub)
-            .getEnrichedProjectsUsingQueryResponse(any(), any());
+            .getEnrichedProjectsUsingQueryResponse(any());
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
 
         var gatewayResponse = sendDefaultQuery();
@@ -210,25 +222,37 @@ class QueryCristinProjectHandlerTest {
             .when(cristinApiClientStub).fetchGetResultAsync(any());
         handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
         var gatewayResponse = sendDefaultQuery();
-        var expected = Constants.OBJECT_MAPPER.readTree(getBodyFromResource(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON));
-        var actual = Constants.OBJECT_MAPPER.readTree(gatewayResponse.getBody());
+        var expected = OBJECT_MAPPER.readTree(getBodyFromResource(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON));
+        var actual = OBJECT_MAPPER.readTree(gatewayResponse.getBody());
         assertEquals(expected, actual);
     }
-    
+
     @Test
     void handlerReturnsOkWhenTitleContainsAeOeAacolon() throws Exception {
-        InputStream input = requestWithQueryParameters(
-            Map.of(
-                JsonPropertyNames.QUERY, RANDOM_TITLE + " æØå:;., " + RANDOM_TITLE,
-                JsonPropertyNames.ORGANIZATION,
-                "https%3A%2F%2Fapi.dev.nva.aws.unit.no%2Fcristin%2Forganization%2F20202.0.0.0"
-            ));
+        var map = Map.of(
+            QUERY.getNvaKey(), RANDOM_TITLE + " æØÆØÅå: " + RANDOM_TITLE,
+            ORGANIZATION.getNvaKey(),"https%3A%2F%2Fapi.dev.nva.aws.unit.no%2Fcristin%2Forganization%2F20202.0.0.0"
+        );
+        InputStream input = requestWithQueryParameters(map);
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, Object.class);
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
+
+    @Test
+    void handlerReturnsOkWhenTitleContainsgjennomgaatt() throws Exception {
+        InputStream input = requestWithQueryParameters(
+            Map.of(JsonPropertyNames.QUERY, "gjennomgått akutt"));
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Object.class);
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(MEDIATYPE_JSON_UTF8, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    }
+
+
 
     @Test
     void handlerSetsDefaultValueForMissingOptionalLanguageParameterAndReturnOk() throws Exception {
@@ -282,7 +306,7 @@ class QueryCristinProjectHandlerTest {
     }
 
     @Test
-    void handlerReturnsBadRequestWhenReceivingInvalidLanguageQueryParam() throws Exception {
+    void handlerReturnsOkWhenReceivingInvalidLanguageQueryParam() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
             JsonPropertyNames.LANGUAGE, INVALID_LANGUAGE));
@@ -290,11 +314,7 @@ class QueryCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(),
-                   containsString(
-                       String.format(ErrorMessages.ERROR_MESSAGE_INVALID_VALUE, JsonPropertyNames.LANGUAGE)));
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
     @Test
@@ -311,7 +331,7 @@ class QueryCristinProjectHandlerTest {
         var expected = getBodyFromResource(API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON);
         var actual = sendDefaultQuery().getBody();
 
-        assertEquals(Constants.OBJECT_MAPPER.readTree(expected), Constants.OBJECT_MAPPER.readTree(actual));
+        assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }
 
     @Test
@@ -346,7 +366,6 @@ class QueryCristinProjectHandlerTest {
     void handlerReturnsCristinProjectsWhenQueryContainsPageParameter() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB,
             JsonPropertyNames.PAGE, SECOND_PAGE));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
@@ -359,7 +378,6 @@ class QueryCristinProjectHandlerTest {
     void handlerThrowsBadRequestWhenQueryHasInvalidPageParameter() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB,
             JsonPropertyNames.PAGE, TITLE_ILLEGAL_CHARACTERS));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
@@ -382,13 +400,12 @@ class QueryCristinProjectHandlerTest {
 
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB,
             JsonPropertyNames.PAGE, currentPage,
             JsonPropertyNames.NUMBER_OF_RESULTS, perPage
         ));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
-        Integer actual = Constants.OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
+        Integer actual = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
                              .getFirstRecord();
         assertEquals(expected, actual);
     }
@@ -397,7 +414,6 @@ class QueryCristinProjectHandlerTest {
     void handlerThrowsBadRequestWhenPaginationExceedsNumberOfResults() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB,
             JsonPropertyNames.PAGE, PAGE_15,
             JsonPropertyNames.NUMBER_OF_RESULTS, TEN_RESULTS
         ));
@@ -418,7 +434,6 @@ class QueryCristinProjectHandlerTest {
 
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB,
             JsonPropertyNames.PAGE, SECOND_PAGE,
             JsonPropertyNames.NUMBER_OF_RESULTS, TEN_RESULTS
         ));
@@ -438,7 +453,6 @@ class QueryCristinProjectHandlerTest {
 
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB,
             JsonPropertyNames.PAGE, currentPage,
             JsonPropertyNames.NUMBER_OF_RESULTS, perPage
         ));
@@ -457,7 +471,6 @@ class QueryCristinProjectHandlerTest {
     void handlerReturnsCristinProjectsWhenQueryContainsResultsParameter() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB,
             JsonPropertyNames.NUMBER_OF_RESULTS, TEN_RESULTS));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
@@ -470,7 +483,6 @@ class QueryCristinProjectHandlerTest {
     void handlerThrowsBadRequestWhenQueryHasInvalidResultsParameter() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB,
             JsonPropertyNames.NUMBER_OF_RESULTS, TITLE_ILLEGAL_CHARACTERS));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
@@ -494,7 +506,6 @@ class QueryCristinProjectHandlerTest {
 
         InputStream input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB,
             JsonPropertyNames.PAGE, currentPage,
             JsonPropertyNames.NUMBER_OF_RESULTS, perPage
         ));
@@ -502,12 +513,12 @@ class QueryCristinProjectHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         String actualNext =
-            Optional.ofNullable(Constants.OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
+            Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
                                     .getNextResults()).orElse(new URI(EMPTY_STRING)).toString();
         assertEquals(expectedNext, actualNext);
 
         String actualPrevious =
-            Optional.ofNullable(Constants.OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
+            Optional.ofNullable(OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SearchResponse.class)
                                     .getPreviousResults()).orElse(new URI(EMPTY_STRING)).toString();
         assertEquals(expectedPrevious, actualPrevious);
     }
@@ -572,8 +583,7 @@ class QueryCristinProjectHandlerTest {
     @Test
     void handlerReturnsCristinProjectsWhenQueryContainsTitleWithWhitespace() throws Exception {
         InputStream input = requestWithQueryParameters(Map.of(
-            JsonPropertyNames.QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE + ":",
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB));
+            JsonPropertyNames.QUERY, RANDOM_TITLE + WHITESPACE + RANDOM_TITLE + ":"));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
@@ -595,7 +605,7 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(body.getDetail(), containsString(
-            ErrorMessages.validQueryParameterNamesMessage(QueryCristinProjectHandler.VALID_QUERY_PARAMETERS)));
+            ErrorMessages.validQueryParameterNamesMessage(VALID_QUERY_PARAMETER_NVA_KEYS)));
     }
 
     @Test
@@ -608,7 +618,7 @@ class QueryCristinProjectHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(SAMPLE_NVA_ORGANIZATION_ENCODED));
+        assertThat(gatewayResponse.getBody(), containsString(SAMPLE_NVA_ORGANIZATION));
     }
 
     @Test
@@ -637,10 +647,44 @@ class QueryCristinProjectHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(body.getDetail(),
-                   containsString(
-                       ErrorMessages.invalidQueryParametersMessageWithRange(JsonPropertyNames.STATUS,
-                                                                            Arrays.toString(ProjectStatus.values()))));
+        var value = ErrorMessages.invalidQueryParametersMessageWithRange(
+            JsonPropertyNames.STATUS,
+            Arrays.toString(ProjectStatus.values())
+        );
+        assertThat(body.getDetail(),containsString(value));
+    }
+
+    @Test
+    void shouldAddLangToHttpRequestBeforeSendingToCristin() throws Exception {
+        var cristinProjects = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON));
+        var oneCristinProject = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON));
+        HttpResponse<String> queryResponse = new HttpResponseFaker(cristinProjects, HTTP_OK);
+        HttpResponse<String> getResponse = new HttpResponseFaker(oneCristinProject, HTTP_OK);
+        var mockHttpClient = mock(HttpClient.class);
+        when(mockHttpClient.<String>send(any(), any())).thenReturn(queryResponse);
+        when(mockHttpClient.<String>sendAsync(any(), any())).thenReturn(CompletableFuture.completedFuture(getResponse));
+        var apiClient = spy(new QueryCristinProjectApiClient(mockHttpClient));
+        handler = new QueryCristinProjectHandler(apiClient, environment);
+        sendDefaultQuery();
+
+        var captor = ArgumentCaptor.forClass(HttpRequest.class);
+        verify(mockHttpClient).send(captor.capture(), any());
+
+        var expected = "https://api.cristin-test.uio.no/v2/projects?page=1&per_page=5&title=reindeer&lang=en,nb,nn";
+        var actual = captor.getValue().uri().toString();
+
+        assertThat(actual, equalTo(expected));
+    }
+
+    @Test
+    void shouldAllowLanguageParamForBackwardsCompatibilityEvenIfRedundant() throws Exception {
+        InputStream input = requestWithQueryParameters(Map.of(
+            JsonPropertyNames.QUERY, RANDOM_TITLE,
+            JsonPropertyNames.LANGUAGE, LANGUAGE_NB));
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
     @ParameterizedTest(
@@ -670,7 +714,8 @@ class QueryCristinProjectHandlerTest {
                                  "keyword", KEYWORD_SAMPLE,
                                  "results", "5",
                                  "unit", UNIT_ID_SAMPLE,
-                                 "sort", START_DATE);
+                                 "sort", START_DATE,
+                                 "creator", CREATOR_IDENTIFIER);
         var input = requestWithQueryParameters(queryParams);
         handler.handleRequest(input, output, context);
         var captor = ArgumentCaptor.forClass(URI.class);
@@ -680,11 +725,11 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualURI, containsString("page=5"));
         assertThat(actualURI, containsString(BIOBANK_ID + EQUAL_OPERATOR + BIOBANK_SAMPLE));
         assertThat(actualURI, containsString(FUNDING + EQUAL_OPERATOR + FUNDING_SAMPLE));
-        assertThat(actualURI, containsString(LANGUAGE.getKey() + EQUAL_OPERATOR + NB));
         assertThat(actualURI, containsString(TITLE.getKey() + "=hello"));
         assertThat(actualURI, containsString(PROJECT_KEYWORD + EQUAL_OPERATOR + KEYWORD_SAMPLE));
         assertThat(actualURI, containsString(PROJECT_UNIT + EQUAL_OPERATOR + UNIT_ID_SAMPLE));
         assertThat(actualURI, containsString(PROJECT_SORT + EQUAL_OPERATOR + START_DATE));
+        assertThat(actualURI, containsString(PROJECT_CREATOR_PARAM + EQUAL_OPERATOR + CREATOR_IDENTIFIER));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                                                                SearchResponse.class);
@@ -702,6 +747,27 @@ class QueryCristinProjectHandlerTest {
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(UPSTREAM_RETURNED_BAD_REQUEST));
+    }
+
+    @Test
+    void shouldReturnOkWithOnlyCreatorPersonIdWhenProjectCreatorHasMissingOrganizationInRoles() throws Exception {
+        var serializedCristinProject = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON));
+        var deserialized = OBJECT_MAPPER.readValue(serializedCristinProject, CristinProject.class);
+        deserialized.getCreator().setRoles(null);
+
+        cristinApiClientStub =
+            new QueryCristinProjectClientStub(OBJECT_MAPPER.writeValueAsString(deserialized));
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        var gatewayResponse = sendDefaultQuery();
+
+        List<NvaProject> responseHits =
+            OBJECT_MAPPER.convertValue(gatewayResponse.getBodyObject(SearchResponse.class).getHits(),
+                                       new TypeReference<>() {});
+
+        var creatorPersonId = responseHits.get(0).getCreator().getIdentity().getId().toString();
+
+        assertThat(creatorPersonId, containsString(CREATOR_IDENTIFIER));
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
@@ -729,26 +795,21 @@ class QueryCristinProjectHandlerTest {
     }
 
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
-        InputStream input = requestWithQueryParameters(Map.of(
-            JsonPropertyNames.QUERY, RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE, LANGUAGE_NB));
+        InputStream input = requestWithQueryParameters(Map.of(JsonPropertyNames.QUERY, RANDOM_TITLE));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
     private GatewayResponse<SearchResponse> sendBadParameterRequestQuery() throws IOException {
         InputStream input = requestWithQueryParameters(Map.of(
-            JsonPropertyNames.QUERY,
-            RANDOM_TITLE,
-            JsonPropertyNames.LANGUAGE,
-            LANGUAGE_NB,
+            JsonPropertyNames.QUERY, RANDOM_TITLE,
             PROJECT_SORT, BAD_PARAM_FOR_SORT));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
-        return new HandlerRequestBuilder<Void>(Constants.OBJECT_MAPPER)
+        return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                    .withBody(null)
                    .withQueryParameters(map)
                    .build();

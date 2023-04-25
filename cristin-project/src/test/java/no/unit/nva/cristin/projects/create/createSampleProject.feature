@@ -103,17 +103,17 @@ Feature: API tests for Cristin Project retrieve and search
       ],
       'funding': [
         {
-          'type': 'Funding',
-          'source': {
-            'type': 'FundingSource',
-            'code': 'NFR'
-          },
-          'code': '1234'
+          'type': 'SomeRandomValue',
+          'source': 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR',
+          'identifier': '1234',
+          'labels': {
+            'en': 'Research Council of Norway (RCN)'
+          }
         }
       ],
       'newFunding': [
         {
-          'type': 'Funding',
+          'type': 'SomeRandomValue',
           'source': 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR',
           'identifier': '1234',
           'labels': {

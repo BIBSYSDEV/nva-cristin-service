@@ -101,7 +101,7 @@ Feature: API tests for Cristin projects query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'depth\', \'funding\', \'funding_source\', \'institution\', \'keyword\', \'language\', \'modified_since\', \'name\', \'organization\', \'page\', \'participant\', \'project_code\', \'project_manager\', \'query\', \'results\', \'sort\', \'status\', \'title\', \'unit\', \'user\']'
+    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'creator\', \'depth\', \'funding\', \'funding_source\', \'institution\', \'keyword\', \'language\', \'modified_since\', \'name\', \'organization\', \'page\', \'participant\', \'project_code\', \'project_manager\', \'query\', \'results\', \'sort\', \'status\', \'title\', \'unit\', \'user\']'
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
@@ -142,8 +142,8 @@ Feature: API tests for Cristin projects query
     And param page = '2'
     When method GET
     Then status 200
-    * def nextResultsPath = CRISTIN_BASE + '/project?language=nb&page=3&title=' + queryString + '&results=5'
-    * def previousResultsPath = CRISTIN_BASE + '/project?language=nb&page=1&title=' + queryString + '&results=5'
+    * def nextResultsPath = CRISTIN_BASE + '/project?page=3&title=' + queryString + '&results=5'
+    * def previousResultsPath = CRISTIN_BASE + '/project?page=1&title=' + queryString + '&results=5'
     And match response.nextResults == nextResultsPath
     And match response.previousResults == previousResultsPath
     And match response.firstRecord == 6

@@ -2,8 +2,8 @@ package no.unit.nva.cristin.model;
 
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.nvaIdentifierToCristinIdentifier;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -24,6 +24,7 @@ public class CristinInstitution {
     private String url;
 
     public CristinInstitution() {
+
     }
 
     public CristinInstitution(String identifier) {

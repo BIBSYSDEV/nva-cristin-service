@@ -4,15 +4,18 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import no.unit.nva.cristin.model.CristinApproval;
+import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
+import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
-import no.unit.nva.cristin.projects.model.nva.ExternalSource;
+import no.unit.nva.model.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.cristin.projects.model.nva.TypedLabel;
+import no.unit.nva.model.TypedLabel;
 import no.unit.nva.model.Organization;
 
 import java.util.Collections;
@@ -62,7 +65,7 @@ public class CristinProjectBuilder {
         cristinProject.setEndDate(nvaProject.getEndDate());
         cristinProject.setAcademicSummary(extractSummary(nvaProject.getAcademicSummary()));
         cristinProject.setPopularScientificSummary(extractSummary(nvaProject.getPopularScientificSummary()));
-        cristinProject.setProjectFundingSources(extractFundings(nvaProject.getNewFunding()));
+        cristinProject.setProjectFundingSources(extractFundings(nvaProject.getFunding()));
         cristinProject.setParticipants(extractContributors(nvaProject.getContributors()));
         cristinProject.setCoordinatingInstitution(extractCristinOrganization(nvaProject.getCoordinatingInstitution()));
         cristinProject.setMethod(extractSummary(nvaProject.getMethod()));
@@ -79,8 +82,20 @@ public class CristinProjectBuilder {
         cristinProject.setRelatedProjects(extractRelatedProjects(nvaProject.getRelatedProjects()));
         cristinProject.setContactInfo(extractContactInfo(nvaProject.getContactInfo()));
         cristinProject.setExemptFromPublicDisclosure(nvaProject.getExemptFromPublicDisclosure());
+        cristinProject.setCreator(extractCreator(nvaProject.getCreator()));
 
         return cristinProject;
+    }
+
+    private CristinPerson extractCreator(NvaContributor creator) {
+        if (nonNull(creator)) {
+            if (nonNull(creator.getAffiliation())) {
+                return creator.toCristinPersonWithRoles();
+            } else {
+                return creator.getIdentity().toCristinPersonWithoutRoles();
+            }
+        }
+        return null;
     }
 
     public static void removeFieldsNotSupportedByPost(CristinProject cristinProject) {

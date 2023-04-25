@@ -13,11 +13,18 @@ import nva.commons.core.Environment;
 
 import java.net.HttpURLConnection;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
+import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
+import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 
 public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, NvaProject> {
+
+    private static final Logger logger = LoggerFactory.getLogger(CreateCristinProjectHandler.class);
 
     private final transient CreateCristinProjectApiClient apiClient;
 
@@ -56,10 +63,17 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
             throws ApiGatewayException {
 
         verifyRequesterCanEditProjects(requestInfo);
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
         Validator<NvaProject> validator = new CreateCristinProjectValidator();
         validator.validate(input);
+        addCreatorDataToInput(input, requestInfo);
 
         return apiClient.createProjectInCristin(input);
+    }
+
+    private void addCreatorDataToInput(NvaProject input, RequestInfo requestInfo) {
+        var creator = new ProjectCreatorAppender(requestInfo).getCreator();
+        input.setCreator(creator);
     }
 
     /**

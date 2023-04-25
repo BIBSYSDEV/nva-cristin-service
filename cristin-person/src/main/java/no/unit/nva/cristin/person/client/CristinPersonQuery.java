@@ -3,7 +3,6 @@ package no.unit.nva.cristin.person.client;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.SORT;
-import static no.unit.nva.utils.UriUtils.addLanguage;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import java.net.URI;
 import java.util.Map;
@@ -44,7 +43,7 @@ public class CristinPersonQuery {
      * @return an URI to Cristin person with identifier
      */
     public static URI fromId(String identifier) {
-        return addLanguage(getCristinUri(identifier, PERSON_PATH));
+        return getCristinUri(identifier, PERSON_PATH);
     }
 
     /**
@@ -56,12 +55,10 @@ public class CristinPersonQuery {
     public static URI fromOrcid(String orcid) {
         String identifier = String.format("ORCID:%s", orcid);
 
-        var uri = UriWrapper.fromUri(CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
             .addChild(PERSON_PATH)
             .addChild(identifier)
             .getUri();
-
-        return addLanguage(uri);
     }
 
     /**
@@ -71,12 +68,10 @@ public class CristinPersonQuery {
      * @return an URI to Cristin person with National Identification Number identifier
      */
     public static URI fromNationalIdentityNumber(String identifier) {
-        var uri = UriWrapper.fromUri(CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
             .addChild(PERSON_PATH)
             .addQueryParameter(NIN_PARAM_KEY, identifier)
             .getUri();
-
-        return addLanguage(uri);
     }
 
     public CristinPersonQuery withName(String name) {
@@ -115,12 +110,10 @@ public class CristinPersonQuery {
      * @return an URI to Cristin Persons with parameters
      */
     public URI toURI() {
-        var uri = UriWrapper.fromUri(CRISTIN_API_URL)
+        return UriWrapper.fromUri(CRISTIN_API_URL)
             .addChild(PERSON_PATH)
             .addQueryParameters(cristinQueryParameters)
             .getUri();
-
-        return addLanguage(uri);
     }
 
 }

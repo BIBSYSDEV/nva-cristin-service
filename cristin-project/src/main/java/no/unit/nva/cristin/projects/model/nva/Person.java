@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Objects;
-import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import no.unit.nva.cristin.model.CristinPerson;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Person {
@@ -41,6 +41,17 @@ public class Person {
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
+    }
+
+    /**
+     * Create a valid NVA Person from Builder.
+     */
+    public Person(Builder builder) {
+        this.id = builder.id;
+        this.firstName = builder.firstName;
+        this.lastName = builder.lastName;
+        this.email = builder.email;
+        this.phone = builder.phone;
     }
 
     /**
@@ -123,5 +134,43 @@ public class Person {
 
     private String toCristinPersonIdentity() {
         return extractLastPathElement(getId());
+    }
+
+    public static final class Builder {
+
+        private transient URI id;
+        private transient String firstName;
+        private transient String lastName;
+        private transient String email;
+        private transient String phone;
+
+        public Builder withId(URI id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder withFirstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public Builder withLastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public Builder withEmail(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder withPhone(String phone) {
+            this.phone = phone;
+            return this;
+        }
+
+        public Person build() {
+            return new Person(this);
+        }
     }
 }

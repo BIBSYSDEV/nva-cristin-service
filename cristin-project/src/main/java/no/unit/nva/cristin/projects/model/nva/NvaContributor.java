@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinInstitution;
-import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
-import no.unit.nva.cristin.projects.model.cristin.CristinRole;
+import no.unit.nva.cristin.model.CristinPerson;
+import no.unit.nva.cristin.model.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.model.Organization;
 
@@ -57,9 +57,9 @@ public class NvaContributor implements JsonSerializable {
             return false;
         }
         NvaContributor that = (NvaContributor) o;
-        return getType().equals(that.getType())
-            && getIdentity().equals(that.getIdentity())
-            && getAffiliation().equals(that.getAffiliation());
+        return Objects.equals(getType(), that.getType())
+               && Objects.equals(getIdentity(), that.getIdentity())
+               && Objects.equals(getAffiliation(), that.getAffiliation());
     }
 
     /**

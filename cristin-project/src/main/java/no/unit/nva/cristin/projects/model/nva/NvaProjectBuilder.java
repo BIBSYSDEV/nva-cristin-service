@@ -3,25 +3,30 @@ package no.unit.nva.cristin.projects.model.nva;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.CristinInstitution;
 import no.unit.nva.cristin.projects.model.cristin.CristinApplicationCodeBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinApprovalAuthorityBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinApprovalStatusBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
-import no.unit.nva.cristin.projects.model.cristin.CristinApproval;
+import no.unit.nva.cristin.model.CristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
-import no.unit.nva.cristin.projects.model.cristin.CristinDateInfo;
-import no.unit.nva.cristin.projects.model.cristin.CristinExternalSource;
+import no.unit.nva.cristin.model.CristinDateInfo;
+import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingAmount;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinHealthProjectTypeBuilder;
-import no.unit.nva.cristin.projects.model.cristin.CristinPerson;
+import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.cristin.CristinRole;
+import no.unit.nva.cristin.model.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
+import no.unit.nva.model.ApprovalStatus;
+import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.Organization;
+import no.unit.nva.model.DateInfo;
+import no.unit.nva.model.TypedLabel;
 import nva.commons.core.language.LanguageMapper;
 
 import java.util.Collections;
@@ -36,6 +41,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
 import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -45,12 +51,10 @@ import static nva.commons.core.StringUtils.isNotBlank;
 
 public class NvaProjectBuilder {
 
-    public static final String CRISTIN_IDENTIFIER_TYPE = "CristinIdentifier";
     public static final String PROJECT_TYPE = "Project";
 
-    public static final String TYPE = "type";
-    public static final String VALUE = "value";
     public static final String FUNDING_SOURCES = "funding-sources";
+    public static final String PRO_CREATOR = "PRO_CREATOR";
 
     private final transient CristinProject cristinProject;
     private transient String context;
@@ -120,7 +124,7 @@ public class NvaProjectBuilder {
                    .withLanguage(LanguageMapper.toUri(cristinProject.getMainLanguage()))
                    .withStartDate(cristinProject.getStartDate())
                    .withEndDate(cristinProject.getEndDate())
-                   .withFunding(extractOldFunding())
+                   .withFunding(extractFunding())
                    .withNewFunding(extractFunding())
                    .withCoordinatingInstitution(extractCoordinatingInstitution())
                    .withContributors(extractContributors())
@@ -145,7 +149,35 @@ public class NvaProjectBuilder {
                    .withHealthProjectData(extractHealthProjectData(cristinProject))
                    .withApprovals(extractApprovals(cristinProject.getApprovals()))
                    .withExemptFromPublicDisclosure(cristinProject.getExemptFromPublicDisclosure())
+                   .withCreator(extractCreator(cristinProject.getCreator()))
                    .build();
+    }
+
+    private NvaContributor extractCreator(CristinPerson creator) {
+        return Optional.ofNullable(creator)
+            .stream().peek(this::addRoleDataIfMissing)
+            .flatMap(NvaProjectBuilder::generateRoleBasedContribution)
+                   .findAny()
+                   .or(() -> creatorWithoutAffiliation(creator))
+                   .orElse(null);
+    }
+
+    private Optional<NvaContributor> creatorWithoutAffiliation(CristinPerson creator) {
+        return Optional.ofNullable(creator)
+                   .filter(presentCreator -> nonNull(presentCreator.getCristinPersonId()))
+                   .map(presentCreator -> {
+                       var creatorWithoutAffiliation = new NvaContributor();
+                       creatorWithoutAffiliation.setIdentity(Person.fromCristinPerson(presentCreator));
+                       return creatorWithoutAffiliation;
+                   });
+    }
+
+    private void addRoleDataIfMissing(CristinPerson cristinPerson) {
+        if (isNull(cristinPerson.getRoles())) {
+            cristinPerson.setRoles(emptyList());
+        } else {
+            cristinPerson.getRoles().forEach(role -> role.setRoleCode(PRO_CREATOR));
+        }
     }
 
     private List<Approval> extractApprovals(List<CristinApproval> cristinApprovals) {
@@ -237,7 +269,9 @@ public class NvaProjectBuilder {
 
     private List<Map<String, String>> createCristinIdentifier() {
         return nonNull(cristinProject.getCristinProjectId())
-                ? singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, cristinProject.getCristinProjectId()))
+                ? singletonList(Map.of(
+                    Constants.TYPE, Constants.CRISTIN_IDENTIFIER_TYPE,
+                    Constants.VALUE, cristinProject.getCristinProjectId()))
                 : emptyList();
     }
 
@@ -268,22 +302,10 @@ public class NvaProjectBuilder {
                 .orElse(emptyList());
     }
 
-    private List<OldFunding> extractOldFunding() {
-        return cristinProject.getProjectFundingSources().stream()
-                   .map(this::createOldFunding)
-                   .collect(Collectors.toList());
-    }
-
     private List<Funding> extractFunding() {
         return cristinProject.getProjectFundingSources().stream()
                 .map(this::createFunding)
                 .collect(Collectors.toList());
-    }
-
-    private OldFunding createOldFunding(CristinFundingSource cristinFunding) {
-        var nvaFundingSource = new FundingSource(cristinFunding.getFundingSourceName(),
-                                                 cristinFunding.getFundingSourceCode());
-        return new OldFunding(nvaFundingSource, cristinFunding.getProjectCode());
     }
 
     private Funding createFunding(CristinFundingSource cristinFunding) {
@@ -291,7 +313,7 @@ public class NvaProjectBuilder {
         var identifier = cristinFunding.getProjectCode();
         var labels = cristinFunding.getFundingSourceName();
 
-        return new Funding(source, identifier, labels);
+        return new Funding(UNCONFIRMED_FUNDING, source, identifier, labels);
     }
 
     private URI extractFundingSource(CristinFundingSource cristinFunding) {

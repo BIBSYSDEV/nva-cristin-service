@@ -65,13 +65,6 @@ paths:
             - CONCLUDED
             - NOTSTARTED
             example: 'active'
-        - name: language
-          in: query
-          description: Preferred language for some fields
-          required: false
-          schema:
-            $ref: '#/components/schemas/LanguageParam'
-          example: 'nb'
         - name: page
           in: query
           description: Current page requested
@@ -175,6 +168,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: creator
+          in: query
+          description: Creator identifier
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -274,13 +273,6 @@ paths:
             type: string
             pattern: '^[0-9]+$'
           example: '495216'
-        - name: language
-          in: query
-          description: Preferred language for some fields
-          required: false
-          schema:
-            $ref: '#/components/schemas/LanguageParam'
-          example: 'nb'
       responses:
         200:
           description: successful operation
@@ -688,6 +680,12 @@ paths:
         - name: biobank
           in: query
           description: Biobank id. 'biobank' can be used more than once.
+          required: false
+          schema:
+            type: string
+        - name: creator
+          in: query
+          description: Creator identifier
           required: false
           schema:
             type: string
@@ -1414,6 +1412,48 @@ paths:
         502:
           $ref: '#/components/responses/502'
 
+  /biobank/{identifier}:
+    parameters:
+      - name: identifier
+        in: path
+        description: Identifier of biobank
+        required: true
+        schema:
+          type: string
+        example: '1234567'
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchBiobankFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Biobank
+      summary: Fetch a biobank by identifier
+      description: Returns the biobank with the given identifier
+      operationId: FetchBiobank
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiobankNew'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/BiobankExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/BiobankNew'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/BiobankExample'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 components:
   responses:
     400:
@@ -1708,6 +1748,32 @@ components:
                 - PhaseIV
         approvals:
           $ref: '#/components/schemas/Approvals'
+        creator:
+          type: object
+          description: Project Creator
+          properties:
+            type:
+              type: string
+              description: Type. Always ProjectCreator
+            identity:
+              type: object
+              properties:
+                id:
+                  $ref: '#/components/schemas/Id'
+                type:
+                  type: string
+                  pattern: 'Person'
+                  description: Type of identity. Always Person
+                firstName:
+                  type: string
+                  pattern: '.+'
+                  description: First name
+                lastName:
+                  type: string
+                  pattern: '.+'
+                  description: Last name
+            affiliation:
+              $ref: '#/components/schemas/Organization'
     ProjectPost:
       type: object
       properties:
@@ -1780,16 +1846,8 @@ components:
                     type: string
                     pattern: '.*'
                     description: Phone number
-
               affiliation:
                 $ref: '#/components/schemas/Organization'
-        status:
-          type: string
-          enum:
-            - NOTSTARTED
-            - ACTIVE
-            - CONCLUDED
-          description: Project status, based on start_date and end_date.
         academicSummary:
           $ref: '#/components/schemas/Languages'
         popularScientificSummary:
@@ -1958,27 +2016,30 @@ components:
             $ref: '#/components/schemas/Organization'
     Problem:
       type: object
+      description: NVA error reporting object
+      required:
+        - title
+        - detail
+        - status
       properties:
         title:
           type: string
           description: Human-readable description of the error status
-        status:
-          type: integer
-          format: int32
-          description: The HTTP status code associated with the problem
         detail:
           type: string
           description: A more detailed error message describing the error and potential mitigations
+        status:
+          type: integer
+          description: The HTTP status code associated with the problem
         requestId:
           type: string
-          description: Unique id for the request
-    LanguageParam:
-      type: string
-      enum:
-        - nb
-        - nn
-        - en
-      default: 'nb'
+          description: Identifier of the request causing the problem
+        instance:
+          type: string
+          description: The requested path associated with the error
+        type:
+          type: string
+          description: A URI describing the error and mitigations, in generic cases, this is about:blank
     Context:
       type: string
       pattern: 'https:\/\/.*$'
@@ -2060,8 +2121,8 @@ components:
       properties:
         type:
           type: string
-          pattern: 'Funding'
-          description: Always Funding
+          pattern: 'UnconfirmedFunding'
+          description: Always UnconfirmedFunding
         source:
           type: string
           description: The source of the funding formatted as an uri
@@ -2153,10 +2214,6 @@ components:
       type: object
       description: Funding creation
       properties:
-        type:
-          type: string
-          pattern: 'Funding'
-          description: Always Funding
         source:
           type: string
           description: The source of the funding formatted as an uri or an alternative url encoded code
@@ -2484,7 +2541,133 @@ components:
           description: the identifier (code) for the funding source
         name:
           $ref: '#/components/schemas/Languages'
-
+    BioBanks:
+      type: object
+      required:
+        - type
+        - '@Context'
+        - id
+        - sources
+      properties:
+        type:
+          type: string
+          description: Always BioBanks
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          type: string
+          description: URI to the query
+        sources:
+          type: array
+          description: The list of BioBanks
+          items:
+            $ref: '#/components/schemas/BiobankNew'
+    BiobankNew:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        type:
+          type: string
+          pattern: 'Biobank'
+          description: The type of the returned object, always Biobank
+        identifiers:
+          type: array
+          description: Identifiers for this Biobank
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: 'CristinIdentifier'
+                description: Name of identifier, always CristinIdentifier
+              value:
+                type: integer
+                format: int32
+                description: Cristin ID of project
+        name:
+          type: array
+          description: Names in alternative languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        mainLanguage:
+          type: string
+          description: Main Language
+        storeUntilDate:
+          type: string
+          format: date-time
+        startDate:
+          type: string
+          format: date-time
+        status:
+          type: string
+        created:
+          type: object
+          properties:
+            sourceShortName:
+              type: string
+              description: Short name of the source that created the entry
+            date:
+              type: string
+              format: date-time
+              description: Date the entry was created
+        lastModified:
+          type: object
+          properties:
+            sourceShortName:
+              type: string
+              description: Short name of the source that created the entry
+            date:
+              type: string
+              format: date-time
+              description: Date the entry was created
+        coordinatingOrganization:
+          $ref: '#/components/schemas/Organization'
+        coordinatingUnit:
+          $ref: '#/components/schemas/Organization'
+        coordinator:
+          $ref: '#/components/schemas/Person'
+        project:
+          type: object
+          properties:
+            cristinProjectId:
+              type: string
+              description: The type of object. Here always ExternalSource
+            title:
+              type: array
+              description: Title in alternative languages
+              items:
+                $ref: '#/components/schemas/Languages'
+            url:
+              $ref: '#/components/schemas/Project'
+        externalSources:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The type of object. Here always ExternalSource
+              identifier:
+                type: string
+                description: The source reference identifier as it is in upstream
+              name:
+                type: string
+                description: The name of the source in short form
+        approvals:
+          $ref: '#/components/schemas/Approvals'
+        biobankMaterials:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
+              label:
+                $ref: '#/components/schemas/Languages'
     PersonEmploymentQuery:
       type: object
       properties:
@@ -2629,7 +2812,7 @@ components:
             startDate: '2012-01-09T00:00:00Z'
             endDate: '2017-12-31T00:00:00Z'
             funding:
-              - type: 'Funding'
+              - type: 'UnconfirmedFunding'
                 source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
                 identifier: '1234556'
                 labels:
@@ -2734,7 +2917,7 @@ components:
         startDate: '2012-01-09T00:00:00Z'
         endDate: '2017-12-31T00:00:00Z'
         funding:
-          - type: 'Funding'
+          - type: 'UnconfirmedFunding'
             source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
             identifier: '1234556'
             labels:
@@ -2824,6 +3007,16 @@ components:
             identifier: '2017/800'
             authorityName:
               en: 'Regional committees for medical and health research ethics'
+        creator:
+          type: 'ProjectCreator'
+          identity:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+            type: 'Person'
+            firstName: 'Ola'
+            lastName: 'Nordmann'
+          affiliation:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+            type: 'Organization'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -2904,7 +3097,6 @@ components:
             affiliation:
               type: 'Organization'
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-        status: CONCLUDED
         academicSummary:
           en: "Summary in an academic manner"
         popularScientificSummary:
@@ -2927,14 +3119,13 @@ components:
             applicationCode: 'EthicalApproval'
             identifier: '2017/800'
         funding:
-          - type: 'Funding'
-            source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR'
+          - source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR'
             identifier: '1234556'
         keywords:
-          - code: '4245'
-          - code: '5686'
+          - type: '4245'
+          - type: '5686'
         projectCategories:
-          - code: 'PHD'
+          - type: 'PHD'
         relatedProjects:
           - 'https://api.dev.nva.aws.unit.no/cristin/project/21500'
         contactInfo:
@@ -3258,7 +3449,62 @@ components:
         startDate: '2008-01-01T00:00:00Z'
         endDate: '2019-12-31T00:00:00Z'
         fullTimeEquivalentPercentage: 100.0
-
+    BiobankExample:
+      value:
+        {
+          "type": "Biobank",
+          "id": "https://api.dev.nva.aws.unit.no/cristin/biobank/2510604",
+          "identifiers": [ {
+            "type": "CristinIdentifier",
+            "value": "2510604"
+          }
+          ],
+          "biobankType": "SPECIFICBIOBANK",
+          "name": {
+            "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
+          },
+          "mainLanguage": "nb",
+          "startDate": "2021-03-15T12:00:00Z",
+          "status": "ACTIVE",
+          "created": {
+            "sourceShortName": "REK",
+            "date": "2021-05-14T21:54:35Z"
+          },
+          "lastModified": {
+            "sourceShortName": "REK",
+            "date": "2022-11-28T21:45:17Z"
+          },
+          "coordinatingOrganization": "https://api.dev.nva.aws.unit.no/cristin/organization/2012.0.0.0",
+          "coordinator": "https://api.dev.nva.aws.unit.no/cristin/person/58388",
+          "project": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/project/2510603",
+            "title": {
+              "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
+            }
+          },
+          "externalSources": [ {
+            "type": "ExternalSource",
+            "identifier": "REK mappenr 1",
+            "name": "REK"
+          }
+          ],
+          "approvals": [ {
+            "approvedDate": "2021-05-11T21:50:45Z",
+            "approvedBy": "REK",
+            "approvedStatus": "Approved",
+            "applicationCode": "BIOBANK",
+            "approvalReferenceId": "247285"
+          }
+          ],
+          "biobankMaterials": [ {
+            "type": "24",
+            "label": {
+              "en": "Other material"
+            }
+          }
+          ],
+          "@context": "https://bibsysdev.github.io/src/biobank-context.json"
+        }
     OrganizationPersonsExample:
       value:
         '@context': 'https://example.org/person-search-context.json'
@@ -3348,7 +3594,7 @@ components:
             startDate: '2012-01-09T00:00:00Z'
             endDate: '2017-12-31T00:00:00Z'
             funding:
-              - type: 'Funding'
+              - type: 'UnconfirmedFunding'
                 source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
                 identifier: '1234556'
                 labels:

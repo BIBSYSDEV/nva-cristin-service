@@ -38,14 +38,13 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PRO
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED_CONTENT_TYPE;
-import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.common.client.ApiClient.RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER;
-import static no.unit.nva.cristin.common.handler.CristinHandler.DEFAULT_LANGUAGE_CODE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
-import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.projects.fetch.FetchCristinProjectClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
+import static no.unit.nva.cristin.projects.fetch.FetchCristinProjectHandler.ERROR_MESSAGE_CLIENT_SENT_UNSUPPORTED_QUERY_PARAM;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.FUNDING_SOURCES;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -73,9 +72,6 @@ public class FetchCristinProjectHandlerTest {
     private static final String NOT_AN_ID = "Not an ID";
     private static final String DEFAULT_IDENTIFIER = "9999";
     private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
-    private static final String ENGLISH_LANGUAGE = "en";
-    private static final String GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI =
-            "https://api.cristin-test.uio.no/v2/projects/9999?lang=en";
     private static final String DEFAULT_ACCEPT_HEADER = "*/*";
     public static final String FIELD_STATUS = "status";
     public static final String NOT_LEGAL_STATUS = "not_legal_status";
@@ -141,7 +137,7 @@ public class FetchCristinProjectHandlerTest {
         cristinApiClientStub = spy(cristinApiClientStub);
 
         doThrow(new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED)).when(cristinApiClientStub)
-            .getProject(any(), any());
+            .getProject(any());
         handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
@@ -154,7 +150,7 @@ public class FetchCristinProjectHandlerTest {
     void handlerReturnsServerErrorExceptionWhenBackendThrowsGenericException() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
 
-        doThrow(RuntimeException.class).when(cristinApiClientStub).getProject(any(), any());
+        doThrow(RuntimeException.class).when(cristinApiClientStub).getProject(any());
         handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
         GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
 
@@ -192,12 +188,6 @@ public class FetchCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(
             String.format(ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID, DEFAULT_IDENTIFIER)));
-    }
-
-    @Test
-    void getsCorrectUriWhenCallingGetProjectUriBuilder() throws Exception {
-        assertEquals(new URI(GET_ONE_CRISTIN_PROJECT_EXAMPLE_URI),
-            cristinApiClientStub.generateGetProjectUri(DEFAULT_IDENTIFIER, ENGLISH_LANGUAGE));
     }
 
     @Test
@@ -306,8 +296,7 @@ public class FetchCristinProjectHandlerTest {
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(body.getDetail(), containsString(
-                validQueryParameterNamesMessage(FetchCristinProjectHandler.VALID_QUERY_PARAMETERS)));
+        assertThat(body.getDetail(), containsString(ERROR_MESSAGE_CLIENT_SENT_UNSUPPORTED_QUERY_PARAM));
     }
 
     @Test
@@ -323,8 +312,7 @@ public class FetchCristinProjectHandlerTest {
     void handlerReturnsBadGatewayWhenCristinProjectHasInvalidStatusValue() throws Exception {
         final FetchCristinProjectHandler fetchHandler =
                 new FetchCristinProjectHandler(createCristinApiClientWithResponseContainingError(), environment);
-        final InputStream input = requestWithLanguageAndId(
-                of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(IDENTIFIER, DEFAULT_IDENTIFIER));
+        final InputStream input = requestWithIdentifier(of(IDENTIFIER, DEFAULT_IDENTIFIER));
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         fetchHandler.handleRequest(input, outputStream, mock(Context.class));
         final GatewayResponse<NvaProject> gatewayResponse =
@@ -339,8 +327,7 @@ public class FetchCristinProjectHandlerTest {
         final Map<String, String> expectedSummary = Map.of(summaryLanguage, summary);
         final FetchCristinProjectApiClient cristinApiClient =
             createCristinApiClientWithAcademicSummary(summaryLanguage, summary);
-        final InputStream input = requestWithLanguageAndId(
-                of(LANGUAGE, DEFAULT_LANGUAGE_CODE), of(IDENTIFIER, DEFAULT_IDENTIFIER));
+        final InputStream input = requestWithIdentifier(of(IDENTIFIER, DEFAULT_IDENTIFIER));
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         new FetchCristinProjectHandler(cristinApiClient, environment)
                 .handleRequest(input, outputStream, mock(Context.class));
@@ -395,24 +382,20 @@ public class FetchCristinProjectHandlerTest {
         final var source = UriWrapper.fromUri(getNvaApiUri(FUNDING_SOURCES)).addChild("NFR").getUri();
         final var identifier = "654321";
         final var labels = Map.of("en", "Research Council of Norway (RCN)");
-        return List.of(new Funding(source, identifier, labels));
+        return List.of(new Funding(UNCONFIRMED_FUNDING, source, identifier, labels));
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String identifier) throws IOException {
-        InputStream input = requestWithLanguageAndId(
-            of(LANGUAGE, DEFAULT_LANGUAGE_CODE),
-            of(IDENTIFIER, identifier));
+        InputStream input = requestWithIdentifier(of(IDENTIFIER, identifier));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, NvaProject.class);
     }
 
-    private InputStream requestWithLanguageAndId(Map<String, String> languageQueryParam,
-                                                 Map<String, String> idPathParam)
+    private InputStream requestWithIdentifier(Map<String, String> idPathParam)
         throws JsonProcessingException {
 
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withQueryParameters(languageQueryParam)
             .withPathParameters(idPathParam)
             .build();
     }

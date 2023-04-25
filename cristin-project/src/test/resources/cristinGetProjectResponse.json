@@ -140,5 +140,17 @@
     "approval_status" : "APPROVED",
     "application_code" : "ETICHAPPR",
     "approval_reference_id" : "2017/800"
-  } ]
+  } ],
+  "creator": {
+    "cristin_person_id": "123456",
+    "first_name": "Ola",
+    "surname": "Nordmann",
+    "roles": [
+      {
+        "unit": {
+          "cristin_unit_id": "1234.0.0.0"
+        }
+      }
+    ]
+  }
 }

@@ -16,7 +16,10 @@ import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.Organization;
+import no.unit.nva.model.DateInfo;
+import no.unit.nva.model.TypedLabel;
 
 @SuppressWarnings({"PMD.ExcessivePublicCount","PMD.TooManyFields"})
 @JsonInclude(ALWAYS)
@@ -46,7 +49,7 @@ public class NvaProject implements JsonSerializable {
     @JsonProperty
     private Instant endDate;
     @JsonProperty
-    private List<OldFunding> funding;
+    private List<Funding> funding;
     @JsonProperty
     private List<Funding> newFunding;
     @JsonProperty
@@ -99,6 +102,9 @@ public class NvaProject implements JsonSerializable {
     @JsonProperty
     @JsonInclude(NON_NULL)
     private Boolean exemptFromPublicDisclosure;
+    @JsonProperty
+    @JsonInclude(NON_NULL)
+    private NvaContributor creator;
 
     private NvaProject() {
     }
@@ -175,11 +181,11 @@ public class NvaProject implements JsonSerializable {
         this.endDate = endDate;
     }
 
-    public List<OldFunding> getFunding() {
+    public List<Funding> getFunding() {
         return nonEmptyOrDefault(funding);
     }
 
-    public void setFunding(List<OldFunding> funding) {
+    public void setFunding(List<Funding> funding) {
         this.funding = funding;
     }
 
@@ -359,6 +365,14 @@ public class NvaProject implements JsonSerializable {
         this.exemptFromPublicDisclosure = exemptFromPublicDisclosure;
     }
 
+    public NvaContributor getCreator() {
+        return creator;
+    }
+
+    public void setCreator(NvaContributor creator) {
+        this.creator = creator;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -399,7 +413,8 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch())
                && Objects.equals(getHealthProjectData(), that.getHealthProjectData())
                && Objects.equals(getApprovals(), that.getApprovals())
-               && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure());
+               && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure())
+               && Objects.equals(getCreator(), that.getCreator());
     }
 
     @Override
@@ -411,7 +426,7 @@ public class NvaProject implements JsonSerializable {
                             getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
                             getProjectCategories(), getKeywords(), getExternalSources(), getRelatedProjects(),
                             getInstitutionsResponsibleForResearch(), getHealthProjectData(), getApprovals(),
-                            getExemptFromPublicDisclosure());
+                            getExemptFromPublicDisclosure(), getCreator());
     }
 
     @Override
@@ -477,7 +492,7 @@ public class NvaProject implements JsonSerializable {
             return this;
         }
 
-        public Builder withFunding(List<OldFunding> funding) {
+        public Builder withFunding(List<Funding> funding) {
             nvaProject.setFunding(funding);
             return this;
         }
@@ -589,6 +604,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withExemptFromPublicDisclosure(Boolean exemptFromPublicDisclosure) {
             nvaProject.setExemptFromPublicDisclosure(exemptFromPublicDisclosure);
+            return this;
+        }
+
+        public Builder withCreator(NvaContributor creator) {
+            nvaProject.setCreator(creator);
             return this;
         }
 
