@@ -515,7 +515,9 @@ class CreateCristinProjectHandlerTest {
                         .build();
     }
 
-    private InputStream inputWithClientIdentifierButNoClientOrganization(NvaProject nvaProject) throws JsonProcessingException {
+    private InputStream inputWithClientIdentifierButNoClientOrganization(NvaProject nvaProject)
+        throws JsonProcessingException {
+
         var customer = randomUri();
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
                    .withBody(nvaProject)
