@@ -14,6 +14,13 @@
         "type": "Person",
         "id": "https://api.dev.nva.aws.unit.no/cristin/person/538786"
       }
+    },
+    {
+      "type": "LocalProjectManager",
+      "identity": {
+        "type": "Person",
+        "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456"
+      }
     }
   ],
   "funding": [
