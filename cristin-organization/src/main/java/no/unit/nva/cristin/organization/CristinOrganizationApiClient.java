@@ -114,10 +114,11 @@ public class CristinOrganizationApiClient extends ApiClient {
 
     private Organization toOrganization(String identifier, SubUnitDto subUnitDto) {
         return new Organization.Builder()
-                .withId(getNvaApiId(identifier, ORGANIZATION_PATH))
-                .withName(subUnitDto.getName())
-                .withAcronym(subUnitDto.getAcronym())
-                .build();
+                   .withId(getNvaApiId(identifier, ORGANIZATION_PATH))
+                   .withName(subUnitDto.getName())
+                   .withLabels(subUnitDto.getName())
+                   .withAcronym(subUnitDto.getAcronym())
+                   .build();
     }
 
     private URI getCristinOrganizationByIdentifierUri(String identifier) {
@@ -217,9 +218,11 @@ public class CristinOrganizationApiClient extends ApiClient {
                 : Set.of(getParentOrganization(attempt(() ->
                 getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
         return new Organization.Builder()
-                .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
-                .withPartOf(partOf)
-                .withName(subSubUnitDto.getUnitName()).build();
+                   .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
+                   .withPartOf(partOf)
+                   .withName(subSubUnitDto.getUnitName())
+                   .withLabels(subSubUnitDto.getUnitName())
+                   .build();
     }
 
     private Organization fromSubSubunit(SubSubUnitDto subSubUnitDto) {
@@ -229,10 +232,12 @@ public class CristinOrganizationApiClient extends ApiClient {
                 : Set.of(getParentOrganization(attempt(() ->
                 getSubSubUnitDtoWithMultipleEfforts(parent)).orElseThrow()));
         return new Organization.Builder()
-                .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
-                .withPartOf(partOf)
-                .withHasPart(getSubUnits(subSubUnitDto))
-                .withName(subSubUnitDto.getUnitName()).build();
+                   .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
+                   .withPartOf(partOf)
+                   .withHasPart(getSubUnits(subSubUnitDto))
+                   .withName(subSubUnitDto.getUnitName())
+                   .withLabels(subSubUnitDto.getUnitName())
+                   .build();
     }
 
     private Set<Organization> getSubUnits(SubSubUnitDto subSubUnitDto) {
@@ -253,9 +258,11 @@ public class CristinOrganizationApiClient extends ApiClient {
 
     private Organization getHasParts(SubSubUnitDto subSubUnitDto) {
         return new Organization.Builder()
-                .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
-                .withHasPart(getSubUnits(subSubUnitDto))
-                .withName(subSubUnitDto.getUnitName()).build();
+                   .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
+                   .withHasPart(getSubUnits(subSubUnitDto))
+                   .withName(subSubUnitDto.getUnitName())
+                   .withLabels(subSubUnitDto.getUnitName())
+                   .build();
     }
 
     private List<Organization> getOrganizations(HttpResponse<String> response) throws JsonProcessingException {
