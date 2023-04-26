@@ -1,14 +1,7 @@
 openapi: 3.0.3
 info:
   title: NVA Cristin Proxy API
-  description: >
-    The NVA Cristin Proxy API.
-
-      This API provides transformed Cristin data stored in [Cristin](https://api.cristin.no/v2).
-
-      The data is reformatted as JSON-LD with a schema defined in the [search ontology](https://bibsysdev.github.io/src/search-ontology.ttl), the [Organization ontology](https://bibsysdev.github.io/src/organization-ontology.ttl) and the [project ontology](https://bibsysdev.github.io/src/publication-channel-ontology.ttl).
-
-      To understand the semantic layer, take a look at the @context URI returned by the API, the data is marked up according to this and may be interpreted directly to RDF using this.
+  description: This API provides transformed Cristin data stored in [Cristin](https://api.cristin.no/v2).
   termsOfService: https://nva.unit.no/terms/
   contact:
     email: nva@unit.no
