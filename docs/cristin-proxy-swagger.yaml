@@ -2099,6 +2099,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Languages'
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Languages'
         acronym:
           type: string
           pattern: '.*'
@@ -2492,7 +2496,12 @@ components:
           type: string
         name:
           type: array
-          description: Titles in alternative languages
+          description: Titles in different languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        labels:
+          type: array
+          description: Titles in different languages
           items:
             $ref: '#/components/schemas/Languages'
         enabled:
@@ -2585,7 +2594,12 @@ components:
                 description: Cristin ID of project
         name:
           type: array
-          description: Names in alternative languages
+          description: Names in different languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        labels:
+          type: array
+          description: Names in different languages
           items:
             $ref: '#/components/schemas/Languages'
         mainLanguage:
@@ -2818,6 +2832,8 @@ components:
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
+              labels:
+                'nb': 'OsloMet - storbyuniversitetet'
             contributors:
               - type: 'ProjectManager'
                 identity:
@@ -2830,6 +2846,8 @@ components:
                   type: 'Organization'
                   name:
                     'nb': 'OsloMet - storbyuniversitetet'
+                  labels:
+                    'nb': 'OsloMet - storbyuniversitetet'
               - type: 'ProjectParticipant'
                 identity:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
@@ -2840,6 +2858,8 @@ components:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
                   name:
+                    'nb': 'OsloMet - storbyuniversitetet'
+                  labels:
                     'nb': 'OsloMet - storbyuniversitetet'
             status: CONCLUDED
             academicSummary:
@@ -2923,6 +2943,8 @@ components:
           type: 'Organization'
           name:
             'nb': 'OsloMet - storbyuniversitetet'
+          labels:
+            'nb': 'OsloMet - storbyuniversitetet'
         contributors:
           - type: 'ProjectManager'
             identity:
@@ -2935,6 +2957,8 @@ components:
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
+              labels:
+                'nb': 'OsloMet - storbyuniversitetet'
           - type: 'ProjectParticipant'
             identity:
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
@@ -2945,6 +2969,8 @@ components:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
               name:
+                'nb': 'OsloMet - storbyuniversitetet'
+              labels:
                 'nb': 'OsloMet - storbyuniversitetet'
         status: CONCLUDED
         academicSummary:
@@ -3146,11 +3172,17 @@ components:
             name:
               'nb': 'OsloMet - storbyuniversitetet'
               'en': 'Oslomet - Oslo Metropolitan University'
+            labels:
+              'nb': 'OsloMet - storbyuniversitetet'
+              'en': 'Oslomet - Oslo Metropolitan University'
             acronym: 'OSLOMET'
             partOf:
               - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                 type: 'Organization'
                 name:
+                  'nb': 'OsloMet - storbyuniversitetet'
+                  'en': 'Oslomet - Oslo Metropolitan University'
+                labels:
                   'nb': 'OsloMet - storbyuniversitetet'
                   'en': 'Oslomet - Oslo Metropolitan University'
             hasPart:
@@ -3159,6 +3191,9 @@ components:
                 name:
                   'en': 'Norwegian Social Research'
                   'nb': 'Velferdsforskningsinstituttet NOVA'
+                labels:
+                  'nb': 'OsloMet - storbyuniversitetet'
+                  'en': 'Oslomet - Oslo Metropolitan University'
 
     OrganizationExample:
       value:
@@ -3168,11 +3203,17 @@ components:
         name:
           'nb': 'OsloMet - storbyuniversitetet'
           'en': 'Oslomet - Oslo Metropolitan University'
+        labels:
+          'nb': 'OsloMet - storbyuniversitetet'
+          'en': 'Oslomet - Oslo Metropolitan University'
         acronym: 'OSLOMET'
         partOf:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             type: 'Organization'
             name:
+              'nb': 'OsloMet - storbyuniversitetet'
+              'en': 'Oslomet - Oslo Metropolitan University'
+            labels:
               'nb': 'OsloMet - storbyuniversitetet'
               'en': 'Oslomet - Oslo Metropolitan University'
         hasPart:
@@ -3181,6 +3222,9 @@ components:
             name:
               'en': 'Norwegian Social Research'
               'nb': 'Velferdsforskningsinstituttet NOVA'
+            labels:
+              'nb': 'OsloMet - storbyuniversitetet'
+              'en': 'Oslomet - Oslo Metropolitan University'
     PersonsExample:
       value:
         '@context': 'https://example.org/person-search-context.json'
@@ -3382,11 +3426,15 @@ components:
         positions:
           - id: "https://api.{env.}nva.aws.unit.no/positions#9308"
             name:
-              nb: Overstyrmann
+              nb: "Overstyrmann"
+            labels:
+              nb: "Overstyrmann"
             enabled: false
           - id: "https://api.{env.}nva.aws.unit.no/positions#VITRÅDGIVER"
             name:
-              en: Academic adviser
+              en: "Academic adviser"
+            labels:
+              en: "Academic adviser"
             enabled: true
     FundingSourcesSample:
       value:
@@ -3457,6 +3505,9 @@ components:
           ],
           "biobankType": "SPECIFICBIOBANK",
           "name": {
+            "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
+          },
+          "labels": {
             "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
           },
           "mainLanguage": "nb",
@@ -3600,6 +3651,8 @@ components:
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
+              labels:
+                'nb': 'OsloMet - storbyuniversitetet'
             contributors:
               - type: 'ProjectManager'
                 identity:
@@ -3612,6 +3665,8 @@ components:
                   type: 'Organization'
                   name:
                     'nb': 'OsloMet - storbyuniversitetet'
+                  labels:
+                    'nb': 'OsloMet - storbyuniversitetet'
               - type: 'ProjectParticipant'
                 identity:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
@@ -3622,6 +3677,8 @@ components:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
                   name:
+                    'nb': 'OsloMet - storbyuniversitetet'
+                  labels:
                     'nb': 'OsloMet - storbyuniversitetet'
             status: CONCLUDED
             academicSummary:

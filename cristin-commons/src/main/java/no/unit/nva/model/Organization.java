@@ -4,6 +4,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ACRONYM;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.HAS_PART;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LABELS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PART_OF;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
@@ -30,6 +31,9 @@ public class Organization implements JsonSerializable {
     @JsonPropertyOrder(alphabetic = true)
     @JsonProperty(NAME)
     private final Map<String, String> name;
+    @JsonPropertyOrder(alphabetic = true)
+    @JsonProperty(LABELS)
+    private final Map<String, String> labels;
     @JsonProperty(ACRONYM)
     private final String acronym;
     @JsonProperty(PART_OF)
@@ -50,11 +54,13 @@ public class Organization implements JsonSerializable {
     @JsonCreator
     public Organization(@JsonProperty(ID) URI id,
                         @JsonProperty(NAME) Map<String, String> name,
+                        @JsonProperty(LABELS) Map<String, String> labels,
                         @JsonProperty(ACRONYM) String acronym,
                         @JsonProperty(PART_OF) Set<Organization> partOf,
                         @JsonProperty(HAS_PART) Set<Organization> hasPart) {
         this.id = id;
         this.name = name;
+        this.labels = labels;
         this.acronym = acronym;
         this.partOf = partOf;
         this.hasPart = hasPart;
@@ -63,6 +69,7 @@ public class Organization implements JsonSerializable {
     private Organization(Builder builder) {
         this.id = builder.id;
         this.name = builder.name;
+        this.labels = builder.labels;
         this.acronym = builder.acronym;
         this.partOf = builder.partOf;
         this.hasPart = builder.hasPart;
@@ -82,6 +89,10 @@ public class Organization implements JsonSerializable {
 
     public Map<String, String> getName() {
         return name;
+    }
+
+    public Map<String, String> getLabels() {
+        return labels;
     }
 
     public String getAcronym() {
@@ -106,15 +117,16 @@ public class Organization implements JsonSerializable {
         }
         Organization that = (Organization) o;
         return Objects.equals(getId(), that.getId())
-                && Objects.equals(getName(), that.getName())
-                && Objects.equals(getAcronym(), that.getAcronym())
-                && Objects.equals(getPartOf(), that.getPartOf())
-                && Objects.equals(getHasPart(), that.getHasPart());
+               && Objects.equals(getName(), that.getName())
+               && Objects.equals(getLabels(), that.getLabels())
+               && Objects.equals(getAcronym(), that.getAcronym())
+               && Objects.equals(getPartOf(), that.getPartOf())
+               && Objects.equals(getHasPart(), that.getHasPart());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getAcronym(), getPartOf(), getHasPart());
+        return Objects.hash(getId(), getName(), getLabels(), getAcronym(), getPartOf(), getHasPart());
     }
 
     @Override
@@ -126,6 +138,7 @@ public class Organization implements JsonSerializable {
 
         private URI id;
         private Map<String, String> name;
+        private Map<String, String> labels;
         private String acronym;
         private Set<Organization> partOf;
         private Set<Organization> hasPart;
@@ -137,6 +150,11 @@ public class Organization implements JsonSerializable {
 
         public Builder withName(Map<String, String> name) {
             this.name = name;
+            return this;
+        }
+
+        public Builder withLabels(Map<String, String> labels) {
+            this.labels = labels;
             return this;
         }
 
