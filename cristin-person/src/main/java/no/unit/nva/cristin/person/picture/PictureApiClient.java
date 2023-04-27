@@ -1,8 +1,8 @@
 package no.unit.nva.cristin.person.picture;
 
-import java.io.InputStream;
 import java.net.http.HttpClient;
 import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.person.model.nva.Binary;
 
 public class PictureApiClient extends ApiClient {
 
@@ -10,7 +10,7 @@ public class PictureApiClient extends ApiClient {
         super(client);
     }
 
-    public Void uploadPicture(String personId, InputStream input) {
+    public Void uploadPicture(String personId, Binary input) {
         return null;
     }
 
