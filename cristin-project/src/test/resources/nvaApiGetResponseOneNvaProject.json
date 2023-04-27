@@ -80,6 +80,9 @@
         "type": "Organization",
         "name": {
           "en": "Medical Department"
+        },
+        "labels": {
+          "en": "Medical Department"
         }
       }
     }
