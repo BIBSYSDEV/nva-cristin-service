@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.picture;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
@@ -39,6 +40,7 @@ public class UpdatePictureHandlerTest {
     public static final URI PERSON_IDENTIFIER_URI = getNvaApiId(PERSON_CRISTIN_ID, PERSON);
     private static final Map<String, String> validPath = Map.of(PERSON_ID, PERSON_CRISTIN_ID);
     private static final String PROFILE_PICTURE_JPG = "profilePicture.jpg";
+    private static final String TEXT_FILE = "textFile.txt";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -73,6 +75,17 @@ public class UpdatePictureHandlerTest {
 
         assertEquals(HTTP_UNAUTHORIZED, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(CONTENT_TYPE));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenInputIsNotAnImage() throws Exception {
+        try (InputStream textFile = IoUtils.inputStreamFromResources(TEXT_FILE)) {
+            var encoded = Base64.getEncoder().encodeToString(textFile.readAllBytes());
+            var input = new Binary(encoded);
+            var response = queryWithBody(input);
+
+            assertThat(response.getStatusCode(), equalTo(HTTP_BAD_REQUEST));
+        }
     }
 
     private GatewayResponse<Void> queryWithoutRequiredAccessRights(Binary body) throws IOException {
