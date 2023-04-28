@@ -524,6 +524,20 @@ Resources:
             Path: /biobank/{identifier}
             Method: get
 
+    NvaCristinUpdatePersonPictureFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        CodeUri: cristin-person
+        Handler: no.unit.nva.cristin.person.picture.UpdatePictureHandler::handleRequest
+        Role: !GetAtt ReadCristinAuthenticationRole.Arn
+        Events:
+          NvaCristinUpdatePersonPictureEvent:
+            Type: Api
+            Properties:
+              RestApiId: !Ref NvaCristinProxyApi
+              Path: /person/{id}/picture/
+              Method: put
+
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
