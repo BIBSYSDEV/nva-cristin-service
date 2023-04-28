@@ -9,6 +9,8 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomCont
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithoutUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomOrganization;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomPerson;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_ONE;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_THREE;
@@ -47,6 +49,7 @@ import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.ApprovalAuthority;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
+import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.DateInfo;
@@ -502,6 +505,51 @@ class CreateCristinProjectHandlerTest {
         var creator = capturedCristinProject.getCreator();
 
         assertThat(creator, equalTo(null));
+    }
+
+    @Test
+    void shouldAddContributorRolesToOutputPayload() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        mockUpstreamUsingRequest(nvaProject);
+
+        var contributorOne = nvaContributorWithRole("ProjectManager");
+        var contributorTwo = nvaContributorWithRole("LocalProjectManager");
+        var contributorThree = nvaContributorWithRole("ProjectParticipant");
+        nvaProject.setContributors(List.of(contributorOne, contributorTwo, contributorThree));
+
+        var input = requestWithBodyAndRole(nvaProject);
+        handler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+
+        var matchingFirstRole = hasRole(capturedCristinProject, "PRO_LMANAGER");
+        var matchingSecondRole = hasRole(capturedCristinProject, "PRO_MANAGER");
+        var matchingThirdRole = hasRole(capturedCristinProject, "PRO_PARTICIPANT");
+
+        assertThat(matchingFirstRole, equalTo(true));
+        assertThat(matchingSecondRole, equalTo(true));
+        assertThat(matchingThirdRole, equalTo(true));
+    }
+
+    private NvaContributor nvaContributorWithRole(String roleCode) {
+        var contributorOne = new NvaContributor();
+        contributorOne.setType(roleCode);
+        contributorOne.setIdentity(randomPerson());
+        contributorOne.setAffiliation(randomOrganization());
+        return contributorOne;
+    }
+
+    private boolean hasRole(CristinProject capturedCristinProject, String roleCode) {
+        return capturedCristinProject.getParticipants()
+                   .stream()
+                   .anyMatch(person -> person.getRoles().get(0).getRoleCode().equals(roleCode));
     }
 
     private InputStream inputWithClientIdentifiers(NvaProject nvaProject) throws JsonProcessingException {

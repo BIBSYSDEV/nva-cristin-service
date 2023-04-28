@@ -1586,7 +1586,8 @@ components:
                 enum:
                   - ProjectManager
                   - ProjectParticipant
-                description: Type of contributor. Can be ProjectManager or ProjectParticipant
+                  - LocalProjectManager
+                description: Type of contributor.
               identity:
                 type: object
                 properties:
@@ -1813,7 +1814,8 @@ components:
                 enum:
                   - ProjectManager
                   - ProjectParticipant
-                description: Type of contributor. Can be ProjectManager or ProjectParticipant
+                  - LocalProjectManager
+                description: Type of contributor.
               identity:
                 type: object
                 properties:
@@ -1950,7 +1952,8 @@ components:
                 enum:
                   - ProjectManager
                   - ProjectParticipant
-                description: Type of contributor. Can be ProjectManager or ProjectParticipant
+                  - LocalProjectManager
+                description: Type of contributor.
               identity:
                 type: object
                 properties:

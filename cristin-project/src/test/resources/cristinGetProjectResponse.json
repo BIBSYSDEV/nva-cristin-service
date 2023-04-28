@@ -76,6 +76,31 @@
           }
         }
       ]
+    },
+    {
+      "cristin_person_id": "456789",
+      "first_name": "Kari",
+      "surname": "Nordmann",
+      "url": "https://api.cristin.no/v2/persons/456789",
+      "email": "kari.nordmann@example.org",
+      "phone": "12345678",
+      "roles": [
+        {
+          "role_code": "PRO_LMANAGER",
+          "institution": {
+            "cristin_institution_id": "1234",
+            "institution_name": {
+              "en": "University"
+            }
+          },
+          "unit": {
+            "cristin_unit_id": "1234.0.0.0",
+            "unit_name": {
+              "en": "Medical Department"
+            }
+          }
+        }
+      ]
     }
   ],
   "popular_scientific_summary": {

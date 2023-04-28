@@ -74,7 +74,7 @@ public class RandomProjectDataGenerator {
             ".creator"
     );
     private static final String NORWEGIAN = "nb";
-    private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant"};
+    private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant", "LocalProjectManager"};
     public static final String SOME_UNIT_IDENTIFIER = "185.90.0.0";
     public static final String EMAIL_DOMAIN = "@email.no";
     public static final String PATH_DELIMITER = "/";
@@ -220,7 +220,7 @@ public class RandomProjectDataGenerator {
         return randomElement(CONTRIBUTOR_TYPES);
     }
 
-    private static Person randomPerson() {
+    public static Person randomPerson() {
         return new Person(semiRandomPersonId(randomString()), randomString(), randomString(),
                           randomString() + EMAIL_DOMAIN, randomString());
     }
