@@ -2,6 +2,7 @@ package no.unit.nva.cristin.person.picture;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
+import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
@@ -37,7 +38,9 @@ import org.junit.jupiter.api.Test;
 public class UpdatePictureHandlerTest {
 
     private static final String PERSON_CRISTIN_ID = "123456";
-    public static final URI PERSON_IDENTIFIER_URI = getNvaApiId(PERSON_CRISTIN_ID, PERSON);
+    private static final URI PERSON_IDENTIFIER_URI = getNvaApiId(PERSON_CRISTIN_ID, PERSON);
+    private static final String ANOTHER_PERSON_CRISTIN_ID = "987654";
+    private static final URI PERSON_IDENTIFIER_MATCHING_ANOTHER_URI = getNvaApiId(ANOTHER_PERSON_CRISTIN_ID, PERSON);
     private static final Map<String, String> validPath = Map.of(PERSON_ID, PERSON_CRISTIN_ID);
     private static final String PROFILE_PICTURE_JPG = "profilePicture.jpg";
     private static final String TEXT_FILE = "textFile.txt";
@@ -63,7 +66,7 @@ public class UpdatePictureHandlerTest {
         try (InputStream picture = IoUtils.inputStreamFromResources(PROFILE_PICTURE_JPG)) {
             var encoded = Base64.getEncoder().encodeToString(picture.readAllBytes());
             var input = new Binary(encoded);
-            var response = queryWithBody(input);
+            var response = queryWithValidBodyAndMatchingIdentifier(input);
 
             assertThat(response.getStatusCode(), equalTo(HTTP_NO_CONTENT));
         }
@@ -82,9 +85,22 @@ public class UpdatePictureHandlerTest {
         try (InputStream textFile = IoUtils.inputStreamFromResources(TEXT_FILE)) {
             var encoded = Base64.getEncoder().encodeToString(textFile.readAllBytes());
             var input = new Binary(encoded);
-            var response = queryWithBody(input);
+            var response = queryWithValidBodyAndMatchingIdentifier(input);
 
             assertThat(response.getStatusCode(), equalTo(HTTP_BAD_REQUEST));
+        }
+    }
+
+    @Test
+    void shouldThrowForbiddenWhenClientIsNotUpdatingThemselves() throws IOException {
+        try (InputStream picture = IoUtils.inputStreamFromResources(PROFILE_PICTURE_JPG)) {
+            var encoded = Base64.getEncoder().encodeToString(picture.readAllBytes());
+            var input = new Binary(encoded);
+
+            var gatewayResponse = queryWithValidBodyButNonMatchingIdentifier(input);
+
+            assertEquals(HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+            assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(CONTENT_TYPE));
         }
     }
 
@@ -98,11 +114,19 @@ public class UpdatePictureHandlerTest {
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
-    private GatewayResponse<Void> queryWithBody(Binary body) throws IOException {
+    private GatewayResponse<Void> queryWithValidBodyAndMatchingIdentifier(Binary body) throws IOException {
+        return sendQuery(body, PERSON_IDENTIFIER_URI);
+    }
+
+    private GatewayResponse<Void> queryWithValidBodyButNonMatchingIdentifier(Binary body) throws IOException {
+        return sendQuery(body, PERSON_IDENTIFIER_MATCHING_ANOTHER_URI);
+    }
+
+    private GatewayResponse<Void> sendQuery(Binary body, URI personIdentifier) throws IOException {
         var input = new HandlerRequestBuilder<Binary>(OBJECT_MAPPER)
                         .withBody(body)
                         .withPathParameters(validPath)
-                        .withPersonCristinId(PERSON_IDENTIFIER_URI)
+                        .withPersonCristinId(personIdentifier)
                         .build();
         handler.handleRequest(input, output, context);
 

@@ -30,6 +30,7 @@ public class UpdatePictureHandler extends ApiGatewayHandler<Binary, Void> {
     public static final String CANNOT_BE_EMPTY = "Json cannot be empty";
     public static final String NOT_AN_IMAGE = "Binary data is not an image";
     public static final String DECODED_DATA_SIZE_MESSAGE = "Decoded data is an image of size in bytes: {}";
+    public static final String IS_ACTING_AS_THEMSELVES = " and is acting as themselves";
 
     private final transient PictureApiClient apiClient;
 
@@ -48,8 +49,8 @@ public class UpdatePictureHandler extends ApiGatewayHandler<Binary, Void> {
 
         new UpdatePictureAccessCheck().verifyAccess(requestInfo);
 
-        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-        logger.info(STARTING_UPDATE_MESSAGE);
+        logger.info(LOG_IDENTIFIERS + IS_ACTING_AS_THEMSELVES, extractCristinIdentifier(requestInfo),
+                    extractOrgIdentifier(requestInfo));
 
         checkHasContent(input);
         var decoded = decodeInput(input);
