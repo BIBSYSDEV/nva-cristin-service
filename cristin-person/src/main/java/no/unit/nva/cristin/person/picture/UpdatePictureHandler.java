@@ -15,7 +15,6 @@ import nva.commons.core.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("unused")
 public class UpdatePictureHandler extends ApiGatewayHandler<Binary, Void> {
 
     private static final Logger logger = LoggerFactory.getLogger(UpdatePictureHandler.class);
@@ -23,6 +22,7 @@ public class UpdatePictureHandler extends ApiGatewayHandler<Binary, Void> {
 
     private final transient PictureApiClient apiClient;
 
+    @SuppressWarnings("unused")
     public UpdatePictureHandler() {
         this(new PictureApiClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
