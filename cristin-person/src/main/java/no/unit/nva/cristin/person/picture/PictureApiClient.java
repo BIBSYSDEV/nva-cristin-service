@@ -12,9 +12,6 @@ import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -22,7 +19,6 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import no.unit.nva.cristin.common.client.ApiClient;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
@@ -37,8 +33,6 @@ public class PictureApiClient extends ApiClient {
     public static final String IDENTIFIER_OR_PAYLOAD_IS_NOT_VALID = "Supplied identifier or payload is not valid";
     public static final String UNSUPPORTED_MEDIA_TYPE_ERROR_MESSAGE = "Upstream returned unsupported media type";
     public static final String PAYLOAD_NOT_ACCEPTED_BY_UPSTREAM = "Payload not accepted by upstream";
-    public static final String ERROR_SENDING_BINARY_TO_UPSTREAM = "Error sending profile picture to upstream";
-    public static final String DELIMITER = " : ";
 
     public PictureApiClient(HttpClient client) {
         super(client);
@@ -52,13 +46,8 @@ public class PictureApiClient extends ApiClient {
      */
     public Void uploadPicture(String personId, byte[] input) throws ApiGatewayException {
         var uri = generateCristinUri(personId);
-        try (InputStream stream = new ByteArrayInputStream(input)) {
-            var response = put(uri, stream);
-            checkPutHttpStatusCode(generateIdUri(personId), response.statusCode(), response.body());
-        } catch (IOException ex) {
-            logger.error(ERROR_SENDING_BINARY_TO_UPSTREAM + DELIMITER + ex.getMessage());
-            throw new BadGatewayException(ERROR_SENDING_BINARY_TO_UPSTREAM);
-        }
+        var response = put(uri, input);
+        checkPutHttpStatusCode(generateIdUri(personId), response.statusCode(), response.body());
 
         return null;
     }
@@ -68,11 +57,11 @@ public class PictureApiClient extends ApiClient {
      * @param uri to call
      * @return response containing data from requested URI or error
      */
-    private HttpResponse<String> put(URI uri, InputStream body) throws ApiGatewayException {
+    private HttpResponse<String> put(URI uri, byte[] body) throws ApiGatewayException {
         var httpRequest = HttpRequest.newBuilder(uri)
                               .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
                               .header(CONTENT_TYPE, IMAGE_JPEG)
-                              .PUT(BodyPublishers.ofInputStream(() -> body))
+                              .PUT(BodyPublishers.ofByteArray(body))
                               .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
