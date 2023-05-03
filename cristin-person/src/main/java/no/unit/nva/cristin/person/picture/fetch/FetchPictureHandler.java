@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.picture.fetch;
 
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.unit.nva.cristin.common.Utils.getValidIdentifier;
+import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Map;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
@@ -28,7 +28,7 @@ public class FetchPictureHandler extends ApiGatewayHandler<Void, byte[]> {
 
     @Override
     protected byte[] processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        var identifier = getValidIdentifier(requestInfo);
+        var identifier = getValidPersonId(requestInfo);
 
         addAdditionalHeaders(() -> Map.of(CONTENT_TYPE, IMAGE_JPEG));
 
