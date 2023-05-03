@@ -1339,6 +1339,35 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonPictureFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Fetch person profile picture
+      description: Retrieves person profile picture
+      operationId: FetchPersonPicture
+      responses:
+        200:
+          description: successful operation
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: byte
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 
   /position:
     get:

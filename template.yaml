@@ -528,7 +528,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.picture.UpdatePictureHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.picture.update.UpdatePictureHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinUpdatePersonPictureEvent:
@@ -537,6 +537,20 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/{id}/picture/
             Method: put
+
+  NvaCristinFetchPersonPictureFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.picture.fetch.FetchPictureHandler::handleRequest
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinFetchPersonPictureEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /person/{id}/picture/
+            Method: get
 
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
