@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.person.picture;
+package no.unit.nva.cristin.person.picture.update;
 
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import java.util.Objects;

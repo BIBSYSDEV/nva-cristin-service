@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.person.picture;
+package no.unit.nva.cristin.person.picture.update;
 
 import static java.util.Objects.isNull;
 import java.io.ByteArrayInputStream;

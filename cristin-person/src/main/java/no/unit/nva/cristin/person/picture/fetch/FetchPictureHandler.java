@@ -9,6 +9,7 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 
 public class FetchPictureHandler extends ApiGatewayHandler<Void, byte[]> {
 
@@ -17,6 +18,7 @@ public class FetchPictureHandler extends ApiGatewayHandler<Void, byte[]> {
     private final transient FetchPictureApiClient apiClient;
 
     @SuppressWarnings("unused")
+    @JacocoGenerated
     public FetchPictureHandler() {
         this(new FetchPictureApiClient(CristinAuthenticator.getHttpClient()), new Environment());
     }

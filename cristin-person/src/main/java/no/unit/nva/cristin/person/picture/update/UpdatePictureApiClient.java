@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.person.picture;
+package no.unit.nva.cristin.person.picture.update;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
@@ -24,9 +24,9 @@ import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PictureApiClient extends ApiClient {
+public class UpdatePictureApiClient extends ApiClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(PictureApiClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdatePictureApiClient.class);
 
     public static final String PICTURE_PATH = "picture";
     public static final String IMAGE_JPEG = "image/jpeg";
@@ -34,7 +34,7 @@ public class PictureApiClient extends ApiClient {
     public static final String UNSUPPORTED_MEDIA_TYPE_ERROR_MESSAGE = "Upstream returned unsupported media type";
     public static final String PAYLOAD_NOT_ACCEPTED_BY_UPSTREAM = "Payload not accepted by upstream";
 
-    public PictureApiClient(HttpClient client) {
+    public UpdatePictureApiClient(HttpClient client) {
         super(client);
     }
 

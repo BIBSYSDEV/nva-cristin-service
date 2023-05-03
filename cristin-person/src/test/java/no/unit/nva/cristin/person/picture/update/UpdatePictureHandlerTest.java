@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.person.picture;
+package no.unit.nva.cristin.person.picture.update;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
@@ -50,12 +50,11 @@ public class UpdatePictureHandlerTest {
     private Context context;
     private ByteArrayOutputStream output;
     private UpdatePictureHandler handler;
-    private PictureApiClient apiClient;
 
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
-        apiClient = new PictureApiClient(httpClientMock);
+        UpdatePictureApiClient apiClient = new UpdatePictureApiClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new UpdatePictureHandler(apiClient, environment);

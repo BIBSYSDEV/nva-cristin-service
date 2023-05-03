@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.person.picture;
+package no.unit.nva.cristin.person.picture.update;
 
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
@@ -20,14 +20,14 @@ public class UpdatePictureHandler extends ApiGatewayHandler<Binary, Void> {
     private static final Logger logger = LoggerFactory.getLogger(UpdatePictureHandler.class);
     public static final String IS_ACTING_AS_THEMSELVES = " and is acting as themselves";
 
-    private final transient PictureApiClient apiClient;
+    private final transient UpdatePictureApiClient apiClient;
 
     @SuppressWarnings("unused")
     public UpdatePictureHandler() {
-        this(new PictureApiClient(CristinAuthenticator.getHttpClient()), new Environment());
+        this(new UpdatePictureApiClient(CristinAuthenticator.getHttpClient()), new Environment());
     }
 
-    public UpdatePictureHandler(PictureApiClient apiClient, Environment environment) {
+    public UpdatePictureHandler(UpdatePictureApiClient apiClient, Environment environment) {
         super(Binary.class, environment);
         this.apiClient = apiClient;
     }
