@@ -2,6 +2,7 @@ package no.unit.nva.cristin.person.picture.fetch;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
+import static no.unit.nva.cristin.common.client.CristinAuthenticator.basicAuthHeader;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME;
@@ -57,9 +58,14 @@ public class FetchPictureApiClient extends ApiClient {
     private HttpResponse<byte[]> fetchBinary(URI uri) throws ApiGatewayException {
         var httpRequest = HttpRequest.newBuilder(uri)
                               .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                              .header(AUTHORIZATION, readBasicAuthHeader())
                               .GET()
                               .build();
         return getSuccessfulBinaryResponseOrThrowException(httpRequest);
+    }
+
+    protected String readBasicAuthHeader() {
+        return basicAuthHeader();
     }
 
     private URI generateCristinUri(String personId) {

@@ -6,10 +6,13 @@ import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.person.picture.fetch.FetchPictureHandler.CONTENT_TYPE;
 import static no.unit.nva.cristin.person.picture.fetch.FetchPictureHandler.IMAGE_JPEG;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.io.ByteArrayOutputStream;
@@ -46,6 +49,8 @@ public class FetchPictureHandlerTest {
         when(httpResponseMock.statusCode()).thenReturn(200);
         when(httpClientMock.<byte[]>send(any(), any())).thenReturn(httpResponseMock);
         apiClient = new FetchPictureApiClient(httpClientMock);
+        apiClient = spy(apiClient);
+        doReturn(randomString()).when(apiClient).readBasicAuthHeader();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new FetchPictureHandler(apiClient, environment);
@@ -64,6 +69,8 @@ public class FetchPictureHandlerTest {
     void shouldReturnBadGatewayWhenRequestFails() throws Exception {
         when(httpClientMock.<byte[]>send(any(), any())). thenThrow(HttpTimeoutException.class);
         apiClient = new FetchPictureApiClient(httpClientMock);
+        apiClient = spy(apiClient);
+        doReturn(randomString()).when(apiClient).readBasicAuthHeader();
         handler = new FetchPictureHandler(apiClient, environment);
 
         var response = sendQuery();
