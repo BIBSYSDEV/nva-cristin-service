@@ -9,6 +9,8 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomCont
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomContributorWithoutUnitAffiliation;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomMinimalNvaProject;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomOrganization;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomPerson;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_ONE;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_THREE;
@@ -34,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.List;
@@ -46,6 +49,7 @@ import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.ApprovalAuthority;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
+import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.DateInfo;
@@ -71,6 +75,9 @@ class CreateCristinProjectHandlerTest {
     public static final String HEALTH_PROJECT_TYPE_JSON_FIELD = "\"type\": \"%s\"";
     public static final String SUPPLIED_HEALTH_PROJECT_TYPE_IS_NOT_VALID = "Supplied HealthProjectType is not valid";
     public static final boolean IS_EXEMPT_FROM_PUBLIC_DISCLOSURE = true;
+    public static final URI CRISTIN_PERSON_ID = URI.create("https://api.dev.nva.aws.unit.no/cristin/person/12345");
+    public static final URI CRISTIN_ORG_ID =
+        URI.create("https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0");
 
     private final Environment environment = new Environment();
     private Context context;
@@ -405,6 +412,167 @@ class CreateCristinProjectHandlerTest {
 
         assertThat(projectCategory.getName(), equalTo(null));
         assertThat(keyword.getName(), equalTo(null));
+    }
+
+    @Test
+    void shouldAddCreatorDataToInput() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        mockUpstreamUsingRequest(nvaProject);
+        var input = inputWithClientIdentifiers(nvaProject);
+        handler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(NvaProject.class);
+        verify(apiClient).createProjectInCristin(captor.capture());
+        var capturedNvaProject = captor.getValue();
+        var creator = capturedNvaProject.getCreator();
+
+        assertThat(creator.getIdentity().getId(), equalTo(CRISTIN_PERSON_ID));
+        assertThat(creator.getAffiliation().getId(), equalTo(CRISTIN_ORG_ID));
+    }
+
+    @Test
+    void shouldAddCreatorDataToOutputPayload() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        mockUpstreamUsingRequest(nvaProject);
+        var input = inputWithClientIdentifiers(nvaProject);
+
+        handler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+
+        var creator = capturedCristinProject.getCreator();
+        var actualPerson = creator.getCristinPersonId();
+        var actualOrg = creator.getRoles().get(0).getInstitutionUnit().getCristinUnitId();
+
+        assertThat(actualPerson, equalTo(extractLastPathElement(CRISTIN_PERSON_ID)));
+        assertThat(actualOrg, equalTo(extractLastPathElement(CRISTIN_ORG_ID)));
+    }
+
+    @Test
+    void shouldAddCreatorDataToOutputPayloadEvenWithMissingOrganization() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        mockUpstreamUsingRequest(nvaProject);
+        var input = inputWithClientIdentifierButNoClientOrganization(nvaProject);
+
+        handler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+
+        var creator = capturedCristinProject.getCreator();
+        var actualPerson = creator.getCristinPersonId();
+        var actualOrg = creator.getRoles();
+
+        assertThat(actualPerson, equalTo(extractLastPathElement(CRISTIN_PERSON_ID)));
+        assertThat(actualOrg, equalTo(null));
+    }
+
+    @Test
+    void shouldNotAddCreatorDataToOutputWhenPersonIdentifierIsMissing() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        mockUpstreamUsingRequest(nvaProject);
+        var input = requestWithBodyAndRole(nvaProject);
+
+        handler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+
+        var creator = capturedCristinProject.getCreator();
+
+        assertThat(creator, equalTo(null));
+    }
+
+    @Test
+    void shouldAddContributorRolesToOutputPayload() throws Exception {
+        var apiClient = new CreateCristinProjectApiClient(mockHttpClient);
+        apiClient = spy(apiClient);
+        handler = new CreateCristinProjectHandler(apiClient, environment);
+
+        var nvaProject = randomNvaProject();
+        nvaProject.setId(null);
+        mockUpstreamUsingRequest(nvaProject);
+
+        var contributorOne = nvaContributorWithRole("ProjectManager");
+        var contributorTwo = nvaContributorWithRole("LocalProjectManager");
+        var contributorThree = nvaContributorWithRole("ProjectParticipant");
+        nvaProject.setContributors(List.of(contributorOne, contributorTwo, contributorThree));
+
+        var input = requestWithBodyAndRole(nvaProject);
+        handler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
+
+        var matchingFirstRole = hasRole(capturedCristinProject, "PRO_LMANAGER");
+        var matchingSecondRole = hasRole(capturedCristinProject, "PRO_MANAGER");
+        var matchingThirdRole = hasRole(capturedCristinProject, "PRO_PARTICIPANT");
+
+        assertThat(matchingFirstRole, equalTo(true));
+        assertThat(matchingSecondRole, equalTo(true));
+        assertThat(matchingThirdRole, equalTo(true));
+    }
+
+    private NvaContributor nvaContributorWithRole(String roleCode) {
+        var contributorOne = new NvaContributor();
+        contributorOne.setType(roleCode);
+        contributorOne.setIdentity(randomPerson());
+        contributorOne.setAffiliation(randomOrganization());
+        return contributorOne;
+    }
+
+    private boolean hasRole(CristinProject capturedCristinProject, String roleCode) {
+        return capturedCristinProject.getParticipants()
+                   .stream()
+                   .anyMatch(person -> person.getRoles().get(0).getRoleCode().equals(roleCode));
+    }
+
+    private InputStream inputWithClientIdentifiers(NvaProject nvaProject) throws JsonProcessingException {
+        var customer = randomUri();
+        return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
+                        .withBody(nvaProject)
+                        .withCurrentCustomer(customer)
+                        .withPersonCristinId(CRISTIN_PERSON_ID)
+                        .withTopLevelCristinOrgId(CRISTIN_ORG_ID)
+                        .withAccessRights(customer, EDIT_OWN_INSTITUTION_PROJECTS)
+                        .build();
+    }
+
+    private InputStream inputWithClientIdentifierButNoClientOrganization(NvaProject nvaProject)
+        throws JsonProcessingException {
+
+        var customer = randomUri();
+        return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
+                   .withBody(nvaProject)
+                   .withCurrentCustomer(customer)
+                   .withPersonCristinId(CRISTIN_PERSON_ID)
+                   .withAccessRights(customer, EDIT_OWN_INSTITUTION_PROJECTS)
+                   .build();
     }
 
     private CristinProject captureCristinProjectFromApiClient(CreateCristinProjectApiClient apiClient,

@@ -129,7 +129,7 @@ Feature: API tests for Cristin persons query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == "Parameter 'name' has invalid value. May only contain alphanumeric characters, dash, comma, period and whitespace"
+    And match response.detail == "Parameter 'name' has invalid value. May only contain alphanumeric characters, dash, comma, period, colon, semicolon and whitespace"
     And match response.requestId == '#notnull'
 
   Scenario: Query returns correct pagination values and URIs

@@ -69,5 +69,6 @@ public class JsonPropertyNames {
     public static final String TYPE = "type";
     public static final String UNIT = "unit";
     public static final String USER = "user";
+    public static final String LABELS = "labels";
 
 }

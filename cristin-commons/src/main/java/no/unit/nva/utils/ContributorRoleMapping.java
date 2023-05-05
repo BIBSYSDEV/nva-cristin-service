@@ -8,7 +8,9 @@ import java.util.Optional;
 public enum ContributorRoleMapping {
 
     MANAGER("ProjectManager", "PRO_MANAGER"),
-    PARTICIPANT("ProjectParticipant","PRO_PARTICIPANT");
+    PARTICIPANT("ProjectParticipant","PRO_PARTICIPANT"),
+    CREATOR("ProjectCreator", "PRO_CREATOR"),
+    LOCAL_MANAGER("LocalProjectManager", "PRO_LMANAGER");
 
     private final String nvaRole;
     private final String cristinRole;

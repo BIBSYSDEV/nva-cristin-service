@@ -16,6 +16,7 @@ public class PositionCode implements JsonSerializable {
 
     private final URI id;
     private final Map<String, String> name;
+    private final Map<String, String> labels;
     private final boolean enabled;
 
     /**
@@ -23,9 +24,10 @@ public class PositionCode implements JsonSerializable {
      */
     @JsonCreator
     public PositionCode(@JsonProperty("id") URI id, @JsonProperty("name") Map<String, String> name,
-                        @JsonProperty("enabled") boolean enabled) {
+                        @JsonProperty("labels") Map<String, String> labels, @JsonProperty("enabled") boolean enabled) {
         this.id = id;
         this.name = name;
+        this.labels = labels;
         this.enabled = enabled;
     }
 
@@ -35,6 +37,10 @@ public class PositionCode implements JsonSerializable {
 
     public Map<String, String> getName() {
         return Utils.nonEmptyOrDefault(name);
+    }
+
+    public Map<String, String> getLabels() {
+        return Utils.nonEmptyOrDefault(labels);
     }
 
     public boolean isEnabled() {
@@ -52,8 +58,9 @@ public class PositionCode implements JsonSerializable {
         }
         PositionCode that = (PositionCode) o;
         return Objects.equals(getId(), that.getId())
-            && getName().equals(that.getName())
-            && Objects.equals(isEnabled(), that.isEnabled());
+               && getName().equals(that.getName())
+               && getLabels().equals(that.getLabels())
+               && Objects.equals(isEnabled(), that.isEnabled());
     }
 
     @Override
@@ -64,6 +71,6 @@ public class PositionCode implements JsonSerializable {
     @JacocoGenerated
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), isEnabled());
+        return Objects.hash(getId(), getName(), getLabels(), isEnabled());
     }
 }

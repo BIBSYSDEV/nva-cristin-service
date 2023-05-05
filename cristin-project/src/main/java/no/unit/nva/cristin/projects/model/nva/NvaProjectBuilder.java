@@ -41,6 +41,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
 import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -53,6 +54,7 @@ public class NvaProjectBuilder {
     public static final String PROJECT_TYPE = "Project";
 
     public static final String FUNDING_SOURCES = "funding-sources";
+    public static final String PRO_CREATOR = "PRO_CREATOR";
 
     private final transient CristinProject cristinProject;
     private transient String context;
@@ -147,7 +149,35 @@ public class NvaProjectBuilder {
                    .withHealthProjectData(extractHealthProjectData(cristinProject))
                    .withApprovals(extractApprovals(cristinProject.getApprovals()))
                    .withExemptFromPublicDisclosure(cristinProject.getExemptFromPublicDisclosure())
+                   .withCreator(extractCreator(cristinProject.getCreator()))
                    .build();
+    }
+
+    private NvaContributor extractCreator(CristinPerson creator) {
+        return Optional.ofNullable(creator)
+            .stream().peek(this::addRoleDataIfMissing)
+            .flatMap(NvaProjectBuilder::generateRoleBasedContribution)
+                   .findAny()
+                   .or(() -> creatorWithoutAffiliation(creator))
+                   .orElse(null);
+    }
+
+    private Optional<NvaContributor> creatorWithoutAffiliation(CristinPerson creator) {
+        return Optional.ofNullable(creator)
+                   .filter(presentCreator -> nonNull(presentCreator.getCristinPersonId()))
+                   .map(presentCreator -> {
+                       var creatorWithoutAffiliation = new NvaContributor();
+                       creatorWithoutAffiliation.setIdentity(Person.fromCristinPerson(presentCreator));
+                       return creatorWithoutAffiliation;
+                   });
+    }
+
+    private void addRoleDataIfMissing(CristinPerson cristinPerson) {
+        if (isNull(cristinPerson.getRoles())) {
+            cristinPerson.setRoles(emptyList());
+        } else {
+            cristinPerson.getRoles().forEach(role -> role.setRoleCode(PRO_CREATOR));
+        }
     }
 
     private List<Approval> extractApprovals(List<CristinApproval> cristinApprovals) {
@@ -283,7 +313,7 @@ public class NvaProjectBuilder {
         var identifier = cristinFunding.getProjectCode();
         var labels = cristinFunding.getFundingSourceName();
 
-        return new Funding(source, identifier, labels);
+        return new Funding(UNCONFIRMED_FUNDING, source, identifier, labels);
     }
 
     private URI extractFundingSource(CristinFundingSource cristinFunding) {

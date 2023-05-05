@@ -1,14 +1,7 @@
 openapi: 3.0.3
 info:
   title: NVA Cristin Proxy API
-  description: >
-    The NVA Cristin Proxy API.
-
-      This API provides transformed Cristin data stored in [Cristin](https://api.cristin.no/v2).
-
-      The data is reformatted as JSON-LD with a schema defined in the [search ontology](https://bibsysdev.github.io/src/search-ontology.ttl), the [Organization ontology](https://bibsysdev.github.io/src/organization-ontology.ttl) and the [project ontology](https://bibsysdev.github.io/src/publication-channel-ontology.ttl).
-
-      To understand the semantic layer, take a look at the @context URI returned by the API, the data is marked up according to this and may be interpreted directly to RDF using this.
+  description: This API provides transformed Cristin data stored in [Cristin](https://api.cristin.no/v2).
   termsOfService: https://nva.unit.no/terms/
   contact:
     email: nva@unit.no
@@ -165,6 +158,12 @@ paths:
         - name: biobank
           in: query
           description: Biobank id. 'biobank' can be used more than once.
+          required: false
+          schema:
+            type: string
+        - name: creator
+          in: query
+          description: Creator identifier
           required: false
           schema:
             type: string
@@ -674,6 +673,12 @@ paths:
         - name: biobank
           in: query
           description: Biobank id. 'biobank' can be used more than once.
+          required: false
+          schema:
+            type: string
+        - name: creator
+          in: query
+          description: Creator identifier
           required: false
           schema:
             type: string
@@ -1680,7 +1685,8 @@ components:
                 enum:
                   - ProjectManager
                   - ProjectParticipant
-                description: Type of contributor. Can be ProjectManager or ProjectParticipant
+                  - LocalProjectManager
+                description: Type of contributor.
               identity:
                 type: object
                 properties:
@@ -1835,6 +1841,32 @@ components:
                 - PhaseIV
         approvals:
           $ref: '#/components/schemas/Approvals'
+        creator:
+          type: object
+          description: Project Creator
+          properties:
+            type:
+              type: string
+              description: Type. Always ProjectCreator
+            identity:
+              type: object
+              properties:
+                id:
+                  $ref: '#/components/schemas/Id'
+                type:
+                  type: string
+                  pattern: 'Person'
+                  description: Type of identity. Always Person
+                firstName:
+                  type: string
+                  pattern: '.+'
+                  description: First name
+                lastName:
+                  type: string
+                  pattern: '.+'
+                  description: Last name
+            affiliation:
+              $ref: '#/components/schemas/Organization'
     ProjectPost:
       type: object
       properties:
@@ -1881,7 +1913,8 @@ components:
                 enum:
                   - ProjectManager
                   - ProjectParticipant
-                description: Type of contributor. Can be ProjectManager or ProjectParticipant
+                  - LocalProjectManager
+                description: Type of contributor.
               identity:
                 type: object
                 properties:
@@ -1907,16 +1940,8 @@ components:
                     type: string
                     pattern: '.*'
                     description: Phone number
-
               affiliation:
                 $ref: '#/components/schemas/Organization'
-        status:
-          type: string
-          enum:
-            - NOTSTARTED
-            - ACTIVE
-            - CONCLUDED
-          description: Project status, based on start_date and end_date.
         academicSummary:
           $ref: '#/components/schemas/Languages'
         popularScientificSummary:
@@ -2026,7 +2051,8 @@ components:
                 enum:
                   - ProjectManager
                   - ProjectParticipant
-                description: Type of contributor. Can be ProjectManager or ProjectParticipant
+                  - LocalProjectManager
+                description: Type of contributor.
               identity:
                 type: object
                 properties:
@@ -2085,20 +2111,30 @@ components:
             $ref: '#/components/schemas/Organization'
     Problem:
       type: object
+      description: NVA error reporting object
+      required:
+        - title
+        - detail
+        - status
       properties:
         title:
           type: string
           description: Human-readable description of the error status
-        status:
-          type: integer
-          format: int32
-          description: The HTTP status code associated with the problem
         detail:
           type: string
           description: A more detailed error message describing the error and potential mitigations
+        status:
+          type: integer
+          description: The HTTP status code associated with the problem
         requestId:
           type: string
-          description: Unique id for the request
+          description: Identifier of the request causing the problem
+        instance:
+          type: string
+          description: The requested path associated with the error
+        type:
+          type: string
+          description: A URI describing the error and mitigations, in generic cases, this is about:blank
     Context:
       type: string
       pattern: 'https:\/\/.*$'
@@ -2162,6 +2198,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Languages'
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Languages'
         acronym:
           type: string
           pattern: '.*'
@@ -2180,8 +2220,8 @@ components:
       properties:
         type:
           type: string
-          pattern: 'Funding'
-          description: Always Funding
+          pattern: 'UnconfirmedFunding'
+          description: Always UnconfirmedFunding
         source:
           type: string
           description: The source of the funding formatted as an uri
@@ -2273,10 +2313,6 @@ components:
       type: object
       description: Funding creation
       properties:
-        type:
-          type: string
-          pattern: 'Funding'
-          description: Always Funding
         source:
           type: string
           description: The source of the funding formatted as an uri or an alternative url encoded code
@@ -2559,7 +2595,12 @@ components:
           type: string
         name:
           type: array
-          description: Titles in alternative languages
+          description: Titles in different languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        labels:
+          type: array
+          description: Titles in different languages
           items:
             $ref: '#/components/schemas/Languages'
         enabled:
@@ -2652,7 +2693,12 @@ components:
                 description: Cristin ID of project
         name:
           type: array
-          description: Names in alternative languages
+          description: Names in different languages
+          items:
+            $ref: '#/components/schemas/Languages'
+        labels:
+          type: array
+          description: Names in different languages
           items:
             $ref: '#/components/schemas/Languages'
         mainLanguage:
@@ -2882,7 +2928,7 @@ components:
             startDate: '2012-01-09T00:00:00Z'
             endDate: '2017-12-31T00:00:00Z'
             funding:
-              - type: 'Funding'
+              - type: 'UnconfirmedFunding'
                 source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
                 identifier: '1234556'
                 labels:
@@ -2891,6 +2937,8 @@ components:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
               name:
+                'nb': 'OsloMet - storbyuniversitetet'
+              labels:
                 'nb': 'OsloMet - storbyuniversitetet'
             contributors:
               - type: 'ProjectManager'
@@ -2904,6 +2952,8 @@ components:
                   type: 'Organization'
                   name:
                     'nb': 'OsloMet - storbyuniversitetet'
+                  labels:
+                    'nb': 'OsloMet - storbyuniversitetet'
               - type: 'ProjectParticipant'
                 identity:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
@@ -2914,6 +2964,8 @@ components:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
                   name:
+                    'nb': 'OsloMet - storbyuniversitetet'
+                  labels:
                     'nb': 'OsloMet - storbyuniversitetet'
             status: CONCLUDED
             academicSummary:
@@ -2987,7 +3039,7 @@ components:
         startDate: '2012-01-09T00:00:00Z'
         endDate: '2017-12-31T00:00:00Z'
         funding:
-          - type: 'Funding'
+          - type: 'UnconfirmedFunding'
             source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
             identifier: '1234556'
             labels:
@@ -2996,6 +3048,8 @@ components:
           id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
           type: 'Organization'
           name:
+            'nb': 'OsloMet - storbyuniversitetet'
+          labels:
             'nb': 'OsloMet - storbyuniversitetet'
         contributors:
           - type: 'ProjectManager'
@@ -3009,6 +3063,8 @@ components:
               type: 'Organization'
               name:
                 'nb': 'OsloMet - storbyuniversitetet'
+              labels:
+                'nb': 'OsloMet - storbyuniversitetet'
           - type: 'ProjectParticipant'
             identity:
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
@@ -3019,6 +3075,8 @@ components:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
               name:
+                'nb': 'OsloMet - storbyuniversitetet'
+              labels:
                 'nb': 'OsloMet - storbyuniversitetet'
         status: CONCLUDED
         academicSummary:
@@ -3077,6 +3135,16 @@ components:
             identifier: '2017/800'
             authorityName:
               en: 'Regional committees for medical and health research ethics'
+        creator:
+          type: 'ProjectCreator'
+          identity:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+            type: 'Person'
+            firstName: 'Ola'
+            lastName: 'Nordmann'
+          affiliation:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+            type: 'Organization'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -3157,7 +3225,6 @@ components:
             affiliation:
               type: 'Organization'
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-        status: CONCLUDED
         academicSummary:
           en: "Summary in an academic manner"
         popularScientificSummary:
@@ -3180,14 +3247,13 @@ components:
             applicationCode: 'EthicalApproval'
             identifier: '2017/800'
         funding:
-          - type: 'Funding'
-            source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR'
+          - source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR'
             identifier: '1234556'
         keywords:
-          - code: '4245'
-          - code: '5686'
+          - type: '4245'
+          - type: '5686'
         projectCategories:
-          - code: 'PHD'
+          - type: 'PHD'
         relatedProjects:
           - 'https://api.dev.nva.aws.unit.no/cristin/project/21500'
         contactInfo:
@@ -3212,11 +3278,17 @@ components:
             name:
               'nb': 'OsloMet - storbyuniversitetet'
               'en': 'Oslomet - Oslo Metropolitan University'
+            labels:
+              'nb': 'OsloMet - storbyuniversitetet'
+              'en': 'Oslomet - Oslo Metropolitan University'
             acronym: 'OSLOMET'
             partOf:
               - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                 type: 'Organization'
                 name:
+                  'nb': 'OsloMet - storbyuniversitetet'
+                  'en': 'Oslomet - Oslo Metropolitan University'
+                labels:
                   'nb': 'OsloMet - storbyuniversitetet'
                   'en': 'Oslomet - Oslo Metropolitan University'
             hasPart:
@@ -3225,6 +3297,9 @@ components:
                 name:
                   'en': 'Norwegian Social Research'
                   'nb': 'Velferdsforskningsinstituttet NOVA'
+                labels:
+                  'nb': 'OsloMet - storbyuniversitetet'
+                  'en': 'Oslomet - Oslo Metropolitan University'
 
     OrganizationExample:
       value:
@@ -3234,11 +3309,17 @@ components:
         name:
           'nb': 'OsloMet - storbyuniversitetet'
           'en': 'Oslomet - Oslo Metropolitan University'
+        labels:
+          'nb': 'OsloMet - storbyuniversitetet'
+          'en': 'Oslomet - Oslo Metropolitan University'
         acronym: 'OSLOMET'
         partOf:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             type: 'Organization'
             name:
+              'nb': 'OsloMet - storbyuniversitetet'
+              'en': 'Oslomet - Oslo Metropolitan University'
+            labels:
               'nb': 'OsloMet - storbyuniversitetet'
               'en': 'Oslomet - Oslo Metropolitan University'
         hasPart:
@@ -3247,6 +3328,9 @@ components:
             name:
               'en': 'Norwegian Social Research'
               'nb': 'Velferdsforskningsinstituttet NOVA'
+            labels:
+              'nb': 'OsloMet - storbyuniversitetet'
+              'en': 'Oslomet - Oslo Metropolitan University'
     PersonsExample:
       value:
         '@context': 'https://example.org/person-search-context.json'
@@ -3448,11 +3532,15 @@ components:
         positions:
           - id: "https://api.{env.}nva.aws.unit.no/positions#9308"
             name:
-              nb: Overstyrmann
+              nb: "Overstyrmann"
+            labels:
+              nb: "Overstyrmann"
             enabled: false
           - id: "https://api.{env.}nva.aws.unit.no/positions#VITRÅDGIVER"
             name:
-              en: Academic adviser
+              en: "Academic adviser"
+            labels:
+              en: "Academic adviser"
             enabled: true
     FundingSourcesSample:
       value:
@@ -3523,6 +3611,9 @@ components:
           ],
           "biobankType": "SPECIFICBIOBANK",
           "name": {
+            "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
+          },
+          "labels": {
             "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
           },
           "mainLanguage": "nb",
@@ -3656,7 +3747,7 @@ components:
             startDate: '2012-01-09T00:00:00Z'
             endDate: '2017-12-31T00:00:00Z'
             funding:
-              - type: 'Funding'
+              - type: 'UnconfirmedFunding'
                 source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
                 identifier: '1234556'
                 labels:
@@ -3665,6 +3756,8 @@ components:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
               name:
+                'nb': 'OsloMet - storbyuniversitetet'
+              labels:
                 'nb': 'OsloMet - storbyuniversitetet'
             contributors:
               - type: 'ProjectManager'
@@ -3678,6 +3771,8 @@ components:
                   type: 'Organization'
                   name:
                     'nb': 'OsloMet - storbyuniversitetet'
+                  labels:
+                    'nb': 'OsloMet - storbyuniversitetet'
               - type: 'ProjectParticipant'
                 identity:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
@@ -3688,6 +3783,8 @@ components:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
                   name:
+                    'nb': 'OsloMet - storbyuniversitetet'
+                  labels:
                     'nb': 'OsloMet - storbyuniversitetet'
             status: CONCLUDED
             academicSummary:

@@ -82,8 +82,20 @@ public class CristinProjectBuilder {
         cristinProject.setRelatedProjects(extractRelatedProjects(nvaProject.getRelatedProjects()));
         cristinProject.setContactInfo(extractContactInfo(nvaProject.getContactInfo()));
         cristinProject.setExemptFromPublicDisclosure(nvaProject.getExemptFromPublicDisclosure());
+        cristinProject.setCreator(extractCreator(nvaProject.getCreator()));
 
         return cristinProject;
+    }
+
+    private CristinPerson extractCreator(NvaContributor creator) {
+        if (nonNull(creator)) {
+            if (nonNull(creator.getAffiliation())) {
+                return creator.toCristinPersonWithRoles();
+            } else {
+                return creator.getIdentity().toCristinPersonWithoutRoles();
+            }
+        }
+        return null;
     }
 
     public static void removeFieldsNotSupportedByPost(CristinProject cristinProject) {

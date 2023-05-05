@@ -51,6 +51,7 @@ public class Biobank implements JsonSerializable {
     private final List<Map<String, String>> identifiers;
     private final BiobankType biobankType;
     private final Map<String, String> name;
+    private final Map<String, String> labels;
     private final String mainLanguage;
     private final Instant storeUntilDate;
     private final Instant startDate;
@@ -65,14 +66,14 @@ public class Biobank implements JsonSerializable {
     private final List<TypedLabel> biobankMaterials;
 
 
-    @ConstructorProperties({"id", "identifiers", "biobankType", "name", "mainLanguage", "storeUntilDate", "startDate",
-        "status","created", "lastModified", "coordinatingUnit", "coordinator", "project",
+    @ConstructorProperties({"id", "identifiers", "biobankType", "name", "labels", "mainLanguage", "storeUntilDate",
+        "startDate", "status","created", "lastModified", "coordinatingUnit", "coordinator", "project",
         "externalSources","approvals", "biobankMaterials"})
     public Biobank(URI id, List<Map<String, String>> identifiers, BiobankType biobankType, Map<String, String> name,
-                   String mainLanguage, Instant storeUntilDate, Instant startDate, String status, DateInfo created,
-                   DateInfo lastModified, URI coordinatingOrganization, URI coordinator,
-                   AssociatedProject project, Set<ExternalSource> externalSources, List<BiobankApproval> approvals,
-                   List<TypedLabel> biobankMaterials) {
+                   Map<String, String> labels, String mainLanguage, Instant storeUntilDate, Instant startDate,
+                   String status, DateInfo created, DateInfo lastModified, URI coordinatingOrganization,
+                   URI coordinator, AssociatedProject project, Set<ExternalSource> externalSources,
+                   List<BiobankApproval> approvals, List<TypedLabel> biobankMaterials) {
         this.context = URI.create("https://bibsysdev.github.io/src/biobank-context.json");
         this.approvals = approvals;
         this.biobankMaterials = biobankMaterials;
@@ -86,6 +87,7 @@ public class Biobank implements JsonSerializable {
         this.lastModified = lastModified;
         this.mainLanguage = mainLanguage;
         this.name = name;
+        this.labels = labels;
         this.project = project;
         this.startDate = startDate;
         this.status = status;
@@ -97,6 +99,7 @@ public class Biobank implements JsonSerializable {
             getNvaApiId(cristinBiobank.getCristinBiobankId(), BIOBANK_ID),
             toCristinIdentifier(cristinBiobank),
             BiobankType.valueOf(cristinBiobank.getType()),
+            cristinBiobank.getName(),
             cristinBiobank.getName(),
             cristinBiobank.getMainLanguage(),
             cristinBiobank.getStoreUntilDate(),
@@ -131,6 +134,10 @@ public class Biobank implements JsonSerializable {
 
     public Map<String, String> getName() {
         return name;
+    }
+
+    public Map<String, String> getLabels() {
+        return labels;
     }
 
     public String getMainLanguage() {
@@ -196,6 +203,7 @@ public class Biobank implements JsonSerializable {
                && Objects.equals(getIdentifiers(), biobank.getIdentifiers())
                && Objects.equals(getBiobankType(), biobank.getBiobankType())
                && Objects.equals(getName(), biobank.getName())
+               && Objects.equals(getLabels(), biobank.getLabels())
                && Objects.equals(getMainLanguage(), biobank.getMainLanguage())
                && Objects.equals(getStoreUntilDate(), biobank.getStoreUntilDate())
                && Objects.equals(getStartDate(), biobank.getStartDate())
@@ -213,11 +221,10 @@ public class Biobank implements JsonSerializable {
     @Override
     @JacocoGenerated
     public int hashCode() {
-        return Objects.hash(context, getId(), getIdentifiers(), getBiobankType(), getName(), getMainLanguage(),
-                            getStoreUntilDate(), getStartDate(), getStatus(), getCreated(), getLastModified(),
-                            getCoordinatingOrganization(), getCoordinator(), getProject(), getExternalSources(),
-                            getApprovals(), getBiobankMaterials()
-        );
+        return Objects.hash(context, getId(), getIdentifiers(), getBiobankType(), getName(), getLabels(),
+                            getMainLanguage(), getStoreUntilDate(), getStartDate(), getStatus(), getCreated(),
+                            getLastModified(), getCoordinatingOrganization(), getCoordinator(), getProject(),
+                            getExternalSources(), getApprovals(), getBiobankMaterials());
     }
 
     @Override

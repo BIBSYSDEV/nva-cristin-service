@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.IGNORE_LIST;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaProject;
+import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringFields;
 import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.ioutils.IoUtils.stringFromResources;
@@ -60,7 +61,7 @@ class CristinProjectBuilderTest {
     @CsvSource({"NFR,NFR", "EC%2FFP7,EC/FP7", URI_ENCODED_FUNDING_SOURCE_URI + ",EC/FP7"})
     void shouldParseAndDecodeDifferentValuesForFundingSources(String input, String expected) {
         var nvaProject = randomNvaProject();
-        var funding = new Funding(URI.create(input), null, null);
+        var funding = new Funding(UNCONFIRMED_FUNDING, URI.create(input), null, null);
         nvaProject.setFunding(List.of(funding));
         var cristinProject = new CristinProjectBuilder(nvaProject).build();
         var cristinFunding = cristinProject.getProjectFundingSources().get(0);

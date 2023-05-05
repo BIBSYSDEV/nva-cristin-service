@@ -15,7 +15,7 @@
   "endDate": "2021-05-01T00:00:00Z",
   "funding": [
     {
-      "type": "Funding",
+      "type": "UnconfirmedFunding",
       "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
       "identifier": "654321",
       "labels": {
@@ -25,7 +25,7 @@
   ],
   "newFunding": [
     {
-      "type": "Funding",
+      "type": "UnconfirmedFunding",
       "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
       "identifier": "654321",
       "labels": {
@@ -37,6 +37,9 @@
     "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
     "type": "Organization",
     "name": {
+      "en": "Medical Department"
+    },
+    "labels": {
       "en": "Medical Department"
     }
   },
@@ -55,6 +58,30 @@
         "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
         "type": "Organization",
         "name": {
+          "en": "Medical Department"
+        },
+        "labels": {
+          "en": "Medical Department"
+        }
+      }
+    },
+    {
+      "type": "LocalProjectManager",
+      "identity": {
+        "id": "https://api.dev.nva.aws.unit.no/cristin/person/456789",
+        "type": "Person",
+        "firstName": "Kari",
+        "lastName": "Nordmann",
+        "email": "kari.nordmann@example.org",
+        "phone": "12345678"
+      },
+      "affiliation": {
+        "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+        "type": "Organization",
+        "name": {
+          "en": "Medical Department"
+        },
+        "labels": {
           "en": "Medical Department"
         }
       }
@@ -118,6 +145,9 @@
       "type": "Organization",
       "name": {
         "en": "Medical Department"
+      },
+      "labels": {
+        "en": "Medical Department"
       }
     }
   ],
@@ -138,5 +168,18 @@
     "authorityName" : {
       "en" : "Regional committees for medical and health research ethics"
     }
-  } ]
+  } ],
+  "creator": {
+    "type": "ProjectCreator",
+    "identity": {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
+      "type": "Person",
+      "firstName": "Ola",
+      "lastName": "Nordmann"
+    },
+    "affiliation": {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+      "type": "Organization"
+    }
+  }
 }

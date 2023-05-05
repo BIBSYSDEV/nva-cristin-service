@@ -8,6 +8,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQ
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.PROJECT_CREATOR_PARAM;
 import static no.unit.nva.cristin.model.JsonPropertyNames.BIOBANK_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import java.io.ByteArrayOutputStream;
@@ -54,6 +56,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -64,6 +67,7 @@ import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -130,6 +134,7 @@ class QueryCristinProjectHandlerTest {
     public static final String BAD_PARAM_FOR_SORT = "cristin id";
     public static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON = "cristinQueryProjectsResponse.json";
     public static final String CRISTIN_GET_PROJECT_RESPONSE_JSON = "cristinGetProjectResponse.json";
+    public static final String CREATOR_IDENTIFIER = "12345";
 
     private final Environment environment = new Environment();
     private QueryCristinProjectApiClient cristinApiClientStub;
@@ -709,7 +714,8 @@ class QueryCristinProjectHandlerTest {
                                  "keyword", KEYWORD_SAMPLE,
                                  "results", "5",
                                  "unit", UNIT_ID_SAMPLE,
-                                 "sort", START_DATE);
+                                 "sort", START_DATE,
+                                 "creator", CREATOR_IDENTIFIER);
         var input = requestWithQueryParameters(queryParams);
         handler.handleRequest(input, output, context);
         var captor = ArgumentCaptor.forClass(URI.class);
@@ -723,6 +729,7 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualURI, containsString(PROJECT_KEYWORD + EQUAL_OPERATOR + KEYWORD_SAMPLE));
         assertThat(actualURI, containsString(PROJECT_UNIT + EQUAL_OPERATOR + UNIT_ID_SAMPLE));
         assertThat(actualURI, containsString(PROJECT_SORT + EQUAL_OPERATOR + START_DATE));
+        assertThat(actualURI, containsString(PROJECT_CREATOR_PARAM + EQUAL_OPERATOR + CREATOR_IDENTIFIER));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                                                                SearchResponse.class);
@@ -740,6 +747,27 @@ class QueryCristinProjectHandlerTest {
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(UPSTREAM_RETURNED_BAD_REQUEST));
+    }
+
+    @Test
+    void shouldReturnOkWithOnlyCreatorPersonIdWhenProjectCreatorHasMissingOrganizationInRoles() throws Exception {
+        var serializedCristinProject = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON));
+        var deserialized = OBJECT_MAPPER.readValue(serializedCristinProject, CristinProject.class);
+        deserialized.getCreator().setRoles(null);
+
+        cristinApiClientStub =
+            new QueryCristinProjectClientStub(OBJECT_MAPPER.writeValueAsString(deserialized));
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        var gatewayResponse = sendDefaultQuery();
+
+        List<NvaProject> responseHits =
+            OBJECT_MAPPER.convertValue(gatewayResponse.getBodyObject(SearchResponse.class).getHits(),
+                                       new TypeReference<>() {});
+
+        var creatorPersonId = responseHits.get(0).getCreator().getIdentity().getId().toString();
+
+        assertThat(creatorPersonId, containsString(CREATOR_IDENTIFIER));
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {

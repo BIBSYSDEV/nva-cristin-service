@@ -18,6 +18,15 @@
           "role_code": "PRO_MANAGER"
         }
       ]
+    },
+    {
+      "cristin_person_id": "123456",
+      "url": "https://api.cristin-test.uio.no/v2/persons/123456",
+      "roles": [
+        {
+          "role_code": "PRO_LMANAGER"
+        }
+      ]
     }
   ],
   "start_date": "2022-10-09T00:00:00.001Z",
