@@ -3,18 +3,15 @@ package no.unit.nva.cristin.person.picture.fetch;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import com.amazonaws.services.lambda.runtime.Context;
-import java.util.Map;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
+import no.unit.nva.cristin.person.model.nva.Binary;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-public class FetchPictureHandler extends ApiGatewayHandler<Void, byte[]> {
-
-    public static final String CONTENT_TYPE = "Content-Type";
-    public static final String IMAGE_JPEG = "image/jpeg";
+public class FetchPictureHandler extends ApiGatewayHandler<Void, Binary> {
     private final transient FetchPictureApiClient apiClient;
 
     @SuppressWarnings("unused")
@@ -29,16 +26,14 @@ public class FetchPictureHandler extends ApiGatewayHandler<Void, byte[]> {
     }
 
     @Override
-    protected byte[] processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+    protected Binary processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         var identifier = getValidPersonId(requestInfo);
-
-        addAdditionalHeaders(() -> Map.of(CONTENT_TYPE, IMAGE_JPEG));
 
         return apiClient.fetchPicture(identifier);
     }
 
     @Override
-    protected Integer getSuccessStatusCode(Void input, byte[] output) {
+    protected Integer getSuccessStatusCode(Void input, Binary output) {
         return HTTP_OK;
     }
 }

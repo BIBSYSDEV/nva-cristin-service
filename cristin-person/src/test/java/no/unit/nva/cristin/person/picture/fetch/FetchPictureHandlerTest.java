@@ -4,8 +4,6 @@ import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
-import static no.unit.nva.cristin.person.picture.fetch.FetchPictureHandler.CONTENT_TYPE;
-import static no.unit.nva.cristin.person.picture.fetch.FetchPictureHandler.IMAGE_JPEG;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,7 +18,9 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
+import java.util.Base64;
 import java.util.Map;
+import no.unit.nva.cristin.person.model.nva.Binary;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
@@ -59,10 +59,11 @@ public class FetchPictureHandlerTest {
     @Test
     void shouldReturnPictureFromResponse() throws Exception {
         var response = sendQuery();
-        var responseBody = response.getBodyObject(byte[].class);
+        var responseBody = response.getBodyObject(Binary.class);
+        var responseAsBytes = Base64.getDecoder().decode(responseBody.getBase64Data());
 
         assertThat(response.getStatusCode(), equalTo(HTTP_OK));
-        assertThat(responseBody.length, equalTo(PICTURE_SIZE_IN_BYTES));
+        assertThat(responseAsBytes.length, equalTo(PICTURE_SIZE_IN_BYTES));
     }
 
     @Test
@@ -78,24 +79,17 @@ public class FetchPictureHandlerTest {
         assertThat(response.getStatusCode(), equalTo(HTTP_BAD_GATEWAY));
     }
 
-    @Test
-    void shouldReturnAddedContentTypeHeaderWhenSuccessfulRequest() throws Exception {
-        var response = sendQuery();
-
-        assertThat(response.getHeaders().get(CONTENT_TYPE), equalTo(IMAGE_JPEG));
-    }
-
     private byte[] pictureToByteArray() throws IOException {
         return IoUtils.inputStreamToBytes(IoUtils.inputStreamFromResources(PROFILE_PICTURE_JPG));
     }
 
-    private GatewayResponse<byte[]> sendQuery() throws IOException {
-        var input = new HandlerRequestBuilder<byte[]>(OBJECT_MAPPER)
+    private GatewayResponse<Binary> sendQuery() throws IOException {
+        var input = new HandlerRequestBuilder<Binary>(OBJECT_MAPPER)
                         .withPathParameters(validPath)
                         .build();
         handler.handleRequest(input, output, context);
 
-        return GatewayResponse.fromOutputStream(output, byte[].class);
+        return GatewayResponse.fromOutputStream(output, Binary.class);
     }
 
 }

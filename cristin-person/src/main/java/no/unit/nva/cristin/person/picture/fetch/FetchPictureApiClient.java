@@ -16,7 +16,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Base64;
 import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.person.model.nva.Binary;
 import no.unit.nva.exception.FailedHttpRequestException;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.paths.UriWrapper;
@@ -42,12 +44,18 @@ public class FetchPictureApiClient extends ApiClient {
      * @return A byte[] containing person profile picture
      * @throws ApiGatewayException if something went wrong that can be mapped to a client response
      */
-    public byte[] fetchPicture(String personId) throws ApiGatewayException {
+    public Binary fetchPicture(String personId) throws ApiGatewayException {
         var uri = generateCristinUri(personId);
         var response = fetchBinary(uri);
         checkHttpStatusCode(generateIdUri(personId), response.statusCode());
 
-        return response.body();
+        return createResponseJson(response);
+    }
+
+    private Binary createResponseJson(HttpResponse<byte[]> response) {
+        var base64Data = Base64.getEncoder().encodeToString(response.body());
+
+        return new Binary(base64Data);
     }
 
     /**

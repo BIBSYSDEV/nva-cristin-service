@@ -1348,16 +1348,24 @@ paths:
       tags:
         - Person
       summary: Fetch person profile picture
-      description: Retrieves person profile picture
+      description: Retrieves person profile picture in base64 format which contains mimetype image/jpeg
       operationId: FetchPersonPicture
       responses:
         200:
           description: successful operation
           content:
-            image/jpeg:
+            application/json:
               schema:
-                type: string
-                format: byte
+                $ref: '#/components/schemas/Binary'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/BinaryExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Binary'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/BinaryExample'
         400:
           $ref: '#/components/responses/400'
         401:
