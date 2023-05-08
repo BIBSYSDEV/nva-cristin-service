@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.FULL;
 import static no.unit.nva.cristin.model.Constants.NONE;
@@ -24,16 +25,15 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.organization.OrganizationQueryApiClientCreator.VERSION;
 
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
 
-    public static final String VERSION = "version";
-    public static final String VERSION_TWO = "2";
-
     private transient IQueryApiClient<Organization> cristinApiClient;
-    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH);
+    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH, VERSION);
 
     @JacocoGenerated
+    @SuppressWarnings("unused")
     public QueryCristinOrganizationHandler() {
         super(Void.class, new Environment());
     }
@@ -54,17 +54,11 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         requestQueryParams.put(PAGE, getValidPage(requestInfo));
         requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
 
-        if (clientRequestsVersionTwo(requestInfo)) {
-            cristinApiClient = new CristinOrganizationApiClientV2();
-        } else {
-            cristinApiClient = new CristinOrganizationApiClient();
+        if (isNull(cristinApiClient)) {
+            cristinApiClient = new OrganizationQueryApiClientCreator().createFromVersionParam(requestInfo);
         }
 
         return cristinApiClient.executeQuery(requestQueryParams);
-    }
-
-    private boolean clientRequestsVersionTwo(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(VERSION).map(VERSION_TWO::equals).isPresent();
     }
 
     @Override

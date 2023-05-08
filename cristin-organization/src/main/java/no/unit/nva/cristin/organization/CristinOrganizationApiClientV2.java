@@ -9,6 +9,12 @@ public class CristinOrganizationApiClientV2 extends CristinOrganizationApiClient
 
     @Override
     public SearchResponse<Organization> executeQuery(Map<String, String> queryParams) {
-        return null;
+        //var queryUri = createCristinQueryUri(translateToCristinApi(queryParams), UNITS_PATH);
+        var start = System.currentTimeMillis();
+        //var searchResponse = query(queryUri);
+        SearchResponse<Organization> searchResponse = new SearchResponse<>(null);
+        var totalProcessingTime = System.currentTimeMillis() - start;
+
+        return updateSearchResponseMetadata(searchResponse, queryParams, totalProcessingTime);
     }
 }

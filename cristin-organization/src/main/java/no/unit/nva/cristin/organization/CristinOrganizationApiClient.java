@@ -144,7 +144,7 @@ public class CristinOrganizationApiClient extends ApiClient implements IQueryApi
         return updateSearchResponseMetadata(searchResponse, requestQueryParams, totalProcessingTime);
     }
 
-    private Map<String, String> translateToCristinApi(Map<String, String> requestQueryParams) {
+    protected Map<String, String> translateToCristinApi(Map<String, String> requestQueryParams) {
         return Map.of(
                 CRISTIN_LEVELS_PARAM, toCristinLevel(requestQueryParams.get(DEPTH)),
                 CRISTIN_QUERY_NAME_PARAM, requestQueryParams.get(QUERY),
@@ -156,7 +156,7 @@ public class CristinOrganizationApiClient extends ApiClient implements IQueryApi
         return TOP.equals(depth) || isNull(depth) ? FIRST_LEVEL : ALL_SUB_LEVELS;
     }
 
-    private SearchResponse<Organization> updateSearchResponseMetadata(
+    protected SearchResponse<Organization> updateSearchResponseMetadata(
             SearchResponse<Organization> searchResponse,
             Map<String, String> requestQueryParams,
             long timeUsed) {
