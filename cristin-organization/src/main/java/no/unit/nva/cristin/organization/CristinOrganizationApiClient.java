@@ -50,7 +50,7 @@ import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.attempt.Try.of;
 
 @SuppressWarnings("PMD.GodClass")
-public class CristinOrganizationApiClient extends ApiClient {
+public class CristinOrganizationApiClient extends ApiClient implements IQueryApiClient<Organization> {
 
     public static final String CRISTIN_LEVELS_PARAM = "levels";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
@@ -133,7 +133,8 @@ public class CristinOrganizationApiClient extends ApiClient {
      *
      * @param requestQueryParams Map containing verified query parameters
      */
-    public SearchResponse<Organization> queryOrganizations(Map<String, String> requestQueryParams)
+    @Override
+    public SearchResponse<Organization> executeQuery(Map<String, String> requestQueryParams)
             throws NotFoundException, FailedHttpRequestException {
 
         URI queryUri = createCristinQueryUri(translateToCristinApi(requestQueryParams), UNITS_PATH);

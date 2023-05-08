@@ -1,0 +1,175 @@
+{
+  "cristin_unit_id" : "185.53.0.0",
+  "unit_name" : {
+    "en" : "Institutt for klinisk medisin"
+  },
+  "institution" : {
+    "cristin_institution_id" : "185",
+    "url" : "https://api.cristin.no/v2/institutions/185"
+  },
+  "parent_unit" : {
+    "cristin_unit_id" : "185.50.0.0",
+    "unit_name" : {
+      "en" : "Faculty of Medicine"
+    },
+    "parent_unit" : {
+      "cristin_unit_id" : "185.90.0.0"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.50.0.0"
+  },
+  "parent_units" : [ {
+    "cristin_unit_id" : "185.90.0.0",
+    "unit_name" : {
+      "en" : "University of Oslo"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.90.0.0"
+  }, {
+    "cristin_unit_id" : "185.50.0.0",
+    "unit_name" : {
+      "en" : "Faculty of Medicine"
+    },
+    "parent_unit" : {
+      "cristin_unit_id" : "185.90.0.0"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.50.0.0"
+  } ],
+  "subunits" : [ {
+    "cristin_unit_id" : "185.53.1.0",
+    "unit_name" : {
+      "en" : "Administrasjonen klinisk medisin"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.1.0"
+  }, {
+    "cristin_unit_id" : "185.53.1.5",
+    "unit_name" : {
+      "en" : "UiO Campus South"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.1.5"
+  }, {
+    "cristin_unit_id" : "185.53.2.10",
+    "unit_name" : {
+      "en" : "Centre for Cancer Biomedicine"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.2.10"
+  }, {
+    "cristin_unit_id" : "185.53.2.11",
+    "unit_name" : {
+      "en" : "Centre for Immune Regulation"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.2.11"
+  }, {
+    "cristin_unit_id" : "185.53.2.12",
+    "unit_name" : {
+      "en" : "Norwegian Centre for Mental Disorders Research - Centre of Excellence"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.2.12"
+  }, {
+    "cristin_unit_id" : "185.53.2.15",
+    "unit_name" : {
+      "en" : "Centre for Cancer Cell Reprogramming"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.2.15"
+  }, {
+    "cristin_unit_id" : "185.53.2.16",
+    "unit_name" : {
+      "en" : "Division of Technology and Innovation"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.2.16"
+  }, {
+    "cristin_unit_id" : "185.53.10.0",
+    "unit_name" : {
+      "en" : "Division of Mental Health and Addiction"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.10.0"
+  }, {
+    "cristin_unit_id" : "185.53.11.0",
+    "unit_name" : {
+      "en" : "Medicine Clinic"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.11.0"
+  }, {
+    "cristin_unit_id" : "185.53.15.0",
+    "unit_name" : {
+      "en" : "Clinic for Cardiovascular and Pulmonary Diseases"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.15.0"
+  }, {
+    "cristin_unit_id" : "185.53.18.0",
+    "unit_name" : {
+      "en" : "Division of Laboratory Medicine"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.18.0"
+  }, {
+    "cristin_unit_id" : "185.53.20.0",
+    "unit_name" : {
+      "en" : "Oslo Hospital Services"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.20.0"
+  }, {
+    "cristin_unit_id" : "185.53.42.0",
+    "unit_name" : {
+      "en" : "Division of Clinical Neuroscience"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.42.0"
+  }, {
+    "cristin_unit_id" : "185.53.43.0",
+    "unit_name" : {
+      "en" : "Divison of Head, Neck and Reconstructive Surgery"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.43.0"
+  }, {
+    "cristin_unit_id" : "185.53.44.0",
+    "unit_name" : {
+      "en" : "Division of Orthopaedic Surgery"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.44.0"
+  }, {
+    "cristin_unit_id" : "185.53.45.0",
+    "unit_name" : {
+      "en" : "Women&#8217;s Division"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.45.0"
+  }, {
+    "cristin_unit_id" : "185.53.46.0",
+    "unit_name" : {
+      "en" : "Division of Paediatric and Adolescent Medicine"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.46.0"
+  }, {
+    "cristin_unit_id" : "185.53.48.0",
+    "unit_name" : {
+      "en" : "Division of Surgery, Inflammatory Medicine and Transplantation"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.48.0"
+  }, {
+    "cristin_unit_id" : "185.53.49.0",
+    "unit_name" : {
+      "en" : "Division of Cancer Medicine"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.49.0"
+  }, {
+    "cristin_unit_id" : "185.53.60.0",
+    "unit_name" : {
+      "en" : "Division of Critical Care"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.60.0"
+  }, {
+    "cristin_unit_id" : "185.53.61.0",
+    "unit_name" : {
+      "en" : "Division of Prehospital Services"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.61.0"
+  }, {
+    "cristin_unit_id" : "185.53.63.0",
+    "unit_name" : {
+      "en" : "Division of Radiology and Nuclear Medicine"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.63.0"
+  }, {
+    "cristin_unit_id" : "185.53.80.0",
+    "unit_name" : {
+      "en" : "Administration Campus Ahus"
+    },
+    "url" : "https://api.cristin.no/v2/units/185.53.80.0"
+  } ]
+}

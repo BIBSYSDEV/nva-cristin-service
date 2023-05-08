@@ -24,20 +24,21 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static nva.commons.core.attempt.Try.attempt;
 
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
 
-    private final transient CristinOrganizationApiClient cristinApiClient;
-    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH);
+    public static final String VERSION = "version";
+    public static final String VERSION_TWO = "2";
 
+    private transient IQueryApiClient<Organization> cristinApiClient;
+    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH);
 
     @JacocoGenerated
     public QueryCristinOrganizationHandler() {
-        this(new CristinOrganizationApiClient(), new Environment());
+        super(Void.class, new Environment());
     }
 
-    public QueryCristinOrganizationHandler(CristinOrganizationApiClient apiClient, Environment environment) {
+    public QueryCristinOrganizationHandler(IQueryApiClient<Organization> apiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = apiClient;
     }
@@ -52,7 +53,18 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         requestQueryParams.put(DEPTH, getValidDepth(requestInfo));
         requestQueryParams.put(PAGE, getValidPage(requestInfo));
         requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
-        return attempt(() -> cristinApiClient.queryOrganizations(requestQueryParams)).orElseThrow();
+
+        if (clientRequestsVersionTwo(requestInfo)) {
+            cristinApiClient = new CristinOrganizationApiClientV2();
+        } else {
+            cristinApiClient = new CristinOrganizationApiClient();
+        }
+
+        return cristinApiClient.executeQuery(requestQueryParams);
+    }
+
+    private boolean clientRequestsVersionTwo(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(VERSION).map(VERSION_TWO::equals).isPresent();
     }
 
     @Override
