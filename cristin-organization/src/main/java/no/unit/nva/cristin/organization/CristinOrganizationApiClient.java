@@ -135,7 +135,7 @@ public class CristinOrganizationApiClient extends ApiClient implements IQueryApi
      */
     @Override
     public SearchResponse<Organization> executeQuery(Map<String, String> requestQueryParams)
-            throws NotFoundException, FailedHttpRequestException {
+        throws ApiGatewayException {
 
         URI queryUri = createCristinQueryUri(translateToCristinApi(requestQueryParams), UNITS_PATH);
         final long start = System.currentTimeMillis();

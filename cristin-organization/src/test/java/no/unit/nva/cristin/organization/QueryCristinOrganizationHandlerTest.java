@@ -7,12 +7,11 @@ import com.google.common.net.HttpHeaders;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.GatewayResponse;
-import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
@@ -65,7 +64,7 @@ class QueryCristinOrganizationHandlerTest {
     private Context context;
 
     @BeforeEach
-    void setUp() throws NotFoundException, FailedHttpRequestException {
+    void setUp() throws ApiGatewayException {
         context = mock(Context.class);
         var cristinApiClient = mock(CristinOrganizationApiClient.class);
         when(cristinApiClient.executeQuery(any())).thenReturn(emptySearchResponse());
