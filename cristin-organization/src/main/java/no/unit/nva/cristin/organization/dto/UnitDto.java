@@ -18,6 +18,9 @@ public class UnitDto {
     private final List<UnitDto> subUnits;
     private final URI uri;
 
+    /**
+     * Default and JSON constructor.
+     */
     @JsonCreator
     public UnitDto(@JsonProperty("cristin_unit_id") String id,
                    @JsonProperty("unit_name") Map<String, String> unitName,

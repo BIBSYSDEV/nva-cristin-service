@@ -5,11 +5,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
+import no.unit.nva.cristin.organization.dto.OrganizationFromUnitMapper;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.organization.dto.SubUnitDto;
+import no.unit.nva.cristin.organization.dto.UnitDto;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.model.Organization;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
@@ -27,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.util.Arrays.asList;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
@@ -50,7 +54,7 @@ import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.attempt.Try.of;
 
 @SuppressWarnings("PMD.GodClass")
-public class CristinOrganizationApiClient extends ApiClient implements IQueryApiClient<Organization> {
+public class CristinOrganizationApiClient extends ApiClient {
 
     public static final String CRISTIN_LEVELS_PARAM = "levels";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
@@ -133,8 +137,7 @@ public class CristinOrganizationApiClient extends ApiClient implements IQueryApi
      *
      * @param requestQueryParams Map containing verified query parameters
      */
-    @Override
-    public SearchResponse<Organization> executeQuery(Map<String, String> requestQueryParams)
+    public SearchResponse<Organization> queryOrganizations(Map<String, String> requestQueryParams)
         throws ApiGatewayException {
 
         URI queryUri = createCristinQueryUri(translateToCristinApi(requestQueryParams), UNITS_PATH);
@@ -144,7 +147,7 @@ public class CristinOrganizationApiClient extends ApiClient implements IQueryApi
         return updateSearchResponseMetadata(searchResponse, requestQueryParams, totalProcessingTime);
     }
 
-    protected Map<String, String> translateToCristinApi(Map<String, String> requestQueryParams) {
+    private Map<String, String> translateToCristinApi(Map<String, String> requestQueryParams) {
         return Map.of(
                 CRISTIN_LEVELS_PARAM, toCristinLevel(requestQueryParams.get(DEPTH)),
                 CRISTIN_QUERY_NAME_PARAM, requestQueryParams.get(QUERY),
@@ -156,7 +159,7 @@ public class CristinOrganizationApiClient extends ApiClient implements IQueryApi
         return TOP.equals(depth) || isNull(depth) ? FIRST_LEVEL : ALL_SUB_LEVELS;
     }
 
-    protected SearchResponse<Organization> updateSearchResponseMetadata(
+    private SearchResponse<Organization> updateSearchResponseMetadata(
             SearchResponse<Organization> searchResponse,
             Map<String, String> requestQueryParams,
             long timeUsed) {
@@ -312,5 +315,40 @@ public class CristinOrganizationApiClient extends ApiClient implements IQueryApi
 
     private String errorMessage(HttpResponse<String> response) {
         return String.format(ERROR_MESSAGE_FORMAT, response.statusCode(), response.body());
+    }
+
+    /**
+     * Fetch Organizations matching given query criteria using version 2 code.
+     *
+     * @param queryParams Map containing verified query parameters
+     */
+    public SearchResponse<Organization> queryOrganizationsV2(Map<String, String> queryParams)
+        throws ApiGatewayException {
+
+        var queryUri = createCristinQueryUri(translateToCristinApi(queryParams), UNITS_PATH);
+        var start = System.currentTimeMillis();
+        var searchResponse = queryUpstreamV2(queryUri);
+        var totalProcessingTime = System.currentTimeMillis() - start;
+
+        return updateSearchResponseMetadata(searchResponse, queryParams, totalProcessingTime);
+    }
+
+    private SearchResponse<Organization> queryUpstreamV2(URI uri) throws ApiGatewayException {
+        var response = sendRequestMultipleTimes(uri).get();
+        var idUri = getNvaApiUri(UNITS_PATH);
+        checkHttpStatusCode(idUri, response.statusCode(), response.body());
+        var organizations = getOrganizationsV2(response);
+
+        return new SearchResponse<Organization>(idUri)
+                   .withHits(organizations)
+                   .withSize(getCount(response, organizations));
+    }
+
+    private List<Organization> getOrganizationsV2(HttpResponse<String> response) throws BadGatewayException {
+        var units = asList(getDeserializedResponse(response, UnitDto[].class));
+
+        return units.stream()
+                   .map(new OrganizationFromUnitMapper())
+                   .collect(Collectors.toList());
     }
 }

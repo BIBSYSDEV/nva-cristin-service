@@ -15,8 +15,9 @@ import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.FULL;
 import static no.unit.nva.cristin.model.Constants.NONE;
@@ -25,20 +26,25 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.organization.OrganizationQueryApiClientCreator.VERSION;
 
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
 
-    private transient IQueryApiClient<Organization> cristinApiClient;
+    private static final Logger logger = LoggerFactory.getLogger(QueryCristinOrganizationHandler.class);
+
+    public static final String VERSION = "version";
+    public static final String VERSION_ONE = "1";
+    public static final String VERSION_TWO = "2";
+    public static final String CLIENT_WANTS_VERSION_OF_THE_API_CLIENT = "Client wants version {} of the api client";
+
+    private final transient CristinOrganizationApiClient cristinApiClient;
     private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH, VERSION);
 
     @JacocoGenerated
-    @SuppressWarnings("unused")
     public QueryCristinOrganizationHandler() {
-        super(Void.class, new Environment());
+        this(new CristinOrganizationApiClient(), new Environment());
     }
 
-    public QueryCristinOrganizationHandler(IQueryApiClient<Organization> apiClient, Environment environment) {
+    public QueryCristinOrganizationHandler(CristinOrganizationApiClient apiClient, Environment environment) {
         super(Void.class, environment);
         this.cristinApiClient = apiClient;
     }
@@ -54,11 +60,13 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         requestQueryParams.put(PAGE, getValidPage(requestInfo));
         requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
 
-        if (isNull(cristinApiClient)) {
-            cristinApiClient = new OrganizationQueryApiClientCreator().createFromVersionParam(requestInfo);
+        if (clientRequestsVersionTwo(requestInfo)) {
+            logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_TWO);
+            return cristinApiClient.queryOrganizationsV2(requestQueryParams);
+        } else {
+            logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_ONE);
+            return cristinApiClient.queryOrganizations(requestQueryParams);
         }
-
-        return cristinApiClient.executeQuery(requestQueryParams);
     }
 
     @Override
@@ -89,5 +97,8 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
                 && Set.of(TOP, FULL, NONE).contains(requestInfo.getQueryParameter(DEPTH));
     }
 
+    private boolean clientRequestsVersionTwo(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(VERSION).map(VERSION_TWO::equals).isPresent();
+    }
 
 }

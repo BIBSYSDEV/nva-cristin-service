@@ -44,15 +44,20 @@ import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.organization.QueryCristinOrganizationHandler.VERSION;
+import static no.unit.nva.cristin.organization.QueryCristinOrganizationHandler.VERSION_TWO;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class QueryCristinOrganizationHandlerTest {
@@ -67,7 +72,7 @@ class QueryCristinOrganizationHandlerTest {
     void setUp() throws ApiGatewayException {
         context = mock(Context.class);
         var cristinApiClient = mock(CristinOrganizationApiClient.class);
-        when(cristinApiClient.executeQuery(any())).thenReturn(emptySearchResponse());
+        when(cristinApiClient.queryOrganizations(any())).thenReturn(emptySearchResponse());
         output = new ByteArrayOutputStream();
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
     }
@@ -149,6 +154,34 @@ class QueryCristinOrganizationHandlerTest {
         var actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(ERROR_MESSAGE_DEPTH_INVALID));
+    }
+
+    @Test
+    void shouldReturnVersion2WhenRequestingItUsingQueryParam() throws Exception {
+        var cristinApiClient = mock(CristinOrganizationApiClient.class);
+        when(cristinApiClient.queryOrganizations(any())).thenReturn(emptySearchResponse());
+        when(cristinApiClient.queryOrganizationsV2(any())).thenReturn(emptySearchResponse());
+        cristinApiClient = spy(cristinApiClient);
+
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
+        var input = generateValidHandlerRequestUsingVersion2();
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                                                               SearchResponse.class);
+
+        verify(cristinApiClient, times(1)).queryOrganizationsV2(any());
+        verify(cristinApiClient, times(0)).queryOrganizations(any());
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    private InputStream generateValidHandlerRequestUsingVersion2() throws JsonProcessingException {
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withQueryParameters(Map.of("query", "Department of Medical Biochemistry",
+                                               "depth","full",
+                                               VERSION, VERSION_TWO))
+                   .build();
     }
 
     private Try<HttpResponse<String>> getTry(HttpResponse<String> mockHttpResponse) {

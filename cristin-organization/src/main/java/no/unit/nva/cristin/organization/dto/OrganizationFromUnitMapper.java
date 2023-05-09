@@ -8,7 +8,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import no.unit.nva.model.Organization;
 
-public class OrganizationMapper implements Function<UnitDto, Organization> {
+public class OrganizationFromUnitMapper implements Function<UnitDto, Organization> {
 
     @Override
     public Organization apply(UnitDto unitDto) {
