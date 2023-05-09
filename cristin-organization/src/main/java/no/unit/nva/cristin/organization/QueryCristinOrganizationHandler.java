@@ -98,7 +98,10 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     }
 
     private boolean clientRequestsVersionTwo(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(VERSION).map(VERSION_TWO::equals).isPresent();
+        return requestInfo
+                   .getQueryParameterOpt(VERSION)
+                   .filter(VERSION_TWO::equals)
+                   .isPresent();
     }
 
 }

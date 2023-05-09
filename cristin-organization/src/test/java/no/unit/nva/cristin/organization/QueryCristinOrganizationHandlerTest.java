@@ -45,6 +45,7 @@ import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.cristin.organization.QueryCristinOrganizationHandler.VERSION;
+import static no.unit.nva.cristin.organization.QueryCristinOrganizationHandler.VERSION_ONE;
 import static no.unit.nva.cristin.organization.QueryCristinOrganizationHandler.VERSION_TWO;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
@@ -164,7 +165,7 @@ class QueryCristinOrganizationHandlerTest {
         cristinApiClient = spy(cristinApiClient);
 
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
-        var input = generateValidHandlerRequestUsingVersion2();
+        var input = generateValidHandlerRequestWithVersionParam(VERSION_TWO);
         queryCristinOrganizationHandler.handleRequest(input, output, context);
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
@@ -175,12 +176,33 @@ class QueryCristinOrganizationHandlerTest {
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 
-    private InputStream generateValidHandlerRequestUsingVersion2() throws JsonProcessingException {
+    @Test
+    void shouldReturnVersion1AsDefaultWhenNotRequestingAnotherVersion() throws Exception {
+        var cristinApiClient = mock(CristinOrganizationApiClient.class);
+        when(cristinApiClient.queryOrganizations(any())).thenReturn(emptySearchResponse());
+        when(cristinApiClient.queryOrganizationsV2(any())).thenReturn(emptySearchResponse());
+        cristinApiClient = spy(cristinApiClient);
+
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
+        var input = generateValidHandlerRequestWithVersionParam(VERSION_ONE);
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                                                               SearchResponse.class);
+
+        verify(cristinApiClient, times(0)).queryOrganizationsV2(any());
+        verify(cristinApiClient, times(1)).queryOrganizations(any());
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    private InputStream generateValidHandlerRequestWithVersionParam(String versionParam)
+        throws JsonProcessingException {
+
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                    .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
                    .withQueryParameters(Map.of("query", "Department of Medical Biochemistry",
                                                "depth","full",
-                                               VERSION, VERSION_TWO))
+                                               VERSION, versionParam))
                    .build();
     }
 
