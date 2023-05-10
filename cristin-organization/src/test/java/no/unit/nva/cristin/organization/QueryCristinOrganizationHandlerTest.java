@@ -184,6 +184,25 @@ class QueryCristinOrganizationHandlerTest {
         cristinApiClient = spy(cristinApiClient);
 
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
+        var input = generateValidHandlerRequest();
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                                                               SearchResponse.class);
+
+        verify(cristinApiClient, times(0)).queryOrganizationsV2(any());
+        verify(cristinApiClient, times(1)).queryOrganizations(any());
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    @Test
+    void shouldReturnVersion1WhenRequestingItUsingQueryParam() throws Exception {
+        var cristinApiClient = mock(CristinOrganizationApiClient.class);
+        when(cristinApiClient.queryOrganizations(any())).thenReturn(emptySearchResponse());
+        when(cristinApiClient.queryOrganizationsV2(any())).thenReturn(emptySearchResponse());
+        cristinApiClient = spy(cristinApiClient);
+
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(cristinApiClient, new Environment());
         var input = generateValidHandlerRequestWithVersionParam(VERSION_ONE);
         queryCristinOrganizationHandler.handleRequest(input, output, context);
 
