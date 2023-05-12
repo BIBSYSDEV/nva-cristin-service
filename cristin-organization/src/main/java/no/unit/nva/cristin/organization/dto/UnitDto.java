@@ -6,8 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import no.unit.nva.commons.json.JsonSerializable;
 
-public class UnitDto {
+public class UnitDto implements JsonSerializable {
 
     private final String id;
     private final Map<String, String> unitName;
@@ -70,5 +71,10 @@ public class UnitDto {
 
     public URI getUri() {
         return uri;
+    }
+
+    @Override
+    public String toString() {
+        return toJsonString();
     }
 }

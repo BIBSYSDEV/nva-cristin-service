@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.organization.dto;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import java.util.List;
@@ -12,7 +13,7 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
 
     @Override
     public Organization apply(UnitDto unitDto) {
-        return toOrganization(unitDto);
+        return nonNull(unitDto) ? toOrganization(unitDto) : null;
     }
 
     private Organization toOrganization(UnitDto unitDto) {
@@ -21,12 +22,13 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
                    .withName(unitDto.getUnitName())
                    .withLabels(unitDto.getUnitName())
                    .withAcronym(unitDto.getAcronym())
+                   .withNearestPartOf(this.apply(unitDto.getParentUnit()))
                    .withHasPart(unitsToOrganizations(unitDto.getSubUnits()))
                    .withPartOf(unitsToOrganizations(unitDto.getParentUnits()))
                    .build();
     }
 
     private Set<Organization> unitsToOrganizations(List<UnitDto> unitDto) {
-        return unitDto.stream().map(this::toOrganization).collect(Collectors.toSet());
+        return unitDto.stream().map(this).collect(Collectors.toSet());
     }
 }
