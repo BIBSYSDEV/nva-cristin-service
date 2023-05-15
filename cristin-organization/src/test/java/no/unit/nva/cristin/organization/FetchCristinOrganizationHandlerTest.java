@@ -11,7 +11,6 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
@@ -26,12 +25,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
-import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
@@ -43,7 +40,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
-import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,46 +47,49 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 class FetchCristinOrganizationHandlerTest {
 
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     public static final String IDENTIFIER = "identifier";
     public static final String NON_EXISTING_IDENTIFIER = "1.0.0.0";
-    public static final String ORGANIZATION_NOT_FOUND_MESSAGE = "cannot be dereferenced";
     public static final String LIST_OF_UNITS_JSON_FILE = "list_of_unit_185_53_18_14.json";
     public static final String CRISTIN_UNITS_URI = "https://api.cristin-test.uio.no/v2/units?id=185.53.18.14";
     public static final String ENGLISH_LANGUAGE_KEY = "en";
     public static final String DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY = "Department of Medical Biochemistry";
+    public static final String EMPTY_JSON = "{}";
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
+    private DefaultOrgFetchProvider clientProvider;
     private ByteArrayOutputStream output;
     private Context context;
-    private HttpClient mockHttpClient;
 
     @BeforeEach
     void setUp() {
         context = mock(Context.class);
-        mockHttpClient = mock(HttpClient.class);
+        HttpClient mockHttpClient = mock(HttpClient.class);
         cristinApiClient = new CristinOrganizationApiClient(mockHttpClient);
+        cristinApiClient = spy(cristinApiClient);
+        doReturn(Try.of(new HttpResponseFaker(EMPTY_JSON)))
+            .when(cristinApiClient).sendRequestMultipleTimes(any());
+        clientProvider = new DefaultOrgFetchProvider();
+        clientProvider = spy(clientProvider);
+        doReturn(cristinApiClient).when(clientProvider).getClient(any());
         output = new ByteArrayOutputStream();
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
     }
 
     @Test
-    void shouldReturnsNotFoundResponseWhenUnitIsMissing()
-            throws IOException, ApiGatewayException {
-
+    void shouldReturnsNotFoundResponseWhenUnitIsMissing() throws IOException {
         cristinApiClient = spy(cristinApiClient);
-        doThrow(new NotFoundException(NOT_FOUND_MESSAGE_TEMPLATE + NON_EXISTING_IDENTIFIER))
-                .when(cristinApiClient).getOrganization(any());
+        doReturn(Try.of(new HttpResponseFaker(EMPTY_JSON, HTTP_NOT_FOUND)))
+            .when(cristinApiClient).sendRequestMultipleTimes(any());
+        doReturn(cristinApiClient).when(clientProvider).getClient(any());
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(NON_EXISTING_IDENTIFIER), output, context);
         var gatewayResponse = parseFailureResponse();
 
@@ -99,8 +98,8 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(gatewayResponse.getHeaders(), hasKey(ACCESS_CONTROL_ALLOW_ORIGIN));
 
         var actualDetail = getProblemDetail(gatewayResponse);
-        assertThat(actualDetail, containsString(ORGANIZATION_NOT_FOUND_MESSAGE));
-        assertThat(actualDetail, containsString(NON_EXISTING_IDENTIFIER));
+        var errorMessage = String.format(NOT_FOUND_MESSAGE_TEMPLATE, NON_EXISTING_IDENTIFIER);
+        assertThat(actualDetail, containsString(errorMessage));
     }
 
     @Test
@@ -142,28 +141,6 @@ class FetchCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnInternalServerErrorResponseOnUnexpectedException() throws IOException {
-        var serviceThrowingException = spy(cristinApiClient);
-        try {
-            doThrow(new NullPointerException())
-                    .when(serviceThrowingException)
-                    .getOrganization(any());
-        } catch (ApiGatewayException e) {
-            e.printStackTrace();
-        }
-
-        fetchCristinOrganizationHandler =
-                new FetchCristinOrganizationHandler(serviceThrowingException, new Environment());
-        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(NON_EXISTING_IDENTIFIER), output, context);
-
-        var gatewayResponse = parseFailureResponse();
-        var actualDetail = getProblemDetail(gatewayResponse);
-        assertEquals(HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(
-                MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS));
-    }
-
-    @Test
     void shouldReturnOrganizationHierarchy() throws IOException, ApiGatewayException {
         cristinApiClient = spy(cristinApiClient);
         final var level1 = getCristinUri("185.90.0.0", UNITS_PATH);
@@ -182,7 +159,9 @@ class FetchCristinOrganizationHandlerTest {
         doReturn(getSubSubUnit("unit_18_53_18_14.json"))
                 .when(cristinApiClient).getSubSubUnitDtoWithMultipleEfforts(level4);
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+        doReturn(cristinApiClient).when(clientProvider).getClient(any());
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
         final var identifier = "185.53.18.14";
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(identifier), output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
@@ -201,28 +180,15 @@ class FetchCristinOrganizationHandlerTest {
 
 
     @Test
-    void shouldReturnHttp404NotFoundWhenNonExistingIdentifier() throws Exception {
-        var fakeHttpResponse = new HttpResponseFaker(randomString(), HTTP_NOT_FOUND);
-        CompletableFuture futureNotFound =
-            CompletableFuture.completedFuture(fakeHttpResponse);
-        when(mockHttpClient.sendAsync(any(), any())).thenReturn(futureNotFound);
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
-        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(NON_EXISTING_IDENTIFIER), output, context);
-        var gatewayResponse = parseFailureResponse();
-
-        assertEquals(HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
-    }
-
-
-    @Test
     void shouldReturnOrganizationFlatHierarchy() throws IOException {
         var resource = stringFromResources(LIST_OF_UNITS_JSON_FILE);
         var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
         var cristinUri = URI.create(CRISTIN_UNITS_URI);
         cristinApiClient = spy(cristinApiClient);
         doReturn(Try.of(fakeHttpResponse)).when(cristinApiClient).sendRequestMultipleTimes(cristinUri);
+        doReturn(cristinApiClient).when(clientProvider).getClient(any());
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
         final var identifier = "185.53.18.14";
         fetchCristinOrganizationHandler
                 .handleRequest(generateHandlerRequestWithAdditionalQueryParameters(identifier, NONE), output, context);

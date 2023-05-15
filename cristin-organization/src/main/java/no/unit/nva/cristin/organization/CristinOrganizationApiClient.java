@@ -31,6 +31,7 @@ import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
+import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
@@ -38,19 +39,24 @@ import static no.unit.nva.cristin.model.Constants.TOP;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.Constants.UNIT_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.attempt.Try.of;
 
 @SuppressWarnings("PMD.GodClass")
-public class CristinOrganizationApiClient extends ApiClient implements IQueryApiClient<Organization> {
+public class CristinOrganizationApiClient
+    extends ApiClient
+    implements IQueryApiClient<Organization>, IFetchApiClient<Map<String, String>, Organization> {
 
     public static final String CRISTIN_LEVELS_PARAM = "levels";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
@@ -102,6 +108,20 @@ public class CristinOrganizationApiClient extends ApiClient implements IQueryApi
     @Override
     public SearchResponse<Organization> executeQuery(Map<String, String> queryParams) throws ApiGatewayException {
         return queryOrganizations(queryParams);
+    }
+
+    @Override
+    public Organization executeFetch(Map<String, String> params) throws ApiGatewayException {
+        if (NONE.equals(params.get(DEPTH))) {
+            var organization = getFlatOrganization(params.get(IDENTIFIER));
+            organization.setContext(ORGANIZATION_CONTEXT);
+            return organization;
+        } else {
+            var cristinUri = getCristinUri(params.get(IDENTIFIER), UNITS_PATH);
+            var organization = getOrganization(cristinUri);
+            organization.setContext(ORGANIZATION_CONTEXT);
+            return organization;
+        }
     }
 
     private Organization extractOrganization(String identifier, HttpResponse<String> response)
@@ -308,7 +328,8 @@ public class CristinOrganizationApiClient extends ApiClient implements IQueryApi
         } else if (isSuccessful(response.statusCode())) {
             return response;
         } else if (response.statusCode() == HTTP_NOT_FOUND) {
-            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, requestedUri));
+            var resource = extractLastPathElement(requestedUri);
+            throw new NotFoundException(String.format(NOT_FOUND_MESSAGE_TEMPLATE, resource));
         } else {
             throw new FailedHttpRequestException(errorMessage(response));
         }
