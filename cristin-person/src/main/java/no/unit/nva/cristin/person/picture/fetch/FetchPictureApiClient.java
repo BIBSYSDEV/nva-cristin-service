@@ -30,6 +30,7 @@ public class FetchPictureApiClient extends ApiClient {
     private static final Logger logger = LoggerFactory.getLogger(FetchPictureApiClient.class);
 
     public static final String PICTURE_PATH = "picture";
+    public static final String DELIMITER = ": ";
 
     private final transient HttpClient httpClient;
 
@@ -77,13 +78,20 @@ public class FetchPictureApiClient extends ApiClient {
     }
 
     private URI generateCristinUri(String personId) {
-        return  UriWrapper.fromUri(CRISTIN_API_URL).addChild(PERSON_PATH).addChild(personId)
-                    .addChild(PICTURE_PATH).getUri();
+        return  UriWrapper.fromUri(CRISTIN_API_URL)
+                    .addChild(PERSON_PATH)
+                    .addChild(personId)
+                    .addChild(PICTURE_PATH)
+                    .getUri();
     }
 
     private URI generateIdUri(String personId) {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH_NVA).addChild(personId)
-                   .addChild(PICTURE_PATH).getUri();
+        return new UriWrapper(HTTPS, DOMAIN_NAME)
+                   .addChild(BASE_PATH)
+                   .addChild(PERSON_PATH_NVA)
+                   .addChild(personId)
+                   .addChild(PICTURE_PATH)
+                   .getUri();
     }
 
     private HttpResponse<byte[]> getSuccessfulBinaryResponseOrThrowException(HttpRequest httpRequest)
@@ -99,8 +107,13 @@ public class FetchPictureApiClient extends ApiClient {
     }
 
     private void logError(String uri, Exception failure) {
-        logger.error(String.format(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, uri,
-                                   failure.getClass().getCanonicalName() + ": " + failure.getMessage()));
+        logger.error(String.format(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION,
+                                   uri,
+                                   formatMessageFromException(failure)));
+    }
+
+    private String formatMessageFromException(Exception failure) {
+        return failure.getClass().getCanonicalName() + DELIMITER + failure.getMessage();
     }
 
     private void checkHttpStatusCode(URI uri, int statusCode) throws ApiGatewayException {

@@ -22,7 +22,7 @@ public class UpdatePictureAccessCheck {
     /**
      * Verifies that the user is logged in and only tries to update their own profile picture.
      */
-    public void verifyAccess(RequestInfo requestInfo) throws ApiGatewayException {
+    public void verifyUserHasAccess(RequestInfo requestInfo) throws ApiGatewayException {
         var personIdFromPath = getValidPersonId(requestInfo);
         var personIdFromCognito =
             getValidPersonIdFromCognito(requestInfo).orElseThrow(this::couldNotGetPersonIdFromCognito);

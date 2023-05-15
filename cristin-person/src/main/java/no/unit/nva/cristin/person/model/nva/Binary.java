@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.model.nva;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 
 public class Binary {
 
@@ -17,4 +18,20 @@ public class Binary {
         return base64Data;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Binary)) {
+            return false;
+        }
+        Binary binary = (Binary) o;
+        return Objects.equals(getBase64Data(), binary.getBase64Data());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBase64Data());
+    }
 }

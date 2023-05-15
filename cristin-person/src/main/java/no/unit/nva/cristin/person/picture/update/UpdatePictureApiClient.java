@@ -47,7 +47,9 @@ public class UpdatePictureApiClient extends ApiClient {
     public Void uploadPicture(String personId, byte[] input) throws ApiGatewayException {
         var uri = generateCristinUri(personId);
         var response = put(uri, input);
-        checkPutHttpStatusCode(generateIdUri(personId), response.statusCode(), response.body());
+        checkPutHttpStatusCode(generateIdUri(personId),
+                               response.statusCode(),
+                               response.body());
 
         return null;
     }
@@ -85,13 +87,20 @@ public class UpdatePictureApiClient extends ApiClient {
     }
 
     private URI generateCristinUri(String personId) {
-        return  UriWrapper.fromUri(CRISTIN_API_URL).addChild(PERSON_PATH).addChild(personId)
-                    .addChild(PICTURE_PATH).getUri();
+        return  UriWrapper.fromUri(CRISTIN_API_URL)
+                    .addChild(PERSON_PATH)
+                    .addChild(personId)
+                    .addChild(PICTURE_PATH)
+                    .getUri();
     }
 
     private URI generateIdUri(String personId) {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH_NVA).addChild(personId)
-                   .addChild(PICTURE_PATH).getUri();
+        return new UriWrapper(HTTPS, DOMAIN_NAME)
+                   .addChild(BASE_PATH)
+                   .addChild(PERSON_PATH_NVA)
+                   .addChild(personId)
+                   .addChild(PICTURE_PATH)
+                   .getUri();
     }
 
 }

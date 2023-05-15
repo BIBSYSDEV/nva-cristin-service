@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.person.picture.update;
 
-import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Base64;
@@ -24,7 +24,10 @@ public class UpdatePictureContentVerifier {
     * Verifies that content from input is a valid image and decodes it.
     **/
     public UpdatePictureContentVerifier(Binary input) throws BadRequestException {
-        checkHasContent(input);
+        if (!hasContent(input)) {
+            throw new BadRequestException(CANNOT_BE_EMPTY);
+        }
+
         decoded = decodeInput(input);
 
         if (!isImage(decoded)) {
@@ -34,10 +37,8 @@ public class UpdatePictureContentVerifier {
         logger.info(DECODED_DATA_SIZE_MESSAGE, decoded.length);
     }
 
-    private void checkHasContent(Binary input) throws BadRequestException {
-        if (isNull(input.getBase64Data())) {
-            throw new BadRequestException(CANNOT_BE_EMPTY);
-        }
+    private boolean hasContent(Binary input) {
+        return nonNull(input.getBase64Data());
     }
 
     private byte[] decodeInput(Binary input) {
