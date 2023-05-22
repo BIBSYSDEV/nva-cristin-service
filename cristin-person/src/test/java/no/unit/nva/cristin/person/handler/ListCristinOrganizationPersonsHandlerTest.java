@@ -61,6 +61,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class ListCristinOrganizationPersonsHandlerTest {
@@ -201,6 +202,34 @@ class ListCristinOrganizationPersonsHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                 SearchResponse.class);
         assertThat(gatewayResponse.getBody(), not(containsString(NATIONAL_IDENTITY_NUMBER)));
+    }
+
+    @Test
+    void shouldNotDoAuthorizedQueriesWhenMissingAccessRight() throws Exception {
+        cristinApiClient = spy(cristinApiClient);
+        handler = new ListCristinOrganizationPersonsHandler(cristinApiClient, new Environment());
+        var input = queryMissingAccessRightToReadNIN();
+        handler.handleRequest(input, output, context);
+
+        verify(cristinApiClient, times(0)).authorizedFetchQueryResultsOneByOne(any());
+        verify(cristinApiClient, times(0)).fetchGetResultWithAuthentication(any());
+        verify(cristinApiClient, times(0)).authenticatedFetchGetResultAsync(any());
+        verify(cristinApiClient, times(0)).authorizedGenerateQueryResponse(any());
+        verify(cristinApiClient, times(1)).generateQueryResponse(any());
+    }
+
+    @Test
+    void shouldDoAuthorizedQueriesWhenHavingRequiredAccessRight() throws Exception {
+        cristinApiClient = spy(cristinApiClient);
+        HttpResponse<String> fakeResponse = new HttpResponseFaker(EMPTY_LIST_STRING, 200);
+        doReturn(fakeResponse).when(cristinApiClient).fetchGetResultWithAuthentication(any());
+        handler = new ListCristinOrganizationPersonsHandler(cristinApiClient, new Environment());
+        var input = queryWithAccessRightToReadNIN();
+        handler.handleRequest(input, output, context);
+
+        verify(cristinApiClient, times(1)).fetchGetResultWithAuthentication(any());
+        verify(cristinApiClient, times(1)).authorizedGenerateQueryResponse(any());
+        verify(cristinApiClient, times(0)).generateQueryResponse(any());
     }
 
     private SearchResponse<Person> randomPersonsWithNIN(int personCount) {
