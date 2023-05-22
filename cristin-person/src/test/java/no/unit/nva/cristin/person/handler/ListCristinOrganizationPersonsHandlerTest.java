@@ -74,7 +74,6 @@ class ListCristinOrganizationPersonsHandlerTest {
     public static final String INVALID_VALUE = "value";
     public static final int PERSON_COUNT = 5;
     private static final String EMPTY_LIST_STRING = "[]";
-    private static final String ZERO_VALUE = "0";
 
     public static final String SORT_VALUE = "id desc";
 
@@ -82,11 +81,11 @@ class ListCristinOrganizationPersonsHandlerTest {
     private ByteArrayOutputStream output;
     private Context context;
     private CristinOrganizationPersonsClient cristinApiClient;
-    private List<String> generatedNINs = List.of("04031839594",
-            "23047748038",
-            "07021702867",
-            "04011679604",
-            "20106514977");
+    private final List<String> generatedNINs = List.of("04031839594",
+                                                       "23047748038",
+                                                       "07021702867",
+                                                       "04011679604",
+                                                       "20106514977");
 
     @BeforeEach
     void setUp() throws Exception {
@@ -179,7 +178,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     void shouldIncludeNationalIdentificationNumberInResponseForAuthenticatedUser()
             throws IOException, ApiGatewayException {
         CristinOrganizationPersonsClient apiClient = mock(CristinOrganizationPersonsClient.class);
-        SearchResponse<Person> searchResponse = randomPersonsWithNIN(PERSON_COUNT);
+        SearchResponse<Person> searchResponse = randomPersonsWithNIN();
         doReturn(searchResponse).when(apiClient).authorizedGenerateQueryResponse(any());
 
         handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
@@ -194,7 +193,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     void shouldNotIncludeNationalIdentificationNumberInResponseForUserWithoutAuthentication()
             throws IOException, ApiGatewayException {
         CristinOrganizationPersonsClient apiClient = mock(CristinOrganizationPersonsClient.class);
-        SearchResponse<Person> searchResponse = randomPersons(PERSON_COUNT);
+        SearchResponse<Person> searchResponse = randomPersons();
         doReturn(searchResponse).when(apiClient).generateQueryResponse(any());
         handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
         var input = queryMissingAccessRightToReadNIN();
@@ -232,15 +231,15 @@ class ListCristinOrganizationPersonsHandlerTest {
         verify(cristinApiClient, times(0)).generateQueryResponse(any());
     }
 
-    private SearchResponse<Person> randomPersonsWithNIN(int personCount) {
+    private SearchResponse<Person> randomPersonsWithNIN() {
         List<Person> persons = new ArrayList<>();
-        IntStream.range(0, personCount).mapToObj(i -> randomPersonWithNin()).forEach(persons::add);
+        IntStream.range(0, PERSON_COUNT).mapToObj(i -> randomPersonWithNin()).forEach(persons::add);
         return new SearchResponse<Person>(randomUri()).withHits(persons);
     }
 
-    private SearchResponse<Person> randomPersons(int personCount) {
+    private SearchResponse<Person> randomPersons() {
         List<Person> persons = new ArrayList<>();
-        IntStream.range(0, personCount).mapToObj(i -> randomPerson()).forEach(persons::add);
+        IntStream.range(0, PERSON_COUNT).mapToObj(i -> randomPerson()).forEach(persons::add);
         return new SearchResponse<Person>(randomUri()).withHits(persons);
     }
 
@@ -261,10 +260,10 @@ class ListCristinOrganizationPersonsHandlerTest {
     private InputStream queryWithAccessRightToReadNIN() throws JsonProcessingException {
         final URI customerId = randomUri();
         return new HandlerRequestBuilder<Void>(restApiMapper)
-                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
-                .withCustomerId(customerId)
-                .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS.toString())
-                .build();
+                   .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                   .withCurrentCustomer(customerId)
+                   .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS.toString())
+                   .build();
     }
 
     private InputStream queryMissingAccessRightToReadNIN() throws JsonProcessingException {
