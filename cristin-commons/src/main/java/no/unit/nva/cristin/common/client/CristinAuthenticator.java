@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.common.client;
 
+import java.net.http.HttpClient.Version;
 import nva.commons.secrets.SecretsReader;
 
 import java.net.Authenticator;
@@ -42,10 +43,11 @@ public class CristinAuthenticator {
      */
     public static HttpClient getHttpClient() {
         return HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.ALWAYS)
-                .authenticator(getBasicAuthenticator())
-                .connectTimeout(Duration.ofSeconds(30))
-                .build();
+                   .followRedirects(HttpClient.Redirect.ALWAYS)
+                   .version(Version.HTTP_1_1)
+                   .authenticator(getBasicAuthenticator())
+                   .connectTimeout(Duration.ofSeconds(30))
+                   .build();
     }
 
     /**
