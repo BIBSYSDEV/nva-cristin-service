@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.client;
 
+import java.net.http.HttpClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -25,6 +26,13 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 
 public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
 
+    public CristinOrganizationPersonsClient() {
+        super();
+    }
+
+    public CristinOrganizationPersonsClient(HttpClient client) {
+        super(client);
+    }
 
     /**
      * Creates a SearchResponse based on fetch from Cristin upstream.
