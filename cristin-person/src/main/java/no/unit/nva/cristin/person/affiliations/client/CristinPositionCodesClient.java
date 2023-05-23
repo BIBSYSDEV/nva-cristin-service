@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.affiliations.client;
 
 import static java.util.Arrays.asList;
+import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
@@ -9,7 +10,6 @@ import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,10 +29,7 @@ public class CristinPositionCodesClient extends ApiClient {
      * Create CristinPositionCodesClient with default HTTP client.
      */
     public CristinPositionCodesClient() {
-        this(HttpClient.newBuilder()
-                 .followRedirects(HttpClient.Redirect.ALWAYS)
-                 .connectTimeout(Duration.ofSeconds(30))
-                 .build());
+        this(defaultHttpClient());
     }
 
     public CristinPositionCodesClient(HttpClient client) {

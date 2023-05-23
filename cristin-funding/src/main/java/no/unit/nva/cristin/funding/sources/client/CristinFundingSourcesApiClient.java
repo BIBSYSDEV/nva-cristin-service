@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.funding.sources.client;
 
+import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -23,7 +24,7 @@ public class CristinFundingSourcesApiClient extends ApiClient {
 
     @JacocoGenerated
     public static CristinFundingSourcesApiClient defaultClient() {
-        var httpClient = HttpClient.newBuilder().build();
+        var httpClient = defaultHttpClient();
         var cristinBaseUri = URI.create(new Environment().readEnv(EnvironmentKeys.ENV_KEY_CRISTIN_API_URL));
         return new CristinFundingSourcesApiClient(httpClient, cristinBaseUri);
     }

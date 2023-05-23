@@ -12,7 +12,6 @@ import nva.commons.core.paths.UriWrapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +19,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
+import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.common.Utils.isOrcid;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
@@ -46,10 +46,7 @@ public class CristinPersonApiClient extends ApiClient {
      * Create CristinPersonApiClient with default HTTP client.
      */
     public CristinPersonApiClient() {
-        this(HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.ALWAYS)
-                .connectTimeout(Duration.ofSeconds(30))
-                .build());
+        this(defaultHttpClient());
     }
 
     public CristinPersonApiClient(HttpClient client) {
