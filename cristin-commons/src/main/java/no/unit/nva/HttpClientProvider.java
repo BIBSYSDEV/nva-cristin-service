@@ -10,7 +10,7 @@ public class HttpClientProvider {
         return HttpClient.newBuilder()
                    .followRedirects(HttpClient.Redirect.ALWAYS)
                    .version(Version.HTTP_1_1)
-                   .connectTimeout(Duration.ofSeconds(30))
+                   .connectTimeout(Duration.ofSeconds(15))
                    .build();
     }
 
