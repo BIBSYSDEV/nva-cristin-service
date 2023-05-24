@@ -1,11 +1,11 @@
 package no.unit.nva.cristin.projects.common;
 
 import static java.util.Arrays.asList;
+import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -23,10 +23,7 @@ public class CristinProjectApiClient extends ApiClient {
      * Create a generic cristin API client with default HTTP client.
      */
     public CristinProjectApiClient() {
-        this(HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.ALWAYS)
-                .connectTimeout(Duration.ofSeconds(30))
-                .build());
+        this(defaultHttpClient());
     }
 
 

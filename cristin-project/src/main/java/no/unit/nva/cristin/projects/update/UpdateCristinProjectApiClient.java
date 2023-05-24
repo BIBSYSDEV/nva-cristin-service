@@ -8,7 +8,6 @@ import nva.commons.core.paths.UriWrapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
@@ -18,16 +17,6 @@ import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 
 public class UpdateCristinProjectApiClient extends PatchApiClient {
-
-    /**
-     * Create a cristin API client with default HTTP client.
-     */
-    public UpdateCristinProjectApiClient() {
-        this(HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.ALWAYS)
-                .connectTimeout(Duration.ofSeconds(30))
-                .build());
-    }
 
     public UpdateCristinProjectApiClient(HttpClient client) {
         super(client);

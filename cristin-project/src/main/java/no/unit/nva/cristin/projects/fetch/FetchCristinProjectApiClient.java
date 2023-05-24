@@ -4,7 +4,6 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PRO
 import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import java.net.http.HttpClient;
-import java.time.Duration;
 import java.util.Optional;
 import no.unit.nva.cristin.model.CristinQuery;
 import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
@@ -25,10 +24,7 @@ public class FetchCristinProjectApiClient extends CristinProjectApiClient {
      * Creates instance with default Http Client.
      */
     public FetchCristinProjectApiClient() {
-        this(HttpClient.newBuilder()
-                 .followRedirects(HttpClient.Redirect.ALWAYS)
-                 .connectTimeout(Duration.ofSeconds(30))
-                 .build());
+        super();
     }
 
     public FetchCristinProjectApiClient(HttpClient client) {
