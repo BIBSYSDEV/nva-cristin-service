@@ -46,7 +46,7 @@ public class CristinAuthenticator {
                    .followRedirects(HttpClient.Redirect.ALWAYS)
                    .version(Version.HTTP_1_1)
                    .authenticator(getBasicAuthenticator())
-                   .connectTimeout(Duration.ofSeconds(30))
+                   .connectTimeout(Duration.ofSeconds(15))
                    .build();
     }
 
