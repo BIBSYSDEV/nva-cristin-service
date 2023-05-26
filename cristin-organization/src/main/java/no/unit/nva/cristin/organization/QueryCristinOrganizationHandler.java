@@ -41,8 +41,8 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         this(new DefaultOrgQueryClientProvider(), new Environment());
     }
 
-    public QueryCristinOrganizationHandler(IClientProvider<IQueryApiClient<Map<String, String>, Organization>> clientProvider,
-                                           Environment environment) {
+    public QueryCristinOrganizationHandler(IClientProvider<IQueryApiClient<Map<String, String>, Organization>>
+                                               clientProvider, Environment environment) {
         super(Void.class, environment);
         this.clientProvider = clientProvider;
     }
