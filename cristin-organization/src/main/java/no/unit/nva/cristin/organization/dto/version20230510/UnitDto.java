@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.organization.dto;
+package no.unit.nva.cristin.organization.dto.version20230510;
 
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -7,6 +7,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.organization.dto.InstitutionDto;
 
 public class UnitDto implements JsonSerializable {
 
