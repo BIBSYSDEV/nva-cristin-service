@@ -14,13 +14,13 @@ public class DefaultOrgQueryClientProvider
 
     public static final String VERSION = "version";
     public static final String VERSION_ONE = "1";
-    public static final String VERSION_2023_05_10 = "2023-05-10";
+    public static final String VERSION_2023_05_26 = "2023-05-26";
     public static final String CLIENT_WANTS_VERSION_OF_THE_API_CLIENT = "Client wants version {} of the api client";
 
     @Override
     public IQueryApiClient<Map<String, String>, Organization> getClient(String apiVersion) {
-        if (VERSION_2023_05_10.equals(apiVersion)) {
-            logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_2023_05_10);
+        if (VERSION_2023_05_26.equals(apiVersion)) {
+            logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_2023_05_26);
             return getVersionTwo();
         }
         logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_ONE);

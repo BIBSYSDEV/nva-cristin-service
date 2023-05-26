@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.organization.dto.version20230510.mapper;
+package no.unit.nva.cristin.organization.dto.version20230526.mapper;
 
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import no.unit.nva.cristin.organization.dto.version20230510.UnitDto;
+import no.unit.nva.cristin.organization.dto.version20230526.UnitDto;
 import no.unit.nva.model.Organization;
 
 public class OrganizationFromUnitMapper implements Function<UnitDto, Organization> {

@@ -42,7 +42,7 @@ import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION_2023_05_10;
+import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION_2023_05_26;
 import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION_ONE;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
@@ -210,7 +210,7 @@ class QueryCristinOrganizationHandlerTest {
     private static Stream<Arguments> versionArgumentProvider() {
         return Stream.of(
             Arguments.of(String.format(ACCEPT_HEADER_EXAMPLE, VERSION_ONE), 1, 0),
-            Arguments.of(String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_10), 0, 1)
+            Arguments.of(String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26), 0, 1)
         );
     }
 
