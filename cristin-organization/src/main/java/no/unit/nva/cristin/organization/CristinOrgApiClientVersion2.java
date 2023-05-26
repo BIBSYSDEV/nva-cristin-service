@@ -17,7 +17,8 @@ import no.unit.nva.model.Organization;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 
-public class CristinOrgApiClientVersion2 extends CristinOrganizationApiClient implements IQueryApiClient<Organization> {
+public class CristinOrgApiClientVersion2 extends CristinOrganizationApiClient
+    implements IQueryApiClient<Map<String, String>, Organization> {
 
     public CristinOrgApiClientVersion2() {
         super();
@@ -30,20 +31,20 @@ public class CristinOrgApiClientVersion2 extends CristinOrganizationApiClient im
     /**
      * Fetch Organizations matching given query criteria using version 2 code.
      *
-     * @param queryParams Map containing verified query parameters
+     * @param params Map containing verified query parameters
      */
     @Override
-    public SearchResponse<Organization> executeQuery(Map<String, String> queryParams) throws ApiGatewayException {
-        var queryUri = createCristinQueryUri(translateToCristinApi(queryParams), UNITS_PATH);
+    public SearchResponse<Organization> executeQuery(Map<String, String> params) throws ApiGatewayException {
+        var queryUri = createCristinQueryUri(translateToCristinApi(params), UNITS_PATH);
         var start = System.currentTimeMillis();
         var searchResponse = queryUpstream(queryUri);
         var totalProcessingTime = System.currentTimeMillis() - start;
 
-        return updateSearchResponseMetadata(searchResponse, queryParams, totalProcessingTime);
+        return updateSearchResponseMetadata(searchResponse, params, totalProcessingTime);
     }
 
     private SearchResponse<Organization> queryUpstream(URI uri) throws ApiGatewayException {
-        var response = sendRequestMultipleTimes(uri).get();
+        var response = fetchQueryResults(uri);
         var idUri = getNvaApiUri(UNITS_PATH);
         checkHttpStatusCode(idUri, response.statusCode(), response.body());
         var organizations = getOrganizations(response);
@@ -57,8 +58,6 @@ public class CristinOrgApiClientVersion2 extends CristinOrganizationApiClient im
         var units = asList(getDeserializedResponse(response, UnitDto[].class));
 
         return units.stream()
-                   //.parallel()
-                   //.map(oneUnit -> attempt(() -> fetchOneUnit(oneUnit.getId())).orElse(fail -> oneUnit))
                    .map(new OrganizationFromUnitMapper())
                    .collect(Collectors.toList());
     }

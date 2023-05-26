@@ -50,7 +50,8 @@ import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.attempt.Try.of;
 
 @SuppressWarnings("PMD.GodClass")
-public class CristinOrganizationApiClient extends ApiClient implements IQueryApiClient<Organization> {
+public class CristinOrganizationApiClient extends ApiClient
+    implements IQueryApiClient<Map<String, String>, Organization> {
 
     public static final String CRISTIN_LEVELS_PARAM = "levels";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
@@ -97,8 +98,8 @@ public class CristinOrganizationApiClient extends ApiClient implements IQueryApi
     }
 
     @Override
-    public SearchResponse<Organization> executeQuery(Map<String, String> queryParams) throws ApiGatewayException {
-        return queryOrganizations(queryParams);
+    public SearchResponse<Organization> executeQuery(Map<String, String> params) throws ApiGatewayException {
+        return queryOrganizations(params);
     }
 
     private Organization extractOrganization(String identifier, HttpResponse<String> response)

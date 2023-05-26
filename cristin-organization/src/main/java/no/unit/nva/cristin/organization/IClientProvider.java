@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.organization;
 
-public interface IClientProvider<T, R> {
+public interface IClientProvider<T> {
 
-    R getClient(T params);
+    T getClient(String apiVersion);
 
 }
