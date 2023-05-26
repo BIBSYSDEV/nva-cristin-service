@@ -10,7 +10,6 @@ import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import no.unit.nva.utils.VersioningUtils;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
@@ -43,7 +42,6 @@ import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION;
 import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION_2023_05_10;
 import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION_ONE;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
@@ -55,6 +53,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -86,8 +85,7 @@ class QueryCristinOrganizationHandlerTest {
         cristinApiClientVersionTwo = spy(cristinApiClientVersionTwo);
         doReturn(Try.of(new HttpResponseFaker(EMPTY_ARRAY)))
             .when(cristinApiClientVersionOne).sendRequestMultipleTimes(any());
-        doReturn(Try.of(new HttpResponseFaker(EMPTY_ARRAY)))
-            .when(cristinApiClientVersionTwo).sendRequestMultipleTimes(any());
+        doThrow(RuntimeException.class).when(cristinApiClientVersionTwo).sendRequestMultipleTimes(any());
         doReturn(new HttpResponseFaker(EMPTY_ARRAY))
             .when(cristinApiClientVersionTwo).fetchQueryResults(any());
         doReturn(new HttpResponseFaker(EMPTY_ARRAY))
