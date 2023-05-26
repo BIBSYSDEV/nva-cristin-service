@@ -3,7 +3,10 @@ package no.unit.nva.cristin.person.handler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
@@ -24,10 +27,8 @@ import org.zalando.problem.Problem;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +47,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler.VALID_QUERY_PARAMETERS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
-import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
@@ -61,6 +61,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class ListCristinOrganizationPersonsHandlerTest {
@@ -73,7 +74,6 @@ class ListCristinOrganizationPersonsHandlerTest {
     public static final String INVALID_VALUE = "value";
     public static final int PERSON_COUNT = 5;
     private static final String EMPTY_LIST_STRING = "[]";
-    private static final String ZERO_VALUE = "0";
 
     public static final String SORT_VALUE = "id desc";
 
@@ -81,16 +81,24 @@ class ListCristinOrganizationPersonsHandlerTest {
     private ByteArrayOutputStream output;
     private Context context;
     private CristinOrganizationPersonsClient cristinApiClient;
-    private List<String> generatedNINs = List.of("04031839594",
-            "23047748038",
-            "07021702867",
-            "04011679604",
-            "20106514977");
+    private final List<String> generatedNINs = List.of("04031839594",
+                                                       "23047748038",
+                                                       "07021702867",
+                                                       "04011679604",
+                                                       "20106514977");
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         context = mock(Context.class);
-        cristinApiClient = new CristinOrganizationPersonsClient();
+        var mockHttpClient = mock(HttpClient.class);
+        mockHttpClient = spy(mockHttpClient);
+
+        HttpResponse<String> fakeResponse = new HttpResponseFaker(EMPTY_LIST_STRING, 200);
+        doReturn(fakeResponse).when(mockHttpClient).send(any(), any());
+        var fakeAsyncResponse = CompletableFuture.completedFuture(fakeResponse);
+        doReturn(fakeAsyncResponse).when(mockHttpClient).sendAsync(any(), any());
+
+        cristinApiClient = new CristinOrganizationPersonsClient(mockHttpClient);
         output = new ByteArrayOutputStream();
         handler = new ListCristinOrganizationPersonsHandler(cristinApiClient, new Environment());
     }
@@ -116,36 +124,14 @@ class ListCristinOrganizationPersonsHandlerTest {
     }
 
     @Test
-    void shouldReturnOKAndEmptyResponseOnValidDummyInput() throws IOException {
-        InputStream inputStream = generateHandlerDummyRequest();
-        handler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
-        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-    }
-
-    @Test
-    void shouldReturnOKAndIdInResponseOnValidDummyInput() throws IOException {
-        InputStream inputStream = generateHandlerDummyRequest();
-        handler.handleRequest(inputStream, output, context);
-        GatewayResponse<SearchResponse> gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
-        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-        final SearchResponse searchResponse = gatewayResponse.getBodyObject(SearchResponse.class);
-        assertTrue(searchResponse.getId().toString().contains(DUMMY_ORGANIZATION_IDENTIFIER));
-    }
-
-    @Test
-    void shouldReturnSearchResponseWithEmptyHitsWhenBackendFetchIsEmpty() throws ApiGatewayException, IOException {
-
-        CristinOrganizationPersonsClient apiClient = spy(cristinApiClient);
-        doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
-                                       generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(apiClient)
-            .queryPersons(any());
-        doReturn(Collections.emptyList()).when(apiClient).fetchQueryResultsOneByOne(any());
-        handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
+    void shouldReturnOkAndSearchResponseWithEmptyHitsWhenBackendFetchDefaultsToEmpty() throws IOException {
         handler.handleRequest(generateHandlerDummyRequest(), output, context);
-        GatewayResponse<SearchResponse> response = GatewayResponse.fromOutputStream(output, SearchResponse.class);
-        SearchResponse<Person> searchResponse = response.getBodyObject(SearchResponse.class);
-        assertThat(0, equalTo(searchResponse.getHits().size()));
+        var response = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        var responseBody = response.getBodyObject(SearchResponse.class);
+
+        assertThat(response.getStatusCode(), equalTo(HTTP_OK));
+        assertThat(0, equalTo(responseBody.getHits().size()));
+        assertTrue(responseBody.getId().toString().contains(DUMMY_ORGANIZATION_IDENTIFIER));
     }
 
     @Test
@@ -192,7 +178,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     void shouldIncludeNationalIdentificationNumberInResponseForAuthenticatedUser()
             throws IOException, ApiGatewayException {
         CristinOrganizationPersonsClient apiClient = mock(CristinOrganizationPersonsClient.class);
-        SearchResponse<Person> searchResponse = randomPersonsWithNIN(PERSON_COUNT);
+        SearchResponse<Person> searchResponse = randomPersonsWithNIN();
         doReturn(searchResponse).when(apiClient).authorizedGenerateQueryResponse(any());
 
         handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
@@ -207,7 +193,7 @@ class ListCristinOrganizationPersonsHandlerTest {
     void shouldNotIncludeNationalIdentificationNumberInResponseForUserWithoutAuthentication()
             throws IOException, ApiGatewayException {
         CristinOrganizationPersonsClient apiClient = mock(CristinOrganizationPersonsClient.class);
-        SearchResponse<Person> searchResponse = randomPersons(PERSON_COUNT);
+        SearchResponse<Person> searchResponse = randomPersons();
         doReturn(searchResponse).when(apiClient).generateQueryResponse(any());
         handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
         var input = queryMissingAccessRightToReadNIN();
@@ -217,15 +203,43 @@ class ListCristinOrganizationPersonsHandlerTest {
         assertThat(gatewayResponse.getBody(), not(containsString(NATIONAL_IDENTITY_NUMBER)));
     }
 
-    private SearchResponse<Person> randomPersonsWithNIN(int personCount) {
+    @Test
+    void shouldNotDoAuthorizedQueriesWhenMissingAccessRight() throws Exception {
+        cristinApiClient = spy(cristinApiClient);
+        handler = new ListCristinOrganizationPersonsHandler(cristinApiClient, new Environment());
+        var input = queryMissingAccessRightToReadNIN();
+        handler.handleRequest(input, output, context);
+
+        verify(cristinApiClient, times(0)).authorizedFetchQueryResultsOneByOne(any());
+        verify(cristinApiClient, times(0)).fetchGetResultWithAuthentication(any());
+        verify(cristinApiClient, times(0)).authenticatedFetchGetResultAsync(any());
+        verify(cristinApiClient, times(0)).authorizedGenerateQueryResponse(any());
+        verify(cristinApiClient, times(1)).generateQueryResponse(any());
+    }
+
+    @Test
+    void shouldDoAuthorizedQueriesWhenHavingRequiredAccessRight() throws Exception {
+        cristinApiClient = spy(cristinApiClient);
+        HttpResponse<String> fakeResponse = new HttpResponseFaker(EMPTY_LIST_STRING, 200);
+        doReturn(fakeResponse).when(cristinApiClient).fetchGetResultWithAuthentication(any());
+        handler = new ListCristinOrganizationPersonsHandler(cristinApiClient, new Environment());
+        var input = queryWithAccessRightToReadNIN();
+        handler.handleRequest(input, output, context);
+
+        verify(cristinApiClient, times(1)).fetchGetResultWithAuthentication(any());
+        verify(cristinApiClient, times(1)).authorizedGenerateQueryResponse(any());
+        verify(cristinApiClient, times(0)).generateQueryResponse(any());
+    }
+
+    private SearchResponse<Person> randomPersonsWithNIN() {
         List<Person> persons = new ArrayList<>();
-        IntStream.range(0, personCount).mapToObj(i -> randomPersonWithNin()).forEach(persons::add);
+        IntStream.range(0, PERSON_COUNT).mapToObj(i -> randomPersonWithNin()).forEach(persons::add);
         return new SearchResponse<Person>(randomUri()).withHits(persons);
     }
 
-    private SearchResponse<Person> randomPersons(int personCount) {
+    private SearchResponse<Person> randomPersons() {
         List<Person> persons = new ArrayList<>();
-        IntStream.range(0, personCount).mapToObj(i -> randomPerson()).forEach(persons::add);
+        IntStream.range(0, PERSON_COUNT).mapToObj(i -> randomPerson()).forEach(persons::add);
         return new SearchResponse<Person>(randomUri()).withHits(persons);
     }
 
@@ -246,10 +260,10 @@ class ListCristinOrganizationPersonsHandlerTest {
     private InputStream queryWithAccessRightToReadNIN() throws JsonProcessingException {
         final URI customerId = randomUri();
         return new HandlerRequestBuilder<Void>(restApiMapper)
-                .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
-                .withCustomerId(customerId)
-                .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS.toString())
-                .build();
+                   .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
+                   .withCurrentCustomer(customerId)
+                   .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS.toString())
+                   .build();
     }
 
     private InputStream queryMissingAccessRightToReadNIN() throws JsonProcessingException {
@@ -299,10 +313,6 @@ class ListCristinOrganizationPersonsHandlerTest {
 
     private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
         return gatewayResponse.getBodyObject(Problem.class).getDetail();
-    }
-
-    private java.net.http.HttpHeaders generateHeaders(String totalCount, String link) {
-        return java.net.http.HttpHeaders.of(HttpResponseFaker.headerMap(totalCount, link), HttpResponseFaker.filter());
     }
 
 }

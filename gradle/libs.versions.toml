@@ -21,6 +21,7 @@ bekkopen-nocommons = { strictly = '0.12.0' }
 com-auth0-jwt = { strictly = '3.18.3' }
 com-auth0-jwks = { strictly = '0.20.2' }
 wiremock = { strictly = '2.33.2' }
+apache-http-core = { strictly = '4.4.16' }
 
 [libraries]
 
@@ -83,6 +84,8 @@ com-auth0-jwks = { group = 'com.auth0', name =  'jwks-rsa', version.ref= 'com-au
 aws-sdk2-urlconnection = { group = 'software.amazon.awssdk', name = 'url-connection-client', version.ref = 'awsSdk2' }
 
 wiremock = { group = 'com.github.tomakehurst', name = 'wiremock-jre8', version.ref = 'wiremock' }
+
+apache-http-core = { group = 'org.apache.httpcomponents', name = 'httpcore', version.ref = 'apache-http-core' }
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']

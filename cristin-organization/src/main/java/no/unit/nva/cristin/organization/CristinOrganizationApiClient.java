@@ -18,7 +18,6 @@ import nva.commons.core.paths.UriWrapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.util.Objects.isNull;
+import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
@@ -66,10 +66,7 @@ public class CristinOrganizationApiClient extends ApiClient implements IQueryApi
      * Create a CristinOrganizationApiClient with default HTTPClient.
      */
     public CristinOrganizationApiClient() {
-        this(HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.ALWAYS)
-                .connectTimeout(Duration.ofSeconds(30))
-                .build());
+        this(defaultHttpClient());
     }
 
     public CristinOrganizationApiClient(HttpClient client) {
