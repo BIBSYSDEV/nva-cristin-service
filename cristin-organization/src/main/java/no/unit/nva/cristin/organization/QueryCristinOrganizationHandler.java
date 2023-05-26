@@ -2,6 +2,8 @@ package no.unit.nva.cristin.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.ErrorMessages;
+import no.unit.nva.cristin.common.client.IClientProvider;
+import no.unit.nva.cristin.common.client.IQueryApiClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.Organization;

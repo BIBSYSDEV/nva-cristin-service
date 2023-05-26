@@ -3,6 +3,7 @@ package no.unit.nva.cristin.organization;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.common.client.IQueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;

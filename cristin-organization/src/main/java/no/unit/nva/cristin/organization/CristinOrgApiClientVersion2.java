@@ -10,6 +10,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import no.unit.nva.cristin.common.client.IQueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.OrganizationFromUnitMapper;
 import no.unit.nva.cristin.organization.dto.UnitDto;
