@@ -140,7 +140,7 @@ public class CristinOrganizationApiClient extends ApiClient
         return updateSearchResponseMetadata(searchResponse, requestQueryParams, totalProcessingTime);
     }
 
-    protected SearchResponse<Organization> updateSearchResponseMetadata(
+    private SearchResponse<Organization> updateSearchResponseMetadata(
             SearchResponse<Organization> searchResponse,
             Map<String, String> requestQueryParams,
             long timeUsed) {
