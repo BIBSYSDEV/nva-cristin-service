@@ -53,7 +53,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -85,9 +84,6 @@ class QueryCristinOrganizationHandlerTest {
         cristinApiClientVersionTwo = spy(cristinApiClientVersionTwo);
         doReturn(Try.of(new HttpResponseFaker(EMPTY_ARRAY)))
             .when(cristinApiClientVersionOne).sendRequestMultipleTimes(any());
-        doThrow(RuntimeException.class).when(cristinApiClientVersionTwo).sendRequestMultipleTimes(any());
-        doReturn(new HttpResponseFaker(EMPTY_ARRAY))
-            .when(cristinApiClientVersionTwo).fetchQueryResults(any());
         doReturn(new HttpResponseFaker(EMPTY_ARRAY))
             .when(cristinApiClientVersionTwo).fetchQueryResults(any());
         doReturn(cristinApiClientVersionOne).when(clientProvider).getVersionOne();

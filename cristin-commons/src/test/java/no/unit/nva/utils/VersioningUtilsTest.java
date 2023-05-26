@@ -35,7 +35,7 @@ class VersioningUtilsTest {
     }
 
     @Test
-    void shouldThrowInformativeExceptionWhenHeaderIsIncorrectlyFormatted() {
+    void shouldReturnNullWhenHeaderIsIncorrectlyFormatted() {
         var actual = extractVersion(INVALID_HEADER_VALUE);
 
         assertThat(actual, equalTo(null));
