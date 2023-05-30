@@ -1282,6 +1282,103 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /person/{id}/picture:
+    parameters:
+      - name: id
+        in: path
+        description: Identifier of person. Must match a valid Cristin identifier
+        required: true
+        schema:
+          type: string
+        example: '359084'
+    put:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinUpdatePersonPictureFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Update person profile picture
+      description: Updates person profile picture
+      operationId: UpdatePersonPicture
+      security:
+        - CognitoUserPool: [ 'https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend','aws.cognito.signin.user.admin' ]
+      requestBody:
+        description: Payload containing base64 encoded binary image. Max size of image is currently 256kb and must be a jpeg image
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Binary'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/BinaryExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/Binary'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/BinaryExample'
+      responses:
+        204:
+          description: Successful update of resource
+          content:
+            application/json:
+              schema:
+                type: string
+            application/ld+json:
+              schema:
+                type: string
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonPictureFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Fetch person profile picture
+      description: Retrieves person profile picture in base64 format which contains mimetype image/jpeg
+      operationId: FetchPersonPicture
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Binary'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/BinaryExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Binary'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/BinaryExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        404:
+          $ref: '#/components/responses/404'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 
   /position:
     get:
@@ -2798,6 +2895,13 @@ components:
           description: The list of persons returned by the query
           items:
             $ref: '#/components/schemas/Project'
+    Binary:
+      type: object
+      description: Json containing binary encoded as base64 string
+      properties:
+        base64Data:
+          type: string
+          description: Base64 encoded string created from a binary
   examples:
     ProjectsExample:
       value:
@@ -3718,6 +3822,9 @@ components:
                 name: 'REK'
             relatedProjects:
               - 'https://api.dev.nva.aws.unit.no/cristin/project/483302'
+    BinaryExample:
+      value:
+        base64Data: '/9j/4AAQSkZJRgABAQEAeAB4AAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAEAAAAAAAD'
 
   securitySchemes:
     CognitoUserPool:

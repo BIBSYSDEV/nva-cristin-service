@@ -11,6 +11,7 @@ import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
@@ -41,10 +42,10 @@ import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION;
+import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION_2023_05_26;
 import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION_ONE;
-import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION_TWO;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
+import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -62,6 +63,7 @@ class QueryCristinOrganizationHandlerTest {
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     private static final String CRISTIN_QUERY_RESPONSE = "cristin_query_response_sample.json";
     public static final String EMPTY_ARRAY = "[]";
+    public static final String ACCEPT_HEADER_EXAMPLE = "application/json; version=%s";
     private QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private DefaultOrgQueryClientProvider clientProvider;
     private ByteArrayOutputStream output;
@@ -70,7 +72,7 @@ class QueryCristinOrganizationHandlerTest {
     private CristinOrgApiClientVersion2 cristinApiClientVersionTwo;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws ApiGatewayException {
         context = mock(Context.class);
         var httpClient = mock(HttpClient.class);
         cristinApiClientVersionOne = new CristinOrganizationApiClient(httpClient);
@@ -82,8 +84,8 @@ class QueryCristinOrganizationHandlerTest {
         cristinApiClientVersionTwo = spy(cristinApiClientVersionTwo);
         doReturn(Try.of(new HttpResponseFaker(EMPTY_ARRAY)))
             .when(cristinApiClientVersionOne).sendRequestMultipleTimes(any());
-        doReturn(Try.of(new HttpResponseFaker(EMPTY_ARRAY)))
-            .when(cristinApiClientVersionTwo).sendRequestMultipleTimes(any());
+        doReturn(new HttpResponseFaker(EMPTY_ARRAY))
+            .when(cristinApiClientVersionTwo).fetchQueryResults(any());
         doReturn(cristinApiClientVersionOne).when(clientProvider).getVersionOne();
         doReturn(cristinApiClientVersionTwo).when(clientProvider).getVersionTwo();
 
@@ -160,9 +162,9 @@ class QueryCristinOrganizationHandlerTest {
 
     @ParameterizedTest(name = "Requesting version {0} should call version one {1} times and version two {2} times")
     @MethodSource("versionArgumentProvider")
-    void shouldReturnVersion2WhenRequestingItUsingQueryParam(String requestedVersion,
-                                                             int callsVersionOne,
-                                                             int callsVersionTwo)
+    void shouldReturnCorrectVersionWhenRequestingItUsingQueryParam(String requestedVersion,
+                                                                   int callsVersionOne,
+                                                                   int callsVersionTwo)
         throws Exception {
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
         var input = generateValidHandlerRequestWithVersionParam(requestedVersion);
@@ -174,13 +176,6 @@ class QueryCristinOrganizationHandlerTest {
         verify(clientProvider, times(callsVersionOne)).getVersionOne();
         verify(clientProvider, times(callsVersionTwo)).getVersionTwo();
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
-    }
-
-    private static Stream<Arguments> versionArgumentProvider() {
-        return Stream.of(
-            Arguments.of(VERSION_ONE, 1, 0),
-            Arguments.of(VERSION_TWO, 0, 1)
-        );
     }
 
     @Test
@@ -201,11 +196,18 @@ class QueryCristinOrganizationHandlerTest {
         throws JsonProcessingException {
 
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type(),
+                                       ACCEPT_HEADER_KEY_NAME, versionParam))
                    .withQueryParameters(Map.of("query", "Department of Medical Biochemistry",
-                                               "depth","full",
-                                               VERSION, versionParam))
+                                               "depth","full"))
                    .build();
+    }
+
+    private static Stream<Arguments> versionArgumentProvider() {
+        return Stream.of(
+            Arguments.of(String.format(ACCEPT_HEADER_EXAMPLE, VERSION_ONE), 1, 0),
+            Arguments.of(String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26), 0, 1)
+        );
     }
 
     private Try<HttpResponse<String>> getTry(HttpResponse<String> mockHttpResponse) {

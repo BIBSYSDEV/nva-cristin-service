@@ -1,9 +1,9 @@
 package no.unit.nva.biobank.client;
 
+import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import no.unit.nva.biobank.model.QueryBiobank;
@@ -19,10 +19,7 @@ public class CristinBiobankApiClient extends ApiClient {
     @JacocoGenerated
     public static CristinBiobankApiClient defaultClient() {
         return new CristinBiobankApiClient(
-            HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.ALWAYS)
-                .connectTimeout(Duration.ofSeconds(30))
-                .build()
+            defaultHttpClient()
         );
     }
     public CristinBiobankApiClient(HttpClient client) {

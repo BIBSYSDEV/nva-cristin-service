@@ -2,6 +2,8 @@ package no.unit.nva.cristin.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.ErrorMessages;
+import no.unit.nva.cristin.common.client.IClientProvider;
+import no.unit.nva.cristin.common.client.IQueryApiClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.Organization;
@@ -25,11 +27,13 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION;
+import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
+import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;
 
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
 
     private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH, VERSION);
-    private final transient IClientProvider<RequestInfo, IQueryApiClient<Organization>> clientProvider;
+    private final transient IClientProvider<IQueryApiClient<Map<String, String>, Organization>> clientProvider;
 
     @JacocoGenerated
     @SuppressWarnings("unused")
@@ -37,8 +41,8 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         this(new DefaultOrgQueryClientProvider(), new Environment());
     }
 
-    public QueryCristinOrganizationHandler(IClientProvider<RequestInfo, IQueryApiClient<Organization>> clientProvider,
-                                           Environment environment) {
+    public QueryCristinOrganizationHandler(IClientProvider<IQueryApiClient<Map<String, String>, Organization>>
+                                               clientProvider, Environment environment) {
         super(Void.class, environment);
         this.clientProvider = clientProvider;
     }
@@ -54,7 +58,13 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         requestQueryParams.put(PAGE, getValidPage(requestInfo));
         requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
 
-        return clientProvider.getClient(requestInfo).executeQuery(requestQueryParams);
+        var apiVersion = getApiVersion(requestInfo);
+
+        return clientProvider.getClient(apiVersion).executeQuery(requestQueryParams);
+    }
+
+    private String getApiVersion(RequestInfo requestInfo) {
+        return extractVersionFromRequestInfo(requestInfo, ACCEPT_HEADER_KEY_NAME);
     }
 
     @Override
