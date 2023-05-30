@@ -63,19 +63,19 @@ class FetchCristinOrganizationHandlerTest {
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
-    private DefaultOrgFetchProvider clientProvider;
+    private DefaultOrgFetchClientProvider clientProvider;
     private ByteArrayOutputStream output;
     private Context context;
 
     @BeforeEach
     void setUp() {
         context = mock(Context.class);
-        HttpClient mockHttpClient = mock(HttpClient.class);
+        var mockHttpClient = mock(HttpClient.class);
         cristinApiClient = new CristinOrganizationApiClient(mockHttpClient);
         cristinApiClient = spy(cristinApiClient);
         doReturn(Try.of(new HttpResponseFaker(EMPTY_JSON)))
             .when(cristinApiClient).sendRequestMultipleTimes(any());
-        clientProvider = new DefaultOrgFetchProvider();
+        clientProvider = new DefaultOrgFetchClientProvider();
         clientProvider = spy(clientProvider);
         doReturn(cristinApiClient).when(clientProvider).getClient(any());
         output = new ByteArrayOutputStream();
