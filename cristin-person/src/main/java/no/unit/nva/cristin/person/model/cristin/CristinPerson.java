@@ -58,6 +58,7 @@ public class CristinPerson implements JsonSerializable {
     private Boolean reserved;
     private String norwegianNationalId;
     private List<CristinPersonEmployment> detailedAffiliations;
+    private Boolean identifiedCristinPerson;
 
     public String getCristinPersonId() {
         return cristinPersonId;
@@ -156,6 +157,13 @@ public class CristinPerson implements JsonSerializable {
         this.detailedAffiliations = detailedAffiliations;
     }
 
+    public Boolean getIdentifiedCristinPerson() {
+        return identifiedCristinPerson;
+    }
+
+    public void setIdentifiedCristinPerson(Boolean identifiedCristinPerson) {
+        this.identifiedCristinPerson = identifiedCristinPerson;
+    }
 
     /**
      * Creates a Nva person model from a Cristin person model. If the person is not publicly viewable, only returns
@@ -174,6 +182,7 @@ public class CristinPerson implements JsonSerializable {
                    .withContactDetails(extractContactDetails())
                    .withImage(extractImage())
                    .withAffiliations(extractAffiliations())
+                   .withVerified(getIdentifiedCristinPerson())
                    .build();
     }
 
@@ -194,6 +203,7 @@ public class CristinPerson implements JsonSerializable {
                    .withAffiliations(extractAffiliations())
                    .withReserved(getReserved())
                    .withEmployments(extractEmployments())
+                   .withVerified(getIdentifiedCristinPerson())
                    .build();
     }
 
