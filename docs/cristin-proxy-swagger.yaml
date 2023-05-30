@@ -2417,6 +2417,9 @@ components:
           description: Employments for this person. Visible to authorized users
           items:
             $ref: '#/components/schemas/PersonEmployment'
+        verified:
+          type: boolean
+          description: If the person is a verified person with a national identity number
     PersonPost:
       type: object
       required: [ identifiers, names ]
@@ -3377,6 +3380,7 @@ components:
                   labels:
                     en: 'Head Engineer'
                     nb: 'Overingeniør'
+            verified: true
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
             type: 'Person'
             identifiers:
@@ -3397,6 +3401,7 @@ components:
                   type: 'Role'
                   labels:
                     en: 'Consultant'
+            verified: true
     PersonExample:
       value:
         '@context': 'https://example.org/person-context.json'
@@ -3445,6 +3450,7 @@ components:
             startDate: '2008-01-01T00:00:00Z'
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
+        verified: true
     PersonPatchExample:
       value:
         orcid: '1234-1234-1234-1234'
