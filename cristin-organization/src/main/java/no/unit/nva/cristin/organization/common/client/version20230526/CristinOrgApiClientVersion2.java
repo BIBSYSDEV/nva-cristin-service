@@ -1,10 +1,10 @@
-package no.unit.nva.cristin.organization;
+package no.unit.nva.cristin.organization.common.client.version20230526;
 
 import static java.util.Arrays.asList;
 import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
-import static no.unit.nva.cristin.organization.QueryParamConverter.translateToCristinApi;
+import static no.unit.nva.cristin.organization.common.QueryParamConverter.translateToCristinApi;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;

@@ -1,9 +1,9 @@
-package no.unit.nva.cristin.organization;
+package no.unit.nva.cristin.organization.fetch;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
-import static no.unit.nva.cristin.organization.QueryCristinOrganizationHandler.getValidDepth;
+import static no.unit.nva.cristin.organization.common.HandlerUtil.getValidDepth;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
 import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;
@@ -32,6 +32,9 @@ public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, O
         this(new DefaultOrgFetchClientProvider(), new Environment());
     }
 
+    /**
+     * Fetch organization constructor with params.
+     */
     public FetchCristinOrganizationHandler(
         IClientProvider<IFetchApiClient<Map<String, String>, Organization>> clientProvider,
         Environment environment) {

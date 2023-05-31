@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.organization;
+package no.unit.nva.cristin.organization.common.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -41,7 +41,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.organization.QueryParamConverter.translateToCristinApi;
+import static no.unit.nva.cristin.organization.common.QueryParamConverter.translateToCristinApi;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
@@ -281,7 +281,10 @@ public class CristinOrganizationApiClient
                 .collect(Collectors.toList());
     }
 
-    protected SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri) throws ApiGatewayException {
+    /**
+     * Sends calls to upstream with multiple retries.
+     */
+    public SubSubUnitDto getSubSubUnitDtoWithMultipleEfforts(URI subunitUri) throws ApiGatewayException {
 
         SubSubUnitDto subsubUnitDto = of(subunitUri)
                 .flatMap(this::sendRequestMultipleTimes)

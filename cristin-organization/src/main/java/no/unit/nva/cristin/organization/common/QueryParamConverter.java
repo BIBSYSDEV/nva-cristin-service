@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.organization;
+package no.unit.nva.cristin.organization.common;
 
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;

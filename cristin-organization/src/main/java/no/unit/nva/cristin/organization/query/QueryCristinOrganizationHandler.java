@@ -1,7 +1,6 @@
-package no.unit.nva.cristin.organization;
+package no.unit.nva.cristin.organization.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.common.client.IClientProvider;
 import no.unit.nva.cristin.common.client.IQueryApiClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
@@ -19,14 +18,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
-import static no.unit.nva.cristin.model.Constants.FULL;
-import static no.unit.nva.cristin.model.Constants.NONE;
-import static no.unit.nva.cristin.model.Constants.TOP;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION;
+import static no.unit.nva.cristin.organization.query.DefaultOrgQueryClientProvider.VERSION;
+import static no.unit.nva.cristin.organization.common.HandlerUtil.getValidDepth;
 import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
 import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;
 
@@ -77,22 +74,6 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     @Override
     protected Integer getSuccessStatusCode(Void input, SearchResponse<Organization> output) {
         return HttpURLConnection.HTTP_OK;
-    }
-
-    protected static String getValidDepth(RequestInfo requestInfo) throws BadRequestException {
-        if (isValidDepth(requestInfo)) {
-            return requestInfo.getQueryParameters().containsKey(DEPTH)
-                    ? requestInfo.getQueryParameter(DEPTH)
-                    : TOP;
-        } else {
-            throw new BadRequestException(ErrorMessages.ERROR_MESSAGE_DEPTH_INVALID);
-        }
-    }
-
-    private static boolean isValidDepth(RequestInfo requestInfo) throws BadRequestException {
-        return !requestInfo.getQueryParameters().containsKey(DEPTH)
-                || requestInfo.getQueryParameters().containsKey(DEPTH)
-                && Set.of(TOP, FULL, NONE).contains(requestInfo.getQueryParameter(DEPTH));
     }
 
 }

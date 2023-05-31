@@ -1,9 +1,10 @@
-package no.unit.nva.cristin.organization;
+package no.unit.nva.cristin.organization.fetch;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.unit.nva.commons.json.JsonUtils;
+import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;

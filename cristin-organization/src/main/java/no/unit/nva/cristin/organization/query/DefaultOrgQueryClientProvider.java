@@ -1,8 +1,10 @@
-package no.unit.nva.cristin.organization;
+package no.unit.nva.cristin.organization.query;
 
 import java.util.Map;
 import no.unit.nva.cristin.common.client.IClientProvider;
 import no.unit.nva.cristin.common.client.IQueryApiClient;
+import no.unit.nva.cristin.organization.common.client.version20230526.CristinOrgApiClientVersion2;
+import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
 import no.unit.nva.model.Organization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
