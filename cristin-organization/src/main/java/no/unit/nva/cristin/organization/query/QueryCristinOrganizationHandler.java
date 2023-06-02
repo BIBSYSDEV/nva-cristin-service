@@ -22,7 +22,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.organization.query.DefaultOrgQueryClientProvider.VERSION;
+import static no.unit.nva.cristin.organization.common.Constants.VERSION;
 import static no.unit.nva.cristin.organization.common.HandlerUtil.getValidDepth;
 import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
 import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
+import no.unit.nva.cristin.organization.common.client.version20230526.CristinOrgApiClientVersion2;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
@@ -16,6 +17,7 @@ import nva.commons.core.Environment;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.zalando.problem.Problem;
 
@@ -35,12 +37,15 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
+import static no.unit.nva.cristin.organization.common.Constants.VERSION_2023_05_26;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -61,24 +66,33 @@ class FetchCristinOrganizationHandlerTest {
     public static final String ENGLISH_LANGUAGE_KEY = "en";
     public static final String DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY = "Department of Medical Biochemistry";
     public static final String EMPTY_JSON = "{}";
+    public static final String ACCEPT_HEADER_EXAMPLE = "application/json; version=%s";
+    public static final String SOME_IDENTIFIER = "1.2.3.4";
+    public static final String CRISTIN_GET_RESPONSE_V2_JSON = "cristinGetResponseV2.json";
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
+    private CristinOrgApiClientVersion2 apiClientVersion2;
     private DefaultOrgFetchClientProvider clientProvider;
     private ByteArrayOutputStream output;
     private Context context;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws ApiGatewayException {
         context = mock(Context.class);
         var mockHttpClient = mock(HttpClient.class);
         cristinApiClient = new CristinOrganizationApiClient(mockHttpClient);
         cristinApiClient = spy(cristinApiClient);
         doReturn(Try.of(new HttpResponseFaker(EMPTY_JSON)))
             .when(cristinApiClient).sendRequestMultipleTimes(any());
+        apiClientVersion2 = new CristinOrgApiClientVersion2(mockHttpClient);
+        apiClientVersion2 = spy(apiClientVersion2);
+        doReturn(new HttpResponseFaker(EMPTY_JSON))
+            .when(apiClientVersion2).fetchGetResult(any());
         clientProvider = new DefaultOrgFetchClientProvider();
         clientProvider = spy(clientProvider);
-        doReturn(cristinApiClient).when(clientProvider).getClient(any());
+        doReturn(cristinApiClient).when(clientProvider).getVersionOne();
+        doReturn(apiClientVersion2).when(clientProvider).getVersionTwo();
         output = new ByteArrayOutputStream();
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
     }
@@ -209,6 +223,25 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(actualOrganization.getPartOf(), equalTo(null));
     }
 
+    @Test
+    @Disabled
+    void shouldMapUpstreamJsonCorrectlyForVersionTwo() throws Exception {
+        var resource = stringFromResources(CRISTIN_GET_RESPONSE_V2_JSON);
+        var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
+        doReturn(fakeHttpResponse).when(apiClientVersion2).fetchGetResult(any());
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
+        fetchCristinOrganizationHandler.handleRequest(requestUsingVersionTwo(), output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
+        var responseBody = gatewayResponse.getBodyObject(Organization.class);
+
+        var pretty = OBJECT_MAPPER.readTree(responseBody.toString()).toPrettyString();
+
+        System.out.println(pretty);
+
+        assertThat(responseBody, equalTo(""));
+    }
 
     private Object getSubSubUnit(String subUnitFile) {
         return SubSubUnitDto.fromJson(IoUtils.stringFromResources(Path.of(subUnitFile)));
@@ -254,5 +287,15 @@ class FetchCristinOrganizationHandlerTest {
         var responseWithProblemType = restApiMapper.getTypeFactory()
                 .constructParametricType(GatewayResponse.class, Problem.class);
         return restApiMapper.readValue(output.toString(), responseWithProblemType);
+    }
+
+    private InputStream requestUsingVersionTwo() throws JsonProcessingException {
+        var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type(),
+                             ACCEPT_HEADER_KEY_NAME, String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26));
+        var pathParameters = Map.of(IDENTIFIER, SOME_IDENTIFIER);
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                   .withHeaders(headers)
+                   .withPathParameters(pathParameters)
+                   .build();
     }
 }

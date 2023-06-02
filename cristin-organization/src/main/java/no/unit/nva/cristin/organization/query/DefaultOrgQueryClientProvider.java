@@ -1,5 +1,8 @@
 package no.unit.nva.cristin.organization.query;
 
+import static no.unit.nva.cristin.organization.common.Constants.CLIENT_WANTS_VERSION_OF_THE_API_CLIENT;
+import static no.unit.nva.cristin.organization.common.Constants.VERSION_2023_05_26;
+import static no.unit.nva.cristin.organization.common.Constants.VERSION_ONE;
 import java.util.Map;
 import no.unit.nva.cristin.common.client.IClientProvider;
 import no.unit.nva.cristin.common.client.IQueryApiClient;
@@ -13,11 +16,6 @@ public class DefaultOrgQueryClientProvider
     implements IClientProvider<IQueryApiClient<Map<String, String>, Organization>> {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultOrgQueryClientProvider.class);
-
-    public static final String VERSION = "version";
-    public static final String VERSION_ONE = "1";
-    public static final String VERSION_2023_05_26 = "2023-05-26";
-    public static final String CLIENT_WANTS_VERSION_OF_THE_API_CLIENT = "Client wants version {} of the api client";
 
     @Override
     public IQueryApiClient<Map<String, String>, Organization> getClient(String apiVersion) {

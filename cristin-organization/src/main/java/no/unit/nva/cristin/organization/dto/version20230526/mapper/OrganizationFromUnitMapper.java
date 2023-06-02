@@ -1,9 +1,10 @@
 package no.unit.nva.cristin.organization.dto.version20230526.mapper;
 
-import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -14,7 +15,11 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
 
     @Override
     public Organization apply(UnitDto unitDto) {
-        return nonNull(unitDto) ? toOrganization(unitDto) : null;
+        return Optional.ofNullable(unitDto)
+                   .map(ParentTrailMapper::new)
+                   .map(ParentTrailMapper::getWithParentTrail)
+                   .map(this::toOrganization)
+                   .orElse(null);
     }
 
     private Organization toOrganization(UnitDto unitDto) {
@@ -23,13 +28,20 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
                    .withName(unitDto.getUnitName())
                    .withLabels(unitDto.getUnitName())
                    .withAcronym(unitDto.getAcronym())
-                   .withNearestPartOf(this.apply(unitDto.getParentUnit()))
-                   .withHasPart(unitsToOrganizations(unitDto.getSubUnits()))
-                   .withPartOf(unitsToOrganizations(unitDto.getParentUnits()))
+                   //.withNearestPartOf(this.apply(unitDto.getParentUnit()))
+                   .withHasPart(unitsToOrganizations(unitDto.getSubUnits())) // TODO: Build subunit tree here
+                   .withPartOf(parentToSetOfOrganizations(unitDto.getParentUnit()))
                    .build();
     }
 
-    private Set<Organization> unitsToOrganizations(List<UnitDto> unitDto) {
-        return unitDto.stream().map(this).collect(Collectors.toSet());
+    private Set<Organization> unitsToOrganizations(List<UnitDto> unitDtos) {
+        return unitDtos.stream().map(this).collect(Collectors.toSet());
     }
+
+    private Set<Organization> parentToSetOfOrganizations(UnitDto parent) {
+        var set = new HashSet<Organization>();
+        set.add(this.apply(parent));
+        return set;
+    }
+
 }

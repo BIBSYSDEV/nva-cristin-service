@@ -15,7 +15,8 @@ public class UnitDto implements JsonSerializable {
     private final Map<String, String> unitName;
     private final InstitutionDto institution;
     private final String acronym;
-    private final UnitDto parentUnit;
+    private UnitDto parentUnit;
+    // TODO: UnitDto subUnit
     private final List<UnitDto> parentUnits;
     private final List<UnitDto> subUnits;
     private final URI uri;
@@ -60,6 +61,10 @@ public class UnitDto implements JsonSerializable {
 
     public UnitDto getParentUnit() {
         return parentUnit;
+    }
+
+    public void setParentUnit(UnitDto parentUnit) {
+        this.parentUnit = parentUnit;
     }
 
     public List<UnitDto> getParentUnits() {

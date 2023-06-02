@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.organization;
+package no.unit.nva.cristin.organization.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,8 +9,6 @@ import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
 import no.unit.nva.cristin.organization.common.client.version20230526.CristinOrgApiClientVersion2;
-import no.unit.nva.cristin.organization.query.DefaultOrgQueryClientProvider;
-import no.unit.nva.cristin.organization.query.QueryCristinOrganizationHandler;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -46,8 +44,8 @@ import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.organization.query.DefaultOrgQueryClientProvider.VERSION_2023_05_26;
-import static no.unit.nva.cristin.organization.query.DefaultOrgQueryClientProvider.VERSION_ONE;
+import static no.unit.nva.cristin.organization.common.Constants.VERSION_2023_05_26;
+import static no.unit.nva.cristin.organization.common.Constants.VERSION_ONE;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
