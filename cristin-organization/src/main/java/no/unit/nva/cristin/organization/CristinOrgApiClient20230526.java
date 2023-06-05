@@ -23,16 +23,16 @@ import no.unit.nva.model.Organization;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 
-public class CristinOrgApiClientVersion2 extends ApiClient
+public class CristinOrgApiClient20230526 extends ApiClient
     implements QueryApiClient<Map<String, String>, Organization> {
 
     public static final URI ORGANIZATION_ID_URI = getNvaApiUri(ORGANIZATION_PATH);
 
-    public CristinOrgApiClientVersion2() {
+    public CristinOrgApiClient20230526() {
         this(defaultHttpClient());
     }
 
-    public CristinOrgApiClientVersion2(HttpClient client) {
+    public CristinOrgApiClient20230526(HttpClient client) {
         super(client);
     }
 

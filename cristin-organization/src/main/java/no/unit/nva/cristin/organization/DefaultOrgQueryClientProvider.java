@@ -21,7 +21,7 @@ public class DefaultOrgQueryClientProvider
     public QueryApiClient<Map<String, String>, Organization> getClient(String apiVersion) {
         if (VERSION_2023_05_26.equals(apiVersion)) {
             logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_2023_05_26);
-            return getVersionTwo();
+            return getVersion20230526();
         }
         logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_ONE);
         return getVersionOne();
@@ -31,7 +31,7 @@ public class DefaultOrgQueryClientProvider
         return new CristinOrganizationApiClient();
     }
 
-    public QueryApiClient<Map<String, String>, Organization> getVersionTwo() {
-        return new CristinOrgApiClientVersion2();
+    public QueryApiClient<Map<String, String>, Organization> getVersion20230526() {
+        return new CristinOrgApiClient20230526();
     }
 }
