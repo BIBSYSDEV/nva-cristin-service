@@ -173,7 +173,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      * Query Parameter map contain key.
      *
      * @param key to check
-     * @return true if map contains key.
+     * @return true if map contains key
      */
     public boolean containsKey(T key) {
         return queryParameters.containsKey(key) || pathParameters.containsKey(key);
