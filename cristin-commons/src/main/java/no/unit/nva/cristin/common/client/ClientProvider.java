@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.common.client;
 
-public interface IClientProvider<T> {
+public interface ClientProvider<T> {
 
     T getClient(String apiVersion);
 
