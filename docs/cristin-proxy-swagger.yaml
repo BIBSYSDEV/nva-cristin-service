@@ -2419,7 +2419,7 @@ components:
             $ref: '#/components/schemas/PersonEmployment'
         verified:
           type: boolean
-          description: If the person is a verified person with a national identity number
+          description: Whether we can document the existence of the person
     PersonPost:
       type: object
       required: [ identifiers, names ]
