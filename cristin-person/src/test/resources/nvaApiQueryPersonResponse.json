@@ -69,7 +69,8 @@
             }
           }
         }
-      ]
+      ],
+      "verified": true
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/person/359084",
@@ -132,7 +133,8 @@
             }
           }
         }
-      ]
+      ],
+      "verified": true
     }
   ]
 }

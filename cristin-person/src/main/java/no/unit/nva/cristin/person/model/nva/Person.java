@@ -33,6 +33,7 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 
 @JacocoGenerated
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
@@ -59,6 +60,8 @@ public class Person implements JsonSerializable {
     private Boolean reserved;
     @JsonProperty(EMPLOYMENTS)
     private Set<Employment> employments;
+    @JsonProperty(VERIFIED)
+    private Boolean verified;
 
     private Person() {
 
@@ -75,13 +78,14 @@ public class Person implements JsonSerializable {
      * @param affiliations   This person's organization affiliations.
      * @param reserved       If person is a reserved person, meaning not publicly viewable.
      * @param employments    This person's detailed employment data at each organization.
+     * @param verified       If this person is a verified person.
      */
     @JsonCreator
     public Person(@JsonProperty(ID) URI id, @JsonProperty(IDENTIFIERS) Set<TypedValue> identifiers,
                   @JsonProperty(NAMES) Set<TypedValue> names,
                   @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails, @JsonProperty(IMAGE) URI image,
                   @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations, @JsonProperty(RESERVED) Boolean reserved,
-                  @JsonProperty(EMPLOYMENTS) Set<Employment> employments) {
+                  @JsonProperty(EMPLOYMENTS) Set<Employment> employments, @JsonProperty(VERIFIED) Boolean verified) {
         this.id = id;
         this.identifiers = identifiers;
         this.names = names;
@@ -90,6 +94,7 @@ public class Person implements JsonSerializable {
         this.affiliations = affiliations;
         this.reserved = reserved;
         this.employments = employments;
+        this.verified = verified;
     }
 
     public String getContext() {
@@ -168,6 +173,14 @@ public class Person implements JsonSerializable {
         this.employments = employments;
     }
 
+    public Boolean getVerified() {
+        return verified;
+    }
+
+    public void setVerified(Boolean verified) {
+        this.verified = verified;
+    }
+
     /**
      * Converts this object to an appropriate format for POST to Cristin.
      */
@@ -226,14 +239,15 @@ public class Person implements JsonSerializable {
                && Objects.equals(getImage(), person.getImage())
                && Objects.equals(getAffiliations(), person.getAffiliations())
                && Objects.equals(getReserved(), person.getReserved())
-               && Objects.equals(getEmployments(), person.getEmployments());
+               && Objects.equals(getEmployments(), person.getEmployments())
+               && Objects.equals(getVerified(), person.getVerified());
     }
 
     @JacocoGenerated
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getContext(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
-                            getAffiliations(), getReserved(), getEmployments());
+                            getAffiliations(), getReserved(), getEmployments(), getVerified());
     }
 
     @Override
@@ -292,6 +306,11 @@ public class Person implements JsonSerializable {
 
         public Builder withEmployments(Set<Employment> employments) {
             person.setEmployments(employments);
+            return this;
+        }
+
+        public Builder withVerified(Boolean verified) {
+            person.setVerified(verified);
             return this;
         }
 
