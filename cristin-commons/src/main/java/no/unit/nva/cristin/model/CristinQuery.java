@@ -179,6 +179,11 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
         return queryParameters.containsKey(key) || pathParameters.containsKey(key);
     }
 
+    /**
+     * Query Parameter map remove value having key.
+     *
+     * @param key to check
+     */
     public void removeValue(T key) {
         if (queryParameters.containsKey(key)) {
             queryParameters.remove(key);
