@@ -101,7 +101,6 @@ public class CristinPersonTest {
 
     private ObjectNode removeIgnoredFields(String body) throws JsonProcessingException {
         ObjectNode nodeTree = (ObjectNode) OBJECT_MAPPER.readTree(body);
-        nodeTree.remove("identified_cristin_person");
         nodeTree.remove("cristin_profile_url");
         removeInstitutionFieldFromAffiliations(nodeTree);
         return nodeTree;
