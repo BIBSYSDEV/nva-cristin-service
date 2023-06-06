@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
-import no.unit.nva.cristin.organization.common.client.version20230526.CristinOrgApiClientVersion2;
+import no.unit.nva.cristin.organization.common.client.version20230526.CristinOrgApiClient20230526;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -71,25 +71,25 @@ class QueryCristinOrganizationHandlerTest {
     private ByteArrayOutputStream output;
     private Context context;
     private CristinOrganizationApiClient cristinApiClientVersionOne;
-    private CristinOrgApiClientVersion2 cristinApiClientVersionTwo;
+    private CristinOrgApiClient20230526 cristinOrgApiClient20230526;
 
     @BeforeEach
     void setUp() throws ApiGatewayException {
         context = mock(Context.class);
         var httpClient = mock(HttpClient.class);
         cristinApiClientVersionOne = new CristinOrganizationApiClient(httpClient);
-        cristinApiClientVersionTwo = new CristinOrgApiClientVersion2(httpClient);
+        cristinOrgApiClient20230526 = new CristinOrgApiClient20230526(httpClient);
         clientProvider = new DefaultOrgQueryClientProvider();
         clientProvider = spy(clientProvider);
 
         cristinApiClientVersionOne = spy(cristinApiClientVersionOne);
-        cristinApiClientVersionTwo = spy(cristinApiClientVersionTwo);
+        cristinOrgApiClient20230526 = spy(cristinOrgApiClient20230526);
         doReturn(Try.of(new HttpResponseFaker(EMPTY_ARRAY)))
             .when(cristinApiClientVersionOne).sendRequestMultipleTimes(any());
         doReturn(new HttpResponseFaker(EMPTY_ARRAY))
-            .when(cristinApiClientVersionTwo).fetchQueryResults(any());
+            .when(cristinOrgApiClient20230526).fetchQueryResults(any());
         doReturn(cristinApiClientVersionOne).when(clientProvider).getVersionOne();
-        doReturn(cristinApiClientVersionTwo).when(clientProvider).getVersionTwo();
+        doReturn(cristinOrgApiClient20230526).when(clientProvider).getVersion20230526();
 
         output = new ByteArrayOutputStream();
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
@@ -176,7 +176,7 @@ class QueryCristinOrganizationHandlerTest {
                                                                SearchResponse.class);
 
         verify(clientProvider, times(callsVersionOne)).getVersionOne();
-        verify(clientProvider, times(callsVersionTwo)).getVersionTwo();
+        verify(clientProvider, times(callsVersionTwo)).getVersion20230526();
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 
@@ -190,7 +190,7 @@ class QueryCristinOrganizationHandlerTest {
                                                                SearchResponse.class);
 
         verify(clientProvider, times(1)).getVersionOne();
-        verify(clientProvider, times(0)).getVersionTwo();
+        verify(clientProvider, times(0)).getVersion20230526();
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 

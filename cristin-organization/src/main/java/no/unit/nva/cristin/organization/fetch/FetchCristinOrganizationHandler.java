@@ -11,7 +11,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.regex.Pattern;
-import no.unit.nva.cristin.common.client.IClientProvider;
+import no.unit.nva.cristin.common.client.ClientProvider;
 import no.unit.nva.cristin.common.client.IFetchApiClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.model.Organization;
@@ -24,7 +24,7 @@ import nva.commons.core.JacocoGenerated;
 public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, Organization> {
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
-    private final transient IClientProvider<IFetchApiClient<Map<String, String>, Organization>> clientProvider;
+    private final transient ClientProvider<IFetchApiClient<Map<String, String>, Organization>> clientProvider;
 
     @JacocoGenerated
     @SuppressWarnings("unused")
@@ -36,7 +36,7 @@ public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, O
      * Fetch organization constructor with params.
      */
     public FetchCristinOrganizationHandler(
-        IClientProvider<IFetchApiClient<Map<String, String>, Organization>> clientProvider,
+        ClientProvider<IFetchApiClient<Map<String, String>, Organization>> clientProvider,
         Environment environment) {
 
         super(Void.class, environment);

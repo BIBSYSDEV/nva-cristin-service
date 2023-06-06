@@ -6,7 +6,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.HAS_PART;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LABELS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NEAREST_PART_OF;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PART_OF;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -20,7 +19,7 @@ import java.util.Set;
 import no.unit.nva.commons.json.JsonSerializable;
 
 @SuppressWarnings({"PMD.BeanMembersShouldSerialize", "PMD.LinguisticNaming"})
-@JsonPropertyOrder({CONTEXT, ID, TYPE, NAME, ACRONYM, NEAREST_PART_OF, PART_OF, HAS_PART})
+@JsonPropertyOrder({CONTEXT, ID, TYPE, NAME, ACRONYM, PART_OF, HAS_PART})
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Organization implements JsonSerializable {
 
@@ -37,8 +36,6 @@ public class Organization implements JsonSerializable {
     private final Map<String, String> labels;
     @JsonProperty(ACRONYM)
     private final String acronym;
-    @JsonProperty(NEAREST_PART_OF)
-    private final Organization nearestPartOf;
     @JsonProperty(PART_OF)
     private final Set<Organization> partOf;
     @JsonProperty(HAS_PART)
@@ -52,7 +49,6 @@ public class Organization implements JsonSerializable {
      * @param id            unique identifier for Organization
      * @param name          of Organization
      * @param acronym       shortname for Organization
-     * @param nearestPartOf nearest parent this is part of
      * @param partOf        Set of organizations this organization is part of
      * @param hasPart       sub organizations of this organization
      */
@@ -61,14 +57,12 @@ public class Organization implements JsonSerializable {
                         @JsonProperty(NAME) Map<String, String> name,
                         @JsonProperty(LABELS) Map<String, String> labels,
                         @JsonProperty(ACRONYM) String acronym,
-                        @JsonProperty(NEAREST_PART_OF) Organization nearestPartOf,
                         @JsonProperty(PART_OF) Set<Organization> partOf,
                         @JsonProperty(HAS_PART) Set<Organization> hasPart) {
         this.id = id;
         this.name = name;
         this.labels = labels;
         this.acronym = acronym;
-        this.nearestPartOf = nearestPartOf;
         this.partOf = partOf;
         this.hasPart = hasPart;
     }
@@ -78,7 +72,6 @@ public class Organization implements JsonSerializable {
         this.name = builder.name;
         this.labels = builder.labels;
         this.acronym = builder.acronym;
-        this.nearestPartOf = builder.nearestPartOf;
         this.partOf = builder.partOf;
         this.hasPart = builder.hasPart;
     }
@@ -148,7 +141,6 @@ public class Organization implements JsonSerializable {
         private Map<String, String> name;
         private Map<String, String> labels;
         private String acronym;
-        private Organization nearestPartOf;
         private Set<Organization> partOf;
         private Set<Organization> hasPart;
 
@@ -169,11 +161,6 @@ public class Organization implements JsonSerializable {
 
         public Builder withAcronym(String acronym) {
             this.acronym = acronym;
-            return this;
-        }
-
-        public Builder withNearestPartOf(Organization nearestPartOf) {
-            this.nearestPartOf = nearestPartOf;
             return this;
         }
 

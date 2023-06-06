@@ -3,8 +3,8 @@ package no.unit.nva.cristin.organization.common.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.common.client.QueryApiClient;
 import no.unit.nva.cristin.common.client.IFetchApiClient;
-import no.unit.nva.cristin.common.client.IQueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
@@ -55,7 +55,7 @@ import static nva.commons.core.attempt.Try.of;
 @SuppressWarnings("PMD.GodClass")
 public class CristinOrganizationApiClient
     extends ApiClient
-    implements IQueryApiClient<Map<String, String>, Organization>, IFetchApiClient<Map<String, String>, Organization> {
+    implements QueryApiClient<Map<String, String>, Organization>, IFetchApiClient<Map<String, String>, Organization> {
 
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
     public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";

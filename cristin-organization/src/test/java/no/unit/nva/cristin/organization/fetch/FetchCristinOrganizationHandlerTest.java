@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
-import no.unit.nva.cristin.organization.common.client.version20230526.CristinOrgApiClientVersion2;
+import no.unit.nva.cristin.organization.common.client.version20230526.CristinOrgApiClient20230526;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
@@ -72,7 +72,7 @@ class FetchCristinOrganizationHandlerTest {
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
-    private CristinOrgApiClientVersion2 apiClientVersion2;
+    private CristinOrgApiClient20230526 apiClientVersion2;
     private DefaultOrgFetchClientProvider clientProvider;
     private ByteArrayOutputStream output;
     private Context context;
@@ -85,14 +85,14 @@ class FetchCristinOrganizationHandlerTest {
         cristinApiClient = spy(cristinApiClient);
         doReturn(Try.of(new HttpResponseFaker(EMPTY_JSON)))
             .when(cristinApiClient).sendRequestMultipleTimes(any());
-        apiClientVersion2 = new CristinOrgApiClientVersion2(mockHttpClient);
+        apiClientVersion2 = new CristinOrgApiClient20230526(mockHttpClient);
         apiClientVersion2 = spy(apiClientVersion2);
         doReturn(new HttpResponseFaker(EMPTY_JSON))
             .when(apiClientVersion2).fetchGetResult(any());
         clientProvider = new DefaultOrgFetchClientProvider();
         clientProvider = spy(clientProvider);
         doReturn(cristinApiClient).when(clientProvider).getVersionOne();
-        doReturn(apiClientVersion2).when(clientProvider).getVersionTwo();
+        doReturn(apiClientVersion2).when(clientProvider).getVersion20230526();
         output = new ByteArrayOutputStream();
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
     }

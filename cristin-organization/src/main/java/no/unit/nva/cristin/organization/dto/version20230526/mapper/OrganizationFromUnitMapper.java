@@ -28,7 +28,6 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
                    .withName(unitDto.getUnitName())
                    .withLabels(unitDto.getUnitName())
                    .withAcronym(unitDto.getAcronym())
-                   //.withNearestPartOf(this.apply(unitDto.getParentUnit()))
                    .withHasPart(unitsToOrganizations(unitDto.getSubUnits())) // TODO: Build subunit tree here
                    .withPartOf(parentToSetOfOrganizations(unitDto.getParentUnit()))
                    .build();

@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.common.client.IFetchApiClient;
-import no.unit.nva.cristin.common.client.IQueryApiClient;
+import no.unit.nva.cristin.common.client.QueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.version20230526.mapper.OrganizationFromUnitMapper;
 import no.unit.nva.cristin.organization.dto.version20230526.UnitDto;
@@ -27,17 +27,17 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.paths.UriWrapper;
 
-public class CristinOrgApiClientVersion2 extends ApiClient
-    implements IQueryApiClient<Map<String, String>, Organization>,
+public class CristinOrgApiClient20230526 extends ApiClient
+    implements QueryApiClient<Map<String, String>, Organization>,
                IFetchApiClient<Map<String, String>, Organization> {
 
     public static final URI ORGANIZATION_ID_URI = getNvaApiUri(ORGANIZATION_PATH);
 
-    public CristinOrgApiClientVersion2() {
+    public CristinOrgApiClient20230526() {
         this(defaultHttpClient());
     }
 
-    public CristinOrgApiClientVersion2(HttpClient client) {
+    public CristinOrgApiClient20230526(HttpClient client) {
         super(client);
     }
 

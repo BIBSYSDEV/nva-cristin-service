@@ -1,8 +1,8 @@
 package no.unit.nva.cristin.organization.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import no.unit.nva.cristin.common.client.IClientProvider;
-import no.unit.nva.cristin.common.client.IQueryApiClient;
+import no.unit.nva.cristin.common.client.ClientProvider;
+import no.unit.nva.cristin.common.client.QueryApiClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.Organization;
@@ -30,7 +30,7 @@ import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
 
     private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH, VERSION);
-    private final transient IClientProvider<IQueryApiClient<Map<String, String>, Organization>> clientProvider;
+    private final transient ClientProvider<QueryApiClient<Map<String, String>, Organization>> clientProvider;
 
     @JacocoGenerated
     @SuppressWarnings("unused")
@@ -38,7 +38,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         this(new DefaultOrgQueryClientProvider(), new Environment());
     }
 
-    public QueryCristinOrganizationHandler(IClientProvider<IQueryApiClient<Map<String, String>, Organization>>
+    public QueryCristinOrganizationHandler(ClientProvider<QueryApiClient<Map<String, String>, Organization>>
                                                clientProvider, Environment environment) {
         super(Void.class, environment);
         this.clientProvider = clientProvider;
