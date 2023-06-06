@@ -72,7 +72,7 @@ class FetchCristinOrganizationHandlerTest {
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
-    private CristinOrgApiClient20230526 apiClientVersion2;
+    private CristinOrgApiClient20230526 apiClient20230526;
     private DefaultOrgFetchClientProvider clientProvider;
     private ByteArrayOutputStream output;
     private Context context;
@@ -85,14 +85,14 @@ class FetchCristinOrganizationHandlerTest {
         cristinApiClient = spy(cristinApiClient);
         doReturn(Try.of(new HttpResponseFaker(EMPTY_JSON)))
             .when(cristinApiClient).sendRequestMultipleTimes(any());
-        apiClientVersion2 = new CristinOrgApiClient20230526(mockHttpClient);
-        apiClientVersion2 = spy(apiClientVersion2);
+        apiClient20230526 = new CristinOrgApiClient20230526(mockHttpClient);
+        apiClient20230526 = spy(apiClient20230526);
         doReturn(new HttpResponseFaker(EMPTY_JSON))
-            .when(apiClientVersion2).fetchGetResult(any());
+            .when(apiClient20230526).fetchGetResult(any());
         clientProvider = new DefaultOrgFetchClientProvider();
         clientProvider = spy(clientProvider);
         doReturn(cristinApiClient).when(clientProvider).getVersionOne();
-        doReturn(apiClientVersion2).when(clientProvider).getVersion20230526();
+        doReturn(apiClient20230526).when(clientProvider).getVersion20230526();
         output = new ByteArrayOutputStream();
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
     }
@@ -228,7 +228,7 @@ class FetchCristinOrganizationHandlerTest {
     void shouldMapUpstreamJsonCorrectlyForVersionTwo() throws Exception {
         var resource = stringFromResources(CRISTIN_GET_RESPONSE_V2_JSON);
         var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
-        doReturn(fakeHttpResponse).when(apiClientVersion2).fetchGetResult(any());
+        doReturn(fakeHttpResponse).when(apiClient20230526).fetchGetResult(any());
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
         fetchCristinOrganizationHandler.handleRequest(requestUsingVersionTwo(), output, context);

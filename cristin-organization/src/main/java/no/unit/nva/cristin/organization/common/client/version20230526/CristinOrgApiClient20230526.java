@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.common.client.ApiClient;
-import no.unit.nva.cristin.common.client.IFetchApiClient;
+import no.unit.nva.cristin.common.client.FetchApiClient;
 import no.unit.nva.cristin.common.client.QueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.version20230526.mapper.OrganizationFromUnitMapper;
@@ -29,7 +29,7 @@ import nva.commons.core.paths.UriWrapper;
 
 public class CristinOrgApiClient20230526 extends ApiClient
     implements QueryApiClient<Map<String, String>, Organization>,
-               IFetchApiClient<Map<String, String>, Organization> {
+               FetchApiClient<Map<String, String>, Organization> {
 
     public static final URI ORGANIZATION_ID_URI = getNvaApiUri(ORGANIZATION_PATH);
 
