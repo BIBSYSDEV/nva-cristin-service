@@ -18,6 +18,8 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
         return Optional.ofNullable(unitDto)
                    .map(ParentTrailMapper::new)
                    .map(ParentTrailMapper::getWithParentTrail)
+                   .map(SubTreeMapper::new)
+                   .map(SubTreeMapper::getWithSubUnitTree)
                    .map(this::toOrganization)
                    .orElse(null);
     }
@@ -28,13 +30,13 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
                    .withName(unitDto.getUnitName())
                    .withLabels(unitDto.getUnitName())
                    .withAcronym(unitDto.getAcronym())
-                   .withHasPart(unitsToOrganizations(unitDto.getSubUnits())) // TODO: Build subunit tree here
+                   .withHasPart(unitsToOrganizations(unitDto.getSubUnits()))
                    .withPartOf(parentToSetOfOrganizations(unitDto.getParentUnit()))
                    .build();
     }
 
     private Set<Organization> unitsToOrganizations(List<UnitDto> unitDtos) {
-        return unitDtos.stream().map(this).collect(Collectors.toSet());
+        return unitDtos.stream().map(this::toOrganization).collect(Collectors.toSet());
     }
 
     private Set<Organization> parentToSetOfOrganizations(UnitDto parent) {

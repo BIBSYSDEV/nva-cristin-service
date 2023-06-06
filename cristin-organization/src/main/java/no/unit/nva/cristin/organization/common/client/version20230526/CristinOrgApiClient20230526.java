@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.organization.common.QueryParamConverter.translateToCristinApi;
@@ -65,7 +66,9 @@ public class CristinOrgApiClient20230526 extends ApiClient
     public Organization executeFetch(Map<String, String> params) throws ApiGatewayException {
         var fetchUri = getCristinUri(params.get(IDENTIFIER));
         var response = fetchGetResult(fetchUri);
-        var organization = getOrganization(response);
+        var fetchSubsUri = createCristinQueryUri(Map.of(PARENT_UNIT_ID, params.get(IDENTIFIER)), UNITS_PATH);
+        var responseWithSubs = fetchGetResult(fetchSubsUri);
+        var organization = getOrganization(response, responseWithSubs);
         organization.setContext(ORGANIZATION_CONTEXT);
 
         return organization;
@@ -78,8 +81,11 @@ public class CristinOrgApiClient20230526 extends ApiClient
                    .getUri();
     }
 
-    private Organization getOrganization(HttpResponse<String> response) throws BadGatewayException {
+    private Organization getOrganization(HttpResponse<String> response, HttpResponse<String> responseWithSubs)
+        throws BadGatewayException {
         var unit = getDeserializedResponse(response, UnitDto.class);
+        var subUnits = List.of(getDeserializedResponse(responseWithSubs, UnitDto[].class));
+        unit.setSubUnits(subUnits);
 
         return new OrganizationFromUnitMapper().apply(unit);
     }
