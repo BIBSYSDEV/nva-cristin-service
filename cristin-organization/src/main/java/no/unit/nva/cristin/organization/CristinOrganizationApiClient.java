@@ -3,6 +3,7 @@ package no.unit.nva.cristin.organization;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.common.client.QueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
@@ -29,18 +30,14 @@ import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.util.Objects.isNull;
 import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
-import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
-import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
-import static no.unit.nva.cristin.model.Constants.TOP;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.Constants.UNIT_ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
+import static no.unit.nva.cristin.organization.QueryParamConverter.translateToCristinApi;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
@@ -50,15 +47,13 @@ import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.attempt.Try.of;
 
 @SuppressWarnings("PMD.GodClass")
-public class CristinOrganizationApiClient extends ApiClient {
+public class CristinOrganizationApiClient extends ApiClient
+    implements QueryApiClient<Map<String, String>, Organization> {
 
-    public static final String CRISTIN_LEVELS_PARAM = "levels";
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
     public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
     public static final int SINGLE_HIT = 1;
     public static final String UNIQUELY_IDENTIFY_ORGANIZATION = "Identifier does not uniquely identify organization";
-    public static final String FIRST_LEVEL = "1";
-    public static final String ALL_SUB_LEVELS = "32";
     public static final int FIRST_AND_ONLY_UNIT = 0;
     private static final int NO_HITS = 0;
 
@@ -96,6 +91,11 @@ public class CristinOrganizationApiClient extends ApiClient {
         return isSuccessful(response.statusCode()) ? extractOrganization(identifier, response) : null;
     }
 
+    @Override
+    public SearchResponse<Organization> executeQuery(Map<String, String> params) throws ApiGatewayException {
+        return queryOrganizations(params);
+    }
+
     private Organization extractOrganization(String identifier, HttpResponse<String> response)
             throws ApiGatewayException {
         List<SubUnitDto> units = attempt(() ->
@@ -131,25 +131,13 @@ public class CristinOrganizationApiClient extends ApiClient {
      * @param requestQueryParams Map containing verified query parameters
      */
     public SearchResponse<Organization> queryOrganizations(Map<String, String> requestQueryParams)
-            throws NotFoundException, FailedHttpRequestException {
+        throws ApiGatewayException {
 
         URI queryUri = createCristinQueryUri(translateToCristinApi(requestQueryParams), UNITS_PATH);
         final long start = System.currentTimeMillis();
         SearchResponse<Organization> searchResponse = query(queryUri);
         final long totalProcessingTime = System.currentTimeMillis() - start;
         return updateSearchResponseMetadata(searchResponse, requestQueryParams, totalProcessingTime);
-    }
-
-    private Map<String, String> translateToCristinApi(Map<String, String> requestQueryParams) {
-        return Map.of(
-                CRISTIN_LEVELS_PARAM, toCristinLevel(requestQueryParams.get(DEPTH)),
-                CRISTIN_QUERY_NAME_PARAM, requestQueryParams.get(QUERY),
-                PAGE, requestQueryParams.get(PAGE),
-                CRISTIN_PER_PAGE_PARAM, requestQueryParams.get(NUMBER_OF_RESULTS));
-    }
-
-    private String toCristinLevel(String depth) {
-        return TOP.equals(depth) || isNull(depth) ? FIRST_LEVEL : ALL_SUB_LEVELS;
     }
 
     private SearchResponse<Organization> updateSearchResponseMetadata(
@@ -309,4 +297,5 @@ public class CristinOrganizationApiClient extends ApiClient {
     private String errorMessage(HttpResponse<String> response) {
         return String.format(ERROR_MESSAGE_FORMAT, response.statusCode(), response.body());
     }
+
 }

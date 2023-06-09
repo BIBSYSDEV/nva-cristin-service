@@ -89,3 +89,15 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 200
     And match response.name.en == '#present'
     And match response.name.nb == '#present'
+
+  Scenario: GET organization using version 2023-05-26 returns results
+    Given path '/organization'
+    And header Accept = 'application/json; version=2023-05-26'
+    And param query = testOrganizationNameSearchTerm
+    And param results = '2'
+    And param page = '4'
+    When method GET
+    Then status 200
+    And match response.hits == '#array'
+    And match response.size == '#number'
+    And match response.hits == '#[2]' // hits array length == 0

@@ -1,0 +1,103 @@
+{
+  "cristin_unit_id" : "185.15.0.10",
+  "unit_name" : {
+    "en" : "Fakultetsadministrasjonen"
+  },
+  "institution" : {
+    "cristin_institution_id" : "185",
+    "url" : "https://api.cristin-test.uio.no/v2/institutions/185"
+  },
+  "parent_unit" : {
+    "cristin_unit_id" : "185.15.0.0",
+    "unit_name" : {
+      "en" : "Faculty of Mathematics and Natural Sciences"
+    },
+    "parent_unit" : {
+      "cristin_unit_id" : "185.90.0.0"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.0"
+  },
+  "parent_units" : [ {
+    "cristin_unit_id" : "185.90.0.0",
+    "unit_name" : {
+      "en" : "University of Oslo"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.90.0.0"
+  }, {
+    "cristin_unit_id" : "185.15.0.0",
+    "unit_name" : {
+      "en" : "Faculty of Mathematics and Natural Sciences"
+    },
+    "parent_unit" : {
+      "cristin_unit_id" : "185.90.0.0"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.0"
+  } ],
+  "subunits" : [ {
+    "cristin_unit_id" : "185.15.0.11",
+    "unit_name" : {
+      "en" : "Fakultetsledelsen"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.11"
+  }, {
+    "cristin_unit_id" : "185.15.0.12",
+    "unit_name" : {
+      "en" : "Fakultetssekretariatet fellestiltak"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.12"
+  }, {
+    "cristin_unit_id" : "185.15.0.13",
+    "unit_name" : {
+      "en" : "Leksehjelp"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.13"
+  }, {
+    "cristin_unit_id" : "185.15.0.15",
+    "unit_name" : {
+      "en" : "Studies Section"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.15"
+  }, {
+    "cristin_unit_id" : "185.15.0.16",
+    "unit_name" : {
+      "en" : "Communication and HR Section"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.16"
+  }, {
+    "cristin_unit_id" : "185.15.0.19",
+    "unit_name" : {
+      "en" : "Section for Research"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.19"
+  }, {
+    "cristin_unit_id" : "185.15.0.21",
+    "unit_name" : {
+      "en" : "Finance Section"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.21"
+  }, {
+    "cristin_unit_id" : "185.15.0.25",
+    "unit_name" : {
+      "en" : "IT-section"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.25"
+  }, {
+    "cristin_unit_id" : "185.15.0.31",
+    "unit_name" : {
+      "en" : "Forskningsadministrasjon"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.31"
+  }, {
+    "cristin_unit_id" : "185.15.0.32",
+    "unit_name" : {
+      "en" : "Studieadministrasjon"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.32"
+  }, {
+    "cristin_unit_id" : "185.15.0.36",
+    "unit_name" : {
+      "en" : "Økonomigruppen"
+    },
+    "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.36"
+  } ]
+}

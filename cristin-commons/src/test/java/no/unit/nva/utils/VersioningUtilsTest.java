@@ -11,6 +11,7 @@ class VersioningUtilsTest {
     public static final String ACCEPT_HEADER_VALUE_WITH_QUOTES = "application/json; version=\"2023-05-10\"";
     public static final String ACCEPT_HEADER_VALUE_WITHOUT_VERSION = "application/json";
     public static final String VERSION_VALUE = "2023-05-10";
+    public static final String INVALID_HEADER_VALUE = "someHeaderValue";
 
     @Test
     void shouldExtractVersionFromHeader() {
@@ -31,6 +32,13 @@ class VersioningUtilsTest {
         var actual = extractVersion(ACCEPT_HEADER_VALUE_WITH_QUOTES);
 
         assertThat(actual, equalTo(VERSION_VALUE));
+    }
+
+    @Test
+    void shouldReturnNullWhenHeaderIsIncorrectlyFormatted() {
+        var actual = extractVersion(INVALID_HEADER_VALUE);
+
+        assertThat(actual, equalTo(null));
     }
 
 }

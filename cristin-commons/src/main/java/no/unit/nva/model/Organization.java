@@ -45,11 +45,12 @@ public class Organization implements JsonSerializable {
 
     /**
      * Construct an Organization from parameters.
-     * @param id unique identifier for Organization
-     * @param name of Organization
-     * @param acronym shortname for Organization
-     * @param partOf Set of organizations this organization is part of
-     * @param hasPart sub organizations of this organization
+     *
+     * @param id            unique identifier for Organization
+     * @param name          of Organization
+     * @param acronym       shortname for Organization
+     * @param partOf        Set of organizations this organization is part of
+     * @param hasPart       sub organizations of this organization
      */
     @JsonCreator
     public Organization(@JsonProperty(ID) URI id,
