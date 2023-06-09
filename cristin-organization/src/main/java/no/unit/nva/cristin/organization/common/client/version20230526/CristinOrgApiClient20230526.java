@@ -3,9 +3,12 @@ package no.unit.nva.cristin.organization.common.client.version20230526;
 import static java.util.Arrays.asList;
 import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
+import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
+import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.organization.common.QueryParamConverter.translateToCristinApi;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
@@ -33,6 +36,7 @@ public class CristinOrgApiClient20230526 extends ApiClient
                FetchApiClient<Map<String, String>, Organization> {
 
     public static final URI ORGANIZATION_ID_URI = getNvaApiUri(ORGANIZATION_PATH);
+    public static final String ALL_RESULTS = "2000";
 
     public CristinOrgApiClient20230526() {
         this(defaultHttpClient());
@@ -43,7 +47,7 @@ public class CristinOrgApiClient20230526 extends ApiClient
     }
 
     /**
-     * Fetch Organizations matching given query criteria using version 2 code.
+     * Query organizations matching given query criteria.
      *
      * @param params Map containing verified query parameters
      */
@@ -62,16 +66,34 @@ public class CristinOrgApiClient20230526 extends ApiClient
                    .withProcessingTime(totalProcessingTime);
     }
 
+    /**
+     * Fetch one organization matching given query criteria.
+     *
+     * @param params Map containing verified query parameters depth and identifier
+     */
     @Override
     public Organization executeFetch(Map<String, String> params) throws ApiGatewayException {
-        var fetchUri = getCristinUri(params.get(IDENTIFIER));
+        var identifier = params.get(IDENTIFIER);
+        var fetchUri = getCristinUri(identifier);
         var response = fetchGetResult(fetchUri);
-        var fetchSubsUri = createCristinQueryUri(Map.of(PARENT_UNIT_ID, params.get(IDENTIFIER)), UNITS_PATH);
-        var responseWithSubs = fetchGetResult(fetchSubsUri);
-        var organization = getOrganization(response, responseWithSubs);
-        organization.setContext(ORGANIZATION_CONTEXT);
+        if (wantsDepth(params)) {
+            var fetchSubsUri = createCristinQueryUri(translateParamsForSubUnits(identifier), UNITS_PATH);
+            var responseWithSubs = fetchGetResult(fetchSubsUri);
+            var organization = getOrganization(response, responseWithSubs);
+            organization.setContext(ORGANIZATION_CONTEXT);
 
-        return organization;
+            return organization;
+        } else {
+            var organization = getSingleLevelOrganization(response);
+            organization.setContext(ORGANIZATION_CONTEXT);
+
+            return organization;
+        }
+    }
+
+    private boolean wantsDepth(Map<String, String> params) {
+        var depth = params.get(DEPTH);
+        return !NONE.equals(depth);
     }
 
     private URI getCristinUri(String identifier) {
@@ -79,6 +101,16 @@ public class CristinOrgApiClient20230526 extends ApiClient
                    .addChild(UNITS_PATH)
                    .addChild(identifier)
                    .getUri();
+    }
+
+    private Map<String, String> translateParamsForSubUnits(String identifier) {
+        return Map.of(PARENT_UNIT_ID, identifier, CRISTIN_PER_PAGE_PARAM, ALL_RESULTS);
+    }
+
+    private Organization getSingleLevelOrganization(HttpResponse<String> response) throws BadGatewayException {
+        var unit = getDeserializedResponse(response, UnitDto.class);
+
+        return new OrganizationFromUnitMapper().apply(unit);
     }
 
     private Organization getOrganization(HttpResponse<String> response, HttpResponse<String> responseWithSubs)

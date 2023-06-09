@@ -235,7 +235,7 @@ class FetchCristinOrganizationHandlerTest {
         var subsResource = stringFromResources(CRISTIN_GET_RESPONSE_V2_WITH_SUBS_JSON);
         var fakeSubsHttpResponse = new HttpResponseFaker(subsResource, HTTP_OK);
         doReturn(fakeSubsHttpResponse).when(apiClient20230526)
-            .fetchGetResult(URI.create("https://api.cristin-test.uio.no/v2/units?parent_unit_id=1.2.3.4"));
+            .fetchGetResult(URI.create("https://api.cristin-test.uio.no/v2/units?parent_unit_id=1.2.3.4&per_page=2000"));
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
         fetchCristinOrganizationHandler.handleRequest(requestUsingVersionTwo(), output, context);
