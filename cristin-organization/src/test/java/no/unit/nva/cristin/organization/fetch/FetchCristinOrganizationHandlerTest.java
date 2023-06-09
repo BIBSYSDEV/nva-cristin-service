@@ -34,6 +34,7 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static java.util.Collections.emptyMap;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
@@ -55,6 +56,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class FetchCristinOrganizationHandlerTest {
 
@@ -70,6 +73,7 @@ class FetchCristinOrganizationHandlerTest {
     public static final String SOME_IDENTIFIER = "1.2.3.4";
     public static final String CRISTIN_GET_RESPONSE_V2_JSON = "cristinGetResponseV2.json";
     public static final String CRISTIN_GET_RESPONSE_V2_WITH_SUBS_JSON = "cristinGetResponseV2WithSubUnits.json";
+    public static final Map<String, String> QUERY_PARAM_NO_DEPTH = Map.of(DEPTH, NONE);
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
@@ -238,7 +242,7 @@ class FetchCristinOrganizationHandlerTest {
             .fetchGetResult(URI.create("https://api.cristin-test.uio.no/v2/units?parent_unit_id=1.2.3.4&per_page=2000"));
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
-        fetchCristinOrganizationHandler.handleRequest(requestUsingVersionTwo(), output, context);
+        fetchCristinOrganizationHandler.handleRequest(requestUsingV20230526(emptyMap()), output, context);
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
         var responseBody = gatewayResponse.getBodyObject(Organization.class);
@@ -248,6 +252,22 @@ class FetchCristinOrganizationHandlerTest {
         System.out.println(pretty);
 
         assertThat(responseBody, equalTo(""));
+    }
+
+    @Test
+    void shouldNotCallUpstreamOneMoreTimeForFetchingSubunitsWhenSendingParamDepthWithValueNone() throws Exception {
+        var resource = stringFromResources(CRISTIN_GET_RESPONSE_V2_JSON);
+        var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
+        doReturn(fakeHttpResponse).when(apiClient20230526)
+            .fetchGetResult(URI.create("https://api.cristin-test.uio.no/v2/units/1.2.3.4"));
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
+        fetchCristinOrganizationHandler.handleRequest(requestUsingV20230526(QUERY_PARAM_NO_DEPTH), output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
+
+        verify(apiClient20230526, times(1)).fetchGetResult(any());
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 
     private Object getSubSubUnit(String subUnitFile) {
@@ -296,13 +316,15 @@ class FetchCristinOrganizationHandlerTest {
         return restApiMapper.readValue(output.toString(), responseWithProblemType);
     }
 
-    private InputStream requestUsingVersionTwo() throws JsonProcessingException {
+    private InputStream requestUsingV20230526(Map<String, String> queryParameters) throws JsonProcessingException {
         var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type(),
                              ACCEPT_HEADER_KEY_NAME, String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26));
         var pathParameters = Map.of(IDENTIFIER, SOME_IDENTIFIER);
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                    .withHeaders(headers)
                    .withPathParameters(pathParameters)
+                   .withQueryParameters(queryParameters)
                    .build();
     }
+
 }
