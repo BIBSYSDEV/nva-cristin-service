@@ -2,7 +2,9 @@ package no.unit.nva.cristin.organization.fetch;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
 import no.unit.nva.cristin.organization.common.client.v20230526.CristinOrgApiClient20230526;
@@ -17,8 +19,10 @@ import nva.commons.core.Environment;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -35,6 +39,7 @@ import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
@@ -74,6 +79,8 @@ class FetchCristinOrganizationHandlerTest {
     public static final String CRISTIN_GET_RESPONSE_JSON = "cristinGetResponse.json";
     public static final String CRISTIN_GET_RESPONSE_SUB_UNITS_JSON = "cristinGetResponseSubUnits.json";
     public static final Map<String, String> QUERY_PARAM_NO_DEPTH = Map.of(DEPTH, NONE);
+    public static final String NVA_GET_RESPONSE_20230526_JSON = "nvaGetResponse20230526.json";
+    public static final String NVA_GET_RESPONSE_WITH_SUB_UNITS_20230526_JSON = "nvaGetResponseWithSubUnits20230526" + ".json";
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
@@ -229,37 +236,10 @@ class FetchCristinOrganizationHandlerTest {
     }
 
     @Test
-    @Disabled
-    void shouldMapUpstreamJsonCorrectlyForVersionTwo() throws Exception {
-        var resource = stringFromResources(CRISTIN_GET_RESPONSE_JSON);
-        var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
-        doReturn(fakeHttpResponse).when(apiClient20230526)
-            .fetchGetResult(URI.create("https://api.cristin-test.uio.no/v2/units/1.2.3.4"));
-
-        var subsResource = stringFromResources(CRISTIN_GET_RESPONSE_SUB_UNITS_JSON);
-        var fakeSubsHttpResponse = new HttpResponseFaker(subsResource, HTTP_OK);
-        doReturn(fakeSubsHttpResponse).when(apiClient20230526)
-            .fetchGetResult(URI.create("https://api.cristin-test.uio.no/v2/units?parent_unit_id=1.2.3.4&per_page=2000"));
-
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
-        fetchCristinOrganizationHandler.handleRequest(requestUsingV20230526(emptyMap()), output, context);
-
-        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
-        var responseBody = gatewayResponse.getBodyObject(Organization.class);
-
-        var pretty = OBJECT_MAPPER.readTree(responseBody.toString()).toPrettyString();
-
-        System.out.println(pretty);
-
-        assertThat(responseBody, equalTo(""));
-    }
-
-    @Test
     void shouldNotCallUpstreamOneMoreTimeForFetchingSubunitsWhenSendingParamDepthWithValueNone() throws Exception {
         var resource = stringFromResources(CRISTIN_GET_RESPONSE_JSON);
         var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
-        doReturn(fakeHttpResponse).when(apiClient20230526)
-            .fetchGetResult(URI.create("https://api.cristin-test.uio.no/v2/units/1.2.3.4"));
+        doReturn(fakeHttpResponse).when(apiClient20230526).fetchGetResult(any());
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
         fetchCristinOrganizationHandler.handleRequest(requestUsingV20230526(QUERY_PARAM_NO_DEPTH), output, context);
@@ -268,6 +248,34 @@ class FetchCristinOrganizationHandlerTest {
 
         verify(apiClient20230526, times(1)).fetchGetResult(any());
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    @ParameterizedTest(name = "Requesting payload using version 20230526 with depth value {0} should return "
+                              + "correct payload")
+    @MethodSource("depthAndCorrespondingPayloadArgumentProvider")
+    void shouldReturnCorrectPayloadBasedOnQueryParamDepthWhenRequestingVersion20230526(String depth,
+                                                                                       String cristinPayload,
+                                                                                       String cristinSubsPayload,
+                                                                                       String nvaPayload)
+        throws Exception {
+
+        doReturn(new HttpResponseFaker(cristinPayload)).doReturn(new HttpResponseFaker(cristinSubsPayload))
+            .when(apiClient20230526).fetchGetResult(any());
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
+        Map<String, String> queryParams = nonNull(depth) ? Map.of(DEPTH, depth) : emptyMap();
+        var input = requestUsingV20230526(queryParams);
+        fetchCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
+        var responseBody = gatewayResponse.getBodyObject(Organization.class);
+
+        var expected = OBJECT_MAPPER.readValue(nvaPayload, Organization.class);
+
+        assertThat(readOrganizationAsTree(responseBody), equalTo(readOrganizationAsTree(expected)));
+    }
+
+    private JsonNode readOrganizationAsTree(Organization org) throws JsonProcessingException {
+        return OBJECT_MAPPER.readTree(org.toString());
     }
 
     private Object getSubSubUnit(String subUnitFile) {
@@ -327,4 +335,24 @@ class FetchCristinOrganizationHandlerTest {
                    .build();
     }
 
+    public static Stream<Arguments> depthAndCorrespondingPayloadArgumentProvider() {
+        return Stream.of(
+            Arguments.of(
+                NONE,
+                getFromResources(CRISTIN_GET_RESPONSE_JSON),
+                null,
+                getFromResources(NVA_GET_RESPONSE_20230526_JSON)
+            ),
+            Arguments.of(
+                null,
+                getFromResources(CRISTIN_GET_RESPONSE_JSON),
+                getFromResources(CRISTIN_GET_RESPONSE_SUB_UNITS_JSON),
+                getFromResources(NVA_GET_RESPONSE_WITH_SUB_UNITS_20230526_JSON)
+            )
+        );
+    }
+
+    private static String getFromResources(String filename) {
+        return IoUtils.stringFromResources(Path.of(filename));
+    }
 }
