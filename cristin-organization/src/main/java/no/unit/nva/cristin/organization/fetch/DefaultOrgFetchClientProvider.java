@@ -7,7 +7,7 @@ import java.util.Map;
 import no.unit.nva.cristin.common.client.ClientProvider;
 import no.unit.nva.cristin.common.client.FetchApiClient;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
-import no.unit.nva.cristin.organization.common.client.v20230526.CristinOrgApiClient20230526;
+import no.unit.nva.cristin.organization.common.client.v20230526.FetchCristinOrgClient20230526;
 import no.unit.nva.model.Organization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +32,6 @@ public class DefaultOrgFetchClientProvider
     }
 
     protected FetchApiClient<Map<String, String>, Organization> getVersion20230526() {
-        return new CristinOrgApiClient20230526();
+        return new FetchCristinOrgClient20230526();
     }
 }

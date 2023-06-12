@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
-import no.unit.nva.cristin.organization.common.client.v20230526.CristinOrgApiClient20230526;
+import no.unit.nva.cristin.organization.common.client.v20230526.FetchCristinOrgClient20230526;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
@@ -84,7 +84,7 @@ class FetchCristinOrganizationHandlerTest {
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
-    private CristinOrgApiClient20230526 apiClient20230526;
+    private FetchCristinOrgClient20230526 fetchOrgClient20230526;
     private DefaultOrgFetchClientProvider clientProvider;
     private ByteArrayOutputStream output;
     private Context context;
@@ -97,14 +97,14 @@ class FetchCristinOrganizationHandlerTest {
         cristinApiClient = spy(cristinApiClient);
         doReturn(Try.of(new HttpResponseFaker(EMPTY_JSON)))
             .when(cristinApiClient).sendRequestMultipleTimes(any());
-        apiClient20230526 = new CristinOrgApiClient20230526(mockHttpClient);
-        apiClient20230526 = spy(apiClient20230526);
+        fetchOrgClient20230526 = new FetchCristinOrgClient20230526(mockHttpClient);
+        fetchOrgClient20230526 = spy(fetchOrgClient20230526);
         doReturn(new HttpResponseFaker(EMPTY_JSON))
-            .when(apiClient20230526).fetchGetResult(any());
+            .when(fetchOrgClient20230526).fetchGetResult(any());
         clientProvider = new DefaultOrgFetchClientProvider();
         clientProvider = spy(clientProvider);
         doReturn(cristinApiClient).when(clientProvider).getVersionOne();
-        doReturn(apiClient20230526).when(clientProvider).getVersion20230526();
+        doReturn(fetchOrgClient20230526).when(clientProvider).getVersion20230526();
         output = new ByteArrayOutputStream();
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
     }
@@ -239,14 +239,14 @@ class FetchCristinOrganizationHandlerTest {
     void shouldNotCallUpstreamOneMoreTimeForFetchingSubunitsWhenSendingParamDepthWithValueNone() throws Exception {
         var resource = stringFromResources(CRISTIN_GET_RESPONSE_JSON);
         var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
-        doReturn(fakeHttpResponse).when(apiClient20230526).fetchGetResult(any());
+        doReturn(fakeHttpResponse).when(fetchOrgClient20230526).fetchGetResult(any());
 
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
         fetchCristinOrganizationHandler.handleRequest(requestUsingV20230526(QUERY_PARAM_NO_DEPTH), output, context);
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
 
-        verify(apiClient20230526, times(1)).fetchGetResult(any());
+        verify(fetchOrgClient20230526, times(1)).fetchGetResult(any());
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 
@@ -260,7 +260,7 @@ class FetchCristinOrganizationHandlerTest {
         throws Exception {
 
         doReturn(new HttpResponseFaker(cristinPayload)).doReturn(new HttpResponseFaker(cristinSubsPayload))
-            .when(apiClient20230526).fetchGetResult(any());
+            .when(fetchOrgClient20230526).fetchGetResult(any());
         fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
         Map<String, String> queryParams = nonNull(depth) ? Map.of(DEPTH, depth) : emptyMap();
         var input = requestUsingV20230526(queryParams);
