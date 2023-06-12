@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
-import no.unit.nva.cristin.organization.common.client.version20230526.CristinOrgApiClient20230526;
+import no.unit.nva.cristin.organization.common.client.v20230526.CristinOrgApiClient20230526;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -70,7 +70,7 @@ class QueryCristinOrganizationHandlerTest {
     public static final String EMPTY_ARRAY = "[]";
     public static final String ACCEPT_HEADER_EXAMPLE = "application/json; version=%s";
     public static final String NVA_QUERY_RESPONSE_20230526_JSON = "nvaQueryResponse20230526.json";
-    public static final String CRISTIN_QUERY_RESPONSE_V_2_JSON = "cristinQueryResponseV2.json";
+    public static final String CRISTIN_QUERY_RESPONSE_V_2_JSON = "cristinQueryResponse.json";
     private QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private DefaultOrgQueryClientProvider clientProvider;
     private ByteArrayOutputStream output;

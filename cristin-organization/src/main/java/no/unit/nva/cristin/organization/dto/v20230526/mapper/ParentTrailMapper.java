@@ -1,9 +1,9 @@
-package no.unit.nva.cristin.organization.dto.version20230526.mapper;
+package no.unit.nva.cristin.organization.dto.v20230526.mapper;
 
 import static java.util.Objects.nonNull;
 import java.util.ArrayList;
 import java.util.List;
-import no.unit.nva.cristin.organization.dto.version20230526.UnitDto;
+import no.unit.nva.cristin.organization.dto.v20230526.UnitDto;
 
 public class ParentTrailMapper {
 

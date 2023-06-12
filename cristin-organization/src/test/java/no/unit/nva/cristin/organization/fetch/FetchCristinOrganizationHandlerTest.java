@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
-import no.unit.nva.cristin.organization.common.client.version20230526.CristinOrgApiClient20230526;
+import no.unit.nva.cristin.organization.common.client.v20230526.CristinOrgApiClient20230526;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
@@ -71,8 +71,8 @@ class FetchCristinOrganizationHandlerTest {
     public static final String EMPTY_JSON = "{}";
     public static final String ACCEPT_HEADER_EXAMPLE = "application/json; version=%s";
     public static final String SOME_IDENTIFIER = "1.2.3.4";
-    public static final String CRISTIN_GET_RESPONSE_V2_JSON = "cristinGetResponseV2.json";
-    public static final String CRISTIN_GET_RESPONSE_V2_WITH_SUBS_JSON = "cristinGetResponseV2WithSubUnits.json";
+    public static final String CRISTIN_GET_RESPONSE_JSON = "cristinGetResponse.json";
+    public static final String CRISTIN_GET_RESPONSE_SUB_UNITS_JSON = "cristinGetResponseSubUnits.json";
     public static final Map<String, String> QUERY_PARAM_NO_DEPTH = Map.of(DEPTH, NONE);
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
@@ -231,12 +231,12 @@ class FetchCristinOrganizationHandlerTest {
     @Test
     @Disabled
     void shouldMapUpstreamJsonCorrectlyForVersionTwo() throws Exception {
-        var resource = stringFromResources(CRISTIN_GET_RESPONSE_V2_JSON);
+        var resource = stringFromResources(CRISTIN_GET_RESPONSE_JSON);
         var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
         doReturn(fakeHttpResponse).when(apiClient20230526)
             .fetchGetResult(URI.create("https://api.cristin-test.uio.no/v2/units/1.2.3.4"));
 
-        var subsResource = stringFromResources(CRISTIN_GET_RESPONSE_V2_WITH_SUBS_JSON);
+        var subsResource = stringFromResources(CRISTIN_GET_RESPONSE_SUB_UNITS_JSON);
         var fakeSubsHttpResponse = new HttpResponseFaker(subsResource, HTTP_OK);
         doReturn(fakeSubsHttpResponse).when(apiClient20230526)
             .fetchGetResult(URI.create("https://api.cristin-test.uio.no/v2/units?parent_unit_id=1.2.3.4&per_page=2000"));
@@ -256,7 +256,7 @@ class FetchCristinOrganizationHandlerTest {
 
     @Test
     void shouldNotCallUpstreamOneMoreTimeForFetchingSubunitsWhenSendingParamDepthWithValueNone() throws Exception {
-        var resource = stringFromResources(CRISTIN_GET_RESPONSE_V2_JSON);
+        var resource = stringFromResources(CRISTIN_GET_RESPONSE_JSON);
         var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
         doReturn(fakeHttpResponse).when(apiClient20230526)
             .fetchGetResult(URI.create("https://api.cristin-test.uio.no/v2/units/1.2.3.4"));

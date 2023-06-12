@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.organization.dto.version20230526;
+package no.unit.nva.cristin.organization.dto.v20230526;
 
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import com.fasterxml.jackson.annotation.JsonCreator;

@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.organization.common.client.version20230526;
+package no.unit.nva.cristin.organization.common.client.v20230526;
 
 import static java.util.Arrays.asList;
 import static no.unit.nva.HttpClientProvider.defaultHttpClient;
@@ -24,8 +24,8 @@ import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.common.client.FetchApiClient;
 import no.unit.nva.cristin.common.client.QueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.organization.dto.version20230526.mapper.OrganizationFromUnitMapper;
-import no.unit.nva.cristin.organization.dto.version20230526.UnitDto;
+import no.unit.nva.cristin.organization.dto.v20230526.mapper.OrganizationFromUnitMapper;
+import no.unit.nva.cristin.organization.dto.v20230526.UnitDto;
 import no.unit.nva.model.Organization;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
