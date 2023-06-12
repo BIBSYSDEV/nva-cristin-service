@@ -2,8 +2,11 @@ package no.unit.nva.cristin.organization.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
+import java.util.List;
 import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
@@ -66,6 +69,8 @@ class QueryCristinOrganizationHandlerTest {
     private static final String CRISTIN_QUERY_RESPONSE = "cristin_query_response_sample.json";
     public static final String EMPTY_ARRAY = "[]";
     public static final String ACCEPT_HEADER_EXAMPLE = "application/json; version=%s";
+    public static final String NVA_QUERY_RESPONSE_20230526_JSON = "nvaQueryResponse20230526.json";
+    public static final String CRISTIN_QUERY_RESPONSE_V_2_JSON = "cristinQueryResponseV2.json";
     private QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private DefaultOrgQueryClientProvider clientProvider;
     private ByteArrayOutputStream output;
@@ -192,6 +197,40 @@ class QueryCristinOrganizationHandlerTest {
         verify(clientProvider, times(1)).getVersionOne();
         verify(clientProvider, times(0)).getVersion20230526();
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    @Test
+    void shouldReturnCorrectPayloadWhenRequestingVersion20230526() throws Exception {
+        var fakeQueryResponseResource = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_V_2_JSON));
+        doReturn(new HttpResponseFaker(fakeQueryResponseResource))
+            .when(cristinOrgApiClient20230526).fetchQueryResults(any());
+
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
+        var input =
+            generateValidHandlerRequestWithVersionParam(String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26));
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                                                               SearchResponse.class);
+        var responseBody = gatewayResponse.getBodyObject(SearchResponse.class);
+
+        var expectedSerialized = IoUtils.stringFromResources(Path.of(NVA_QUERY_RESPONSE_20230526_JSON));
+        var expected = OBJECT_MAPPER.readValue(expectedSerialized, SearchResponse.class);
+
+        var actualHits = convertHitsToProperFormat(responseBody);
+        var expectedHits = convertHitsToProperFormat(expected);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+        assertThat(actualHits.size(), equalTo(2));
+        assertThat(readHitsAsTree(actualHits), equalTo(readHitsAsTree(expectedHits)));
+    }
+
+    private List<Organization> convertHitsToProperFormat(SearchResponse searchResponse) {
+        return OBJECT_MAPPER.convertValue(searchResponse.getHits(), new TypeReference<>() {});
+    }
+
+    private JsonNode readHitsAsTree(List<Organization> hits) throws JsonProcessingException {
+        return OBJECT_MAPPER.readTree(hits.toString());
     }
 
     private InputStream generateValidHandlerRequestWithVersionParam(String versionParam)

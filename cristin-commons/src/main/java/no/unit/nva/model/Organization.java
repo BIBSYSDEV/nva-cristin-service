@@ -11,7 +11,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
@@ -19,13 +18,14 @@ import java.util.Set;
 import no.unit.nva.commons.json.JsonSerializable;
 
 @SuppressWarnings({"PMD.BeanMembersShouldSerialize", "PMD.LinguisticNaming"})
-@JsonPropertyOrder({CONTEXT, ID, TYPE, NAME, ACRONYM, PART_OF, HAS_PART})
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonPropertyOrder({CONTEXT, TYPE, ID, TYPE, NAME, ACRONYM, PART_OF, HAS_PART})
 public class Organization implements JsonSerializable {
 
     public static final String ORGANIZATION_IDENTIFIER_PATTERN = "^(?:[0-9]+\\.){3}[0-9]{1,3}$";
     public static final String ORGANIZATION_CONTEXT = "https://bibsysdev.github.io/src/organization-context.json";
 
+    @JsonProperty(TYPE)
+    private static final String type = "Organization";
     @JsonProperty(ID)
     private final URI id;
     @JsonPropertyOrder(alphabetic = true)
@@ -106,6 +106,10 @@ public class Organization implements JsonSerializable {
 
     public Set<Organization> getHasPart() {
         return hasPart;
+    }
+
+    public String getType() {
+        return type;
     }
 
     @Override
