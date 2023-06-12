@@ -101,3 +101,22 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.hits == '#array'
     And match response.size == '#number'
     And match response.hits == '#[2]' // hits array length == 0
+
+  Scenario: GET organization for known organization using version 2023-05-26 with depth param value none returns data without depth
+    Given path '/organization/' + existingOrganizationIdentifier
+    And header Accept = 'application/json; version=2023-05-26'
+    And param depth = 'none'
+    When method GET
+    Then status 200
+    And match response.name.en == '#present'
+    And match response.name.nb == '#present'
+    And match response.hasPart == '#[0]'
+
+  Scenario: GET organization for known organization using version 2023-05-26 without depth param returns data with depth
+    Given path '/organization/' + existingOrganizationIdentifier
+    And header Accept = 'application/json; version=2023-05-26'
+    When method GET
+    Then status 200
+    And match response.name.en == '#present'
+    And match response.name.nb == '#present'
+    And match response.hasPart != '#[0]'
