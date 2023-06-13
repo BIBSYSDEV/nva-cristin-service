@@ -2,7 +2,6 @@ package no.unit.nva.cristin.organization.dto.v20230526.mapper;
 
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -40,9 +39,10 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
     }
 
     private Set<Organization> parentToSetOfOrganizations(UnitDto parent) {
-        var set = new HashSet<Organization>();
-        set.add(this.apply(parent));
-        return set;
+        return Optional.ofNullable(parent)
+                   .map(this)
+                   .stream()
+                   .collect(Collectors.toSet());
     }
 
 }

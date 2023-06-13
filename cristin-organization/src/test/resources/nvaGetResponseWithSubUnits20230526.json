@@ -19,9 +19,7 @@
           "name": {
             "en": "University of Oslo"
           },
-          "partOf": [
-            null
-          ],
+          "partOf": [],
           "labels": {
             "en": "University of Oslo"
           }
@@ -35,66 +33,6 @@
   "hasPart": [
     {
       "type": "Organization",
-      "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.13",
-      "name": {
-        "en": "Leksehjelp"
-      },
-      "acronym": "MN-LEKSEHJ",
-      "partOf": [
-        {
-          "type": "Organization",
-          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": [
-            null
-          ]
-        }
-      ],
-      "labels": {
-        "en": "Leksehjelp"
-      }
-    },
-    {
-      "type": "Organization",
-      "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.12",
-      "name": {
-        "en": "Fakultetssekretariatet fellestiltak"
-      },
-      "acronym": "MN-FELLES",
-      "partOf": [
-        {
-          "type": "Organization",
-          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": [
-            null
-          ]
-        }
-      ],
-      "labels": {
-        "en": "Fakultetssekretariatet fellestiltak"
-      }
-    },
-    {
-      "type": "Organization",
-      "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.15",
-      "name": {
-        "en": "Studies Section"
-      },
-      "acronym": "MN-STUDIE",
-      "partOf": [
-        {
-          "type": "Organization",
-          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": [
-            null
-          ]
-        }
-      ],
-      "labels": {
-        "en": "Studies Section"
-      }
-    },
-    {
-      "type": "Organization",
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.11",
       "name": {
         "en": "Fakultetsledelsen"
@@ -104,9 +42,7 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": [
-            null
-          ]
+          "partOf": []
         }
       ],
       "hasPart": [
@@ -121,9 +57,7 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.11",
-              "partOf": [
-                null
-              ]
+              "partOf": []
             }
           ],
           "labels": {
@@ -141,9 +75,7 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.11",
-              "partOf": [
-                null
-              ]
+              "partOf": []
             }
           ],
           "labels": {
@@ -166,9 +98,7 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": [
-            null
-          ]
+          "partOf": []
         }
       ],
       "hasPart": [
@@ -183,9 +113,7 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.21",
-              "partOf": [
-                null
-              ]
+              "partOf": []
             }
           ],
           "labels": {
@@ -203,9 +131,7 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.21",
-              "partOf": [
-                null
-              ]
+              "partOf": []
             }
           ],
           "labels": {
@@ -223,9 +149,7 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.21",
-              "partOf": [
-                null
-              ]
+              "partOf": []
             }
           ],
           "labels": {
@@ -248,9 +172,7 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": [
-            null
-          ]
+          "partOf": []
         }
       ],
       "labels": {
@@ -268,9 +190,7 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": [
-            null
-          ]
+          "partOf": []
         }
       ],
       "hasPart": [
@@ -285,9 +205,7 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.16",
-              "partOf": [
-                null
-              ]
+              "partOf": []
             }
           ],
           "labels": {
@@ -305,9 +223,7 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.16",
-              "partOf": [
-                null
-              ]
+              "partOf": []
             }
           ],
           "labels": {
@@ -330,9 +246,7 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": [
-            null
-          ]
+          "partOf": []
         }
       ],
       "labels": {
@@ -350,9 +264,7 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": [
-            null
-          ]
+          "partOf": []
         }
       ],
       "labels": {
@@ -370,9 +282,7 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": [
-            null
-          ]
+          "partOf": []
         }
       ],
       "labels": {
@@ -390,9 +300,7 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": [
-            null
-          ]
+          "partOf": []
         }
       ],
       "hasPart": [
@@ -407,9 +315,7 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.36",
-              "partOf": [
-                null
-              ]
+              "partOf": []
             }
           ],
           "labels": {
@@ -427,9 +333,7 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.36",
-              "partOf": [
-                null
-              ]
+              "partOf": []
             }
           ],
           "labels": {
@@ -447,9 +351,7 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.36",
-              "partOf": [
-                null
-              ]
+              "partOf": []
             }
           ],
           "hasPart": [
@@ -464,9 +366,7 @@
                 {
                   "type": "Organization",
                   "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.35",
-                  "partOf": [
-                    null
-                  ]
+                  "partOf": []
                 }
               ],
               "labels": {

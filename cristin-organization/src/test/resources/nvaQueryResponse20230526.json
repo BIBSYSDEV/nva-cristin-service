@@ -18,9 +18,7 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.53.18.0",
-          "partOf": [
-            null
-          ]
+          "partOf": []
         }
       ],
       "labels": {
@@ -37,9 +35,7 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/2012.9.0.0",
-          "partOf": [
-            null
-          ]
+          "partOf": []
         }
       ],
       "labels": {

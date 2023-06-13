@@ -64,45 +64,6 @@
     "cristin_unit_id" : "185.15.0.10"
   }
 }, {
-  "cristin_unit_id" : "185.15.0.12",
-  "unit_name" : {
-    "en" : "Fakultetssekretariatet fellestiltak"
-  },
-  "institution" : {
-    "acronym" : "UIO"
-  },
-  "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.12",
-  "acronym" : "MN-FELLES",
-  "parent_unit" : {
-    "cristin_unit_id" : "185.15.0.10"
-  }
-}, {
-  "cristin_unit_id" : "185.15.0.13",
-  "unit_name" : {
-    "en" : "Leksehjelp"
-  },
-  "institution" : {
-    "acronym" : "UIO"
-  },
-  "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.13",
-  "acronym" : "MN-LEKSEHJ",
-  "parent_unit" : {
-    "cristin_unit_id" : "185.15.0.10"
-  }
-}, {
-  "cristin_unit_id" : "185.15.0.15",
-  "unit_name" : {
-    "en" : "Studies Section"
-  },
-  "institution" : {
-    "acronym" : "UIO"
-  },
-  "url" : "https://api.cristin-test.uio.no/v2/units/185.15.0.15",
-  "acronym" : "MN-STUDIE",
-  "parent_unit" : {
-    "cristin_unit_id" : "185.15.0.10"
-  }
-}, {
   "cristin_unit_id" : "185.15.0.16",
   "unit_name" : {
     "en" : "Communication and HR Section"
