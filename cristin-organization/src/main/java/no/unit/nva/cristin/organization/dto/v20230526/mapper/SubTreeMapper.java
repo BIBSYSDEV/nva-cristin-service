@@ -9,6 +9,9 @@ import no.unit.nva.cristin.organization.dto.v20230526.UnitDto;
 
 public class SubTreeMapper {
 
+    public static final int MAX_TRAVERSALS = 2000;
+    public static final int FIRST_TRAVERSAL = 1;
+
     private final transient UnitDto input;
     private final transient List<UnitDto> allSubUnits;
 
@@ -24,10 +27,14 @@ public class SubTreeMapper {
         if (allSubUnits.isEmpty()) {
             return;
         }
-        calculate(input);
+        calculate(input, FIRST_TRAVERSAL);
     }
 
-    private void calculate(UnitDto unitDto) {
+    private void calculate(UnitDto unitDto, int traversals) {
+        if (traversals > MAX_TRAVERSALS) {
+            return;
+        }
+
         var results = allSubUnits.stream()
                           .filter(hasParentUnit())
                           .filter(hasMatch(unitDto))
@@ -35,7 +42,7 @@ public class SubTreeMapper {
 
         unitDto.setSubUnits(results);
         allSubUnits.removeAll(results);
-        results.forEach(this::calculate);
+        results.forEach(result -> calculate(result, traversals + 1));
     }
 
     private Predicate<UnitDto> hasParentUnit() {

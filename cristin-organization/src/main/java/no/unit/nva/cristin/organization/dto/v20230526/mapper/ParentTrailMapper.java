@@ -8,6 +8,9 @@ import no.unit.nva.cristin.organization.dto.v20230526.UnitDto;
 
 public class ParentTrailMapper {
 
+    public static final int MAX_TRAVERSALS = 2000;
+    public static final int FIRST_TRAVERSAL = 1;
+
     private final transient UnitDto input;
     private final transient List<UnitDto> allParents;
 
@@ -23,11 +26,11 @@ public class ParentTrailMapper {
         if (allParents.isEmpty()) {
             return;
         }
-        calculate(input);
+        calculate(input, FIRST_TRAVERSAL);
     }
 
-    private void calculate(UnitDto unitDto) {
-        if (!hasParentUnit(unitDto)) {
+    private void calculate(UnitDto unitDto, int traversals) {
+        if (!hasParentUnit(unitDto) || traversals > MAX_TRAVERSALS) {
             return;
         }
 
@@ -41,7 +44,7 @@ public class ParentTrailMapper {
             var presentMatch = match.get();
             unitDto.setParentUnit(presentMatch);
             allParents.remove(presentMatch);
-            calculate(unitDto.getParentUnit());
+            calculate(unitDto.getParentUnit(), traversals + 1);
         }
     }
 
