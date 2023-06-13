@@ -1,10 +1,6 @@
 package no.unit.nva.cristin.organization.query;
 
 import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.organization.common.Constants.CLIENT_DID_NOT_SPECIFY_VERSION_RETURNING_DEFAULT;
-import static no.unit.nva.cristin.organization.common.Constants.CLIENT_WANTS_VERSION_OF_THE_API_CLIENT;
-import static no.unit.nva.cristin.organization.common.Constants.VERSION_2023_05_26;
-import static no.unit.nva.cristin.organization.common.Constants.VERSION_ONE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import java.util.Map;
 import no.unit.nva.cristin.common.client.ClientProvider;

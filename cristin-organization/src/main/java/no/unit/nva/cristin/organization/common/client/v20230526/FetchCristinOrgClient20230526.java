@@ -37,6 +37,12 @@ public class FetchCristinOrgClient20230526 extends ApiClient
         super(client);
     }
 
+    /**
+     * Fetch one organization matching given query criteria. By specifying query param depth one can choose if the
+     * response should include sub organization tree downwards or just have the upwards parent trail.
+     *
+     * @param params Map containing verified query parameters
+     */
     @Override
     public Organization executeFetch(Map<String, String> params) throws ApiGatewayException {
         var identifier = params.get(IDENTIFIER);

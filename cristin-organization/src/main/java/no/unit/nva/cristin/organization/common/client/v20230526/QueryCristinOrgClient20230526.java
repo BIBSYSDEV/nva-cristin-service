@@ -37,7 +37,8 @@ public class QueryCristinOrgClient20230526 extends ApiClient
     }
 
     /**
-     * Query organizations matching given query criteria.
+     * Query organizations matching given query criteria. By specifying query param depth one can choose how deep in
+     * the organization tree the search should go.
      *
      * @param params Map containing verified query parameters
      */
