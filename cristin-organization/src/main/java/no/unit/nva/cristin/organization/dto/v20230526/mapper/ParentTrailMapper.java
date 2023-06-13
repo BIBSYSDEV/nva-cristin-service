@@ -3,6 +3,7 @@ package no.unit.nva.cristin.organization.dto.v20230526.mapper;
 import static java.util.Objects.nonNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import no.unit.nva.cristin.organization.dto.v20230526.UnitDto;
 
 public class ParentTrailMapper {
@@ -26,11 +27,14 @@ public class ParentTrailMapper {
     }
 
     private void calculate(UnitDto unitDto) {
+        if (!hasParentUnit(unitDto)) {
+            return;
+        }
+
         var match = allParents
                         .stream()
-                        .filter(possibleParent -> nonNull(possibleParent.getId()))
-                        // TODO: Make null safe
-                        .filter(possibleParent -> possibleParent.getId().equals(unitDto.getParentUnit().getId()))
+                        .filter(hasId())
+                        .filter(hasMatch(unitDto))
                         .findAny();
 
         if (match.isPresent()) {
@@ -39,6 +43,18 @@ public class ParentTrailMapper {
             allParents.remove(presentMatch);
             calculate(unitDto.getParentUnit());
         }
+    }
+
+    private boolean hasParentUnit(UnitDto unitDto) {
+        return nonNull(unitDto.getParentUnit()) && nonNull(unitDto.getParentUnit().getId());
+    }
+
+    private Predicate<UnitDto> hasId() {
+        return possibleParent -> nonNull(possibleParent.getId());
+    }
+
+    private Predicate<UnitDto> hasMatch(UnitDto unitDto) {
+        return possibleParent -> possibleParent.getId().equals(unitDto.getParentUnit().getId());
     }
 
     public UnitDto getWithParentTrail() {

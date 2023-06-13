@@ -1,7 +1,10 @@
 package no.unit.nva.cristin.organization.dto.v20230526.mapper;
 
+import static java.util.Objects.nonNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import no.unit.nva.cristin.organization.dto.v20230526.UnitDto;
 
 public class SubTreeMapper {
@@ -25,17 +28,22 @@ public class SubTreeMapper {
     }
 
     private void calculate(UnitDto unitDto) {
-        var list = new ArrayList<UnitDto>();
-        allSubUnits.forEach(subUnit -> {
-            if (subUnit.getParentUnit() != null // TODO: Better null checks
-                && subUnit.getParentUnit().getId() != null
-                && subUnit.getParentUnit().getId().equals(unitDto.getId())) {
+        var results = allSubUnits.stream()
+                          .filter(hasParentUnit())
+                          .filter(hasMatch(unitDto))
+                          .collect(Collectors.toList());
 
-                list.add(subUnit);
-            }
-        });
-        unitDto.setSubUnits(list);
-        list.forEach(this::calculate);
+        unitDto.setSubUnits(results);
+        allSubUnits.removeAll(results);
+        results.forEach(this::calculate);
+    }
+
+    private Predicate<UnitDto> hasParentUnit() {
+        return subUnit -> nonNull(subUnit.getParentUnit()) && nonNull(subUnit.getParentUnit().getId());
+    }
+
+    private Predicate<UnitDto> hasMatch(UnitDto unitDto) {
+        return subUnit -> subUnit.getParentUnit().getId().equals(unitDto.getId());
     }
 
     public UnitDto getWithSubUnitTree() {

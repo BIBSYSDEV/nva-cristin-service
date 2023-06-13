@@ -80,7 +80,8 @@ class FetchCristinOrganizationHandlerTest {
     public static final String CRISTIN_GET_RESPONSE_SUB_UNITS_JSON = "cristinGetResponseSubUnits.json";
     public static final Map<String, String> QUERY_PARAM_NO_DEPTH = Map.of(DEPTH, NONE);
     public static final String NVA_GET_RESPONSE_20230526_JSON = "nvaGetResponse20230526.json";
-    public static final String NVA_GET_RESPONSE_WITH_SUB_UNITS_20230526_JSON = "nvaGetResponseWithSubUnits20230526" + ".json";
+    public static final String NVA_GET_RESPONSE_WITH_SUB_UNITS_20230526_JSON =
+        "nvaGetResponseWithSubUnits20230526.json";
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
