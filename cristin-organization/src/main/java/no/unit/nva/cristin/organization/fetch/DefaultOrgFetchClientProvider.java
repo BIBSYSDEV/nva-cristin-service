@@ -1,8 +1,11 @@
 package no.unit.nva.cristin.organization.fetch;
 
+import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.organization.common.Constants.CLIENT_DID_NOT_SPECIFY_VERSION_RETURNING_DEFAULT;
 import static no.unit.nva.cristin.organization.common.Constants.CLIENT_WANTS_VERSION_OF_THE_API_CLIENT;
 import static no.unit.nva.cristin.organization.common.Constants.VERSION_2023_05_26;
 import static no.unit.nva.cristin.organization.common.Constants.VERSION_ONE;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import java.util.Map;
 import no.unit.nva.cristin.common.client.ClientProvider;
 import no.unit.nva.cristin.common.client.FetchApiClient;
@@ -19,12 +22,17 @@ public class DefaultOrgFetchClientProvider
 
     @Override
     public FetchApiClient<Map<String, String>, Organization> getClient(String apiVersion) {
-        if (VERSION_2023_05_26.equals(apiVersion)) {
-            logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_2023_05_26);
-            return getVersion20230526();
+        switch (nonNull(apiVersion) ? apiVersion : EMPTY_STRING) {
+            case VERSION_2023_05_26:
+                logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_2023_05_26);
+                return getVersion20230526();
+            case VERSION_ONE:
+                logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_ONE);
+                return getVersionOne();
+            default:
+                logger.info(CLIENT_DID_NOT_SPECIFY_VERSION_RETURNING_DEFAULT, VERSION_ONE);
+                return getVersionOne();
         }
-        logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_ONE);
-        return getVersionOne();
     }
 
     protected FetchApiClient<Map<String, String>, Organization> getVersionOne() {
