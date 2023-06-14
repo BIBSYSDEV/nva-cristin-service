@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects.create;
 
 import static java.net.HttpURLConnection.HTTP_CREATED;
+import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
@@ -12,6 +13,7 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaP
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomOrganization;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomPerson;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
+import static no.unit.nva.cristin.projects.common.CreateProjectAccessCheck.ACCESS_RIGHT_CREATE_PROJECT;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_ONE;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_THREE;
 import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.DRUGSTUDY;
@@ -104,7 +106,7 @@ class CreateCristinProjectHandlerTest {
         handler.handleRequest(input, output, context);
         var response = GatewayResponse.fromOutputStream(output, Object.class);
 
-        assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_FORBIDDEN));
+        assertThat(response.getStatusCode(), equalTo(HTTP_FORBIDDEN));
     }
 
     @Test
@@ -538,6 +540,38 @@ class CreateCristinProjectHandlerTest {
         assertThat(matchingThirdRole, equalTo(true));
     }
 
+    @Test
+    void shouldReturnForbiddenWhenMissingRequiredAccessRight() throws Exception {
+        var randomNvaProject = randomNvaProject();
+        var customerId = randomUri();
+        var input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
+                        .withBody(randomNvaProject)
+                        .withCurrentCustomer(customerId)
+                        .withAccessRights(customerId, NO_ACCESS)
+                        .build();
+        handler.handleRequest(input, output, context);
+        var response = GatewayResponse.fromOutputStream(output, Object.class);
+
+        assertThat(response.getStatusCode(), equalTo(HTTP_FORBIDDEN));
+    }
+
+    @Test
+    void shouldAllowUsersWithLegacyAccessRightForBackwardsCompatibility() throws Exception {
+        var randomNvaProject = randomNvaProject();
+        randomNvaProject.setId(null);
+        mockUpstreamUsingRequest(randomNvaProject);
+        var customerId = randomUri();
+        var input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
+                        .withBody(randomNvaProject)
+                        .withCurrentCustomer(customerId)
+                        .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
+                        .build();
+        handler.handleRequest(input, output, context);
+        var response = GatewayResponse.fromOutputStream(output, Object.class);
+
+        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
+    }
+
     private NvaContributor nvaContributorWithRole(String roleCode) {
         var contributorOne = new NvaContributor();
         contributorOne.setType(roleCode);
@@ -559,7 +593,7 @@ class CreateCristinProjectHandlerTest {
                         .withCurrentCustomer(customer)
                         .withPersonCristinId(CRISTIN_PERSON_ID)
                         .withTopLevelCristinOrgId(CRISTIN_ORG_ID)
-                        .withAccessRights(customer, EDIT_OWN_INSTITUTION_PROJECTS)
+                        .withAccessRights(customer, ACCESS_RIGHT_CREATE_PROJECT)
                         .build();
     }
 
@@ -571,7 +605,7 @@ class CreateCristinProjectHandlerTest {
                    .withBody(nvaProject)
                    .withCurrentCustomer(customer)
                    .withPersonCristinId(CRISTIN_PERSON_ID)
-                   .withAccessRights(customer, EDIT_OWN_INSTITUTION_PROJECTS)
+                   .withAccessRights(customer, ACCESS_RIGHT_CREATE_PROJECT)
                    .build();
     }
 
@@ -642,7 +676,7 @@ class CreateCristinProjectHandlerTest {
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
             .withBody(body)
             .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
+            .withAccessRights(customerId, ACCESS_RIGHT_CREATE_PROJECT)
             .build();
     }
 
@@ -659,7 +693,7 @@ class CreateCristinProjectHandlerTest {
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                    .withBody(expected)
                    .withCurrentCustomer(customerId)
-                   .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
+                   .withAccessRights(customerId, ACCESS_RIGHT_CREATE_PROJECT)
                    .build();
     }
 
