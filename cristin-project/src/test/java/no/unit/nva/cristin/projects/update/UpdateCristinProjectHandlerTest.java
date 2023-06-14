@@ -30,6 +30,7 @@ import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_KEY_VALUE_FIELD;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.TITLE_MUST_HAVE_A_LANGUAGE;
+import static no.unit.nva.cristin.projects.update.UpdateProjectHandlerAccessCheck.ACCESS_RIGHT_EDIT_ALL_PROJECTS;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
@@ -178,6 +179,14 @@ class UpdateCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
+    @Test
+    void shouldAllowUpdateOfProjectWhenHavingLegacyAccessRight() throws IOException {
+        var input = IoUtils.stringFromResources(Path.of(PATCH_REQUEST_JSON));
+        var gatewayResponse = sendQuery(input, EDIT_OWN_INSTITUTION_PROJECTS);
+
+        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
     private UpdateCristinProjectApiClient spyOnApiClient() throws IOException, InterruptedException {
         var mockHttpClient = mock(HttpClient.class);
         var apiClient = new UpdateCristinProjectApiClient(mockHttpClient);
@@ -204,17 +213,21 @@ class UpdateCristinProjectHandlerTest {
     }
 
     private GatewayResponse<Void> sendQuery(String body) throws IOException {
-        var input = createRequest(body);
+        return sendQuery(body, ACCESS_RIGHT_EDIT_ALL_PROJECTS);
+    }
+
+    private GatewayResponse<Void> sendQuery(String body, String accessRight) throws IOException {
+        var input = createRequest(body, accessRight);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
-    private InputStream createRequest(String body) throws JsonProcessingException {
+    private InputStream createRequest(String body, String accessRight) throws JsonProcessingException {
         var customerId = randomUri();
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                    .withBody(body)
                    .withCurrentCustomer(customerId)
-                   .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
+                   .withAccessRights(customerId, accessRight)
                    .withPathParameters(validPath)
                    .build();
     }

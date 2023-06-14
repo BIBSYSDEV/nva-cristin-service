@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
 import no.unit.nva.Validator;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.utils.AccessUtils;
+import no.unit.nva.utils.HandlerAccessCheck;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -28,6 +28,7 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
     private final transient UpdateCristinProjectApiClient cristinApiClient;
 
     @JacocoGenerated
+    @SuppressWarnings("unused")
     public UpdateCristinProjectHandler() {
         this(new Environment());
     }
@@ -45,7 +46,8 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
     @Override
     protected Void processInput(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
 
-        AccessUtils.verifyRequesterCanEditProjects(requestInfo);
+        HandlerAccessCheck handlerAccessCheck = new UpdateProjectHandlerAccessCheck();
+        handlerAccessCheck.verifyAccess(requestInfo);
 
         ObjectNode objectNode = readJsonFromInput(input);
         Validator<ObjectNode> validator = new ProjectPatchValidator();

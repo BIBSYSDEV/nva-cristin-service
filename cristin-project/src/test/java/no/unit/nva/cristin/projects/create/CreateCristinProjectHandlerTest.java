@@ -13,7 +13,7 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaP
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomOrganization;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomPerson;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
-import static no.unit.nva.cristin.projects.common.CreateProjectAccessCheck.ACCESS_RIGHT_CREATE_PROJECT;
+import static no.unit.nva.cristin.projects.create.CreateProjectHandlerAccessCheck.ACCESS_RIGHT_CREATE_PROJECT;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_ONE;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_THREE;
 import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.DRUGSTUDY;

@@ -4,9 +4,8 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import no.unit.nva.Validator;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.cristin.projects.common.CreateProjectAccessCheck;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.utils.AccessCheck;
+import no.unit.nva.utils.HandlerAccessCheck;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
@@ -63,8 +62,8 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
     protected NvaProject processInput(NvaProject input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 
-        AccessCheck accessCheck = new CreateProjectAccessCheck();
-        accessCheck.verifyAccess(requestInfo);
+        HandlerAccessCheck handlerAccessCheck = new CreateProjectHandlerAccessCheck();
+        handlerAccessCheck.verifyAccess(requestInfo);
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
         Validator<NvaProject> validator = new CreateCristinProjectValidator();
         validator.validate(input);
