@@ -73,9 +73,20 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
         HandlerAccessCheck handlerAccessCheck = new UpdateProjectHandlerAccessCheck();
         handlerAccessCheck.verifyAccess(requestInfo);
 
-        var userIdentifier = extractCristinIdentifier(requestInfo);
+        if (!handlerAccessCheck.isVerified()) {
+            var projectFromUpstream =
+                fetchApiClient.queryOneCristinProjectUsingIdIntoNvaProject(getValidIdentifier(requestInfo));
 
-        logger.info(LOG_IDENTIFIERS, userIdentifier, extractOrgIdentifier(requestInfo));
+            ResourceAccessCheck<NvaProject> resourceAccessCheck = new UpdateProjectResourceAccessCheck();
+            resourceAccessCheck.verifyAccess(projectFromUpstream,
+                                             Map.of(USER_IDENTIFIER, extractCristinIdentifier(requestInfo)));
+
+            if (!resourceAccessCheck.isVerified()) {
+                throw new ForbiddenException();
+            }
+        }
+
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
         var objectNode = readJsonFromInput(input);
         Validator<ObjectNode> validator = new ProjectPatchValidator();
@@ -84,18 +95,6 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
 
         if (noSupportedValuesPresent(cristinJson)) {
             throw new BadRequestException(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD);
-        }
-
-        if (!handlerAccessCheck.isVerified()) {
-            var projectFromUpstream =
-                fetchApiClient.queryOneCristinProjectUsingIdIntoNvaProject(getValidIdentifier(requestInfo));
-
-            ResourceAccessCheck<NvaProject> resourceAccessCheck = new UpdateProjectResourceAccessCheck();
-            resourceAccessCheck.verifyAccess(projectFromUpstream, Map.of(USER_IDENTIFIER, userIdentifier));
-
-            if (!resourceAccessCheck.isVerified()) {
-                throw new ForbiddenException();
-            }
         }
 
         logger.info(ACCESS_RIGHT_OR_PROJECT_OWNERSHIP_ALLOWING_UPDATE);
