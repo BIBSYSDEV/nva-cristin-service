@@ -17,7 +17,7 @@ public class UpdateProjectResourceAccessCheck implements ResourceAccessCheck<Nva
     private static final Logger logger = LoggerFactory.getLogger(UpdateProjectResourceAccessCheck.class);
 
     public static final String USER_IDENTIFIER = "userIdentifier";
-    public static final String PROJECT_MANAGER = "ProjectManager";
+    public static final String PROJECT_MANAGER_ROLE_CODE = "ProjectManager";
     public static final String NOT_ALLOWED_TO_UPDATE_THIS_RESOURCE =
         "User with identifier: {} is not allowed to update resource with id {}";
 
@@ -71,7 +71,7 @@ public class UpdateProjectResourceAccessCheck implements ResourceAccessCheck<Nva
     }
 
     private boolean isProjectManager(NvaContributor nvaContributor) {
-        return PROJECT_MANAGER.equals(nvaContributor.getType());
+        return PROJECT_MANAGER_ROLE_CODE.equals(nvaContributor.getType());
     }
 
     private boolean hasMatch(String identifierFromResource, String userIdentifier) {

@@ -58,7 +58,7 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
     }
 
     /**
-     * Creating the handler instance with required parameters
+     * Creating the handler instance with required parameters.
      */
     public UpdateCristinProjectHandler(UpdateCristinProjectApiClient cristinApiClient,
                                        FetchCristinProjectApiClient fetchApiClient, Environment environment) {
