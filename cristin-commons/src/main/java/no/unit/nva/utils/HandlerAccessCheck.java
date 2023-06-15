@@ -13,4 +13,6 @@ public interface HandlerAccessCheck {
      **/
     void verifyAccess(RequestInfo requestInfo) throws ApiGatewayException;
 
+    boolean isVerified();
+
 }

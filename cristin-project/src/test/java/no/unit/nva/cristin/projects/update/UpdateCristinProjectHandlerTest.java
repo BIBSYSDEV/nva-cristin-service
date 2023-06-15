@@ -63,6 +63,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import no.unit.nva.cristin.model.CristinPerson;
+import no.unit.nva.cristin.projects.fetch.FetchCristinProjectApiClient;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
@@ -71,6 +74,7 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -85,8 +89,11 @@ class UpdateCristinProjectHandlerTest {
     public static final String PATCH_REQUEST_JSON = "nvaApiPatchRequest.json";
     public static final String CRISTIN_PATCH_REQUEST_JSON = "cristinPatchRequest.json";
     public static final String UNSUPPORTED_FIELD = "unsupportedField";
+    public static final String STATUS_ACTIVE = "ACTIVE";
+    public static final String LANGUAGE_NORWEGIAN = "nb";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
+    private final HttpClient httpClientMockFetch = mock(HttpClient.class);
     private Context context;
     private ByteArrayOutputStream output;
     private UpdateCristinProjectHandler handler;
@@ -95,10 +102,14 @@ class UpdateCristinProjectHandlerTest {
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
+        var cristinProject = basicCristinProject();
+        when(httpClientMockFetch.<String>send(any(), any()))
+            .thenReturn(new HttpResponseFaker(cristinProject.toString(), 200));
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        UpdateCristinProjectApiClient updateCristinProjectApiClient = new UpdateCristinProjectApiClient(httpClientMock);
-        handler = new UpdateCristinProjectHandler(updateCristinProjectApiClient, environment);
+        var updateCristinProjectApiClient = new UpdateCristinProjectApiClient(httpClientMock);
+        var fetchProjectApiClient = new FetchCristinProjectApiClient(httpClientMockFetch);
+        handler = new UpdateCristinProjectHandler(updateCristinProjectApiClient, fetchProjectApiClient, environment);
     }
 
     @Test
@@ -187,11 +198,31 @@ class UpdateCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
+    @Test
+    @Disabled
+    void shouldAllowCreatorToEditOwnProject() {
+
+    }
+
+    @Test
+    @Disabled
+    void shouldAllowProjectManagerToEditTheirProjects() {
+
+    }
+
+    @Test
+    @Disabled
+    void shouldNotAllowPersonWithoutAccessRightOrRoleInProjectToEditRequestedProject() {
+
+    }
+
     private UpdateCristinProjectApiClient spyOnApiClient() throws IOException, InterruptedException {
         var mockHttpClient = mock(HttpClient.class);
         var apiClient = new UpdateCristinProjectApiClient(mockHttpClient);
         apiClient = spy(apiClient);
-        handler = new UpdateCristinProjectHandler(apiClient, environment);
+        var fetchApiClient = new FetchCristinProjectApiClient(mockHttpClient);
+        fetchApiClient = spy(fetchApiClient);
+        handler = new UpdateCristinProjectHandler(apiClient, fetchApiClient, environment);
         mockUpstream(mockHttpClient);
         return apiClient;
     }
@@ -204,7 +235,7 @@ class UpdateCristinProjectHandlerTest {
     }
 
     private void mockUpstream(HttpClient mockHttpClient) throws IOException, InterruptedException {
-        var httpResponse = new HttpResponseFaker("", 204);
+        var httpResponse = new HttpResponseFaker(EMPTY_STRING, 204);
         when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
     }
 
@@ -336,6 +367,27 @@ class UpdateCristinProjectHandlerTest {
         array.add(randomString());
         input.set(ALTERNATIVE_TITLES, array);
         return input;
+    }
+
+    private CristinProject basicCristinProject() {
+        var cristinProject = new CristinProject();
+        injectRequiredFields(cristinProject);
+        return cristinProject;
+    }
+
+    private void injectRequiredFields(CristinProject cristinProject) {
+        cristinProject.setCristinProjectId(randomInteger(999999).toString());
+        cristinProject.setStatus(STATUS_ACTIVE);
+        cristinProject.setTitle(Map.of(LANGUAGE_NORWEGIAN, randomString()));
+    }
+
+    private CristinProject cristinProjectWithCreatorData(String creatorId) {
+        var cristinProject = basicCristinProject();
+        var creator = new CristinPerson();
+        creator.setCristinPersonId(creatorId);
+        cristinProject.setCreator(creator);
+
+        return cristinProject;
     }
 
 }

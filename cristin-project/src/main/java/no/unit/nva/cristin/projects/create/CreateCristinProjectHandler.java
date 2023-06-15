@@ -10,6 +10,7 @@ import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 
 import java.net.HttpURLConnection;
@@ -64,6 +65,11 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
 
         HandlerAccessCheck handlerAccessCheck = new CreateProjectHandlerAccessCheck();
         handlerAccessCheck.verifyAccess(requestInfo);
+
+        if (!handlerAccessCheck.isVerified()) {
+            throw new ForbiddenException();
+        }
+
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
         Validator<NvaProject> validator = new CreateCristinProjectValidator();
         validator.validate(input);
