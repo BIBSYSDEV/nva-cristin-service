@@ -98,6 +98,7 @@ class UpdateCristinProjectHandlerTest {
     public static final String USER_IDENTIFIER = "12345";
     public static final String CRISTIN_PRO_PARTICIPANT_CODE = "PRO_PARTICIPANT";
     public static final String CRISTIN_PRO_MANAGER_CODE = "PRO_MANAGER";
+    public static final String ANOTHER_IDENTIFIER_THAN_USER = "999888";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final HttpClient httpClientMockFetch = mock(HttpClient.class);
@@ -244,6 +245,10 @@ class UpdateCristinProjectHandlerTest {
 
     @Test
     void shouldNotAllowPersonWithoutAccessRightOrRoleInProjectToEditRequestedProject() throws Exception {
+        var fetchedProjectJson =
+            cristinProjectWithParticipantRoles(ANOTHER_IDENTIFIER_THAN_USER, CRISTIN_PRO_MANAGER_CODE).toString();
+        mockFetchResponse(fetchedProjectJson);
+
         var input = generateInputWithPayloadAndRequesterPersonCristinId();
         handler.handleRequest(input, output, context);
         var response =  GatewayResponse.fromOutputStream(output, Void.class);
@@ -445,17 +450,17 @@ class UpdateCristinProjectHandlerTest {
     }
 
     private CristinProject cristinProjectWithManagerData() {
-        return cristinProjectWithParticipantRoles(CRISTIN_PRO_MANAGER_CODE);
+        return cristinProjectWithParticipantRoles(USER_IDENTIFIER, CRISTIN_PRO_MANAGER_CODE);
     }
 
     private CristinProject cristinProjectWithRegularParticipantData() {
-        return cristinProjectWithParticipantRoles(CRISTIN_PRO_PARTICIPANT_CODE);
+        return cristinProjectWithParticipantRoles(USER_IDENTIFIER, CRISTIN_PRO_PARTICIPANT_CODE);
     }
 
-    private CristinProject cristinProjectWithParticipantRoles(String roleCode) {
+    private CristinProject cristinProjectWithParticipantRoles(String userIdentifier, String roleCode) {
         var cristinProject = basicCristinProject();
         var participant = new CristinPerson();
-        participant.setCristinPersonId(USER_IDENTIFIER);
+        participant.setCristinPersonId(userIdentifier);
         participant.setRoles(List.of(createRole(roleCode)));
         cristinProject.setParticipants(List.of(participant));
 
