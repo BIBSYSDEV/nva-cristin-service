@@ -30,7 +30,7 @@ public class ErrorMessages {
     public static final String ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE =
         "May only contain alphanumeric characters, dash, comma, period, colon, semicolon and whitespace";
     public static final String ERROR_MESSAGE_DEPTH_INVALID = "Parameter 'depth' has invalid value. "
-            + "Must be 'top' or 'full'";
+            + "Must be 'top' or 'full' for query, 'none' for fetch";
     public static final String ERROR_MESSAGE_INVALID_VALUE = "Parameter '%s' has invalid value. ";
 
     public static final String ERROR_MESSAGE_INVALID_NUMBER = "Parameter '%s' has invalid value. Must be a number.";

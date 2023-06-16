@@ -1,12 +1,17 @@
-package no.unit.nva.cristin.organization;
+package no.unit.nva.cristin.organization.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
+import java.util.List;
 import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
+import no.unit.nva.cristin.organization.common.client.v20230526.QueryCristinOrgClient20230526;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -38,12 +43,12 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_DEPTH_INVALID;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
+import static no.unit.nva.cristin.common.client.ClientProvider.VERSION_2023_05_26;
+import static no.unit.nva.cristin.common.client.ClientProvider.VERSION_ONE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION_2023_05_26;
-import static no.unit.nva.cristin.organization.DefaultOrgQueryClientProvider.VERSION_ONE;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
@@ -64,30 +69,32 @@ class QueryCristinOrganizationHandlerTest {
     private static final String CRISTIN_QUERY_RESPONSE = "cristin_query_response_sample.json";
     public static final String EMPTY_ARRAY = "[]";
     public static final String ACCEPT_HEADER_EXAMPLE = "application/json; version=%s";
+    public static final String NVA_QUERY_RESPONSE_20230526_JSON = "nvaQueryResponse20230526.json";
+    public static final String CRISTIN_QUERY_RESPONSE_V_2_JSON = "cristinQueryResponse.json";
     private QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private DefaultOrgQueryClientProvider clientProvider;
     private ByteArrayOutputStream output;
     private Context context;
     private CristinOrganizationApiClient cristinApiClientVersionOne;
-    private CristinOrgApiClient20230526 cristinOrgApiClient20230526;
+    private QueryCristinOrgClient20230526 queryCristinOrgClient20230526;
 
     @BeforeEach
     void setUp() throws ApiGatewayException {
         context = mock(Context.class);
         var httpClient = mock(HttpClient.class);
         cristinApiClientVersionOne = new CristinOrganizationApiClient(httpClient);
-        cristinOrgApiClient20230526 = new CristinOrgApiClient20230526(httpClient);
+        queryCristinOrgClient20230526 = new QueryCristinOrgClient20230526(httpClient);
         clientProvider = new DefaultOrgQueryClientProvider();
         clientProvider = spy(clientProvider);
 
         cristinApiClientVersionOne = spy(cristinApiClientVersionOne);
-        cristinOrgApiClient20230526 = spy(cristinOrgApiClient20230526);
+        queryCristinOrgClient20230526 = spy(queryCristinOrgClient20230526);
         doReturn(Try.of(new HttpResponseFaker(EMPTY_ARRAY)))
             .when(cristinApiClientVersionOne).sendRequestMultipleTimes(any());
         doReturn(new HttpResponseFaker(EMPTY_ARRAY))
-            .when(cristinOrgApiClient20230526).fetchQueryResults(any());
+            .when(queryCristinOrgClient20230526).fetchQueryResults(any());
         doReturn(cristinApiClientVersionOne).when(clientProvider).getVersionOne();
-        doReturn(cristinOrgApiClient20230526).when(clientProvider).getVersion20230526();
+        doReturn(queryCristinOrgClient20230526).when(clientProvider).getVersion20230526();
 
         output = new ByteArrayOutputStream();
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
@@ -190,6 +197,40 @@ class QueryCristinOrganizationHandlerTest {
         verify(clientProvider, times(1)).getVersionOne();
         verify(clientProvider, times(0)).getVersion20230526();
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    @Test
+    void shouldReturnCorrectPayloadWhenRequestingVersion20230526() throws Exception {
+        var fakeQueryResponseResource = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_V_2_JSON));
+        doReturn(new HttpResponseFaker(fakeQueryResponseResource))
+            .when(queryCristinOrgClient20230526).fetchQueryResults(any());
+
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
+        var input =
+            generateValidHandlerRequestWithVersionParam(String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26));
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,
+                                                               SearchResponse.class);
+        var responseBody = gatewayResponse.getBodyObject(SearchResponse.class);
+
+        var expectedSerialized = IoUtils.stringFromResources(Path.of(NVA_QUERY_RESPONSE_20230526_JSON));
+        var expected = OBJECT_MAPPER.readValue(expectedSerialized, SearchResponse.class);
+
+        var actualHits = convertHitsToProperFormat(responseBody);
+        var expectedHits = convertHitsToProperFormat(expected);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+        assertThat(actualHits.size(), equalTo(2));
+        assertThat(readHitsAsTree(actualHits), equalTo(readHitsAsTree(expectedHits)));
+    }
+
+    private List<Organization> convertHitsToProperFormat(SearchResponse searchResponse) {
+        return OBJECT_MAPPER.convertValue(searchResponse.getHits(), new TypeReference<>() {});
+    }
+
+    private JsonNode readHitsAsTree(List<Organization> hits) throws JsonProcessingException {
+        return OBJECT_MAPPER.readTree(hits.toString());
     }
 
     private InputStream generateValidHandlerRequestWithVersionParam(String versionParam)
