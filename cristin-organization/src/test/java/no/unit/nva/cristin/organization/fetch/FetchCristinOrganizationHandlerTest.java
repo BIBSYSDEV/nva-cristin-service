@@ -1,9 +1,13 @@
-package no.unit.nva.cristin.organization;
+package no.unit.nva.cristin.organization.fetch;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
+import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
+import no.unit.nva.cristin.organization.common.client.v20230526.FetchCristinOrgClient20230526;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
@@ -11,12 +15,14 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -26,24 +32,26 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
-import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static java.util.Collections.emptyMap;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
+import static no.unit.nva.cristin.common.client.ClientProvider.VERSION_2023_05_26;
 import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
+import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
-import static nva.commons.apigateway.ApiGatewayHandler.MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS;
+import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,46 +59,65 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class FetchCristinOrganizationHandlerTest {
 
     public static final ObjectMapper restApiMapper = JsonUtils.dtoObjectMapper;
     public static final String IDENTIFIER = "identifier";
     public static final String NON_EXISTING_IDENTIFIER = "1.0.0.0";
-    public static final String ORGANIZATION_NOT_FOUND_MESSAGE = "cannot be dereferenced";
     public static final String LIST_OF_UNITS_JSON_FILE = "list_of_unit_185_53_18_14.json";
     public static final String CRISTIN_UNITS_URI = "https://api.cristin-test.uio.no/v2/units?id=185.53.18.14";
     public static final String ENGLISH_LANGUAGE_KEY = "en";
     public static final String DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY = "Department of Medical Biochemistry";
+    public static final String EMPTY_JSON = "{}";
+    public static final String ACCEPT_HEADER_EXAMPLE = "application/json; version=%s";
+    public static final String SOME_IDENTIFIER = "1.2.3.4";
+    public static final String CRISTIN_GET_RESPONSE_JSON = "cristinGetResponse.json";
+    public static final String CRISTIN_GET_RESPONSE_SUB_UNITS_JSON = "cristinGetResponseSubUnits.json";
+    public static final Map<String, String> QUERY_PARAM_NO_DEPTH = Map.of(DEPTH, NONE);
+    public static final String NVA_GET_RESPONSE_20230526_JSON = "nvaGetResponse20230526.json";
+    public static final String NVA_GET_RESPONSE_WITH_SUB_UNITS_20230526_JSON =
+        "nvaGetResponseWithSubUnits20230526.json";
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
+    private FetchCristinOrgClient20230526 fetchOrgClient20230526;
+    private DefaultOrgFetchClientProvider clientProvider;
     private ByteArrayOutputStream output;
     private Context context;
-    private HttpClient mockHttpClient;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws ApiGatewayException {
         context = mock(Context.class);
-        mockHttpClient = mock(HttpClient.class);
+        var mockHttpClient = mock(HttpClient.class);
         cristinApiClient = new CristinOrganizationApiClient(mockHttpClient);
+        cristinApiClient = spy(cristinApiClient);
+        doReturn(Try.of(new HttpResponseFaker(EMPTY_JSON)))
+            .when(cristinApiClient).sendRequestMultipleTimes(any());
+        fetchOrgClient20230526 = new FetchCristinOrgClient20230526(mockHttpClient);
+        fetchOrgClient20230526 = spy(fetchOrgClient20230526);
+        doReturn(new HttpResponseFaker(EMPTY_JSON))
+            .when(fetchOrgClient20230526).fetchGetResult(any());
+        clientProvider = new DefaultOrgFetchClientProvider();
+        clientProvider = spy(clientProvider);
+        doReturn(cristinApiClient).when(clientProvider).getVersionOne();
+        doReturn(fetchOrgClient20230526).when(clientProvider).getVersion20230526();
         output = new ByteArrayOutputStream();
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
     }
 
     @Test
-    void shouldReturnsNotFoundResponseWhenUnitIsMissing()
-            throws IOException, ApiGatewayException {
-
+    void shouldReturnsNotFoundResponseWhenUnitIsMissing() throws IOException {
         cristinApiClient = spy(cristinApiClient);
-        doThrow(new NotFoundException(NOT_FOUND_MESSAGE_TEMPLATE + NON_EXISTING_IDENTIFIER))
-                .when(cristinApiClient).getOrganization(any());
+        doReturn(Try.of(new HttpResponseFaker(EMPTY_JSON, HTTP_NOT_FOUND)))
+            .when(cristinApiClient).sendRequestMultipleTimes(any());
+        doReturn(cristinApiClient).when(clientProvider).getClient(any());
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(NON_EXISTING_IDENTIFIER), output, context);
         var gatewayResponse = parseFailureResponse();
 
@@ -99,8 +126,8 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(gatewayResponse.getHeaders(), hasKey(ACCESS_CONTROL_ALLOW_ORIGIN));
 
         var actualDetail = getProblemDetail(gatewayResponse);
-        assertThat(actualDetail, containsString(ORGANIZATION_NOT_FOUND_MESSAGE));
-        assertThat(actualDetail, containsString(NON_EXISTING_IDENTIFIER));
+        var errorMessage = String.format(NOT_FOUND_MESSAGE_TEMPLATE, NON_EXISTING_IDENTIFIER);
+        assertThat(actualDetail, containsString(errorMessage));
     }
 
     @Test
@@ -142,28 +169,6 @@ class FetchCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnInternalServerErrorResponseOnUnexpectedException() throws IOException {
-        var serviceThrowingException = spy(cristinApiClient);
-        try {
-            doThrow(new NullPointerException())
-                    .when(serviceThrowingException)
-                    .getOrganization(any());
-        } catch (ApiGatewayException e) {
-            e.printStackTrace();
-        }
-
-        fetchCristinOrganizationHandler =
-                new FetchCristinOrganizationHandler(serviceThrowingException, new Environment());
-        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(NON_EXISTING_IDENTIFIER), output, context);
-
-        var gatewayResponse = parseFailureResponse();
-        var actualDetail = getProblemDetail(gatewayResponse);
-        assertEquals(HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(
-                MESSAGE_FOR_RUNTIME_EXCEPTIONS_HIDING_IMPLEMENTATION_DETAILS_TO_API_CLIENTS));
-    }
-
-    @Test
     void shouldReturnOrganizationHierarchy() throws IOException, ApiGatewayException {
         cristinApiClient = spy(cristinApiClient);
         final var level1 = getCristinUri("185.90.0.0", UNITS_PATH);
@@ -182,7 +187,9 @@ class FetchCristinOrganizationHandlerTest {
         doReturn(getSubSubUnit("unit_18_53_18_14.json"))
                 .when(cristinApiClient).getSubSubUnitDtoWithMultipleEfforts(level4);
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+        doReturn(cristinApiClient).when(clientProvider).getClient(any());
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
         final var identifier = "185.53.18.14";
         fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(identifier), output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
@@ -201,28 +208,15 @@ class FetchCristinOrganizationHandlerTest {
 
 
     @Test
-    void shouldReturnHttp404NotFoundWhenNonExistingIdentifier() throws Exception {
-        var fakeHttpResponse = new HttpResponseFaker(randomString(), HTTP_NOT_FOUND);
-        CompletableFuture futureNotFound =
-            CompletableFuture.completedFuture(fakeHttpResponse);
-        when(mockHttpClient.sendAsync(any(), any())).thenReturn(futureNotFound);
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
-        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(NON_EXISTING_IDENTIFIER), output, context);
-        var gatewayResponse = parseFailureResponse();
-
-        assertEquals(HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
-    }
-
-
-    @Test
     void shouldReturnOrganizationFlatHierarchy() throws IOException {
         var resource = stringFromResources(LIST_OF_UNITS_JSON_FILE);
         var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
         var cristinUri = URI.create(CRISTIN_UNITS_URI);
         cristinApiClient = spy(cristinApiClient);
         doReturn(Try.of(fakeHttpResponse)).when(cristinApiClient).sendRequestMultipleTimes(cristinUri);
+        doReturn(cristinApiClient).when(clientProvider).getClient(any());
 
-        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(cristinApiClient, new Environment());
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
         final var identifier = "185.53.18.14";
         fetchCristinOrganizationHandler
                 .handleRequest(generateHandlerRequestWithAdditionalQueryParameters(identifier, NONE), output, context);
@@ -242,6 +236,48 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(actualOrganization.getPartOf(), equalTo(null));
     }
 
+    @Test
+    void shouldNotCallUpstreamOneMoreTimeForFetchingSubunitsWhenSendingParamDepthWithValueNone() throws Exception {
+        var resource = stringFromResources(CRISTIN_GET_RESPONSE_JSON);
+        var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
+        doReturn(fakeHttpResponse).when(fetchOrgClient20230526).fetchGetResult(any());
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
+        fetchCristinOrganizationHandler.handleRequest(requestUsingV20230526(QUERY_PARAM_NO_DEPTH), output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
+
+        verify(fetchOrgClient20230526, times(1)).fetchGetResult(any());
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    @ParameterizedTest(name = "Requesting payload using version 20230526 with depth value {0} should return "
+                              + "correct payload")
+    @MethodSource("depthAndCorrespondingPayloadArgumentProvider")
+    void shouldReturnCorrectPayloadBasedOnQueryParamDepthWhenRequestingVersion20230526(String depth,
+                                                                                       String cristinPayload,
+                                                                                       String cristinSubsPayload,
+                                                                                       String nvaPayload)
+        throws Exception {
+
+        doReturn(new HttpResponseFaker(cristinPayload)).doReturn(new HttpResponseFaker(cristinSubsPayload))
+            .when(fetchOrgClient20230526).fetchGetResult(any());
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
+        Map<String, String> queryParams = nonNull(depth) ? Map.of(DEPTH, depth) : emptyMap();
+        var input = requestUsingV20230526(queryParams);
+        fetchCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
+        var responseBody = gatewayResponse.getBodyObject(Organization.class);
+
+        var expected = OBJECT_MAPPER.readValue(nvaPayload, Organization.class);
+
+        assertThat(readOrganizationAsTree(responseBody), equalTo(readOrganizationAsTree(expected)));
+    }
+
+    private JsonNode readOrganizationAsTree(Organization org) throws JsonProcessingException {
+        return OBJECT_MAPPER.readTree(org.toString());
+    }
 
     private Object getSubSubUnit(String subUnitFile) {
         return SubSubUnitDto.fromJson(IoUtils.stringFromResources(Path.of(subUnitFile)));
@@ -287,5 +323,37 @@ class FetchCristinOrganizationHandlerTest {
         var responseWithProblemType = restApiMapper.getTypeFactory()
                 .constructParametricType(GatewayResponse.class, Problem.class);
         return restApiMapper.readValue(output.toString(), responseWithProblemType);
+    }
+
+    private InputStream requestUsingV20230526(Map<String, String> queryParameters) throws JsonProcessingException {
+        var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type(),
+                             ACCEPT_HEADER_KEY_NAME, String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26));
+        var pathParameters = Map.of(IDENTIFIER, SOME_IDENTIFIER);
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                   .withHeaders(headers)
+                   .withPathParameters(pathParameters)
+                   .withQueryParameters(queryParameters)
+                   .build();
+    }
+
+    public static Stream<Arguments> depthAndCorrespondingPayloadArgumentProvider() {
+        return Stream.of(
+            Arguments.of(
+                NONE,
+                getFromResources(CRISTIN_GET_RESPONSE_JSON),
+                null,
+                getFromResources(NVA_GET_RESPONSE_20230526_JSON)
+            ),
+            Arguments.of(
+                null,
+                getFromResources(CRISTIN_GET_RESPONSE_JSON),
+                getFromResources(CRISTIN_GET_RESPONSE_SUB_UNITS_JSON),
+                getFromResources(NVA_GET_RESPONSE_WITH_SUB_UNITS_20230526_JSON)
+            )
+        );
+    }
+
+    private static String getFromResources(String filename) {
+        return IoUtils.stringFromResources(Path.of(filename));
     }
 }

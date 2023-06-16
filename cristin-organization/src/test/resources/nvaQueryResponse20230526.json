@@ -1,0 +1,46 @@
+{
+  "@context": "https://bibsysdev.github.io/src/organization-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/organization",
+  "size": 135,
+  "searchString": null,
+  "processingTime": 42,
+  "firstRecord": 1,
+  "nextResults": "https://api.dev.nva.aws.unit.no/cristin/organization?depth=full&query=Department+of+Medical+Biochemistry&page=2&results=5",
+  "previousResults": null,
+  "hits": [
+    {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.53.18.14",
+      "name": {
+        "en": "Department of Medical Biochemistry"
+      },
+      "acronym": "KLM-MBK",
+      "partOf": [
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.53.18.0",
+          "partOf": []
+        }
+      ],
+      "labels": {
+        "en": "Department of Medical Biochemistry"
+      }
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/organization/2012.9.20.0",
+      "name": {
+        "en": "Department of Medical Biochemistry"
+      },
+      "acronym": "MBK",
+      "partOf": [
+        {
+          "type": "Organization",
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/2012.9.0.0",
+          "partOf": []
+        }
+      ],
+      "labels": {
+        "en": "Department of Medical Biochemistry"
+      }
+    }
+  ]
+}

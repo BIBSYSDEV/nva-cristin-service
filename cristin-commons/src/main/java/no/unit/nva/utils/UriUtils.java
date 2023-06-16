@@ -21,9 +21,7 @@ import nva.commons.core.paths.UriWrapper;
 public class UriUtils {
 
     public static final String POSITION = "position";
-    public static final String FRAGMENT = "#";
     public static final String PROJECT = "project";
-    public static final String INSTITUTION = "institution";
     public static final String PERSON = "person";
     public static final String WHITESPACE_REGEX = "\\s+";
     public static final String WHITESPACE_REPLACEMENT = "+";

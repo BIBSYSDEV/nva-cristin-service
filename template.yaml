@@ -195,7 +195,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-organization
-      Handler: no.unit.nva.cristin.organization.QueryCristinOrganizationHandler::handleRequest
+      Handler: no.unit.nva.cristin.organization.query.QueryCristinOrganizationHandler::handleRequest
       Events:
         NvaCristinOrganizationsEvent:
           Type: Api
@@ -212,7 +212,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-organization
-      Handler: no.unit.nva.cristin.organization.FetchCristinOrganizationHandler::handleRequest
+      Handler: no.unit.nva.cristin.organization.fetch.FetchCristinOrganizationHandler::handleRequest
       AutoPublishAlias: live
       DeploymentPreference:
         Enabled: true

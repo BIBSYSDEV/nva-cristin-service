@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.organization.dto.version20230526;
+package no.unit.nva.cristin.organization.dto.v20230526;
 
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -15,9 +15,9 @@ public class UnitDto implements JsonSerializable {
     private final Map<String, String> unitName;
     private final InstitutionDto institution;
     private final String acronym;
-    private final UnitDto parentUnit;
+    private UnitDto parentUnit;
     private final List<UnitDto> parentUnits;
-    private final List<UnitDto> subUnits;
+    private List<UnitDto> subUnits;
     private final URI uri;
 
     /**
@@ -62,12 +62,20 @@ public class UnitDto implements JsonSerializable {
         return parentUnit;
     }
 
+    public void setParentUnit(UnitDto parentUnit) {
+        this.parentUnit = parentUnit;
+    }
+
     public List<UnitDto> getParentUnits() {
         return nonEmptyOrDefault(parentUnits);
     }
 
     public List<UnitDto> getSubUnits() {
         return nonEmptyOrDefault(subUnits);
+    }
+
+    public void setSubUnits(List<UnitDto> subUnits) {
+        this.subUnits = subUnits;
     }
 
     public URI getUri() {
