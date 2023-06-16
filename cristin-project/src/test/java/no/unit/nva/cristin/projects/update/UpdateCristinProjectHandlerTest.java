@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -258,7 +259,7 @@ class UpdateCristinProjectHandlerTest {
 
     private void mockFetchResponse(String fetchedProjectJson) throws IOException, InterruptedException {
         fetchApiClient = spy(fetchApiClient);
-        doReturn(new HttpResponseFaker(fetchedProjectJson, HTTP_NO_CONTENT))
+        doReturn(new HttpResponseFaker(fetchedProjectJson, HTTP_OK))
             .when(httpClientMockFetch).<String>send(any(),any());
     }
 
