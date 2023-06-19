@@ -5,10 +5,12 @@ import com.google.common.net.MediaType;
 import no.unit.nva.Validator;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.utils.HandlerAccessCheck;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
 
 import java.net.HttpURLConnection;
@@ -17,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.utils.AccessUtils.verifyRequesterCanEditProjects;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
@@ -62,7 +63,13 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
     protected NvaProject processInput(NvaProject input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 
-        verifyRequesterCanEditProjects(requestInfo);
+        HandlerAccessCheck handlerAccessCheck = new CreateProjectHandlerAccessCheck();
+        handlerAccessCheck.verifyAccess(requestInfo);
+
+        if (!handlerAccessCheck.isVerified()) {
+            throw new ForbiddenException();
+        }
+
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
         Validator<NvaProject> validator = new CreateCristinProjectValidator();
         validator.validate(input);
