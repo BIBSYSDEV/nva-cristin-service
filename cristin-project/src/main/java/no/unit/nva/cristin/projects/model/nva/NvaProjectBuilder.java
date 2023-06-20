@@ -48,6 +48,7 @@ import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.StringUtils.isNotBlank;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class NvaProjectBuilder {
 
@@ -150,7 +151,12 @@ public class NvaProjectBuilder {
                    .withApprovals(extractApprovals(cristinProject.getApprovals()))
                    .withExemptFromPublicDisclosure(cristinProject.getExemptFromPublicDisclosure())
                    .withCreator(extractCreator(cristinProject.getCreator()))
+                   .withWebPage(extractWebPage(cristinProject.getExternalUrl()))
                    .build();
+    }
+
+    private URI extractWebPage(String externalUrl) {
+        return attempt(() -> URI.create(externalUrl)).orElse(fail -> null);
     }
 
     private NvaContributor extractCreator(CristinPerson creator) {
