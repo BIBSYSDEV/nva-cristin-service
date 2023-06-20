@@ -682,7 +682,6 @@ class CreateCristinProjectHandlerTest {
 
     private void removeFieldsNotSupportedByPost(NvaProject expected) {
         expected.setFundingAmount(null);
-        expected.setWebPage(null);
     }
 
     private String getProjectPostRequestJsonSample() {

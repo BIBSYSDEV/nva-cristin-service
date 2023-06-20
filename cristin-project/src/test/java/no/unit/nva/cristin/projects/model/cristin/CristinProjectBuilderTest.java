@@ -74,7 +74,6 @@ class CristinProjectBuilderTest {
         actual.setCreated(expected.getCreated());
         actual.setLastModified(expected.getLastModified());
         actual.setFundingAmount(expected.getFundingAmount());
-        actual.setWebPage(expected.getWebPage());
     }
 
     private Set<String> addFieldsToIgnoreListNotSupportedByCristinPost() {
@@ -85,7 +84,6 @@ class CristinProjectBuilderTest {
         ignoreList.add(".lastModified.sourceShortName");
         ignoreList.add(".lastModified.date");
         ignoreList.add("lastModified");
-        ignoreList.add("webPage");
 
         return ignoreList;
     }
