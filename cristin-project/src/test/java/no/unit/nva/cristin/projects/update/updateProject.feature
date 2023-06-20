@@ -86,7 +86,8 @@ Feature: API tests for Cristin Project Update
         {
           'nn': null
         }
-      ]
+      ],
+      'webPage': 'https://www.change.org'
     }
     """
     Given url CRISTIN_BASE

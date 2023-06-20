@@ -54,6 +54,8 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
                                                                + "numeric or URI";
     public static final String NOT_A_VALID_KEY_VALUE_FIELD = "%s not a valid key value field";
     public static final String NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS = "%s not a valid list of key value fields";
+    public static final String WEB_PAGE = "webPage";
+    public static final String NOT_A_VALID_URI = "Field %s is not a valid URI";
 
     /**
      * Validate changes to Project, both nullable fields and values.
@@ -79,6 +81,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         validateDescription(input, EQUIPMENT);
         validateResearchResponsibleOrganizationsIfPresent(input);
         validateExtraLanguages(input);
+        validateWebPage(input);
     }
 
     private static void validateTitleAndLanguage(ObjectNode input) throws BadRequestException {
@@ -236,5 +239,16 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
 
     private BadRequestException notAListOfMapsException() {
         return new BadRequestException(format(NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS, ALTERNATIVE_TITLES));
+    }
+
+    private void validateWebPage(ObjectNode input) throws BadRequestException {
+        if (input.has(WEB_PAGE)) {
+            var webPage = input.get(WEB_PAGE).asText();
+            attempt(() -> URI.create(webPage)).orElseThrow(failure -> fieldIsNotUri());
+        }
+    }
+
+    private BadRequestException fieldIsNotUri() {
+        return new BadRequestException(format(NOT_A_VALID_URI, WEB_PAGE));
     }
 }

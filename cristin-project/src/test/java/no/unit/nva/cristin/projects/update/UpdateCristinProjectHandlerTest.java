@@ -32,7 +32,9 @@ import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST_OF_IDENTIFIERS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_KEY_VALUE_FIELD;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_URI;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.TITLE_MUST_HAVE_A_LANGUAGE;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.WEB_PAGE;
 import static no.unit.nva.cristin.projects.update.UpdateProjectHandlerAccessCheck.ACCESS_RIGHT_EDIT_ALL_PROJECTS;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE;
@@ -100,6 +102,7 @@ class UpdateCristinProjectHandlerTest {
     public static final String CRISTIN_PRO_PARTICIPANT_CODE = "PRO_PARTICIPANT";
     public static final String CRISTIN_PRO_MANAGER_CODE = "PRO_MANAGER";
     public static final String ANOTHER_IDENTIFIER_THAN_USER = "999888";
+    public static final String NOT_SOME_WEBPAGE = "<script>1</script>";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final HttpClient httpClientMockFetch = mock(HttpClient.class);
@@ -355,8 +358,13 @@ class UpdateCristinProjectHandlerTest {
             Arguments.of(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH, notAnOrganization(),
                          format(ILLEGAL_VALUE_FOR_PROPERTY, NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)),
             Arguments.of(ALTERNATIVE_TITLES, notAListOfMaps(),
-                         format(NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS, ALTERNATIVE_TITLES))
+                         format(NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS, ALTERNATIVE_TITLES)),
+            Arguments.of(WEB_PAGE, notAWebPage(), format(NOT_A_VALID_URI, WEB_PAGE))
         );
+    }
+
+    private static JsonNode notAWebPage() {
+        return OBJECT_MAPPER.createObjectNode().put(WEB_PAGE, NOT_SOME_WEBPAGE);
     }
 
     private static JsonNode notAnArray(String fieldName) {

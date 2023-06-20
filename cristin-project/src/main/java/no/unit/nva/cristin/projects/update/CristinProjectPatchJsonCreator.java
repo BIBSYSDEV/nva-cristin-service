@@ -48,6 +48,7 @@ import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizat
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinContactInfo.CRISTIN_CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_EXTERNAL_URL;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_MAIN_LANGUAGE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_PROJECT_CATEGORIES;
@@ -60,6 +61,7 @@ import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_
 import static no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder.extractFundingSourceCode;
 import static no.unit.nva.cristin.projects.model.nva.ContactInfo.CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.WEB_PAGE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.convertToMap;
 import static no.unit.nva.language.LanguageConstants.UNDEFINED_LANGUAGE;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
@@ -101,6 +103,7 @@ public class CristinProjectPatchJsonCreator {
         addEquipmentIfPresent();
         addContactInfoIfPresent();
         addResponsibleInstitutionsIfPresent();
+        addWebPageIfPresent();
 
         return this;
     }
@@ -318,5 +321,12 @@ public class CristinProjectPatchJsonCreator {
 
     private Organization extractOrganization(JsonNode institution) {
         return new Organization.Builder().withId(URI.create(institution.get(ID).asText())).build();
+    }
+
+    private void addWebPageIfPresent() {
+        if (input.has(WEB_PAGE)) {
+            var webPage = input.get(WEB_PAGE);
+            output.set(CRISTIN_EXTERNAL_URL, webPage);
+        }
     }
 }
