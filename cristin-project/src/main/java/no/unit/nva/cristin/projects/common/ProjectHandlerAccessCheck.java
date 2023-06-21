@@ -9,6 +9,9 @@ public class ProjectHandlerAccessCheck {
         "User:{} does not have required access right:{}";
     public static final String NO_USERNAME_FOUND = "NO USERNAME FOUND";
 
+    protected ProjectHandlerAccessCheck() {
+    }
+
     protected boolean hasLegacyAccessRight(RequestInfo requestInfo) {
         return requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_PROJECTS);
     }
