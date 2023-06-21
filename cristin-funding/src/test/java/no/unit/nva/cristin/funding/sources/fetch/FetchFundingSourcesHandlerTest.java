@@ -5,10 +5,13 @@ import static no.unit.nva.cristin.funding.sources.common.EnvironmentKeys.ENV_KEY
 import static no.unit.nva.cristin.funding.sources.common.EnvironmentKeys.ENV_KEY_BASE_PATH;
 import static no.unit.nva.cristin.funding.sources.common.EnvironmentKeys.ENV_KEY_DOMAIN_NAME;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.collection.IsMapWithSize.aMapWithSize;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
@@ -89,6 +92,7 @@ public class FetchFundingSourcesHandlerTest {
 
         var expectedId = URI.create("https://api.sandbox.nva.aws.unit.no/cristin/funding-sources/"
                                     + EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED);
+        assertThat(fundingSource.getContext(), is(not(nullValue())));
         assertThat(fundingSource.getId(), is(equalTo(expectedId)));
         assertThat(fundingSource.getIdentifier(), is(equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
 
@@ -195,12 +199,12 @@ public class FetchFundingSourcesHandlerTest {
 
     private void assertNamesArePresentForFundingSource(FundingSource fundingSource) {
         var expectedNumberOfLanguagesInName = 3;
-        assertThat(fundingSource.getName(), aMapWithSize(expectedNumberOfLanguagesInName));
-        assertThat(fundingSource.getName(), hasEntry(equalTo("en"),
+        assertThat(fundingSource.getLabels(), aMapWithSize(expectedNumberOfLanguagesInName));
+        assertThat(fundingSource.getLabels(), hasEntry(equalTo("en"),
                                                      equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
-        assertThat(fundingSource.getName(), hasEntry(equalTo("nn"),
+        assertThat(fundingSource.getLabels(), hasEntry(equalTo("nn"),
                                                      equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
-        assertThat(fundingSource.getName(), hasEntry(equalTo("nb"),
+        assertThat(fundingSource.getLabels(), hasEntry(equalTo("nb"),
                                                      equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
     }
 }

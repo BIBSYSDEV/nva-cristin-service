@@ -2701,7 +2701,7 @@ components:
         - type
         - id
         - identifier
-        - name
+        - labels
       properties:
         type:
           type: string
@@ -2712,7 +2712,7 @@ components:
         identifier:
           type: string
           description: the identifier (code) for the funding source
-        name:
+        labels:
           $ref: '#/components/schemas/Languages'
     BioBanks:
       type: object
@@ -3630,7 +3630,7 @@ components:
           - type: "FundingSource"
             id: "https://api.{env.}nva.aws.unit.no/funding-sources/EC%2FH2020"
             identifier: "EC/H2020"
-            name:
+            labels:
               nb: "EC/H2020"
               nn: "EC/H2020"
               en: "EC/H2020"
@@ -3639,7 +3639,7 @@ components:
         type: "FundingSource"
         id: "https://api.{env.}nva.aws.unit.no/funding-sources/EC%2FFP7"
         identifier: "EC/FP7"
-        name:
+        labels:
           nb: "EC/FP7"
           nn: "EC/FP7"
           en: "EC/FP7"
