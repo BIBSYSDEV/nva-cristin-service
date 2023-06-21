@@ -11,17 +11,15 @@ public class UpdateProjectHandlerAccessCheck extends ProjectHandlerAccessCheck i
 
     private static final Logger logger = LoggerFactory.getLogger(UpdateProjectHandlerAccessCheck.class);
 
-    public static final String ACCESS_RIGHT_EDIT_ALL_PROJECTS = "EDIT_ALL_PROJECTS";
-
     private transient boolean verified;
 
     @Override
     public void verifyAccess(RequestInfo requestInfo) {
-        if (requestInfo.userIsAuthorized(ACCESS_RIGHT_EDIT_ALL_PROJECTS) || hasLegacyAccessRight(requestInfo)) {
+        if (requestInfo.userIsAuthorized(MANAGE_OWN_PROJECTS) || hasLegacyAccessRight(requestInfo)) {
             verified = true;
         } else {
             var username = attempt(requestInfo::getUserName).orElse(fail -> NO_USERNAME_FOUND);
-            logger.info(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, username, ACCESS_RIGHT_EDIT_ALL_PROJECTS);
+            logger.info(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, username, MANAGE_OWN_PROJECTS);
             verified = false;
         }
     }

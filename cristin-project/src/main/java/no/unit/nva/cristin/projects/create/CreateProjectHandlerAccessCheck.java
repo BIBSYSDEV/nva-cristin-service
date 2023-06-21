@@ -11,17 +11,15 @@ public class CreateProjectHandlerAccessCheck extends ProjectHandlerAccessCheck i
 
     private static final Logger logger = LoggerFactory.getLogger(CreateProjectHandlerAccessCheck.class);
 
-    public static final String ACCESS_RIGHT_CREATE_PROJECT = "CREATE_PROJECT";
-
     private transient boolean verified;
 
     @Override
     public void verifyAccess(RequestInfo requestInfo) {
-        if (requestInfo.userIsAuthorized(ACCESS_RIGHT_CREATE_PROJECT) || hasLegacyAccessRight(requestInfo)) {
+        if (requestInfo.userIsAuthorized(MANAGE_OWN_PROJECTS) || hasLegacyAccessRight(requestInfo)) {
             verified = true;
         } else {
             var username = attempt(requestInfo::getUserName).orElse(fail -> NO_USERNAME_FOUND);
-            logger.info(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, username, ACCESS_RIGHT_CREATE_PROJECT);
+            logger.info(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, username, MANAGE_OWN_PROJECTS);
             verified = false;
         }
     }

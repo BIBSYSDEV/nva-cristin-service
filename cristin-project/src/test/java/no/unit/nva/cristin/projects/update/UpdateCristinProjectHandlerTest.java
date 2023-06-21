@@ -20,6 +20,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUM
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
+import static no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck.MANAGE_OWN_PROJECTS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinContactInfo.CRISTIN_CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
@@ -33,7 +34,6 @@ import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_KEY_VALUE_FIELD;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.TITLE_MUST_HAVE_A_LANGUAGE;
-import static no.unit.nva.cristin.projects.update.UpdateProjectHandlerAccessCheck.ACCESS_RIGHT_EDIT_ALL_PROJECTS;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
@@ -304,7 +304,7 @@ class UpdateCristinProjectHandlerTest {
     }
 
     private GatewayResponse<Void> sendQuery(String body) throws IOException {
-        return sendQuery(body, ACCESS_RIGHT_EDIT_ALL_PROJECTS);
+        return sendQuery(body, MANAGE_OWN_PROJECTS);
     }
 
     private GatewayResponse<Void> sendQuery(String body, String accessRight) throws IOException {
