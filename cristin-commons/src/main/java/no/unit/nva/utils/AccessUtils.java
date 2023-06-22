@@ -1,6 +1,7 @@
 package no.unit.nva.utils;
 
 import no.unit.nva.commons.json.JsonUtils;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
@@ -26,6 +27,7 @@ public class AccessUtils {
 
     public static final String EDIT_OWN_INSTITUTION_USERS = "EDIT_OWN_INSTITUTION_USERS";
     public static final String EDIT_OWN_INSTITUTION_PROJECTS = "EDIT_OWN_INSTITUTION_PROJECTS";
+    public static final String MANAGE_OWN_PROJECTS = AccessRight.MANAGE_OWN_PROJECTS.toString();
     public static final String ACCESS_TOKEN_CLAIMS_SCOPE_FIELD = "scope";
     public static final String ACCESS_TOKEN_CLAIMS_FIELD = "claims";
     public static final String AUTHORIZER_FIELD = "authorizer";
