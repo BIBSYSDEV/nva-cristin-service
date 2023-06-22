@@ -14,7 +14,7 @@ public class ProjectHandlerAccessCheck {
     protected ProjectHandlerAccessCheck() {
     }
 
-    protected boolean hasLegacyAccessRight(RequestInfo requestInfo) {
+    public static boolean hasLegacyAccessRight(RequestInfo requestInfo) {
         return requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_PROJECTS);
     }
 

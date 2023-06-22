@@ -100,6 +100,7 @@ class UpdateCristinProjectHandlerTest {
     public static final String CRISTIN_PRO_PARTICIPANT_CODE = "PRO_PARTICIPANT";
     public static final String CRISTIN_PRO_MANAGER_CODE = "PRO_MANAGER";
     public static final String ANOTHER_IDENTIFIER_THAN_USER = "999888";
+    public static final String NO_ACCESS = "noAccess";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final HttpClient httpClientMockFetch = mock(HttpClient.class);
@@ -108,6 +109,7 @@ class UpdateCristinProjectHandlerTest {
     private UpdateCristinProjectHandler handler;
     private FetchCristinProjectApiClient fetchApiClient;
     private final Environment environment = new Environment();
+    private UpdateCristinProjectApiClient updateApiClient;
 
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
@@ -117,9 +119,11 @@ class UpdateCristinProjectHandlerTest {
             .thenReturn(new HttpResponseFaker(cristinProject.toString(), 200));
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        var updateCristinProjectApiClient = new UpdateCristinProjectApiClient(httpClientMock);
+        updateApiClient = new UpdateCristinProjectApiClient(httpClientMock);
+        updateApiClient = spy(updateApiClient);
         fetchApiClient = new FetchCristinProjectApiClient(httpClientMockFetch);
-        handler = new UpdateCristinProjectHandler(updateCristinProjectApiClient, fetchApiClient, environment);
+        fetchApiClient = spy(fetchApiClient);
+        handler = new UpdateCristinProjectHandler(updateApiClient, fetchApiClient, environment);
     }
 
     @Test
@@ -130,14 +134,20 @@ class UpdateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenSendingNullBody() throws IOException {
+    void shouldReturnBadRequestWhenSendingNullBody() throws Exception {
+        handler = spy(handler);
+        doReturn(true).when(handler).hasResourceAccess(any());
+
         var gatewayResponse = sendQuery(null);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_INVALID_PAYLOAD));
     }
 
     @Test
-    void shouldReturnNoContentResponseWhenCallingHandlerWithValidJson() throws IOException {
+    void shouldReturnNoContentResponseWhenCallingHandlerWithValidJson() throws Exception {
+        handler = spy(handler);
+        doReturn(true).when(handler).hasResourceAccess(any());
+
         var input = IoUtils.stringFromResources(Path.of(PATCH_REQUEST_JSON));
         var gatewayResponse = sendQuery(input);
 
@@ -146,7 +156,10 @@ class UpdateCristinProjectHandlerTest {
 
     @ParameterizedTest(name = "Exception for field {0} with message {2}")
     @MethodSource("badRequestProvider")
-    void shouldReturnBadRequestOnInvalidJson(String field, JsonNode input, String exceptionMessage) throws IOException {
+    void shouldReturnBadRequestOnInvalidJson(String field, JsonNode input, String exceptionMessage) throws Exception {
+        handler = spy(handler);
+        doReturn(true).when(handler).hasResourceAccess(any());
+
         var gatewayResponse = sendQuery(input.toString());
 
         assertThat(gatewayResponse.getBody(), containsString(exceptionMessage));
@@ -154,11 +167,13 @@ class UpdateCristinProjectHandlerTest {
 
     @Test
     void shouldProduceCorrectPayloadToSendToCristin() throws Exception {
-        var apiClient = spyOnApiClient();
+        handler = spy(handler);
+        doReturn(true).when(handler).hasResourceAccess(any());
+
         var input = IoUtils.stringFromResources(Path.of(PATCH_REQUEST_JSON));
         sendQuery(input);
 
-        var actualPayload = captureCristinPayload(apiClient);
+        var actualPayload = captureCristinPayload(updateApiClient);
         var expectedPayload = IoUtils.stringFromResources(Path.of(CRISTIN_PATCH_REQUEST_JSON));
 
         assertThat(OBJECT_MAPPER.readTree(actualPayload), equalTo(OBJECT_MAPPER.readTree(expectedPayload)));
@@ -166,7 +181,10 @@ class UpdateCristinProjectHandlerTest {
 
     @ParameterizedTest(name = "Allowing null value for field {0}")
     @ValueSource(strings = {"funding", "relatedProjects", "institutionsResponsibleForResearch"})
-    void shouldAllowFieldsWhichCanBeNullable(String fieldName) throws IOException {
+    void shouldAllowFieldsWhichCanBeNullable(String fieldName) throws Exception {
+        handler = spy(handler);
+        doReturn(true).when(handler).hasResourceAccess(any());
+
         var input = OBJECT_MAPPER.createObjectNode().putNull(fieldName);
         var gatewayResponse = sendQuery(input.toString());
 
@@ -174,7 +192,10 @@ class UpdateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldSilentlyIgnoreUnsupportedFieldsInPayload() throws IOException {
+    void shouldSilentlyIgnoreUnsupportedFieldsInPayload() throws Exception {
+        handler = spy(handler);
+        doReturn(true).when(handler).hasResourceAccess(any());
+
         var input = OBJECT_MAPPER.createObjectNode();
         input.put(START_DATE, randomInstant().toString());
         input.put(UNSUPPORTED_FIELD, randomString());
@@ -185,14 +206,16 @@ class UpdateCristinProjectHandlerTest {
 
     @Test
     void shouldDefaultToEmptyStringAndNotCrashWhenSendingNonTextualValuesForContactInfoFields() throws Exception {
-        var apiClient = spyOnApiClient();
+        handler = spy(handler);
+        doReturn(true).when(handler).hasResourceAccess(any());
+
         var input = OBJECT_MAPPER.createObjectNode();
         var contactInfo = OBJECT_MAPPER.createObjectNode();
         contactInfo.putPOJO(CONTACT_PERSON, Map.of(randomString(), randomString()));
         input.set(CONTACT_INFO, contactInfo);
 
         var gatewayResponse = sendQuery(input.toString());
-        var actualPayload = captureCristinPayload(apiClient);
+        var actualPayload = captureCristinPayload(updateApiClient);
 
         var actualContactInfo = OBJECT_MAPPER.readTree(actualPayload).get(CRISTIN_CONTACT_INFO);
 
@@ -209,11 +232,11 @@ class UpdateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldAllowCreatorToEditOwnProject() throws Exception {
+    void shouldAllowCreatorWithCorrectRoleToEditOwnProject() throws Exception {
         var fetchedProjectJson = cristinProjectWithCreatorData().toString();
         mockFetchResponse(fetchedProjectJson);
 
-        var input = generateInputWithPayloadAndRequesterPersonCristinId();
+        var input = generateInputWithPayloadAndRequesterPersonCristinId(MANAGE_OWN_PROJECTS);
         handler.handleRequest(input, output, context);
         var response =  GatewayResponse.fromOutputStream(output, Void.class);
 
@@ -221,11 +244,11 @@ class UpdateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldAllowProjectManagerToEditTheirProjects() throws Exception {
+    void shouldAllowProjectManagerWithCorrectRoleToEditTheirProjects() throws Exception {
         var fetchedProjectJson = cristinProjectWithManagerData().toString();
         mockFetchResponse(fetchedProjectJson);
 
-        var input = generateInputWithPayloadAndRequesterPersonCristinId();
+        var input = generateInputWithPayloadAndRequesterPersonCristinId(MANAGE_OWN_PROJECTS);
         handler.handleRequest(input, output, context);
         var response =  GatewayResponse.fromOutputStream(output, Void.class);
 
@@ -233,11 +256,12 @@ class UpdateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldNotAllowProjectParticipantToEditTheirProjects() throws Exception {
+    void shouldNotAllowPersonWithCorrectRoleButIsNeitherProjectManagerOrCreatorToEditTheirProjects()
+        throws Exception {
         var fetchedProjectJson = cristinProjectWithRegularParticipantData().toString();
         mockFetchResponse(fetchedProjectJson);
 
-        var input = generateInputWithPayloadAndRequesterPersonCristinId();
+        var input = generateInputWithPayloadAndRequesterPersonCristinId(MANAGE_OWN_PROJECTS);
         handler.handleRequest(input, output, context);
         var response =  GatewayResponse.fromOutputStream(output, Void.class);
 
@@ -250,7 +274,19 @@ class UpdateCristinProjectHandlerTest {
             cristinProjectWithParticipantRoles(ANOTHER_IDENTIFIER_THAN_USER, CRISTIN_PRO_MANAGER_CODE).toString();
         mockFetchResponse(fetchedProjectJson);
 
-        var input = generateInputWithPayloadAndRequesterPersonCristinId();
+        var input = generateInputWithPayloadAndRequesterPersonCristinId(NO_ACCESS);
+        handler.handleRequest(input, output, context);
+        var response =  GatewayResponse.fromOutputStream(output, Void.class);
+
+        assertThat(response.getStatusCode(), equalTo(HTTP_FORBIDDEN));
+    }
+
+    @Test
+    void shouldNotAllowPersonWhichIsCreatorAndManagerButWithoutRoleToEditTheirOwnProject() throws Exception {
+        var fetchedProjectJson = cristinProjectWithManagerAndCreatorAsTheSame().toString();
+        mockFetchResponse(fetchedProjectJson);
+
+        var input = generateInputWithPayloadAndRequesterPersonCristinId(NO_ACCESS);
         handler.handleRequest(input, output, context);
         var response =  GatewayResponse.fromOutputStream(output, Void.class);
 
@@ -263,7 +299,9 @@ class UpdateCristinProjectHandlerTest {
             .when(httpClientMockFetch).<String>send(any(),any());
     }
 
-    private InputStream generateInputWithPayloadAndRequesterPersonCristinId() throws JsonProcessingException {
+    private InputStream generateInputWithPayloadAndRequesterPersonCristinId(String accessRight)
+        throws JsonProcessingException {
+
         var body = IoUtils.stringFromResources(Path.of(PATCH_REQUEST_JSON));
         var customerId = randomUri();
         var personCristinId = UriWrapper.fromUri(randomUri()).addChild(USER_IDENTIFIER).getUri();
@@ -272,19 +310,9 @@ class UpdateCristinProjectHandlerTest {
                    .withBody(body)
                    .withCurrentCustomer(customerId)
                    .withPersonCristinId(personCristinId)
+                   .withAccessRights(customerId, accessRight)
                    .withPathParameters(validPath)
                    .build();
-    }
-
-    private UpdateCristinProjectApiClient spyOnApiClient() throws IOException, InterruptedException {
-        var mockHttpClient = mock(HttpClient.class);
-        var apiClient = new UpdateCristinProjectApiClient(mockHttpClient);
-        apiClient = spy(apiClient);
-        var fetchApiClient = new FetchCristinProjectApiClient(mockHttpClient);
-        fetchApiClient = spy(fetchApiClient);
-        handler = new UpdateCristinProjectHandler(apiClient, fetchApiClient, environment);
-        mockUpstream(mockHttpClient);
-        return apiClient;
     }
 
     private String captureCristinPayload(UpdateCristinProjectApiClient apiClient)
@@ -292,11 +320,6 @@ class UpdateCristinProjectHandlerTest {
         var captor = ArgumentCaptor.forClass(String.class);
         verify(apiClient).patch(any(), captor.capture());
         return captor.getValue();
-    }
-
-    private void mockUpstream(HttpClient mockHttpClient) throws IOException, InterruptedException {
-        var httpResponse = new HttpResponseFaker(EMPTY_STRING, 204);
-        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
     }
 
     private static String randomIntegerAsString() {
@@ -460,18 +483,29 @@ class UpdateCristinProjectHandlerTest {
 
     private CristinProject cristinProjectWithParticipantRoles(String userIdentifier, String roleCode) {
         var cristinProject = basicCristinProject();
-        var participant = new CristinPerson();
-        participant.setCristinPersonId(userIdentifier);
-        participant.setRoles(List.of(createRole(roleCode)));
+        var participant = getParticipant(userIdentifier, roleCode);
         cristinProject.setParticipants(List.of(participant));
 
         return cristinProject;
+    }
+
+    private CristinPerson getParticipant(String userIdentifier, String roleCode) {
+        var participant = new CristinPerson();
+        participant.setCristinPersonId(userIdentifier);
+        participant.setRoles(List.of(createRole(roleCode)));
+        return participant;
     }
 
     private CristinRole createRole(String roleCode) {
         var cristinRole = new CristinRole();
         cristinRole.setRoleCode(roleCode);
         return cristinRole;
+    }
+
+    private CristinProject cristinProjectWithManagerAndCreatorAsTheSame() {
+        var cristinProject = cristinProjectWithCreatorData();
+        cristinProject.setParticipants(List.of(getParticipant(USER_IDENTIFIER, CRISTIN_PRO_MANAGER_CODE)));
+        return cristinProject;
     }
 
 }
