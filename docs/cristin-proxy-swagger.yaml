@@ -298,7 +298,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Project
-      summary: Update project matching identifier
+      summary: Update project matching identifier. Only allowed for project creator or manager
       description: Updates project data
       operationId: UpdateProject
       parameters:

@@ -1,26 +1,26 @@
 [versions]
 junit = { strictly = '5.8.2' }
-nva-commons = {strictly = '1.25.15'}
-jackson = { strictly = '2.13.3' }
-mockito = { strictly = '4.5.1' }
+nva-commons = {strictly = '1.30.1'}
+jackson = { strictly = '2.15.2' }
+mockito = { strictly = '5.3.1' }
 hamcrest = { strictly = '2.2' }
 zalando = { strictly = '0.27.1' }
 javax-ws-rs = { strictly = '2.1.1' }
 jsoup = { strictly = '1.14.3' }
-aws-lambda-java-core = { strictly = '1.2.1' }
-google-guava = { strictly = '31.1-jre' }
+aws-lambda-java-core = { strictly = '1.2.2' }
+google-guava = { strictly = '32.0.0-jre' }
 karate-core = { strictly = '1.1.0' }
 karate-apache = { strictly = '0.9.6' }
 karate-junit5 = { strictly = '1.1.0' }
 log4jApi = { strictly = '2.17.2' }
 slf4j = { strictly = '1.8.0-beta4' }
 nva-language = { strictly = '1.0' }
-awsSdk = { strictly = '1.12.220' }
-awsSdk2 = { strictly = '2.17.191' }
+awsSdk = { strictly = '1.12.483' }
+awsSdk2 = { strictly = '2.20.80' }
 bekkopen-nocommons = { strictly = '0.12.0' }
 com-auth0-jwt = { strictly = '3.18.3' }
 com-auth0-jwks = { strictly = '0.20.2' }
-wiremock = { strictly = '2.33.2' }
+wiremock = { strictly = '2.35.0' }
 apache-http-core = { strictly = '4.4.16' }
 
 [libraries]

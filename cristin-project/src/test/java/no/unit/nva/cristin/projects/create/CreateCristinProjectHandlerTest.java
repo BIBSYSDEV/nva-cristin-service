@@ -13,7 +13,7 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaP
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomOrganization;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomPerson;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
-import static no.unit.nva.cristin.projects.create.CreateProjectHandlerAccessCheck.ACCESS_RIGHT_CREATE_PROJECT;
+import static no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck.MANAGE_OWN_PROJECTS;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_ONE;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_THREE;
 import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.DRUGSTUDY;
@@ -593,7 +593,7 @@ class CreateCristinProjectHandlerTest {
                         .withCurrentCustomer(customer)
                         .withPersonCristinId(CRISTIN_PERSON_ID)
                         .withTopLevelCristinOrgId(CRISTIN_ORG_ID)
-                        .withAccessRights(customer, ACCESS_RIGHT_CREATE_PROJECT)
+                        .withAccessRights(customer, MANAGE_OWN_PROJECTS)
                         .build();
     }
 
@@ -605,7 +605,7 @@ class CreateCristinProjectHandlerTest {
                    .withBody(nvaProject)
                    .withCurrentCustomer(customer)
                    .withPersonCristinId(CRISTIN_PERSON_ID)
-                   .withAccessRights(customer, ACCESS_RIGHT_CREATE_PROJECT)
+                   .withAccessRights(customer, MANAGE_OWN_PROJECTS)
                    .build();
     }
 
@@ -676,7 +676,7 @@ class CreateCristinProjectHandlerTest {
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
             .withBody(body)
             .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, ACCESS_RIGHT_CREATE_PROJECT)
+            .withAccessRights(customerId, MANAGE_OWN_PROJECTS)
             .build();
     }
 
@@ -693,7 +693,7 @@ class CreateCristinProjectHandlerTest {
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                    .withBody(expected)
                    .withCurrentCustomer(customerId)
-                   .withAccessRights(customerId, ACCESS_RIGHT_CREATE_PROJECT)
+                   .withAccessRights(customerId, MANAGE_OWN_PROJECTS)
                    .build();
     }
 
