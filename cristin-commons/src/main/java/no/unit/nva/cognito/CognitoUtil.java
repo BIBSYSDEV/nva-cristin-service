@@ -138,7 +138,7 @@ public class CognitoUtil {
     }
 
     private static String constructAccessRights(URI currentCustomerClaimValue) {
-        return Stream.of(AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS, AccessUtils.EDIT_OWN_INSTITUTION_USERS)
+        return Stream.of(AccessUtils.EDIT_OWN_INSTITUTION_USERS, AccessUtils.MANAGE_OWN_PROJECTS)
             .map(right -> right + AT + currentCustomerClaimValue.toString())
             .collect(Collectors.joining(MULTI_VALUE_DELIMITER));
     }
