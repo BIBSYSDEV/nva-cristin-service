@@ -15,7 +15,7 @@ public class UpdateProjectHandlerAccessCheck extends ProjectHandlerAccessCheck i
 
     @Override
     public void verifyAccess(RequestInfo requestInfo) {
-        if (requestInfo.userIsAuthorized(MANAGE_OWN_PROJECTS) || hasLegacyAccessRight(requestInfo)) {
+        if (requestInfo.userIsAuthorized(MANAGE_OWN_PROJECTS)) {
             verified = true;
         } else {
             var username = attempt(requestInfo::getUserName).orElse(fail -> NO_USERNAME_FOUND);
