@@ -63,20 +63,6 @@ public class AccessUtils {
     }
 
     /**
-     * Validate if Requester is authorized to create or change a project.
-     *
-     * @param requestInfo information from request
-     * @throws ForbiddenException thrown when user has no access to create or change projects
-     */
-    public static void verifyRequesterCanEditProjects(RequestInfo requestInfo) throws ForbiddenException {
-        if (requesterHasNoAccessRightToEditProjects(requestInfo)) {
-            String nvaUsername = attempt(requestInfo::getNvaUsername).orElse(fail -> null);
-            logger.warn(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, nvaUsername, EDIT_OWN_INSTITUTION_PROJECTS);
-            throw new ForbiddenException();
-        }
-    }
-
-    /**
      * Checks if the requester is permitted to act as a user administrator, either by having that specific role, or if
      * the client is internal backend.
      *
@@ -89,10 +75,6 @@ public class AccessUtils {
 
     private static boolean requesterHasNoAccessRightToUseNationalIdentificationNumber(RequestInfo requestInfo) {
         return !(requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS) || requestInfo.clientIsInternalBackend());
-    }
-
-    private static boolean requesterHasNoAccessRightToEditProjects(RequestInfo requestInfo) {
-        return !requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_PROJECTS);
     }
 
     /**
