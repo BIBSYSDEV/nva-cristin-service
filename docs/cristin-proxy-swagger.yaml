@@ -457,6 +457,9 @@ paths:
         cacheKeyParameters:
           - "method.request.path.identifier"
           - "method.request.query.depth"
+        requestParameters:
+          - "method.request.path.identifier"
+          - "method.request.query.depth"
       tags:
         - Organization
       summary: Fetch Organization by identifier
