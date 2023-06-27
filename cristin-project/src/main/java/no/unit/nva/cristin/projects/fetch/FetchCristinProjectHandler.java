@@ -56,13 +56,13 @@ public class FetchCristinProjectHandler extends CristinHandler<Void, NvaProject>
                 return authenticatedFetchProject(id);
             }
 
-            if (!hasHandlerAccess(requestInfo)) {
+            if (doesNotHaveHandlerAccess(requestInfo)) {
                 throw new ForbiddenException();
             }
 
             var requestedProject =  authenticatedFetchProject(id);
 
-            if (!hasResourceAccess(requestInfo, requestedProject)) {
+            if (doesNotHaveResourceAccess(requestInfo, requestedProject)) {
                 throw new ForbiddenException();
             }
 
@@ -70,19 +70,21 @@ public class FetchCristinProjectHandler extends CristinHandler<Void, NvaProject>
         }
     }
 
-    private boolean hasResourceAccess(RequestInfo requestInfo, NvaProject requestedProject) throws ApiGatewayException {
+    private boolean doesNotHaveResourceAccess(RequestInfo requestInfo, NvaProject requestedProject)
+        throws ApiGatewayException {
+
         ResourceAccessCheck<NvaProject> resourceAccessCheck = new FetchCristinProjectResourceAccessCheck();
         resourceAccessCheck.verifyAccess(requestedProject,
                                          Map.of(USER_IDENTIFIER, extractCristinIdentifier(requestInfo)));
 
-        return resourceAccessCheck.isVerified();
+        return !resourceAccessCheck.isVerified();
     }
 
-    private boolean hasHandlerAccess(RequestInfo requestInfo) throws ApiGatewayException {
+    private boolean doesNotHaveHandlerAccess(RequestInfo requestInfo) throws ApiGatewayException {
         HandlerAccessCheck handlerAccessCheck = new FetchCristinProjectHandlerAccessCheck();
         handlerAccessCheck.verifyAccess(requestInfo);
 
-        return handlerAccessCheck.isVerified();
+        return !handlerAccessCheck.isVerified();
     }
 
     private void validateQueryParameters(RequestInfo requestInfo) throws BadRequestException {
