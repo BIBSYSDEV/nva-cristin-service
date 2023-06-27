@@ -111,16 +111,6 @@ Resources:
       RestApiId: !Ref NvaCristinProxyApi
       StageName: Prod
 
-
-  NvaCristinProxyApiStage:
-    Type: AWS::ApiGateway::Stage
-    Properties:
-      StageName: Prod
-      CacheClusterEnabled: true
-      CacheClusterSize: "0.5"
-      RestApiId: !Ref NvaCristinProxyApi
-
-
   ReadCristinAuthenticationRole:
     Type: AWS::IAM::Role
     Properties:
