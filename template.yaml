@@ -87,6 +87,13 @@ Resources:
   NvaCristinProxyApi:
     Type: AWS::Serverless::Api
     Properties:
+      CacheClusterEnabled: true
+      CacheClusterSize: "0.5"
+      MethodSettings:
+        - HttpMethod: 'GET'
+          ResourcePath: '/*'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
@@ -98,19 +105,8 @@ Resources:
       StageName: Prod
       Auth:
         DefaultAuthorizer: NONE
-      EndpointConfiguration: Regional
-
-  NvaCristinProxyApiDeployment:
-    Type: AWS::ApiGateway::Deployment
-    Properties:
-      Description: String
-      StageDescription:
-        CacheClusterEnabled: true
-        CacheClusterSize: "0.5"
-        CacheTtlInSeconds: 300
-      RestApiId: !Ref NvaCristinProxyApi
-      StageName: Prod
-
+      EndpointConfiguration:
+        Type: REGIONAL
 
   ReadCristinAuthenticationRole:
     Type: AWS::IAM::Role
@@ -156,12 +152,9 @@ Resources:
             Path: /project/
             Method: get
             RequestParameters:
-              - method.request.querystring.query:
-                  Caching: true
-              - method.request.querystring.page:
-                  Caching: true
-              - method.request.querystring.results:
-                  Caching: true
+              - method.request.querystring.query
+              - method.request.querystring.page
+              - method.request.querystring.results
 
   NvaCristinCreateProjectsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -191,9 +184,7 @@ Resources:
             Path: /project/{identifier}
             Method: get
             RequestParameters:
-              - method.request.path.identifier:
-                  Required: true
-                  Caching: true
+              - method.request.path.identifier
 
 
   NvaCristinUpdateProjectFunction:
@@ -223,14 +214,10 @@ Resources:
             Path: /organization/
             Method: get
             RequestParameters:
-              - method.request.querystring.query:
-                  Caching: true
-              - method.request.querystring.page:
-                  Caching: true
-              - method.request.querystring.results:
-                  Caching: true
-              - method.request.querystring.depth:
-                  Caching: true
+              - method.request.querystring.query
+              - method.request.querystring.page
+              - method.request.querystring.results
+              - method.request.querystring.depth
 
   NvaCristinFetchOrganization:
     Type: AWS::Serverless::Function
@@ -249,12 +236,8 @@ Resources:
             Path: /organization/{id}
             Method: get
             RequestParameters:
-              - method.request.querystring.depth:
-                  Required: false
-                  Caching: true
-              - method.request.path.id:
-                  Required: true
-                  Caching: true
+              - method.request.querystring.depth
+              - method.request.path.id
 
   NvaCristinFetchOrganizationTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
@@ -292,13 +275,9 @@ Resources:
             Path: /organization/{id}/persons
             Method: get
             RequestParameters:
-              - method.request.path.id:
-                  Required: true
-                  Caching: true
-              - method.request.querystring.page:
-                  Caching: true
-              - method.request.querystring.results:
-                  Caching: true
+              - method.request.path.id
+              - method.request.querystring.page
+              - method.request.querystring.results
 
   NvaCristinListOrganizationProjectsFunction:
     Type: AWS::Serverless::Function
@@ -313,13 +292,9 @@ Resources:
             Path: /organization/{identifier}/projects
             Method: get
             RequestParameters:
-              - method.request.path.identifier:
-                  Required: true
-                  Caching: true
-              - method.request.querystring.page:
-                  Caching: true
-              - method.request.querystring.results:
-                  Caching: true
+              - method.request.path.identifier
+              - method.request.querystring.page
+              - method.request.querystring.results
 
   NvaCristinQueryPersonFunction:
     Type: AWS::Serverless::Function
@@ -335,14 +310,10 @@ Resources:
             Path: /person/
             Method: get
             RequestParameters:
-              - method.request.querystring.name:
-                  Caching: true
-              - method.request.querystring.organization:
-                  Caching: true
-              - method.request.querystring.page:
-                  Caching: true
-              - method.request.querystring.results:
-                  Caching: true
+              - method.request.querystring.name
+              - method.request.querystring.organization
+              - method.request.querystring.page
+              - method.request.querystring.results
 
   NvaCristinFetchPersonFunction:
     Type: AWS::Serverless::Function
@@ -358,9 +329,7 @@ Resources:
             Path: /person/{id}
             Method: get
             RequestParameters:
-              - method.request.path.id:
-                  Required: true
-                  Caching: true
+              - method.request.path.id
 
   NvaCristinFetchPersonUsingNin:
     Type: AWS::Serverless::Function
@@ -445,12 +414,8 @@ Resources:
             Path: /person/{id}/organization/{orgId}/
             Method: get
             RequestParameters:
-              - method.request.path.id:
-                  Required: true
-                  Caching: true
-              - method.request.path.orgId:
-                  Required: true
-                  Caching: true
+              - method.request.path.id
+              - method.request.path.orgId
 
 
   NvaCristinUpdatePersonInstitutionInfoFunction:
@@ -494,9 +459,7 @@ Resources:
             Path: /person/{id}/employment/
             Method: get
             RequestParameters:
-              - method.request.path.id:
-                  Required: true
-                  Caching: true
+              - method.request.path.id
 
   NvaCristinCreatePersonEmploymentFunction:
     Type: AWS::Serverless::Function
@@ -568,9 +531,7 @@ Resources:
             Path: /funding-sources/{identifier}
             Method: get
             RequestParameters:
-              - method.request.path.identifier:
-                  Required: true
-                  Caching: true
+              - method.request.path.identifier
 
   NvaCristinFetchBiobankFunction:
     Type: AWS::Serverless::Function
@@ -586,9 +547,7 @@ Resources:
             Path: /biobank/{identifier}
             Method: get
             RequestParameters:
-              - method.request.path.identifier:
-                  Required: true
-                  Caching: true
+              - method.request.path.identifier
 
   NvaCristinUpdatePersonPictureFunction:
     Type: AWS::Serverless::Function
@@ -618,9 +577,7 @@ Resources:
             Path: /person/{id}/picture/
             Method: get
             RequestParameters:
-              - method.request.path.id:
-                  Required: true
-                  Caching: true
+              - method.request.path.id
 
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
