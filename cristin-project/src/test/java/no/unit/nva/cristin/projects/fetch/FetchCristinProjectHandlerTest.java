@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
+import java.net.http.HttpClient;
+import no.unit.nva.cristin.model.CristinPerson;
+import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
@@ -32,6 +35,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
+import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 import static java.util.Map.of;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
@@ -41,11 +47,16 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED
 import static no.unit.nva.cristin.common.client.ApiClient.RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck.MANAGE_OWN_PROJECTS;
 import static no.unit.nva.cristin.projects.fetch.FetchCristinProjectClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.fetch.FetchCristinProjectHandler.ERROR_MESSAGE_CLIENT_SENT_UNSUPPORTED_QUERY_PARAM;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.FUNDING_SOURCES;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
@@ -77,6 +88,9 @@ public class FetchCristinProjectHandlerTest {
     public static final String NOT_LEGAL_STATUS = "not_legal_status";
     public static final String INVALID_QUERY_PARAM_KEY = "invalid";
     public static final String INVALID_QUERY_PARAM_VALUE = "value";
+    public static final String PERSON_ID = "12345";
+    public static final String STATUS_ACTIVE = "ACTIVE";
+    public static final String LANGUAGE_NB = "nb";
 
     private FetchCristinProjectApiClient cristinApiClientStub;
     private final Environment environment = new Environment();
@@ -85,11 +99,18 @@ public class FetchCristinProjectHandlerTest {
     private FetchCristinProjectHandler handler;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         cristinApiClientStub = new FetchCristinProjectClientStub();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
+
+        var mockHttpClient = mock(HttpClient.class);
+        doReturn(fakeOkResponse()).when(mockHttpClient).<String>send(any(), any());
+        var fakeAuthorizedClient = new FetchCristinProjectApiClient(mockHttpClient);
+
         handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
+        handler = spy(handler);
+        doReturn(fakeAuthorizedClient).when(handler).authorizedApiClient();
     }
 
     @Test
@@ -338,9 +359,7 @@ public class FetchCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldReturnBadGatewayWhenUpstreamReturnForbiddenIndicationMissingAllowHeader()
-        throws Exception {
-
+    void shouldReturnBadGatewayWhenUpstreamReturnForbiddenIndicationMissingAllowHeader() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
         var payload = getBodyFromResource(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON);
         doReturn(new HttpResponseFaker(payload, 403)).when(cristinApiClientStub).fetchGetResult(any(URI.class));
@@ -350,6 +369,71 @@ public class FetchCristinProjectHandlerTest {
 
         assertThat(gatewayResponse.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_GATEWAY));
         assertThat(gatewayResponse.getBody(), containsString(RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER));
+    }
+
+    @Test
+    void shouldThrowForbiddenWhenUserRequestingRestrictedProjectWithoutHavingRequiredRights() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseFaker(EMPTY_STRING, HTTP_UNAUTHORIZED)).when(cristinApiClientStub)
+            .fetchGetResult(any());
+
+        var mockHttpClient = mock(HttpClient.class);
+        doReturn(fakeOkResponse()).when(mockHttpClient).<String>send(any(), any());
+        var fakeAuthorizedClient = new FetchCristinProjectApiClient(mockHttpClient);
+
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
+        handler = spy(handler);
+        doReturn(fakeAuthorizedClient).when(handler).authorizedApiClient();
+
+        var gatewayResponse =
+            sendQueryWithPersonIdAndAccessRight(MANAGE_OWN_PROJECTS);
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_FORBIDDEN));
+    }
+
+    @Test
+    void shouldReturnRestrictedProjectWhenUserHasRequiredRights() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseFaker(EMPTY_STRING, HTTP_UNAUTHORIZED)).when(cristinApiClientStub)
+            .fetchGetResult(any());
+
+        var mockHttpClient = mock(HttpClient.class);
+        doReturn(fakeOkResponseWithCreatorSameAsUser()).when(mockHttpClient).<String>send(any(), any());
+        var fakeAuthorizedClient = new FetchCristinProjectApiClient(mockHttpClient);
+
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
+        handler = spy(handler);
+        doReturn(fakeAuthorizedClient).when(handler).authorizedApiClient();
+
+        var gatewayResponse =
+            sendQueryWithPersonIdAndAccessRight(MANAGE_OWN_PROJECTS);
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    @Test
+    void shouldReturnRestrictedProjectWhenUserHasLegacyRights() throws Exception {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(new HttpResponseFaker(EMPTY_STRING, HTTP_UNAUTHORIZED)).when(cristinApiClientStub)
+            .fetchGetResult(any());
+
+        var mockHttpClient = mock(HttpClient.class);
+        doReturn(fakeOkResponse()).when(mockHttpClient).<String>send(any(), any());
+        var fakeAuthorizedClient = new FetchCristinProjectApiClient(mockHttpClient);
+
+        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
+        handler = spy(handler);
+        doReturn(fakeAuthorizedClient).when(handler).authorizedApiClient();
+
+        var gatewayResponse =
+            sendQueryWithPersonIdAndAccessRight(EDIT_OWN_INSTITUTION_PROJECTS);
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    private HttpResponseFaker fakeOkResponse() {
+        return new HttpResponseFaker(basicCristinProjectWithOnlyRequiredFields().toString(), HTTP_OK);
+    }
+
+    private HttpResponseFaker fakeOkResponseWithCreatorSameAsUser() {
+        return new HttpResponseFaker(cristinProjectWithCreatorData().toString(), HTTP_OK);
     }
 
     private String randomLanguageCode() {
@@ -402,5 +486,46 @@ public class FetchCristinProjectHandlerTest {
 
     private String getBodyFromResource(String resource) {
         return IoUtils.stringFromResources(Path.of(resource));
+    }
+
+    private GatewayResponse<NvaProject> sendQueryWithPersonIdAndAccessRight(String accessRight) throws IOException {
+        var input = requestWithPersonIdAndAccessRight(accessRight);
+        handler.handleRequest(input, output, context);
+        return GatewayResponse.fromOutputStream(output, NvaProject.class);
+    }
+
+    private InputStream requestWithPersonIdAndAccessRight(String accessRight)
+        throws JsonProcessingException {
+
+        var customerId = randomUri();
+        var personIdUri = UriWrapper.fromUri(randomUri()).addChild(PERSON_ID).getUri();
+
+        return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                   .withBody(null)
+                   .withPersonCristinId(personIdUri)
+                   .withCurrentCustomer(customerId)
+                   .withAccessRights(customerId, accessRight)
+                   .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
+                   .build();
+    }
+
+    private CristinProject basicCristinProjectWithOnlyRequiredFields() {
+        var cristinProject = new CristinProject();
+        cristinProject.setCristinProjectId(randomInteger(999999).toString());
+        cristinProject.setStatus(STATUS_ACTIVE);
+        cristinProject.setTitle(Map.of(LANGUAGE_NB, randomString()));
+        return cristinProject;
+    }
+
+    private CristinProject cristinProjectWithCreatorData() {
+        var cristinProject = basicCristinProjectWithOnlyRequiredFields();
+        cristinProject.setCreator(cristinPersonWithDefaultIdentifier());
+        return cristinProject;
+    }
+
+    private CristinPerson cristinPersonWithDefaultIdentifier() {
+        var creator = new CristinPerson();
+        creator.setCristinPersonId(PERSON_ID);
+        return creator;
     }
 }
