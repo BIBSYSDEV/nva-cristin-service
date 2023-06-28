@@ -111,6 +111,7 @@ Resources:
       RestApiId: !Ref NvaCristinProxyApi
       StageName: Prod
 
+
   ReadCristinAuthenticationRole:
     Type: AWS::IAM::Role
     Properties:

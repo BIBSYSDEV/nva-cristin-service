@@ -458,8 +458,8 @@ paths:
           - "method.request.path.identifier"
           - "method.request.query.depth"
         requestParameters:
-          - "method.request.path.identifier"
-          - "method.request.query.depth"
+          integration.request.path.identifier: "method.request.path.identifier"
+          integration.request.query.depth: "method.request.query.depth"
       tags:
         - Organization
       summary: Fetch Organization by identifier
