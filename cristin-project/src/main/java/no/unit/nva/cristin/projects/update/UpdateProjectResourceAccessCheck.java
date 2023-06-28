@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.projects.common.ProjectResourceAccessCheck;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
@@ -12,11 +13,11 @@ import no.unit.nva.utils.UriUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UpdateProjectResourceAccessCheck implements ResourceAccessCheck<NvaProject> {
+public class UpdateProjectResourceAccessCheck extends ProjectResourceAccessCheck
+    implements ResourceAccessCheck<NvaProject> {
 
     private static final Logger logger = LoggerFactory.getLogger(UpdateProjectResourceAccessCheck.class);
 
-    public static final String USER_IDENTIFIER = "userIdentifier";
     public static final String PROJECT_MANAGER_ROLE_CODE = "ProjectManager";
     public static final String NOT_ALLOWED_TO_UPDATE_THIS_RESOURCE =
         "User with identifier: {} is not allowed to update resource with id {}";
@@ -61,20 +62,8 @@ public class UpdateProjectResourceAccessCheck implements ResourceAccessCheck<Nva
                    .filter(Utils::isPositiveInteger);
     }
 
-    private Optional<String> getResourceCreator(NvaProject resource) {
-        return Optional.ofNullable(resource)
-                   .map(NvaProject::getCreator)
-                   .map(NvaContributor::getIdentity)
-                   .map(Person::getId)
-                   .map(UriUtils::extractLastPathElement)
-                   .filter(Utils::isPositiveInteger);
-    }
-
     private boolean isProjectManager(NvaContributor nvaContributor) {
         return PROJECT_MANAGER_ROLE_CODE.equals(nvaContributor.getType());
     }
 
-    private boolean hasMatch(String identifierFromResource, String userIdentifier) {
-        return identifierFromResource.equals(userIdentifier);
-    }
 }
