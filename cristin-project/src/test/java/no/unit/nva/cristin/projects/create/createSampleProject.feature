@@ -208,3 +208,5 @@ Feature: API tests for Cristin Project retrieve and search
     And request swaggerMinimumSampleProject
     When method POST
     Then status 201
+    And print response
+    And match response.publishable == true

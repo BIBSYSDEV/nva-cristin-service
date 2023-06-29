@@ -12,6 +12,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTACT_INFO;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_CONTACT_INFO;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
+import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
@@ -162,6 +163,7 @@ class UpdateCristinProjectHandlerTest {
 
         var gatewayResponse = sendQuery(input.toString());
 
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_BAD_REQUEST));
         assertThat(gatewayResponse.getBody(), containsString(exceptionMessage));
     }
 
@@ -378,8 +380,15 @@ class UpdateCristinProjectHandlerTest {
             Arguments.of(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH, notAnOrganization(),
                          format(ILLEGAL_VALUE_FOR_PROPERTY, NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)),
             Arguments.of(ALTERNATIVE_TITLES, notAListOfMaps(),
-                         format(NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS, ALTERNATIVE_TITLES))
+                         format(NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS, ALTERNATIVE_TITLES)),
+            Arguments.of(END_DATE, endDateInstant(EMPTY_STRING), format(ILLEGAL_VALUE_FOR_PROPERTY, END_DATE)),
+            Arguments.of(END_DATE, endDateInstant(null), format(ILLEGAL_VALUE_FOR_PROPERTY, END_DATE)),
+            Arguments.of(END_DATE, endDateInstant(randomString()), format(ILLEGAL_VALUE_FOR_PROPERTY, END_DATE))
         );
+    }
+
+    private static JsonNode endDateInstant(String fieldValue) {
+        return OBJECT_MAPPER.createObjectNode().put(END_DATE, fieldValue);
     }
 
     private static JsonNode notAnArray(String fieldName) {

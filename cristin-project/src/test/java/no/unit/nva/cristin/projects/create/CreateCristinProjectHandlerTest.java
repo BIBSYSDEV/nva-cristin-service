@@ -163,6 +163,7 @@ class CreateCristinProjectHandlerTest {
         randomNvaProject.setCoordinatingInstitution(null);
         randomNvaProject.setContributors(null);
         randomNvaProject.setStartDate(null);
+        randomNvaProject.setEndDate(null);
 
         var response = executeRequest(randomNvaProject);
 
@@ -170,6 +171,7 @@ class CreateCristinProjectHandlerTest {
         assertThat(response.getBody(), containsString(ValidatedResult.HasNoCoordinatingOrganization.getLabel()));
         assertThat(response.getBody(), containsString(ValidatedResult.HasNoContributors.getLabel()));
         assertThat(response.getBody(), containsString(ValidatedResult.InvalidStartDate.getLabel()));
+        assertThat(response.getBody(), containsString(ValidatedResult.InvalidEndDate.getLabel()));
     }
 
     @Test
