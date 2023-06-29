@@ -37,7 +37,6 @@ import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VA
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_URI;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.TITLE_MUST_HAVE_A_LANGUAGE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.WEB_PAGE;
-import static no.unit.nva.cristin.projects.update.UpdateProjectHandlerAccessCheck.ACCESS_RIGHT_EDIT_ALL_PROJECTS;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
