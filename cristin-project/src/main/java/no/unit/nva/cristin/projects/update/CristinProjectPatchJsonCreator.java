@@ -131,7 +131,9 @@ public class CristinProjectPatchJsonCreator {
             }
         }
 
-        output.putPOJO(TITLE, cristinTitles);
+        if (cristinTitles.size() > 0) {
+            output.putPOJO(TITLE, cristinTitles);
+        }
     }
 
     private boolean isSupportedLanguage(Language language) {
