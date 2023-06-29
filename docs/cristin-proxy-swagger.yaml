@@ -2755,11 +2755,6 @@ components:
                 type: integer
                 format: int32
                 description: Cristin ID of project
-        name:
-          type: array
-          description: Names in different languages
-          items:
-            $ref: '#/components/schemas/Languages'
         labels:
           type: array
           description: Names in different languages
@@ -3673,9 +3668,6 @@ components:
           }
           ],
           "biobankType": "SPECIFICBIOBANK",
-          "name": {
-            "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
-          },
           "labels": {
             "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
           },
