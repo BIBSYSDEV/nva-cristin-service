@@ -1,6 +1,7 @@
 package no.unit.nva.utils;
 
 import no.unit.nva.commons.json.JsonUtils;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
@@ -26,6 +27,7 @@ public class AccessUtils {
 
     public static final String EDIT_OWN_INSTITUTION_USERS = "EDIT_OWN_INSTITUTION_USERS";
     public static final String EDIT_OWN_INSTITUTION_PROJECTS = "EDIT_OWN_INSTITUTION_PROJECTS";
+    public static final String MANAGE_OWN_PROJECTS = AccessRight.MANAGE_OWN_PROJECTS.toString();
     public static final String ACCESS_TOKEN_CLAIMS_SCOPE_FIELD = "scope";
     public static final String ACCESS_TOKEN_CLAIMS_FIELD = "claims";
     public static final String AUTHORIZER_FIELD = "authorizer";
@@ -63,20 +65,6 @@ public class AccessUtils {
     }
 
     /**
-     * Validate if Requester is authorized to create or change a project.
-     *
-     * @param requestInfo information from request
-     * @throws ForbiddenException thrown when user has no access to create or change projects
-     */
-    public static void verifyRequesterCanEditProjects(RequestInfo requestInfo) throws ForbiddenException {
-        if (requesterHasNoAccessRightToEditProjects(requestInfo)) {
-            String nvaUsername = attempt(requestInfo::getNvaUsername).orElse(fail -> null);
-            logger.warn(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, nvaUsername, EDIT_OWN_INSTITUTION_PROJECTS);
-            throw new ForbiddenException();
-        }
-    }
-
-    /**
      * Checks if the requester is permitted to act as a user administrator, either by having that specific role, or if
      * the client is internal backend.
      *
@@ -89,10 +77,6 @@ public class AccessUtils {
 
     private static boolean requesterHasNoAccessRightToUseNationalIdentificationNumber(RequestInfo requestInfo) {
         return !(requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS) || requestInfo.clientIsInternalBackend());
-    }
-
-    private static boolean requesterHasNoAccessRightToEditProjects(RequestInfo requestInfo) {
-        return !requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_PROJECTS);
     }
 
     /**

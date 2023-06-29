@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects.update;
+package no.unit.nva.cristin.projects.fetch;
 
 import static nva.commons.core.attempt.Try.attempt;
 import no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck;
@@ -7,9 +7,9 @@ import nva.commons.apigateway.RequestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UpdateProjectHandlerAccessCheck extends ProjectHandlerAccessCheck implements HandlerAccessCheck {
+public class FetchCristinProjectHandlerAccessCheck extends ProjectHandlerAccessCheck implements HandlerAccessCheck {
 
-    private static final Logger logger = LoggerFactory.getLogger(UpdateProjectHandlerAccessCheck.class);
+    private static final Logger logger = LoggerFactory.getLogger(FetchCristinProjectHandlerAccessCheck.class);
 
     private transient boolean verified;
 
@@ -28,5 +28,4 @@ public class UpdateProjectHandlerAccessCheck extends ProjectHandlerAccessCheck i
     public boolean isVerified() {
         return verified;
     }
-
 }

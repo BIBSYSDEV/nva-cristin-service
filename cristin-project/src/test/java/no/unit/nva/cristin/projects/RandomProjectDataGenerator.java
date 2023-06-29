@@ -173,16 +173,17 @@ public class RandomProjectDataGenerator {
     public static NvaProject randomMinimalNvaProject() {
         final String identifier = randomString();
         return new NvaProject.Builder()
-                .withId(UriUtils.createNvaProjectId(identifier))
-                .withIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
-                .withType(PROJECT_TYPE)
-                .withTitle(randomString())
-                .withLanguage(LanguageMapper.toUri(randomElement(LANGUAGES)))
-                .withStatus(randomStatus())
-                .withCoordinatingInstitution(randomOrganization())
-                .withContributors(randomContributors())
-                .withStartDate(randomInstant())
-                .build();
+                   .withId(UriUtils.createNvaProjectId(identifier))
+                   .withIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
+                   .withType(PROJECT_TYPE)
+                   .withTitle(randomString())
+                   .withLanguage(LanguageMapper.toUri(randomElement(LANGUAGES)))
+                   .withStatus(randomStatus())
+                   .withCoordinatingInstitution(randomOrganization())
+                   .withContributors(randomContributors())
+                   .withStartDate(randomInstant())
+                   .withEndDate(randomInstant())
+                   .build();
     }
 
     public static Map<String, String> randomNamesMap() {

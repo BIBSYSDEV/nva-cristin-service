@@ -10,13 +10,13 @@ import no.unit.nva.cristin.person.institution.update.PersonInstInfoPatchSerializ
 import nva.commons.core.JacocoGenerated;
 
 @JsonSerialize(using = PersonInstInfoPatchSerializer.class)
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "PMD.BeanMembersShouldSerialize"})
 @JsonInclude(ALWAYS)
 @JacocoGenerated
 public class PersonInstInfoPatch implements JsonSerializable {
 
-    private transient Optional<String> email;
-    private transient Optional<String> phone;
+    private Optional<String> email;
+    private Optional<String> phone;
 
     public Optional<String> getEmail() {
         return email;
