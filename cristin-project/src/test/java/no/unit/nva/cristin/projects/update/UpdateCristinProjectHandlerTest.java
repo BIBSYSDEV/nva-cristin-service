@@ -185,7 +185,7 @@ class UpdateCristinProjectHandlerTest {
     }
 
     @ParameterizedTest(name = "Allowing null value for field {0}")
-    @ValueSource(strings = {"funding", "relatedProjects", "institutionsResponsibleForResearch"})
+    @ValueSource(strings = {"funding", "relatedProjects", "institutionsResponsibleForResearch", "webPage"})
     void shouldAllowFieldsWhichCanBeNullable(String fieldName) throws Exception {
         handler = spy(handler);
         doReturn(true).when(handler).hasResourceAccess(any());

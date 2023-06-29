@@ -175,3 +175,10 @@ Feature: API tests for Cristin Project retrieve and search
     And match response == '#object'
     And match response.webPage == '#present'
     And match response.webPage == 'https://www.example.org'
+
+  Scenario: Fetch returns project without webpage when not present in upstream
+    Given path '/project/550767'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.webPage != '#present'
