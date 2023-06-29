@@ -242,7 +242,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     }
 
     private void validateWebPage(ObjectNode input) throws BadRequestException {
-        if (input.has(WEB_PAGE)) {
+        if (input.has(WEB_PAGE) && !input.get(WEB_PAGE).isNull()) {
             var webPage = input.get(WEB_PAGE).asText();
             attempt(() -> URI.create(webPage)).orElseThrow(failure -> fieldIsNotUri());
         }
