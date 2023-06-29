@@ -131,7 +131,7 @@ public class CristinProjectPatchJsonCreator {
             }
         }
 
-        if (cristinTitles.size() > 0) {
+        if (!cristinTitles.isEmpty()) {
             output.putPOJO(TITLE, cristinTitles);
         }
     }
