@@ -46,6 +46,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -120,6 +121,7 @@ public class RandomProjectDataGenerator {
                                           .withHealthProjectData(randomHealthProjectData())
                                           .withApprovals(randomApprovals())
                                           .withExemptFromPublicDisclosure(randomBoolean())
+                                          .withWebPage(randomUri())
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;

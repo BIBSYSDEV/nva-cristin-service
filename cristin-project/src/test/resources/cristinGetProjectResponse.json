@@ -177,5 +177,6 @@
         }
       }
     ]
-  }
+  },
+  "external_url": "https://www.external.url"
 }

@@ -190,7 +190,8 @@
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "type": "Organization"
         }
-      }
+      },
+      "webPage": "https://www.external.url"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -374,7 +375,8 @@
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "type": "Organization"
         }
-      }
+      },
+      "webPage": "https://www.external.url"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -558,7 +560,8 @@
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "type": "Organization"
         }
-      }
+      },
+      "webPage": "https://www.external.url"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -742,7 +745,8 @@
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "type": "Organization"
         }
-      }
+      },
+      "webPage": "https://www.external.url"
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -926,7 +930,8 @@
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "type": "Organization"
         }
-      }
+      },
+      "webPage": "https://www.external.url"
     }
   ]
 }

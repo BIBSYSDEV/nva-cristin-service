@@ -83,8 +83,13 @@ public class CristinProjectBuilder {
         cristinProject.setContactInfo(extractContactInfo(nvaProject.getContactInfo()));
         cristinProject.setExemptFromPublicDisclosure(nvaProject.getExemptFromPublicDisclosure());
         cristinProject.setCreator(extractCreator(nvaProject.getCreator()));
+        cristinProject.setExternalUrl(extractExternalUrl(nvaProject.getWebPage()));
 
         return cristinProject;
+    }
+
+    private String extractExternalUrl(URI webPage) {
+        return Optional.ofNullable(webPage).map(URI::toString).orElse(null);
     }
 
     private CristinPerson extractCreator(NvaContributor creator) {

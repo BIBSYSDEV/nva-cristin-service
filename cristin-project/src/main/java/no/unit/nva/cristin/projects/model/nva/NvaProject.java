@@ -105,6 +105,9 @@ public class NvaProject implements JsonSerializable {
     @JsonProperty
     @JsonInclude(NON_NULL)
     private NvaContributor creator;
+    @JsonProperty
+    @JsonInclude(NON_NULL)
+    private URI webPage;
 
     private NvaProject() {
     }
@@ -373,6 +376,14 @@ public class NvaProject implements JsonSerializable {
         this.creator = creator;
     }
 
+    public URI getWebPage() {
+        return webPage;
+    }
+
+    public void setWebPage(URI webPage) {
+        this.webPage = webPage;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -414,7 +425,8 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getHealthProjectData(), that.getHealthProjectData())
                && Objects.equals(getApprovals(), that.getApprovals())
                && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure())
-               && Objects.equals(getCreator(), that.getCreator());
+               && Objects.equals(getCreator(), that.getCreator())
+               && Objects.equals(getWebPage(), that.getWebPage());
     }
 
     @Override
@@ -426,7 +438,7 @@ public class NvaProject implements JsonSerializable {
                             getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
                             getProjectCategories(), getKeywords(), getExternalSources(), getRelatedProjects(),
                             getInstitutionsResponsibleForResearch(), getHealthProjectData(), getApprovals(),
-                            getExemptFromPublicDisclosure(), getCreator());
+                            getExemptFromPublicDisclosure(), getCreator(), getWebPage());
     }
 
     @Override
@@ -609,6 +621,11 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withCreator(NvaContributor creator) {
             nvaProject.setCreator(creator);
+            return this;
+        }
+
+        public Builder withWebPage(URI webPage) {
+            nvaProject.setWebPage(webPage);
             return this;
         }
 
