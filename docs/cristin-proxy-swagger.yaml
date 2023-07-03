@@ -1925,6 +1925,10 @@ components:
                   description: Last name
             affiliation:
               $ref: '#/components/schemas/Organization'
+        webPage:
+          type: string
+          format: uri
+          description: Project webpage
     ProjectPost:
       type: object
       properties:
@@ -2069,6 +2073,10 @@ components:
               type: string
             phone:
               type: string
+        webPage:
+          type: string
+          format: uri
+          description: Project webpage
     ProjectPatch:
       type: object
       properties:
@@ -2167,6 +2175,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Organization'
+        webPage:
+          type: string
+          format: uri
+          description: Project webpage
     Problem:
       type: object
       description: NVA error reporting object
@@ -3073,6 +3085,7 @@ components:
                 identifier: '2017/800'
                 authorityName:
                   en: 'Regional committees for medical and health research ethics'
+            webPage: 'https://www.example.org'
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -3188,6 +3201,7 @@ components:
           affiliation:
             id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             type: 'Organization'
+        webPage: 'https://www.example.org'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -3230,6 +3244,7 @@ components:
           phone: '44223355'
         institutionsResponsibleForResearch:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+        webPage: 'https://www.example.org'
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -3305,6 +3320,7 @@ components:
           organization: 'Universitetet i Oslo'
           email: 'navn.navnesen@uio.no'
           phone: '99223344'
+        webPage: 'https://www.example.org'
     OrganizationsExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
