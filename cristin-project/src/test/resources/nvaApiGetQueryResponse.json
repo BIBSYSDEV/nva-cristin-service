@@ -45,9 +45,6 @@
       "coordinatingInstitution": {
         "type": "Organization",
         "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-        "name": {
-          "en": "Medical Department"
-        },
         "labels": {
           "en": "Medical Department"
         }
@@ -66,9 +63,6 @@
           "affiliation": {
             "type": "Organization",
             "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-            "name": {
-              "en": "Medical Department"
-            },
             "labels": {
               "en": "Medical Department"
             }
@@ -87,9 +81,6 @@
           "affiliation": {
             "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
             "type": "Organization",
-            "name": {
-              "en": "Medical Department"
-            },
             "labels": {
               "en": "Medical Department"
             }
@@ -152,9 +143,6 @@
         {
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "type": "Organization",
-          "name": {
-            "en": "Medical Department"
-          },
           "labels": {
             "en": "Medical Department"
           }
@@ -229,9 +217,6 @@
       "coordinatingInstitution": {
         "type": "Organization",
         "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-        "name": {
-          "en": "Medical Department"
-        },
         "labels": {
           "en": "Medical Department"
         }
@@ -250,9 +235,6 @@
           "affiliation": {
             "type": "Organization",
             "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-            "name": {
-              "en": "Medical Department"
-            },
             "labels": {
               "en": "Medical Department"
             }
@@ -271,9 +253,6 @@
           "affiliation": {
             "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
             "type": "Organization",
-            "name": {
-              "en": "Medical Department"
-            },
             "labels": {
               "en": "Medical Department"
             }
@@ -336,9 +315,6 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-          "name": {
-            "en": "Medical Department"
-          },
           "labels": {
             "en": "Medical Department"
           }
@@ -413,9 +389,6 @@
       "coordinatingInstitution": {
         "type": "Organization",
         "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-        "name": {
-          "en": "Medical Department"
-        },
         "labels": {
           "en": "Medical Department"
         }
@@ -434,9 +407,6 @@
           "affiliation": {
             "type": "Organization",
             "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-            "name": {
-              "en": "Medical Department"
-            },
             "labels": {
               "en": "Medical Department"
             }
@@ -455,9 +425,6 @@
           "affiliation": {
             "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
             "type": "Organization",
-            "name": {
-              "en": "Medical Department"
-            },
             "labels": {
               "en": "Medical Department"
             }
@@ -520,9 +487,6 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-          "name": {
-            "en": "Medical Department"
-          },
           "labels": {
             "en": "Medical Department"
           }
@@ -597,9 +561,6 @@
       "coordinatingInstitution": {
         "type": "Organization",
         "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-        "name": {
-          "en": "Medical Department"
-        },
         "labels": {
           "en": "Medical Department"
         }
@@ -618,9 +579,6 @@
           "affiliation": {
             "type": "Organization",
             "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-            "name": {
-              "en": "Medical Department"
-            },
             "labels": {
               "en": "Medical Department"
             }
@@ -639,9 +597,6 @@
           "affiliation": {
             "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
             "type": "Organization",
-            "name": {
-              "en": "Medical Department"
-            },
             "labels": {
               "en": "Medical Department"
             }
@@ -704,9 +659,6 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-          "name": {
-            "en": "Medical Department"
-          },
           "labels": {
             "en": "Medical Department"
           }
@@ -781,9 +733,6 @@
       "coordinatingInstitution": {
         "type": "Organization",
         "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-        "name": {
-          "en": "Medical Department"
-        },
         "labels": {
           "en": "Medical Department"
         }
@@ -802,9 +751,6 @@
           "affiliation": {
             "type": "Organization",
             "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-            "name": {
-              "en": "Medical Department"
-            },
             "labels": {
               "en": "Medical Department"
             }
@@ -823,9 +769,6 @@
           "affiliation": {
             "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
             "type": "Organization",
-            "name": {
-              "en": "Medical Department"
-            },
             "labels": {
               "en": "Medical Department"
             }
@@ -888,9 +831,6 @@
         {
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
           "type": "Organization",
-          "name": {
-            "en": "Medical Department"
-          },
           "labels": {
             "en": "Medical Department"
           }

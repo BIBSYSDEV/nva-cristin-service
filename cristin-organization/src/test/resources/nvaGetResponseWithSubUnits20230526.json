@@ -2,39 +2,35 @@
   "@context": "https://bibsysdev.github.io/src/organization-context.json",
   "type": "Organization",
   "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-  "name": {
+  "labels": {
     "en": "Fakultetsadministrasjonen"
   },
   "partOf": [
     {
       "type": "Organization",
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.0",
-      "name": {
+      "labels": {
         "en": "Faculty of Mathematics and Natural Sciences"
       },
       "partOf": [
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
-          "name": {
+          "labels": {
             "en": "University of Oslo"
           },
           "partOf": [],
-          "labels": {
-            "en": "University of Oslo"
-          }
+          "hasPart": []
         }
       ],
-      "labels": {
-        "en": "Faculty of Mathematics and Natural Sciences"
-      }
+      "hasPart": []
     }
   ],
   "hasPart": [
     {
       "type": "Organization",
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.11",
-      "name": {
+      "labels": {
         "en": "Fakultetsledelsen"
       },
       "acronym": "MN-LED",
@@ -42,14 +38,16 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": []
+          "labels": {},
+          "partOf": [],
+          "hasPart": []
         }
       ],
       "hasPart": [
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.29",
-          "name": {
+          "labels": {
             "en": "Kommunikasjon"
           },
           "acronym": "LED-KOMM",
@@ -57,17 +55,17 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.11",
-              "partOf": []
+              "labels": {},
+              "partOf": [],
+              "hasPart": []
             }
           ],
-          "labels": {
-            "en": "Kommunikasjon"
-          }
+          "hasPart": []
         },
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.28",
-          "name": {
+          "labels": {
             "en": "Personal/Arkiv/HMS"
           },
           "acronym": "LED-PERSON",
@@ -75,22 +73,19 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.11",
-              "partOf": []
+              "labels": {},
+              "partOf": [],
+              "hasPart": []
             }
           ],
-          "labels": {
-            "en": "Personal/Arkiv/HMS"
-          }
+          "hasPart": []
         }
-      ],
-      "labels": {
-        "en": "Fakultetsledelsen"
-      }
+      ]
     },
     {
       "type": "Organization",
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.21",
-      "name": {
+      "labels": {
         "en": "Finance Section"
       },
       "acronym": "MN-ØKSEK",
@@ -98,14 +93,16 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": []
+          "labels": {},
+          "partOf": [],
+          "hasPart": []
         }
       ],
       "hasPart": [
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.23",
-          "name": {
+          "labels": {
             "en": "Projects Department"
           },
           "acronym": "MN-PROAVD",
@@ -113,17 +110,17 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.21",
-              "partOf": []
+              "labels": {},
+              "partOf": [],
+              "hasPart": []
             }
           ],
-          "labels": {
-            "en": "Projects Department"
-          }
+          "hasPart": []
         },
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.24",
-          "name": {
+          "labels": {
             "en": "Accounting"
           },
           "acronym": "MN-REGNAVD",
@@ -131,17 +128,17 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.21",
-              "partOf": []
+              "labels": {},
+              "partOf": [],
+              "hasPart": []
             }
           ],
-          "labels": {
-            "en": "Accounting"
-          }
+          "hasPart": []
         },
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.22",
-          "name": {
+          "labels": {
             "en": "Finance"
           },
           "acronym": "MN-INSTAVD",
@@ -149,22 +146,19 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.21",
-              "partOf": []
+              "labels": {},
+              "partOf": [],
+              "hasPart": []
             }
           ],
-          "labels": {
-            "en": "Finance"
-          }
+          "hasPart": []
         }
-      ],
-      "labels": {
-        "en": "Finance Section"
-      }
+      ]
     },
     {
       "type": "Organization",
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.19",
-      "name": {
+      "labels": {
         "en": "Section for Research"
       },
       "acronym": "MN-FA",
@@ -172,17 +166,17 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": []
+          "labels": {},
+          "partOf": [],
+          "hasPart": []
         }
       ],
-      "labels": {
-        "en": "Section for Research"
-      }
+      "hasPart": []
     },
     {
       "type": "Organization",
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.16",
-      "name": {
+      "labels": {
         "en": "Communication and HR Section"
       },
       "acronym": "MN-KOMMHR",
@@ -190,14 +184,16 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": []
+          "labels": {},
+          "partOf": [],
+          "hasPart": []
         }
       ],
       "hasPart": [
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.18",
-          "name": {
+          "labels": {
             "en": "HR Section"
           },
           "acronym": "MN-HRSEK",
@@ -205,17 +201,17 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.16",
-              "partOf": []
+              "labels": {},
+              "partOf": [],
+              "hasPart": []
             }
           ],
-          "labels": {
-            "en": "HR Section"
-          }
+          "hasPart": []
         },
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.17",
-          "name": {
+          "labels": {
             "en": "Communication Section"
           },
           "acronym": "MN-KOMMSEK",
@@ -223,22 +219,19 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.16",
-              "partOf": []
+              "labels": {},
+              "partOf": [],
+              "hasPart": []
             }
           ],
-          "labels": {
-            "en": "Communication Section"
-          }
+          "hasPart": []
         }
-      ],
-      "labels": {
-        "en": "Communication and HR Section"
-      }
+      ]
     },
     {
       "type": "Organization",
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.32",
-      "name": {
+      "labels": {
         "en": "Studieadministrasjon"
       },
       "acronym": "LED-STUDAD",
@@ -246,17 +239,17 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": []
+          "labels": {},
+          "partOf": [],
+          "hasPart": []
         }
       ],
-      "labels": {
-        "en": "Studieadministrasjon"
-      }
+      "hasPart": []
     },
     {
       "type": "Organization",
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.31",
-      "name": {
+      "labels": {
         "en": "Forskningsadministrasjon"
       },
       "acronym": "LED-FORSKA",
@@ -264,17 +257,17 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": []
+          "labels": {},
+          "partOf": [],
+          "hasPart": []
         }
       ],
-      "labels": {
-        "en": "Forskningsadministrasjon"
-      }
+      "hasPart": []
     },
     {
       "type": "Organization",
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.25",
-      "name": {
+      "labels": {
         "en": "IT-section"
       },
       "acronym": "MN-IT-SEK",
@@ -282,17 +275,17 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": []
+          "labels": {},
+          "partOf": [],
+          "hasPart": []
         }
       ],
-      "labels": {
-        "en": "IT-section"
-      }
+      "hasPart": []
     },
     {
       "type": "Organization",
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.36",
-      "name": {
+      "labels": {
         "en": "Økonomigruppen"
       },
       "acronym": "LED-ØKONOM",
@@ -300,14 +293,16 @@
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-          "partOf": []
+          "labels": {},
+          "partOf": [],
+          "hasPart": []
         }
       ],
       "hasPart": [
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.34",
-          "name": {
+          "labels": {
             "en": "Regnskap"
           },
           "acronym": "LED-REGNSK",
@@ -315,17 +310,17 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.36",
-              "partOf": []
+              "labels": {},
+              "partOf": [],
+              "hasPart": []
             }
           ],
-          "labels": {
-            "en": "Regnskap"
-          }
+          "hasPart": []
         },
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.33",
-          "name": {
+          "labels": {
             "en": "Prosjektøkonomi"
           },
           "acronym": "LED-PROSJØ",
@@ -333,17 +328,17 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.36",
-              "partOf": []
+              "labels": {},
+              "partOf": [],
+              "hasPart": []
             }
           ],
-          "labels": {
-            "en": "Prosjektøkonomi"
-          }
+          "hasPart": []
         },
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.35",
-          "name": {
+          "labels": {
             "en": "Totaløkonomi virksomhetsstyring"
           },
           "acronym": "LED-TOTØK",
@@ -351,14 +346,16 @@
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.36",
-              "partOf": []
+              "labels": {},
+              "partOf": [],
+              "hasPart": []
             }
           ],
           "hasPart": [
             {
               "type": "Organization",
               "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.100.100",
-              "name": {
+              "labels": {
                 "en": "ØkonomigruppenUnderEnhet"
               },
               "acronym": "LED-ØKONOM-UNDENHET",
@@ -366,25 +363,16 @@
                 {
                   "type": "Organization",
                   "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.35",
-                  "partOf": []
+                  "labels": {},
+                  "partOf": [],
+                  "hasPart": []
                 }
               ],
-              "labels": {
-                "en": "ØkonomigruppenUnderEnhet"
-              }
+              "hasPart": []
             }
-          ],
-          "labels": {
-            "en": "Totaløkonomi virksomhetsstyring"
-          }
+          ]
         }
-      ],
-      "labels": {
-        "en": "Økonomigruppen"
-      }
+      ]
     }
-  ],
-  "labels": {
-    "en": "Fakultetsadministrasjonen"
-  }
+  ]
 }
