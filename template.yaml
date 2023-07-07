@@ -28,7 +28,7 @@ Globals:
   Api:
     Cors:
       AllowOrigin: "'*'"
-      AllowMethods: "'OPTIONS, GET, POST, PATCH, DELETE'"
+      AllowMethods: "'OPTIONS, GET, POST, PATCH, DELETE, PUT'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
 Parameters:
@@ -98,7 +98,8 @@ Resources:
       StageName: Prod
       Auth:
         DefaultAuthorizer: NONE
-      EndpointConfiguration: Regional
+      EndpointConfiguration:
+        Type: REGIONAL
 
 
 
@@ -483,9 +484,9 @@ Resources:
             Method: patch
 
   NvaCristinListFundingSourcesFunction:
-    Description: Function for listing all funding sources
     Type: AWS::Serverless::Function
     Properties:
+      Description: Function for listing all funding sources
       CodeUri: cristin-funding
       Handler: no.unit.nva.cristin.funding.sources.query.ListFundingSourcesHandler::handleRequest
       Events:
@@ -497,9 +498,9 @@ Resources:
             Method: get
 
   NvaCristinFetchFundingSourceFunction:
-    Description: Function for fetching a funding source by identifier
     Type: AWS::Serverless::Function
     Properties:
+      Description: Function for fetching a funding source by identifier
       CodeUri: cristin-funding
       Handler: no.unit.nva.cristin.funding.sources.fetch.FetchFundingSourceHandler::handleRequest
       Events:
@@ -511,9 +512,9 @@ Resources:
             Method: get
 
   NvaCristinFetchBiobankFunction:
-    Description: Function for fetching a Biobank by identifier
     Type: AWS::Serverless::Function
     Properties:
+      Description: Function for fetching a Biobank by identifier
       CodeUri: cristin-biobank
       Handler: no.unit.nva.biobank.fetch.FetchBiobankHandler::handleRequest
       Events:
