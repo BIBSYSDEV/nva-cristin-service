@@ -90,8 +90,8 @@ Resources:
       CacheClusterEnabled: true
       CacheClusterSize: "0.5"
       MethodSettings:
-        - HttpMethod: GET
-          ResourcePath: /*
+        - HttpMethod: 'GET'
+          ResourcePath: '/'
           CacheTtlInSeconds: 300
           CachingEnabled: true
       DefinitionBody:
