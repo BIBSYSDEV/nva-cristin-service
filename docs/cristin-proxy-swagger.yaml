@@ -456,6 +456,8 @@ paths:
         httpMethod: POST
         cacheParameters:
           - method.request.path.identifier
+          - method.request.querystring.depth
+          - method.request.header.accept
         type: "AWS_PROXY"
       tags:
         - Organization
