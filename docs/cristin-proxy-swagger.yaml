@@ -459,12 +459,9 @@ paths:
             method.request.path.identifier
           integration.request.querystring.depth:
             method.request.querystring.depth
-          integration.request.header.accept:
-            method.request.header.accept
         cacheParameters:
           - method.request.path.identifier
           - method.request.querystring.depth
-          - method.request.header.accept
         type: "AWS_PROXY"
       tags:
         - Organization
