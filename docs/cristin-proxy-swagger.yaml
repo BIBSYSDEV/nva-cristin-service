@@ -454,6 +454,8 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchOrganization.Arn}:live/invocations
         httpMethod: POST
+        cacheParameters:
+          - method.request.path.identifier
         type: "AWS_PROXY"
       tags:
         - Organization

@@ -91,7 +91,7 @@ Resources:
       CacheClusterSize: "0.5"
       MethodSettings:
         - HttpMethod: 'GET'
-          ResourcePath: '/'
+          ResourcePath: '/organization/*'
           CacheTtlInSeconds: 300
           CachingEnabled: true
       DefinitionBody:
