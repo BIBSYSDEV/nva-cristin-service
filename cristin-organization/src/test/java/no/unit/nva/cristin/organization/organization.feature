@@ -87,8 +87,8 @@ Feature: API tests for Cristin Organization retrieve and search
     And param depth = 'none'
     When method GET
     Then status 200
-    And match response.name.en == '#present'
-    And match response.name.nb == '#present'
+    And match response.labels.en == '#present'
+    And match response.labels.nb == '#present'
 
   Scenario: GET organization using version 2023-05-26 returns results
     Given path '/organization'
@@ -108,8 +108,8 @@ Feature: API tests for Cristin Organization retrieve and search
     And param depth = 'none'
     When method GET
     Then status 200
-    And match response.name.en == '#present'
-    And match response.name.nb == '#present'
+    And match response.labels.en == '#present'
+    And match response.labels.nb == '#present'
     And match response.hasPart == '#[0]'
 
   Scenario: GET organization for known organization using version 2023-05-26 without depth param returns data with depth
@@ -117,6 +117,6 @@ Feature: API tests for Cristin Organization retrieve and search
     And header Accept = 'application/json; version=2023-05-26'
     When method GET
     Then status 200
-    And match response.name.en == '#present'
-    And match response.name.nb == '#present'
+    And match response.labels.en == '#present'
+    And match response.labels.nb == '#present'
     And match response.hasPart != '#[0]'

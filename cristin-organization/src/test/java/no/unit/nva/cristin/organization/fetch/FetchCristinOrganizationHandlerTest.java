@@ -2,7 +2,6 @@ package no.unit.nva.cristin.organization.fetch;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
@@ -202,7 +201,7 @@ class FetchCristinOrganizationHandlerTest {
         var actualOrganization = gatewayResponse.getBodyObject(Organization.class);
 
         assertEquals(actualOrganization.getId(), expectedId);
-        assertThat(actualOrganization.getName().get(ENGLISH_LANGUAGE_KEY),
+        assertThat(actualOrganization.getLabels().get(ENGLISH_LANGUAGE_KEY),
                    containsString(DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY));
     }
 
@@ -230,7 +229,7 @@ class FetchCristinOrganizationHandlerTest {
         var actualOrganization = gatewayResponse.getBodyObject(Organization.class);
 
         assertThat(actualOrganization.getId(), equalTo(expectedId));
-        assertThat(actualOrganization.getName().get(ENGLISH_LANGUAGE_KEY),
+        assertThat(actualOrganization.getLabels().get(ENGLISH_LANGUAGE_KEY),
                    containsString(DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY));
         assertThat(actualOrganization.getHasPart(), equalTo(null));
         assertThat(actualOrganization.getPartOf(), equalTo(null));
@@ -268,15 +267,13 @@ class FetchCristinOrganizationHandlerTest {
         fetchCristinOrganizationHandler.handleRequest(input, output, context);
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
-        var responseBody = gatewayResponse.getBodyObject(Organization.class);
+        var responseBody = gatewayResponse.getBody();
 
-        var expected = OBJECT_MAPPER.readValue(nvaPayload, Organization.class);
-
-        assertThat(readOrganizationAsTree(responseBody), equalTo(readOrganizationAsTree(expected)));
+        assertThat(deserialize(responseBody), equalTo(deserialize(nvaPayload)));
     }
 
-    private JsonNode readOrganizationAsTree(Organization org) throws JsonProcessingException {
-        return OBJECT_MAPPER.readTree(org.toString());
+    private Organization deserialize(String body) throws JsonProcessingException {
+        return OBJECT_MAPPER.readValue(body, Organization.class);
     }
 
     private Object getSubSubUnit(String subUnitFile) {

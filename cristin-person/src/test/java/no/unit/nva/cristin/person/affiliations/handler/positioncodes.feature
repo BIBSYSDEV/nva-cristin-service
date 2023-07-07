@@ -11,5 +11,7 @@ Feature: API tests for Cristin Organization retrieve and search
     When method GET
     Then status 200
     And match response.positions == '#array'
-    And  response.size >= 1
+    And match response.positions[0].id == '#present'
+    And match response.positions[0].labels == '#present'
+    And match response.positions[0].enabled == '#present'
 

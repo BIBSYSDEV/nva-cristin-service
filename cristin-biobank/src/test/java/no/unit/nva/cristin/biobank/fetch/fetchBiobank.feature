@@ -48,7 +48,7 @@ Feature: API tests for Cristin Biobank get
     And match response == '#object'
     And match response.type == 'Biobank'
     And match response.id contains validIdentifier
-    And match response.name == '#present'
+    And match response.labels == '#present'
 
     Examples:
       | CONTENT_TYPE          |

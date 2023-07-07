@@ -26,7 +26,6 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
     private Organization toOrganization(UnitDto unitDto) {
         return new Organization.Builder()
                    .withId(getNvaApiId(unitDto.getId(), ORGANIZATION_PATH))
-                   .withName(unitDto.getUnitName())
                    .withLabels(unitDto.getUnitName())
                    .withAcronym(unitDto.getAcronym())
                    .withHasPart(unitsToOrganizations(unitDto.getSubUnits()))
