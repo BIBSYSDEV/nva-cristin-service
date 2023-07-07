@@ -251,7 +251,6 @@ public class RandomProjectDataGenerator {
         var labels = randomNamesMap();
         return new Organization.Builder()
                    .withId(semiRandomOrganizationId(randomString()))
-                   .withName(labels)
                    .withLabels(labels)
                    .build();
     }

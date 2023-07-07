@@ -151,7 +151,7 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 200
     And match response == '#object'
     And match response.institutionsResponsibleForResearch[0].id == '#present'
-    And match response.institutionsResponsibleForResearch[0].name == '#present'
+    And match response.institutionsResponsibleForResearch[0].labels == '#present'
 
   Scenario: Fetch returns project with additional health data and approvals
     Given path '/project/538881'
