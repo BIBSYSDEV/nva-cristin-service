@@ -87,13 +87,13 @@ Resources:
   NvaCristinProxyApi:
     Type: AWS::Serverless::Api
     Properties:
-#      CacheClusterEnabled: true
-#      CacheClusterSize: "0.5"
-#      MethodSettings:
-#        - HttpMethod: 'GET'
-#          ResourcePath: '/*'
-#          CacheTtlInSeconds: 300
-#          CachingEnabled: true
+      CacheClusterEnabled: true
+      CacheClusterSize: "0.5"
+      MethodSettings:
+        - HttpMethod: 'GET'
+          ResourcePath: '/*'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
