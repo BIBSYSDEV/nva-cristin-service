@@ -89,6 +89,11 @@ Resources:
     Properties:
       CacheClusterEnabled: true
       CacheClusterSize: "0.5"
+      MethodSettings:
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1organization~1{identifier}'
+          CacheTtlInSeconds: 600
+          CachingEnabled: true
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
