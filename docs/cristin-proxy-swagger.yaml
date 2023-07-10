@@ -459,9 +459,12 @@ paths:
             'method.request.path.identifier'
           integration.request.querystring.depth:
             'method.request.querystring.depth'
+          integration.request.header.Accept:
+            'method.request.header.Accept'
         cacheKeyParameters:
           - 'method.request.path.identifier'
           - 'method.request.querystring.depth'
+          - 'method.request.header.Accept'
         type: "AWS_PROXY"
       tags:
         - Organization
