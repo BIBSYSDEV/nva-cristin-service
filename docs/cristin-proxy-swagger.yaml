@@ -456,12 +456,12 @@ paths:
         httpMethod: POST
         requestParameters:
           integration.request.path.identifier:
-            method.request.path.identifier
+            'method.request.path.identifier'
           integration.request.querystring.depth:
-            method.request.querystring.depth
+            'method.request.querystring.depth'
         cacheParameters:
-          - method.request.path.identifier
-          - method.request.querystring.depth
+          - 'method.request.path.identifier'
+          - 'method.request.querystring.depth'
         type: "AWS_PROXY"
       tags:
         - Organization
