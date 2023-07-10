@@ -1031,6 +1031,18 @@ paths:
           type: string
           pattern: '^[0-9]+$|[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9|Xx]'
         example: '359084'
+      - name: Accept
+        in: header
+        description: Requested response format and version of the returned payload
+        examples:
+          applicationJson:
+            value: application/json
+            description: application/json
+          applicationLdPlusJson:
+            value: application/ld+json
+            description: application/ld+json
+        schema:
+          type: string
     get:
       x-amazon-apigateway-integration:
         uri:
