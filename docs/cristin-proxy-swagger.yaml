@@ -354,6 +354,24 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinQueryOrganizationFunction.Arn}/invocations
         httpMethod: POST
+        requestParameters:
+          integration.request.querystring.query:
+            'method.request.querystring.query'
+          integration.request.querystring.depth:
+            'method.request.querystring.depth'
+          integration.request.querystring.page:
+            'method.request.querystring.page'
+          integration.request.querystring.results:
+            'method.request.querystring.results'
+          integration.request.header.Accept:
+            'method.request.header.Accept'
+        cacheKeyParameters:
+          - 'method.request.querystring.query'
+          - 'method.request.querystring.depth'
+          - 'method.request.querystring.page'
+          - 'method.request.querystring.results'
+          - 'method.request.header.Accept'
+
         type: "AWS_PROXY"
       tags:
         - Organization
@@ -549,6 +567,26 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListOrganizationPersonsFunction.Arn}/invocations
         httpMethod: POST
+        requestParameters:
+          integration.request.path.identifier:
+            'method.request.path.identifier'
+          integration.request.querystring.page:
+            'method.request.querystring.page'
+          integration.request.querystring.results:
+            'method.request.querystring.results'
+          integration.request.querystring.name:
+            'method.request.querystring.name'
+          integration.request.querystring.sort:
+            'method.request.querystring.sort'
+          integration.request.header.Accept:
+            'method.request.header.Accept'
+        cacheKeyParameters:
+          - 'method.request.path.identifier'
+          - 'method.request.querystring.page'
+          - 'method.request.querystring.results'
+          - 'method.request.querystring.name'
+          - 'method.request.querystring.sort'
+          - 'method.request.header.Accept'
         type: "AWS_PROXY"
       tags:
         - Organization
@@ -632,6 +670,65 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListOrganizationProjectsFunction.Arn}/invocations
         httpMethod: POST
+        requestParameters:
+          integration.request.path.identifier:
+            'method.request.path.identifier'
+          integration.request.querystring.page:
+            'method.request.querystring.page'
+          integration.request.querystring.results:
+            'method.request.querystring.results'
+          integration.request.querystring.institution:
+            'method.request.querystring.institution'
+          integration.request.querystring.project_manager:
+            'method.request.querystring.project_manager'
+          integration.request.querystring.participant:
+            'method.request.querystring.participant'
+          integration.request.querystring.keyword:
+            'method.request.querystring.keyword'
+          integration.request.querystring.approval_reference_id:
+            'method.request.querystring.approval_reference_id'
+          integration.request.querystring.funding_source:
+            'method.request.querystring.funding_source'
+          integration.request.querystring.sort:
+            'method.request.querystring.sort'
+          integration.request.querystring.unit:
+            'method.request.querystring.unit'
+          integration.request.querystring.user:
+            'method.request.querystring.user'
+          integration.request.querystring.approved_by:
+            'method.request.querystring.approved_by'
+          integration.request.querystring.funding:
+            'method.request.querystring.funding'
+          integration.request.querystring.levels:
+            'method.request.querystring.levels'
+          integration.request.querystring.modified_since:
+            'method.request.querystring.modified_since'
+          integration.request.querystring.biobank:
+            'method.request.querystring.biobank'
+          integration.request.querystring.creator:
+            'method.request.querystring.creator'
+          integration.request.header.Accept:
+            'method.request.header.Accept'
+        cacheKeyParameters:
+          - 'method.request.path.identifier'
+          - 'method.request.querystring.page'
+          - 'method.request.querystring.results'
+          - 'method.request.querystring.institution'
+          - 'method.request.querystring.project_manager'
+          - 'method.request.querystring.participant'
+          - 'method.request.querystring.keyword'
+          - 'method.request.querystring.approval_reference_id'
+          - 'method.request.querystring.funding_source'
+          - 'method.request.querystring.sort'
+          - 'method.request.querystring.unit'
+          - 'method.request.querystring.user'
+          - 'method.request.querystring.approved_by'
+          - 'method.request.querystring.funding'
+          - 'method.request.querystring.levels'
+          - 'method.request.querystring.modified_since'
+          - 'method.request.querystring.biobank'
+          - 'method.request.querystring.creator'
+          - 'method.request.header.Accept'
         type: "AWS_PROXY"
       tags:
         - Organization
@@ -915,6 +1012,14 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonFunction.Arn}/invocations
         httpMethod: POST
+        requestParameters:
+          integration.request.path.id:
+            'method.request.path.id'
+          integration.request.header.Accept:
+            'method.request.header.Accept'
+        cacheKeyParameters:
+          - 'method.request.path.id'
+          - 'method.request.header.Accept'
         type: "AWS_PROXY"
       tags:
         - Person

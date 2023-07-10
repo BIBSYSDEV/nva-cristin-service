@@ -94,6 +94,22 @@ Resources:
           ResourcePath: '/~1organization~1{identifier}'
           CacheTtlInSeconds: 600
           CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1organization'
+          CacheTtlInSeconds: 600
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1organization~1persons'
+          CacheTtlInSeconds: 600
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1organization~1projects'
+          CacheTtlInSeconds: 600
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1person~1{id}'
+          CacheTtlInSeconds: 600
+          CachingEnabled: true
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
