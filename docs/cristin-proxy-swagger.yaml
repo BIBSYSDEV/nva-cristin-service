@@ -640,6 +640,18 @@ paths:
               value: 'name desc'
             nameAsc:
               value: 'name asc'
+        - name: Accept
+          in: header
+          description: Requested response format and version of the returned payload
+          examples:
+            applicationJson:
+              value: application/json
+              description: application/json
+            applicationLdPlusJson:
+              value: application/ld+json
+              description: application/ld+json
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -848,6 +860,18 @@ paths:
           in: query
           description: Creator identifier
           required: false
+          schema:
+            type: string
+        - name: Accept
+          in: header
+          description: Requested response format and version of the returned payload
+          examples:
+            applicationJson:
+              value: application/json
+              description: application/json
+            applicationLdPlusJson:
+              value: application/ld+json
+              description: application/ld+json
           schema:
             type: string
       responses:
