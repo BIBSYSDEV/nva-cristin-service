@@ -459,7 +459,7 @@ paths:
             'method.request.path.identifier'
           integration.request.querystring.depth:
             'method.request.querystring.depth'
-        cacheParameters:
+        cacheKeyParameters:
           - 'method.request.path.identifier'
           - 'method.request.querystring.depth'
         type: "AWS_PROXY"
