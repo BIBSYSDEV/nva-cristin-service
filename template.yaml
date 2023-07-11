@@ -92,23 +92,44 @@ Resources:
       MethodSettings:
         - HttpMethod: 'GET'
           ResourcePath: '/~1organization~1{identifier}'
-          CacheTtlInSeconds: 600
+          CacheTtlInSeconds: 300
           CachingEnabled: true
         - HttpMethod: 'GET'
           ResourcePath: '/~1organization'
-          CacheTtlInSeconds: 600
-          CachingEnabled: true
+          CachingEnabled: false
         - HttpMethod: 'GET'
           ResourcePath: '/~1organization~1persons'
-          CacheTtlInSeconds: 600
-          CachingEnabled: true
+          CachingEnabled: false
         - HttpMethod: 'GET'
           ResourcePath: '/~1organization~1projects'
-          CacheTtlInSeconds: 600
-          CachingEnabled: true
+          CachingEnabled: false
         - HttpMethod: 'GET'
           ResourcePath: '/~1person~1{id}'
-          CacheTtlInSeconds: 600
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1person~1{id}~1organization~1{orgId}'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1person~1{id}~1employment'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1person~1{id}~1picture'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1position'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1funding-sources'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1funding-sources~1{identifier}'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1biobank~1{identifier}'
+          CacheTtlInSeconds: 300
           CachingEnabled: true
       DefinitionBody:
         'Fn::Transform':
