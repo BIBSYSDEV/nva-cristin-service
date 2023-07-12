@@ -922,6 +922,12 @@ paths:
             description: application/ld+json
         schema:
           type: string
+      - name: Authorization
+        in: header
+        description: Bearer token authorization that can allow exposure of national identity number
+        required: false
+        schema:
+          type: string
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -932,9 +938,12 @@ paths:
             'method.request.path.id'
           integration.request.header.Accept:
             'method.request.header.Accept'
+          integration.request.header.Authorization:
+            'method.request.header.Authorization'
         cacheKeyParameters:
           - 'method.request.path.id'
           - 'method.request.header.Accept'
+          - 'method.request.header.Authorization'
         type: "AWS_PROXY"
       tags:
         - Person
