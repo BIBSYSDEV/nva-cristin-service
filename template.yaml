@@ -175,7 +175,6 @@ Resources:
                   - secretsmanager:GetSecretValue
                 Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:CristinClientBasicAuth*'
 
-
   NvaCristinProjectsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -188,10 +187,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /project/
             Method: get
-#            RequestParameters:
-#              - method.request.querystring.query
-#              - method.request.querystring.page
-#              - method.request.querystring.results
 
   NvaCristinCreateProjectsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -220,9 +215,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /project/{identifier}
             Method: get
-#            RequestParameters:
-#              - method.request.path.identifier
-
 
   NvaCristinUpdateProjectFunction:
     Type: AWS::Serverless::Function
@@ -250,11 +242,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /organization/
             Method: get
-#            RequestParameters:
-#              - method.request.querystring.query
-#              - method.request.querystring.page
-#              - method.request.querystring.results
-#              - method.request.querystring.depth
 
   NvaCristinFetchOrganization:
     Type: AWS::Serverless::Function
@@ -272,9 +259,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /organization/{id}
             Method: get
-#            RequestParameters:
-#              - method.request.querystring.depth
-#              - method.request.path.id
 
   NvaCristinFetchOrganizationTarget:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
@@ -311,10 +295,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /organization/{id}/persons
             Method: get
-#            RequestParameters:
-#              - method.request.path.id
-#              - method.request.querystring.page
-#              - method.request.querystring.results
 
   NvaCristinListOrganizationProjectsFunction:
     Type: AWS::Serverless::Function
@@ -328,10 +308,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /organization/{identifier}/projects
             Method: get
-#            RequestParameters:
-#              - method.request.path.identifier
-#              - method.request.querystring.page
-#              - method.request.querystring.results
 
   NvaCristinQueryPersonFunction:
     Type: AWS::Serverless::Function
@@ -346,11 +322,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/
             Method: get
-#            RequestParameters:
-#              - method.request.querystring.name
-#              - method.request.querystring.organization
-#              - method.request.querystring.page
-#              - method.request.querystring.results
 
   NvaCristinFetchPersonFunction:
     Type: AWS::Serverless::Function
@@ -365,8 +336,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/{id}
             Method: get
-#            RequestParameters:
-#              - method.request.path.id
 
   NvaCristinFetchPersonUsingNin:
     Type: AWS::Serverless::Function
@@ -450,10 +419,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/{id}/organization/{orgId}/
             Method: get
-#            RequestParameters:
-#              - method.request.path.id
-#              - method.request.path.orgId
-
 
   NvaCristinUpdatePersonInstitutionInfoFunction:
     Type: AWS::Serverless::Function
@@ -495,8 +460,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/{id}/employment/
             Method: get
-#            RequestParameters:
-#              - method.request.path.id
 
   NvaCristinCreatePersonEmploymentFunction:
     Type: AWS::Serverless::Function
@@ -567,8 +530,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /funding-sources/{identifier}
             Method: get
-#            RequestParameters:
-#              - method.request.path.identifier
 
   NvaCristinFetchBiobankFunction:
     Type: AWS::Serverless::Function
@@ -583,8 +544,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /biobank/{identifier}
             Method: get
-#            RequestParameters:
-#              - method.request.path.identifier
 
   NvaCristinUpdatePersonPictureFunction:
     Type: AWS::Serverless::Function
@@ -613,8 +572,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/{id}/picture/
             Method: get
-#            RequestParameters:
-#              - method.request.path.id
 
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
@@ -623,6 +580,3 @@ Resources:
       DomainName: !Ref ApiDomain
       RestApiId: !Ref NvaCristinProxyApi
       Stage: !Ref NvaCristinProxyApi.Stage
-
-
-
