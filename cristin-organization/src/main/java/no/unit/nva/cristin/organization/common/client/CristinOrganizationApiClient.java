@@ -133,7 +133,6 @@ public class CristinOrganizationApiClient
     private Organization toOrganization(String identifier, SubUnitDto subUnitDto) {
         return new Organization.Builder()
                    .withId(getNvaApiId(identifier, ORGANIZATION_PATH))
-                   .withName(subUnitDto.getName())
                    .withLabels(subUnitDto.getName())
                    .withAcronym(subUnitDto.getAcronym())
                    .build();
@@ -226,7 +225,6 @@ public class CristinOrganizationApiClient
         return new Organization.Builder()
                    .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                    .withPartOf(partOf)
-                   .withName(subSubUnitDto.getUnitName())
                    .withLabels(subSubUnitDto.getUnitName())
                    .build();
     }
@@ -241,7 +239,6 @@ public class CristinOrganizationApiClient
                    .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                    .withPartOf(partOf)
                    .withHasPart(getSubUnits(subSubUnitDto))
-                   .withName(subSubUnitDto.getUnitName())
                    .withLabels(subSubUnitDto.getUnitName())
                    .build();
     }
@@ -266,7 +263,6 @@ public class CristinOrganizationApiClient
         return new Organization.Builder()
                    .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
                    .withHasPart(getSubUnits(subSubUnitDto))
-                   .withName(subSubUnitDto.getUnitName())
                    .withLabels(subSubUnitDto.getUnitName())
                    .build();
     }

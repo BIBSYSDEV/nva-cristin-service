@@ -12,6 +12,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTACT_INFO;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_CONTACT_INFO;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ALTERNATIVE_TITLES;
+import static no.unit.nva.cristin.model.JsonPropertyNames.END_DATE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LANGUAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.START_DATE;
@@ -33,7 +34,9 @@ import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.MUST_BE_A_LIST_OF_IDENTIFIERS;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_KEY_VALUE_FIELD;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.NOT_A_VALID_URI;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.TITLE_MUST_HAVE_A_LANGUAGE;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.WEB_PAGE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_CATEGORIES_MISSING_REQUIRED_FIELD_TYPE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
@@ -101,6 +104,7 @@ class UpdateCristinProjectHandlerTest {
     public static final String CRISTIN_PRO_MANAGER_CODE = "PRO_MANAGER";
     public static final String ANOTHER_IDENTIFIER_THAN_USER = "999888";
     public static final String NO_ACCESS = "noAccess";
+    public static final String NOT_SOME_WEBPAGE = "<script>1</script>";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final HttpClient httpClientMockFetch = mock(HttpClient.class);
@@ -162,6 +166,7 @@ class UpdateCristinProjectHandlerTest {
 
         var gatewayResponse = sendQuery(input.toString());
 
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_BAD_REQUEST));
         assertThat(gatewayResponse.getBody(), containsString(exceptionMessage));
     }
 
@@ -180,7 +185,7 @@ class UpdateCristinProjectHandlerTest {
     }
 
     @ParameterizedTest(name = "Allowing null value for field {0}")
-    @ValueSource(strings = {"funding", "relatedProjects", "institutionsResponsibleForResearch"})
+    @ValueSource(strings = {"funding", "relatedProjects", "institutionsResponsibleForResearch", "webPage"})
     void shouldAllowFieldsWhichCanBeNullable(String fieldName) throws Exception {
         handler = spy(handler);
         doReturn(true).when(handler).hasResourceAccess(any());
@@ -378,8 +383,20 @@ class UpdateCristinProjectHandlerTest {
             Arguments.of(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH, notAnOrganization(),
                          format(ILLEGAL_VALUE_FOR_PROPERTY, NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)),
             Arguments.of(ALTERNATIVE_TITLES, notAListOfMaps(),
-                         format(NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS, ALTERNATIVE_TITLES))
+                         format(NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS, ALTERNATIVE_TITLES)),
+            Arguments.of(WEB_PAGE, notAWebPage(), format(NOT_A_VALID_URI, WEB_PAGE)),
+            Arguments.of(END_DATE, endDateInstant(EMPTY_STRING), format(ILLEGAL_VALUE_FOR_PROPERTY, END_DATE)),
+            Arguments.of(END_DATE, endDateInstant(null), format(ILLEGAL_VALUE_FOR_PROPERTY, END_DATE)),
+            Arguments.of(END_DATE, endDateInstant(randomString()), format(ILLEGAL_VALUE_FOR_PROPERTY, END_DATE))
         );
+    }
+
+    private static JsonNode endDateInstant(String fieldValue) {
+        return OBJECT_MAPPER.createObjectNode().put(END_DATE, fieldValue);
+    }
+
+    private static JsonNode notAWebPage() {
+        return OBJECT_MAPPER.createObjectNode().put(WEB_PAGE, NOT_SOME_WEBPAGE);
     }
 
     private static JsonNode notAnArray(String fieldName) {

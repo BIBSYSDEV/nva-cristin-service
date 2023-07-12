@@ -62,7 +62,7 @@ public class CristinInstitution {
      */
     public Organization toOrganization() {
         URI id = getNvaApiId(getCristinInstitutionId(), ORGANIZATION_PATH);
-        return new Organization.Builder().withId(id).withName(getInstitutionName()).withLabels(getInstitutionName())
+        return new Organization.Builder().withId(id).withLabels(getInstitutionName())
                    .build();
     }
 
@@ -76,7 +76,7 @@ public class CristinInstitution {
             return null;
         }
         CristinInstitution institution = new CristinInstitution();
-        institution.setInstitutionName(organization.getName());
+        institution.setInstitutionName(organization.getLabels());
         institution.setUrl(nvaIdentifierToCristinIdentifier(organization.getId(), INSTITUTION_PATH).toString());
         institution.setCristinInstitutionId(extractLastPathElement(organization.getId()));
         return institution;

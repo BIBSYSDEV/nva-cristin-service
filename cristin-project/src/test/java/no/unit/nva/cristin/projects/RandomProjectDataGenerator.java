@@ -46,6 +46,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -120,6 +121,7 @@ public class RandomProjectDataGenerator {
                                           .withHealthProjectData(randomHealthProjectData())
                                           .withApprovals(randomApprovals())
                                           .withExemptFromPublicDisclosure(randomBoolean())
+                                          .withWebPage(randomUri())
                                           .build();
         assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         return nvaProject;
@@ -171,16 +173,17 @@ public class RandomProjectDataGenerator {
     public static NvaProject randomMinimalNvaProject() {
         final String identifier = randomString();
         return new NvaProject.Builder()
-                .withId(UriUtils.createNvaProjectId(identifier))
-                .withIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
-                .withType(PROJECT_TYPE)
-                .withTitle(randomString())
-                .withLanguage(LanguageMapper.toUri(randomElement(LANGUAGES)))
-                .withStatus(randomStatus())
-                .withCoordinatingInstitution(randomOrganization())
-                .withContributors(randomContributors())
-                .withStartDate(randomInstant())
-                .build();
+                   .withId(UriUtils.createNvaProjectId(identifier))
+                   .withIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
+                   .withType(PROJECT_TYPE)
+                   .withTitle(randomString())
+                   .withLanguage(LanguageMapper.toUri(randomElement(LANGUAGES)))
+                   .withStatus(randomStatus())
+                   .withCoordinatingInstitution(randomOrganization())
+                   .withContributors(randomContributors())
+                   .withStartDate(randomInstant())
+                   .withEndDate(randomInstant())
+                   .build();
     }
 
     public static Map<String, String> randomNamesMap() {
@@ -248,7 +251,6 @@ public class RandomProjectDataGenerator {
         var labels = randomNamesMap();
         return new Organization.Builder()
                    .withId(semiRandomOrganizationId(randomString()))
-                   .withName(labels)
                    .withLabels(labels)
                    .build();
     }

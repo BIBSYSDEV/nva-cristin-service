@@ -149,7 +149,8 @@ Feature: API tests for Cristin Project retrieve and search
         'organization': 'Universitetet i Oslo',
         'email': 'navn.navnesen@uio.no',
         'phone': '99223344'
-      }
+      },
+      'webPage': 'https://www.example.org'
     }
     """
     Given url CRISTIN_BASE
@@ -208,3 +209,5 @@ Feature: API tests for Cristin Project retrieve and search
     And request swaggerMinimumSampleProject
     When method POST
     Then status 201
+    And print response
+    And match response.publishable == true
