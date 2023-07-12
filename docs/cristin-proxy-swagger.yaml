@@ -454,6 +454,17 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchOrganization.Arn}:live/invocations
         httpMethod: POST
+        requestParameters:
+          integration.request.path.identifier:
+            'method.request.path.identifier'
+          integration.request.querystring.depth:
+            'method.request.querystring.depth'
+          integration.request.header.Accept:
+            'method.request.header.Accept'
+        cacheKeyParameters:
+          - 'method.request.path.identifier'
+          - 'method.request.querystring.depth'
+          - 'method.request.header.Accept'
         type: "AWS_PROXY"
       tags:
         - Organization
@@ -899,11 +910,31 @@ paths:
           type: string
           pattern: '^[0-9]+$|[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9|Xx]'
         example: '359084'
+      - name: Accept
+        in: header
+        description: Requested response format and version of the returned payload
+        examples:
+          applicationJson:
+            value: application/json
+            description: application/json
+          applicationLdPlusJson:
+            value: application/ld+json
+            description: application/ld+json
+        schema:
+          type: string
     get:
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonFunction.Arn}/invocations
         httpMethod: POST
+        requestParameters:
+          integration.request.path.id:
+            'method.request.path.id'
+          integration.request.header.Accept:
+            'method.request.header.Accept'
+        cacheKeyParameters:
+          - 'method.request.path.id'
+          - 'method.request.header.Accept'
         type: "AWS_PROXY"
       tags:
         - Person
@@ -1533,6 +1564,11 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchFundingSourceFunction.Arn}/invocations
         httpMethod: POST
+        requestParameters:
+          integration.request.path.identifier:
+            'method.request.path.identifier'
+        cacheKeyParameters:
+          - 'method.request.path.identifier'
         type: "AWS_PROXY"
       tags:
         - FundingSource
@@ -1576,6 +1612,11 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchBiobankFunction.Arn}/invocations
         httpMethod: POST
+        requestParameters:
+          integration.request.path.identifier:
+            'method.request.path.identifier'
+        cacheKeyParameters:
+          - 'method.request.path.identifier'
         type: "AWS_PROXY"
       tags:
         - Biobank
