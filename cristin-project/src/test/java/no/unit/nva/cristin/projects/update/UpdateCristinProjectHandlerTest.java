@@ -42,7 +42,6 @@ import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static no.unit.nva.utils.PatchValidator.COULD_NOT_PARSE_LANGUAGE_FIELD;
 import static no.unit.nva.utils.PatchValidator.ILLEGAL_VALUE_FOR_PROPERTY;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -229,11 +228,12 @@ class UpdateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldAllowUpdateOfProjectWhenHavingLegacyAccessRight() throws IOException {
+    void shouldReturnForbiddenOnUpdateOfProjectWhenHavingLegacyAccessRight() throws IOException {
+        final var legacyAccessRight = "EDIT_OWN_INSTITUTION_PROJECTS";
         var input = IoUtils.stringFromResources(Path.of(PATCH_REQUEST_JSON));
-        var gatewayResponse = sendQuery(input, EDIT_OWN_INSTITUTION_PROJECTS);
+        var gatewayResponse = sendQuery(input, legacyAccessRight);
 
-        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
     }
 
     @Test

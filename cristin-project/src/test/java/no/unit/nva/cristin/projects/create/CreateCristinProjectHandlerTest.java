@@ -20,7 +20,6 @@ import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.DRUGSTUDY
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -558,7 +557,7 @@ class CreateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldAllowUsersWithLegacyAccessRightForBackwardsCompatibility() throws Exception {
+    void shouldNotAllowUsersWithLegacyAccessRightForBackwardsCompatibility() throws Exception {
         var randomNvaProject = randomNvaProject();
         randomNvaProject.setId(null);
         mockUpstreamUsingRequest(randomNvaProject);
@@ -566,12 +565,12 @@ class CreateCristinProjectHandlerTest {
         var input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
                         .withBody(randomNvaProject)
                         .withCurrentCustomer(customerId)
-                        .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
+                        .withAccessRights(customerId, "EDIT_OWN_INSTITUTION_PROJECTS")
                         .build();
         handler.handleRequest(input, output, context);
         var response = GatewayResponse.fromOutputStream(output, Object.class);
 
-        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
+        assertThat(response.getStatusCode(), equalTo(HTTP_FORBIDDEN));
     }
 
     private NvaContributor nvaContributorWithRole(String roleCode) {

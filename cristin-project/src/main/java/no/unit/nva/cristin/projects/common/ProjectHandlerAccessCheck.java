@@ -1,8 +1,6 @@
 package no.unit.nva.cristin.projects.common;
 
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import nva.commons.apigateway.AccessRight;
-import nva.commons.apigateway.RequestInfo;
 
 public class ProjectHandlerAccessCheck {
 
@@ -12,10 +10,6 @@ public class ProjectHandlerAccessCheck {
     public static final String MANAGE_OWN_PROJECTS = AccessRight.MANAGE_OWN_PROJECTS.toString();
 
     protected ProjectHandlerAccessCheck() {
-    }
-
-    public static boolean hasLegacyAccessRight(RequestInfo requestInfo) {
-        return requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_PROJECTS);
     }
 
 }

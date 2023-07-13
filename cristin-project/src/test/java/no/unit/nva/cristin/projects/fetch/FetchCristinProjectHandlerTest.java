@@ -56,7 +56,6 @@ import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.FUNDING_S
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
@@ -410,7 +409,8 @@ public class FetchCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldReturnRestrictedProjectWhenUserHasLegacyRights() throws Exception {
+    void shouldReturnForbiddenForRestrictedProjectWhenUserHasLegacyRights() throws Exception {
+        final String legacyAccessRight = "EDIT_OWN_INSTITUTION_PROJECTS";
         cristinApiClientStub = spy(cristinApiClientStub);
         doReturn(new HttpResponseFaker(EMPTY_STRING, HTTP_UNAUTHORIZED)).when(cristinApiClientStub)
             .fetchGetResult(any());
@@ -424,8 +424,8 @@ public class FetchCristinProjectHandlerTest {
         doReturn(fakeAuthorizedClient).when(handler).authorizedApiClient();
 
         var gatewayResponse =
-            sendQueryWithPersonIdAndAccessRight(EDIT_OWN_INSTITUTION_PROJECTS);
-        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+            sendQueryWithPersonIdAndAccessRight(legacyAccessRight);
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_FORBIDDEN));
     }
 
     private HttpResponseFaker fakeOkResponse() {
