@@ -124,9 +124,6 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.funding[0].source == '#present'
     And match response.funding[0].identifier == '#present'
     And match response.funding[0].labels == '#present'
-    And match response.newFunding[0].source == '#present'
-    And match response.newFunding[0].identifier == '#present'
-    And match response.newFunding[0].labels == '#present'
 
   Scenario: Fetch returns method and equipment
     Given path '/project/284612'

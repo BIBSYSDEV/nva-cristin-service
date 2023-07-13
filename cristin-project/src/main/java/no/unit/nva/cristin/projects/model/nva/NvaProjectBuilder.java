@@ -126,7 +126,6 @@ public class NvaProjectBuilder {
                    .withStartDate(cristinProject.getStartDate())
                    .withEndDate(cristinProject.getEndDate())
                    .withFunding(extractFunding())
-                   .withNewFunding(extractFunding())
                    .withCoordinatingInstitution(extractCoordinatingInstitution())
                    .withContributors(extractContributors())
                    .withStatus(extractProjectStatus())
