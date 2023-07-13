@@ -933,17 +933,6 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonFunction.Arn}/invocations
         httpMethod: POST
-        requestParameters:
-          integration.request.path.id:
-            'method.request.path.id'
-          integration.request.header.Accept:
-            'method.request.header.Accept'
-          integration.request.header.Authorization:
-            'method.request.header.Authorization'
-        cacheKeyParameters:
-          - 'method.request.path.id'
-          - 'method.request.header.Accept'
-          - 'method.request.header.Authorization'
         type: "AWS_PROXY"
       tags:
         - Person

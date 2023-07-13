@@ -105,8 +105,7 @@ Resources:
           CachingEnabled: false
         - HttpMethod: 'GET'
           ResourcePath: '/~1person~1{id}'
-          CacheTtlInSeconds: 300
-          CachingEnabled: true
+          CachingEnabled: false
         - HttpMethod: 'GET'
           ResourcePath: '/~1person~1{id}~1organization~1{orgId}'
           CachingEnabled: false
