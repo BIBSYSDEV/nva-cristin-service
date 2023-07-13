@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import static no.unit.nva.cristin.common.Utils.getValidIdentifier;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
-import static no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck.hasLegacyAccessRight;
 import static no.unit.nva.cristin.projects.update.UpdateProjectResourceAccessCheck.USER_IDENTIFIER;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
@@ -70,7 +69,7 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
     @Override
     protected Void processInput(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
 
-        if (!hasLegacyAccessRight(requestInfo) && missingHandlerOrResourceAccess(requestInfo)) {
+        if (missingHandlerOrResourceAccess(requestInfo)) {
             throw new ForbiddenException();
         }
 

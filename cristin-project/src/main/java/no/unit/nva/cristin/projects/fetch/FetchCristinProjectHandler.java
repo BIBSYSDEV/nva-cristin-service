@@ -18,7 +18,6 @@ import nva.commons.core.JacocoGenerated;
 import java.net.HttpURLConnection;
 
 import static no.unit.nva.cristin.common.Utils.getValidIdentifier;
-import static no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck.hasLegacyAccessRight;
 import static no.unit.nva.cristin.projects.update.UpdateProjectResourceAccessCheck.USER_IDENTIFIER;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 
@@ -52,10 +51,6 @@ public class FetchCristinProjectHandler extends CristinHandler<Void, NvaProject>
         try {
             return getTransformedProjectFromCristin(id);
         } catch (UnauthorizedException unauthorizedException) {
-            if (hasLegacyAccessRight(requestInfo)) {
-                return authenticatedFetchProject(id);
-            }
-
             if (doesNotHaveHandlerAccess(requestInfo)) {
                 throw new ForbiddenException();
             }
