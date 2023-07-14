@@ -71,7 +71,7 @@ public class NvaProjectBuilderTest {
         cristinProject.setProjectFundingSources(List.of(cristinFunding));
         var nvaProject = new NvaProjectBuilder(cristinProject).build();
 
-        var actual = nvaProject.getNewFunding().get(0).getSource().toString();
+        var actual = nvaProject.getFunding().get(0).getSource().toString();
 
         assertThat(actual, equalTo(URI_ENCODED_FUNDING_SOURCE_URI));
     }

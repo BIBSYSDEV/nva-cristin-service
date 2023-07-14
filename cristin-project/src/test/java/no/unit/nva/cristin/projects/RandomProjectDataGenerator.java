@@ -103,7 +103,6 @@ public class RandomProjectDataGenerator {
                                           .withEndDate(randomInstant())
                                           .withAcademicSummary(randomSummary())
                                           .withPopularScientificSummary(randomSummary())
-                                          .withNewFunding(fundings)
                                           .withFunding(fundings)
                                           .withContributors(randomContributors())
                                           .withCoordinatingInstitution(randomOrganization())

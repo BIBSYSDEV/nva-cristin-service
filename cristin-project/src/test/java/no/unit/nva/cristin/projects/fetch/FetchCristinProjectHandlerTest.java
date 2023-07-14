@@ -296,7 +296,7 @@ public class FetchCristinProjectHandlerTest {
         final NvaProject expectedNvaProject = OBJECT_MAPPER.readValue(
             getBodyFromResource(API_RESPONSE_ONE_PROJECT_JSON), NvaProject.class);
         final List<Funding> funding = notRandomFunding();
-        expectedNvaProject.setNewFunding(funding);
+        expectedNvaProject.setFunding(funding);
         final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
 
         assertEquals(expectedNvaProject, actualNvaProject);

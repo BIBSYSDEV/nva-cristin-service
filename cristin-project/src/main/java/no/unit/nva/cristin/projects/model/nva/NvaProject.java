@@ -21,7 +21,7 @@ import no.unit.nva.model.Organization;
 import no.unit.nva.model.DateInfo;
 import no.unit.nva.model.TypedLabel;
 
-@SuppressWarnings({"PMD.ExcessivePublicCount","PMD.TooManyFields"})
+@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyFields"})
 @JsonInclude(ALWAYS)
 public class NvaProject implements JsonSerializable {
 
@@ -50,8 +50,6 @@ public class NvaProject implements JsonSerializable {
     private Instant endDate;
     @JsonProperty
     private List<Funding> funding;
-    @JsonProperty
-    private List<Funding> newFunding;
     @JsonProperty
     private Organization coordinatingInstitution;
     @JsonProperty
@@ -190,14 +188,6 @@ public class NvaProject implements JsonSerializable {
 
     public void setFunding(List<Funding> funding) {
         this.funding = funding;
-    }
-
-    public List<Funding> getNewFunding() {
-        return nonEmptyOrDefault(newFunding);
-    }
-
-    public void setNewFunding(List<Funding> newFunding) {
-        this.newFunding = newFunding;
     }
 
     public Organization getCoordinatingInstitution() {
@@ -403,7 +393,6 @@ public class NvaProject implements JsonSerializable {
                && Objects.equals(getStartDate(), that.getStartDate())
                && Objects.equals(getEndDate(), that.getEndDate())
                && Objects.equals(getFunding(), that.getFunding())
-               && Objects.equals(getNewFunding(), that.getNewFunding())
                && Objects.equals(getCoordinatingInstitution(), that.getCoordinatingInstitution())
                && Objects.equals(getContributors(), that.getContributors())
                && getStatus() == that.getStatus()
@@ -432,7 +421,7 @@ public class NvaProject implements JsonSerializable {
     @Override
     public int hashCode() {
         return Objects.hash(getContext(), getId(), getType(), getIdentifiers(), getTitle(), getLanguage(),
-                            getAlternativeTitles(), getStartDate(), getEndDate(), getFunding(), getNewFunding(),
+                            getAlternativeTitles(), getStartDate(), getEndDate(), getFunding(),
                             getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
                             getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
                             getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
@@ -449,7 +438,6 @@ public class NvaProject implements JsonSerializable {
     public CristinProject toCristinProject() {
         return new CristinProjectBuilder(this).build();
     }
-
 
     public static final class Builder {
 
@@ -506,11 +494,6 @@ public class NvaProject implements JsonSerializable {
 
         public Builder withFunding(List<Funding> funding) {
             nvaProject.setFunding(funding);
-            return this;
-        }
-
-        public Builder withNewFunding(List<Funding> newFunding) {
-            nvaProject.setNewFunding(newFunding);
             return this;
         }
 

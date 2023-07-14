@@ -23,16 +23,6 @@
       }
     }
   ],
-  "newFunding": [
-    {
-      "type": "UnconfirmedFunding",
-      "source": "https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR",
-      "identifier": "654321",
-      "labels": {
-        "en": "Research Council of Norway (RCN)"
-      }
-    }
-  ],
   "coordinatingInstitution": {
     "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
     "type": "Organization",
