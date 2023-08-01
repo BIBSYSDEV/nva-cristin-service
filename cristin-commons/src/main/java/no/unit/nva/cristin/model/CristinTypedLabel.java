@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.projects.model.cristin;
+package no.unit.nva.cristin.model;
 
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import com.fasterxml.jackson.annotation.JsonCreator;

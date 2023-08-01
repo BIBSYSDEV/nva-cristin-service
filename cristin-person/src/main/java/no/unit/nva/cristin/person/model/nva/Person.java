@@ -7,8 +7,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.ArrayList;
 import java.util.List;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.model.TypedLabel;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.URI;
@@ -22,6 +24,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.distinctByKey;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIERS;
@@ -30,13 +33,15 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AFFILIATION
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 
 @JacocoGenerated
-@JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
+@JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS, RESERVED, EMPLOYMENTS,
+    VERIFIED, KEYWORDS})
 public class Person implements JsonSerializable {
 
     @JsonProperty(TYPE)
@@ -62,6 +67,8 @@ public class Person implements JsonSerializable {
     private Set<Employment> employments;
     @JsonProperty(VERIFIED)
     private Boolean verified;
+    @JsonProperty(KEYWORDS)
+    private Set<TypedLabel> keywords;
 
     private Person() {
 
@@ -79,13 +86,16 @@ public class Person implements JsonSerializable {
      * @param reserved       If person is a reserved person, meaning not publicly viewable.
      * @param employments    This person's detailed employment data at each organization.
      * @param verified       If this person is a verified person.
+     * @param keywords       Keywords related to this person.
      */
     @JsonCreator
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public Person(@JsonProperty(ID) URI id, @JsonProperty(IDENTIFIERS) Set<TypedValue> identifiers,
                   @JsonProperty(NAMES) Set<TypedValue> names,
                   @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails, @JsonProperty(IMAGE) URI image,
                   @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations, @JsonProperty(RESERVED) Boolean reserved,
-                  @JsonProperty(EMPLOYMENTS) Set<Employment> employments, @JsonProperty(VERIFIED) Boolean verified) {
+                  @JsonProperty(EMPLOYMENTS) Set<Employment> employments, @JsonProperty(VERIFIED) Boolean verified,
+                  @JsonProperty(KEYWORDS) Set<TypedLabel> keywords) {
         this.id = id;
         this.identifiers = identifiers;
         this.names = names;
@@ -95,6 +105,7 @@ public class Person implements JsonSerializable {
         this.reserved = reserved;
         this.employments = employments;
         this.verified = verified;
+        this.keywords = keywords;
     }
 
     public String getContext() {
@@ -181,6 +192,14 @@ public class Person implements JsonSerializable {
         this.verified = verified;
     }
 
+    public Set<TypedLabel> getKeywords() {
+        return nonEmptyOrDefault(keywords);
+    }
+
+    public void setKeywords(Set<TypedLabel> keywords) {
+        this.keywords = keywords;
+    }
+
     /**
      * Converts this object to an appropriate format for POST to Cristin.
      */
@@ -198,8 +217,15 @@ public class Person implements JsonSerializable {
 
         cristinPerson.setDetailedAffiliations(mapEmploymentsToCristinEmployments(getEmployments()));
         cristinPerson.setReserved(getReserved());
+        cristinPerson.setKeywords(extractKeywordCodes(getKeywords()));
 
         return cristinPerson;
+    }
+
+    private List<CristinTypedLabel> extractKeywordCodes(Set<TypedLabel> keywords) {
+        return keywords.stream()
+            .map(label -> new CristinTypedLabel(label.getType(), null))
+            .collect(Collectors.toList());
     }
 
     private Map<String, String> convertTypedValuesToMap(Set<TypedValue> typedValueSet) {
@@ -240,14 +266,15 @@ public class Person implements JsonSerializable {
                && Objects.equals(getAffiliations(), person.getAffiliations())
                && Objects.equals(getReserved(), person.getReserved())
                && Objects.equals(getEmployments(), person.getEmployments())
-               && Objects.equals(getVerified(), person.getVerified());
+               && Objects.equals(getVerified(), person.getVerified())
+               && Objects.equals(getKeywords(), person.getKeywords());
     }
 
     @JacocoGenerated
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getContext(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
-                            getAffiliations(), getReserved(), getEmployments(), getVerified());
+                            getAffiliations(), getReserved(), getEmployments(), getVerified(), getKeywords());
     }
 
     @Override
@@ -311,6 +338,11 @@ public class Person implements JsonSerializable {
 
         public Builder withVerified(Boolean verified) {
             person.setVerified(verified);
+            return this;
+        }
+
+        public Builder withKeywords(Set<TypedLabel> keywords) {
+            person.setKeywords(keywords);
             return this;
         }
 
