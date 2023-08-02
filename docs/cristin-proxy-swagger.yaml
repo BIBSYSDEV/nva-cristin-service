@@ -2535,6 +2535,16 @@ components:
         verified:
           type: boolean
           description: Whether we can document the existence of the person
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
+              label:
+                $ref: '#/components/schemas/Languages'
     PersonPost:
       type: object
       required: [ identifiers, names ]
@@ -2572,6 +2582,14 @@ components:
           description: Employments for this person
           items:
             $ref: '#/components/schemas/PersonEmployment'
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
     PersonPostResponse:
       type: object
       properties:
@@ -2613,6 +2631,16 @@ components:
           description: Employments for this person
           items:
             $ref: '#/components/schemas/PersonEmployment'
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
+              label:
+                $ref: '#/components/schemas/Languages'
     PersonPatch:
       type: object
       properties:
@@ -2638,6 +2666,15 @@ components:
           description: Employments for this person. Only for authorized users
           items:
             $ref: '#/components/schemas/PersonEmployment'
+        keywords:
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
     PersonNIN:
       type: object
       properties:
@@ -3460,6 +3497,10 @@ components:
                     en: 'Head Engineer'
                     nb: 'Overingeniør'
             verified: true
+            keywords:
+              - type: '4837'
+                label:
+                  'en': 'Supply Chain'
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
             type: 'Person'
             identifiers:
@@ -3481,6 +3522,10 @@ components:
                   labels:
                     en: 'Consultant'
             verified: true
+            keywords:
+              - type: '4837'
+                label:
+                  'en': 'Supply Chain'
     PersonExample:
       value:
         '@context': 'https://example.org/person-context.json'
@@ -3530,6 +3575,10 @@ components:
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
         verified: true
+        keywords:
+          - type: '4837'
+            label:
+              'en': 'Supply Chain'
     PersonPatchExample:
       value:
         orcid: '1234-1234-1234-1234'
@@ -3542,6 +3591,9 @@ components:
             startDate: '2008-01-01T00:00:00Z'
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
+        keywords:
+          - type: '4245'
+          - type: '5686'
     PersonPostExample:
       value:
         identifiers:
@@ -3562,6 +3614,9 @@ components:
             startDate: '2008-01-01T00:00:00Z'
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
+        keywords:
+          - type: '4245'
+          - type: '5686'
     PersonPostResponseExample:
       value:
         '@context': 'https://example.org/person-context.json'
@@ -3595,6 +3650,10 @@ components:
             startDate: '2008-01-01T00:00:00Z'
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
+        keywords:
+          - type: '4837'
+            label:
+              'en': 'Supply Chain'
     PersonOrganizationInfoExample:
       value:
         '@context': 'https://ontology.org'
