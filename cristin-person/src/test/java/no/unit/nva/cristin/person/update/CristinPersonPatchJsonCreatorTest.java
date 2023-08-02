@@ -41,7 +41,7 @@ public class CristinPersonPatchJsonCreatorTest {
 
     @Test
     void shouldParseInputJsonIntoCristinJsonWithCorrectMappingOfFields() {
-        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        var input = OBJECT_MAPPER.createObjectNode();
         input.put(ORCID, VALID_ORCID);
         input.put(FIRST_NAME, SOME_NAME);
         input.put(LAST_NAME, SOME_OTHER_NAME);
@@ -49,7 +49,7 @@ public class CristinPersonPatchJsonCreatorTest {
         input.putNull(PREFERRED_LAST_NAME);
         input.put(RESERVED, true);
 
-        ObjectNode result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+        var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
 
         assertEquals(VALID_ORCID, result.get(ORCID).get(ID).asText());
         assertEquals(SOME_NAME, result.get(CRISTIN_FIRST_NAME).asText());
@@ -62,9 +62,9 @@ public class CristinPersonPatchJsonCreatorTest {
 
     @Test
     void shouldParseOrcidIntoCristinFormatEvenIfNull() {
-        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        var input = OBJECT_MAPPER.createObjectNode();
         input.putNull(ORCID);
-        ObjectNode result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+        var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
 
         assertThat(result.get(ORCID).has(ID), equalTo(true));
         assertThat(result.get(ORCID).get(ID).isNull(), equalTo(true));
@@ -72,8 +72,8 @@ public class CristinPersonPatchJsonCreatorTest {
 
     @Test
     void shouldNotCreateCristinFieldsIfNotInInput() {
-        ObjectNode emptyJson = OBJECT_MAPPER.createObjectNode();
-        ObjectNode result = new CristinPersonPatchJsonCreator(emptyJson).create().getOutput();
+        var emptyJson = OBJECT_MAPPER.createObjectNode();
+        var result = new CristinPersonPatchJsonCreator(emptyJson).create().getOutput();
 
         assertThat(result.isEmpty(), equalTo(true));
     }
@@ -145,18 +145,18 @@ public class CristinPersonPatchJsonCreatorTest {
 
     @Test
     void shouldNotAddReservedFieldIfSetToFalse() {
-        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        var input = OBJECT_MAPPER.createObjectNode();
         input.put(RESERVED, false);
-        ObjectNode result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+        var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
 
         assertThat(result.has(RESERVED), equalTo(false));
     }
 
     @Test
     void shouldNotAddReservedFieldWhenNotABoolean() {
-        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        var input = OBJECT_MAPPER.createObjectNode();
         input.put(RESERVED, randomString());
-        ObjectNode result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+        var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
 
         assertThat(result.has(RESERVED), equalTo(false));
     }
