@@ -9,6 +9,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
@@ -25,7 +26,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Arrays;
 import java.util.Collections;
+import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.person.model.nva.TypedValue;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import org.junit.jupiter.api.Test;
 
@@ -157,4 +160,20 @@ public class CristinPersonPatchJsonCreatorTest {
 
         assertThat(result.has(RESERVED), equalTo(false));
     }
+    
+    @Test
+    void shouldAddKeywordsFieldToOutputWhenInputHasKeywords() throws Exception {
+        var input = OBJECT_MAPPER.createObjectNode();
+        var keyword = new TypedValue(randomString(), randomString());
+        input.putArray(KEYWORDS).add(OBJECT_MAPPER.readTree(keyword.toString()));
+        var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+
+        assertThat(result.has(KEYWORDS), equalTo(true));
+
+        var keywordFromJson =
+            OBJECT_MAPPER.readValue(result.get(KEYWORDS).toString(), CristinTypedLabel[].class);
+
+        assertThat(keywordFromJson[0].getCode(), equalTo(keyword.getType()));
+    }
+
 }
