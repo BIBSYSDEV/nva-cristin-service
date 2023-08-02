@@ -176,4 +176,14 @@ public class CristinPersonPatchJsonCreatorTest {
         assertThat(keywordFromJson[0].getCode(), equalTo(keyword.getType()));
     }
 
+    @Test
+    void shouldAllowEmptyListForKeywords() {
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.putArray(KEYWORDS);
+        var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+
+        assertThat(result.has(KEYWORDS), equalTo(true));
+        assertThat(result.get(KEYWORDS).isEmpty(), equalTo(true));
+    }
+
 }
