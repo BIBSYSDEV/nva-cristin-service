@@ -1,16 +1,18 @@
 package no.unit.nva.cristin.keyword.query;
 
+import static java.util.Arrays.asList;
 import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.common.client.QueryApiClient;
+import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.TypedLabel;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -33,10 +35,11 @@ public class QueryKeywordsApiClient extends ApiClient implements QueryApiClient<
 
     @Override
     public SearchResponse<TypedLabel> executeQuery(Map<String, String> params) throws ApiGatewayException {
-        var queryUri = createCristinQueryUri(params, CRISTIN_KEYWORDS_PATH);
+        var convertedParams = new QueryParamConverter(params).convert().getResult();
+        var queryUri = createCristinQueryUri(convertedParams, CRISTIN_KEYWORDS_PATH);
         var start = System.currentTimeMillis();
         var response = queryUpstream(queryUri);
-        var keywords = getKeywords();
+        var keywords = getKeywords(response);
         var totalProcessingTime = calculateProcessingTime(start, System.currentTimeMillis());
 
         return new SearchResponse<TypedLabel>(KEYWORD_ID_URI)
@@ -53,9 +56,12 @@ public class QueryKeywordsApiClient extends ApiClient implements QueryApiClient<
         return response;
     }
 
-    // TODO: Add response parameter and finish the method
-    private List<TypedLabel> getKeywords() throws BadGatewayException {
-        return Collections.emptyList();
+    private List<TypedLabel> getKeywords(HttpResponse<String> response) throws BadGatewayException {
+        var keywords = asList(getDeserializedResponse(response, CristinTypedLabel[].class));
+
+        return keywords.stream()
+                   .map(keyword -> new TypedLabel(keyword.getCode(), keyword.getName()))
+                   .collect(Collectors.toList());
     }
 
 }

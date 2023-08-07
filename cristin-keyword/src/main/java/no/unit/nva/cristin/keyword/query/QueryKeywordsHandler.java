@@ -19,12 +19,13 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 
-@SuppressWarnings("unused")
 public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchResponse<TypedLabel>> {
 
-    public static final String PER_PAGE = "per_page";
+    public static final String DEFAULT_NUMBER_OF_RESULTS = "100";
+    public static final String DEFAULT_PAGE = "1";
     private final transient QueryApiClient<Map<String, String>, TypedLabel> apiClient;
 
+    @SuppressWarnings("unused")
     public QueryKeywordsHandler() {
         this(new Environment());
     }
@@ -57,8 +58,11 @@ public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchRespon
 
         var queryParams = new ConcurrentHashMap<String, String>();
         getValidQueryOpt(requestInfo).ifPresent(query -> queryParams.put(NAME, query));
-        getValidPageOpt(requestInfo).ifPresent(page -> queryParams.put(PAGE, page));
-        getValidResultsPerPageOpt(requestInfo).ifPresent(results -> queryParams.put(PER_PAGE, results));
+        getValidPageOpt(requestInfo)
+            .ifPresentOrElse(page -> queryParams.put(PAGE, page), () -> queryParams.put(PAGE, DEFAULT_PAGE));
+        getValidResultsPerPageOpt(requestInfo)
+            .ifPresentOrElse(results -> queryParams.put(NUMBER_OF_RESULTS, results),
+                             () -> queryParams.put(NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS));
 
         return queryParams;
     }
