@@ -21,7 +21,21 @@ Feature: API tests for Cristin Person Update
     {
       'firstName': 'Helge',
       'lastName': 'Pettersen',
-      'preferredFirstName': null
+      'preferredFirstName': null,
+      'keywords': [
+        {
+          'type': '3548',
+          'label': {
+            'en': 'Decision support'
+          }
+        },
+        {
+          'type': '5156',
+          'label': {
+            'en': 'Risk management'
+          }
+        }
+      ]
     }
     """
     Given url CRISTIN_BASE

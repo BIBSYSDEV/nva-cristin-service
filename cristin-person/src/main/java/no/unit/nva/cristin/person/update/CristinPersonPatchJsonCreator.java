@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
@@ -15,8 +16,10 @@ import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 import java.util.stream.Collectors;
+import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.cristin.person.model.nva.Employment;
+import no.unit.nva.cristin.person.model.nva.TypedValue;
 
 public class CristinPersonPatchJsonCreator {
 
@@ -47,6 +50,7 @@ public class CristinPersonPatchJsonCreator {
         addPreferredLastName();
         addReserved();
         addEmployments();
+        addKeywords();
 
         return this;
     }
@@ -117,5 +121,22 @@ public class CristinPersonPatchJsonCreator {
 
     private List<CristinPersonEmployment> employmentsToCristinFormat(List<Employment> employments) {
         return employments.stream().map(Employment::toCristinEmployment).collect(Collectors.toList());
+    }
+
+    private void addKeywords() {
+        if (input.has(KEYWORDS) && !input.get(KEYWORDS).isNull()) {
+            var inputKeywords = input.get(KEYWORDS).toString();
+            var keywordsInCristinFormat =
+                attempt(() -> {
+                    var parsedInput = asList(OBJECT_MAPPER.readValue(inputKeywords, TypedValue[].class));
+                    return OBJECT_MAPPER.readTree(keywordsToCristinFormat(parsedInput).toString());
+                }).orElseThrow();
+            output.set(KEYWORDS, keywordsInCristinFormat);
+        }
+    }
+
+    private List<CristinTypedLabel> keywordsToCristinFormat(List<TypedValue> parsedInput) {
+        return parsedInput.stream().map(elm -> new CristinTypedLabel(elm.getType(), null))
+                   .collect(Collectors.toList());
     }
 }

@@ -34,11 +34,13 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_EMPLOYMENT_FIELD;
+import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_KEYWORD_FIELD;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.FIELD_CAN_NOT_BE_ERASED;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.ORCID_IS_NOT_VALID;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.RESERVED_MUST_BE_BOOLEAN;
@@ -284,6 +286,17 @@ public class UpdateCristinPersonHandlerTest {
         assertThat(actual, equalTo(UPSTREAM_BAD_REQUEST_RESPONSE + responseBody));
     }
 
+    @Test
+    void shouldThrowBadRequestWhenPersonKeywordsNotValid() throws IOException {
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
+        var invalidData = randomString();
+        jsonObject.put(KEYWORDS, invalidData);
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(COULD_NOT_PARSE_KEYWORD_FIELD));
+    }
+
     private URI getDummyOrgUri() {
         return UriWrapper.fromUri(randomUri()).addChild(SOME_ORGANIZATION).getUri();
     }
@@ -321,7 +334,7 @@ public class UpdateCristinPersonHandlerTest {
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                    .withBody(body)
                    .withPathParameters(validPath)
-                   .withCustomerId(customerId)
+                   .withCurrentCustomer(customerId)
                    .withTopLevelCristinOrgId(Optional.ofNullable(orgId).orElse(URI.create(EMPTY_STRING)))
                    .withScope(scope)
                    .withAccessRights(customerId, accessRight)
@@ -333,7 +346,7 @@ public class UpdateCristinPersonHandlerTest {
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
             .withBody(body)
             .withPathParameters(pathParam)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .build();
     }

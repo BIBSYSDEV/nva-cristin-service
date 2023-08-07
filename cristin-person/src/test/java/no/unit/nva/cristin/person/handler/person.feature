@@ -160,10 +160,12 @@ Feature: API tests for Cristin Person fetch
     And match identifiers !contains 'NationalIdentificationNumber'
 
   Scenario: Get returns supported fields in payload
-    * def samplePersonIdentifier = '515114'
+    * def samplePersonIdentifier = '1135903'
     Given path '/person/' + samplePersonIdentifier
     When method GET
     Then status 200
     And match response == '#object'
     And match response.verified == '#present'
     And match response.verified == true
+    And match response.keywords[0].type == '#present'
+    And match response.keywords[0].label == '#present'
