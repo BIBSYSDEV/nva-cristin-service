@@ -43,5 +43,19 @@
         "nb": "Overingeniør"
       }
     }
+  ],
+  "keywords": [
+    {
+      "code": "3548",
+      "name": {
+        "en": "Decision support"
+      }
+    },
+    {
+      "code": "5156",
+      "name": {
+        "en": "Risk management"
+      }
+    }
   ]
 }

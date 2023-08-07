@@ -61,5 +61,19 @@
       }
     }
   ],
-  "verified": true
+  "verified": true,
+  "keywords": [
+    {
+      "type": "3548",
+      "label": {
+        "en": "Decision support"
+      }
+    },
+    {
+      "type": "5156",
+      "label": {
+        "en": "Risk management"
+      }
+    }
+  ]
 }

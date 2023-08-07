@@ -93,6 +93,7 @@ public class QueryCristinPersonHandlerTest {
         handler = new QueryCristinPersonHandler(apiClient, environment);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void shouldReturnResponseWhenCallingEndpointWithNameParameter() throws IOException {
         SearchResponse<Person> actual = sendDefaultQuery().getBodyObject(SearchResponse.class);
@@ -114,7 +115,7 @@ public class QueryCristinPersonHandlerTest {
         doThrow(new RuntimeException()).when(apiClient).getEnrichedPersonsUsingQueryResponse(any());
         handler = new QueryCristinPersonHandler(apiClient, environment);
 
-        GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
+        var gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -124,11 +125,11 @@ public class QueryCristinPersonHandlerTest {
     @Test
     void shouldReturnBadGatewayToClientWhenBackendFetchFails() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
-        HttpResponse<String> response = new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
+        var response = new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(response).when(apiClient).fetchQueryResults(any());
         handler = new QueryCristinPersonHandler(apiClient, environment);
 
-        GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
+        var gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -138,11 +139,10 @@ public class QueryCristinPersonHandlerTest {
     @Test
     void shouldReturnResponseFromQueryInsteadOfEnrichedGetWhenEnrichingFails() throws IOException {
         apiClient = spy(apiClient);
-        HttpResponse<String> response =
-            new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
+        var response = new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(CompletableFuture.completedFuture(response)).when(apiClient).fetchGetResultAsync(any());
         handler = new QueryCristinPersonHandler(apiClient, environment);
-        SearchResponse searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
+        var searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
 
         // Query response has size of 2, and will return that even if trying to enrich those 2 returns empty
         assertThat(2, equalTo(searchResponse.getHits().size()));
@@ -158,10 +158,10 @@ public class QueryCristinPersonHandlerTest {
     void shouldReturnSearchResponseWithEmptyHitsWhenBackendFetchIsEmpty() throws ApiGatewayException, IOException {
         apiClient = spy(apiClient);
         doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
-            generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE))).when(apiClient).queryPersons(any());
+            generateHeaders())).when(apiClient).queryPersons(any());
         doReturn(Collections.emptyList()).when(apiClient).fetchQueryResultsOneByOne(any());
         handler = new QueryCristinPersonHandler(apiClient, environment);
-        SearchResponse<Person> searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
+        var searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
 
         assertThat(0, equalTo(searchResponse.getHits().size()));
     }
@@ -176,11 +176,11 @@ public class QueryCristinPersonHandlerTest {
 
     @Test
     void shouldReturnGatewayTimeoutWhenQueryToUpstreamServerTimesOut() throws Exception {
-        HttpClient clientMock = mock(HttpClient.class);
+        var clientMock = mock(HttpClient.class);
         when(clientMock.<String>send(any(), any())).thenThrow(new HttpConnectTimeoutException(EMPTY_STRING));
         CristinPersonApiClient apiClient = new CristinPersonApiClient(clientMock);
         handler = new QueryCristinPersonHandler(apiClient, environment);
-        GatewayResponse<SearchResponse> gatewayResponse = sendDefaultQuery();
+        var gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -305,7 +305,7 @@ public class QueryCristinPersonHandlerTest {
         final var customerId = randomUri();
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                    .withQueryParameters(queryParameters)
-                   .withCustomerId(customerId)
+                   .withCurrentCustomer(customerId)
                    .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS.toString())
                    .build();
     }
@@ -318,8 +318,9 @@ public class QueryCristinPersonHandlerTest {
                    .build();
     }
 
+    @SuppressWarnings("rawtypes")
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
-        InputStream input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME));
+        var input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME));
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
@@ -331,7 +332,8 @@ public class QueryCristinPersonHandlerTest {
             .build();
     }
 
-    private java.net.http.HttpHeaders generateHeaders(String totalCount, String link) {
-        return java.net.http.HttpHeaders.of(HttpResponseFaker.headerMap(totalCount, link), HttpResponseFaker.filter());
+    private java.net.http.HttpHeaders generateHeaders() {
+        return java.net.http.HttpHeaders.of(HttpResponseFaker.headerMap(ZERO_VALUE, LINK_EXAMPLE_VALUE),
+                                            HttpResponseFaker.filter());
     }
 }

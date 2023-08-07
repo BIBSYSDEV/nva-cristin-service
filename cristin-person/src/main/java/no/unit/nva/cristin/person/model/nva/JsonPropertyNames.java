@@ -18,4 +18,5 @@ public class JsonPropertyNames {
     public static final String CRISTIN_FULL_TIME_PERCENTAGE = "fte_percentage";
     public static final String EMPLOYMENTS = "employments";
     public static final String VERIFIED = "verified";
+    public static final String KEYWORDS = "keywords";
 }
