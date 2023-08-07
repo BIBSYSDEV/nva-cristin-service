@@ -1,13 +1,10 @@
 plugins {
     id 'java'
-    id 'checkstyle'
-    id 'pmd'
-    id 'jacoco'
-    id 'base'
+    id 'jacoco-report-aggregation'
 }
 
 group 'no.unit.nva'
-version '1.0-SNAPSHOT'
+version '1.0-JDK17'
 
 dependencies {
     testImplementation libs.bundles.testing
@@ -16,37 +13,15 @@ dependencies {
     implementation libs.slf4j.api
 }
 
-sourceCompatibility = JavaVersion.VERSION_11  // source-code version and must be <= targetCompatibility
-targetCompatibility = JavaVersion.VERSION_11 // bytecode target version
+sourceCompatibility = JavaVersion.VERSION_17  // source-code version and must be <= targetCompatibility
+targetCompatibility = JavaVersion.VERSION_17 // bytecode target version
 
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
 }
 
-compileJava.options.encoding = 'utf-8'
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'utf-8'
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    finalizedBy jacocoTestReport
-}
-
-test {
-    environment "ALLOWED_ORIGIN", "*"
-    environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
-    environment "BASE_PATH", "cristin"
-    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
-}
-
-task karateTest(type: Test) {
+tasks.register('karateTest', Test) {
     useJUnitPlatform {
         includeTags('karateTest')
     }
@@ -60,7 +35,7 @@ task karateTest(type: Test) {
     outputs.upToDateWhen { false }
 }
 
-task createTestUsers(type: Test) {
+tasks.register('createTestUsers', Test) {
     useJUnitPlatform {
         includeTags('createTestUsers')
     }
@@ -68,7 +43,7 @@ task createTestUsers(type: Test) {
     outputs.upToDateWhen { false }
 }
 
-task deleteTestUsers(type: Test) {
+tasks.register('deleteTestUsers', Test) {
     useJUnitPlatform {
         includeTags('deleteTestUsers')
     }
@@ -76,32 +51,32 @@ task deleteTestUsers(type: Test) {
     outputs.upToDateWhen { false }
 }
 
-
-pmd {
+tasks.register('pmd', Checkstyle) {
     toolVersion = '6.20.0'
     ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
     ruleSets = []
     ignoreFailures = false
 }
 
-checkstyle {
+tasks.register('checkstyle',Checkstyle) {
     configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
     showViolations = true
 }
 
-tasks.withType(Checkstyle) {
-    reports {
-        xml.enabled true
-        html.enabled true
-        html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
+tasks.named('test') {
+    useJUnitPlatform()
+    failFast = true
+    testLogging {
+        events 'skipped', 'passed', 'failed'
     }
+    environment "ALLOWED_ORIGIN", "*"
+    environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
+    environment "BASE_PATH", "cristin"
+    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
+//    finalizedBy jacocoTestReport
 }
 
-check.dependsOn jacocoTestCoverageVerification
-jacocoTestCoverageVerification.dependsOn(jacocoTestReport)
-
-jacocoTestCoverageVerification {
-
+tasks.named('jacocoTestCoverageVerification') {
     violationRules {
         rule {
             excludes = [
@@ -113,7 +88,6 @@ jacocoTestCoverageVerification {
                 minimum = 0.8
             }
         }
-
         rule {
             excludes = [
                     'cristin-commons:*'
@@ -125,4 +99,21 @@ jacocoTestCoverageVerification {
             }
         }
     }
+    dependsOn(jacocoTestReport)
 }
+check.dependsOn jacocoTestCoverageVerification
+
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        xml.enabled true
+        html.enabled true
+        html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'utf-8'
+//    options.compilerArgs << '--release:17'
+}
+
+
