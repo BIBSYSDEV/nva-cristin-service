@@ -23,6 +23,7 @@ public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchRespon
 
     public static final String DEFAULT_NUMBER_OF_RESULTS = "100";
     public static final String DEFAULT_PAGE = "1";
+
     private final transient QueryApiClient<Map<String, String>, TypedLabel> apiClient;
 
     @SuppressWarnings("unused")

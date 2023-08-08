@@ -46,6 +46,7 @@ class QueryKeywordsHandlerTest {
         "https://api.cristin-test.uio.no/v2/keywords?per_page=100&name=Biology&page=1";
     public static final String QUERY_VALUE = "Biology";
     public static final String NVA_QUERY_KEYWORDS_RESPONSE_JSON = "nvaQueryKeywordsResponse.json";
+
     private QueryKeywordsApiClient apiClient;
     private final Environment environment = new Environment();
     private Context context;
