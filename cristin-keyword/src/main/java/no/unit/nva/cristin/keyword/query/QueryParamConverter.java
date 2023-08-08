@@ -4,6 +4,7 @@ import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +26,7 @@ public class QueryParamConverter {
      * Does the actual conversion and puts the result into an object.
      */
     public QueryParamConverter convert() {
-        Optional.ofNullable(input.get(NAME)).ifPresent(entry -> result.put(NAME, entry));
+        Optional.ofNullable(input.get(QUERY)).ifPresent(entry -> result.put(NAME, entry));
         Optional.ofNullable(input.get(PAGE)).ifPresent(entry -> result.put(PAGE, entry));
         Optional.ofNullable(input.get(NUMBER_OF_RESULTS)).ifPresent(entry -> result.put(CRISTIN_PER_PAGE_PARAM, entry));
 

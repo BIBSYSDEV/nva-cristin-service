@@ -41,7 +41,7 @@ Feature: API tests for keywords query
 
   Scenario Outline: Query returns valid data and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
-    Given path '/keywords/'
+    Given path '/keyword/'
     And param query = queryString
     When method GET
     Then status 200
@@ -59,14 +59,14 @@ Feature: API tests for keywords query
       | 'application/json'    |
 
   Scenario: Query accepts special characters and whitespace
-    Given path '/keywords/'
+    Given path '/keyword/'
     And param query = 'Kåre G'
     When method GET
     Then status 200
     And match response == '#object'
 
   Scenario: Query with bad parameter returns Bad Request
-    Given path '/keywords/'
+    Given path '/keyword/'
     And param notValidParam = 'someValue'
     When method GET
     Then status 400
@@ -76,7 +76,7 @@ Feature: API tests for keywords query
     And match response.status == 400
 
   Scenario: Query without query parameters do return results
-    Given path '/keywords/'
+    Given path '/keyword/'
     And method GET
     Then status 200
     And match response == '#object'

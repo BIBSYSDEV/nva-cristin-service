@@ -17,6 +17,7 @@ import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.TypedLabel;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
+import nva.commons.core.paths.UriWrapper;
 
 public class QueryKeywordsApiClient extends ApiClient implements QueryApiClient<Map<String, String>, TypedLabel> {
 
@@ -42,7 +43,7 @@ public class QueryKeywordsApiClient extends ApiClient implements QueryApiClient<
         var keywords = getKeywords(response);
         var totalProcessingTime = calculateProcessingTime(start, System.currentTimeMillis());
 
-        return new SearchResponse<TypedLabel>(KEYWORD_ID_URI)
+        return new SearchResponse<TypedLabel>(appendSearchStringToId(params))
                    .withContext(KEYWORD_CONTEXT_JSON)
                    .withHits(keywords)
                    .usingHeadersAndQueryParams(response.headers(), params)
@@ -62,6 +63,10 @@ public class QueryKeywordsApiClient extends ApiClient implements QueryApiClient<
         return keywords.stream()
                    .map(keyword -> new TypedLabel(keyword.getCode(), keyword.getName()))
                    .collect(Collectors.toList());
+    }
+
+    private URI appendSearchStringToId(Map<String, String> params) {
+        return UriWrapper.fromUri(KEYWORD_ID_URI).addQueryParameters(params).getUri();
     }
 
 }

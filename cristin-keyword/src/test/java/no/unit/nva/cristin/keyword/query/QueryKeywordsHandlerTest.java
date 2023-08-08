@@ -43,8 +43,8 @@ class QueryKeywordsHandlerTest {
     public static final String EXPECTED_CRISTIN_URI_WITH_DEFAULT_PARAMS =
         "https://api.cristin-test.uio.no/v2/keywords?per_page=100&page=1";
     public static final String EXPECTED_CRISTIN_URI_WITH_QUERY_PARAM =
-        "https://api.cristin-test.uio.no/v2/keywords?per_page=100&name=Biology&page=1";
-    public static final String QUERY_VALUE = "Biology";
+        "https://api.cristin-test.uio.no/v2/keywords?per_page=100&name=biology&page=1";
+    public static final String QUERY_VALUE = "biology";
     public static final String NVA_QUERY_KEYWORDS_RESPONSE_JSON = "nvaQueryKeywordsResponse.json";
 
     private QueryKeywordsApiClient apiClient;
