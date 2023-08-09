@@ -113,8 +113,8 @@ public class CristinProjectPatchJsonCreator {
         var cristinTitles = new HashMap<String, String>();
 
         if (input.has(LANGUAGE)) {
-            var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
-            var title = input.get(TITLE);
+            final var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
+            final var title = input.get(TITLE);
             if (nonNull(language) && isSupportedLanguage(language)) {
                 output.put(CRISTIN_MAIN_LANGUAGE, language.getIso6391Code());
                 if (nonNull(title)) {
@@ -154,8 +154,7 @@ public class CristinProjectPatchJsonCreator {
 
     private void addContributorsIfPresent() {
         if (input.has(CONTRIBUTORS)) {
-            TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
-            };
+            var typeRef = new TypeReference<List<NvaContributor>>() { };
             var contributors =
                     attempt(() -> OBJECT_MAPPER.readValue(input.get(CONTRIBUTORS).toString(), typeRef)).orElseThrow();
             output.set(PARTICIPANTS, OBJECT_MAPPER.valueToTree(extractContributors(contributors)));

@@ -225,7 +225,7 @@ class QueryCristinOrganizationHandlerTest {
         assertThat(readHitsAsTree(actualHits), equalTo(readHitsAsTree(expectedHits)));
     }
 
-    private List<Organization> convertHitsToProperFormat(SearchResponse searchResponse) {
+    private List<Organization> convertHitsToProperFormat(SearchResponse<?> searchResponse) {
         return OBJECT_MAPPER.convertValue(searchResponse.getHits(), new TypeReference<>() {});
     }
 

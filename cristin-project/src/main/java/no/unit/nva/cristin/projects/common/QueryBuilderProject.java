@@ -56,30 +56,24 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
     protected void assignDefaultValues() {
         requiredMissing().forEach(key -> {
             switch (key) {
-                case PATH_ORGANISATION:
+                case PATH_ORGANISATION -> {
                     if (query.containsKey(PATH_IDENTITY)) {
                         query.setPath(key, query.getValue(PATH_IDENTITY));
                         query.removeValue(PATH_IDENTITY);
                     }
-                    break;
-                case PATH_PROJECT:
-                    query.setPath(key, EMPTY_STRING);
-                    break;
-                case PAGE_CURRENT:
-                    query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
-                    break;
-                case PAGE_ITEMS_PER_PAGE:
-                    query.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
-                    break;
-                default:
-                    break;
+                }
+                case PATH_PROJECT -> query.setPath(key, EMPTY_STRING);
+                case PAGE_CURRENT -> query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
+                case PAGE_ITEMS_PER_PAGE -> query.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
+                default -> {
+                }
             }
         });
     }
 
     @Override
     protected void setPath(String key, String value) {
-        var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
+        final var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
 
         if (key.equals(PATH_IDENTITY.getNvaKey())) {
             withPathIdentity(nonNullValue);
@@ -96,58 +90,26 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
     protected void setValue(String key, String value) {
         var qpKey = keyFromString(key,value);
         switch (qpKey) {
-            case PATH_IDENTITY:
-            case PATH_PROJECT:
-                withPathIdentity(value);
-                break;
-            case PATH_ORGANISATION:
-                withPathOrganization(value);
-                break;
-            case ORGANIZATION:
-                withOrganization(value);
-                break;
-            case BIOBANK:
-                withBiobank(value);
-                break;
-            case KEYWORD:
-                withKeyword(value);
-                break;
-            case LANGUAGE:
-                logger.info("Ignoring language parameter -> " + value);
-                break;
-            case PARTICIPANT:
-                withParticipant(value);
-                break;
-            case QUERY:
-                withQuery(value);
-                break;
-            case STATUS:
-                withStatus(value);
-                break;
-            case APPROVAL_REFERENCE_ID:
-            case APPROVED_BY:
-            case FUNDING:
-            case FUNDING_SOURCE:
-            case GRANT_ID:
-            case INSTITUTION:
-            case LEVELS:
-            case MODIFIED_SINCE:
-            case NAME:
-            case PROJECT_MANAGER:
-            case PROJECT_UNIT:
-            case TITLE:
-            case USER:
-            case PAGE_CURRENT:
-            case PAGE_ITEMS_PER_PAGE:
-            case PAGE_SORT:
+            case PATH_IDENTITY, PATH_PROJECT -> withPathIdentity(value);
+            case PATH_ORGANISATION -> withPathOrganization(value);
+            case ORGANIZATION -> withOrganization(value);
+            case BIOBANK -> withBiobank(value);
+            case KEYWORD -> withKeyword(value);
+            case LANGUAGE -> logger.info("Ignoring language parameter -> " + value);
+            case PARTICIPANT -> withParticipant(value);
+            case QUERY -> withQuery(value);
+            case STATUS -> withStatus(value);
+            case APPROVAL_REFERENCE_ID, APPROVED_BY,
+                     FUNDING, FUNDING_SOURCE,
+                     GRANT_ID, INSTITUTION,
+                     LEVELS, MODIFIED_SINCE,
+                     NAME, PROJECT_MANAGER,
+                     PROJECT_UNIT, TITLE,
+                     USER, PAGE_CURRENT,
+                     PAGE_ITEMS_PER_PAGE, PAGE_SORT ->
                 query.setValue(qpKey, value);
-                break;
-            case CREATOR:
-                withCreator(value);
-                break;
-            default:
-                invalidKeys.add(key);
-                break;
+            case CREATOR -> withCreator(value);
+            default -> invalidKeys.add(key);
         }
     }
 
@@ -161,14 +123,16 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
         final var key = entry.getKey();
         if (invalidQueryParameter(key, entry.getValue())) {
             final var keyName =  key.getNvaKey();
-            String errorMessage;
+            var errorMessage = EMPTY_STRING;
             if (key == STATUS) {
                 errorMessage =
                     invalidQueryParametersMessageWithRange(key.getKey(), Arrays.toString(ProjectStatus.values()));
-            } else if (nonNull(key.getErrorMessage())) {
-                errorMessage = String.format(key.getErrorMessage(), keyName);
             } else {
-                errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
+                if (nonNull(key.getErrorMessage())) {
+                    errorMessage = String.format(key.getErrorMessage(), keyName);
+                } else {
+                    errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
+                }
             }
             throw new BadRequestException(errorMessage);
         }

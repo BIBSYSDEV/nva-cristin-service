@@ -8,6 +8,7 @@ import static org.hamcrest.core.Is.is;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import com.intuit.karate.junit5.Karate.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -26,6 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @WireMockTest(httpsEnabled = true)
+
 public class FetchBiobankHandlerTest {
 
     public static final String APPLICATION_LD_JSON = "application/ld+json";

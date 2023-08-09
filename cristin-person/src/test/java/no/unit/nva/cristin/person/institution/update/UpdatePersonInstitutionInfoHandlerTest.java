@@ -103,7 +103,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
         var customerId = randomUri();
         return new HandlerRequestBuilder<PersonInstInfoPatch>(OBJECT_MAPPER)
             .withBody(body)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .withPathParameters(pathParam)
             .build();

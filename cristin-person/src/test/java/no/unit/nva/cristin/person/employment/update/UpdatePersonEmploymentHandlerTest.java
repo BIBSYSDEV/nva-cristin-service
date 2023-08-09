@@ -156,7 +156,7 @@ public class UpdatePersonEmploymentHandlerTest {
 
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                    .withBody(body)
-                   .withCustomerId(customerId)
+                   .withCurrentCustomer(customerId)
                    .withTopLevelCristinOrgId(TOP_ORG_ID)
                    .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
                    .withPathParameters(validPath)

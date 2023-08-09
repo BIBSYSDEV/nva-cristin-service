@@ -321,7 +321,7 @@ public class UpdateCristinPersonHandlerTest {
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                    .withBody(body)
                    .withPathParameters(validPath)
-                   .withCustomerId(customerId)
+                   .withCurrentCustomer(customerId)
                    .withTopLevelCristinOrgId(Optional.ofNullable(orgId).orElse(URI.create(EMPTY_STRING)))
                    .withScope(scope)
                    .withAccessRights(customerId, accessRight)
@@ -333,7 +333,7 @@ public class UpdateCristinPersonHandlerTest {
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
             .withBody(body)
             .withPathParameters(pathParam)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .build();
     }

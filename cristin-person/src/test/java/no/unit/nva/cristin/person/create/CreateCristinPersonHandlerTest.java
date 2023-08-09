@@ -397,16 +397,17 @@ public class CreateCristinPersonHandlerTest {
     }
 
     private GatewayResponse<Problem> sendQueryReturningProblemJson(Person body) throws IOException {
-        var input = requestWithBody(body);
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithBody(body)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Problem.class);
     }
 
     private InputStream requestWithBody(Person body) throws JsonProcessingException {
-        var customerId = randomUri();
+        final var customerId = randomUri();
         return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
             .withBody(body)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .build();
     }
@@ -457,10 +458,10 @@ public class CreateCristinPersonHandlerTest {
 
     private InputStream requestWithBodyAndMockedCristinOrgId(Person body, URI cristinOrgId)
         throws JsonProcessingException {
-        var customerId = randomUri();
+        final var customerId = randomUri();
         return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
                    .withBody(body)
-                   .withCustomerId(customerId)
+                   .withCurrentCustomer(customerId)
                    .withTopLevelCristinOrgId(cristinOrgId)
                    .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
                    .build();
@@ -475,25 +476,26 @@ public class CreateCristinPersonHandlerTest {
 
     private InputStream requestWithBodyActingAsInternalBackend(Person body)
         throws JsonProcessingException {
-        var customerId = randomUri();
+        final var customerId = randomUri();
         return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
                    .withBody(body)
-                   .withCustomerId(customerId)
+                   .withCurrentCustomer(customerId)
                    .withScope(BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE)
                    .build();
     }
 
     private GatewayResponse<Person> sendQueryWhileMockingIdentifiersUsedForLogging(Person body)
         throws IOException {
-        var customerId = randomUri();
-        var input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
-                        .withBody(body)
-                        .withCustomerId(customerId)
-                        .withPersonCristinId(UriWrapper.fromUri(randomUri()).addChild(DUMMY_CRISTIN_ID).getUri())
-                        .withTopLevelCristinOrgId(UriWrapper.fromUri(ONE_ORGANIZATION).getUri())
-                        .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
-                        .build();
-        handler.handleRequest(input, output, context);
+        final var customerId = randomUri();
+        try (var input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
+                             .withBody(body)
+                             .withCurrentCustomer(customerId)
+                             .withPersonCristinId(UriWrapper.fromUri(randomUri()).addChild(DUMMY_CRISTIN_ID).getUri())
+                             .withTopLevelCristinOrgId(UriWrapper.fromUri(ONE_ORGANIZATION).getUri())
+                             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                             .build()) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 }

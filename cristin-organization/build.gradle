@@ -15,14 +15,10 @@ tasks.named('test') {
     useJUnitPlatform {
         excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
     }
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    finalizedBy jacocoTestReport
     environment "COGNITO_URI", "https://example.cognito.org"
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
+    finalizedBy jacocoTestReport
 }
 
 sourceSets {

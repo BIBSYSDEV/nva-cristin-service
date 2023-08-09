@@ -214,7 +214,7 @@ public class FetchFromIdentityNumberHandlerTest {
         throws JsonProcessingException {
         var customerId = randomUri();
         return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, accessRight)
             .withBody(body)
             .withQueryParameters(queryParams)
@@ -234,7 +234,7 @@ public class FetchFromIdentityNumberHandlerTest {
     private InputStream requestWithInvalidPayload() throws JsonProcessingException {
         var customerId = randomUri();
         return new HandlerRequestBuilder<Map<String, String>>(OBJECT_MAPPER)
-             .withCustomerId(customerId)
+             .withCurrentCustomer(customerId)
             .withAccessRights(customerId,EDIT_OWN_INSTITUTION_USERS)
             .withBody(INVALID_PAYLOAD)
             .build();

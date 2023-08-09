@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.CristinQuery;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
@@ -55,14 +56,10 @@ public class CristinProjectApiClient extends ApiClient {
                 .map(CristinProject::getCristinProjectId)
                 .collect(Collectors.toSet());
 
-        List<CristinProject> missingProjects = projectsFromQuery.stream()
-                .filter(queryProject -> !enrichedProjectIds.contains(queryProject.getCristinProjectId()))
-                .collect(Collectors.toList());
+        var missingProjects = projectsFromQuery.stream()
+                .filter(queryProject -> !enrichedProjectIds.contains(queryProject.getCristinProjectId()));
 
-        ArrayList<CristinProject> result = new ArrayList<>();
-        result.addAll(enrichedProjects);
-        result.addAll(missingProjects);
-        return result;
+        return Stream.concat(enrichedProjects.stream(), missingProjects).toList();
     }
 
     private boolean allProjectsWereEnriched(List<CristinProject> projectsFromQuery,
@@ -74,7 +71,7 @@ public class CristinProjectApiClient extends ApiClient {
         return projectsFromQuery.stream()
                    .map(CristinProject::getCristinProjectId)
                    .map(CristinQuery::fromIdentifier)
-                   .collect(Collectors.toList());
+                   .toList();
     }
 
     private List<CristinProject> mapValidResponsesToCristinProjects(List<HttpResponse<String>> responses) {
@@ -82,14 +79,14 @@ public class CristinProjectApiClient extends ApiClient {
                 .map(attempt(response -> getDeserializedResponse(response, CristinProject.class)))
                 .map(Try::orElseThrow)
                 .filter(CristinProject::hasValidContent)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     protected List<NvaProject> mapValidCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
         return cristinProjects.stream()
                 .filter(CristinProject::hasValidContent)
                 .map(CristinProject::toNvaProject)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 }

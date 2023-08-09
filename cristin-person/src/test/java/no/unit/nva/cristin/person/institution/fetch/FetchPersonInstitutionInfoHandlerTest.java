@@ -188,7 +188,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
     private GatewayResponse<PersonInstitutionInfo> queryWithUnsupportedQueryParams() throws IOException {
         var customerId = randomUri();
         InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .withQueryParameters(Map.of(randomString(), randomString()))
             .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID))
@@ -215,7 +215,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
         var customerId = randomUri();
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .withPathParameters(pathParams)
             .build();

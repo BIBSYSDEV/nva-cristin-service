@@ -115,8 +115,9 @@ public class PositionCodesHandlerTest {
     }
 
     private GatewayResponse<PositionCodes> sendQuery(Map<String, String> queryParams) throws IOException {
-        InputStream input = requestWithParams(queryParams);
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithParams(queryParams)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, PositionCodes.class);
     }
 

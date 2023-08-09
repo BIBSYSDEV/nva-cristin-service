@@ -105,8 +105,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     private static void validateContributors(ObjectNode input) throws BadRequestException {
         validateNotNullIfPresent(input, CONTRIBUTORS);
         if (propertyHasValue(input, CONTRIBUTORS)) {
-            TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
-            };
+            var typeRef = new TypeReference<List<NvaContributor>>() { };
             validateJsonReadable(typeRef, input.get(CONTRIBUTORS).toString(), CONTRIBUTORS);
         }
     }
@@ -139,7 +138,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
 
     private void validateKeywordsIfPresent(ObjectNode input) throws BadRequestException {
         if (input.has(KEYWORDS)) {
-            var keywords = input.get(KEYWORDS);
+            final var keywords = input.get(KEYWORDS);
             validateIsArray(keywords, KEYWORDS);
             validateKeywords(keywords);
         }
@@ -243,7 +242,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
 
     private void validateWebPage(ObjectNode input) throws BadRequestException {
         if (input.has(WEB_PAGE) && !input.get(WEB_PAGE).isNull()) {
-            var webPage = input.get(WEB_PAGE).asText();
+            final var webPage = input.get(WEB_PAGE).asText();
             attempt(() -> URI.create(webPage)).orElseThrow(failure -> fieldIsNotUri());
         }
     }

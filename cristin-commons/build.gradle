@@ -29,22 +29,17 @@ dependencies {
 
 
 }
-tasks.named('test') {
+
+jacocoTestCoverageVerification.enabled = false
+
+
+test {
+    println("Running local conf tests for ${project.name}")
     useJUnitPlatform {
         excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
     }
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
+
     finalizedBy jacocoTestReport
 }
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
-}
+
 

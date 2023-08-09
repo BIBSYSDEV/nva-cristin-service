@@ -1,25 +1,93 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'checkstyle'
+    id 'pmd'
     id 'jacoco-report-aggregation'
 }
 
 group 'no.unit.nva'
 version '1.0-JDK17'
+sourceCompatibility = JavaVersion.VERSION_17  // source-code version and must be <= targetCompatibility
+targetCompatibility = JavaVersion.VERSION_17 // bytecode target version
 
 dependencies {
-    testImplementation libs.bundles.testing
     implementation libs.bundles.nvaCommons
+    testImplementation libs.bundles.testing
     implementation libs.bundles.jackson
     implementation libs.slf4j.api
 }
-
-sourceCompatibility = JavaVersion.VERSION_17  // source-code version and must be <= targetCompatibility
-targetCompatibility = JavaVersion.VERSION_17 // bytecode target version
 
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
 }
+
+pmd {
+    toolVersion = '6.20.0'
+    ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
+    ruleSets = []
+    ignoreFailures = false
+}
+
+checkstyle {
+    configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
+    showViolations = true
+}
+
+test {
+    println("Test config for ${project.name}")
+    useJUnitPlatform()
+//    failFast = true
+    testLogging {
+        events 'failed'
+    }
+    environment "ALLOWED_ORIGIN", "*"
+    environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
+    environment "BASE_PATH", "cristin"
+    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
+    finalizedBy jacocoTestReport
+}
+
+tasks.withType(Checkstyle).configureEach{
+    println("Checkstyle for ${project.name}")
+    reports {
+        xml.required
+        html.required
+        html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
+    }
+    configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
+    showViolations = true
+}
+
+
+//tasks.named('check') {
+//    dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
+//    dependsOn tasks.named('jacocoTestCoverageVerification', JacocoReport)
+////    dependsOn tasks.named('integrationTestCodeCoverageReport', JacocoReport)
+//}
+
+
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 0.800
+            }
+        }
+        rule {
+            limit {
+                counter = 'CLASS'
+                value = 'COVEREDRATIO'
+                minimum = 0.900
+            }
+        }
+    }
+    dependsOn jacocoTestReport
+}
+
 
 tasks.register('karateTest', Test) {
     useJUnitPlatform {
@@ -51,69 +119,6 @@ tasks.register('deleteTestUsers', Test) {
     outputs.upToDateWhen { false }
 }
 
-tasks.register('pmd', Checkstyle) {
-    toolVersion = '6.20.0'
-    ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
-    ruleSets = []
-    ignoreFailures = false
-}
 
-tasks.register('checkstyle',Checkstyle) {
-    configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
-    showViolations = true
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    environment "ALLOWED_ORIGIN", "*"
-    environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
-    environment "BASE_PATH", "cristin"
-    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
-//    finalizedBy jacocoTestReport
-}
-
-tasks.named('jacocoTestCoverageVerification') {
-    violationRules {
-        rule {
-            excludes = [
-                    'cristin-commons:*'
-            ]
-            limit {
-                counter = 'METHOD'
-                value = 'COVEREDRATIO'
-                minimum = 0.8
-            }
-        }
-        rule {
-            excludes = [
-                    'cristin-commons:*'
-            ]
-            limit {
-                counter = 'CLASS'
-                value = 'COVEREDRATIO'
-                minimum = 1.0
-            }
-        }
-    }
-    dependsOn(jacocoTestReport)
-}
-check.dependsOn jacocoTestCoverageVerification
-
-tasks.withType(Checkstyle).configureEach {
-    reports {
-        xml.enabled true
-        html.enabled true
-        html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'utf-8'
-//    options.compilerArgs << '--release:17'
-}
 
 

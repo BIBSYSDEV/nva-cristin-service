@@ -56,7 +56,7 @@ public class AccessUtils {
      */
     public static void validateIdentificationNumberAccess(RequestInfo requestInfo) throws ForbiddenException {
         if (requesterHasNoAccessRightToUseNationalIdentificationNumber(requestInfo)) {
-            String nvaUsername = attempt(requestInfo::getNvaUsername).orElse(fail -> null);
+            String nvaUsername = attempt(requestInfo::getUserName).orElse(fail -> null);
             logger.warn(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT,
                     nvaUsername, EDIT_OWN_INSTITUTION_USERS);
             throw new ForbiddenException();
