@@ -3,6 +3,8 @@ package no.unit.nva.cristin.person.model.cristin;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
@@ -31,7 +33,7 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "PMD.GodClass"})
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPerson implements JsonSerializable {
@@ -63,6 +65,7 @@ public class CristinPerson implements JsonSerializable {
     private List<CristinPersonEmployment> detailedAffiliations;
     private Boolean identifiedCristinPerson;
     private List<CristinTypedLabel> keywords;
+    private Map<String, String> background;
 
     public String getCristinPersonId() {
         return cristinPersonId;
@@ -177,6 +180,14 @@ public class CristinPerson implements JsonSerializable {
         this.keywords = keywords;
     }
 
+    public Map<String, String> getBackground() {
+        return background;
+    }
+
+    public void setBackground(Map<String, String> background) {
+        this.background = background;
+    }
+
     /**
      * Creates a Nva person model from a Cristin person model. If the person is not publicly viewable, only returns
      * identifier.
@@ -196,6 +207,7 @@ public class CristinPerson implements JsonSerializable {
                    .withAffiliations(extractAffiliations())
                    .withVerified(getIdentifiedCristinPerson())
                    .withKeywords(extractKeywords())
+                   .withBackground(extractBackground())
                    .build();
     }
 
@@ -218,6 +230,7 @@ public class CristinPerson implements JsonSerializable {
                    .withEmployments(extractEmployments())
                    .withVerified(getIdentifiedCristinPerson())
                    .withKeywords(extractKeywords())
+                   .withBackground(extractBackground())
                    .build();
     }
 
@@ -282,6 +295,10 @@ public class CristinPerson implements JsonSerializable {
         return getDetailedAffiliations().stream()
                    .map(cristinEmployment -> cristinEmployment.toEmployment(getCristinPersonId()))
                    .collect(Collectors.toSet());
+    }
+
+    private Map<String, String> extractBackground() {
+        return nonNull(getBackground()) ? new ConcurrentHashMap<>(getBackground()) : Collections.emptyMap();
     }
 
     @Override
