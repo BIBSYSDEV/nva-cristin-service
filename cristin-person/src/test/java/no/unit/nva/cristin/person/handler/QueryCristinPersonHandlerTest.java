@@ -41,6 +41,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERRO
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.exception.GatewayTimeoutException.ERROR_MESSAGE_GATEWAY_TIMEOUT;
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
@@ -253,6 +254,31 @@ public class QueryCristinPersonHandlerTest {
                                                                SearchResponse.class);
 
         assertThat(gatewayResponse.getBody(), not(containsString(NATIONAL_IDENTITY_NUMBER)));
+    }
+
+    @Test
+    void shouldNotIncludeAuthorizedFieldsWhenUnauthorizedQueryEvenIfPresentInUpstream()
+        throws ApiGatewayException, IOException {
+
+        var apiClient = spy(CristinPersonApiClient.class);
+
+        var queryResponse = generateDummyQueryResponseWithNin();
+        doReturn(queryResponse).when(apiClient).fetchGetResultWithAuthentication(any());
+        doReturn(queryResponse).when(apiClient).fetchGetResult(any());
+
+        var getResponse = generateDummyGetResponseWithNin();
+        doReturn(List.of(getResponse)).when(apiClient).authorizedFetchQueryResultsOneByOne(any());
+        doReturn(List.of(getResponse)).when(apiClient).fetchQueryResultsOneByOne(any());
+
+        handler = new QueryCristinPersonHandler(apiClient, new Environment());
+        var input = queryMissingAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME));
+        handler.handleRequest(input, output, context);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        var responseBody = gatewayResponse.getBody();
+
+        assertThat(responseBody, not(containsString(NATIONAL_IDENTITY_NUMBER)));
+        assertThat(responseBody, not(containsString(RESERVED)));
+        generatedNINs.forEach(nin -> assertThat(responseBody, not(containsString(nin))));
     }
 
     private SearchResponse<Person> randomPersons() {
