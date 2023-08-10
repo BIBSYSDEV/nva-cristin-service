@@ -130,6 +130,9 @@ Resources:
           ResourcePath: '/~1biobank~1{identifier}'
           CacheTtlInSeconds: 300
           CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1keyword'
+          CachingEnabled: false
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
@@ -570,6 +573,19 @@ Resources:
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/{id}/picture/
+            Method: get
+
+  NvaCristinQueryKeywordFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-keyword
+      Handler: no.unit.nva.cristin.keyword.query.QueryKeywordsHandler::handleRequest
+      Events:
+        NvaCristinKeywordEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /keyword/
             Method: get
 
   NvaCristinProxyBasePathMapping:
