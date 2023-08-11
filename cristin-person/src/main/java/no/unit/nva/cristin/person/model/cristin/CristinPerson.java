@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
 import no.unit.nva.cristin.person.model.nva.ContactDetails;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
+import no.unit.nva.model.TypedLabel;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
 
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -59,6 +62,7 @@ public class CristinPerson implements JsonSerializable {
     private String norwegianNationalId;
     private List<CristinPersonEmployment> detailedAffiliations;
     private Boolean identifiedCristinPerson;
+    private List<CristinTypedLabel> keywords;
 
     public String getCristinPersonId() {
         return cristinPersonId;
@@ -165,6 +169,14 @@ public class CristinPerson implements JsonSerializable {
         this.identifiedCristinPerson = identifiedCristinPerson;
     }
 
+    public List<CristinTypedLabel> getKeywords() {
+        return nonEmptyOrDefault(keywords);
+    }
+
+    public void setKeywords(List<CristinTypedLabel> keywords) {
+        this.keywords = keywords;
+    }
+
     /**
      * Creates a Nva person model from a Cristin person model. If the person is not publicly viewable, only returns
      * identifier.
@@ -183,6 +195,7 @@ public class CristinPerson implements JsonSerializable {
                    .withImage(extractImage())
                    .withAffiliations(extractAffiliations())
                    .withVerified(getIdentifiedCristinPerson())
+                   .withKeywords(extractKeywords())
                    .build();
     }
 
@@ -204,7 +217,16 @@ public class CristinPerson implements JsonSerializable {
                    .withReserved(getReserved())
                    .withEmployments(extractEmployments())
                    .withVerified(getIdentifiedCristinPerson())
+                   .withKeywords(extractKeywords())
                    .build();
+    }
+
+    private Set<TypedLabel> extractKeywords() {
+        return getKeywords().stream().map(this::toTypedLabel).collect(Collectors.toSet());
+    }
+
+    private TypedLabel toTypedLabel(CristinTypedLabel cristinTypedLabel) {
+        return new TypedLabel(cristinTypedLabel.getCode(), cristinTypedLabel.getName());
     }
 
     private Set<TypedValue> extractAuthorizedIdentifiers() {

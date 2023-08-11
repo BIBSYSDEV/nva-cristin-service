@@ -11,6 +11,7 @@ import no.unit.nva.cristin.model.CristinDateInfo;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
+import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;

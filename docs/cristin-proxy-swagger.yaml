@@ -1643,6 +1643,66 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /keyword:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinQueryKeywordFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Keywords
+      summary: Query keywords
+      description: Returns paginated list of keywords
+      operationId: QueryKeywords
+      parameters:
+        - name: query
+          in: query
+          description: Search string for matching keywords
+          required: false
+          schema:
+            type: string
+            pattern: '.+'
+          example: 'Biology'
+        - name: page
+          in: query
+          description: Current page requested
+          required: false
+          schema:
+            type: number
+            default: '1'
+          example: '3'
+        - name: results
+          in: query
+          description: Results per page
+          required: false
+          schema:
+            type: number
+            default: '100'
+          example: '5'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Keywords'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/KeywordsExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Keywords'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/KeywordsExample'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+        400:
+          $ref: '#/components/responses/400'
+
 components:
   responses:
     400:
@@ -2535,6 +2595,16 @@ components:
         verified:
           type: boolean
           description: Whether we can document the existence of the person
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
+              label:
+                $ref: '#/components/schemas/Languages'
     PersonPost:
       type: object
       required: [ identifiers, names ]
@@ -2572,6 +2642,14 @@ components:
           description: Employments for this person
           items:
             $ref: '#/components/schemas/PersonEmployment'
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
     PersonPostResponse:
       type: object
       properties:
@@ -2613,6 +2691,16 @@ components:
           description: Employments for this person
           items:
             $ref: '#/components/schemas/PersonEmployment'
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
+              label:
+                $ref: '#/components/schemas/Languages'
     PersonPatch:
       type: object
       properties:
@@ -2638,6 +2726,15 @@ components:
           description: Employments for this person. Only for authorized users
           items:
             $ref: '#/components/schemas/PersonEmployment'
+        keywords:
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
     PersonNIN:
       type: object
       properties:
@@ -3010,6 +3107,50 @@ components:
         base64Data:
           type: string
           description: Base64 encoded string created from a binary
+    Keywords:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of organizations returned by the query
+          items:
+            $ref: '#/components/schemas/Keyword'
+    Keyword:
+      type: object
+      description: Single keyword
+      properties:
+        type:
+          type: string
+          description: The keyword code
+        label:
+          $ref: '#/components/schemas/Languages'
   examples:
     ProjectsExample:
       value:
@@ -3460,6 +3601,10 @@ components:
                     en: 'Head Engineer'
                     nb: 'Overingeniør'
             verified: true
+            keywords:
+              - type: '4837'
+                label:
+                  'en': 'Supply Chain'
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
             type: 'Person'
             identifiers:
@@ -3481,6 +3626,10 @@ components:
                   labels:
                     en: 'Consultant'
             verified: true
+            keywords:
+              - type: '4837'
+                label:
+                  'en': 'Supply Chain'
     PersonExample:
       value:
         '@context': 'https://example.org/person-context.json'
@@ -3530,6 +3679,10 @@ components:
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
         verified: true
+        keywords:
+          - type: '4837'
+            label:
+              'en': 'Supply Chain'
     PersonPatchExample:
       value:
         orcid: '1234-1234-1234-1234'
@@ -3542,6 +3695,9 @@ components:
             startDate: '2008-01-01T00:00:00Z'
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
+        keywords:
+          - type: '4245'
+          - type: '5686'
     PersonPostExample:
       value:
         identifiers:
@@ -3562,6 +3718,9 @@ components:
             startDate: '2008-01-01T00:00:00Z'
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
+        keywords:
+          - type: '4245'
+          - type: '5686'
     PersonPostResponseExample:
       value:
         '@context': 'https://example.org/person-context.json'
@@ -3595,6 +3754,10 @@ components:
             startDate: '2008-01-01T00:00:00Z'
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
+        keywords:
+          - type: '4837'
+            label:
+              'en': 'Supply Chain'
     PersonOrganizationInfoExample:
       value:
         '@context': 'https://ontology.org'
@@ -3897,6 +4060,22 @@ components:
     BinaryExample:
       value:
         base64Data: '/9j/4AAQSkZJRgABAQEAeAB4AAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAEAAAAAAAD'
+    KeywordsExample:
+      value:
+        '@context': 'https://example.org/keyword-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/keywords/?page=1&query=food%results=5'
+        size: 150
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/keywords/?page=2&query=food%results=5'
+        previousResults: ''
+        hits:
+          - type: '1971'
+            label:
+              en: 'Food'
+          - type: '1972'
+            label:
+              en: 'Food Classification'
 
   securitySchemes:
     CognitoUserPool:

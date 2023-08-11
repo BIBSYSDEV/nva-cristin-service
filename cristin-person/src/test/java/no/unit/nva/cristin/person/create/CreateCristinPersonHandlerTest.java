@@ -59,6 +59,7 @@ import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
+import no.unit.nva.model.TypedLabel;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
@@ -346,6 +347,30 @@ public class CreateCristinPersonHandlerTest {
         var actual = gatewayResponse.getBodyObject(Problem.class).getDetail();
 
         assertThat(actual, CoreMatchers.equalTo(UPSTREAM_BAD_REQUEST_RESPONSE + responseBody));
+    }
+
+    @Test
+    void shouldAddKeywordsToCristinJsonWhenPresentInInput() throws Exception {
+        apiClient = spy(apiClient);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+
+        var dummyPerson = dummyPerson();
+        var dummyKeyword = randomKeyword();
+        dummyPerson.setKeywords(Set.of(dummyKeyword));
+
+        var actual = sendQuery(dummyPerson);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
+        var codeFromCapture = capturedCristinPerson.getKeywords().get(0).getCode();
+
+        assertThat(codeFromCapture, equalTo(dummyKeyword.getType()));
+        assertThat(actual.getStatusCode(), equalTo(HTTP_CREATED));
+    }
+
+    private TypedLabel randomKeyword() {
+        return new TypedLabel(randomString(), null);
     }
 
     private CristinAffiliation randomCristinAffiliation() {

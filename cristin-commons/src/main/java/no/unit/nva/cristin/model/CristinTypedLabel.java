@@ -1,12 +1,13 @@
-package no.unit.nva.cristin.projects.model.cristin;
+package no.unit.nva.cristin.model;
 
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 import java.util.Objects;
+import no.unit.nva.commons.json.JsonSerializable;
 
-public class CristinTypedLabel {
+public class CristinTypedLabel implements JsonSerializable {
 
     public static final String CODE = "code";
 
@@ -46,4 +47,8 @@ public class CristinTypedLabel {
         return Objects.hash(getCode(), getName());
     }
 
+    @Override
+    public String toString() {
+        return toJsonString();
+    }
 }
