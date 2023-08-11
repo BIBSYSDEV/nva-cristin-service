@@ -11,8 +11,8 @@ sourceCompatibility = JavaVersion.VERSION_17  // source-code version and must be
 targetCompatibility = JavaVersion.VERSION_17 // bytecode target version
 
 dependencies {
-    implementation libs.bundles.nvaCommons
     testImplementation libs.bundles.testing
+    implementation libs.bundles.nvaCommons
     implementation libs.bundles.jackson
     implementation libs.slf4j.api
 }
@@ -22,71 +22,80 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-pmd {
+tasks.named('test', Test) {
+    println("Java-convension - ${project.name} - test")
+    useJUnitPlatform()
+    testLogging {
+        events 'skipped', 'passed', 'failed'
+    }
+    environment "ALLOWED_ORIGIN", "*"
+    environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
+    environment "BASE_PATH", "cristin"
+    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
+//    finalizedBy jacocoTestReport
+}
+
+tasks.register ('pmd') {
+    println("Java-convension - ${project.name} - pmd")
     toolVersion = '6.20.0'
     ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
     ruleSets = []
     ignoreFailures = false
 }
 
-checkstyle {
+tasks.register('checkstyle') {
+    println("Java-convension - ${project.name} - checkstyle")
     configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
     showViolations = true
 }
 
-test {
-    println("Test config for ${project.name}")
-    useJUnitPlatform()
-//    failFast = true
-    testLogging {
-        events 'failed'
-    }
-    environment "ALLOWED_ORIGIN", "*"
-    environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
-    environment "BASE_PATH", "cristin"
-    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
-    finalizedBy jacocoTestReport
-}
 
 tasks.withType(Checkstyle).configureEach{
-    println("Checkstyle for ${project.name}")
+    println("Java-convension - type-Checkstyle - ${project.name} - ${it.name}")
     reports {
         xml.required
         html.required
         html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
     }
-    configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
-    showViolations = true
 }
 
-
-//tasks.named('check') {
-//    dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
-//    dependsOn tasks.named('jacocoTestCoverageVerification', JacocoReport)
-////    dependsOn tasks.named('integrationTestCodeCoverageReport', JacocoReport)
-//}
-
-
+//check.dependsOn jacocoTestCoverageVerification
+//jacocoTestCoverageVerification.dependsOn(jacocoTestReport)
 
 jacocoTestCoverageVerification {
+    println("Java-convension - ${project.name} jacocoTestCoverageVerification - 1")
     violationRules {
         rule {
+            excludes = [
+                    'cristin-commons:*'
+            ]
             limit {
                 counter = 'METHOD'
                 value = 'COVEREDRATIO'
                 minimum = 0.800
             }
         }
+
         rule {
+            excludes = [
+                    'cristin-commons:*'
+            ]
             limit {
                 counter = 'CLASS'
                 value = 'COVEREDRATIO'
-                minimum = 0.900
+                minimum = 1.000
             }
         }
     }
     dependsOn jacocoTestReport
 }
+
+//check {
+//    println("Java-convension - ${project.name} - check")
+//    dependsOn jacocoTestCoverageVerification
+//    dependsOn testCodeCoverageReport
+////    dependsOn integrationTestCodeCoverageReport
+//}
 
 
 tasks.register('karateTest', Test) {

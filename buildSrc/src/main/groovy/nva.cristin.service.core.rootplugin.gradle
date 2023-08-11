@@ -1,22 +1,22 @@
 plugins{
-    id 'nva.cristin.service.core.java-conventions'
+    id 'java-library'
     id 'jacoco-report-aggregation'
 }
-
 
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
 }
 
-//dependencies {
-//    subprojects.forEach {
-//        println( it.name)
-//        jacocoAggregation it
-//    }
-//}
+dependencies {
+    subprojects.forEach {
+        jacocoAggregation it
+    }
+}
+
 
 reporting {
+    println("Core - ${project.name} - reporting")
     reports {
         testCodeCoverageReport(JacocoCoverageReport) {
             testType = TestSuiteType.UNIT_TEST
@@ -27,9 +27,10 @@ reporting {
     }
 }
 
-tasks.named('check') {
-    println("Check for ${project.name}")
-    dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
-    dependsOn tasks.named('jacocoTestCoverageVerification')
-//    dependsOn tasks.named('integrationTestCodeCoverageReport', JacocoReport)
+
+check {
+    println("Core - ${project.name} - check")
+    dependsOn testCodeCoverageReport
+    dependsOn integrationTestCodeCoverageReport
+//    dependsOn jacocoTestCoverageVerification
 }

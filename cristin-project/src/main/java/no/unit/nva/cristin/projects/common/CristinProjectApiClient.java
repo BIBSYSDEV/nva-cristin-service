@@ -6,7 +6,6 @@ import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,14 +51,18 @@ public class CristinProjectApiClient extends ApiClient {
 
     protected List<CristinProject> combineResultsWithQueryInCaseEnrichmentFails(List<CristinProject> projectsFromQuery,
                                                                                 List<CristinProject> enrichedProjects) {
-        Set<String> enrichedProjectIds = enrichedProjects.stream()
-                .map(CristinProject::getCristinProjectId)
-                .collect(Collectors.toSet());
+        final var enrichedProjectIds = getEnrichedProjectIds(enrichedProjects);
 
         var missingProjects = projectsFromQuery.stream()
                 .filter(queryProject -> !enrichedProjectIds.contains(queryProject.getCristinProjectId()));
 
         return Stream.concat(enrichedProjects.stream(), missingProjects).toList();
+    }
+
+    private Set<String> getEnrichedProjectIds(List<CristinProject> enrichedProjects) {
+        return enrichedProjects.stream()
+                   .map(CristinProject::getCristinProjectId)
+                   .collect(Collectors.toSet());
     }
 
     private boolean allProjectsWereEnriched(List<CristinProject> projectsFromQuery,

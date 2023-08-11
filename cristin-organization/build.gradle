@@ -11,21 +11,12 @@ dependencies {
     testImplementation project(":cristin-testing")
 }
 
-tasks.named('test') {
+test{
     useJUnitPlatform {
         excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
     }
     environment "COGNITO_URI", "https://example.cognito.org"
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
-    finalizedBy jacocoTestReport
-}
 
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
 }

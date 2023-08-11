@@ -242,14 +242,15 @@ public class FetchCristinProjectHandlerTest {
     @ValueSource(strings = {"application/json; charset=utf-8", "application/ld+json"})
     void handlerReturnsMatchingContentTypeBasedOnAcceptHeader(String contentTypeRequested) throws Exception {
 
-        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-            .withBody(null)
-            .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
-            .withHeaders(of(HttpHeaders.ACCEPT, contentTypeRequested))
-            .build();
-        handler.handleRequest(input, output, context);
+        try (var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                 .withBody(null)
+                 .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
+                 .withHeaders(of(HttpHeaders.ACCEPT, contentTypeRequested))
+                 .build()) {
+            handler.handleRequest(input, output, context);
+        }
 
-        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output, NvaProject.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, NvaProject.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(contentTypeRequested, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -257,14 +258,15 @@ public class FetchCristinProjectHandlerTest {
 
     @Test
     void handlerReturnsDefaultContentTypeWhenAcceptHeaderSetToDefault() throws Exception {
-        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-            .withBody(null)
-            .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
-            .withHeaders(of(HttpHeaders.ACCEPT, DEFAULT_ACCEPT_HEADER))
-            .build();
-        handler.handleRequest(input, output, context);
+        try (var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                     .withBody(null)
+                     .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
+                     .withHeaders(of(HttpHeaders.ACCEPT, DEFAULT_ACCEPT_HEADER))
+                     .build()) {
+            handler.handleRequest(input, output, context);
+        }
 
-        GatewayResponse<NvaProject> gatewayResponse = GatewayResponse.fromOutputStream(output, NvaProject.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, NvaProject.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(MediaType.JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -275,14 +277,15 @@ public class FetchCristinProjectHandlerTest {
     void handlerThrowsNotAcceptableWhenAcceptHeaderUnsupported(String contentTypeRequested)
         throws Exception {
 
-        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-            .withBody(null)
-            .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
-            .withHeaders(of(HttpHeaders.ACCEPT, contentTypeRequested))
-            .build();
-        handler.handleRequest(input, output, context);
+        try (var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                     .withBody(null)
+                     .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
+                     .withHeaders(of(HttpHeaders.ACCEPT, contentTypeRequested))
+                     .build()) {
+            handler.handleRequest(input, output, context);
+        }
 
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_UNSUPPORTED_TYPE, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBodyObject(Problem.class).getDetail(),
@@ -292,27 +295,28 @@ public class FetchCristinProjectHandlerTest {
     @Test
     void handlerReturnsNvaProjectContainingFundingFromCristinWhenFundingHasValuesInCristin() throws Exception {
 
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
-        final NvaProject expectedNvaProject = OBJECT_MAPPER.readValue(
+        var gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
+        final var expectedNvaProject = OBJECT_MAPPER.readValue(
             getBodyFromResource(API_RESPONSE_ONE_PROJECT_JSON), NvaProject.class);
-        final List<Funding> funding = notRandomFunding();
-        expectedNvaProject.setFunding(funding);
-        final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
+
+        expectedNvaProject.setFunding(notRandomFunding());
+        final var actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
 
         assertEquals(expectedNvaProject, actualNvaProject);
     }
 
     @Test
     void handlerThrowsBadRequestWhenQueryParamsIsNotSupported() throws Exception {
-        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-                .withBody(null)
-                .withQueryParameters(of(INVALID_QUERY_PARAM_KEY, INVALID_QUERY_PARAM_VALUE))
-                .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
-                .build();
-        handler.handleRequest(input, output, context);
+        try (var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                     .withBody(null)
+                     .withQueryParameters(of(INVALID_QUERY_PARAM_KEY, INVALID_QUERY_PARAM_VALUE))
+                     .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
+                     .build()) {
+            handler.handleRequest(input, output, context);
+        }
 
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
-        Problem body = gatewayResponse.getBodyObject(Problem.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
+        var body = gatewayResponse.getBodyObject(Problem.class);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -322,39 +326,41 @@ public class FetchCristinProjectHandlerTest {
     @Test
     void handlerReturnsNvaProjectContainingStatusFromCristinWhenStatusIsValid() throws Exception {
 
-        final GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
-        final NvaProject actualNvaProject = gatewayResponse.getBodyObject(NvaProject.class);
-        final ProjectStatus expectedProjectStatus = ProjectStatus.ACTIVE;
+        final var gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
+        final var actualNvaProject = gatewayResponse.getBodyObject(NvaProject.class);
+        final var expectedProjectStatus = ProjectStatus.ACTIVE;
         assertEquals(expectedProjectStatus, actualNvaProject.getStatus());
     }
 
     @Test
     void handlerReturnsBadGatewayWhenCristinProjectHasInvalidStatusValue() throws Exception {
-        final FetchCristinProjectHandler fetchHandler =
+        final var fetchHandler =
                 new FetchCristinProjectHandler(createCristinApiClientWithResponseContainingError(), environment);
-        final InputStream input = requestWithIdentifier(of(IDENTIFIER, DEFAULT_IDENTIFIER));
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        fetchHandler.handleRequest(input, outputStream, mock(Context.class));
-        final GatewayResponse<NvaProject> gatewayResponse =
+        try (var input = requestWithIdentifier(of(IDENTIFIER, DEFAULT_IDENTIFIER))) {
+            var outputStream = new ByteArrayOutputStream();
+            fetchHandler.handleRequest(input, outputStream, mock(Context.class));
+            final var gatewayResponse =
                 GatewayResponse.fromOutputStream(outputStream, NvaProject.class);
-        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
+            assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
+        }
     }
 
     @Test
     void handlerReturnsNvaProjectWithSummaryWhenCristinProjectHasAcademicSummary() throws Exception {
-        final String summaryLanguage = randomLanguageCode();
-        final String summary = randomSummary();
-        final Map<String, String> expectedSummary = Map.of(summaryLanguage, summary);
-        final FetchCristinProjectApiClient cristinApiClient =
+        final var summaryLanguage = randomLanguageCode();
+        final var summary = randomSummary();
+        final var expectedSummary = Map.of(summaryLanguage, summary);
+        final var cristinApiClient =
             createCristinApiClientWithAcademicSummary(summaryLanguage, summary);
-        final InputStream input = requestWithIdentifier(of(IDENTIFIER, DEFAULT_IDENTIFIER));
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        new FetchCristinProjectHandler(cristinApiClient, environment)
-                .handleRequest(input, outputStream, mock(Context.class));
-        final GatewayResponse<NvaProject> gatewayResponse =
+        try (InputStream input = requestWithIdentifier(of(IDENTIFIER, DEFAULT_IDENTIFIER))) {
+            var outputStream = new ByteArrayOutputStream();
+            new FetchCristinProjectHandler(cristinApiClient, environment)
+                    .handleRequest(input, outputStream, mock(Context.class));
+            final var gatewayResponse =
                 GatewayResponse.fromOutputStream(outputStream, NvaProject.class);
-        final NvaProject actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
-        assertEquals(expectedSummary, actualNvaProject.getAcademicSummary());
+            final var actualNvaProject = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), NvaProject.class);
+            assertEquals(expectedSummary, actualNvaProject.getAcademicSummary());
+        }
     }
 
     @Test

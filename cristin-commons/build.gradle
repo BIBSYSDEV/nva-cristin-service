@@ -27,19 +27,12 @@ dependencies {
     implementation libs.aws.sdk2.spi
     implementation libs.apache.http.core
 
-
 }
 
-jacocoTestCoverageVerification.enabled = false
-
-
 test {
-    println("Running local conf tests for ${project.name}")
     useJUnitPlatform {
         excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
     }
-
-    finalizedBy jacocoTestReport
 }
 
 

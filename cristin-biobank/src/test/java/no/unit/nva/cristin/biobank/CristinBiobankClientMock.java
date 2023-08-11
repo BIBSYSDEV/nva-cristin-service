@@ -1,10 +1,9 @@
 package no.unit.nva.cristin.biobank;
 
-import static java.util.Objects.nonNull;
+import java.net.URI;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import no.unit.nva.biobank.client.CristinBiobankApiClient;
 import no.unit.nva.biobank.model.ParameterKeyBiobank;
@@ -38,13 +37,19 @@ public class CristinBiobankClientMock extends CristinBiobankApiClient {
 
     @Override
     protected HttpResponse<String> httpRequestWithStatusCheck(QueryBiobank query) throws ApiGatewayException {
-        var errorMessage = String.format(ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, query.toURI());
-        var value = query.getValue(ParameterKeyBiobank.PATH_BIOBANK);
+//        final var value = ;
+        Predicate<String> containsBioBank = e -> e.contains(query.getValue(ParameterKeyBiobank.PATH_BIOBANK));
         var body = Arrays.stream(responseBody)
-                .filter(s -> s.contains(value))
+                .filter(containsBioBank)
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException(errorMessage));
+                .orElseThrow(() -> throwNotFoundException(query.toURI()));
         return new HttpResponseFaker(body);
     }
 
+
+
+    private static NotFoundException throwNotFoundException(URI uri) {
+        var errorMessage = String.format(ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, uri);
+        return new NotFoundException(errorMessage);
+    }
 }

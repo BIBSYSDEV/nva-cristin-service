@@ -39,8 +39,8 @@ public class CristinProjectApiClientTest {
 
     @Test
     void returnsListOfResultsFromBothQueryAndEnrichmentIfAnyEnrichmentsFail() {
-        List<CristinProject> queryProjects = getSomeCristinProjects();
-        List<CristinProject> enrichedProjects = new ArrayList<>(queryProjects);
+        var queryProjects = getSomeCristinProjects();
+        var enrichedProjects = new ArrayList<>(queryProjects);
         // Remove one element to fake a failed enrichment
         enrichedProjects.remove(enrichedProjects.size() - 1);
 
@@ -65,40 +65,40 @@ public class CristinProjectApiClientTest {
 
     @Test
     void returnsFetchGetResultHandlesException() throws IOException, InterruptedException {
-        HttpClient mockHttpClient = mock(HttpClient.class);
+        var mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(), any())).thenThrow(new RuntimeException(""));
-        final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
+        final var cristinApiClient = new CristinProjectApiClient(mockHttpClient);
         assertThrows(RuntimeException.class, () ->  cristinApiClient.fetchGetResult(LOCALHOST_URI));
     }
 
     @Test
     void returnsDummyFetchGetResultForCodeCoverage() throws IOException, InterruptedException, ApiGatewayException {
-        HttpClient mockHttpClient = mock(HttpClient.class);
+        var mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> httpResponse =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(httpResponse);
-        final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
-        HttpResponse<String> result = cristinApiClient.fetchGetResult(LOCALHOST_URI);
+        final var cristinApiClient = new CristinProjectApiClient(mockHttpClient);
+        var result = cristinApiClient.fetchGetResult(LOCALHOST_URI);
         assertNotNull(result);
     }
 
 
     @Test
     void returnsFetchQueryResultsHandlesException() throws IOException, InterruptedException {
-        HttpClient mockHttpClient = mock(HttpClient.class);
+        var mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(), any())).thenThrow(new RuntimeException(""));
-        final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
+        final var cristinApiClient = new CristinProjectApiClient(mockHttpClient);
         assertThrows(RuntimeException.class, () ->  cristinApiClient.fetchQueryResults(LOCALHOST_URI));
     }
 
     @Test
     void returnsDummyFetchQueryResultsForCodeCoverage() throws IOException, InterruptedException, ApiGatewayException {
-        HttpClient mockHttpClient = mock(HttpClient.class);
+        var mockHttpClient = mock(HttpClient.class);
         HttpResponse<String> httpResponse =
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         when(mockHttpClient.<String>send(any(), any())).thenReturn(httpResponse);
         final CristinProjectApiClient cristinApiClient = new CristinProjectApiClient(mockHttpClient);
-        HttpResponse<String> result = cristinApiClient.fetchQueryResults(LOCALHOST_URI);
+        var result = cristinApiClient.fetchQueryResults(LOCALHOST_URI);
         assertNotNull(result);
     }
 

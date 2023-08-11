@@ -14,23 +14,11 @@ dependencies {
 }
 
 
-tasks.named('test') {
+test {
     useJUnitPlatform {
         excludeTags 'karateTest'
     }
     environment "COGNITO_URI", "https://example.cognito.org"
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
-    finalizedBy jacocoTestReport
-}
-
-
-
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
 }

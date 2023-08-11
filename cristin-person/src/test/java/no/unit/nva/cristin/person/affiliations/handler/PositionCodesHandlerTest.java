@@ -74,9 +74,8 @@ public class PositionCodesHandlerTest {
 
     @Test
     void shouldReturnAllPositionCodesWhenCallingEndpointWithNoParams() throws IOException {
-        PositionCodes actual = sendQuery(null).getBodyObject(PositionCodes.class);
-        List<PositionCode> actualHits = OBJECT_MAPPER.convertValue(actual.getPositions(), new TypeReference<>() {
-        });
+        var actual = sendQuery(null).getBodyObject(PositionCodes.class);
+        List<PositionCode> actualHits = OBJECT_MAPPER.convertValue(actual.getPositions(), new TypeReference<>() { });
 
         assertThat(actualHits.contains(getOneCode().toPositionCode()), equalTo(true));
         assertThat(actualHits.contains(getAnotherCode().toPositionCode()), equalTo(true));

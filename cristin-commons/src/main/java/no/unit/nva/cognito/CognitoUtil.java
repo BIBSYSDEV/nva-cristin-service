@@ -57,9 +57,9 @@ public class CognitoUtil {
     /**
      * Create user in the user to the user pool.
      *
-     * @param username User name for the sign up
-     * @param password    Password for the sign up
-     * @param poolId      Identifier for Cognito userpool
+     * @param username Username for the sign-up
+     * @param password    Password for the sign-up
+     * @param poolId      Identifier for Cognito user pool
      * @return username in cognito for user created from parameters.
      */
     public static String adminCreateUser(String username,
@@ -164,19 +164,18 @@ public class CognitoUtil {
     }
 
     private static Optional<String> getUsername(String nvaUsername, String poolId) {
-        Optional<String> username = Optional.empty();
         try {
             var listUsersRequest = ListUsersRequest.builder()
                 .userPoolId(poolId)
                     .filter(String.format("username = \"%s\"", nvaUsername))
                 .build();
-            username = getCognitoIdentityProvider().listUsers(listUsersRequest).users().stream()
+            return getCognitoIdentityProvider().listUsers(listUsersRequest).users().stream()
                 .findFirst()
                 .map(UserType::username);
         } catch (Exception e) {
             logger.warn("Error getting username:{}, {}", nvaUsername, e.getMessage());
+            return Optional.empty();
         }
-        return username;
     }
 
     /**

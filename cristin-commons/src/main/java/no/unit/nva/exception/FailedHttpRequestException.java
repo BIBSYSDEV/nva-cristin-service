@@ -6,6 +6,7 @@ import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 
 public class FailedHttpRequestException extends ApiGatewayException {
 
+    private static final long serialVersionUID = -2345623546891L;
 
     public FailedHttpRequestException(String message) {
         super(message);
