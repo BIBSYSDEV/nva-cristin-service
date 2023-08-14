@@ -22,7 +22,7 @@ public class UpdateProjectResourceAccessCheck extends ProjectResourceAccessCheck
     public static final String NOT_ALLOWED_TO_UPDATE_THIS_RESOURCE =
         "User with identifier: {} is not allowed to update resource with id {}";
 
-    private transient boolean verified = false;
+    private transient boolean verified;
 
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
     @Override
@@ -30,7 +30,8 @@ public class UpdateProjectResourceAccessCheck extends ProjectResourceAccessCheck
         var userIdentifier = params.get(USER_IDENTIFIER);
 
         getResourceCreator(resource)
-            .ifPresent(creator -> verified = hasMatch(creator, userIdentifier));
+            .ifPresentOrElse(creator -> verified = hasMatch(creator, userIdentifier),
+                             () -> verified = false);
         if (verified) {
             return;
         }

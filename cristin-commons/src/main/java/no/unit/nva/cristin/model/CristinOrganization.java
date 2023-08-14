@@ -67,16 +67,23 @@ public class CristinOrganization {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CristinOrganization that)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        return Objects.equals(getInstitution(), that.getInstitution())
-               && Objects.equals(getInstitutionUnit(), that.getInstitutionUnit());
+
+        CristinOrganization that = (CristinOrganization) o;
+
+        if (!Objects.equals(institution, that.institution)) {
+            return false;
+        }
+        return Objects.equals(institutionUnit, that.institutionUnit);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getInstitution(), getInstitutionUnit());
+        int result = institution != null ? institution.hashCode() : 0;
+        result = 31 * result + (institutionUnit != null ? institutionUnit.hashCode() : 0);
+        return result;
     }
 }
 
