@@ -7,8 +7,6 @@ plugins {
 
 group 'no.unit.nva'
 version '1.0-JDK17'
-sourceCompatibility = JavaVersion.VERSION_17  // source-code version and must be <= targetCompatibility
-targetCompatibility = JavaVersion.VERSION_17 // bytecode target version
 
 dependencies {
     testImplementation libs.bundles.testing
@@ -90,12 +88,7 @@ jacocoTestCoverageVerification {
     dependsOn jacocoTestReport
 }
 
-//check {
-//    println("Java-convension - ${project.name} - check")
-//    dependsOn jacocoTestCoverageVerification
-//    dependsOn testCodeCoverageReport
-////    dependsOn integrationTestCodeCoverageReport
-//}
+
 
 
 tasks.register('karateTest', Test) {
