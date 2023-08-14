@@ -317,8 +317,9 @@ public class QueryCristinPersonHandlerTest {
 
     @SuppressWarnings("rawtypes")
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
-        var input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME));
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME))) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 

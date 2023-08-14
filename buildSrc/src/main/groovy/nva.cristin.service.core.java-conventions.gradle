@@ -7,8 +7,6 @@ plugins {
 
 group 'no.unit.nva'
 version '1.0-JDK17'
-sourceCompatibility = JavaVersion.VERSION_17  // source-code version and must be <= targetCompatibility
-targetCompatibility = JavaVersion.VERSION_17 // bytecode target version
 
 dependencies {
     testImplementation libs.bundles.testing
@@ -23,7 +21,6 @@ repositories {
 }
 
 tasks.named('test', Test) {
-    println("Java-convension - ${project.name} - test")
     useJUnitPlatform()
     testLogging {
         events 'skipped', 'passed', 'failed'
@@ -32,26 +29,35 @@ tasks.named('test', Test) {
     environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
     environment "BASE_PATH", "cristin"
     environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
-//    finalizedBy jacocoTestReport
+    environment "COGNITO_URI", "https://example.cognito.org"
+    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
+    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
+    finalizedBy jacocoTestReport
 }
 
-tasks.register ('pmd') {
-    println("Java-convension - ${project.name} - pmd")
+sourceSets {
+    test {
+        resources {
+            srcDir file('src/test/java')
+            exclude '**/*.java'
+        }
+    }
+}
+
+pmd {
     toolVersion = '6.20.0'
     ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
     ruleSets = []
     ignoreFailures = false
 }
 
-tasks.register('checkstyle') {
-    println("Java-convension - ${project.name} - checkstyle")
+checkstyle {
     configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
     showViolations = true
 }
 
 
 tasks.withType(Checkstyle).configureEach{
-    println("Java-convension - type-Checkstyle - ${project.name} - ${it.name}")
     reports {
         xml.required
         html.required
@@ -59,11 +65,12 @@ tasks.withType(Checkstyle).configureEach{
     }
 }
 
-//check.dependsOn jacocoTestCoverageVerification
-//jacocoTestCoverageVerification.dependsOn(jacocoTestReport)
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'utf-8'
+}
+
 
 jacocoTestCoverageVerification {
-    println("Java-convension - ${project.name} jacocoTestCoverageVerification - 1")
     violationRules {
         rule {
             excludes = [
@@ -75,7 +82,6 @@ jacocoTestCoverageVerification {
                 minimum = 0.800
             }
         }
-
         rule {
             excludes = [
                     'cristin-commons:*'
@@ -89,13 +95,6 @@ jacocoTestCoverageVerification {
     }
     dependsOn jacocoTestReport
 }
-
-//check {
-//    println("Java-convension - ${project.name} - check")
-//    dependsOn jacocoTestCoverageVerification
-//    dependsOn testCodeCoverageReport
-////    dependsOn integrationTestCodeCoverageReport
-//}
 
 
 tasks.register('karateTest', Test) {
@@ -127,7 +126,6 @@ tasks.register('deleteTestUsers', Test) {
 
     outputs.upToDateWhen { false }
 }
-
 
 
 

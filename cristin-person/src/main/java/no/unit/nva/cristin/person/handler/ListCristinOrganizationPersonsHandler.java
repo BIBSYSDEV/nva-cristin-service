@@ -71,6 +71,7 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
      * @throws ApiGatewayException all exceptions are caught by writeFailure and mapped to error codes through the
      *                             method {@link RestRequestHandler#getFailureStatusCode}
      */
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
     @Override
     protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
@@ -78,13 +79,16 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
         validateHasIdentifierPathParameter(requestInfo);
         validateQueryParameterKeys(requestInfo);
 
-        String identifier = getValidId(requestInfo);
-        String page = getValidPage(requestInfo);
-        String numberOfResults = getValidNumberOfResults(requestInfo);
-        Optional<String> name = getNameIfPresent(requestInfo);
-        Optional<String> sort = getSortIfPresent(requestInfo);
-        Map<String, String> requestQueryParams = buildParamMap(identifier, page, numberOfResults,
-                name.orElse(null), sort.orElse(null));
+        var identifier = getValidId(requestInfo);
+        var page = getValidPage(requestInfo);
+        var numberOfResults = getValidNumberOfResults(requestInfo);
+        var name =
+            getNameIfPresent(requestInfo).orElse(null);
+        var sort =
+            getSortIfPresent(requestInfo).orElse(null);
+
+        var requestQueryParams =
+            buildParamMap(identifier, page, numberOfResults, name, sort);
 
         return attempt(() -> getAuthorizedSearchResponse(requestInfo, requestQueryParams))
                 .orElse(list -> apiClient.generateQueryResponse(requestQueryParams));

@@ -476,8 +476,9 @@ public class FetchCristinProjectHandlerTest {
     }
 
     private GatewayResponse<NvaProject> sendQueryWithId(String identifier) throws IOException {
-        InputStream input = requestWithIdentifier(of(IDENTIFIER, identifier));
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithIdentifier(of(IDENTIFIER, identifier))) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, NvaProject.class);
     }
 

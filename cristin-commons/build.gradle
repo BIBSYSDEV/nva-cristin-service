@@ -28,8 +28,7 @@ dependencies {
     implementation libs.apache.http.core
 
 }
-
-test {
+tasks.named('test', Test) {
     useJUnitPlatform {
         excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
     }

@@ -67,8 +67,8 @@ public class CristinProjectApiClientTest {
     void returnsFetchGetResultHandlesException() throws IOException, InterruptedException {
         var mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(), any())).thenThrow(new RuntimeException(""));
-        final var cristinApiClient = new CristinProjectApiClient(mockHttpClient);
-        assertThrows(RuntimeException.class, () ->  cristinApiClient.fetchGetResult(LOCALHOST_URI));
+        assertThrows(RuntimeException.class,
+                     () -> new CristinProjectApiClient(mockHttpClient).fetchGetResult(LOCALHOST_URI));
     }
 
     @Test
@@ -87,8 +87,8 @@ public class CristinProjectApiClientTest {
     void returnsFetchQueryResultsHandlesException() throws IOException, InterruptedException {
         var mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(), any())).thenThrow(new RuntimeException(""));
-        final var cristinApiClient = new CristinProjectApiClient(mockHttpClient);
-        assertThrows(RuntimeException.class, () ->  cristinApiClient.fetchQueryResults(LOCALHOST_URI));
+        assertThrows(RuntimeException.class,
+                     () -> new CristinProjectApiClient(mockHttpClient).fetchQueryResults(LOCALHOST_URI));
     }
 
     @Test

@@ -40,6 +40,7 @@ public class FetchFundingSourcesHandlerTest {
 
     private static final String EXISTING_FUNDING_SOURCE_IDENTIFIER = "EC/FP7";
     private static final String EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED = "EC%2FFP7";
+    public static final String IDENTIFIER = "identifier";
 
     private final Context context = new FakeContext();
     private FetchFundingSourceHandler handlerUnderTest;
@@ -71,15 +72,15 @@ public class FetchFundingSourcesHandlerTest {
     @ParameterizedTest(name = "Should support accept header {0}")
     @ValueSource(strings = {"application/json", "application/ld+json"})
     public void shouldReturnFundingSourceWhenExists(String acceptHeaderValue) throws IOException {
-        var input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
-                        .withPathParameters(Map.of("identifier",
-                                                   EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED))
-                        .withHeaders(Map.of("Accept", acceptHeaderValue))
-                        .build();
-
-        cristinFundingSourcesStubs.stubSuccess();
-
-        handlerUnderTest.handleRequest(input, output, context);
+        try (var input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
+                             .withPathParameters(
+                                 Map.of(IDENTIFIER, EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED))
+                             .withHeaders(
+                                 Map.of("Accept", acceptHeaderValue))
+                             .build()) {
+            cristinFundingSourcesStubs.stubSuccess();
+            handlerUnderTest.handleRequest(input, output, context);
+        }
 
         var response = GatewayResponse.fromOutputStream(output, FundingSource.class);
 
@@ -99,7 +100,7 @@ public class FetchFundingSourcesHandlerTest {
     public void shouldReturnStatusCodeNotFoundWhenFundingSourceDoesNotExistInCristin() throws IOException {
         var urlEncodedIdentifier = "NotFound";
         var input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
-                        .withPathParameters(Map.of("identifier", urlEncodedIdentifier))
+                        .withPathParameters(Map.of(IDENTIFIER, urlEncodedIdentifier))
                         .build();
 
         cristinFundingSourcesStubs.stubSuccess();
@@ -114,7 +115,7 @@ public class FetchFundingSourcesHandlerTest {
     @Test
     public void shouldReturnBadGatewayWhenCristinReturnsMalformedJson() throws IOException {
         var input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
-                        .withPathParameters(Map.of("identifier",
+                        .withPathParameters(Map.of(IDENTIFIER,
                                                    EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED))
                         .build();
 
@@ -130,7 +131,7 @@ public class FetchFundingSourcesHandlerTest {
     @Test
     public void shouldReturnBadGatewayWhenCristinIsUnavailable() throws IOException {
         var input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
-                        .withPathParameters(Map.of("identifier",
+                        .withPathParameters(Map.of(IDENTIFIER,
                                                    EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED))
                         .build();
 
@@ -148,7 +149,7 @@ public class FetchFundingSourcesHandlerTest {
     @Test
     public void shouldUseProvidedBasePathForResourceIds() throws IOException {
         var input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
-                        .withPathParameters(Map.of("identifier",
+                        .withPathParameters(Map.of(IDENTIFIER,
                                                    EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED))
                         .build();
 
@@ -172,7 +173,7 @@ public class FetchFundingSourcesHandlerTest {
     @Test
     public void shouldSupportEmptyBasePathInResourceIds() throws IOException {
         var input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
-                        .withPathParameters(Map.of("identifier",
+                        .withPathParameters(Map.of(IDENTIFIER,
                                                    EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED))
                         .build();
 

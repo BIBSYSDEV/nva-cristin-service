@@ -58,25 +58,24 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
 
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
-        ObjectNode objectNode = readJsonFromInput(input);
-        String personId = getValidPersonId(requestInfo);
-
         if (clientCanUpdateAllFields(requestInfo)) {
+            var objectNode = readJsonFromInput(input);
             PersonPatchValidator.validate(objectNode);
-            ObjectNode cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
+            var cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
             checkHasFields(cristinJson);
 
             if (cristinJson.has(CRISTIN_EMPLOYMENTS)) {
-                return apiClient.updatePersonInCristin(personId, cristinJson,
-                                                       extractCristinInstitutionIdentifier(requestInfo));
+                return apiClient.updatePersonInCristin(
+                    getValidPersonId(requestInfo), cristinJson, extractCristinInstitutionIdentifier(requestInfo));
             } else {
-                return apiClient.updatePersonInCristin(personId, cristinJson);
+                return apiClient.updatePersonInCristin(getValidPersonId(requestInfo), cristinJson);
             }
         } else if (clientCanUpdateOwnData(requestInfo)) {
+            var objectNode = readJsonFromInput(input);
             String personIdFromCognito = parseLastPartOfPersonCristinIdFromCognito(requestInfo).orElseThrow();
-            checkIdentifiersMatch(personId, personIdFromCognito);
+            checkIdentifiersMatch(getValidPersonId(requestInfo), personIdFromCognito);
             PersonPatchValidator.validateOrcidIfPresent(objectNode);
-            ObjectNode cristinJson =
+            var cristinJson =
                 new CristinPersonPatchJsonCreator(objectNode).createWithAllowedUserModifiableData().getOutput();
             checkHasFields(cristinJson);
 

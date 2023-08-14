@@ -3,6 +3,7 @@ plugins{
     id 'jacoco-report-aggregation'
 }
 
+
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
@@ -16,7 +17,6 @@ dependencies {
 
 
 reporting {
-    println("Core - ${project.name} - reporting")
     reports {
         testCodeCoverageReport(JacocoCoverageReport) {
             testType = TestSuiteType.UNIT_TEST
@@ -28,9 +28,10 @@ reporting {
 }
 
 
+
 check {
-    println("Core - ${project.name} - check")
     dependsOn testCodeCoverageReport
     dependsOn integrationTestCodeCoverageReport
 //    dependsOn jacocoTestCoverageVerification
 }
+

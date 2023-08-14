@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import nva.commons.core.paths.UriWrapper;
 
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class UriUtils {
 
     public static final String POSITION = "position";

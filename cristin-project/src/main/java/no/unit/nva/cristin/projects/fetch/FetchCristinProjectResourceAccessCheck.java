@@ -8,6 +8,7 @@ import no.unit.nva.utils.ResourceAccessCheck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class FetchCristinProjectResourceAccessCheck extends ProjectResourceAccessCheck
     implements ResourceAccessCheck<NvaProject> {
 
@@ -20,7 +21,7 @@ public class FetchCristinProjectResourceAccessCheck extends ProjectResourceAcces
 
     @Override
     public void verifyAccess(NvaProject resource, Map<String, String> params) {
-        var userIdentifier = params.get(USER_IDENTIFIER);
+        final var userIdentifier = params.get(USER_IDENTIFIER);
         verified = getResourceCreator(resource)
                        .map(creator -> hasMatch(creator, userIdentifier))
                        .orElseGet(() -> logAndReturnInvalidAccess(userIdentifier, resource.getId()));

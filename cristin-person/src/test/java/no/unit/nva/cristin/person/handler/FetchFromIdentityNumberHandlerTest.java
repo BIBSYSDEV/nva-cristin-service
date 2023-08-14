@@ -197,16 +197,18 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     private GatewayResponse<Person> sendQueryWithUnauthorizedAccessRight() throws IOException {
-        InputStream input = requestWithParams(defaultBody(), EMPTY_MAP, randomString());
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithParams(defaultBody(), EMPTY_MAP, randomString())) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
     private GatewayResponse<Person> sendQuery(TypedValue body, Map<String, String> queryParams)
         throws IOException {
 
-        InputStream input = requestWithParams(body, queryParams, EDIT_OWN_INSTITUTION_USERS);
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithParams(body, queryParams, EDIT_OWN_INSTITUTION_USERS)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
@@ -226,8 +228,9 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     private GatewayResponse<Person> sendInvalidQuery() throws IOException {
-        InputStream input = requestWithInvalidPayload();
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithInvalidPayload()) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 

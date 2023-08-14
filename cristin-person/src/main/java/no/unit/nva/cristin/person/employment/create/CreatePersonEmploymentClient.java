@@ -47,8 +47,8 @@ public class CreatePersonEmploymentClient extends PostApiClient {
     }
 
     private String generatePayloadFromRequest(Employment employment) {
-        CristinPersonEmployment cristinEmployment = employment.toCristinEmployment();
-        return attempt(() -> OBJECT_MAPPER.writeValueAsString(cristinEmployment)).orElseThrow();
+        return attempt(() -> OBJECT_MAPPER.writeValueAsString(employment.toCristinEmployment()))
+                   .orElseThrow();
     }
 
     private URI getCristinPostUri(String identifier) {

@@ -64,6 +64,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 class CreateCristinProjectHandlerTest {
 
     public static final String NO_ACCESS = "NoAccess";

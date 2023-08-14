@@ -45,7 +45,7 @@ import no.unit.nva.cristin.model.QueryBuilder;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
-@SuppressWarnings({"PMD.GodClass"})
+@SuppressWarnings({"PMD.GodClass", "PMD.DataflowAnomalyAnalysis"})
 public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
 
     public QueryBuilderProject() {
@@ -123,7 +123,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
         final var key = entry.getKey();
         if (invalidQueryParameter(key, entry.getValue())) {
             final var keyName =  key.getNvaKey();
-            var errorMessage = EMPTY_STRING;
+            String errorMessage;
             if (key == STATUS) {
                 errorMessage =
                     invalidQueryParametersMessageWithRange(key.getKey(), Arrays.toString(ProjectStatus.values()));

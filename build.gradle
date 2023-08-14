@@ -5,4 +5,3 @@ plugins {
 allprojects{
     apply plugin: 'nva.cristin.service.core.java-conventions'
 }
-
