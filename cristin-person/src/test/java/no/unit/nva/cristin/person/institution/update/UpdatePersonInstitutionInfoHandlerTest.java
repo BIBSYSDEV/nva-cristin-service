@@ -39,7 +39,6 @@ public class UpdatePersonInstitutionInfoHandlerTest {
         Map.of(PERSON_ID, randomIntegerAsString(), ORG_ID, randomIntegerAsString());
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
-    private UpdatePersonInstitutionInfoClient apiClient;
     private final Environment environment = new Environment();
     private Context context;
     private ByteArrayOutputStream output;
@@ -48,7 +47,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
-        apiClient = new UpdatePersonInstitutionInfoClient(httpClientMock);
+        UpdatePersonInstitutionInfoClient apiClient = new UpdatePersonInstitutionInfoClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new UpdatePersonInstitutionInfoHandler(apiClient, environment);
@@ -72,7 +71,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldThrowBadRequestIfNoSupportedFieldsIsPresentInRequest() throws IOException {
-        GatewayResponse<Object> gatewayResponse = sendQuery(validPath, bodyWithUnsupportedFields());
+        var gatewayResponse = sendQuery(validPath, bodyWithUnsupportedFields());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -81,7 +80,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenSendingNullBody() throws IOException {
-        GatewayResponse<Object> gatewayResponse = sendQuery(validPath, null);
+        var gatewayResponse = sendQuery(validPath, null);
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
     }
@@ -93,8 +92,9 @@ public class UpdatePersonInstitutionInfoHandlerTest {
     private GatewayResponse<Object> sendQuery(Map<String, String> pathParam, PersonInstInfoPatch body)
         throws IOException {
 
-        InputStream input = createRequest(pathParam, body);
-        handler.handleRequest(input, output, context);
+        try (var input = createRequest(pathParam, body)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Object.class);
     }
 
@@ -110,11 +110,12 @@ public class UpdatePersonInstitutionInfoHandlerTest {
     }
 
     private GatewayResponse<String> queryWithoutRequiredAccessRights(PersonInstInfoPatch body) throws IOException {
-        InputStream input = new HandlerRequestBuilder<PersonInstInfoPatch>(OBJECT_MAPPER)
-            .withBody(body)
-            .withPathParameters(validPath)
-            .build();
-        handler.handleRequest(input, output, context);
+        try (var input = new HandlerRequestBuilder<PersonInstInfoPatch>(OBJECT_MAPPER)
+                                     .withBody(body)
+                                     .withPathParameters(validPath)
+                                     .build()) {
+            handler.handleRequest(input, output, context);
+        }
 
         return GatewayResponse.fromOutputStream(output, String.class);
     }

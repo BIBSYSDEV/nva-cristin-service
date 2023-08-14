@@ -10,7 +10,7 @@ import static no.unit.nva.cristin.common.Utils.isPositiveInteger;
 import static no.unit.nva.cristin.model.CristinUnit.isCristinUnitIdentifier;
 import static no.unit.nva.cristin.model.JsonPropertyNames.UNIT;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "PMD.DataflowAnomalyAnalysis"})
 @JacocoGenerated
 public class CristinOrganization {
 
@@ -50,7 +50,7 @@ public class CristinOrganization {
      * Creates CristinOrganization from identifier. Either Unit which is preferred, or else falls back to institution.
      */
     public static CristinOrganization fromIdentifier(String identifier) {
-        CristinOrganization cristinOrganization = new CristinOrganization();
+        var cristinOrganization = new CristinOrganization();
         if (isCristinUnitIdentifier(identifier)) {
             cristinOrganization.setInstitutionUnit(new CristinUnit(identifier));
             return cristinOrganization;
@@ -67,12 +67,11 @@ public class CristinOrganization {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CristinOrganization)) {
+        if (!(o instanceof CristinOrganization that)) {
             return false;
         }
-        CristinOrganization that = (CristinOrganization) o;
-        return Objects.equals(getInstitution(), that.getInstitution()) && Objects.equals(
-            getInstitutionUnit(), that.getInstitutionUnit());
+        return Objects.equals(getInstitution(), that.getInstitution())
+               && Objects.equals(getInstitutionUnit(), that.getInstitutionUnit());
     }
 
     @Override

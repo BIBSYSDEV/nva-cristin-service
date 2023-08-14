@@ -37,7 +37,6 @@ public class CristinBiobankClientMock extends CristinBiobankApiClient {
 
     @Override
     protected HttpResponse<String> httpRequestWithStatusCheck(QueryBiobank query) throws ApiGatewayException {
-//        final var value = ;
         Predicate<String> containsBioBank = e -> e.contains(query.getValue(ParameterKeyBiobank.PATH_BIOBANK));
         var body = Arrays.stream(responseBody)
                 .filter(containsBioBank)
@@ -45,7 +44,6 @@ public class CristinBiobankClientMock extends CristinBiobankApiClient {
                 .orElseThrow(() -> throwNotFoundException(query.toURI()));
         return new HttpResponseFaker(body);
     }
-
 
 
     private static NotFoundException throwNotFoundException(URI uri) {

@@ -71,6 +71,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class CreateCristinPersonHandlerTest {
 
     private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
@@ -326,14 +327,16 @@ public class CreateCristinPersonHandlerTest {
 
     @Test
     void shouldLogClientSpecificIdentifiersWhenDoingAuthorizedRequests() throws IOException {
-        final var standardOut = System.out;
-        final var outputStreamCaptor = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outputStreamCaptor));
-        var response = sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
-        System.setOut(standardOut);
-
-        assertThat(outputStreamCaptor.toString(), Matchers.containsString(LOG_MESSAGE_FOR_IDENTIFIERS));
-        assertEquals(HTTP_CREATED, response.getStatusCode());
+        try (var outputStreamCaptor = new ByteArrayOutputStream()) {
+            try (var printStream = new PrintStream(outputStreamCaptor)) {
+                System.setOut(printStream);
+                var response =
+                    sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
+                assertEquals(HTTP_CREATED, response.getStatusCode());
+                System.setOut(System.out);
+            }
+            assertThat(outputStreamCaptor.toString(), Matchers.containsString(LOG_MESSAGE_FOR_IDENTIFIERS));
+        }
     }
 
     @Test
@@ -494,8 +497,9 @@ public class CreateCristinPersonHandlerTest {
 
     private GatewayResponse<Person> sendQueryWhileActingAsInternalBackend(Person body)
         throws IOException {
-        var input = requestWithBodyActingAsInternalBackend(body);
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithBodyActingAsInternalBackend(body)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
@@ -520,7 +524,7 @@ public class CreateCristinPersonHandlerTest {
                              .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
                              .build()) {
             handler.handleRequest(input, output, context);
+            return GatewayResponse.fromOutputStream(output, Person.class);
         }
-        return GatewayResponse.fromOutputStream(output, Person.class);
     }
 }

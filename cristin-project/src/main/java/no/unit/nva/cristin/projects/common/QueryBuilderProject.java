@@ -45,7 +45,7 @@ import no.unit.nva.cristin.model.QueryBuilder;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
-@SuppressWarnings({"PMD.GodClass"})
+@SuppressWarnings({"PMD.GodClass", "PMD.DataflowAnomalyAnalysis"})
 public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
 
     public QueryBuilderProject() {

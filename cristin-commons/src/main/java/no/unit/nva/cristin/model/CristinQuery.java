@@ -193,13 +193,12 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
     }
 
     private String[] getNvaPathAsArray() {
-        final var pathSize = this.pathParameters.size();
         return
             this.pathParameters
                 .entrySet()
                 .stream()
                 .sorted(byOrdinalDesc())
-                .flatMap(entry -> Stream.of(getNvaPathItem(pathSize, entry), entry.getValue()))
+                .flatMap(entry -> Stream.of(getNvaPathItem(this.pathParameters.size(), entry), entry.getValue()))
                 .filter(entry -> !entry.isEmpty())
                 .toArray(String[]::new);
     }

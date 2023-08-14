@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 class CristinProjectBuilderTest {
 
     public static final String ONE_CRISTIN_PROJECT = "cristinGetProjectResponse.json";

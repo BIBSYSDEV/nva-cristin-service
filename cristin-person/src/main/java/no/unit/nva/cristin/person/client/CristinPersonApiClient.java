@@ -13,13 +13,11 @@ import nva.commons.core.paths.UriWrapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
 import static java.util.Arrays.asList;
 import static no.unit.nva.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.common.Utils.isOrcid;
@@ -119,13 +117,16 @@ public class CristinPersonApiClient extends ApiClient {
                 : combineResultsWithQueryInCaseEnrichmentFails(personsFromQuery, enrichedCristinPersons);
     }
 
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
     protected List<CristinPerson> combineResultsWithQueryInCaseEnrichmentFails(List<CristinPerson> personsFromQuery,
                                                                                List<CristinPerson> enrichedPersons) {
-        final var enrichedPersonIds = enrichedPersons.stream()
+        final var enrichedPersonIds =
+            enrichedPersons.stream()
                 .map(CristinPerson::getCristinPersonId)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toUnmodifiableSet());
 
-        var missingPersons = personsFromQuery.stream()
+        var missingPersons =
+            personsFromQuery.stream()
                 .filter(queryPerson -> !enrichedPersonIds.contains(queryPerson.getCristinPersonId()));
 
         return Stream.concat(enrichedPersons.stream(), missingPersons).toList();

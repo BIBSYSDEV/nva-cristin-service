@@ -1,20 +1,16 @@
 package no.unit.nva.cristin.person.employment;
 
-import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.CAN_UPDATE_ANY_INSTITUTION;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
-import java.util.Collections;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.employment.delete.DeletePersonEmploymentClient;
 import no.unit.nva.cristin.person.employment.query.QueryPersonEmploymentClient;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 public class ClearCristinTestPersonEmployment {
 
@@ -29,11 +25,11 @@ public class ClearCristinTestPersonEmployment {
      * @throws ApiGatewayException an error occurred during execution
      */
     public static void clearEmployment(String personId) throws ApiGatewayException {
-        SearchResponse<Employment> queryResponse =
+        var queryResponse =
             new QueryPersonEmploymentClient(CristinAuthenticator.getHttpClient()).generateQueryResponse(personId);
-        List<Employment> hits = nonNull(queryResponse.getHits()) ? (List<Employment>) queryResponse.getHits() :
-            Collections.emptyList();
-        hits.forEach(hit -> deleteEmployment(personId, hit));
+
+        Stream.of(queryResponse.getHits()).forEach(hit -> deleteEmployment(personId, (Employment)hit));
+
     }
 
     private static void deleteEmployment(String personId, Employment employment) {

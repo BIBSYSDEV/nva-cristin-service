@@ -22,26 +22,26 @@ public class UpdateProjectResourceAccessCheck extends ProjectResourceAccessCheck
     public static final String NOT_ALLOWED_TO_UPDATE_THIS_RESOURCE =
         "User with identifier: {} is not allowed to update resource with id {}";
 
-    private transient boolean verified;
+    private transient boolean verified = false;
 
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
     @Override
     public void verifyAccess(NvaProject resource, Map<String, String> params) {
         var userIdentifier = params.get(USER_IDENTIFIER);
 
-        var resourceCreator = getResourceCreator(resource);
-        var resourceManager = getResourceManager(resource);
-
-        if (resourceCreator.isPresent() && hasMatch(resourceCreator.get(), userIdentifier)) {
-            verified = true;
+        getResourceCreator(resource)
+            .ifPresent(creator -> verified = hasMatch(creator, userIdentifier));
+        if (verified) {
             return;
-        } else if (resourceManager.isPresent() && hasMatch(resourceManager.get(), userIdentifier)) {
-            verified = true;
+        }
+
+        getResourceManager(resource)
+            .ifPresent(manager -> verified = hasMatch(manager, userIdentifier));
+        if (verified) {
             return;
         }
 
         logger.info(NOT_ALLOWED_TO_UPDATE_THIS_RESOURCE, userIdentifier, resource.getId());
-
-        verified = false;
     }
 
     @Override

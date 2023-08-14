@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.distinctByKey;
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
@@ -239,12 +238,11 @@ public class Person implements JsonSerializable {
      * Converts NVA formatted employments to Cristin formatted employments.
      */
     public static List<CristinPersonEmployment> mapEmploymentsToCristinEmployments(Set<Employment> employments) {
-        if (isNull(employments)) {
-            return null;
-        }
-        return new ArrayList<>(employments).stream()
-                   .map(Employment::toCristinEmployment)
-                   .collect(Collectors.toList());
+        return Optional.ofNullable(employments)
+            .orElse(Collections.emptySet())
+            .stream()
+            .map(Employment::toCristinEmployment)
+            .toList();
     }
 
     @JacocoGenerated
@@ -253,10 +251,9 @@ public class Person implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Person)) {
+        if (!(o instanceof Person person)) {
             return false;
         }
-        Person person = (Person) o;
         return Objects.equals(getId(), person.getId())
                && Objects.equals(getContext(), person.getContext())
                && Objects.equals(getIdentifiers(), person.getIdentifiers())
