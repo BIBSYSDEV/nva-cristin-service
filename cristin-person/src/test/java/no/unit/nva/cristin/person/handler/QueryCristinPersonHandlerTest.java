@@ -323,6 +323,7 @@ public class QueryCristinPersonHandlerTest {
     private CristinPerson randomCristinPersonWithNin(String nin) {
         var cristinPerson = randomCristinPerson();
         cristinPerson.setNorwegianNationalId(nin);
+        cristinPerson.setReserved(true);
         return cristinPerson;
     }
 
