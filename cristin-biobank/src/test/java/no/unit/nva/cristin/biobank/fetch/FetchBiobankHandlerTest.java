@@ -27,7 +27,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @WireMockTest(httpsEnabled = true)
-
 public class FetchBiobankHandlerTest {
 
     public static final String APPLICATION_LD_JSON = "application/ld+json";
