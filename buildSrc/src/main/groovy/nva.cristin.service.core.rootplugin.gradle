@@ -36,3 +36,4 @@ check {
     dependsOn integrationTestCodeCoverageReport
 //    dependsOn jacocoTestCoverageVerification
 }
+

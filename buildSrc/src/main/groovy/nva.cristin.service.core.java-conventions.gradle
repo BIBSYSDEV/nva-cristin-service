@@ -20,7 +20,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-test {
+tasks.named('test') {
     println("Java-convension - ${project.name} - test")
     useJUnitPlatform()
     testLogging {
@@ -30,7 +30,7 @@ test {
     environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
     environment "BASE_PATH", "cristin"
     environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
-//    finalizedBy jacocoTestReport
+    finalizedBy jacocoTestReport
 }
 
 pmd {
@@ -55,6 +55,10 @@ tasks.withType(Checkstyle).configureEach{
         html.required
         html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'utf-8'
 }
 
 //check.dependsOn jacocoTestCoverageVerification
