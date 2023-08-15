@@ -31,6 +31,11 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "3.8"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: corretto
       - name: Setup AWS SAM CLI
         uses: aws-actions/setup-sam@v2
       - name: Configure AWS credentials
