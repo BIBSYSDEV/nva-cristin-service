@@ -18,7 +18,6 @@ dependencies {
 
 
 reporting {
-    println("Core - ${project.name} - reporting")
     reports {
         testCodeCoverageReport(JacocoCoverageReport) {
             testType = TestSuiteType.UNIT_TEST
@@ -29,9 +28,16 @@ reporting {
     }
 }
 
+sourceSets {
+    test {
+        resources {
+            srcDir file('src/test/java')
+            exclude '**/*.java'
+        }
+    }
+}
 
 check {
-    println("Core - ${project.name} - check")
     dependsOn testCodeCoverageReport
     dependsOn integrationTestCodeCoverageReport
 //    dependsOn jacocoTestCoverageVerification

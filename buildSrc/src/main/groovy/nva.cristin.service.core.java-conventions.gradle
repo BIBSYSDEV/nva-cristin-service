@@ -21,7 +21,6 @@ repositories {
 }
 
 tasks.named('test') {
-    println("Java-convension - ${project.name} - test")
     useJUnitPlatform()
     testLogging {
         events 'skipped', 'passed', 'failed'
@@ -34,7 +33,6 @@ tasks.named('test') {
 }
 
 pmd {
-    println("Java-convension - ${project.name} - pmd")
     toolVersion = '6.20.0'
     ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
     ruleSets = []
@@ -42,14 +40,12 @@ pmd {
 }
 
 checkstyle {
-    println("Java-convension - ${project.name} - checkstyle")
     configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
     showViolations = true
 }
 
 
 tasks.withType(Checkstyle).configureEach{
-    println("Java-convension - type-Checkstyle - ${project.name} - ${it.name}")
     reports {
         xml.required
         html.required
@@ -61,11 +57,8 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'utf-8'
 }
 
-//check.dependsOn jacocoTestCoverageVerification
-//jacocoTestCoverageVerification.dependsOn(jacocoTestReport)
 
 jacocoTestCoverageVerification {
-    println("Java-convension - ${project.name} jacocoTestCoverageVerification - 1")
     violationRules {
         rule {
             excludes = [

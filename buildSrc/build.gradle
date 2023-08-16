@@ -20,11 +20,3 @@ dependencies {
     implementation group: 'org.jacoco', name: 'org.jacoco.report', version: '0.8.7'
 }
 
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
-}
