@@ -18,15 +18,11 @@ dependencies {
     testImplementation libs.bundles.testing
 }
 
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform {
         excludeTags 'karateTest','integrationTest'
     }
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    finalizedBy jacocoTestReport
+
 }
 
 test{

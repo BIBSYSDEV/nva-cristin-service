@@ -20,7 +20,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform()
     testLogging {
         events 'skipped', 'passed', 'failed'

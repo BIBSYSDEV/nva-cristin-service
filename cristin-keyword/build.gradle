@@ -11,15 +11,10 @@ dependencies {
     testImplementation project(":cristin-testing")
 }
 
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform {
         excludeTags 'karateTest'
     }
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    finalizedBy jacocoTestReport
 }
 
 
