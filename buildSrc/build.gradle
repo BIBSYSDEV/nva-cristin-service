@@ -8,11 +8,12 @@ repositories {
     gradlePluginPortal()
 }
 
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
     gradleVersion = "8.2.1"
 }
-
 
 dependencies {
     implementation group: 'nebula.lint', name: 'nebula.lint.gradle.plugin', version: '17.8.0'

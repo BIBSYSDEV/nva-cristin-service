@@ -29,14 +29,6 @@ tasks.named('test') {
     finalizedBy jacocoTestReport
 }
 
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
-}
 test{
     environment "COGNITO_URI", "https://example.congito.org"
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"

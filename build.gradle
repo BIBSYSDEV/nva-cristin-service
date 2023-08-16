@@ -1,5 +1,3 @@
-
-
 plugins {
     id 'nva.cristin.service.core.rootplugin'
 }
@@ -7,6 +5,3 @@ plugins {
 allprojects{
     apply plugin: 'nva.cristin.service.core.java-conventions'
 }
-
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
