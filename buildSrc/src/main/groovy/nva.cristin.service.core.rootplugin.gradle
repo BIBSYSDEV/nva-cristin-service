@@ -27,14 +27,7 @@ reporting {
     }
 }
 
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
-}
+
 
 check {
     dependsOn testCodeCoverageReport
