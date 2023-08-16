@@ -127,7 +127,7 @@ public class SearchResponse<E> implements JsonSerializable {
         this.previousResults = previousResults;
     }
 
-    public List<?> getHits() {
+    public List<E> getHits() {
         return hits;
     }
 
@@ -226,10 +226,9 @@ public class SearchResponse<E> implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SearchResponse)) {
+        if (!(o instanceof SearchResponse<?> that)) {
             return false;
         }
-        SearchResponse<?> that = (SearchResponse<?>) o;
         return Objects.equals(getContext(), that.getContext())
                 && Objects.equals(getId(), that.getId())
                 && Objects.equals(getSize(), that.getSize())

@@ -106,10 +106,9 @@ public class Employment implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Employment)) {
+        if (!(o instanceof Employment that)) {
             return false;
         }
-        Employment that = (Employment) o;
         return Objects.equals(getContext(), that.getContext())
                && Objects.equals(getId(), that.getId())
                && Objects.equals(getType(), that.getType())
