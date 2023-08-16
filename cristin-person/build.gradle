@@ -22,10 +22,6 @@ tasks.named('test', Test) {
     useJUnitPlatform {
         excludeTags 'karateTest','integrationTest'
     }
-
-}
-
-test{
     environment "COGNITO_URI", "https://example.congito.org"
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
