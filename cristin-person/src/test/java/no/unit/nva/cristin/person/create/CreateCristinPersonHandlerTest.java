@@ -330,8 +330,7 @@ public class CreateCristinPersonHandlerTest {
         try (var outputStreamCaptor = new ByteArrayOutputStream()) {
             try (var printStream = new PrintStream(outputStreamCaptor)) {
                 System.setOut(printStream);
-                var response =
-                    sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
+                var response = sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
                 assertEquals(HTTP_CREATED, response.getStatusCode());
                 System.setOut(System.out);
             }

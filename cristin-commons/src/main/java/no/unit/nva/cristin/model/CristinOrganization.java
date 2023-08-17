@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Objects;
+import com.google.common.base.Objects;
 import java.util.Optional;
 import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
@@ -38,9 +38,9 @@ public class CristinOrganization {
      * Creates Organization from unit if present which is preferred or else falls back to institution.
      */
     public Organization extractPreferredTypeOfOrganization() {
-        Optional<Organization> unit = Optional.ofNullable(getInstitutionUnit())
+        var unit = Optional.ofNullable(getInstitutionUnit())
             .map(CristinUnit::toOrganization);
-        Optional<Organization> institution = Optional.ofNullable(getInstitution())
+        var institution = Optional.ofNullable(getInstitution())
             .map(CristinInstitution::toOrganization);
 
         return unit.orElse(institution.orElse(null));
@@ -70,20 +70,14 @@ public class CristinOrganization {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
-        CristinOrganization that = (CristinOrganization) o;
-
-        if (!Objects.equals(institution, that.institution)) {
-            return false;
-        }
-        return Objects.equals(institutionUnit, that.institutionUnit);
+        var that = (CristinOrganization) o;
+        return Objects.equal(institution, that.institution)
+               && Objects.equal(institutionUnit, that.institutionUnit);
     }
 
     @Override
     public int hashCode() {
-        int result = institution != null ? institution.hashCode() : 0;
-        result = 31 * result + (institutionUnit != null ? institutionUnit.hashCode() : 0);
-        return result;
+        return Objects.hashCode(institution, institutionUnit);
     }
 }
 

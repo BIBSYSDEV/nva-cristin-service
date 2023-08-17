@@ -38,8 +38,6 @@ jobs:
           distribution: corretto
       - name: Setup AWS SAM CLI
         uses: aws-actions/setup-sam@v1
-        with:
-          sam-version: "1.37.0"
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@master
         with:

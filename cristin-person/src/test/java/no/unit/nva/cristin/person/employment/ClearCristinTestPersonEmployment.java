@@ -2,6 +2,7 @@ package no.unit.nva.cristin.person.employment;
 
 import static no.unit.nva.cristin.common.Utils.CAN_UPDATE_ANY_INSTITUTION;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import java.util.Optional;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.employment.delete.DeletePersonEmploymentClient;
@@ -26,9 +27,8 @@ public class ClearCristinTestPersonEmployment {
     public static void clearEmployment(String personId) throws ApiGatewayException {
         var queryResponse =
             new QueryPersonEmploymentClient(CristinAuthenticator.getHttpClient()).generateQueryResponse(personId);
-        queryResponse.getHits()
-            .forEach(hit -> deleteEmployment(personId, hit));
-
+        Optional.of(queryResponse.getHits())
+            .ifPresent(hits -> hits.forEach(hit -> deleteEmployment(personId, hit)));
     }
 
     private static void deleteEmployment(String personId, Employment employment) {

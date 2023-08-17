@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.distinctByKey;
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
@@ -238,11 +239,14 @@ public class Person implements JsonSerializable {
      * Converts NVA formatted employments to Cristin formatted employments.
      */
     public static List<CristinPersonEmployment> mapEmploymentsToCristinEmployments(Set<Employment> employments) {
-        return Optional.ofNullable(employments)
-            .orElse(Collections.emptySet())
-            .stream()
-            .map(Employment::toCristinEmployment)
-            .toList();
+        if (isNull(employments)) {
+            return null;
+        }
+        return
+            employments
+                .stream()
+                .map(Employment::toCristinEmployment)
+                .toList();
     }
 
     @JacocoGenerated

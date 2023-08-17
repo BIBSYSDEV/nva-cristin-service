@@ -5,34 +5,16 @@ plugins {
     id 'jacoco-report-aggregation'
 }
 
-group 'no.unit.nva'
-version '1.0-JDK17'
-
-dependencies {
-    testImplementation libs.bundles.testing
-    implementation libs.bundles.nvaCommons
-    implementation libs.bundles.jackson
-    implementation libs.slf4j.api
-}
-
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
 }
 
-tasks.named('test', Test) {
-    useJUnitPlatform()
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    environment "ALLOWED_ORIGIN", "*"
-    environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
-    environment "BASE_PATH", "cristin"
-    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
-    environment "COGNITO_URI", "https://example.cognito.org"
-    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
-    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
-    finalizedBy jacocoTestReport
+dependencies {
+    implementation libs.bundles.nvaCommons
+    implementation libs.bundles.jackson
+    implementation libs.slf4j.api
+    testImplementation libs.bundles.testing
 }
 
 sourceSets {
@@ -44,33 +26,7 @@ sourceSets {
     }
 }
 
-pmd {
-    toolVersion = '6.20.0'
-    ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
-    ruleSets = []
-    ignoreFailures = false
-}
-
-checkstyle {
-    configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
-    showViolations = true
-}
-
-
-tasks.withType(Checkstyle).configureEach{
-    reports {
-        xml.required
-        html.required
-        html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'utf-8'
-}
-
-
-jacocoTestCoverageVerification {
+tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
     violationRules {
         rule {
             excludes = [
@@ -96,19 +52,19 @@ jacocoTestCoverageVerification {
     dependsOn jacocoTestReport
 }
 
-
-tasks.register('karateTest', Test) {
-    useJUnitPlatform {
-        includeTags('karateTest')
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    testLogging {
+        events 'skipped', 'passed', 'failed'
     }
-
     environment "ALLOWED_ORIGIN", "*"
     environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
+    environment "BASE_PATH", "cristin"
     environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
-
-    systemProperty "karate.options", System.properties.getProperty("karate.options")
-    systemProperty "karate.env", System.properties.getProperty("karate.env")
-    outputs.upToDateWhen { false }
+    environment "COGNITO_URI", "https://example.cognito.org"
+    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
+    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
+    finalizedBy jacocoTestReport
 }
 
 tasks.register('createTestUsers', Test) {
@@ -127,5 +83,41 @@ tasks.register('deleteTestUsers', Test) {
     outputs.upToDateWhen { false }
 }
 
+tasks.register('karateTest', Test) {
+    useJUnitPlatform {
+        includeTags('karateTest')
+    }
 
+    environment "ALLOWED_ORIGIN", "*"
+    environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
+    environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
 
+    systemProperty "karate.options", System.properties.getProperty("karate.options")
+    systemProperty "karate.env", System.properties.getProperty("karate.env")
+    outputs.upToDateWhen { false }
+}
+
+tasks.register('checkstyle', Checkstyle) {
+    configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
+    showViolations = true
+}
+
+tasks.register('pmd', Pmd) {
+
+    toolVersion = '7.0.0-rc3'
+    ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
+    ruleSets = []
+    ignoreFailures = false
+}
+
+tasks.withType(Checkstyle).configureEach{
+    reports {
+        xml.required
+        html.required
+        html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'utf-8'
+}

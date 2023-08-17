@@ -47,7 +47,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
-        UpdatePersonInstitutionInfoClient apiClient = new UpdatePersonInstitutionInfoClient(httpClientMock);
+        var apiClient = new UpdatePersonInstitutionInfoClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new UpdatePersonInstitutionInfoHandler(apiClient, environment);
@@ -55,7 +55,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldReturnNoContentResponseWhenCallingHandlerWithValidData() throws IOException {
-        GatewayResponse<Object> gatewayResponse = sendQuery(validPath, defaultBody());
+        var gatewayResponse = sendQuery(validPath, defaultBody());
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
         assertEquals(EMPTY_JSON, gatewayResponse.getBody());
@@ -63,7 +63,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
-        GatewayResponse<String> gatewayResponse = queryWithoutRequiredAccessRights(defaultBody());
+        var gatewayResponse = queryWithoutRequiredAccessRights(defaultBody());
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
