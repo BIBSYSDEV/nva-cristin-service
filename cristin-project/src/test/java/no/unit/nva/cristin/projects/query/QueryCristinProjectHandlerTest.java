@@ -86,7 +86,7 @@ import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
 
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+
 class QueryCristinProjectHandlerTest {
 
     public static final String LANGUAGE_NB = "nb";

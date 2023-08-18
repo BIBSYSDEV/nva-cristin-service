@@ -125,7 +125,7 @@ public class CristinPersonEmployment implements JsonSerializable {
             .addChild(personId).addChild(EMPLOYMENT_PATH).addChild(getId()).getUri() : null;
     }
 
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+    
     private URI generateTypeUri() {
         var uri = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).getUri();
         return

@@ -5,13 +5,9 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
-import java.io.Serial;
 import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
 
 public class PersonInstInfoPatchSerializer extends StdSerializer<PersonInstInfoPatch> {
-
-    @Serial
-    private static final long serialVersionUID = -3456674536341L;
 
     public static final String EMAIL_FIELD = "email";
     public static final String PHONE_FIELD = "phone";

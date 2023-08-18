@@ -8,7 +8,7 @@ import no.unit.nva.utils.ResourceAccessCheck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+
 public class FetchCristinProjectResourceAccessCheck extends ProjectResourceAccessCheck
     implements ResourceAccessCheck<NvaProject> {
 

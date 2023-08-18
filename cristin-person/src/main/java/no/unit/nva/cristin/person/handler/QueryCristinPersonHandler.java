@@ -53,7 +53,7 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     }
 
     @Override
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+    
     protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 

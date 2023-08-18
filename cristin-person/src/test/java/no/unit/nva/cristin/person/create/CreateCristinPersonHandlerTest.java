@@ -71,7 +71,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+
 public class CreateCristinPersonHandlerTest {
 
     private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";

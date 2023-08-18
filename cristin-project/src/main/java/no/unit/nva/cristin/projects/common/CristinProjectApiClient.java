@@ -17,7 +17,7 @@ import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.attempt.Try;
 
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+
 public class CristinProjectApiClient extends ApiClient {
 
     /**

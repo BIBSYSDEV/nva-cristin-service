@@ -10,7 +10,7 @@ import static no.unit.nva.cristin.common.Utils.isPositiveInteger;
 import static no.unit.nva.cristin.model.CristinUnit.isCristinUnitIdentifier;
 import static no.unit.nva.cristin.model.JsonPropertyNames.UNIT;
 
-@SuppressWarnings({"unused", "PMD.DataflowAnomalyAnalysis"})
+@SuppressWarnings({"unused"})
 @JacocoGenerated
 public class CristinOrganization {
 

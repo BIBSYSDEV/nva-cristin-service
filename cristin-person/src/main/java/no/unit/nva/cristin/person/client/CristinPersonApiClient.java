@@ -117,7 +117,7 @@ public class CristinPersonApiClient extends ApiClient {
                 : combineResultsWithQueryInCaseEnrichmentFails(personsFromQuery, enrichedCristinPersons);
     }
 
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+    
     protected List<CristinPerson> combineResultsWithQueryInCaseEnrichmentFails(List<CristinPerson> personsFromQuery,
                                                                                List<CristinPerson> enrichedPersons) {
         final var enrichedPersonIds =

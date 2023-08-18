@@ -44,7 +44,7 @@ import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+
 public class FetchPersonInstitutionInfoHandlerTest {
 
     private static final String EMPTY_JSON = "{}";

@@ -24,7 +24,7 @@ public class UpdateProjectResourceAccessCheck extends ProjectResourceAccessCheck
 
     private transient boolean verified;
 
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+    
     @Override
     public void verifyAccess(NvaProject resource, Map<String, String> params) {
         var userIdentifier = params.get(USER_IDENTIFIER);

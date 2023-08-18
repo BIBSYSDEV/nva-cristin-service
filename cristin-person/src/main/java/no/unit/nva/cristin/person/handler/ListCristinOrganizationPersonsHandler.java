@@ -71,7 +71,7 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
      * @throws ApiGatewayException all exceptions are caught by writeFailure and mapped to error codes through the
      *                             method {@link RestRequestHandler#getFailureStatusCode}
      */
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+    
     @Override
     protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {

@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatterBuilder;
 
 public class CustomInstantSerializer extends StdSerializer<Instant> {
 
-    private static final long serialVersionUID = -3456457891L;
     private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendInstant(3).toFormatter();
 
     public CustomInstantSerializer() {

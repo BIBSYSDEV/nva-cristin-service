@@ -106,7 +106,7 @@ public class CristinPersonPatchJsonCreator {
         }
     }
 
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+    
     private void addEmployments() {
         if (input.has(EMPLOYMENTS) && !input.get(EMPLOYMENTS).isNull()) {
             var employmentsInCristinFormat =
@@ -123,7 +123,7 @@ public class CristinPersonPatchJsonCreator {
         return employments.stream().map(Employment::toCristinEmployment).collect(Collectors.toList());
     }
 
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+    
     private void addKeywords() {
         if (input.has(KEYWORDS) && !input.get(KEYWORDS).isNull()) {
             var keywordsInCristinFormat =

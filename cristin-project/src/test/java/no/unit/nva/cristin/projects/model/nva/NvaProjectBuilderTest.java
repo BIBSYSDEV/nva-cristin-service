@@ -16,7 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+
 public class NvaProjectBuilderTest {
 
     private static final String API_RESPONSE_ONE_NVA_PROJECT_JSON =

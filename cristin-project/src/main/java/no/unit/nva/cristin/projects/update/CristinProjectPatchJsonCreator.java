@@ -69,7 +69,7 @@ import static no.unit.nva.utils.CustomInstantSerializer.addMillisToInstantString
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.core.attempt.Try.attempt;
 
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+
 public class CristinProjectPatchJsonCreator {
 
     public static final String CRISTIN_COORDINATING_INSTITUTION = "coordinating_institution";
