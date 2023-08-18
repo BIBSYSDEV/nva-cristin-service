@@ -58,24 +58,25 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
 
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
+        var objectNode = readJsonFromInput(input);
+        var personId = getValidPersonId(requestInfo);
+
         if (clientCanUpdateAllFields(requestInfo)) {
-            var objectNode = readJsonFromInput(input);
             PersonPatchValidator.validate(objectNode);
-            var cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
+            ObjectNode cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
             checkHasFields(cristinJson);
 
             if (cristinJson.has(CRISTIN_EMPLOYMENTS)) {
-                return apiClient.updatePersonInCristin(
-                    getValidPersonId(requestInfo), cristinJson, extractCristinInstitutionIdentifier(requestInfo));
+                return apiClient.updatePersonInCristin(personId, cristinJson,
+                                                       extractCristinInstitutionIdentifier(requestInfo));
             } else {
-                return apiClient.updatePersonInCristin(getValidPersonId(requestInfo), cristinJson);
+                return apiClient.updatePersonInCristin(personId, cristinJson);
             }
         } else if (clientCanUpdateOwnData(requestInfo)) {
-            var objectNode = readJsonFromInput(input);
             String personIdFromCognito = parseLastPartOfPersonCristinIdFromCognito(requestInfo).orElseThrow();
-            checkIdentifiersMatch(getValidPersonId(requestInfo), personIdFromCognito);
+            checkIdentifiersMatch(personId, personIdFromCognito);
             PersonPatchValidator.validateOrcidIfPresent(objectNode);
-            var cristinJson =
+            ObjectNode cristinJson =
                 new CristinPersonPatchJsonCreator(objectNode).createWithAllowedUserModifiableData().getOutput();
             checkHasFields(cristinJson);
 

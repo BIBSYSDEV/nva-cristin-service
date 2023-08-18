@@ -192,8 +192,8 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
 
     private void validateDescription(ObjectNode input, String fieldName) throws BadRequestException {
         if (input.has(fieldName)) {
-            attempt(() -> convertToMap(input.get(fieldName)))
-                .orElseThrow(failure -> notAMapException(fieldName));
+            var description = input.get(fieldName);
+            attempt(() -> convertToMap(description)).orElseThrow(failure -> notAMapException(fieldName));
         }
     }
 
@@ -242,8 +242,8 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
 
     private void validateWebPage(ObjectNode input) throws BadRequestException {
         if (input.has(WEB_PAGE) && !input.get(WEB_PAGE).isNull()) {
-            attempt(() -> URI.create(input.get(WEB_PAGE).asText()))
-                .orElseThrow(failure -> fieldIsNotUri());
+            var webPage = input.get(WEB_PAGE).asText();
+            attempt(() -> URI.create(webPage)).orElseThrow(failure -> fieldIsNotUri());
         }
     }
 
