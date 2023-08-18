@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
-    id 'checkstyle'
     id 'pmd'
+    id 'checkstyle'
     id 'jacoco-report-aggregation'
 }
 
@@ -21,7 +21,12 @@ sourceSets {
     test {
         resources {
             srcDir file('src/test/java')
-            exclude '**/*.java'
+            exclude '**/*.java' , '*/*.xml'
+        }
+    }
+    check {
+        resources {
+            exclude '**/*.java' , '*/*.xml'
         }
     }
 }
@@ -97,17 +102,17 @@ tasks.register('karateTest', Test) {
     outputs.upToDateWhen { false }
 }
 
-tasks.register('checkstyle', Checkstyle) {
-    configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
-    showViolations = true
-}
-
-tasks.register('pmd', Pmd) {
-
-    toolVersion = '7.0.0-rc3'
+pmd {
+    toolVersion = '6.55.0'
     ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
     ruleSets = []
     ignoreFailures = false
+}
+
+checkstyle {
+    configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
+
+    showViolations = true
 }
 
 tasks.withType(Checkstyle).configureEach{

@@ -27,7 +27,7 @@ public class ClearCristinTestPersonEmployment {
     public static void clearEmployment(String personId) throws ApiGatewayException {
         var queryResponse =
             new QueryPersonEmploymentClient(CristinAuthenticator.getHttpClient()).generateQueryResponse(personId);
-        Optional.of(queryResponse.getHits())
+        Optional.ofNullable(queryResponse.getHits())
             .ifPresent(hits -> hits.forEach(hit -> deleteEmployment(personId, hit)));
     }
 

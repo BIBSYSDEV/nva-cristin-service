@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.List;
-import java.util.Optional;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -238,6 +237,7 @@ public class Person implements JsonSerializable {
     /**
      * Converts NVA formatted employments to Cristin formatted employments.
      */
+    @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
     public static List<CristinPersonEmployment> mapEmploymentsToCristinEmployments(Set<Employment> employments) {
         if (isNull(employments)) {
             return null;

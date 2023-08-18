@@ -21,7 +21,8 @@ import no.unit.nva.model.Organization;
 import no.unit.nva.model.DateInfo;
 import no.unit.nva.model.TypedLabel;
 
-@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyFields"})
+@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyFields", "PMD.GodClass", "PMD"
+        + ".ClassWithOnlyPrivateConstructorsShouldBeFinal"})
 @JsonInclude(ALWAYS)
 public class NvaProject implements JsonSerializable {
 
@@ -379,55 +380,54 @@ public class NvaProject implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof NvaProject)) {
+        if (!(o instanceof NvaProject that)) {
             return false;
         }
-        NvaProject that = (NvaProject) o;
         return Objects.equals(getContext(), that.getContext())
-               && Objects.equals(getId(), that.getId())
-               && Objects.equals(getType(), that.getType())
-               && Objects.equals(getIdentifiers(), that.getIdentifiers())
-               && Objects.equals(getTitle(), that.getTitle())
-               && Objects.equals(getLanguage(), that.getLanguage())
-               && Objects.equals(getAlternativeTitles(), that.getAlternativeTitles())
-               && Objects.equals(getStartDate(), that.getStartDate())
-               && Objects.equals(getEndDate(), that.getEndDate())
-               && Objects.equals(getFunding(), that.getFunding())
-               && Objects.equals(getCoordinatingInstitution(), that.getCoordinatingInstitution())
-               && Objects.equals(getContributors(), that.getContributors())
-               && getStatus() == that.getStatus()
-               && Objects.equals(getAcademicSummary(), that.getAcademicSummary())
-               && Objects.equals(getPopularScientificSummary(), that.getPopularScientificSummary())
-               && Objects.equals(getPublished(), that.getPublished())
-               && Objects.equals(getPublishable(), that.getPublishable())
-               && Objects.equals(getCreated(), that.getCreated())
-               && Objects.equals(getLastModified(), that.getLastModified())
-               && Objects.equals(getContactInfo(), that.getContactInfo())
-               && Objects.equals(getFundingAmount(), that.getFundingAmount())
-               && Objects.equals(getMethod(), that.getMethod())
-               && Objects.equals(getEquipment(), that.getEquipment())
-               && Objects.equals(getProjectCategories(), that.getProjectCategories())
-               && Objects.equals(getKeywords(), that.getKeywords())
-               && Objects.equals(getExternalSources(), that.getExternalSources())
-               && Objects.equals(getRelatedProjects(), that.getRelatedProjects())
-               && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch())
-               && Objects.equals(getHealthProjectData(), that.getHealthProjectData())
-               && Objects.equals(getApprovals(), that.getApprovals())
-               && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure())
-               && Objects.equals(getCreator(), that.getCreator())
-               && Objects.equals(getWebPage(), that.getWebPage());
+            && Objects.equals(getId(), that.getId())
+            && Objects.equals(getType(), that.getType())
+            && Objects.equals(getIdentifiers(), that.getIdentifiers())
+            && Objects.equals(getTitle(), that.getTitle())
+            && Objects.equals(getLanguage(), that.getLanguage())
+            && Objects.equals(getAlternativeTitles(), that.getAlternativeTitles())
+            && Objects.equals(getStartDate(), that.getStartDate())
+            && Objects.equals(getEndDate(), that.getEndDate())
+            && Objects.equals(getFunding(), that.getFunding())
+            && Objects.equals(getCoordinatingInstitution(), that.getCoordinatingInstitution())
+            && Objects.equals(getContributors(), that.getContributors())
+            && getStatus() == that.getStatus()
+            && Objects.equals(getAcademicSummary(), that.getAcademicSummary())
+            && Objects.equals(getPopularScientificSummary(), that.getPopularScientificSummary())
+            && Objects.equals(getPublished(), that.getPublished())
+            && Objects.equals(getPublishable(), that.getPublishable())
+            && Objects.equals(getCreated(), that.getCreated())
+            && Objects.equals(getLastModified(), that.getLastModified())
+            && Objects.equals(getContactInfo(), that.getContactInfo())
+            && Objects.equals(getFundingAmount(), that.getFundingAmount())
+            && Objects.equals(getMethod(), that.getMethod())
+            && Objects.equals(getEquipment(), that.getEquipment())
+            && Objects.equals(getProjectCategories(), that.getProjectCategories())
+            && Objects.equals(getKeywords(), that.getKeywords())
+            && Objects.equals(getExternalSources(), that.getExternalSources())
+            && Objects.equals(getRelatedProjects(), that.getRelatedProjects())
+            && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch())
+            && Objects.equals(getHealthProjectData(), that.getHealthProjectData())
+            && Objects.equals(getApprovals(), that.getApprovals())
+            && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure())
+            && Objects.equals(getCreator(), that.getCreator())
+            && Objects.equals(getWebPage(), that.getWebPage());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getContext(), getId(), getType(), getIdentifiers(), getTitle(), getLanguage(),
-                            getAlternativeTitles(), getStartDate(), getEndDate(), getFunding(),
-                            getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
-                            getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
-                            getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
-                            getProjectCategories(), getKeywords(), getExternalSources(), getRelatedProjects(),
-                            getInstitutionsResponsibleForResearch(), getHealthProjectData(), getApprovals(),
-                            getExemptFromPublicDisclosure(), getCreator(), getWebPage());
+            getAlternativeTitles(), getStartDate(), getEndDate(), getFunding(),
+            getCoordinatingInstitution(), getContributors(), getStatus(), getAcademicSummary(),
+            getPopularScientificSummary(), getPublished(), getPublishable(), getCreated(),
+            getLastModified(), getContactInfo(), getFundingAmount(), getMethod(), getEquipment(),
+            getProjectCategories(), getKeywords(), getExternalSources(), getRelatedProjects(),
+            getInstitutionsResponsibleForResearch(), getHealthProjectData(), getApprovals(),
+            getExemptFromPublicDisclosure(), getCreator(), getWebPage());
     }
 
     @Override
