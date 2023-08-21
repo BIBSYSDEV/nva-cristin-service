@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
+import java.util.Objects;
 import java.util.Optional;
 import no.unit.nva.model.Organization;
 import nva.commons.core.JacocoGenerated;
@@ -67,17 +67,16 @@ public class CristinOrganization {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof CristinOrganization that)) {
             return false;
         }
-        var that = (CristinOrganization) o;
-        return Objects.equal(institution, that.institution)
-               && Objects.equal(institutionUnit, that.institutionUnit);
+        return Objects.equals(getInstitution(), that.getInstitution())
+               && Objects.equals(getInstitutionUnit(), that.getInstitutionUnit());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(institution, institutionUnit);
+        return Objects.hash(getInstitution(), getInstitutionUnit());
     }
 }
 

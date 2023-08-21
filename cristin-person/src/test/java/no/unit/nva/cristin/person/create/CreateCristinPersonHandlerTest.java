@@ -328,12 +328,13 @@ public class CreateCristinPersonHandlerTest {
     @Test
     void shouldLogClientSpecificIdentifiersWhenDoingAuthorizedRequests() throws IOException {
         try (var outputStreamCaptor = new ByteArrayOutputStream()) {
-            try (var printStream = new PrintStream(outputStreamCaptor)) {
-                System.setOut(printStream);
+            var currentPrintSteam = System.out;
+            try (var newPrintStream = new PrintStream(outputStreamCaptor)) {
+                System.setOut(newPrintStream);
                 var response = sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
                 assertEquals(HTTP_CREATED, response.getStatusCode());
-                System.setOut(System.out);
             }
+            System.setOut(currentPrintSteam);
             assertThat(outputStreamCaptor.toString(), Matchers.containsString(LOG_MESSAGE_FOR_IDENTIFIERS));
         }
     }

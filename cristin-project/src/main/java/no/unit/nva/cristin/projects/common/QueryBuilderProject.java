@@ -100,14 +100,13 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
             case QUERY -> withQuery(value);
             case STATUS -> withStatus(value);
             case APPROVAL_REFERENCE_ID, APPROVED_BY,
-                     FUNDING, FUNDING_SOURCE,
-                     GRANT_ID, INSTITUTION,
-                     LEVELS, MODIFIED_SINCE,
-                     NAME, PROJECT_MANAGER,
-                     PROJECT_UNIT, TITLE,
-                     USER, PAGE_CURRENT,
-                     PAGE_ITEMS_PER_PAGE, PAGE_SORT ->
-                query.setValue(qpKey, value);
+                 FUNDING, FUNDING_SOURCE,
+                 GRANT_ID, INSTITUTION,
+                 LEVELS, MODIFIED_SINCE,
+                 NAME, PROJECT_MANAGER,
+                 PROJECT_UNIT, TITLE,
+                 USER, PAGE_CURRENT,
+                 PAGE_ITEMS_PER_PAGE, PAGE_SORT -> query.setValue(qpKey, value);
             case CREATOR -> withCreator(value);
             default -> invalidKeys.add(key);
         }
