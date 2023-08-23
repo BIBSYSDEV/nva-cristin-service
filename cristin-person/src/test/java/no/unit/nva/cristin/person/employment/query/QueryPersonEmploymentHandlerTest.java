@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.Test;
 
 public class QueryPersonEmploymentHandlerTest {
 
+    public static final TypeReference<SearchResponse<Employment>> SEARCH_RESPONSE_REF = new TypeReference<>() {};
     private static final String VALID_PERSON_ID = "123456";
     private static final String INVALID_IDENTIFIER = "hello";
     private static final String EMPTY_ARRAY = "[]";
@@ -69,7 +71,7 @@ public class QueryPersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
-        GatewayResponse<SearchResponse> gatewayResponse = queryWithoutRequiredAccessRights();
+        var gatewayResponse = queryWithoutRequiredAccessRights();
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -77,19 +79,18 @@ public class QueryPersonEmploymentHandlerTest {
 
     @Test
     void shouldReturnStatusOkWithDataInResponseMatchingUpstreamWhenSuccessfulQuery() throws IOException {
-        List<Employment> expectedEmployments = extractHitsFromSearchResponse(readExpectedResponse());
-        GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
-        SearchResponse response = gatewayResponse.getBodyObject(SearchResponse.class);
-        List<Employment> actualEmployments = extractHitsFromSearchResponse(response);
+        var expectedEmployments = extractHitsFromSearchResponse(readExpectedResponse());
+        var gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
+        var actualEmployments = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SEARCH_RESPONSE_REF);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
-        assertEquals(actualEmployments.size(), 2);
-        assertThat(actualEmployments.containsAll(expectedEmployments), equalTo(true));
+        assertEquals(actualEmployments.getHits().size(), 2);
+        assertThat(actualEmployments.getHits().containsAll(expectedEmployments), equalTo(true));
     }
 
     @Test
     void shouldReturnBadRequestWhenCallingHandlerWithInvalidIdentifier() throws IOException {
-        GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, INVALID_IDENTIFIER));
+        var gatewayResponse = sendQuery(Map.of(PERSON_ID, INVALID_IDENTIFIER));
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidPathParameterMessage(PERSON_ID)));
@@ -101,8 +102,8 @@ public class QueryPersonEmploymentHandlerTest {
         apiClient = new QueryPersonEmploymentClient(clientMock);
         handler = new QueryPersonEmploymentHandler(apiClient, environment);
 
-        GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
-        SearchResponse response = gatewayResponse.getBodyObject(SearchResponse.class);
+        var gatewayResponse = this.<Employment>sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
+        var response = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SEARCH_RESPONSE_REF);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertThat(response.getHits().size(), equalTo(0));
@@ -116,7 +117,7 @@ public class QueryPersonEmploymentHandlerTest {
         apiClient = new QueryPersonEmploymentClient(clientMock);
         handler = new QueryPersonEmploymentHandler(apiClient, environment);
 
-        GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
+        var gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(BAD_REQUEST_FROM_UPSTREAM));
@@ -127,45 +128,51 @@ public class QueryPersonEmploymentHandlerTest {
         when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(ONE_EMPTY_RESULT, 200));
         apiClient = new QueryPersonEmploymentClient(clientMock);
         handler = new QueryPersonEmploymentHandler(apiClient, environment);
-        GatewayResponse<SearchResponse> gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
-
+        var gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
     }
 
-    private List<Employment> extractHitsFromSearchResponse(SearchResponse response) {
-        return OBJECT_MAPPER.convertValue(response.getHits(), new TypeReference<>() {
-        });
+    private List<Employment> extractHitsFromSearchResponse(SearchResponse<?> response) {
+        return OBJECT_MAPPER.convertValue(response.getHits(), new TypeReference<List<Employment>>() { });
     }
 
-    private SearchResponse readExpectedResponse() throws JsonProcessingException {
+    private SearchResponse<?> readExpectedResponse() throws JsonProcessingException {
         return OBJECT_MAPPER.readValue(EXPECTED_NVA_RESPONSE, SearchResponse.class);
     }
 
-    private GatewayResponse<SearchResponse> queryWithoutRequiredAccessRights() throws IOException {
-        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-            .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID))
-            .build();
-        handler.handleRequest(input, output, context);
-
-        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
+    private <T> GatewayResponse<SearchResponse<T>> queryWithoutRequiredAccessRights() throws IOException {
+        try (var input = getQueryNoAccess()) {
+            handler.handleRequest(input, output, context);
+        }
+        return OBJECT_MAPPER.readValue(output.toString(StandardCharsets.UTF_8), getTypeRef());
     }
 
-    private GatewayResponse<SearchResponse> sendQuery(Map<String, String> pathParam)
-        throws IOException {
+    private <T> GatewayResponse<SearchResponse<T>> sendQuery(Map<String, String> pathParam) throws IOException {
 
-        InputStream input = requestWithParams(pathParam);
-        handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        try (var input = requestWithParams(pathParam)) {
+            handler.handleRequest(input, output, context);
+        }
+        return OBJECT_MAPPER.readValue(output.toString(StandardCharsets.UTF_8), getTypeRef());
     }
 
-    private InputStream requestWithParams(Map<String, String> pathParams)
-        throws JsonProcessingException {
+    private <T> TypeReference<GatewayResponse<SearchResponse<T>>> getTypeRef() {
+        return new TypeReference<>() {
+        };
+    }
+
+    private InputStream requestWithParams(Map<String, String> pathParams) throws JsonProcessingException {
         var customerId = randomUri();
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .withPathParameters(pathParams)
             .build();
+    }
+
+    private InputStream getQueryNoAccess() throws JsonProcessingException {
+        return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                   .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID))
+                   .build();
     }
 }

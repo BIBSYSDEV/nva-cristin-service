@@ -64,6 +64,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
+
 class CreateCristinProjectHandlerTest {
 
     public static final String NO_ACCESS = "NoAccess";
@@ -278,14 +279,15 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenHealthProjectDataTypePresentButInvalid() throws Exception {
-        String json = getProjectPostRequestJsonSample();
-        String jsonToReplace = HEALTH_PROJECT_TYPE_JSON_FIELD;
+        var json = getProjectPostRequestJsonSample();
+        var jsonToReplace = HEALTH_PROJECT_TYPE_JSON_FIELD;
 
-        String expected = json.replace(String.format(jsonToReplace, DRUGSTUDY.getType()),
+        var expected = json.replace(String.format(jsonToReplace, DRUGSTUDY.getType()),
                                        String.format(jsonToReplace, INVALIDVALUE));
 
-        var input = getInputStreamFromString(expected);
-        handler.handleRequest(input, output, context);
+        try (var input = getInputStreamFromString(expected)) {
+            handler.handleRequest(input, output, context);
+        }
         var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
@@ -294,15 +296,15 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenHealthProjectDataClinicalPhasePresentButInvalid() throws Exception {
-        String json = getProjectPostRequestJsonSample();
-        String jsonToReplace = CLINICAL_TRIAL_PHASE_JSON_FIELD;
+        var json = getProjectPostRequestJsonSample();
+        var jsonToReplace = CLINICAL_TRIAL_PHASE_JSON_FIELD;
 
-        String expected = json.replace(String.format(jsonToReplace, PHASE_THREE.getPhase()),
+        var expected = json.replace(String.format(jsonToReplace, PHASE_THREE.getPhase()),
                                        String.format(jsonToReplace, INVALIDVALUE));
 
-
-        InputStream input = getInputStreamFromString(expected);
-        handler.handleRequest(input, output, context);
+        try (InputStream input = getInputStreamFromString(expected)) {
+            handler.handleRequest(input, output, context);
+        }
         var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
@@ -635,7 +637,8 @@ class CreateCristinProjectHandlerTest {
         var cristinProject = request.toCristinProject();
         addMockedResponseFieldsToCristinProject(cristinProject, request);
         var httpResponse = new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(cristinProject), 201);
-        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+        when(mockHttpClient.send(any(), any()))
+            .thenAnswer(response -> httpResponse);
     }
 
     private void addMockedResponseFieldsToCristinProject(CristinProject cristinProject, NvaProject request) {

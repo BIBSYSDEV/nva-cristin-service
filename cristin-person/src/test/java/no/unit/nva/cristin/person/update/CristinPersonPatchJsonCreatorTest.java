@@ -23,7 +23,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Arrays;
 import java.util.Collections;
 import no.unit.nva.cristin.model.CristinTypedLabel;
@@ -38,6 +37,7 @@ public class CristinPersonPatchJsonCreatorTest {
     private static final String SOME_NAME = randomString();
     private static final String SOME_OTHER_NAME = randomString();
     private static final String SOME_PREFERRED_NAME = randomString();
+    public static final String END_OF_LITERAL = "\" , ";
 
     @Test
     void shouldParseInputJsonIntoCristinJsonWithCorrectMappingOfFields() {
@@ -126,10 +126,10 @@ public class CristinPersonPatchJsonCreatorTest {
         var cristinEmployment = employment.toCristinEmployment();
         var rawJson =
             "{ \"employments\": [ { "
-            + "\"type\": \"" + employment.getType() + "\" , "
-            + "\"organization\": \"" + employment.getOrganization() + "\" , "
-            + "\"startDate\": \"" + employment.getStartDate().toString() + "\" , "
-            + "\"endDate\": \"" + employment.getEndDate().toString() + "\" , "
+            + "\"type\": \"" + employment.getType() + END_OF_LITERAL
+            + "\"organization\": \"" + employment.getOrganization() + END_OF_LITERAL
+            + "\"startDate\": \"" + employment.getStartDate().toString() + END_OF_LITERAL
+            + "\"endDate\": \"" + employment.getEndDate().toString() + END_OF_LITERAL
             + "\"fullTimeEquivalentPercentage\": \"" + employment.getFullTimeEquivalentPercentage() + "\""
             + " } ] }";
         var json = readJsonFromInput(rawJson);

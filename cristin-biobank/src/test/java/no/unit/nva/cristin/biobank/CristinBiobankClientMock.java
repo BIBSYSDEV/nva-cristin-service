@@ -1,15 +1,18 @@
 package no.unit.nva.cristin.biobank;
 
-import static java.util.Objects.nonNull;
+import java.net.URI;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.function.Predicate;
 import no.unit.nva.biobank.client.CristinBiobankApiClient;
 import no.unit.nva.biobank.model.ParameterKeyBiobank;
 import no.unit.nva.biobank.model.QueryBiobank;
+import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.stubs.WiremockHttpClient;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.ioutils.IoUtils;
 
 public class CristinBiobankClientMock extends CristinBiobankApiClient {
@@ -34,16 +37,17 @@ public class CristinBiobankClientMock extends CristinBiobankApiClient {
 
     @Override
     protected HttpResponse<String> httpRequestWithStatusCheck(QueryBiobank query) throws ApiGatewayException {
-        var biobankid = query.getValue(ParameterKeyBiobank.PATH_BIOBANK);
+        Predicate<String> containsBioBank = e -> e.contains(query.getValue(ParameterKeyBiobank.PATH_BIOBANK));
         var body = Arrays.stream(responseBody)
-                       .filter(s -> s.contains(biobankid))
-                       .findFirst()
-                       .orElse(null);
-        if (nonNull(body)) {
-            checkHttpStatusCode(query.toURI(), 200, body);
-        } else {
-            checkHttpStatusCode(query.toURI(), 404, notfoundBody);
-        }
+                .filter(containsBioBank)
+                .findFirst()
+                .orElseThrow(() -> throwNotFoundException(query.toURI()));
         return new HttpResponseFaker(body);
+    }
+
+
+    private static NotFoundException throwNotFoundException(URI uri) {
+        var errorMessage = String.format(ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, uri);
+        return new NotFoundException(errorMessage);
     }
 }

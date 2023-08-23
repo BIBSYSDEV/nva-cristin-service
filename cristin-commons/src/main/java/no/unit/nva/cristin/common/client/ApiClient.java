@@ -224,10 +224,8 @@ public class ApiClient {
     protected void checkHttpStatusCode(URI uri, int statusCode, String body)
             throws NotFoundException, BadGatewayException, BadRequestException, UnauthorizedException {
 
-        String uriAsString = Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
-
         if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
-            String msg = String.format(ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, uriAsString);
+            var msg = String.format(ErrorMessages.ERROR_MESSAGE_IDENTIFIER_NOT_FOUND_FOR_URI, getUriAsString(uri));
             throw new NotFoundException(msg);
         } else if (statusCode == HttpURLConnection.HTTP_BAD_REQUEST) {
             throw new BadRequestException(ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST);
@@ -237,12 +235,16 @@ public class ApiClient {
             logger.warn(FORBIDDEN_THIS_MIGHT_BE_AN_CONFIGURATION_ERROR);
             throw new BadGatewayException(RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER);
         } else if (remoteServerHasInternalProblems(statusCode)) {
-            logBackendFetchFail(uriAsString, statusCode, body);
+            logBackendFetchFail(getUriAsString(uri), statusCode, body);
             throw new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         } else if (errorIsUnknown(statusCode)) {
-            logBackendFetchFail(uriAsString, statusCode, body);
+            logBackendFetchFail(getUriAsString(uri), statusCode, body);
             throw new RuntimeException();
         }
+    }
+
+    private String getUriAsString(URI uri) {
+        return Optional.ofNullable(uri).map(URI::toString).orElse(EMPTY_STRING);
     }
 
     private boolean errorIsUnknown(int statusCode) {

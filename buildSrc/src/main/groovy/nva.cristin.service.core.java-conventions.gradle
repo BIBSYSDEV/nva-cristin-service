@@ -1,52 +1,94 @@
 plugins {
-    id 'java'
-    id 'checkstyle'
+    id 'java-library'
     id 'pmd'
-    id 'jacoco'
-    id 'base'
+    id 'checkstyle'
+    id 'jacoco-report-aggregation'
 }
-
-group 'no.unit.nva'
-version '1.0-SNAPSHOT'
-
-dependencies {
-    testImplementation libs.bundles.testing
-    implementation libs.bundles.nvaCommons
-    implementation libs.bundles.jackson
-    implementation libs.slf4j.api
-}
-
-sourceCompatibility = JavaVersion.VERSION_11  // source-code version and must be <= targetCompatibility
-targetCompatibility = JavaVersion.VERSION_11 // bytecode target version
 
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
 }
 
-compileJava.options.encoding = 'utf-8'
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'utf-8'
+dependencies {
+    implementation libs.bundles.nvaCommons
+    implementation libs.bundles.jackson
+    implementation libs.slf4j.api
+    testImplementation libs.bundles.testing
 }
 
-tasks.named('test') {
+sourceSets {
+    test {
+        resources {
+            srcDir file('src/test/java')
+            exclude '**/*.java' , '*/*.xml'
+        }
+    }
+    check {
+        resources {
+            exclude '**/*.java' , '*/*.xml'
+        }
+    }
+}
+
+tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
+    violationRules {
+        rule {
+            excludes = [
+                    'cristin-commons:*'
+            ]
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 0.800
+            }
+        }
+        rule {
+            excludes = [
+                    'cristin-commons:*'
+            ]
+            limit {
+                counter = 'CLASS'
+                value = 'COVEREDRATIO'
+                minimum = 1.000
+            }
+        }
+    }
+    dependsOn jacocoTestReport
+}
+
+tasks.named('test', Test) {
     useJUnitPlatform()
-    failFast = true
     testLogging {
         events 'skipped', 'passed', 'failed'
     }
-    finalizedBy jacocoTestReport
-}
-
-test {
     environment "ALLOWED_ORIGIN", "*"
     environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
     environment "BASE_PATH", "cristin"
     environment "DOMAIN_NAME", "api.dev.nva.aws.unit.no"
+    environment "COGNITO_URI", "https://example.cognito.org"
+    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
+    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
+    finalizedBy jacocoTestReport
 }
 
-task karateTest(type: Test) {
+tasks.register('createTestUsers', Test) {
+    useJUnitPlatform {
+        includeTags('createTestUsers')
+    }
+
+    outputs.upToDateWhen { false }
+}
+
+tasks.register('deleteTestUsers', Test) {
+    useJUnitPlatform {
+        includeTags('deleteTestUsers')
+    }
+
+    outputs.upToDateWhen { false }
+}
+
+tasks.register('karateTest', Test) {
     useJUnitPlatform {
         includeTags('karateTest')
     }
@@ -60,25 +102,8 @@ task karateTest(type: Test) {
     outputs.upToDateWhen { false }
 }
 
-task createTestUsers(type: Test) {
-    useJUnitPlatform {
-        includeTags('createTestUsers')
-    }
-
-    outputs.upToDateWhen { false }
-}
-
-task deleteTestUsers(type: Test) {
-    useJUnitPlatform {
-        includeTags('deleteTestUsers')
-    }
-
-    outputs.upToDateWhen { false }
-}
-
-
 pmd {
-    toolVersion = '6.20.0'
+    toolVersion = '6.55.0'
     ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
     ruleSets = []
     ignoreFailures = false
@@ -86,43 +111,18 @@ pmd {
 
 checkstyle {
     configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
+
     showViolations = true
 }
 
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach{
     reports {
-        xml.enabled true
-        html.enabled true
+        xml.required
+        html.required
         html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
     }
 }
 
-check.dependsOn jacocoTestCoverageVerification
-jacocoTestCoverageVerification.dependsOn(jacocoTestReport)
-
-jacocoTestCoverageVerification {
-
-    violationRules {
-        rule {
-            excludes = [
-                    'cristin-commons:*'
-            ]
-            limit {
-                counter = 'METHOD'
-                value = 'COVEREDRATIO'
-                minimum = 0.8
-            }
-        }
-
-        rule {
-            excludes = [
-                    'cristin-commons:*'
-            ]
-            limit {
-                counter = 'CLASS'
-                value = 'COVEREDRATIO'
-                minimum = 1.0
-            }
-        }
-    }
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'utf-8'
 }

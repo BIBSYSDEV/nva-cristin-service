@@ -146,8 +146,9 @@ public class UpdatePersonEmploymentHandlerTest {
     }
 
     private GatewayResponse<Void> sendQuery(String body) throws IOException {
-        InputStream input = createRequest(body);
-        handler.handleRequest(input, output, context);
+        try (var input = createRequest(body)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
@@ -156,7 +157,7 @@ public class UpdatePersonEmploymentHandlerTest {
 
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                    .withBody(body)
-                   .withCustomerId(customerId)
+                   .withCurrentCustomer(customerId)
                    .withTopLevelCristinOrgId(TOP_ORG_ID)
                    .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
                    .withPathParameters(validPath)
@@ -164,12 +165,12 @@ public class UpdatePersonEmploymentHandlerTest {
     }
 
     private GatewayResponse<Void> queryWithoutRequiredAccessRights() throws IOException {
-        InputStream input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
-            .withBody(EMPTY_JSON)
-            .withPathParameters(validPath)
-            .build();
-        handler.handleRequest(input, output, context);
-
+        try (var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+                             .withBody(EMPTY_JSON)
+                             .withPathParameters(validPath)
+                             .build()) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 }

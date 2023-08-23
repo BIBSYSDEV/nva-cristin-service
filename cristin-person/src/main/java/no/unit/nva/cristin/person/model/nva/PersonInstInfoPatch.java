@@ -10,7 +10,7 @@ import no.unit.nva.cristin.person.institution.update.PersonInstInfoPatchSerializ
 import nva.commons.core.JacocoGenerated;
 
 @JsonSerialize(using = PersonInstInfoPatchSerializer.class)
-@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "PMD.BeanMembersShouldSerialize"})
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType"})
 @JsonInclude(ALWAYS)
 @JacocoGenerated
 public class PersonInstInfoPatch implements JsonSerializable {
@@ -32,10 +32,9 @@ public class PersonInstInfoPatch implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PersonInstInfoPatch)) {
+        if (!(o instanceof PersonInstInfoPatch that)) {
             return false;
         }
-        PersonInstInfoPatch that = (PersonInstInfoPatch) o;
         return Objects.equals(getEmail(), that.getEmail())
             && Objects.equals(getPhone(), that.getPhone());
     }

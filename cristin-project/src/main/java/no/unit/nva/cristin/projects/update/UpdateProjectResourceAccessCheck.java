@@ -24,24 +24,25 @@ public class UpdateProjectResourceAccessCheck extends ProjectResourceAccessCheck
 
     private transient boolean verified;
 
+    
     @Override
     public void verifyAccess(NvaProject resource, Map<String, String> params) {
         var userIdentifier = params.get(USER_IDENTIFIER);
 
-        var resourceCreator = getResourceCreator(resource);
-        var resourceManager = getResourceManager(resource);
-
-        if (resourceCreator.isPresent() && hasMatch(resourceCreator.get(), userIdentifier)) {
-            verified = true;
+        getResourceCreator(resource)
+            .ifPresentOrElse(creator -> verified = hasMatch(creator, userIdentifier),
+                             () -> verified = false);
+        if (verified) {
             return;
-        } else if (resourceManager.isPresent() && hasMatch(resourceManager.get(), userIdentifier)) {
-            verified = true;
+        }
+
+        getResourceManager(resource)
+            .ifPresent(manager -> verified = hasMatch(manager, userIdentifier));
+        if (verified) {
             return;
         }
 
         logger.info(NOT_ALLOWED_TO_UPDATE_THIS_RESOURCE, userIdentifier, resource.getId());
-
-        verified = false;
     }
 
     @Override

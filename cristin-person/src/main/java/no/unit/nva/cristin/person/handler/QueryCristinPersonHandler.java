@@ -53,18 +53,19 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     }
 
     @Override
+    
     protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
         validateQueryParameterKeys(requestInfo);
 
         var name = getValidName(requestInfo);
-        var organization = getValidOrganization(requestInfo);
         var page = getValidPage(requestInfo);
         var numberOfResults = getValidNumberOfResults(requestInfo);
 
         var requestQueryParameters = buildParametersMap(name, page, numberOfResults);
-        organization.ifPresent(presentOrganization -> requestQueryParameters.put(ORGANIZATION, presentOrganization));
+        getValidOrganization(requestInfo)
+            .ifPresent(presentOrganization -> requestQueryParameters.put(ORGANIZATION, presentOrganization));
 
         return attempt(() -> getAuthorizedSearchResponse(requestInfo, requestQueryParameters))
                    .orElse(list -> apiClient.generateQueryResponse(requestQueryParameters));

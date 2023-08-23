@@ -329,7 +329,7 @@ public class FetchCristinPersonHandlerTest {
         var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                         .withBody(null)
                         .withPathParameters(VALID_PATH_PARAM)
-                        .withCustomerId(customerId)
+                        .withCurrentCustomer(customerId)
                         .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
                         .build();
         handler.handleRequest(input, output, context);

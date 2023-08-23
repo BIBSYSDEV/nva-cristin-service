@@ -1,10 +1,37 @@
 plugins{
-    id 'nva.cristin.service.core.java-conventions'
-    id 'nva.cristin.service.core.gradlelint'
-    id 'nva.cristin.service.core.jacoco-merge'
+    id 'java-library'
+    id 'jacoco-report-aggregation'
 }
 
-allprojects {
-    //workaround for jacoco-merge to work
-    apply plugin: 'nva.cristin.service.core.java-conventions'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
+
+dependencies {
+    subprojects.forEach {
+        jacocoAggregation it
+    }
+}
+
+
+reporting {
+    reports {
+        testCodeCoverageReport(JacocoCoverageReport) {
+            testType = TestSuiteType.UNIT_TEST
+        }
+        integrationTestCodeCoverageReport(JacocoCoverageReport) {
+            testType = TestSuiteType.INTEGRATION_TEST
+        }
+    }
+}
+
+
+
+check {
+    dependsOn testCodeCoverageReport
+    dependsOn integrationTestCodeCoverageReport
+//    dependsOn jacocoTestCoverageVerification
+}
+

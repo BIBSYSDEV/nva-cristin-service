@@ -1,3 +1,4 @@
+
 dependencies {
     implementation project(":cristin-commons")
     implementation libs.nva.json
@@ -17,30 +18,8 @@ dependencies {
     testImplementation libs.bundles.testing
 }
 
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform {
         excludeTags 'karateTest','integrationTest'
     }
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    finalizedBy jacocoTestReport
 }
-
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
-}
-test{
-    environment "COGNITO_URI", "https://example.congito.org"
-    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
-    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
-}
-
-
-

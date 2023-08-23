@@ -69,6 +69,7 @@ import static no.unit.nva.utils.CustomInstantSerializer.addMillisToInstantString
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.core.attempt.Try.attempt;
 
+
 public class CristinProjectPatchJsonCreator {
 
     public static final String CRISTIN_COORDINATING_INSTITUTION = "coordinating_institution";
@@ -113,10 +114,10 @@ public class CristinProjectPatchJsonCreator {
         var cristinTitles = new HashMap<String, String>();
 
         if (input.has(LANGUAGE)) {
-            var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
-            var title = input.get(TITLE);
+            final var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
             if (nonNull(language) && isSupportedLanguage(language)) {
                 output.put(CRISTIN_MAIN_LANGUAGE, language.getIso6391Code());
+                final var title = input.get(TITLE);
                 if (nonNull(title)) {
                     cristinTitles.put(language.getIso6391Code(), title.asText());
                 }
@@ -154,10 +155,11 @@ public class CristinProjectPatchJsonCreator {
 
     private void addContributorsIfPresent() {
         if (input.has(CONTRIBUTORS)) {
-            TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
-            };
             var contributors =
-                    attempt(() -> OBJECT_MAPPER.readValue(input.get(CONTRIBUTORS).toString(), typeRef)).orElseThrow();
+                    attempt(() -> {
+                        var typeRef = new TypeReference<List<NvaContributor>>() { };
+                        return OBJECT_MAPPER.readValue(input.get(CONTRIBUTORS).toString(), typeRef);
+                    }).orElseThrow();
             output.set(PARTICIPANTS, OBJECT_MAPPER.valueToTree(extractContributors(contributors)));
         }
     }

@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class QueryBuilder<T extends Enum<T> & IParameterKey> {
 
-    protected final transient Logger logger = LoggerFactory.getLogger(QueryBuilder.class);
+    protected static final Logger logger = LoggerFactory.getLogger(QueryBuilder.class);
     protected static final String PARAMETER_PAGE_DEFAULT_VALUE = "1";
     protected static final String PARAMETER_PER_PAGE_DEFAULT_VALUE = "5";
     protected final transient Set<String> invalidKeys = new HashSet<>(0);

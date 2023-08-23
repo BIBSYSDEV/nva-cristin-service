@@ -58,8 +58,8 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
 
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
-        ObjectNode objectNode = readJsonFromInput(input);
-        String personId = getValidPersonId(requestInfo);
+        var objectNode = readJsonFromInput(input);
+        var personId = getValidPersonId(requestInfo);
 
         if (clientCanUpdateAllFields(requestInfo)) {
             PersonPatchValidator.validate(objectNode);
