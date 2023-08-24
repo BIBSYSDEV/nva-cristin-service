@@ -108,7 +108,7 @@ class QueryCristinOrganizationHandlerTest {
         var actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(invalidQueryParametersMessage(
-                QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
+            QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
     @Test
@@ -138,11 +138,11 @@ class QueryCristinOrganizationHandlerTest {
 
         doReturn(cristinApiClientVersionOne).when(clientProvider).getClient(any());
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
-        InputStream inputStream = generateValidHandlerRequest();
-        queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
+        try (var inputStream = generateValidHandlerRequest()) {
+            queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
+        }
 
-        var gatewayResponse = GatewayResponse.fromOutputStream(output,
-                                                               SearchResponse.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,SearchResponse.class);
         var actual = gatewayResponse.getBodyObject(SearchResponse.class);
 
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
@@ -153,7 +153,7 @@ class QueryCristinOrganizationHandlerTest {
     private InputStream generateValidHandlerRequest() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withQueryParameters(Map.of("query", "Department of Medical Biochemistry","depth","full"))
+                .withQueryParameters(Map.of(QUERY, "Department of Medical Biochemistry", "depth", "full"))
                 .build();
     }
 
@@ -225,7 +225,7 @@ class QueryCristinOrganizationHandlerTest {
         assertThat(readHitsAsTree(actualHits), equalTo(readHitsAsTree(expectedHits)));
     }
 
-    private List<Organization> convertHitsToProperFormat(SearchResponse searchResponse) {
+    private List<Organization> convertHitsToProperFormat(SearchResponse<?> searchResponse) {
         return OBJECT_MAPPER.convertValue(searchResponse.getHits(), new TypeReference<>() {});
     }
 
@@ -239,8 +239,8 @@ class QueryCristinOrganizationHandlerTest {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                    .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type(),
                                        ACCEPT_HEADER_KEY_NAME, versionParam))
-                   .withQueryParameters(Map.of("query", "Department of Medical Biochemistry",
-                                               "depth","full"))
+                   .withQueryParameters(Map.of(QUERY, "Department of Medical Biochemistry",
+                                               "depth", "full"))
                    .build();
     }
 
@@ -268,14 +268,14 @@ class QueryCristinOrganizationHandlerTest {
     private InputStream generateHandlerRequestWithRandomQueryParameter() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withQueryParameters(Map.of("query", "strangeQueryWithoutHits"))
+                .withQueryParameters(Map.of(QUERY, "strangeQueryWithoutHits"))
                 .build();
     }
 
     private InputStream generateHandlerRequestWithIllegalDepthParameter() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withQueryParameters(Map.of("query", "Fysikk",DEPTH, "feil"))
+                .withQueryParameters(Map.of(QUERY, "Fysikk", DEPTH, "feil"))
                 .build();
     }
 

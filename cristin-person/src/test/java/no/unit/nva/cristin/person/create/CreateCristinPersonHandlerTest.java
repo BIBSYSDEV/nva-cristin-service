@@ -71,6 +71,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
+
 public class CreateCristinPersonHandlerTest {
 
     private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
@@ -328,14 +329,16 @@ public class CreateCristinPersonHandlerTest {
 
     @Test
     void shouldLogClientSpecificIdentifiersWhenDoingAuthorizedRequests() throws IOException {
-        final var standardOut = System.out;
-        final var outputStreamCaptor = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outputStreamCaptor));
-        var response = sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
-        System.setOut(standardOut);
-
-        assertThat(outputStreamCaptor.toString(), Matchers.containsString(LOG_MESSAGE_FOR_IDENTIFIERS));
-        assertEquals(HTTP_CREATED, response.getStatusCode());
+        try (var outputStreamCaptor = new ByteArrayOutputStream()) {
+            var currentPrintSteam = System.out;
+            try (var newPrintStream = new PrintStream(outputStreamCaptor)) {
+                System.setOut(newPrintStream);
+                var response = sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
+                assertEquals(HTTP_CREATED, response.getStatusCode());
+            }
+            System.setOut(currentPrintSteam);
+            assertThat(outputStreamCaptor.toString(), Matchers.containsString(LOG_MESSAGE_FOR_IDENTIFIERS));
+        }
     }
 
     @Test
@@ -444,13 +447,14 @@ public class CreateCristinPersonHandlerTest {
     }
 
     private GatewayResponse<Problem> sendQueryReturningProblemJson(Person body) throws IOException {
-        var input = requestWithBody(body);
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithBody(body)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Problem.class);
     }
 
     private InputStream requestWithBody(Person body) throws JsonProcessingException {
-        var customerId = randomUri();
+        final var customerId = randomUri();
         return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
             .withBody(body)
             .withCurrentCustomer(customerId)
@@ -504,7 +508,7 @@ public class CreateCristinPersonHandlerTest {
 
     private InputStream requestWithBodyAndMockedCristinOrgId(Person body, URI cristinOrgId)
         throws JsonProcessingException {
-        var customerId = randomUri();
+        final var customerId = randomUri();
         return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
                    .withBody(body)
                    .withCurrentCustomer(customerId)
@@ -515,14 +519,15 @@ public class CreateCristinPersonHandlerTest {
 
     private GatewayResponse<Person> sendQueryWhileActingAsInternalBackend(Person body)
         throws IOException {
-        var input = requestWithBodyActingAsInternalBackend(body);
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithBodyActingAsInternalBackend(body)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
     private InputStream requestWithBodyActingAsInternalBackend(Person body)
         throws JsonProcessingException {
-        var customerId = randomUri();
+        final var customerId = randomUri();
         return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
                    .withBody(body)
                    .withCurrentCustomer(customerId)
@@ -532,15 +537,16 @@ public class CreateCristinPersonHandlerTest {
 
     private GatewayResponse<Person> sendQueryWhileMockingIdentifiersUsedForLogging(Person body)
         throws IOException {
-        var customerId = randomUri();
-        var input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
-                        .withBody(body)
-                        .withCurrentCustomer(customerId)
-                        .withPersonCristinId(UriWrapper.fromUri(randomUri()).addChild(DUMMY_CRISTIN_ID).getUri())
-                        .withTopLevelCristinOrgId(UriWrapper.fromUri(ONE_ORGANIZATION).getUri())
-                        .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
-                        .build();
-        handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output, Person.class);
+        final var customerId = randomUri();
+        try (var input = new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
+                             .withBody(body)
+                             .withCurrentCustomer(customerId)
+                             .withPersonCristinId(UriWrapper.fromUri(randomUri()).addChild(DUMMY_CRISTIN_ID).getUri())
+                             .withTopLevelCristinOrgId(UriWrapper.fromUri(ONE_ORGANIZATION).getUri())
+                             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                             .build()) {
+            handler.handleRequest(input, output, context);
+            return GatewayResponse.fromOutputStream(output, Person.class);
+        }
     }
 }

@@ -197,16 +197,18 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     private GatewayResponse<Person> sendQueryWithUnauthorizedAccessRight() throws IOException {
-        InputStream input = requestWithParams(defaultBody(), EMPTY_MAP, randomString());
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithParams(defaultBody(), EMPTY_MAP, randomString())) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
     private GatewayResponse<Person> sendQuery(TypedValue body, Map<String, String> queryParams)
         throws IOException {
 
-        InputStream input = requestWithParams(body, queryParams, EDIT_OWN_INSTITUTION_USERS);
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithParams(body, queryParams, EDIT_OWN_INSTITUTION_USERS)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
@@ -214,7 +216,7 @@ public class FetchFromIdentityNumberHandlerTest {
         throws JsonProcessingException {
         var customerId = randomUri();
         return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, accessRight)
             .withBody(body)
             .withQueryParameters(queryParams)
@@ -226,15 +228,16 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     private GatewayResponse<Person> sendInvalidQuery() throws IOException {
-        InputStream input = requestWithInvalidPayload();
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithInvalidPayload()) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
     private InputStream requestWithInvalidPayload() throws JsonProcessingException {
         var customerId = randomUri();
         return new HandlerRequestBuilder<Map<String, String>>(OBJECT_MAPPER)
-             .withCustomerId(customerId)
+             .withCurrentCustomer(customerId)
             .withAccessRights(customerId,EDIT_OWN_INSTITUTION_USERS)
             .withBody(INVALID_PAYLOAD)
             .build();

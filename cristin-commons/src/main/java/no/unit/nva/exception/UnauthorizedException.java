@@ -5,6 +5,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import java.net.HttpURLConnection;
 
 public class UnauthorizedException extends ApiGatewayException {
+
     public static final String DEFAULT_MESSAGE = "Unauthorized";
 
     public UnauthorizedException() {

@@ -14,7 +14,6 @@ import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Map;
@@ -67,13 +66,12 @@ public class ListFundingSourcesHandlerTest {
     @ParameterizedTest(name = "Should support accept header {0}")
     @ValueSource(strings = {"application/json", "application/ld+json"})
     public void shouldReturnAllFundingSourcesFromCristinOnSuccess(String acceptHeaderValue) throws IOException {
-        InputStream input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
-                                .withHeaders(Map.of("Accept", acceptHeaderValue))
-                                .build();
-
-        cristinFundingSourcesStubs.stubSuccess();
-
-        handlerUnderTest.handleRequest(input, output, context);
+        try (var input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
+                             .withHeaders(Map.of("Accept", acceptHeaderValue))
+                             .build()) {
+            cristinFundingSourcesStubs.stubSuccess();
+            handlerUnderTest.handleRequest(input, output, context);
+        }
 
         GatewayResponse<FundingSources> response = GatewayResponse.fromOutputStream(output, FundingSources.class);
 

@@ -302,27 +302,31 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     private GatewayResponse<Void> sendQueryAsInstAdminWithSomeOrgId(String body, URI orgId) throws IOException {
-        var input = createRequest(body, null, orgId, EDIT_OWN_INSTITUTION_USERS,
-                                          ADMINISTRATE_APPLICATION);
-        handler.handleRequest(input, output, context);
+        try (var input = createRequest(body, null, orgId, EDIT_OWN_INSTITUTION_USERS,
+                                       ADMINISTRATE_APPLICATION)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
     private GatewayResponse<Void> sendQueryAsInternalBackend(String body) throws IOException {
-        var input = createRequest(body, BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE, null);
-        handler.handleRequest(input, output, context);
+        try (var input = createRequest(body, BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE, null)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
     private GatewayResponse<Void> sendQuery(Map<String, String> pathParam, String body) throws IOException {
-        var input = createRequest(pathParam, body);
-        handler.handleRequest(input, output, context);
+        try (var input = createRequest(pathParam, body)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
     private GatewayResponse<Problem> sendQueryReturningProblemJson(String body) throws IOException {
-        var input = createRequest(validPath, body);
-        handler.handleRequest(input, output, context);
+        try (var input = createRequest(validPath, body)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Problem.class);
     }
 
@@ -352,23 +356,25 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     private GatewayResponse<Void> queryWithoutRequiredAccessRights() throws IOException {
-        var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
-            .withBody(EMPTY_JSON)
-            .withPathParameters(validPath)
-            .build();
-        handler.handleRequest(input, output, context);
+        try (var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+                             .withBody(EMPTY_JSON)
+                             .withPathParameters(validPath)
+                             .build()) {
+            handler.handleRequest(input, output, context);
+        }
 
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
     private GatewayResponse<Void> queryWithPersonCristinIdButNoAccessRights(Map<String, String> pathParameters,
                                                                             String body) throws IOException {
-        var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
-                                .withBody(body)
-                                .withPathParameters(pathParameters)
-                                .withPersonCristinId(PERSON_CRISTIN_ID_URI)
-                                .build();
-        handler.handleRequest(input, output, context);
+        try (var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+                             .withBody(body)
+                             .withPathParameters(pathParameters)
+                             .withPersonCristinId(PERSON_CRISTIN_ID_URI)
+                             .build()) {
+            handler.handleRequest(input, output, context);
+        }
 
         return GatewayResponse.fromOutputStream(output, Void.class);
     }

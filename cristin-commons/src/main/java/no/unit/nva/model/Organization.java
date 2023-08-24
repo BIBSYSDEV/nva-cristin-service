@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 import no.unit.nva.commons.json.JsonSerializable;
 
-@SuppressWarnings({"PMD.BeanMembersShouldSerialize", "PMD.LinguisticNaming"})
+@SuppressWarnings({ "PMD.LinguisticNaming"})
 @JsonPropertyOrder({CONTEXT, TYPE, ID, TYPE, LABELS, ACRONYM, PART_OF, HAS_PART})
 public class Organization implements JsonSerializable {
 
@@ -106,10 +106,9 @@ public class Organization implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Organization)) {
+        if (!(o instanceof Organization that)) {
             return false;
         }
-        Organization that = (Organization) o;
         return Objects.equals(getId(), that.getId())
                && Objects.equals(getLabels(), that.getLabels())
                && Objects.equals(getAcronym(), that.getAcronym())

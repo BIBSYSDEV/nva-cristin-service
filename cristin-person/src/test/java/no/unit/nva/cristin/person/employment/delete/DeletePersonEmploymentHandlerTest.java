@@ -85,7 +85,7 @@ class DeletePersonEmploymentHandlerTest {
         var customerId = randomUri();
 
         return new HandlerRequestBuilder<CristinPersonEmployment>(OBJECT_MAPPER)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .withBody(null)
             .withPathParameters(Map.of(PERSON_ID, INVALID_PERSON_ID, EMPLOYMENT_ID, VALID_EMPLOYMENT_ID))
@@ -96,7 +96,7 @@ class DeletePersonEmploymentHandlerTest {
         var customerId = randomUri();
 
         return new HandlerRequestBuilder<CristinPersonEmployment>(OBJECT_MAPPER)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .withBody(null)
             .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, EMPLOYMENT_ID, INVALID_EMPLOYMENT_ID))

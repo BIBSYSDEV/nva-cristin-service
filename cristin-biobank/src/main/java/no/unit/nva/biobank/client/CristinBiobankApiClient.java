@@ -22,6 +22,7 @@ public class CristinBiobankApiClient extends ApiClient {
             defaultHttpClient()
         );
     }
+
     public CristinBiobankApiClient(HttpClient client) {
         super(client);
     }

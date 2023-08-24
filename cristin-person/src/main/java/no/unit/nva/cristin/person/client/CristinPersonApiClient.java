@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.client;
 
+import java.util.stream.Stream;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -12,7 +13,6 @@ import nva.commons.core.paths.UriWrapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -117,20 +117,19 @@ public class CristinPersonApiClient extends ApiClient {
                 : combineResultsWithQueryInCaseEnrichmentFails(personsFromQuery, enrichedCristinPersons);
     }
 
+    
     protected List<CristinPerson> combineResultsWithQueryInCaseEnrichmentFails(List<CristinPerson> personsFromQuery,
                                                                                List<CristinPerson> enrichedPersons) {
-        var enrichedPersonIds = enrichedPersons.stream()
+        final var enrichedPersonIds =
+            enrichedPersons.stream()
                 .map(CristinPerson::getCristinPersonId)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toUnmodifiableSet());
 
-        var missingPersons = personsFromQuery.stream()
-                .filter(queryPerson -> !enrichedPersonIds.contains(queryPerson.getCristinPersonId()))
-                .collect(Collectors.toList());
+        var missingPersons =
+            personsFromQuery.stream()
+                .filter(queryPerson -> !enrichedPersonIds.contains(queryPerson.getCristinPersonId()));
 
-        ArrayList<CristinPerson> result = new ArrayList<>();
-        result.addAll(enrichedPersons);
-        result.addAll(missingPersons);
-        return result;
+        return Stream.concat(enrichedPersons.stream(), missingPersons).toList();
     }
 
     /**

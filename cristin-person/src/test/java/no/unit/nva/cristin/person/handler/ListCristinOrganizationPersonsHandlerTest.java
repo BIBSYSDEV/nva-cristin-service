@@ -105,8 +105,9 @@ class ListCristinOrganizationPersonsHandlerTest {
 
     @Test
     void shouldReturnBadRequestResponseOnMissingPathParam() throws IOException {
-        InputStream inputStream = generateHandlerRequestWithoutOrganizationIdentifier();
-        handler.handleRequest(inputStream, output, context);
+        try (var inputStream = generateHandlerRequestWithoutOrganizationIdentifier()) {
+            handler.handleRequest(inputStream, output, context);
+        }
         GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
@@ -115,8 +116,9 @@ class ListCristinOrganizationPersonsHandlerTest {
 
     @Test
     void shouldReturnBadRequestResponseOnInvalidQueryParameters() throws IOException {
-        InputStream inputStream = generateHandlerDummyRequestWithIllegalQueryParameters();
-        handler.handleRequest(inputStream, output, context);
+        try (var inputStream = generateHandlerDummyRequestWithIllegalQueryParameters()) {
+            handler.handleRequest(inputStream, output, context);
+        }
         GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
         String actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());

@@ -149,7 +149,7 @@ public class CreatePersonEmploymentHandlerTest {
 
         return new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
             .withBody(body)
-            .withCustomerId(customerId)
+            .withCurrentCustomer(customerId)
             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
             .withPathParameters(validPath)
             .build();
@@ -169,7 +169,7 @@ public class CreatePersonEmploymentHandlerTest {
         var customerId = randomUri();
         var input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
                                 .withBody(body)
-                                .withCustomerId(customerId)
+                                .withCurrentCustomer(customerId)
                                 .withTopLevelCristinOrgId(TOP_ORG_ID)
                                 .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
                                 .withPathParameters(validPath)
@@ -183,7 +183,7 @@ public class CreatePersonEmploymentHandlerTest {
         var customerId = randomUri();
         var input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
                         .withBody(body)
-                        .withCustomerId(customerId)
+                        .withCurrentCustomer(customerId)
                         .withAccessRights(customerId, ADMINISTRATE_APPLICATION)
                         .withPathParameters(validPath)
                         .build();

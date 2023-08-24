@@ -1,3 +1,4 @@
+
 dependencies {
     implementation libs.nva.json
     implementation libs.nva.core
@@ -26,24 +27,11 @@ dependencies {
     implementation libs.aws.sdk2.spi
     implementation libs.apache.http.core
 
-
 }
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform {
         excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
     }
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    finalizedBy jacocoTestReport
 }
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
-}
+
 

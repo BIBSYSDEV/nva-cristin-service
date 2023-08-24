@@ -55,8 +55,8 @@ public class CreateCristinPersonApiClient extends PostApiClient {
     }
 
     private String generatePayloadFromRequest(Person person) {
-        CristinPerson requestCristinPerson = person.toCristinPerson();
-        return attempt(() -> OBJECT_MAPPER.writeValueAsString(requestCristinPerson)).orElseThrow();
+        return attempt(() -> OBJECT_MAPPER.writeValueAsString(person.toCristinPerson()))
+                   .orElseThrow();
     }
 
     private URI getCristinPersonPostUri() {

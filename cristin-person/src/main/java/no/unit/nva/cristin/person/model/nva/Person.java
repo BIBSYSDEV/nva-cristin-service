@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.ArrayList;
 import java.util.List;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinTypedLabel;
@@ -253,13 +252,16 @@ public class Person implements JsonSerializable {
     /**
      * Converts NVA formatted employments to Cristin formatted employments.
      */
+    @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
     public static List<CristinPersonEmployment> mapEmploymentsToCristinEmployments(Set<Employment> employments) {
         if (isNull(employments)) {
             return null;
         }
-        return new ArrayList<>(employments).stream()
-                   .map(Employment::toCristinEmployment)
-                   .collect(Collectors.toList());
+        return
+            employments
+                .stream()
+                .map(Employment::toCristinEmployment)
+                .toList();
     }
 
     @JacocoGenerated
@@ -268,10 +270,9 @@ public class Person implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Person)) {
+        if (!(o instanceof Person person)) {
             return false;
         }
-        Person person = (Person) o;
         return Objects.equals(getId(), person.getId())
                && Objects.equals(getContext(), person.getContext())
                && Objects.equals(getIdentifiers(), person.getIdentifiers())

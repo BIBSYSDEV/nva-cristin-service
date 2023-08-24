@@ -80,11 +80,8 @@ public class QueryCristinPersonHandlerTest {
     private Context context;
     private ByteArrayOutputStream output;
     private QueryCristinPersonHandler handler;
-    private final List<String> generatedNINs = List.of("04031839594",
-                                                       "23047748038",
-                                                       "07021702867",
-                                                       "04011679604",
-                                                       "20106514977");
+    private final List<String> generatedNINs =
+        List.of("04031839594", "23047748038", "07021702867", "04011679604", "20106514977");
 
     @BeforeEach
     void setUp() {
@@ -97,9 +94,9 @@ public class QueryCristinPersonHandlerTest {
     @SuppressWarnings("unchecked")
     @Test
     void shouldReturnResponseWhenCallingEndpointWithNameParameter() throws IOException {
-        SearchResponse<Person> actual = sendDefaultQuery().getBodyObject(SearchResponse.class);
-        String expectedString = IoUtils.stringFromResources(Path.of(NVA_API_QUERY_PERSON_JSON));
-        SearchResponse<Person> expected = OBJECT_MAPPER.readValue(expectedString, SearchResponse.class);
+        var actual = sendDefaultQuery().getBodyObject(SearchResponse.class);
+        var expectedString = IoUtils.stringFromResources(Path.of(NVA_API_QUERY_PERSON_JSON));
+        var expected = OBJECT_MAPPER.readValue(expectedString, SearchResponse.class);
 
         // Type casting problems when using generic types. Needed to convert. Was somehow converting to LinkedHashMap
         List<Person> expectedPersons = OBJECT_MAPPER.convertValue(expected.getHits(), new TypeReference<>() {});
@@ -347,8 +344,9 @@ public class QueryCristinPersonHandlerTest {
 
     @SuppressWarnings("rawtypes")
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
-        var input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME));
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME))) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 

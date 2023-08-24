@@ -125,10 +125,13 @@ public class CristinPersonEmployment implements JsonSerializable {
             .addChild(personId).addChild(EMPLOYMENT_PATH).addChild(getId()).getUri() : null;
     }
 
+    
     private URI generateTypeUri() {
-        URI uri = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).getUri();
-        Optional<String> positionCode = Optional.ofNullable(getPosition()).map(CristinPositionCode::getCode);
-        return positionCode.map(code -> createUriWithUnescapedHashtagPath(uri, code)).orElse(null);
+        var uri = new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).getUri();
+        return
+            Optional.ofNullable(getPosition()).map(CristinPositionCode::getCode)
+                .map(code -> createUriWithUnescapedHashtagPath(uri, code))
+                .orElse(null);
     }
 
     private URI createUriWithUnescapedHashtagPath(URI uri, String code) {
@@ -147,10 +150,9 @@ public class CristinPersonEmployment implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CristinPersonEmployment)) {
+        if (!(o instanceof CristinPersonEmployment that)) {
             return false;
         }
-        CristinPersonEmployment that = (CristinPersonEmployment) o;
         return Objects.equals(getId(), that.getId())
                && Objects.equals(getAffiliation(), that.getAffiliation())
                && Objects.equals(getActive(), that.getActive())
