@@ -35,7 +35,10 @@ Feature: API tests for Cristin Person Update
             'en': 'Risk management'
           }
         }
-      ]
+      ],
+      'background': {
+        'en': 'My history as a researcher'
+      }
     }
     """
     Given url CRISTIN_BASE
