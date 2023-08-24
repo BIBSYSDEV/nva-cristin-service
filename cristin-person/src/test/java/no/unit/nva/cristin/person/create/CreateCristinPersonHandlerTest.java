@@ -85,6 +85,8 @@ public class CreateCristinPersonHandlerTest {
     private static final String ONE_ORGANIZATION = "https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0";
     private static final String LOG_MESSAGE_FOR_IDENTIFIERS = "Client has Cristin identifier 123456 from organization "
                                                              + "20754.0.0.0";
+    public static final String ENGLISH_LANG = "en";
+    public static final String ENGLISH_LANG_CONTENT = "My english background";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -366,6 +368,26 @@ public class CreateCristinPersonHandlerTest {
         var codeFromCapture = capturedCristinPerson.getKeywords().get(0).getCode();
 
         assertThat(codeFromCapture, equalTo(dummyKeyword.getType()));
+        assertThat(actual.getStatusCode(), equalTo(HTTP_CREATED));
+    }
+
+    @Test
+    void shouldAddBackgroundToCristinJsonWhenPresentInInput() throws Exception {
+        apiClient = spy(apiClient);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+
+        var dummyPerson = dummyPerson();
+        var dummyBackground = Map.of(ENGLISH_LANG, ENGLISH_LANG_CONTENT);
+        dummyPerson.setBackground(dummyBackground);
+
+        var actual = sendQuery(dummyPerson);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
+        var backgroundFromCapture = capturedCristinPerson.getBackground();
+
+        assertThat(backgroundFromCapture.get(ENGLISH_LANG), equalTo(ENGLISH_LANG_CONTENT));
         assertThat(actual.getStatusCode(), equalTo(HTTP_CREATED));
     }
 

@@ -232,6 +232,7 @@ public class Person implements JsonSerializable {
         cristinPerson.setDetailedAffiliations(mapEmploymentsToCristinEmployments(getEmployments()));
         cristinPerson.setReserved(getReserved());
         cristinPerson.setKeywords(extractKeywordCodes(getKeywords()));
+        cristinPerson.setBackground(getBackground());
 
         return cristinPerson;
     }

@@ -181,7 +181,7 @@ public class CristinPerson implements JsonSerializable {
     }
 
     public Map<String, String> getBackground() {
-        return background;
+        return nonEmptyOrDefault(background);
     }
 
     public void setBackground(Map<String, String> background) {
