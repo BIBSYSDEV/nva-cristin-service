@@ -6,6 +6,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_EMPLOYMENTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
@@ -51,6 +52,7 @@ public class CristinPersonPatchJsonCreator {
         addReserved();
         addEmployments();
         addKeywords();
+        addBackgroundIfPresent();
 
         return this;
     }
@@ -139,5 +141,11 @@ public class CristinPersonPatchJsonCreator {
     private List<CristinTypedLabel> keywordsToCristinFormat(List<TypedValue> parsedInput) {
         return parsedInput.stream().map(elm -> new CristinTypedLabel(elm.getType(), null))
                    .collect(Collectors.toList());
+    }
+
+    private void addBackgroundIfPresent() {
+        if (input.has(BACKGROUND)) {
+            output.set(BACKGROUND, input.get(BACKGROUND));
+        }
     }
 }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
-import java.util.Map;
 import no.unit.nva.Validator;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.model.Organization;
@@ -52,7 +51,6 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
                                                                                 + "field 'type'";
     public static final String MUST_BE_A_LIST_OF_IDENTIFIERS = "RelatedProjects must be a list of identifiers, "
                                                                + "numeric or URI";
-    public static final String NOT_A_VALID_KEY_VALUE_FIELD = "%s not a valid key value field";
     public static final String NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS = "%s not a valid list of key value fields";
     public static final String WEB_PAGE = "webPage";
     public static final String NOT_A_VALID_URI = "Field %s is not a valid URI";
@@ -190,13 +188,6 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         }
     }
 
-    private void validateDescription(ObjectNode input, String fieldName) throws BadRequestException {
-        if (input.has(fieldName)) {
-            var description = input.get(fieldName);
-            attempt(() -> convertToMap(description)).orElseThrow(failure -> notAMapException(fieldName));
-        }
-    }
-
     private void validateResearchResponsibleOrganizationsIfPresent(ObjectNode input) throws BadRequestException {
         if (input.has(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)
             && !input.get(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH).isNull()) {
@@ -216,14 +207,6 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
 
     private void parseOrganizations(JsonNode organizations) {
         organizations.forEach(node -> extractLastPathElement(URI.create(node.get(ID).asText())));
-    }
-
-    private BadRequestException notAMapException(String fieldName) {
-        return new BadRequestException(format(NOT_A_VALID_KEY_VALUE_FIELD, fieldName));
-    }
-
-    public static Map<String, String> convertToMap(JsonNode node) {
-        return OBJECT_MAPPER.convertValue(node, new TypeReference<>() {});
     }
 
     private void validateExtraLanguages(ObjectNode input) throws BadRequestException {
