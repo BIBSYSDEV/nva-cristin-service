@@ -29,6 +29,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AFFILIATIONS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
@@ -40,7 +41,7 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 
 @JacocoGenerated
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS, RESERVED, EMPLOYMENTS,
-    VERIFIED, KEYWORDS})
+    VERIFIED, KEYWORDS, BACKGROUND})
 public class Person implements JsonSerializable {
 
     @JsonProperty(TYPE)
@@ -68,6 +69,8 @@ public class Person implements JsonSerializable {
     private Boolean verified;
     @JsonProperty(KEYWORDS)
     private Set<TypedLabel> keywords;
+    @JsonProperty(BACKGROUND)
+    private Map<String, String> background;
 
     private Person() {
 
@@ -86,6 +89,7 @@ public class Person implements JsonSerializable {
      * @param employments    This person's detailed employment data at each organization.
      * @param verified       If this person is a verified person.
      * @param keywords       Keywords related to this person.
+     * @param background     Background information about this person.
      */
     @JsonCreator
     @SuppressWarnings("PMD.ExcessiveParameterList")
@@ -94,7 +98,8 @@ public class Person implements JsonSerializable {
                   @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails, @JsonProperty(IMAGE) URI image,
                   @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations, @JsonProperty(RESERVED) Boolean reserved,
                   @JsonProperty(EMPLOYMENTS) Set<Employment> employments, @JsonProperty(VERIFIED) Boolean verified,
-                  @JsonProperty(KEYWORDS) Set<TypedLabel> keywords) {
+                  @JsonProperty(KEYWORDS) Set<TypedLabel> keywords,
+                  @JsonProperty(BACKGROUND) Map<String, String> background) {
         this.id = id;
         this.identifiers = identifiers;
         this.names = names;
@@ -105,6 +110,7 @@ public class Person implements JsonSerializable {
         this.employments = employments;
         this.verified = verified;
         this.keywords = keywords;
+        this.background = background;
     }
 
     public String getContext() {
@@ -199,6 +205,14 @@ public class Person implements JsonSerializable {
         this.keywords = keywords;
     }
 
+    public Map<String, String> getBackground() {
+        return nonEmptyOrDefault(background);
+    }
+
+    public void setBackground(Map<String, String> background) {
+        this.background = background;
+    }
+
     /**
      * Converts this object to an appropriate format for POST to Cristin.
      */
@@ -217,6 +231,7 @@ public class Person implements JsonSerializable {
         cristinPerson.setDetailedAffiliations(mapEmploymentsToCristinEmployments(getEmployments()));
         cristinPerson.setReserved(getReserved());
         cristinPerson.setKeywords(extractKeywordCodes(getKeywords()));
+        cristinPerson.setBackground(getBackground());
 
         return cristinPerson;
     }
@@ -268,14 +283,16 @@ public class Person implements JsonSerializable {
                && Objects.equals(getReserved(), person.getReserved())
                && Objects.equals(getEmployments(), person.getEmployments())
                && Objects.equals(getVerified(), person.getVerified())
-               && Objects.equals(getKeywords(), person.getKeywords());
+               && Objects.equals(getKeywords(), person.getKeywords())
+               && Objects.equals(getBackground(), person.getBackground());
     }
 
     @JacocoGenerated
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getContext(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
-                            getAffiliations(), getReserved(), getEmployments(), getVerified(), getKeywords());
+                            getAffiliations(), getReserved(), getEmployments(), getVerified(), getKeywords(),
+                            getBackground());
     }
 
     @Override
@@ -344,6 +361,11 @@ public class Person implements JsonSerializable {
 
         public Builder withKeywords(Set<TypedLabel> keywords) {
             person.setKeywords(keywords);
+            return this;
+        }
+
+        public Builder withBackground(Map<String, String> background) {
+            person.setBackground(background);
             return this;
         }
 

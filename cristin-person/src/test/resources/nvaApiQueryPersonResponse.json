@@ -84,7 +84,11 @@
             "en": "Risk management"
           }
         }
-      ]
+      ],
+      "background": {
+        "en": "Academic Advisor at UiO",
+        "nb": "Akademisk Rådgiver ved UiO"
+      }
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/person/359084",
@@ -162,7 +166,11 @@
             "en": "Risk management"
           }
         }
-      ]
+      ],
+      "background": {
+        "en": "Academic Advisor at UiO",
+        "nb": "Akademisk Rådgiver ved UiO"
+      }
     }
   ]
 }

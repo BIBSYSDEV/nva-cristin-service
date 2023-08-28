@@ -2605,6 +2605,8 @@ components:
                 description: The keyword code
               label:
                 $ref: '#/components/schemas/Languages'
+        background:
+          $ref: '#/components/schemas/Languages'
     PersonPost:
       type: object
       required: [ identifiers, names ]
@@ -2650,6 +2652,8 @@ components:
               type:
                 type: string
                 description: The keyword code
+        background:
+          $ref: '#/components/schemas/Languages'
     PersonPostResponse:
       type: object
       properties:
@@ -2701,6 +2705,8 @@ components:
                 description: The keyword code
               label:
                 $ref: '#/components/schemas/Languages'
+        background:
+          $ref: '#/components/schemas/Languages'
     PersonPatch:
       type: object
       properties:
@@ -2735,6 +2741,8 @@ components:
               type:
                 type: string
                 description: The keyword code
+        background:
+          $ref: '#/components/schemas/Languages'
     PersonNIN:
       type: object
       properties:
@@ -3605,6 +3613,9 @@ components:
               - type: '4837'
                 label:
                   'en': 'Supply Chain'
+            background:
+              no: 'Min bakgrunn som forsker'
+              en: 'My history as a researcher'
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
             type: 'Person'
             identifiers:
@@ -3683,6 +3694,9 @@ components:
           - type: '4837'
             label:
               'en': 'Supply Chain'
+        background:
+          no: 'Min bakgrunn som forsker'
+          en: 'My history as a researcher'
     PersonPatchExample:
       value:
         orcid: '1234-1234-1234-1234'
@@ -3698,6 +3712,9 @@ components:
         keywords:
           - type: '4245'
           - type: '5686'
+        background:
+          no: 'Min bakgrunn som forsker'
+          en: 'null'
     PersonPostExample:
       value:
         identifiers:
@@ -3721,6 +3738,9 @@ components:
         keywords:
           - type: '4245'
           - type: '5686'
+        background:
+          no: 'Min bakgrunn som forsker'
+          en: 'My history as a researcher'
     PersonPostResponseExample:
       value:
         '@context': 'https://example.org/person-context.json'
@@ -3758,6 +3778,9 @@ components:
           - type: '4837'
             label:
               'en': 'Supply Chain'
+        background:
+          no: 'Min bakgrunn som forsker'
+          en: 'My history as a researcher'
     PersonOrganizationInfoExample:
       value:
         '@context': 'https://ontology.org'

@@ -8,6 +8,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
@@ -38,6 +39,9 @@ public class CristinPersonPatchJsonCreatorTest {
     private static final String SOME_OTHER_NAME = randomString();
     private static final String SOME_PREFERRED_NAME = randomString();
     public static final String END_OF_LITERAL = "\" , ";
+    public static final String ENGLISH_LANG = "en";
+    public static final String NORWEGIAN_LANG = "no";
+    public static final String NORWEGIAN_LANG_CONTENT = "Norsk";
 
     @Test
     void shouldParseInputJsonIntoCristinJsonWithCorrectMappingOfFields() {
@@ -184,6 +188,41 @@ public class CristinPersonPatchJsonCreatorTest {
 
         assertThat(result.has(KEYWORDS), equalTo(true));
         assertThat(result.get(KEYWORDS).isEmpty(), equalTo(true));
+    }
+
+    @Test
+    void shouldAllowBackgroundSetToNull() throws Exception {
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.putNull(BACKGROUND);
+        PersonPatchValidator.validate(input);
+        var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+
+        assertThat(result.has(BACKGROUND), equalTo(true));
+        assertThat(result.get(BACKGROUND).isNull(), equalTo(true));
+    }
+
+    @Test
+    void shouldAllowBackgroundSetToEmptyObject() throws Exception {
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.putObject(BACKGROUND);
+        PersonPatchValidator.validate(input);
+        var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+
+        assertThat(result.has(BACKGROUND), equalTo(true));
+        assertThat(result.get(BACKGROUND).isObject(), equalTo(true));
+    }
+
+    @Test
+    void shouldAllowBackgroundWithLanguageContentBothNullAndWithValue() throws Exception {
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.putObject(BACKGROUND).putNull(ENGLISH_LANG).put(NORWEGIAN_LANG, NORWEGIAN_LANG_CONTENT);
+        PersonPatchValidator.validate(input);
+        var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+
+        assertThat(result.has(BACKGROUND), equalTo(true));
+        assertThat(result.get(BACKGROUND).isObject(), equalTo(true));
+        assertThat(result.get(BACKGROUND).get(ENGLISH_LANG).isNull(), equalTo(true));
+        assertThat(result.get(BACKGROUND).get(NORWEGIAN_LANG).asText(), equalTo(NORWEGIAN_LANG_CONTENT));
     }
 
 }

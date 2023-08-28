@@ -19,4 +19,5 @@ public class JsonPropertyNames {
     public static final String EMPLOYMENTS = "employments";
     public static final String VERIFIED = "verified";
     public static final String KEYWORDS = "keywords";
+    public static final String BACKGROUND = "background";
 }
