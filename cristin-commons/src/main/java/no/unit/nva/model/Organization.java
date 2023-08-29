@@ -2,6 +2,7 @@ package no.unit.nva.model;
 
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACRONYM;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
+import static no.unit.nva.cristin.model.JsonPropertyNames.COUNTRY;
 import static no.unit.nva.cristin.model.JsonPropertyNames.HAS_PART;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LABELS;
@@ -17,7 +18,7 @@ import java.util.Set;
 import no.unit.nva.commons.json.JsonSerializable;
 
 @SuppressWarnings({ "PMD.LinguisticNaming"})
-@JsonPropertyOrder({CONTEXT, TYPE, ID, TYPE, LABELS, ACRONYM, PART_OF, HAS_PART})
+@JsonPropertyOrder({CONTEXT, TYPE, ID, TYPE, LABELS, ACRONYM, COUNTRY, PART_OF, HAS_PART})
 public class Organization implements JsonSerializable {
 
     public static final String ORGANIZATION_IDENTIFIER_PATTERN = "^(?:[0-9]+\\.){3}[0-9]{1,3}$";
@@ -38,6 +39,8 @@ public class Organization implements JsonSerializable {
     private final Set<Organization> hasPart;
     @JsonProperty(CONTEXT)
     private String context;
+    @JsonProperty(COUNTRY)
+    private final String country;
 
     /**
      * Construct an Organization from parameters.
@@ -47,18 +50,21 @@ public class Organization implements JsonSerializable {
      * @param acronym       shortname for Organization
      * @param partOf        Set of organizations this organization is part of
      * @param hasPart       sub organizations of this organization
+     * @param country       country of organization
      */
     @JsonCreator
     public Organization(@JsonProperty(ID) URI id,
                         @JsonProperty(LABELS) Map<String, String> labels,
                         @JsonProperty(ACRONYM) String acronym,
                         @JsonProperty(PART_OF) Set<Organization> partOf,
-                        @JsonProperty(HAS_PART) Set<Organization> hasPart) {
+                        @JsonProperty(HAS_PART) Set<Organization> hasPart,
+                        @JsonProperty(COUNTRY) String country) {
         this.id = id;
         this.labels = labels;
         this.acronym = acronym;
         this.partOf = partOf;
         this.hasPart = hasPart;
+        this.country = country;
     }
 
     private Organization(Builder builder) {
@@ -67,6 +73,7 @@ public class Organization implements JsonSerializable {
         this.acronym = builder.acronym;
         this.partOf = builder.partOf;
         this.hasPart = builder.hasPart;
+        this.country = builder.country;
     }
 
     public void setContext(String context) {
@@ -101,6 +108,10 @@ public class Organization implements JsonSerializable {
         return type;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -113,12 +124,13 @@ public class Organization implements JsonSerializable {
                && Objects.equals(getLabels(), that.getLabels())
                && Objects.equals(getAcronym(), that.getAcronym())
                && Objects.equals(getPartOf(), that.getPartOf())
-               && Objects.equals(getHasPart(), that.getHasPart());
+               && Objects.equals(getHasPart(), that.getHasPart())
+               && Objects.equals(getCountry(), that.getCountry());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getLabels(), getAcronym(), getPartOf(), getHasPart());
+        return Objects.hash(getId(), getLabels(), getAcronym(), getPartOf(), getHasPart(), getCountry());
     }
 
     @Override
@@ -133,6 +145,7 @@ public class Organization implements JsonSerializable {
         private String acronym;
         private Set<Organization> partOf;
         private Set<Organization> hasPart;
+        private String country;
 
         public Builder withId(URI id) {
             this.id = id;
@@ -156,6 +169,11 @@ public class Organization implements JsonSerializable {
 
         public Builder withHasPart(Set<Organization> hasPart) {
             this.hasPart = hasPart;
+            return this;
+        }
+
+        public Builder withCountry(String country) {
+            this.country = country;
             return this;
         }
 

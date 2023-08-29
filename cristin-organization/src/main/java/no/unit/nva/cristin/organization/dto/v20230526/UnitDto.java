@@ -19,6 +19,7 @@ public class UnitDto implements JsonSerializable {
     private final List<UnitDto> parentUnits;
     private List<UnitDto> subUnits;
     private final URI uri;
+    private final String country;
 
     /**
      * Default and JSON constructor.
@@ -31,7 +32,8 @@ public class UnitDto implements JsonSerializable {
                    @JsonProperty("parent_unit") UnitDto parentUnit,
                    @JsonProperty("parent_units") List<UnitDto> parentUnits,
                    @JsonProperty("subunits") List<UnitDto> subUnits,
-                   @JsonProperty("url") URI uri) {
+                   @JsonProperty("url") URI uri,
+                   @JsonProperty("country") String country) {
         this.id = id;
         this.unitName = unitName;
         this.institution = institution;
@@ -40,6 +42,7 @@ public class UnitDto implements JsonSerializable {
         this.parentUnits = parentUnits;
         this.subUnits = subUnits;
         this.uri = uri;
+        this.country = country;
     }
 
     public String getId() {
@@ -80,6 +83,10 @@ public class UnitDto implements JsonSerializable {
 
     public URI getUri() {
         return uri;
+    }
+
+    public String getCountry() {
+        return country;
     }
 
     @Override
