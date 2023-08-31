@@ -82,6 +82,7 @@ class FetchCristinOrganizationHandlerTest {
     public static final String NVA_GET_RESPONSE_20230526_JSON = "nvaGetResponse20230526.json";
     public static final String NVA_GET_RESPONSE_WITH_SUB_UNITS_20230526_JSON =
         "nvaGetResponseWithSubUnits20230526.json";
+    public static final String NORWEGIAN_LANGUAGE_KEY_UPPERCASE = "NO";
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
@@ -204,6 +205,7 @@ class FetchCristinOrganizationHandlerTest {
         assertEquals(actualOrganization.getId(), expectedId);
         assertThat(actualOrganization.getLabels().get(ENGLISH_LANGUAGE_KEY),
                    containsString(DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY));
+        assertThat(actualOrganization.getCountry(), equalTo(NORWEGIAN_LANGUAGE_KEY_UPPERCASE));
     }
 
 
@@ -234,6 +236,7 @@ class FetchCristinOrganizationHandlerTest {
                    containsString(DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY));
         assertThat(actualOrganization.getHasPart(), equalTo(null));
         assertThat(actualOrganization.getPartOf(), equalTo(null));
+        assertThat(actualOrganization.getCountry(), equalTo(NORWEGIAN_LANGUAGE_KEY_UPPERCASE));
     }
 
     @Test
@@ -290,6 +293,7 @@ class FetchCristinOrganizationHandlerTest {
                 .build();
     }
 
+    @SuppressWarnings("SameParameterValue")
     private InputStream generateHandlerRequestWithAdditionalQueryParameters(String organizationIdentifier, String depth)
             throws JsonProcessingException {
         var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type());

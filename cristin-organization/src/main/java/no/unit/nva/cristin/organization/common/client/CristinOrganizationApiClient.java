@@ -135,6 +135,7 @@ public class CristinOrganizationApiClient
                    .withId(getNvaApiId(identifier, ORGANIZATION_PATH))
                    .withLabels(subUnitDto.getName())
                    .withAcronym(subUnitDto.getAcronym())
+                   .withCountry(subUnitDto.getCountry())
                    .build();
     }
 
@@ -240,6 +241,7 @@ public class CristinOrganizationApiClient
                    .withPartOf(partOf)
                    .withHasPart(getSubUnits(subSubUnitDto))
                    .withLabels(subSubUnitDto.getUnitName())
+                   .withCountry(subSubUnitDto.getCountry())
                    .build();
     }
 
