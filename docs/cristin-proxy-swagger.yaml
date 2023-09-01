@@ -2371,6 +2371,9 @@ components:
           type: string
           pattern: '.*'
           description: 'Short mnemonic identifying Organization'
+        country:
+          type: string
+          description: Two letter country code (ISO 3166-1 alpha-2)
         partOf:
           description: List of Organizations this organization is part of
           type: array
@@ -3548,6 +3551,7 @@ components:
           'nb': 'OsloMet - storbyuniversitetet'
           'en': 'Oslomet - Oslo Metropolitan University'
         acronym: 'OSLOMET'
+        country: 'NO'
         partOf:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             type: 'Organization'

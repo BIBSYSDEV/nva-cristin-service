@@ -20,10 +20,12 @@
             "en": "University of Oslo"
           },
           "partOf": [],
-          "hasPart": []
+          "hasPart": [],
+          "country" : "NO"
         }
       ],
-      "hasPart": []
+      "hasPart": [],
+      "country" : "NO"
     }
   ],
   "hasPart": [
@@ -374,5 +376,6 @@
         }
       ]
     }
-  ]
+  ],
+  "country" : "NO"
 }

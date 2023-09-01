@@ -30,6 +30,7 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
                    .withAcronym(unitDto.getAcronym())
                    .withHasPart(unitsToOrganizations(unitDto.getSubUnits()))
                    .withPartOf(parentToSetOfOrganizations(unitDto.getParentUnit()))
+                   .withCountry(unitDto.getCountry())
                    .build();
     }
 

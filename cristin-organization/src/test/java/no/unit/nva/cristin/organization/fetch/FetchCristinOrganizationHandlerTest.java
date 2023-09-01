@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -43,7 +45,6 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAT
 import static no.unit.nva.cristin.common.client.ClientProvider.VERSION_2023_05_26;
 import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
-import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
@@ -81,6 +82,7 @@ class FetchCristinOrganizationHandlerTest {
     public static final String NVA_GET_RESPONSE_20230526_JSON = "nvaGetResponse20230526.json";
     public static final String NVA_GET_RESPONSE_WITH_SUB_UNITS_20230526_JSON =
         "nvaGetResponseWithSubUnits20230526.json";
+    public static final String NORWEGIAN_LANGUAGE_KEY_UPPERCASE = "NO";
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
@@ -203,6 +205,7 @@ class FetchCristinOrganizationHandlerTest {
         assertEquals(actualOrganization.getId(), expectedId);
         assertThat(actualOrganization.getLabels().get(ENGLISH_LANGUAGE_KEY),
                    containsString(DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY));
+        assertThat(actualOrganization.getCountry(), equalTo(NORWEGIAN_LANGUAGE_KEY_UPPERCASE));
     }
 
 
@@ -233,6 +236,7 @@ class FetchCristinOrganizationHandlerTest {
                    containsString(DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY));
         assertThat(actualOrganization.getHasPart(), equalTo(null));
         assertThat(actualOrganization.getPartOf(), equalTo(null));
+        assertThat(actualOrganization.getCountry(), equalTo(NORWEGIAN_LANGUAGE_KEY_UPPERCASE));
     }
 
     @Test
@@ -256,7 +260,7 @@ class FetchCristinOrganizationHandlerTest {
     void shouldReturnCorrectPayloadBasedOnQueryParamDepthWhenRequestingVersion20230526(String depth,
                                                                                        String cristinPayload,
                                                                                        String cristinSubsPayload,
-                                                                                       String nvaPayload)
+                                                                                       String expectedResult)
         throws Exception {
 
         doReturn(new HttpResponseFaker(cristinPayload)).doReturn(new HttpResponseFaker(cristinSubsPayload))
@@ -267,13 +271,9 @@ class FetchCristinOrganizationHandlerTest {
         fetchCristinOrganizationHandler.handleRequest(input, output, context);
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
-        var responseBody = gatewayResponse.getBody();
+        var actual = gatewayResponse.getBody();
 
-        assertThat(deserialize(responseBody), equalTo(deserialize(nvaPayload)));
-    }
-
-    private Organization deserialize(String body) throws JsonProcessingException {
-        return OBJECT_MAPPER.readValue(body, Organization.class);
+        JSONAssert.assertEquals(expectedResult, actual, JSONCompareMode.LENIENT);
     }
 
     private Object getSubSubUnit(String subUnitFile) {
@@ -293,6 +293,7 @@ class FetchCristinOrganizationHandlerTest {
                 .build();
     }
 
+    @SuppressWarnings("SameParameterValue")
     private InputStream generateHandlerRequestWithAdditionalQueryParameters(String organizationIdentifier, String depth)
             throws JsonProcessingException {
         var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type());

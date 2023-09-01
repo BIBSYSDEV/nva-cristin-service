@@ -9,6 +9,7 @@ dependencies {
     testImplementation libs.karate.junit5
 
     testImplementation project(":cristin-testing")
+    testImplementation libs.json.assert
 }
 
 tasks.named('test', Test) {
