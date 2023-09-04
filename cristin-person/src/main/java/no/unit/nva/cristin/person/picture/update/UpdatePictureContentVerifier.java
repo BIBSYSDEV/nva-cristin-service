@@ -17,7 +17,8 @@ public class UpdatePictureContentVerifier {
 
     public static final String NOT_AN_IMAGE = "Binary data is not an image";
     public static final String DECODED_DATA_SIZE_MESSAGE = "Decoded data is an image of size in bytes: {}";
-    public static final String SENT_EMPTY_PAYLOAD = "Client sent an empty payload, attempting to delete profile picture";
+    public static final String SENT_EMPTY_PAYLOAD =
+        "Client sent an empty payload, attempting to delete profile picture";
     public static final String COULD_NOT_DECODE_BINARY_DATA = "Could not decode binary data";
 
     private final byte[] decoded;
