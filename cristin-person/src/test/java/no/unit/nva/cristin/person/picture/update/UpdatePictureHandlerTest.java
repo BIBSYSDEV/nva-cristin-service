@@ -12,6 +12,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.UriUtils.PERSON;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -101,6 +102,15 @@ public class UpdatePictureHandlerTest {
             assertEquals(HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
             assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(CONTENT_TYPE));
         }
+    }
+
+    @Test
+    void shouldAllowDeletingProfilePictureBySendingEmptyPayload() throws IOException {
+        var input = new Binary(EMPTY_STRING);
+
+        var gatewayResponse = queryWithValidBodyAndMatchingIdentifier(input);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_NO_CONTENT));
     }
 
     private GatewayResponse<Void> queryWithoutRequiredAccessRights(Binary body) throws IOException {
