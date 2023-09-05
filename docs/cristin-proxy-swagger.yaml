@@ -452,7 +452,7 @@ paths:
     get:
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchOrganization.Arn}:live/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchOrganization.Arn}/invocations
         httpMethod: POST
         requestParameters:
           integration.request.path.identifier:
@@ -1020,7 +1020,7 @@ paths:
     post:
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonUsingNin.Arn}:live/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonUsingNin.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
