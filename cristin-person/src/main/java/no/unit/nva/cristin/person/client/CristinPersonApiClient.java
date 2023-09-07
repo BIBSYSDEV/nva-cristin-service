@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
-import static no.unit.nva.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.common.Utils.isOrcid;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;

@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.util.Objects.isNull;
-import static no.unit.nva.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;

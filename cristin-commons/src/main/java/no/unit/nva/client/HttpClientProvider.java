@@ -1,4 +1,4 @@
-package no.unit.nva;
+package no.unit.nva.client;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;

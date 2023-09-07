@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.affiliations;
 
 import static java.util.Arrays.asList;
-import static no.unit.nva.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;

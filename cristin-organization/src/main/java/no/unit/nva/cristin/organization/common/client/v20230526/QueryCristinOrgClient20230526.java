@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.organization.common.client.v20230526;
 
 import static java.util.Arrays.asList;
-import static no.unit.nva.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.organization.common.QueryParamConverter.translateToCristinApi;

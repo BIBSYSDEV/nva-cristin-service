@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.keyword.query;
 
 import static java.util.Arrays.asList;
-import static no.unit.nva.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import java.net.URI;
