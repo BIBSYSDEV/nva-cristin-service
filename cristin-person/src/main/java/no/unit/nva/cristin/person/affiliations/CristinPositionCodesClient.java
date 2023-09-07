@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.person.affiliations.client;
+package no.unit.nva.cristin.person.affiliations;
 
 import static java.util.Arrays.asList;
 import static no.unit.nva.HttpClientProvider.defaultHttpClient;

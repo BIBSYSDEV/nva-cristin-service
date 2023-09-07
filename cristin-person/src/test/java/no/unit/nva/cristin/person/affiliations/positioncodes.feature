@@ -1,4 +1,4 @@
-Feature: API tests for Cristin Organization retrieve and search
+Feature: API tests for Cristin Position Codes
 
   Background:
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')

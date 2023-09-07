@@ -1,10 +1,10 @@
-package no.unit.nva.cristin.person.affiliations.handler;
+package no.unit.nva.cristin.person.affiliations;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.ONLY_SUPPORT_BOOLEAN_VALUES;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.person.affiliations.handler.PositionCodesHandler.ACTIVE_STATUS_QUERY_PARAM;
+import static no.unit.nva.cristin.person.affiliations.PositionCodesHandler.ACTIVE_STATUS_QUERY_PARAM;
 import static no.unit.nva.testutils.RandomDataGenerator.randomBoolean;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -28,7 +28,6 @@ import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Map;
 import no.unit.nva.cristin.common.ErrorMessages;
-import no.unit.nva.cristin.person.affiliations.client.CristinPositionCodesClient;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
 import no.unit.nva.cristin.person.affiliations.model.PositionCode;
 import no.unit.nva.cristin.person.affiliations.model.PositionCodes;

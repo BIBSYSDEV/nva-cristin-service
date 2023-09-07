@@ -1,10 +1,9 @@
-package no.unit.nva.cristin.person.affiliations.handler;
+package no.unit.nva.cristin.person.affiliations;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ONLY_SUPPORT_BOOLEAN_VALUES;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
-import no.unit.nva.cristin.person.affiliations.client.CristinPositionCodesClient;
 import no.unit.nva.cristin.person.affiliations.model.PositionCodes;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
