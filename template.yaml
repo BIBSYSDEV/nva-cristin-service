@@ -303,7 +303,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.FetchCristinPersonHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.fetch.FetchCristinPersonHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinFetchPersonEvent:
@@ -317,7 +317,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.fetch.FetchFromIdentityNumberHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinFetchPersonUsingNinEvent:

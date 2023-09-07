@@ -1,4 +1,4 @@
-Feature: API tests for Cristin Person fetch
+Feature: API tests for Cristin Person fetch by Identity Number
 
   Background:
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')

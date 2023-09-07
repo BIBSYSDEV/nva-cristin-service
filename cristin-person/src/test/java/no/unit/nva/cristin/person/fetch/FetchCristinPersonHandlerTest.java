@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.person.handler;
+package no.unit.nva.cristin.person.fetch;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
