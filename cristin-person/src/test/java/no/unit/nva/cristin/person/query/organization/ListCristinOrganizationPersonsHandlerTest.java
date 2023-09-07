@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.person.handler;
+package no.unit.nva.cristin.person.query.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
@@ -45,7 +44,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
-import static no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler.VALID_QUERY_PARAMETERS;
+import static no.unit.nva.cristin.person.query.organization.ListCristinOrganizationPersonsHandler.VALID_QUERY_PARAMETERS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;

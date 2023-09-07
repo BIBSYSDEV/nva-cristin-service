@@ -1,9 +1,8 @@
-package no.unit.nva.cristin.person.handler;
+package no.unit.nva.cristin.person.query.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.client.CristinOrganizationPersonsClient;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.utils.AccessUtils;
 import no.unit.nva.utils.UriUtils;

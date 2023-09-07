@@ -1,7 +1,9 @@
-package no.unit.nva.cristin.person.client;
+package no.unit.nva.cristin.person.query.organization;
 
 import java.net.http.HttpClient;
 import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.person.client.CristinPersonApiClient;
+import no.unit.nva.cristin.person.client.CristinPersonQuery;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.paths.UriWrapper;

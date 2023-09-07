@@ -262,7 +262,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.query.organization.ListCristinOrganizationPersonsHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaListOrganizationPersonsEvent:
@@ -289,7 +289,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.QueryCristinPersonHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.query.QueryCristinPersonHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinQueryPersonEvent:
