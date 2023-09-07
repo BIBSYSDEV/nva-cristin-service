@@ -1,4 +1,4 @@
-Feature: API tests for Cristin Person fetch
+Feature: API tests for Cristin Person fetch containing identity number check
 
   Background:
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
@@ -18,26 +18,33 @@ Feature: API tests for Cristin Person fetch
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
 
-  Scenario: Fetch does not return classified person data when authenticated and authorized
+  Scenario: Fetch does return classified person data when authenticated and authorized
     Given path '/person/' + samplePersonIdentifier
     And header Authorization = 'Bearer ' + token
     And request
     When method GET
     Then status 200
-    And print 'Response=' ,response
-    And match response.NationalIdentificationNumber != '#present'
+    * string identifiers = response.identifiers
+    And match identifiers contains 'CristinIdentifier'
+    And match identifiers contains 'NationalIdentificationNumber'
 
   Scenario: Fetch returns unclassified person data when authenticated but not authorized
     Given path '/person/' + samplePersonIdentifier
     * header Authorization = 'Bearer ' + simpleUserToken
     When method GET
     Then status 200
+    * string identifiers = response.identifiers
+    And match identifiers contains 'CristinIdentifier'
+    And match identifiers !contains 'NationalIdentificationNumber'
     And match response.NationalIdentificationNumber != '#present'
 
   Scenario: Fetch returns unclassified person data when not authenticated nor authorized
     Given path '/person/' + samplePersonIdentifier
     When method GET
     Then status 200
+    * string identifiers = response.identifiers
+    And match identifiers contains 'CristinIdentifier'
+    And match identifiers !contains 'NationalIdentificationNumber'
     And match response.NationalIdentificationNumber != '#present'
 
   Scenario: Fetch returns 200 OK and no NationalIdentificationNumber when token is invalid
@@ -45,6 +52,9 @@ Feature: API tests for Cristin Person fetch
     * header Authorization = 'Bearer and.just-a.silly-text-for-token'
     When method GET
     Then status 200
+    * string identifiers = response.identifiers
+    And match identifiers contains 'CristinIdentifier'
+    And match identifiers !contains 'NationalIdentificationNumber'
     And match response.NationalIdentificationNumber != '#present'
 
   Scenario: Fetch returns status Not found when requesting unknown person identifier
