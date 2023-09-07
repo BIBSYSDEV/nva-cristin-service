@@ -1,4 +1,4 @@
-package no.unit.nva.utils;
+package no.unit.nva.access;
 
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;

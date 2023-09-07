@@ -1,4 +1,4 @@
-package no.unit.nva;
+package no.unit.nva.validation;
 
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 

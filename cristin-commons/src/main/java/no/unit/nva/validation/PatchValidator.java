@@ -1,4 +1,4 @@
-package no.unit.nva.utils;
+package no.unit.nva.validation;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;

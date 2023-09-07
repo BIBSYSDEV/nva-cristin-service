@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
-import no.unit.nva.Validator;
+import no.unit.nva.validation.Validator;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.PatchValidator;
+import no.unit.nva.validation.PatchValidator;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
 import java.util.List;

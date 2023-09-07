@@ -8,7 +8,7 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
-import static no.unit.nva.utils.PatchValidator.validateDescription;
+import static no.unit.nva.validation.PatchValidator.validateDescription;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.unit.nva.cristin.common.Utils;

@@ -1,4 +1,4 @@
-package no.unit.nva.utils;
+package no.unit.nva.access;
 
 import java.util.Map;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
