@@ -1,4 +1,4 @@
-package no.unit.nva.utils;
+package no.unit.nva.cristin.projects.model.nva;
 
 import nva.commons.core.SingletonCollector;
 

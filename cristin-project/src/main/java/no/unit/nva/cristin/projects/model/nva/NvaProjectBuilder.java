@@ -42,7 +42,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
-import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
+import static no.unit.nva.cristin.projects.model.nva.ContributorRoleMapping.getNvaRole;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
