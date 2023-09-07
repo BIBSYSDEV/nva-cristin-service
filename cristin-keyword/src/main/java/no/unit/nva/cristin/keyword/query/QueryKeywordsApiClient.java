@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.common.client.ApiClient;
-import no.unit.nva.cristin.common.client.QueryApiClient;
+import no.unit.nva.cristin.common.client.CristinQueryApiClient;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.TypedLabel;
@@ -19,7 +19,8 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.paths.UriWrapper;
 
-public class QueryKeywordsApiClient extends ApiClient implements QueryApiClient<Map<String, String>, TypedLabel> {
+public class QueryKeywordsApiClient extends ApiClient
+    implements CristinQueryApiClient<Map<String, String>, TypedLabel> {
 
     public static final String KEYWORD_PATH = "keyword";
     public static final URI KEYWORD_ID_URI = getNvaApiUri(KEYWORD_PATH);

@@ -16,7 +16,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Map;
 import no.unit.nva.cristin.common.client.ApiClient;
-import no.unit.nva.cristin.common.client.FetchApiClient;
+import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.cristin.organization.dto.v20230526.UnitDto;
 import no.unit.nva.cristin.organization.dto.v20230526.mapper.OrganizationFromUnitMapper;
 import no.unit.nva.model.Organization;

@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.common.client;
+package no.unit.nva.client;
 
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 

@@ -1,9 +1,10 @@
 package no.unit.nva.cristin.common.client;
 
+import no.unit.nva.client.GenericApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 
-public interface QueryApiClient<T, R> extends GenericApiClient {
+public interface CristinQueryApiClient<T, R> extends GenericApiClient {
 
     /**
      * Execute a query to upstream using query params and return its response inside a wrapper class.
