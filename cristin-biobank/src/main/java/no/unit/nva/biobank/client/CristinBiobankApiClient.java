@@ -1,6 +1,6 @@
 package no.unit.nva.biobank.client;
 
-import static no.unit.nva.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;

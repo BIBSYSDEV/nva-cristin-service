@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Map;
 import no.unit.nva.cristin.projects.common.ProjectResourceAccessCheck;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.utils.ResourceAccessCheck;
+import no.unit.nva.access.ResourceAccessCheck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

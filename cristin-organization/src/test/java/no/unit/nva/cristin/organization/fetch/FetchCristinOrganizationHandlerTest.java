@@ -42,7 +42,7 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
-import static no.unit.nva.cristin.common.client.ClientProvider.VERSION_2023_05_26;
+import static no.unit.nva.client.ClientProvider.VERSION_2023_05_26;
 import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;

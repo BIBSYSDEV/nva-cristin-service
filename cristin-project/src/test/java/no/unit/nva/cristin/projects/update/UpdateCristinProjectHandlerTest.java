@@ -42,8 +42,8 @@ import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.PROJECT_
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.PatchValidator.COULD_NOT_PARSE_LANGUAGE_FIELD;
-import static no.unit.nva.utils.PatchValidator.ILLEGAL_VALUE_FOR_PROPERTY;
+import static no.unit.nva.validation.PatchValidator.COULD_NOT_PARSE_LANGUAGE_FIELD;
+import static no.unit.nva.validation.PatchValidator.ILLEGAL_VALUE_FOR_PROPERTY;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
