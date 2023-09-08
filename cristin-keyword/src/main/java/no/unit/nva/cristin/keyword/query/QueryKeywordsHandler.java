@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.cristin.common.Utils;
-import no.unit.nva.cristin.common.client.QueryApiClient;
+import no.unit.nva.cristin.common.client.CristinQueryApiClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.TypedLabel;
@@ -24,7 +24,7 @@ public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchRespon
     public static final String DEFAULT_NUMBER_OF_RESULTS = "100";
     public static final String DEFAULT_PAGE = "1";
 
-    private final transient QueryApiClient<Map<String, String>, TypedLabel> apiClient;
+    private final transient CristinQueryApiClient<Map<String, String>, TypedLabel> apiClient;
 
     @SuppressWarnings("unused")
     public QueryKeywordsHandler() {
@@ -35,7 +35,8 @@ public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchRespon
         this(new QueryKeywordsApiClient(), environment);
     }
 
-    public QueryKeywordsHandler(QueryApiClient<Map<String, String>, TypedLabel> apiClient, Environment environment) {
+    public QueryKeywordsHandler(CristinQueryApiClient<Map<String, String>, TypedLabel> apiClient,
+                                Environment environment) {
         super(Void.class, environment);
         this.apiClient = apiClient;
     }

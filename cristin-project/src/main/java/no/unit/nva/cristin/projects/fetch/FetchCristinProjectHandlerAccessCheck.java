@@ -2,7 +2,7 @@ package no.unit.nva.cristin.projects.fetch;
 
 import static nva.commons.core.attempt.Try.attempt;
 import no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck;
-import no.unit.nva.utils.HandlerAccessCheck;
+import no.unit.nva.access.HandlerAccessCheck;
 import nva.commons.apigateway.RequestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

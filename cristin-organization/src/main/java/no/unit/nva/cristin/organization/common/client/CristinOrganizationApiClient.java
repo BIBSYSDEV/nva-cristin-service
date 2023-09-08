@@ -3,8 +3,8 @@ package no.unit.nva.cristin.organization.common.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import no.unit.nva.cristin.common.client.ApiClient;
-import no.unit.nva.cristin.common.client.QueryApiClient;
-import no.unit.nva.cristin.common.client.FetchApiClient;
+import no.unit.nva.cristin.common.client.CristinQueryApiClient;
+import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.dto.InstitutionDto;
 import no.unit.nva.cristin.organization.dto.SubSubUnitDto;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.util.Objects.isNull;
-import static no.unit.nva.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.NONE;
 import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
@@ -55,7 +55,8 @@ import static nva.commons.core.attempt.Try.of;
 @SuppressWarnings("PMD.GodClass")
 public class CristinOrganizationApiClient
     extends ApiClient
-    implements QueryApiClient<Map<String, String>, Organization>, FetchApiClient<Map<String, String>, Organization> {
+    implements CristinQueryApiClient<Map<String, String>, Organization>,
+               FetchApiClient<Map<String, String>, Organization> {
 
     public static final String ERROR_MESSAGE_FORMAT = "%d:%s";
     public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";

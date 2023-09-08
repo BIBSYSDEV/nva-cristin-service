@@ -8,7 +8,7 @@ import no.unit.nva.cristin.projects.common.ProjectResourceAccessCheck;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
-import no.unit.nva.utils.ResourceAccessCheck;
+import no.unit.nva.access.ResourceAccessCheck;
 import no.unit.nva.utils.UriUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

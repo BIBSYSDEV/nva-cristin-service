@@ -2,7 +2,7 @@ package no.unit.nva.cristin.projects.model.nva;
 
 import static no.unit.nva.cristin.model.CristinInstitution.fromOrganization;
 import static no.unit.nva.cristin.model.CristinUnit.extractUnitIdentifier;
-import static no.unit.nva.utils.ContributorRoleMapping.getCristinRole;
+import static no.unit.nva.cristin.projects.model.nva.ContributorRoleMapping.getCristinRole;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;

@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.picture.fetch;
 
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.unit.nva.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import com.amazonaws.services.lambda.runtime.Context;
 import no.unit.nva.cristin.person.model.nva.Binary;
