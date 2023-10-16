@@ -16,6 +16,7 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,6 +31,8 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import org.mockito.ArgumentCaptor;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.util.Arrays.asList;
@@ -78,6 +81,8 @@ public class FetchCristinPersonHandlerTest {
     private static final String CRISTIN_GET_PERSON_RESPONSE_JSON = "cristinGetPersonResponse.json";
     private static final String CRISTIN_QUERY_EMPLOYMENT_RESPONSE_JSON = "cristinQueryEmploymentResponse.json";
     public static final String NORWEGIAN_NATIONAL_ID = "12345612345";
+    public static final String CRISTIN_PERSON_NVI_VERIFIED_JSON = "cristinPersonNviVerified.json";
+    public static final String NVA_API_GET_PERSON_NVI_VERIFIED_JSON = "nvaApiGetPersonNviVerified.json";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -304,6 +309,22 @@ public class FetchCristinPersonHandlerTest {
         var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
 
         assertThat(actual.getEmployments(), equalTo(null));
+    }
+
+    @Test
+    void shouldReturnResponseContainingNviDataWhenPresentInUpstream() throws Exception {
+        var json = readFromResources(CRISTIN_PERSON_NVI_VERIFIED_JSON);
+        apiClient = spy(apiClient);
+        doReturn(new HttpResponseFaker(json)).when(apiClient).fetchGetResult(any(URI.class));
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBody();
+        var expected = readFromResources(NVA_API_GET_PERSON_NVI_VERIFIED_JSON);
+
+        JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT);
+    }
+
+    private static String readFromResources(String json) {
+        return IoUtils.stringFromResources(Path.of(json));
     }
 
     private GatewayResponse<Person> sendQuery(Map<String, String> queryParams, Map<String, String> pathParam)

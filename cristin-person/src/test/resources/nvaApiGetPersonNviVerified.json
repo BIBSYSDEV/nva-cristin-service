@@ -1,0 +1,28 @@
+{
+  "@context": "https://example.org/person-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/person/359084",
+  "type": "Person",
+  "identifiers": [
+    {
+      "type": "CristinIdentifier",
+      "value": "359084"
+    }
+  ],
+  "names": [
+    {
+      "type": "FirstName",
+      "value": "Kjell Ola"
+    },
+    {
+      "type": "LastName",
+      "value": "Nordmann"
+    }
+  ],
+  "nvi": {
+    "verifiedBy": {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/person/12345",
+      "firstName": "Tor Inge",
+      "lastName": "Kristianslund"
+    }
+  }
+}
