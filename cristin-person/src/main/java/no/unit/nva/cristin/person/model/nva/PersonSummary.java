@@ -3,11 +3,16 @@ package no.unit.nva.cristin.person.model.nva;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 
 public record PersonSummary(@JsonProperty(ID) URI id, @JsonProperty(FIRST_NAME) String firstName,
                             @JsonProperty(LAST_NAME) String lastName) {
+
+    @JsonProperty(TYPE)
+    public static final String type = "Person";
 
     public static Builder builder() {
         return new Builder();
@@ -40,6 +45,11 @@ public record PersonSummary(@JsonProperty(ID) URI id, @JsonProperty(FIRST_NAME) 
         public PersonSummary build() {
             return new PersonSummary(id, firstName, lastName);
         }
+    }
+
+    @JsonGetter
+    public String getType() {
+        return type;
     }
 
 }

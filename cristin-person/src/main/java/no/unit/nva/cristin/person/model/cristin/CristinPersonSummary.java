@@ -5,7 +5,6 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 import no.unit.nva.cristin.person.model.nva.PersonSummary;
@@ -60,7 +59,6 @@ public record CristinPersonSummary(@JsonProperty(FIRST_NAME) String firstName,
         }
     }
 
-    @JsonIgnore
     public PersonSummary toPersonSummary() {
         return nonNull(cristinPersonId) ? new PersonSummary(extractIdUri(), firstName, surname) : null;
     }

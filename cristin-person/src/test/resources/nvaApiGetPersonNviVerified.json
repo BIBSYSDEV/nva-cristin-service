@@ -21,8 +21,27 @@
   "nvi": {
     "verifiedBy": {
       "id": "https://api.dev.nva.aws.unit.no/cristin/person/12345",
+      "type": "Person",
       "firstName": "Tor Inge",
       "lastName": "Kristianslund"
+    },
+    "verifiedAt": {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0",
+      "type": "Organization",
+      "labels": {
+        "en": "Faculty of Theology"
+      },
+      "partOf": [
+        {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
+          "type": "Organization",
+          "labels": {
+            "en": "University of Oslo"
+          },
+          "acronym": "UIO",
+          "country": "NO"
+        }
+      ]
     }
   }
 }

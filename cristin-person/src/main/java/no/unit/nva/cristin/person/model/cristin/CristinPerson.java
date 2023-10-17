@@ -207,10 +207,10 @@ public class CristinPerson implements JsonSerializable {
     public Person toPerson() {
         if (Boolean.TRUE.equals(getReserved())) {
             // Also preserving size of hits from upstream
-            return new Person.Builder().withId(extractIdUri(getCristinPersonId())).build();
+            return new Person.Builder().withId(extractIdUri()).build();
         }
         return new Person.Builder()
-                   .withId(extractIdUri(getCristinPersonId()))
+                   .withId(extractIdUri())
                    .withIdentifiers(extractNonAuthorizedIdentifiers())
                    .withNames(extractNames())
                    .withContactDetails(extractContactDetails())
@@ -232,7 +232,7 @@ public class CristinPerson implements JsonSerializable {
      */
     public Person toPersonWithAuthorizedFields() {
         return new Person.Builder()
-                   .withId(extractIdUri(getCristinPersonId()))
+                   .withId(extractIdUri())
                    .withIdentifiers(extractAuthorizedIdentifiers())
                    .withNames(extractNames())
                    .withContactDetails(extractContactDetails())
@@ -263,9 +263,9 @@ public class CristinPerson implements JsonSerializable {
         return getTel().map(ContactDetails::new).orElse(null);
     }
 
-    private URI extractIdUri(String cristinPersonId) {
+    private URI extractIdUri() {
         return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH_NVA)
-            .addChild(cristinPersonId).getUri();
+            .addChild(getCristinPersonId()).getUri();
     }
 
     private Set<TypedValue> extractNonAuthorizedIdentifiers() {
@@ -315,11 +315,7 @@ public class CristinPerson implements JsonSerializable {
     }
 
     private PersonNvi extractNvi() {
-        return Optional.ofNullable(getPersonNvi())
-                   .map(CristinPersonNvi::verifiedBy)
-                   .map(CristinPersonSummary::toPersonSummary)
-                   .map(PersonNvi::new)
-                   .orElse(null);
+        return nonNull(getPersonNvi()) ? getPersonNvi().toPersonNvi() : null;
     }
 
     @Override
