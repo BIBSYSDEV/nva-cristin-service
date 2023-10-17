@@ -23,7 +23,7 @@ public record CristinPersonNvi(@JsonProperty(VERIFIED_BY) CristinPersonSummary v
                                .map(CristinNviInstitutionUnit::toOrganization);
 
         if (personSummary.isPresent() || organization.isPresent()) {
-            return new PersonNvi(personSummary.orElse(null), organization.orElse(null));
+            return new PersonNvi(personSummary.orElse(null), organization.orElse(null), verifiedDate);
         }
 
         return null;
