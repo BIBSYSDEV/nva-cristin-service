@@ -8,8 +8,10 @@ import no.unit.nva.cristin.person.employment.create.CreatePersonEmploymentValida
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.PersonNvi;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.utils.AccessUtils;
+import no.unit.nva.validation.Validator;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -82,6 +84,15 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
             for (Employment employment : input.getEmployments()) {
                 CreatePersonEmploymentValidator.validate(employment);
             }
+        }
+
+        if (personNviDataHasContent(input)) {
+            AccessUtils.validateIdentificationNumberAccess(requestInfo);
+            Validator<PersonNvi> personNviValidator = new PersonNviValidator();
+            personNviValidator.validate(input.getNvi());
+        }
+
+        if (employmentsHasContent(input) || personNviDataHasContent(input)) {
             return apiClient.createPersonInCristin(input, extractCristinInstitutionIdentifier(requestInfo));
         }
 
@@ -162,5 +173,10 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     private boolean employmentsHasContent(Person input) {
         var employments = input.getEmployments();
         return nonNull(employments) && !employments.isEmpty();
+    }
+
+    private boolean personNviDataHasContent(Person input) {
+        var personNvi = input.getNvi();
+        return nonNull(personNvi);
     }
 }

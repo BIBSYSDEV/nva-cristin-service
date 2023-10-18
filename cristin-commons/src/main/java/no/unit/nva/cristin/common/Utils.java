@@ -143,7 +143,7 @@ public class Utils {
 
     /**
      * Extracts institution string composed of digits from data stored in RequestInfo to be used as value in a header
-     * sent to upstream which describes which institution the user is allowed to change employments at.
+     * sent to upstream which describes which institution the user is allowed to change certain data at.
      *
      * @param requestInfo information from request used to verify allowed permissions
      * @return String with allowed institution to change. Or constant 'any' if internal backend with full access

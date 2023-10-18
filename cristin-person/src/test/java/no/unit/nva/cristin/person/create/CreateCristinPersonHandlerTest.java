@@ -14,6 +14,7 @@ import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR
 import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_IDENTIFIER;
 import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_REQUIRED_NAMES;
 import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_PAYLOAD_EMPTY;
+import static no.unit.nva.cristin.person.create.PersonNviValidator.INVALID_PERSON_ID;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.FIRST_NAME;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.LAST_NAME;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PREFERRED_FIRST_NAME;
@@ -33,6 +34,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -55,10 +57,13 @@ import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.person.model.cristin.CristinAffiliation;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.PersonNvi;
+import no.unit.nva.cristin.person.model.nva.PersonSummary;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
+import no.unit.nva.model.Organization;
 import no.unit.nva.model.TypedLabel;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -85,9 +90,13 @@ public class CreateCristinPersonHandlerTest {
         "https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0";
     private static final String ONE_ORGANIZATION = "https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0";
     private static final String LOG_MESSAGE_FOR_IDENTIFIERS = "Client has Cristin identifier 123456 from organization "
-                                                             + "20754.0.0.0";
+                                                              + "20754.0.0.0";
     public static final String ENGLISH_LANG = "en";
     public static final String ENGLISH_LANG_CONTENT = "My english background";
+    public static final String VERIFIED_BY_ID_URI_NVI = "https://api.dev.nva.aws.unit.no/cristin/person/1234";
+    public static final String VERIFIED_BY_NVI_CRISTIN_IDENTIFIER = "1234";
+    public static final String ONE_ORGANIZATION_IDENTIFIER_LAST_PART = "20754.0.0.0";
+    public static final String ONE_ORGANIZATION_CRISTIN_INSTNR = "20754";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -394,6 +403,39 @@ public class CreateCristinPersonHandlerTest {
         assertThat(actual.getStatusCode(), equalTo(HTTP_CREATED));
     }
 
+    @Test
+    void shouldAddPersonNviDataToCristinJsonWhenPresentInInput() throws Exception {
+        apiClient = spy(apiClient);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+
+        var dummyPerson = dummyPersonNviVerified(dummyNviData());
+
+        var actual = sendQueryWhileMockingCristinOrgIdOfClient(dummyPerson, URI.create(ONE_ORGANIZATION));
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture(), eq(ONE_ORGANIZATION_CRISTIN_INSTNR));
+        var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
+        var personNviFromCapture = capturedCristinPerson.getPersonNvi();
+
+        assertThat(personNviFromCapture.verifiedBy().cristinPersonId(), equalTo(VERIFIED_BY_NVI_CRISTIN_IDENTIFIER));
+        assertThat(personNviFromCapture.verifiedAt().unit().getCristinUnitId(), equalTo(
+            ONE_ORGANIZATION_IDENTIFIER_LAST_PART));
+        assertThat(actual.getStatusCode(), equalTo(HTTP_CREATED));
+    }
+
+    @Test
+    void shouldThrowBadRequestWhenPersonNviDataSuppliedIsInvalid() throws Exception {
+        apiClient = spy(apiClient);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+
+        var dummyPerson = dummyPersonNviVerified(invalidDummyNviData());
+
+        var actual = sendQuery(dummyPerson);
+
+        assertThat(actual.getStatusCode(), equalTo(HTTP_BAD_REQUEST));
+        assertThat(actual.getBody(), containsString(INVALID_PERSON_ID));
+    }
+
     private TypedLabel randomKeyword() {
         return new TypedLabel(randomString(), null);
     }
@@ -549,4 +591,27 @@ public class CreateCristinPersonHandlerTest {
             return GatewayResponse.fromOutputStream(output, Person.class);
         }
     }
+
+    private Person dummyPersonNviVerified(PersonNvi nviData) {
+        return new Person.Builder()
+                   .withNames(Set.of(
+                       new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
+                       new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
+                   .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER)))
+                   .withNvi(nviData)
+                   .build();
+    }
+
+    private PersonNvi dummyNviData() {
+        var verifiedBy = new PersonSummary(URI.create(VERIFIED_BY_ID_URI_NVI), null, null);
+        var verifiedAt = new Organization.Builder().withId(URI.create(ONE_ORGANIZATION)).build();
+        return new PersonNvi(verifiedBy, verifiedAt, null);
+    }
+
+    private PersonNvi invalidDummyNviData() {
+        var verifiedBy = new PersonSummary(null, null, null);
+        var verifiedAt = new Organization.Builder().withId(URI.create(ONE_ORGANIZATION)).build();
+        return new PersonNvi(verifiedBy, verifiedAt, null);
+    }
+
 }
