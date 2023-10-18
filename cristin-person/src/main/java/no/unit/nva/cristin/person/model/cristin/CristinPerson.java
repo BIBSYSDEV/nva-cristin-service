@@ -11,6 +11,7 @@ import no.unit.nva.cristin.person.model.nva.Affiliation;
 import no.unit.nva.cristin.person.model.nva.ContactDetails;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.PersonNvi;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.model.TypedLabel;
 import nva.commons.core.JacocoGenerated;
@@ -33,7 +34,7 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 
-@SuppressWarnings({"unused", "PMD.GodClass"})
+@SuppressWarnings({"unused", "PMD.GodClass", "PMD.TooManyFields"})
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPerson implements JsonSerializable {
@@ -66,6 +67,7 @@ public class CristinPerson implements JsonSerializable {
     private Boolean identifiedCristinPerson;
     private List<CristinTypedLabel> keywords;
     private Map<String, String> background;
+    private CristinPersonNvi personNvi;
 
     public String getCristinPersonId() {
         return cristinPersonId;
@@ -188,6 +190,14 @@ public class CristinPerson implements JsonSerializable {
         this.background = background;
     }
 
+    public CristinPersonNvi getPersonNvi() {
+        return personNvi;
+    }
+
+    public void setPersonNvi(CristinPersonNvi personNvi) {
+        this.personNvi = personNvi;
+    }
+
     /**
      * Creates a Nva person model from a Cristin person model. If the person is not publicly viewable, only returns
      * identifier.
@@ -196,7 +206,8 @@ public class CristinPerson implements JsonSerializable {
      */
     public Person toPerson() {
         if (Boolean.TRUE.equals(getReserved())) {
-            return new Person.Builder().withId(extractIdUri()).build(); // Also preserving size of hits from upstream
+            // Also preserving size of hits from upstream
+            return new Person.Builder().withId(extractIdUri()).build();
         }
         return new Person.Builder()
                    .withId(extractIdUri())
@@ -208,6 +219,7 @@ public class CristinPerson implements JsonSerializable {
                    .withVerified(getIdentifiedCristinPerson())
                    .withKeywords(extractKeywords())
                    .withBackground(extractBackground())
+                   .withNvi(extractNvi())
                    .build();
     }
 
@@ -231,6 +243,7 @@ public class CristinPerson implements JsonSerializable {
                    .withVerified(getIdentifiedCristinPerson())
                    .withKeywords(extractKeywords())
                    .withBackground(extractBackground())
+                   .withNvi(extractNvi())
                    .build();
     }
 
@@ -299,6 +312,10 @@ public class CristinPerson implements JsonSerializable {
 
     private Map<String, String> extractBackground() {
         return nonNull(getBackground()) ? new ConcurrentHashMap<>(getBackground()) : Collections.emptyMap();
+    }
+
+    private PersonNvi extractNvi() {
+        return nonNull(getPersonNvi()) ? getPersonNvi().toPersonNvi() : null;
     }
 
     @Override

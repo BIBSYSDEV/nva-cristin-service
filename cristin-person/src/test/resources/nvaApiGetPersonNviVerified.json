@@ -1,0 +1,48 @@
+{
+  "@context": "https://example.org/person-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/person/359084",
+  "type": "Person",
+  "identifiers": [
+    {
+      "type": "CristinIdentifier",
+      "value": "359084"
+    }
+  ],
+  "names": [
+    {
+      "type": "FirstName",
+      "value": "Kjell Ola"
+    },
+    {
+      "type": "LastName",
+      "value": "Nordmann"
+    }
+  ],
+  "nvi": {
+    "verifiedBy": {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/person/12345",
+      "type": "Person",
+      "firstName": "Tor Inge",
+      "lastName": "Kristianslund"
+    },
+    "verifiedAt": {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0",
+      "type": "Organization",
+      "labels": {
+        "en": "Faculty of Theology"
+      },
+      "partOf": [
+        {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
+          "type": "Organization",
+          "labels": {
+            "en": "University of Oslo"
+          },
+          "acronym": "UIO",
+          "country": "NO"
+        }
+      ]
+    },
+    "verifiedDate": "2023-10-03T15:00:30Z"
+  }
+}

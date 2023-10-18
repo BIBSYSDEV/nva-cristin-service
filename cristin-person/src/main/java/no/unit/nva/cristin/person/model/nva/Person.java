@@ -36,10 +36,12 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NVI;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 
 @JacocoGenerated
+@SuppressWarnings("PMD.ExcessivePublicCount")
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS, RESERVED, EMPLOYMENTS,
     VERIFIED, KEYWORDS, BACKGROUND})
 public class Person implements JsonSerializable {
@@ -71,6 +73,8 @@ public class Person implements JsonSerializable {
     private Set<TypedLabel> keywords;
     @JsonProperty(BACKGROUND)
     private Map<String, String> background;
+    @JsonProperty(NVI)
+    private PersonNvi nvi;
 
     private Person() {
 
@@ -90,6 +94,7 @@ public class Person implements JsonSerializable {
      * @param verified       If this person is a verified person.
      * @param keywords       Keywords related to this person.
      * @param background     Background information about this person.
+     * @param nvi            NVI information about this person.
      */
     @JsonCreator
     @SuppressWarnings("PMD.ExcessiveParameterList")
@@ -99,7 +104,7 @@ public class Person implements JsonSerializable {
                   @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations, @JsonProperty(RESERVED) Boolean reserved,
                   @JsonProperty(EMPLOYMENTS) Set<Employment> employments, @JsonProperty(VERIFIED) Boolean verified,
                   @JsonProperty(KEYWORDS) Set<TypedLabel> keywords,
-                  @JsonProperty(BACKGROUND) Map<String, String> background) {
+                  @JsonProperty(BACKGROUND) Map<String, String> background, @JsonProperty(NVI) PersonNvi nvi) {
         this.id = id;
         this.identifiers = identifiers;
         this.names = names;
@@ -111,6 +116,7 @@ public class Person implements JsonSerializable {
         this.verified = verified;
         this.keywords = keywords;
         this.background = background;
+        this.nvi = nvi;
     }
 
     public String getContext() {
@@ -213,6 +219,14 @@ public class Person implements JsonSerializable {
         this.background = background;
     }
 
+    public PersonNvi getNvi() {
+        return nvi;
+    }
+
+    public void setNvi(PersonNvi nvi) {
+        this.nvi = nvi;
+    }
+
     /**
      * Converts this object to an appropriate format for POST to Cristin.
      */
@@ -284,7 +298,8 @@ public class Person implements JsonSerializable {
                && Objects.equals(getEmployments(), person.getEmployments())
                && Objects.equals(getVerified(), person.getVerified())
                && Objects.equals(getKeywords(), person.getKeywords())
-               && Objects.equals(getBackground(), person.getBackground());
+               && Objects.equals(getBackground(), person.getBackground())
+               && Objects.equals(getNvi(), person.getNvi());
     }
 
     @JacocoGenerated
@@ -292,7 +307,7 @@ public class Person implements JsonSerializable {
     public int hashCode() {
         return Objects.hash(getId(), getContext(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
                             getAffiliations(), getReserved(), getEmployments(), getVerified(), getKeywords(),
-                            getBackground());
+                            getBackground(), getNvi());
     }
 
     @Override
@@ -366,6 +381,11 @@ public class Person implements JsonSerializable {
 
         public Builder withBackground(Map<String, String> background) {
             person.setBackground(background);
+            return this;
+        }
+
+        public Builder withNvi(PersonNvi nvi) {
+            person.setNvi(nvi);
             return this;
         }
 

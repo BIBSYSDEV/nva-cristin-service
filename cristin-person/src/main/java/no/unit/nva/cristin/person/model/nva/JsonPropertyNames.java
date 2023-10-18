@@ -20,4 +20,5 @@ public class JsonPropertyNames {
     public static final String VERIFIED = "verified";
     public static final String KEYWORDS = "keywords";
     public static final String BACKGROUND = "background";
+    public static final String NVI = "nvi";
 }
