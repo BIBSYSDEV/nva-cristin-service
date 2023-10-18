@@ -44,15 +44,13 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     private static final Logger logger = LoggerFactory.getLogger(CreateCristinPersonHandler.class);
 
     public static final String ERROR_MESSAGE_IDENTIFIER_NOT_VALID =
-        String.format("%s is not valid", NATIONAL_IDENTITY_NUMBER);
+        String.format("Required field %s is not valid", NATIONAL_IDENTITY_NUMBER);
     public static final String ERROR_MESSAGE_PAYLOAD_EMPTY = "Payload cannot be empty";
-    public static final String ERROR_MESSAGE_MISSING_IDENTIFIER =
-        String.format("Missing required identifier: %s", NATIONAL_IDENTITY_NUMBER);
     private static final Set<String> REQUIRED_NAMES = Set.of(CristinPerson.FIRST_NAME, CristinPerson.LAST_NAME);
     public static final String ERROR_MESSAGE_MISSING_REQUIRED_NAMES =
         String.format("Missing required names: %s", REQUIRED_NAMES);
     public static final String ERROR_MESSAGE_IDENTIFIERS_REPEATED =
-            String.format("Unique identifier %s is repeated", NATIONAL_IDENTITY_NUMBER);
+        String.format("Unique identifier %s is repeated", NATIONAL_IDENTITY_NUMBER);
     public static final int MAX_NATIONAL_IDENTITY_NUMBER_COUNT = 1;
 
     private final transient CreateCristinPersonApiClient apiClient;
@@ -74,8 +72,15 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
         validateContainsPayload(input);
         validateContainsRequiredNames(extractIdentifiers(input.getNames()));
         validateNoDuplicateNationalIdentifiers(input.getIdentifiers());
-        validateContainsRequiredIdentifiers(extractIdentifiers(input.getIdentifiers()));
-        validateValidIdentificationNumber(extractIdentificationNumber(input.getIdentifiers()));
+
+        if (suppliedInputPersonNinDoesNotMatchClientOwn(input, requestInfo)) {
+            AccessUtils.validateIdentificationNumberAccess(requestInfo);
+        }
+
+        var identificationNumber = extractIdentificationNumber(input.getIdentifiers()).orElse(null);
+        if (nonNull(identificationNumber) && !identificationNumberIsValid(identificationNumber)) {
+            throw new BadRequestException(ERROR_MESSAGE_IDENTIFIER_NOT_VALID);
+        }
 
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
@@ -94,10 +99,6 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
 
         if (employmentsHasContent(input) || personNviDataHasContent(input)) {
             return apiClient.createPersonInCristin(input, extractCristinInstitutionIdentifier(requestInfo));
-        }
-
-        if (suppliedInputPersonNinDoesNotMatchClientOwn(input, requestInfo)) {
-            AccessUtils.validateIdentificationNumberAccess(requestInfo);
         }
 
         return apiClient.createPersonInCristin(input);
@@ -131,41 +132,30 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
         throw new BadRequestException(ERROR_MESSAGE_MISSING_REQUIRED_NAMES);
     }
 
-    private void validateContainsRequiredIdentifiers(Set<String> identificationNumbers) throws BadRequestException {
-        if (identificationNumbers.contains(NATIONAL_IDENTITY_NUMBER)) {
-            return;
-        }
-        throw new BadRequestException(ERROR_MESSAGE_MISSING_IDENTIFIER);
-    }
-
-    private String extractIdentificationNumber(Set<TypedValue> identifiers) throws BadRequestException {
+    private Optional<String> extractIdentificationNumber(Set<TypedValue> identifiers) {
         return identifiers.stream().filter(TypedValue::hasData)
             .filter(elm -> NATIONAL_IDENTITY_NUMBER.equals(elm.getType()))
-            .map(TypedValue::getValue).findFirst()
-            .orElseThrow(() -> new BadRequestException(ERROR_MESSAGE_IDENTIFIER_NOT_VALID));
+            .map(TypedValue::getValue).findFirst();
     }
 
-    private void validateValidIdentificationNumber(String number) throws BadRequestException {
-        if (FodselsnummerValidator.isValid(number)) {
-            return;
-        }
-        throw new BadRequestException(ERROR_MESSAGE_IDENTIFIER_NOT_VALID);
+    private boolean identificationNumberIsValid(String number) {
+        return FodselsnummerValidator.isValid(number);
     }
 
     private void validateNoDuplicateNationalIdentifiers(Set<TypedValue> identifiers) throws BadRequestException {
         if (identifiers.stream().map(TypedValue::getType)
                 .filter(NATIONAL_IDENTITY_NUMBER::equals)
-                .collect(Collectors.toList())
+                .toList()
                 .size() > MAX_NATIONAL_IDENTITY_NUMBER_COUNT) {
             throw new BadRequestException(ERROR_MESSAGE_IDENTIFIERS_REPEATED);
         }
     }
 
-    private boolean suppliedInputPersonNinDoesNotMatchClientOwn(Person input, RequestInfo requestInfo)
-        throws BadRequestException {
-        Optional<String> clientOwnPersonNin = attempt(requestInfo::getPersonNin).toOptional();
+    private boolean suppliedInputPersonNinDoesNotMatchClientOwn(Person input, RequestInfo requestInfo) {
+        var clientOwnPersonNin = attempt(requestInfo::getPersonNin).toOptional();
         if (clientOwnPersonNin.isPresent()) {
-            return !Objects.equals(extractIdentificationNumber(input.getIdentifiers()), clientOwnPersonNin.get());
+            var ninFromPayload = extractIdentificationNumber(input.getIdentifiers()).orElse(null);
+            return isNull(ninFromPayload) || !Objects.equals(ninFromPayload, clientOwnPersonNin.get());
         }
         return true;
     }

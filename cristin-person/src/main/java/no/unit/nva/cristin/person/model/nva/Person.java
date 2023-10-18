@@ -253,7 +253,9 @@ public class Person implements JsonSerializable {
         cristinPerson.setBackground(getBackground());
 
         if (nonNull(getNvi())) {
-            CristinPersonNvi cristinPersonNvi = new CristinPersonNvi(extractVerifiedById(), extractVerifiedAtId(), null);
+            CristinPersonNvi cristinPersonNvi = new CristinPersonNvi(extractVerifiedById(),
+                                                                     extractVerifiedAtId(),
+                                                                     null);
             cristinPerson.setPersonNvi(cristinPersonNvi);
         }
 

@@ -11,7 +11,6 @@ import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
 import static no.unit.nva.cristin.person.RandomPersonData.randomEmployments;
 import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_REPEATED;
 import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIER_NOT_VALID;
-import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_IDENTIFIER;
 import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_MISSING_REQUIRED_NAMES;
 import static no.unit.nva.cristin.person.create.CreateCristinPersonHandler.ERROR_MESSAGE_PAYLOAD_EMPTY;
 import static no.unit.nva.cristin.person.create.PersonNviValidator.INVALID_PERSON_ID;
@@ -73,6 +72,8 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
@@ -133,19 +134,6 @@ public class CreateCristinPersonHandlerTest {
         var response = sendQuery(input);
 
         assertEquals(HTTP_CREATED, response.getStatusCode());
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenClientPayloadIsMissingRequiredIdentifier() throws Exception {
-        var personWithMissingIdentity = new Person.Builder()
-                                            .withNames(Set.of(new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
-                                                              new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
-                                            .build();
-        var gatewayResponse = sendQuery(personWithMissingIdentity);
-
-        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_MISSING_IDENTIFIER));
     }
 
     @Test
@@ -215,6 +203,27 @@ public class CreateCristinPersonHandlerTest {
     void shouldThrowForbiddenIfUserTryingToCreateWithAnotherPersonNinThatDoesNotBelongToThemAndIsNotAuthorized()
         throws IOException {
         var input = injectPersonNinIntoInput(DEFAULT_IDENTITY_NUMBER);
+        var gatewayResponse =
+            sendQueryWithoutAccessRightsButWithPersonNin(input, ANOTHER_IDENTITY_NUMBER);
+
+        assertEquals(HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldThrowForbiddenIfUserTryingToCreateSomeoneOtherThanThemselvesWithNinSetToNull()
+        throws IOException {
+        var input = injectPersonNinIntoInput(null);
+        var gatewayResponse =
+            sendQueryWithoutAccessRightsButWithPersonNin(input, ANOTHER_IDENTITY_NUMBER);
+
+        assertEquals(HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "hello", "1234"})
+    void shouldThrowForbiddenIfUserTryingToCreateSomeoneOtherThanThemselvesWithNinSetToInvalidValue(String nin)
+        throws IOException {
+        var input = injectPersonNinIntoInput(nin);
         var gatewayResponse =
             sendQueryWithoutAccessRightsButWithPersonNin(input, ANOTHER_IDENTITY_NUMBER);
 
@@ -410,7 +419,7 @@ public class CreateCristinPersonHandlerTest {
 
         var dummyPerson = dummyPersonNviVerified(dummyNviData());
 
-        var actual = sendQueryWhileMockingCristinOrgIdOfClient(dummyPerson, URI.create(ONE_ORGANIZATION));
+        final var actual = sendQueryWhileMockingCristinOrgIdOfClient(dummyPerson, URI.create(ONE_ORGANIZATION));
 
         var captor = ArgumentCaptor.forClass(String.class);
         verify(apiClient).post(any(), captor.capture(), eq(ONE_ORGANIZATION_CRISTIN_INSTNR));
@@ -434,6 +443,17 @@ public class CreateCristinPersonHandlerTest {
 
         assertThat(actual.getStatusCode(), equalTo(HTTP_BAD_REQUEST));
         assertThat(actual.getBody(), containsString(INVALID_PERSON_ID));
+    }
+
+    @Test
+    void shouldReturnCreatedWhenClientPayloadIsMissingNinButIsUserAdmin() throws Exception {
+        var personWithMissingIdentity = new Person.Builder()
+                                            .withNames(Set.of(new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
+                                                              new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
+                                            .build();
+        var gatewayResponse = sendQuery(personWithMissingIdentity);
+
+        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
     }
 
     private TypedLabel randomKeyword() {

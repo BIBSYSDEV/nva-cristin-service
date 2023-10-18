@@ -10,8 +10,10 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 
 public class PersonNviValidator implements Validator<PersonNvi> {
 
-    public static final String INVALID_PERSON_ID = "Person NVI verification data must have a person identifier associated with it";
-    public static final String INVALID_ORG_ID = "Person NVI verification data must have a organization identifier associated with it";
+    public static final String INVALID_PERSON_ID =
+        "Person NVI verification data must have a person identifier associated with it";
+    public static final String INVALID_ORG_ID =
+        "Person NVI verification data must have a organization identifier associated with it";
 
     @Override
     public void validate(PersonNvi personNvi) throws ApiGatewayException {
