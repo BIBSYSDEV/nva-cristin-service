@@ -8,7 +8,8 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 
-public record PersonSummary(@JsonProperty(ID) URI id, @JsonProperty(FIRST_NAME) String firstName,
+public record PersonSummary(@JsonProperty(ID) URI id,
+                            @JsonProperty(FIRST_NAME) String firstName,
                             @JsonProperty(LAST_NAME) String lastName) {
 
     @JsonProperty(TYPE)

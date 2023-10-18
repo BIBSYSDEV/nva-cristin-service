@@ -10,7 +10,8 @@ import java.util.Optional;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.model.Organization;
 
-public record CristinPersonNviInstitution(@JsonProperty(ACRONYM) String acronym, @JsonProperty(COUNTRY) String country,
+public record CristinPersonNviInstitution(@JsonProperty(ACRONYM) String acronym,
+                                          @JsonProperty(COUNTRY) String country,
                                           @JsonProperty(CORRESPONDING_UNIT) CristinUnit correspondingUnit,
                                           @JsonProperty(INSTITUTION_NAME) Map<String, String> institutionName) {
 
