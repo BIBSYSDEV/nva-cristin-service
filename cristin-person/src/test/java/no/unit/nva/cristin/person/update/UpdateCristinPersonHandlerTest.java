@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
 import java.net.URI;
 import java.util.Optional;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -20,6 +21,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
 import java.util.Map;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.zalando.problem.Problem;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
@@ -41,7 +45,10 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_L
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_EMPLOYMENT_FIELD;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_KEYWORD_FIELD;
+import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_NVI_FIELD;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.FIELD_CAN_NOT_BE_ERASED;
+import static no.unit.nva.cristin.person.update.PersonPatchValidator.MUST_HAVE_A_VALID_ORGANIZATION_IDENTIFIER;
+import static no.unit.nva.cristin.person.update.PersonPatchValidator.MUST_HAVE_A_VALID_PERSON_IDENTIFIER;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.ORCID_IS_NOT_VALID;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.RESERVED_MUST_BE_BOOLEAN;
 import static no.unit.nva.cristin.person.update.UpdateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH;
@@ -190,8 +197,7 @@ public class UpdateCristinPersonHandlerTest {
         throws IOException {
         var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(ORCID, VALID_ORCID);
-        var gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath,
-                                                                                          jsonObject.toString());
+        var gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath, jsonObject.toString());
 
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
@@ -205,8 +211,7 @@ public class UpdateCristinPersonHandlerTest {
         jsonObject.put(PREFERRED_FIRST_NAME, randomString());
         jsonObject.putNull(PREFERRED_LAST_NAME);
         jsonObject.put(RESERVED, true);
-        var gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath,
-                                                                                          jsonObject.toString());
+        var gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath, jsonObject.toString());
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));
@@ -295,6 +300,97 @@ public class UpdateCristinPersonHandlerTest {
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(COULD_NOT_PARSE_KEYWORD_FIELD));
+    }
+
+    @ParameterizedTest
+    @MethodSource("personNviBadRequestProvider")
+    void shouldThrowBadRequestWhenPersonNviNotValid(String json, String errorMsg) throws IOException {
+        var gatewayResponse = sendQuery(validPath, json);
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(errorMsg));
+    }
+
+    @Test
+    void shouldReturnNoContentWhenPersonNviHasValidContent() throws IOException {
+        var json = """
+            {
+                "nvi": {
+                  "verifiedBy": {
+                    "id": "https://api.dev.nva.aws.unit.no/cristin/person/12345",
+                    "type": "Person",
+                    "firstName": "Tor Inge",
+                    "lastName": "Kristianslund"
+                  },
+                  "verifiedAt": {
+                    "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0",
+                    "type": "Organization",
+                    "labels": {
+                      "en": "Faculty of Theology"
+                    },
+                    "partOf": [
+                      {
+                        "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
+                        "type": "Organization",
+                        "labels": {
+                          "en": "University of Oslo"
+                        },
+                        "acronym": "UIO",
+                        "country": "NO"
+                      }
+                    ]
+                  },
+                  "verifiedDate": "2023-10-03T15:00:30Z"
+                }
+            }
+            """;
+        var gatewayResponse = sendQuery(validPath, json);
+
+        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    private static Stream<Arguments> personNviBadRequestProvider() {
+        return Stream.of(
+            Arguments.of(
+                """
+                {
+                  "nvi": "hello"
+                }
+                """,
+                COULD_NOT_PARSE_NVI_FIELD
+            ),
+            Arguments.of(
+                """
+                {
+                  "nvi": {
+                    "verifiedAt": {
+                      "hello": {
+                        "en": "world"
+                      }
+                    },
+                    "verifiedDate": "2023-10-03T15:00:30Z"
+                  }
+                }
+                """,
+                MUST_HAVE_A_VALID_ORGANIZATION_IDENTIFIER
+            ),
+            Arguments.of(
+                """
+                {
+                  "nvi": {
+                    "verifiedBy": {
+                      "id": ""
+                    },
+                    "verifiedAt": {
+                      "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0"
+                    },
+                    "verifiedDate": "2023-10-03T15:00:30Z"
+                  }
+                }
+                """,
+                MUST_HAVE_A_VALID_PERSON_IDENTIFIER
+            )
+        );
     }
 
     private URI getDummyOrgUri() {

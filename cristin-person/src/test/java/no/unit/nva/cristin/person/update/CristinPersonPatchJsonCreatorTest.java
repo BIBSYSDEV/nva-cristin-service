@@ -4,13 +4,20 @@ import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_EMPLOYMENTS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_UNIT_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.UNIT;
 import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
+import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PERSON_NVI;
+import static no.unit.nva.cristin.person.model.cristin.CristinPersonNvi.VERIFIED_AT;
+import static no.unit.nva.cristin.person.model.cristin.CristinPersonNvi.VERIFIED_BY;
+import static no.unit.nva.cristin.person.model.cristin.CristinPersonSummary.CRISTIN_PERSON_ID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NVI;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
@@ -20,6 +27,7 @@ import static no.unit.nva.cristin.person.update.CristinPersonPatchJsonCreator.CR
 import static no.unit.nva.cristin.person.update.CristinPersonPatchJsonCreator.CRISTIN_SURNAME;
 import static no.unit.nva.cristin.person.update.CristinPersonPatchJsonCreator.CRISTIN_SURNAME_PREFERRED;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,8 +36,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.person.model.nva.PersonNvi;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.Test;
 
 public class CristinPersonPatchJsonCreatorTest {
@@ -223,6 +233,52 @@ public class CristinPersonPatchJsonCreatorTest {
         assertThat(result.get(BACKGROUND).isObject(), equalTo(true));
         assertThat(result.get(BACKGROUND).get(ENGLISH_LANG).isNull(), equalTo(true));
         assertThat(result.get(BACKGROUND).get(NORWEGIAN_LANG).asText(), equalTo(NORWEGIAN_LANG_CONTENT));
+    }
+
+    @Test
+    void shouldAllowNviDataSetToValidValues() throws Exception {
+        var cristinUnitIdHavingVerified = "20754.0.0.0";
+        var cristinPersonIdHavingVerified = "1234";
+        var unitIdString = getIdUriString(cristinUnitIdHavingVerified);
+        var personIdString = getIdUriString(cristinPersonIdHavingVerified);
+
+        var input = OBJECT_MAPPER.createObjectNode();
+        var nvi = OBJECT_MAPPER.createObjectNode();
+        var verifiedBy = OBJECT_MAPPER.createObjectNode().put(ID, personIdString);
+        var verifiedAt = OBJECT_MAPPER.createObjectNode().put(ID, unitIdString);
+        nvi.set(PersonNvi.VERIFIED_BY, verifiedBy);
+        nvi.set(PersonNvi.VERIFIED_AT, verifiedAt);
+        input.set(NVI, nvi);
+
+        PersonPatchValidator.validate(input);
+        var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+
+        assertThat(result.get(PERSON_NVI)
+                       .get(VERIFIED_AT)
+                       .get(UNIT)
+                       .get(CRISTIN_UNIT_ID)
+                       .asText(),
+                   equalTo(cristinUnitIdHavingVerified));
+        assertThat(result.get(PERSON_NVI)
+                       .get(VERIFIED_BY)
+                       .get(CRISTIN_PERSON_ID)
+                       .asText(),
+                   equalTo(cristinPersonIdHavingVerified));
+    }
+
+    @Test
+    void shouldAllowNviDataSetToNull() throws Exception {
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.putNull(NVI);
+        PersonPatchValidator.validate(input);
+        var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
+
+        assertThat(result.has(PERSON_NVI), equalTo(true));
+        assertThat(result.get(PERSON_NVI).isNull(), equalTo(true));
+    }
+
+    private static String getIdUriString(String identifier) {
+        return UriWrapper.fromUri(randomUri()).addChild(identifier).toString();
     }
 
 }

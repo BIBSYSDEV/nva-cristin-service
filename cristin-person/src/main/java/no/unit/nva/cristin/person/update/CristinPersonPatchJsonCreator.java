@@ -6,9 +6,11 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_EMPLOYMENTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PERSON_NVI;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NVI;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
@@ -16,11 +18,21 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.model.CristinTypedLabel;
+import no.unit.nva.cristin.model.CristinUnit;
+import no.unit.nva.cristin.person.model.cristin.CristinNviInstitutionUnit;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonNvi;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonSummary;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonSummary.Builder;
 import no.unit.nva.cristin.person.model.nva.Employment;
+import no.unit.nva.cristin.person.model.nva.PersonNvi;
+import no.unit.nva.cristin.person.model.nva.PersonSummary;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
+import no.unit.nva.model.Organization;
+import no.unit.nva.utils.UriUtils;
 
 public class CristinPersonPatchJsonCreator {
 
@@ -53,6 +65,7 @@ public class CristinPersonPatchJsonCreator {
         addEmployments();
         addKeywords();
         addBackgroundIfPresent();
+        addNviIfPresent();
 
         return this;
     }
@@ -147,5 +160,49 @@ public class CristinPersonPatchJsonCreator {
         if (input.has(BACKGROUND)) {
             output.set(BACKGROUND, input.get(BACKGROUND));
         }
+    }
+
+    private void addNviIfPresent() {
+        if (input.has(NVI)) {
+            if (input.get(NVI).isNull()) {
+                output.putNull(PERSON_NVI);
+                return;
+            }
+
+            var nviNodeString = input.get(NVI).toString();
+
+            var nviInCristinFormat = attempt(() -> {
+                var parsedInput = OBJECT_MAPPER.readValue(nviNodeString, PersonNvi.class);
+                return OBJECT_MAPPER.readTree(nviToCristinFormat(parsedInput).toJsonString());
+            }).orElseThrow();
+
+            output.set(PERSON_NVI, nviInCristinFormat);
+        }
+    }
+
+    private CristinPersonNvi nviToCristinFormat(PersonNvi parsedInput) {
+        var unitId = extractNviUnitId(parsedInput);
+        var unit = unitId.map(CristinUnit::fromCristinUnitIdentifier)
+                       .map(id -> new CristinNviInstitutionUnit(null, id));
+
+        var personId = extractNviPersonId(parsedInput);
+        var person = personId.map(id -> CristinPersonSummary.builder().withCristinPersonId(id))
+                         .map(Builder::build);
+
+        return new CristinPersonNvi(person.orElse(null), unit.orElse(null), null);
+    }
+
+    private static Optional<String> extractNviPersonId(PersonNvi parsedInput) {
+        return Optional.ofNullable(parsedInput)
+                   .map(PersonNvi::verifiedBy)
+                   .map(PersonSummary::id)
+                   .map(UriUtils::extractLastPathElement);
+    }
+
+    private static Optional<String> extractNviUnitId(PersonNvi parsedInput) {
+        return Optional.ofNullable(parsedInput)
+                   .map(PersonNvi::verifiedAt)
+                   .map(Organization::getId)
+                   .map(UriUtils::extractLastPathElement);
     }
 }
