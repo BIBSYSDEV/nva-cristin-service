@@ -7,6 +7,8 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.common.ErrorMessages;
+import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -24,6 +26,7 @@ import java.util.Map;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
@@ -61,14 +64,51 @@ import static nva.commons.apigateway.RequestInfoConstants.BACKEND_SCOPE_AS_DEFIN
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class UpdateCristinPersonHandlerTest {
 
+    public static final String NVI_JSON_AT_185 = """
+        {
+            "preferredFirstName" : "Erik",
+            "nvi": {
+              "verifiedBy": {
+                "id": "https://api.dev.nva.aws.unit.no/cristin/person/12345",
+                "type": "Person",
+                "firstName": "Tor Inge",
+                "lastName": "Kristianslund"
+              },
+              "verifiedAt": {
+                "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0",
+                "type": "Organization",
+                "labels": {
+                  "en": "Faculty of Theology"
+                },
+                "partOf": [
+                  {
+                    "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
+                    "type": "Organization",
+                    "labels": {
+                      "en": "University of Oslo"
+                    },
+                    "acronym": "UIO",
+                    "country": "NO"
+                  }
+                ]
+              },
+              "verifiedDate": "2023-10-03T15:00:30Z"
+            }
+        }
+        """;
     private static final String PERSON_CRISTIN_ID = "123456";
     private static final URI PERSON_CRISTIN_ID_URI = UriWrapper.fromUri(randomUri()).addChild(PERSON_CRISTIN_ID)
                                                          .getUri();
@@ -246,7 +286,7 @@ public class UpdateCristinPersonHandlerTest {
         var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.putArray(EMPLOYMENTS);
         var gatewayResponse =
-            sendQueryAsInstAdminWithSomeOrgId(jsonObject.toString(), getDummyOrgUri());
+            sendQueryAsInstAdminWithSomeOrgId(jsonObject.toString(), getDummyOrgUri185());
 
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
@@ -313,40 +353,57 @@ public class UpdateCristinPersonHandlerTest {
 
     @Test
     void shouldReturnNoContentWhenPersonNviHasValidContent() throws IOException {
-        var json = """
-            {
-                "nvi": {
-                  "verifiedBy": {
-                    "id": "https://api.dev.nva.aws.unit.no/cristin/person/12345",
-                    "type": "Person",
-                    "firstName": "Tor Inge",
-                    "lastName": "Kristianslund"
-                  },
-                  "verifiedAt": {
-                    "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0",
-                    "type": "Organization",
-                    "labels": {
-                      "en": "Faculty of Theology"
-                    },
-                    "partOf": [
-                      {
-                        "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
-                        "type": "Organization",
-                        "labels": {
-                          "en": "University of Oslo"
-                        },
-                        "acronym": "UIO",
-                        "country": "NO"
-                      }
-                    ]
-                  },
-                  "verifiedDate": "2023-10-03T15:00:30Z"
-                }
-            }
-            """;
-        var gatewayResponse = sendQuery(validPath, json);
+        var gatewayResponse = sendQuery(validPath, NVI_JSON_AT_185);
 
         assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldFilterOutNviWhenClientNotAllowedToUpdateAtThatOrganizationForNviVerification() throws Exception {
+        apiClient = spy(apiClient);
+        handler = new UpdateCristinPersonHandler(apiClient, environment);
+
+        final var actual = sendQueryAsInstAdminWithSomeOrgId(NVI_JSON_AT_185, getDummyOrgUri2012());
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).patch(any(), captor.capture());
+        var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
+        var personNviFromCapture = capturedCristinPerson.getPersonNvi();
+
+        assertThat(personNviFromCapture, is(nullValue()));
+        assertEquals(HTTP_NO_CONTENT, actual.getStatusCode());
+    }
+
+    @Test
+    void shouldNotFilterOutNviWhenClientIsAllowedToUpdateAtThatOrganizationForNviVerification() throws Exception {
+        apiClient = spy(apiClient);
+        handler = new UpdateCristinPersonHandler(apiClient, environment);
+
+        final var actual = sendQueryAsInstAdminWithSomeOrgId(NVI_JSON_AT_185, getDummyOrgUri185());
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).patch(any(), captor.capture(), any());
+        var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
+        var personNviFromCapture = capturedCristinPerson.getPersonNvi();
+
+        var outputUnitId = personNviFromCapture.verifiedAt().unit().getCristinUnitId();
+        var instNrFromOutput = Utils.removeUnitPartFromIdentifierIfPresent(outputUnitId);
+        var clientInstitutionId = "185";
+
+        assertThat(instNrFromOutput, equalTo(clientInstitutionId));
+        assertEquals(HTTP_NO_CONTENT, actual.getStatusCode());
+    }
+
+    @Test
+    void shouldCallApiClientWithAddedInstitutionHeaderWhenPayloadHavingNviData() throws Exception {
+        apiClient = spy(apiClient);
+        handler = new UpdateCristinPersonHandler(apiClient, environment);
+
+        sendQueryAsInstAdminWithSomeOrgId(NVI_JSON_AT_185, getDummyOrgUri185());
+        var clientInstitutionId = "185";
+        var captor = ArgumentCaptor.forClass(String.class);
+
+        verify(apiClient).patch(any(), captor.capture(), eq(clientInstitutionId));
     }
 
     private static Stream<Arguments> personNviBadRequestProvider() {
@@ -393,8 +450,12 @@ public class UpdateCristinPersonHandlerTest {
         );
     }
 
-    private URI getDummyOrgUri() {
+    private URI getDummyOrgUri185() {
         return UriWrapper.fromUri(randomUri()).addChild(SOME_ORGANIZATION).getUri();
+    }
+
+    private URI getDummyOrgUri2012() {
+        return UriWrapper.fromUri(randomUri()).addChild(randomString()).addChild("2012").getUri();
     }
 
     private GatewayResponse<Void> sendQueryAsInstAdminWithSomeOrgId(String body, URI orgId) throws IOException {

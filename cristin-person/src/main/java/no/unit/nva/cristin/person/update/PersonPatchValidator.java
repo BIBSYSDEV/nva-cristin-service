@@ -42,8 +42,10 @@ public final class PersonPatchValidator {
                                                                   + "invalid data";
     public static final String EXCEPTION_WHEN_VALIDATING_PERSON_NVI = "Exception when validating personNvi: {}";
     public static final String COULD_NOT_PARSE_NVI_FIELD = "Could not parse personNvi field because of invalid data";
-    public static final String MUST_HAVE_A_VALID_ORGANIZATION_IDENTIFIER = "Person NVI data must have a valid Organization identifier";
-    public static final String MUST_HAVE_A_VALID_PERSON_IDENTIFIER = "Person NVI data must have a valid Person identifier";
+    public static final String MUST_HAVE_A_VALID_ORGANIZATION_IDENTIFIER =
+        "Person NVI data must have a valid Organization identifier";
+    public static final String MUST_HAVE_A_VALID_PERSON_IDENTIFIER =
+        "Person NVI data must have a valid Person identifier";
 
     @JacocoGenerated
     private PersonPatchValidator() {
