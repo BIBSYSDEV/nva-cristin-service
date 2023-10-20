@@ -15,6 +15,7 @@ Feature: API tests for Cristin Person Update
     * def simpleUserToken = tokenGenerator.loginUser(simple_user_name, simple_user_password, cognitoClientAppId)
     * def invalidToken = 'just-a-invalid-token-for-now'
     * def personIdentifier = '1135903'
+    * def nviPersonIdentifier = '1138175'
 
     * def updateFieldsRequest =
     """
@@ -185,3 +186,77 @@ Feature: API tests for Cristin Person Update
     And request employmentRequest
     When method PATCH
     Then status 400
+
+  Scenario: Update returns status 204 when sending valid nvi data for own organization
+    Given path '/person/' + nviPersonIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def nviRequest =
+    """
+    {
+      'nvi': {
+          'verifiedBy': {
+              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/854279'
+          },
+          'verifiedAt': {
+              'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
+          }
+      }
+    }
+    """
+    And request nviRequest
+    When method PATCH
+    Then status 204
+
+  Scenario: Update returns status 204 erasing nvi data at own institution.
+    Given path '/person/' + nviPersonIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def nviRequest =
+    """
+    {
+      'nvi': null
+    }
+    """
+    And request nviRequest
+    When method PATCH
+    Then status 204
+
+  Scenario: Update returns status 400 when sending invalid nvi payload
+    Given path '/person/' + personIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def nviRequest =
+    """
+    {
+      'nvi': {
+          'verifiedBy': {
+              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/854279'
+          },
+          'verifiedAt': {
+              'hello': 'world'
+          }
+      }
+    }
+    """
+    And request nviRequest
+    When method PATCH
+    Then status 400
+
+  Scenario: Update filters out nvi and returns status 400 indicating no supported fields when trying to verify nvi at another institution
+    Given path '/person/' + personIdentifier
+    * header Authorization = 'Bearer ' + token
+    * def nviRequest =
+    """
+    {
+      'nvi': {
+          'verifiedBy': {
+              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/854279'
+          },
+          'verifiedAt': {
+             'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
+          }
+      }
+    }
+    """
+    And request nviRequest
+    When method PATCH
+    Then status 400
+    And match response.detail == 'No supported fields in payload, not doing anything'
