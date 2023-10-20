@@ -1845,22 +1845,7 @@ components:
                   - LocalProjectManager
                 description: Type of contributor.
               identity:
-                type: object
-                properties:
-                  id:
-                    $ref: '#/components/schemas/Id'
-                  type:
-                    type: string
-                    pattern: 'Person'
-                    description: Type of identity. Always Person
-                  firstName:
-                    type: string
-                    pattern: '.+'
-                    description: First name
-                  lastName:
-                    type: string
-                    pattern: '.+'
-                    description: Last name
+                $ref: '#/components/schemas/PersonSummary'
               affiliation:
                 $ref: '#/components/schemas/Organization'
         status:
@@ -2006,22 +1991,7 @@ components:
               type: string
               description: Type. Always ProjectCreator
             identity:
-              type: object
-              properties:
-                id:
-                  $ref: '#/components/schemas/Id'
-                type:
-                  type: string
-                  pattern: 'Person'
-                  description: Type of identity. Always Person
-                firstName:
-                  type: string
-                  pattern: '.+'
-                  description: First name
-                lastName:
-                  type: string
-                  pattern: '.+'
-                  description: Last name
+              $ref: '#/components/schemas/PersonSummary'
             affiliation:
               $ref: '#/components/schemas/Organization'
         webPage:
@@ -2610,6 +2580,17 @@ components:
                 $ref: '#/components/schemas/Languages'
         background:
           $ref: '#/components/schemas/Languages'
+        nvi:
+          type: object
+          description: Person NVI data
+          properties:
+            verifiedBy:
+              $ref: '#/components/schemas/PersonSummary'
+            verifiedAt:
+              $ref: '#/components/schemas/Organization'
+            verifiedDate:
+              type: string
+              format: date-time
     PersonPost:
       type: object
       required: [ identifiers, names ]
@@ -2657,6 +2638,14 @@ components:
                 description: The keyword code
         background:
           $ref: '#/components/schemas/Languages'
+        nvi:
+          type: object
+          description: Person NVI data
+          properties:
+            verifiedBy:
+              $ref: '#/components/schemas/Id'
+            verifiedAt:
+              $ref: '#/components/schemas/Id'
     PersonPostResponse:
       type: object
       properties:
@@ -2710,6 +2699,17 @@ components:
                 $ref: '#/components/schemas/Languages'
         background:
           $ref: '#/components/schemas/Languages'
+        nvi:
+          type: object
+          description: Person NVI data
+          properties:
+            verifiedBy:
+              $ref: '#/components/schemas/PersonSummary'
+            verifiedAt:
+              $ref: '#/components/schemas/Organization'
+            verifiedDate:
+              type: string
+              format: date-time
     PersonPatch:
       type: object
       properties:
@@ -2746,6 +2746,15 @@ components:
                 description: The keyword code
         background:
           $ref: '#/components/schemas/Languages'
+        nvi:
+          type: object
+          nullable: true
+          description: Person NVI data
+          properties:
+            verifiedBy:
+              $ref: '#/components/schemas/Id'
+            verifiedAt:
+              $ref: '#/components/schemas/Id'
     PersonNIN:
       type: object
       properties:
@@ -3162,6 +3171,24 @@ components:
           description: The keyword code
         label:
           $ref: '#/components/schemas/Languages'
+    PersonSummary:
+      type: object
+      description: Minimal person data
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        type:
+          type: string
+          pattern: 'Person'
+          description: Type of identity. Always Person
+        firstName:
+          type: string
+          pattern: '.+'
+          description: First name
+        lastName:
+          type: string
+          pattern: '.+'
+          description: Last name
   examples:
     ProjectsExample:
       value:
@@ -3701,6 +3728,25 @@ components:
         background:
           no: 'Min bakgrunn som forsker'
           en: 'My history as a researcher'
+        nvi:
+          verifiedBy:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+            type: 'Person'
+            firstName: 'Tor Inge'
+            lastName: 'Kristianslund'
+          verifiedAt:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+            type: 'Organization'
+            labels:
+              en: 'Faculty of Theology'
+            partOf:
+              - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
+                type: 'Organization'
+                labels:
+                  en: 'University of Oslo'
+                acronym: 'UIO'
+                country: 'NO'
+          verifiedDate: '2023-10-03T15:00:30Z'
     PersonPatchExample:
       value:
         orcid: '1234-1234-1234-1234'
@@ -3719,6 +3765,11 @@ components:
         background:
           no: 'Min bakgrunn som forsker'
           en: 'null'
+        nvi:
+          verifiedBy:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+          verifiedAt:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
     PersonPostExample:
       value:
         identifiers:
@@ -3745,6 +3796,11 @@ components:
         background:
           no: 'Min bakgrunn som forsker'
           en: 'My history as a researcher'
+        nvi:
+          verifiedBy:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+          verifiedAt:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
     PersonPostResponseExample:
       value:
         '@context': 'https://example.org/person-context.json'
@@ -3785,6 +3841,25 @@ components:
         background:
           no: 'Min bakgrunn som forsker'
           en: 'My history as a researcher'
+        nvi:
+          verifiedBy:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+            type: 'Person'
+            firstName: 'Tor Inge'
+            lastName: 'Kristianslund'
+          verifiedAt:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+            type: 'Organization'
+            labels:
+              en: 'Faculty of Theology'
+            partOf:
+              - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
+                type: 'Organization'
+                labels:
+                  en: 'University of Oslo'
+                acronym: 'UIO'
+                country: 'NO'
+          verifiedDate: '2023-10-03T15:00:30Z'
     PersonOrganizationInfoExample:
       value:
         '@context': 'https://ontology.org'
