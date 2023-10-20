@@ -1,4 +1,4 @@
-Feature: API tests for Cristin Project retrieve and search
+Feature: API tests for creating sample Cristin Projects
 
   Background:
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
