@@ -98,7 +98,7 @@ Feature: API tests for Cristin persons query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['name', 'organization', 'page', 'results']"
+    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['name', 'organization', 'page', 'results', 'verified']"
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
@@ -173,3 +173,24 @@ Feature: API tests for Cristin persons query
     * string identifiers = response['hits'][0].identifiers
     And match identifiers contains 'CristinIdentifier'
     And match identifiers !contains 'NationalIdentificationNumber'
+
+  Scenario: Query returns unverified persons when setting param verified to false
+    Given path '/person/'
+    And param name = 'daniel'
+    And param verified = 'false'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.hits[0].verified == 'false'
+
+  Scenario: Query contains correct searchString matching supplied params and default params
+    Given path '/person/'
+    And param name = 'daniel'
+    And param organization = 'uio'
+    When method GET
+    Then status 200
+    * string searchString = response.searchString
+    And match searchString contains 'organization'
+    And match searchString contains 'name'
+    And match searchString contains 'page'
+    And match searchString contains 'results'

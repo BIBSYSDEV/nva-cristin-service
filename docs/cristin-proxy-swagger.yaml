@@ -823,6 +823,12 @@ paths:
             type: number
             default: '5'
           example: '10'
+        - name: verified
+          in: query
+          description: Verified or not verified persons
+          required: false
+          schema:
+            type: boolean
       responses:
         200:
           description: successful operation
