@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import java.util.Optional;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
@@ -19,11 +20,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
@@ -33,7 +36,11 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
     private static final Logger logger = LoggerFactory.getLogger(QueryCristinPersonHandler.class);
 
-    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(NAME, ORGANIZATION,  PAGE, NUMBER_OF_RESULTS);
+    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(NAME, ORGANIZATION,  PAGE, NUMBER_OF_RESULTS,
+                                                                     VERIFIED);
+    public static final String BOOLEAN_TRUE = "true";
+    public static final String BOOLEAN_FALSE = "false";
+
     private final transient CristinPersonApiClient apiClient;
 
     @JacocoGenerated
@@ -62,10 +69,10 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         var name = getValidName(requestInfo);
         var page = getValidPage(requestInfo);
         var numberOfResults = getValidNumberOfResults(requestInfo);
+        var organization = getValidOrganization(requestInfo).orElse(null);
+        var verified = getValidVerified(requestInfo).orElse(null);
 
-        var requestQueryParameters = buildParametersMap(name, page, numberOfResults);
-        getValidOrganization(requestInfo)
-            .ifPresent(presentOrganization -> requestQueryParameters.put(ORGANIZATION, presentOrganization));
+        var requestQueryParameters = buildParametersMap(name, page, numberOfResults, organization, verified);
 
         return attempt(() -> getAuthorizedSearchResponse(requestInfo, requestQueryParameters))
                    .orElse(list -> apiClient.generateQueryResponse(requestQueryParameters));
@@ -83,12 +90,32 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         }
     }
 
+    private Optional<String> getValidVerified(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(VERIFIED).filter(this::hasEitherTrueFalse);
+    }
 
-    private Map<String, String> buildParametersMap(String name, String page, String numberOfResults) {
+    private boolean hasEitherTrueFalse(String verified) {
+        return BOOLEAN_FALSE.equalsIgnoreCase(verified) || BOOLEAN_TRUE.equalsIgnoreCase(verified);
+    }
+
+    private Map<String, String> buildParametersMap(String name,
+                                                   String page,
+                                                   String numberOfResults,
+                                                   String organization,
+                                                   String verified) {
+
         var requestQueryParameters = new ConcurrentHashMap<String, String>();
+
         requestQueryParameters.put(NAME, name);
         requestQueryParameters.put(PAGE, page);
         requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
+        if (nonNull(organization)) {
+            requestQueryParameters.put(ORGANIZATION, organization);
+        }
+        if (nonNull(verified)) {
+            requestQueryParameters.put(VERIFIED, verified);
+        }
+
         return requestQueryParameters;
     }
 
