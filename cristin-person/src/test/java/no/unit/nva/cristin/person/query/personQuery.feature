@@ -181,7 +181,7 @@ Feature: API tests for Cristin persons query
     When method GET
     Then status 200
     And match response == '#object'
-    And match response.hits[0].verified == 'false'
+    And match response.hits[0].verified == false
 
   Scenario: Query contains correct searchString matching supplied params and default params
     Given path '/person/'
