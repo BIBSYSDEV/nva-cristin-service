@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person.client;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.SORT;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import java.net.URI;
 import java.util.Map;
@@ -101,6 +102,11 @@ public class CristinPersonQuery {
 
     public CristinPersonQuery withSort(String sort) {
         cristinQueryParameters.put(SORT, sort);
+        return this;
+    }
+
+    public CristinPersonQuery withVerified(String verified) {
+        cristinQueryParameters.put(VERIFIED, verified);
         return this;
     }
 

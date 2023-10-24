@@ -40,8 +40,10 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FET
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
+import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.exception.GatewayTimeoutException.ERROR_MESSAGE_GATEWAY_TIMEOUT;
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
@@ -74,6 +76,9 @@ public class QueryCristinPersonHandlerTest {
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String EXPECTED_CRISTIN_URI_WITH_PARAMS =
         "https://api.cristin-test.uio.no/v2/persons?per_page=5&name=John+Smith&page=1";
+    private static final String EXPECTED_CRISTIN_URI_WITH_ADDITIONAL_PARAMS =
+        "https://api.cristin-test.uio.no/v2/persons?per_page=5&institution=uio&name=John+Smith&verified=true&page=1";
+    private static final String ORGANIZATION_UIO = "uio";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -173,6 +178,16 @@ public class QueryCristinPersonHandlerTest {
     }
 
     @Test
+    void shouldProduceCorrectCristinUriFromParamsWithAdditionalOptionalParams() throws IOException,
+                                                                                       ApiGatewayException {
+        apiClient = spy(apiClient);
+        handler = new QueryCristinPersonHandler(apiClient, environment);
+        sendQueryWithAdditionalParams();
+
+        verify(apiClient).fetchQueryResults(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_ADDITIONAL_PARAMS).getUri());
+    }
+
+    @Test
     void shouldReturnGatewayTimeoutWhenQueryToUpstreamServerTimesOut() throws Exception {
         var clientMock = mock(HttpClient.class);
         when(clientMock.<String>send(any(), any())).thenThrow(new HttpConnectTimeoutException(EMPTY_STRING));
@@ -194,8 +209,7 @@ public class QueryCristinPersonHandlerTest {
         handler = new QueryCristinPersonHandler(apiClient, new Environment());
         var input = queryMissingAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME));
         handler.handleRequest(input, output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output,
-                                                               SearchResponse.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         assertThat(gatewayResponse.getStatusCode(), equalTo(HttpURLConnection.HTTP_OK));
         verify(apiClient, times(0)).authorizedGenerateQueryResponse(any());
@@ -211,8 +225,7 @@ public class QueryCristinPersonHandlerTest {
         handler = new QueryCristinPersonHandler(apiClient, new Environment());
         var input = queryWithAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME));
         handler.handleRequest(input, output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output,
-                                                               SearchResponse.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         assertThat(gatewayResponse.getStatusCode(), equalTo(HttpURLConnection.HTTP_OK));
         verify(apiClient, times(1)).authorizedGenerateQueryResponse(any());
@@ -347,6 +360,17 @@ public class QueryCristinPersonHandlerTest {
         try (var input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME))) {
             handler.handleRequest(input, output, context);
         }
+        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private GatewayResponse<SearchResponse> sendQueryWithAdditionalParams() throws IOException {
+        try (var input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME,
+                                                           ORGANIZATION, ORGANIZATION_UIO,
+                                                           VERIFIED, Boolean.TRUE.toString()))) {
+            handler.handleRequest(input, output, context);
+        }
+
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 

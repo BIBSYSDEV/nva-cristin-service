@@ -31,6 +31,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 import static no.unit.nva.utils.UriUtils.PERSON;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
@@ -154,6 +155,9 @@ public class CristinPersonApiClient extends ApiClient {
                 .withName(parameters.get(NAME));
         if (parameters.containsKey(ORGANIZATION)) {
             cristinPersonQuery = cristinPersonQuery.withOrganization(parameters.get(ORGANIZATION));
+        }
+        if (parameters.containsKey(VERIFIED)) {
+            cristinPersonQuery = cristinPersonQuery.withVerified(parameters.get(VERIFIED));
         }
         return cristinPersonQuery.toURI();
     }
