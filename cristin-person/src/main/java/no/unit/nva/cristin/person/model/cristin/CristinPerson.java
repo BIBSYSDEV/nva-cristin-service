@@ -51,6 +51,8 @@ public class CristinPerson implements JsonSerializable {
     public static final String PREFERRED_FIRST_NAME = "PreferredFirstName";
     @JsonIgnore
     public static final String PREFERRED_LAST_NAME = "PreferredLastName";
+    @JsonIgnore
+    public static final String PERSON_NVI = "person_nvi";
 
     private String cristinPersonId;
     private CristinOrcid orcid;

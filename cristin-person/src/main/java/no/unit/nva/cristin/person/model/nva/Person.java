@@ -7,9 +7,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.List;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinTypedLabel;
+import no.unit.nva.cristin.model.CristinUnit;
+import no.unit.nva.cristin.person.model.cristin.CristinNviInstitutionUnit;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonNvi;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonSummary;
 import no.unit.nva.model.TypedLabel;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.core.JacocoGenerated;
 
 import java.net.URI;
@@ -247,7 +252,25 @@ public class Person implements JsonSerializable {
         cristinPerson.setKeywords(extractKeywordCodes(getKeywords()));
         cristinPerson.setBackground(getBackground());
 
+        if (nonNull(getNvi())) {
+            CristinPersonNvi cristinPersonNvi = new CristinPersonNvi(extractVerifiedById(),
+                                                                     extractVerifiedAtId(),
+                                                                     null);
+            cristinPerson.setPersonNvi(cristinPersonNvi);
+        }
+
         return cristinPerson;
+    }
+
+    private CristinNviInstitutionUnit extractVerifiedAtId() {
+        var organizationHavingVerifiedId = UriUtils.extractLastPathElement(getNvi().verifiedAt().getId());
+        return new CristinNviInstitutionUnit(null,
+                                             CristinUnit.fromCristinUnitIdentifier(organizationHavingVerifiedId));
+    }
+
+    private CristinPersonSummary extractVerifiedById() {
+        var personHavingVerifiedId = UriUtils.extractLastPathElement(getNvi().verifiedBy().id());
+        return CristinPersonSummary.builder().withCristinPersonId(personHavingVerifiedId).build();
     }
 
     private List<CristinTypedLabel> extractKeywordCodes(Set<TypedLabel> keywords) {

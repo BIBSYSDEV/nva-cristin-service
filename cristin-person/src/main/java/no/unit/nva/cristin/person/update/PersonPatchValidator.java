@@ -6,15 +6,21 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NVI;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.validation.PatchValidator.validateDescription;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Optional;
 import no.unit.nva.cristin.common.Utils;
+import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.person.employment.create.CreatePersonEmploymentValidator;
 import no.unit.nva.cristin.person.model.nva.Employment;
+import no.unit.nva.cristin.person.model.nva.PersonNvi;
+import no.unit.nva.cristin.person.model.nva.PersonSummary;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.JacocoGenerated;
 import org.slf4j.Logger;
@@ -34,6 +40,12 @@ public final class PersonPatchValidator {
     private static final String EXCEPTION_WHEN_VALIDATING_KEYWORDS = "Exception when validating keywords: {}";
     public static final String COULD_NOT_PARSE_KEYWORD_FIELD = "Could not parse keyword field because of "
                                                                   + "invalid data";
+    public static final String EXCEPTION_WHEN_VALIDATING_PERSON_NVI = "Exception when validating personNvi: {}";
+    public static final String COULD_NOT_PARSE_NVI_FIELD = "Could not parse personNvi field because of invalid data";
+    public static final String MUST_HAVE_A_VALID_ORGANIZATION_IDENTIFIER =
+        "Person NVI data must have a valid Organization identifier";
+    public static final String MUST_HAVE_A_VALID_PERSON_IDENTIFIER =
+        "Person NVI data must have a valid Person identifier";
 
     @JacocoGenerated
     private PersonPatchValidator() {
@@ -51,6 +63,7 @@ public final class PersonPatchValidator {
         validateEmploymentsIfPresent(input);
         validateKeywordsIfPresent(input);
         validateDescription(input, BACKGROUND);
+        validateNviIfPresent(input);
     }
 
     /**
@@ -113,5 +126,33 @@ public final class PersonPatchValidator {
             logger.warn(EXCEPTION_WHEN_VALIDATING_KEYWORDS, e.getMessage());
             throw new BadRequestException(COULD_NOT_PARSE_KEYWORD_FIELD);
         }
+    }
+
+    private static void validateNviIfPresent(ObjectNode input) throws BadRequestException {
+        if (input.has(NVI) && !input.get(NVI).isNull()) {
+            try {
+                var personNvi = OBJECT_MAPPER.readValue(input.get(NVI).toString(), PersonNvi.class);
+
+                Optional.ofNullable(personNvi)
+                    .map(PersonNvi::verifiedAt)
+                    .map(CristinUnit::extractUnitIdentifier)
+                    .filter(Optional::isPresent)
+                    .orElseThrow(() -> invalidIdentifier(MUST_HAVE_A_VALID_ORGANIZATION_IDENTIFIER));
+
+                Optional.of(personNvi)
+                    .map(PersonNvi::verifiedBy)
+                    .map(PersonSummary::id)
+                    .map(UriUtils::extractLastPathElement)
+                    .filter(Utils::isPositiveInteger)
+                    .orElseThrow(() -> invalidIdentifier(MUST_HAVE_A_VALID_PERSON_IDENTIFIER));
+            } catch (JsonProcessingException e) {
+                logger.warn(EXCEPTION_WHEN_VALIDATING_PERSON_NVI, e.getMessage());
+                throw new BadRequestException(COULD_NOT_PARSE_NVI_FIELD);
+            }
+        }
+    }
+
+    private static BadRequestException invalidIdentifier(String msg) {
+        return new BadRequestException(msg);
     }
 }
