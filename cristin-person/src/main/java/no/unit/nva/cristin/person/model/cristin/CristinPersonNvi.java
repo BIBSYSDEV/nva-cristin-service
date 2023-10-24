@@ -1,14 +1,17 @@
 package no.unit.nva.cristin.person.model.cristin;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.Instant;
 import java.util.Optional;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.person.model.nva.PersonNvi;
+import no.unit.nva.utils.CustomInstantSerializer;
 
 public record CristinPersonNvi(@JsonProperty(VERIFIED_BY) CristinPersonSummary verifiedBy,
                                @JsonProperty(VERIFIED_AT) CristinNviInstitutionUnit verifiedAt,
-                               @JsonProperty(VERIFIED_DATE) Instant verifiedDate)
+                               @JsonProperty(VERIFIED_DATE)
+                               @JsonSerialize(using = CustomInstantSerializer.class) Instant verifiedDate)
     implements JsonSerializable {
 
     public static final String VERIFIED_BY = "verified_by";

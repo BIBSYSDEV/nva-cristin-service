@@ -28,9 +28,11 @@ import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_EMPLOYMENTS;
+import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PERSON_NVI;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> {
 
@@ -63,10 +65,11 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
 
         if (clientCanUpdateAllFields(requestInfo)) {
             PersonPatchValidator.validate(objectNode);
+            objectNode = filterInput(requestInfo, objectNode);
             ObjectNode cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
             checkHasFields(cristinJson);
 
-            if (cristinJson.has(CRISTIN_EMPLOYMENTS)) {
+            if (cristinJson.has(CRISTIN_EMPLOYMENTS) || cristinJson.has(PERSON_NVI)) {
                 return apiClient.updatePersonInCristin(personId, cristinJson,
                                                        extractCristinInstitutionIdentifier(requestInfo));
             } else {
@@ -84,6 +87,14 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
         } else {
             throw new ForbiddenException();
         }
+    }
+
+    private ObjectNode filterInput(RequestInfo requestInfo, ObjectNode objectNode) {
+        var clientInstNr = attempt(() -> extractCristinInstitutionIdentifier(requestInfo)).orElse(fail -> null);
+
+        return new PersonPatchFieldFilter(objectNode)
+                   .filterOnInstNr(clientInstNr)
+                   .getFiltered();
     }
 
     private void checkHasFields(ObjectNode cristinJson) throws BadRequestException {
