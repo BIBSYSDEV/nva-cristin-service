@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
+import static no.unit.nva.cristin.common.Utils.CAN_UPDATE_ANY_INSTITUTION;
 import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
@@ -65,13 +66,24 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
 
         if (clientCanUpdateAllFields(requestInfo)) {
             PersonPatchValidator.validate(objectNode);
+            // TODO: Possible bug when is app admin, input dont get filtered, payload also has employments (like
+            //  doing a PUT), causing the payload to be sent still be restricted to own instNr because of employments,
+            //  causing 400 Bad request from upstream because nvi data is at another institution. Need to fix before
+            //  merge.
             objectNode = filterInput(requestInfo, objectNode);
             ObjectNode cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
             checkHasFields(cristinJson);
 
             if (cristinJson.has(CRISTIN_EMPLOYMENTS) || cristinJson.has(PERSON_NVI)) {
-                return apiClient.updatePersonInCristin(personId, cristinJson,
-                                                       extractCristinInstitutionIdentifier(requestInfo));
+                if (cristinJson.has(CRISTIN_EMPLOYMENTS)) {
+                    return apiClient.updatePersonInCristin(personId,
+                                                           cristinJson,
+                                                           extractCristinInstitutionIdentifier(requestInfo));
+                } else {
+                    return apiClient.updatePersonInCristin(personId,
+                                                           cristinJson,
+                                                           fullAccessValueOrInstitutionNumber(requestInfo));
+                }
             } else {
                 return apiClient.updatePersonInCristin(personId, cristinJson);
             }
@@ -90,7 +102,7 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
     }
 
     private ObjectNode filterInput(RequestInfo requestInfo, ObjectNode objectNode) {
-        var clientInstNr = attempt(() -> extractCristinInstitutionIdentifier(requestInfo)).orElse(fail -> null);
+        var clientInstNr = attempt(() -> fullAccessValueOrInstitutionNumber(requestInfo)).orElse(fail -> null);
 
         return new PersonPatchFieldFilter(objectNode)
                    .filterOnInstNr(clientInstNr)
@@ -124,6 +136,14 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
 
     private boolean clientCanUpdateAllFields(RequestInfo requestInfo) {
         return AccessUtils.requesterIsUserAdministrator(requestInfo);
+    }
+
+    private String fullAccessValueOrInstitutionNumber(RequestInfo requestInfo) throws ApiGatewayException {
+        if (requestInfo.userIsApplicationAdmin()) {
+            return CAN_UPDATE_ANY_INSTITUTION;
+        } else {
+            return extractCristinInstitutionIdentifier(requestInfo);
+        }
     }
 
     @Override

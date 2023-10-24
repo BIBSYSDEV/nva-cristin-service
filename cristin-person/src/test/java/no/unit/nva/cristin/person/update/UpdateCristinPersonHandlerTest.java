@@ -15,6 +15,7 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -34,6 +35,7 @@ import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_BAD_REQUEST_RESPONSE;
+import static no.unit.nva.cristin.common.Utils.CAN_UPDATE_ANY_INSTITUTION;
 import static no.unit.nva.cristin.common.client.PatchApiClient.EMPTY_JSON;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
@@ -109,6 +111,22 @@ public class UpdateCristinPersonHandlerTest {
             }
         }
         """;
+
+    public static final String NVI_JSON_AT_185_WITH_EMPLOYMENTS = """
+        {
+            "preferredFirstName" : "Erik",
+            "nvi": {
+              "verifiedBy": {
+                "id": "https://api.dev.nva.aws.unit.no/cristin/person/12345"
+              },
+              "verifiedAt": {
+                "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0"
+              }
+            },
+            "employments": []
+        }
+        """;
+
     private static final String PERSON_CRISTIN_ID = "123456";
     private static final URI PERSON_CRISTIN_ID_URI = UriWrapper.fromUri(randomUri()).addChild(PERSON_CRISTIN_ID)
                                                          .getUri();
@@ -406,6 +424,31 @@ public class UpdateCristinPersonHandlerTest {
         verify(apiClient).patch(any(), captor.capture(), eq(clientInstitutionId));
     }
 
+    @Test
+    @DisplayName("Application administrator can update NVI data at any institution")
+    void shouldCallApiClientWithInstHeaderAnyWhenPayloadHavingNviDataWithoutEmploymentsAndIsAppAdmin()
+        throws Exception {
+
+        apiClient = spy(apiClient);
+        handler = new UpdateCristinPersonHandler(apiClient, environment);
+
+        sendQueryAsBothInstAndApplicationAdminWithSomeOrgId(NVI_JSON_AT_185, getDummyOrgUri2012());
+
+        verify(apiClient).patch(any(), any(), eq(CAN_UPDATE_ANY_INSTITUTION));
+    }
+
+    @Test
+    @DisplayName("Application administrator can only update at own institution when employments also present")
+    void shouldCallApiClientWithOwnInstHeaderWhenPayloadHasEmploymentsEvenIfAppAdmin() throws Exception {
+        apiClient = spy(apiClient);
+        handler = new UpdateCristinPersonHandler(apiClient, environment);
+        var clientOwnInstNr = "2012";
+
+        sendQueryAsBothInstAndApplicationAdminWithSomeOrgId(NVI_JSON_AT_185_WITH_EMPLOYMENTS, getDummyOrgUri2012());
+
+        verify(apiClient).patch(any(), any(), eq(clientOwnInstNr));
+    }
+
     private static Stream<Arguments> personNviBadRequestProvider() {
         return Stream.of(
             Arguments.of(
@@ -459,11 +502,23 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     private GatewayResponse<Void> sendQueryAsInstAdminWithSomeOrgId(String body, URI orgId) throws IOException {
-        try (var input = createRequest(body, null, orgId, EDIT_OWN_INSTITUTION_USERS,
-                                       ADMINISTRATE_APPLICATION)) {
+        try (var input = createRequest(body, null, orgId, EDIT_OWN_INSTITUTION_USERS)) {
             handler.handleRequest(input, output, context);
         }
         return GatewayResponse.fromOutputStream(output, Void.class);
+    }
+
+    private void sendQueryAsBothInstAndApplicationAdminWithSomeOrgId(String json, URI orgId) throws IOException {
+        try (var input = createRequest(json,
+                                       null,
+                                       orgId,
+                                       ADMINISTRATE_APPLICATION,
+                                       EDIT_OWN_INSTITUTION_USERS)) {
+
+            handler.handleRequest(input, output, context);
+        }
+
+        GatewayResponse.fromOutputStream(output, Void.class);
     }
 
     private GatewayResponse<Void> sendQueryAsInternalBackend(String body) throws IOException {

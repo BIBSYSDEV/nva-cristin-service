@@ -2755,7 +2755,7 @@ components:
         nvi:
           type: object
           nullable: true
-          description: Person NVI data
+          description: Person NVI data. NVI verification data at another institution is not allowed if not having extra authorization. If having extra authorization one cannot send employments together with nvi as they have different authorization rights.
           properties:
             verifiedBy:
               $ref: '#/components/schemas/Id'

@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.update;
 
+import static no.unit.nva.cristin.common.Utils.CAN_UPDATE_ANY_INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NVI;
 import static nva.commons.core.attempt.Try.attempt;
@@ -27,6 +28,10 @@ public class PersonPatchFieldFilter {
      */
     public PersonPatchFieldFilter filterOnInstNr(String instNr) {
         if (input.has(NVI) && !input.get(NVI).isNull()) {
+            if (CAN_UPDATE_ANY_INSTITUTION.equalsIgnoreCase(instNr)) {
+                return this;
+            }
+
             var inputInstNr = parseVerifiedAtIdIntoInstNrString();
 
             if (missingInstNrForComparing(instNr) || instNumbersDontMatch(instNr, inputInstNr)) {
