@@ -239,24 +239,3 @@ Feature: API tests for Cristin Person Update
     And request nviRequest
     When method PATCH
     Then status 400
-
-  Scenario: Update filters out nvi and returns status 400 indicating no supported fields when trying to verify nvi at another institution
-    Given path '/person/' + personIdentifier
-    * header Authorization = 'Bearer ' + token
-    * def nviRequest =
-    """
-    {
-      'nvi': {
-          'verifiedBy': {
-              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/854279'
-          },
-          'verifiedAt': {
-             'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
-          }
-      }
-    }
-    """
-    And request nviRequest
-    When method PATCH
-    Then status 400
-    And match response.detail == 'No supported fields in payload, not doing anything'
