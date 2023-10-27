@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.model;
+package no.unit.nva.cristin.model.query;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;

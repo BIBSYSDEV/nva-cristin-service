@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.model;
+package no.unit.nva.cristin.model.query;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +14,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 public abstract class CristinFacet {
 
+    @JsonProperty("count")
+    private Integer count;
+
+    @SuppressWarnings("unused")
+    public Integer getCount() {
+        return count;
+    }
+
     @JsonProperty("key")
-    abstract String getKey();
+    public abstract String getKey();
 
 }

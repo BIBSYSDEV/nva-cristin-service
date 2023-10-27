@@ -1,10 +1,10 @@
-package no.unit.nva.cristin.model;
+package no.unit.nva.cristin.model.query;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CristinInstitutionFacet extends CristinFacet {
 
-    String id;
+    private final String id;
 
     public CristinInstitutionFacet(@JsonProperty("cristin_institution_id") String id) {
         super();
@@ -12,7 +12,7 @@ public class CristinInstitutionFacet extends CristinFacet {
     }
 
     @Override
-    String getKey() {
+    public String getKey() {
         return id;
     }
 
