@@ -7,6 +7,7 @@ public class CristinInstitutionFacet extends CristinFacet {
     String id;
 
     public CristinInstitutionFacet(@JsonProperty("cristin_institution_id") String id) {
+        super();
         this.id = id;
     }
 

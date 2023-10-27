@@ -7,6 +7,7 @@ public class CristinSectorFacet extends CristinFacet {
     String code;
 
     public CristinSectorFacet(@JsonProperty("code") String code) {
+        super();
         this.code = code;
     }
 

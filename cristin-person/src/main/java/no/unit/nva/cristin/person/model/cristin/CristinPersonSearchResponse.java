@@ -14,7 +14,7 @@ public record CristinPersonSearchResponse(CristinPerson[] data,
     @JsonCreator
     public CristinPersonSearchResponse(@JsonProperty("data") CristinPerson[] data,
                                        @JsonProperty("facets") Map<String, CristinFacet[]> facets) {
-        this.data = data;
+        this.data = data.clone();
         this.facets = facets;
     }
 
