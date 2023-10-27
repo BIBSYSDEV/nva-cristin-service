@@ -60,7 +60,6 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     }
 
     @Override
-    
     protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 

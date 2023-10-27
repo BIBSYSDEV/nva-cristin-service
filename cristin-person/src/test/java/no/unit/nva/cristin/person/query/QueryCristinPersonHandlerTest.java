@@ -10,6 +10,7 @@ import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
+import no.unit.nva.cristin.person.model.cristin.CristinPersonSearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -289,6 +290,14 @@ public class QueryCristinPersonHandlerTest {
         assertThat(responseBody, not(containsString(NATIONAL_IDENTITY_NUMBER)));
         assertThat(responseBody, not(containsString(RESERVED)));
         generatedNINs.forEach(nin -> assertThat(responseBody, not(containsString(nin))));
+    }
+
+    @Test
+    void testtest() throws Exception {
+        var json = IoUtils.stringFromResources(Path.of("cristinQueryPersonDataAndFacets.json"));
+        var pojo = OBJECT_MAPPER.readValue(json, CristinPersonSearchResponse.class);
+
+        System.out.println(OBJECT_MAPPER.writeValueAsString(pojo));
     }
 
     private SearchResponse<Person> randomPersons() {

@@ -1,0 +1,59 @@
+{
+  "data" : [ {
+    "first_name" : "Knut",
+    "surname" : "Nilsen",
+    "url" : "https://api.cristin-test.uio.no/v2/persons/12345",
+    "cristin_person_id" : "12345"
+  }, {
+    "first_name" : "Kine",
+    "surname" : "Hansen",
+    "url" : "https://api.cristin-test.uio.no/v2/persons/56789",
+    "cristin_person_id" : "56789"
+  } ],
+  "facets" : {
+    "institution_idfacet" : [ {
+      "count" : 2,
+      "cristin_institution_id" : "185",
+      "institution_name" : {
+        "en" : "University of Oslo"
+      }
+    }, {
+      "count" : 2,
+      "cristin_institution_id" : "194",
+      "institution_name" : {
+        "en" : "Norwegian University of Science and Technology"
+      }
+    }, {
+      "count" : 1,
+      "cristin_institution_id" : "20754",
+      "institution_name" : {
+        "en" : "Sikt - Norwegian Agency for Shared Services in Education and Research"
+      }
+    }, {
+      "count" : 1,
+      "cristin_institution_id" : "217",
+      "institution_name" : {
+        "en" : "University of Stavanger"
+      }
+    }, {
+      "count" : 1,
+      "cristin_institution_id" : "7428",
+      "institution_name" : {
+        "en" : "Norwegian Defence Research Establishment"
+      }
+    } ],
+    "sector_idfacet" : [ {
+      "count" : 2,
+      "code" : "INSTITUTE",
+      "name" : {
+        "en" : "Institute Sector"
+      }
+    }, {
+      "count" : 2,
+      "code" : "UC",
+      "name" : {
+        "en" : "Universities and colleges"
+      }
+    } ]
+  }
+}
