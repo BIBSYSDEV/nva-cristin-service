@@ -8,12 +8,8 @@ import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
 import no.unit.nva.cristin.projects.common.QueryProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class QueryCristinProjectApiClient extends CristinProjectApiClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(QueryCristinProjectApiClient.class);
 
     public QueryCristinProjectApiClient() {
         super();
@@ -49,12 +45,8 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
                    .withProcessingTime(processingTime);
     }
 
-    protected HttpResponse<String> queryProjects(QueryProject queryProject)
-        throws ApiGatewayException {
-
-        logger.info("requests -> " + queryProject.toURI().toString());
-
-        HttpResponse<String> response = fetchQueryResults(queryProject.toURI());
+    protected HttpResponse<String> queryProjects(QueryProject queryProject) throws ApiGatewayException {
+        var response = fetchQueryResults(queryProject.toURI());
         checkHttpStatusCode(queryProject.toNvaURI(), response.statusCode(), response.body());
 
         return response;
