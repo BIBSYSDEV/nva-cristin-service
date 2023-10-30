@@ -1,11 +1,13 @@
 package no.unit.nva.cristin.model.query;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.net.URI;
 import java.util.Map;
+import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.model.Facet;
 
 @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
-public record CristinFacetAdapter(CristinFacet cristinFacet) implements Facet {
+public record CristinFacetAdapter(@JsonIgnore CristinFacet cristinFacet) implements Facet, JsonSerializable {
 
     @Override
     public URI getId() {
@@ -30,5 +32,10 @@ public record CristinFacetAdapter(CristinFacet cristinFacet) implements Facet {
     @Override
     public Map<String, String> getLabels() {
         return cristinFacet.getLabels();
+    }
+
+    @Override
+    public String toString() {
+        return toJsonString();
     }
 }
