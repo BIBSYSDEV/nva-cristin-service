@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.model.query;
+package no.unit.nva.cristin.facet;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -6,13 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import no.unit.nva.model.Facet;
-import no.unit.nva.model.FacetConverter;
+import no.unit.nva.cristin.model.query.CristinFacet;
+import no.unit.nva.cristin.model.query.CristinFacetKey;
+import no.unit.nva.facet.Facet;
+import no.unit.nva.facet.FacetConverter;
 
 public class CristinFacetConverter implements FacetConverter {
 
     private final Map<String, List<Facet>> converted;
 
+    /**
+     * Takes a facet map from Cristin and converts it to a facet map formatted for NVA. Unsupported facets are
+     * silently ignored.
+     */
     public CristinFacetConverter() {
         converted = new HashMap<>();
     }
@@ -48,7 +54,7 @@ public class CristinFacetConverter implements FacetConverter {
     }
 
     private Facet toFacet(CristinFacet cristinFacet) {
-        return new CristinFacetAdapter(cristinFacet);
+        return new CristinFacetAdapter(cristinFacet, null);
     }
 
     @Override

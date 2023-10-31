@@ -1,17 +1,19 @@
-package no.unit.nva.cristin.model.query;
+package no.unit.nva.cristin.facet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.net.URI;
 import java.util.Map;
 import no.unit.nva.commons.json.JsonSerializable;
-import no.unit.nva.model.Facet;
+import no.unit.nva.cristin.model.query.CristinFacet;
+import no.unit.nva.facet.Facet;
 
 @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
-public record CristinFacetAdapter(@JsonIgnore CristinFacet cristinFacet) implements Facet, JsonSerializable {
+public record CristinFacetAdapter(@JsonIgnore CristinFacet cristinFacet,
+                                  @JsonIgnore URI id) implements Facet, JsonSerializable {
 
     @Override
     public URI getId() {
-        return null;
+        return id;
     }
 
     @Override

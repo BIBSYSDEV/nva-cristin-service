@@ -5,15 +5,15 @@ import java.util.Optional;
 import no.unit.nva.facet.FacetKey;
 import nva.commons.core.SingletonCollector;
 
-public enum CristinFacetKey implements FacetKey {
+public enum CristinFacetParamKey implements FacetKey {
 
-    INSTITUTION("institution_idfacet", "organization_facet"),
-    SECTOR("sector_idfacet", "sector_facet");
+    INSTITUTION_PARAM("institution", "organization_facet"),
+    SECTOR_PARAM("sector", "sector_facet");
 
     private final String cristinKey;
     private final String nvaKey;
 
-    CristinFacetKey(String cristinKey, String nvaKey) {
+    CristinFacetParamKey(String cristinKey, String nvaKey) {
         this.cristinKey = cristinKey;
         this.nvaKey = nvaKey;
     }
@@ -31,21 +31,21 @@ public enum CristinFacetKey implements FacetKey {
     public static Optional<String> getNvaKey(String key) {
         return Optional.ofNullable(Arrays.stream(values())
                                        .filter(facetKey -> facetKey.getKey().equals(key))
-                                       .map(CristinFacetKey::getNvaKey)
+                                       .map(CristinFacetParamKey::getNvaKey)
                                        .collect(SingletonCollector.collectOrElse(null)));
     }
 
     public static Optional<String> getCristinKey(String key) {
         return Optional.ofNullable(Arrays.stream(values())
                                        .filter(facetKey -> facetKey.getNvaKey().equals(key))
-                                       .map(CristinFacetKey::getKey)
+                                       .map(CristinFacetParamKey::getKey)
                                        .collect(SingletonCollector.collectOrElse(null)));
     }
 
-    public static Optional<CristinFacetKey> fromKey(String key) {
+    public static Optional<CristinFacetParamKey> fromKey(String key) {
         return Optional.ofNullable(Arrays.stream(values())
-                   .filter(facetKey -> facetKey.getKey().equals(key) || facetKey.getNvaKey().equals(key))
-                   .collect(SingletonCollector.collectOrElse(null)));
+                                       .filter(facetKey -> facetKey.getKey().equals(key)
+                                                           || facetKey.getNvaKey().equals(key))
+                                       .collect(SingletonCollector.collectOrElse(null)));
     }
-
 }

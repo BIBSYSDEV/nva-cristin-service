@@ -1,4 +1,4 @@
-package no.unit.nva.model;
+package no.unit.nva.facet;
 
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LABELS;

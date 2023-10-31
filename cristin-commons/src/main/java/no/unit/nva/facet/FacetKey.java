@@ -1,4 +1,4 @@
-package no.unit.nva.model;
+package no.unit.nva.facet;
 
 public interface FacetKey {
 

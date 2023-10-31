@@ -18,7 +18,6 @@ public abstract class CristinFacet {
     @JsonProperty("count")
     private Integer count;
 
-    @SuppressWarnings("unused")
     public Integer getCount() {
         return count;
     }

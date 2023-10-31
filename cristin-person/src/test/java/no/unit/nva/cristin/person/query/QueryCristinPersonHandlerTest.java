@@ -7,7 +7,7 @@ import com.google.common.net.HttpHeaders;
 import java.util.ArrayList;
 import java.util.stream.IntStream;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.model.query.CristinFacetConverter;
+import no.unit.nva.cristin.facet.CristinFacetConverter;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -297,6 +297,7 @@ public class QueryCristinPersonHandlerTest {
     void testtest() throws Exception {
         var json = IoUtils.stringFromResources(Path.of("cristinQueryPersonDataAndFacets.json"));
         var pojo = OBJECT_MAPPER.readValue(json, CristinPersonSearchResponse.class);
+        //var uri = URI.create("https://api.dev.nva.aws.unit.no/cristin/project?query=helse&sector_facet=UC,HEALTH");
         var facets = new CristinFacetConverter().convert(pojo.facets()).getConverted();
         var searchResponse = new SearchResponse<Person>(randomUri()).withFacets(facets);
 
