@@ -1,10 +1,12 @@
 package no.unit.nva.cristin.facet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import java.net.URI;
 import no.unit.nva.cristin.model.query.CristinFacet;
 import no.unit.nva.cristin.model.query.CristinInstitutionFacet;
 import no.unit.nva.cristin.model.query.CristinSectorFacet;
+import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.Test;
 
 public class FacetUriParamAppenderTest {
@@ -22,11 +24,23 @@ public class FacetUriParamAppenderTest {
         URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?name=tor&organization_facet=uio&sector_facet=UC");
 
     @Test
+    void shouldDoNothingOnNullValueUri() {
+        var actual = new FacetUriParamAppender(null, null)
+                         .create()
+                         .getUriWithFacetKeys()
+                         .map(UriWrapper::getUri)
+                         .orElse(null);
+
+        assertNull(actual);
+    }
+
+    @Test
     void shouldDoNothingOnNullValue() {
         var actual = new FacetUriParamAppender(idUriWithoutFacet, null)
                          .create()
                          .getUriWithFacetKeys()
-                         .getUri();
+                         .map(UriWrapper::getUri)
+                         .orElse(null);
 
         assertEquals(idUriWithoutFacet, actual);
     }
@@ -38,7 +52,8 @@ public class FacetUriParamAppenderTest {
         var actual = new FacetUriParamAppender(idUriWithoutFacet, cristinFacet)
                          .create()
                          .getUriWithFacetKeys()
-                         .getUri();
+                         .map(UriWrapper::getUri)
+                         .orElse(null);
 
         assertEquals(idUriWithSingleFacet, actual);
     }
@@ -50,7 +65,8 @@ public class FacetUriParamAppenderTest {
         var actual = new FacetUriParamAppender(idUriWithSingleFacet, cristinFacet)
                          .create()
                          .getUriWithFacetKeys()
-                         .getUri();
+                         .map(UriWrapper::getUri)
+                         .orElse(null);
 
         assertEquals(idUriWithMultipleFacet, actual);
     }
@@ -63,12 +79,14 @@ public class FacetUriParamAppenderTest {
         var actual = new FacetUriParamAppender(idUriWithoutFacet, institutionFacet)
                          .create()
                          .getUriWithFacetKeys()
-                         .getUri();
+                         .map(UriWrapper::getUri)
+                         .orElse(null);
 
         actual = new FacetUriParamAppender(actual, sectorFacet)
                      .create()
                      .getUriWithFacetKeys()
-                     .getUri();
+                     .map(UriWrapper::getUri)
+                     .orElse(null);
 
         assertEquals(idUriWithMultipleDifferentFacets, actual);
     }

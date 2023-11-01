@@ -6,14 +6,19 @@ import java.util.Map;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.query.CristinFacet;
 import no.unit.nva.facet.Facet;
+import nva.commons.core.paths.UriWrapper;
 
 @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
 public record CristinFacetAdapter(@JsonIgnore CristinFacet cristinFacet,
-                                  @JsonIgnore URI id) implements Facet, JsonSerializable {
+                                  @JsonIgnore URI nvaIdUri) implements Facet, JsonSerializable {
 
     @Override
     public URI getId() {
-        return id;
+        return new FacetUriParamAppender(nvaIdUri, cristinFacet)
+                   .create()
+                   .getUriWithFacetKeys()
+                   .map(UriWrapper::getUri)
+                   .orElse(null);
     }
 
     @Override

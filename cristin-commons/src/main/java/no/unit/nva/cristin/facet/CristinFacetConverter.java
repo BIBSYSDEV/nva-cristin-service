@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.facet;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,13 +15,15 @@ import no.unit.nva.facet.FacetConverter;
 public class CristinFacetConverter implements FacetConverter {
 
     private final Map<String, List<Facet>> converted;
+    private final URI nvaIdUri;
 
     /**
      * Takes a facet map from Cristin and converts it to a facet map formatted for NVA. Unsupported facets are
-     * silently ignored.
+     * silently ignored. Uses Nva id uri as input for calculating facet id uri.
      */
-    public CristinFacetConverter() {
+    public CristinFacetConverter(URI nvaIdUri) {
         converted = new HashMap<>();
+        this.nvaIdUri = nvaIdUri;
     }
 
     public CristinFacetConverter convert(Map<String, CristinFacet[]> input) {
@@ -54,7 +57,7 @@ public class CristinFacetConverter implements FacetConverter {
     }
 
     private Facet toFacet(CristinFacet cristinFacet) {
-        return new CristinFacetAdapter(cristinFacet, null);
+        return new CristinFacetAdapter(cristinFacet, nvaIdUri);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.net.HttpHeaders;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.stream.IntStream;
 import no.unit.nva.cristin.model.SearchResponse;
@@ -297,8 +298,8 @@ public class QueryCristinPersonHandlerTest {
     void testtest() throws Exception {
         var json = IoUtils.stringFromResources(Path.of("cristinQueryPersonDataAndFacets.json"));
         var pojo = OBJECT_MAPPER.readValue(json, CristinPersonSearchResponse.class);
-        //var uri = URI.create("https://api.dev.nva.aws.unit.no/cristin/project?query=helse&sector_facet=UC,HEALTH");
-        var facets = new CristinFacetConverter().convert(pojo.facets()).getConverted();
+        var nvaIdUri = URI.create("https://api.dev.nva.aws.unit.no/cristin/person?name=tore&sector_facet=UC");
+        var facets = new CristinFacetConverter(nvaIdUri).convert(pojo.facets()).getConverted();
         var searchResponse = new SearchResponse<Person>(randomUri()).withFacets(facets);
 
         System.out.println(OBJECT_MAPPER.writeValueAsString(searchResponse));

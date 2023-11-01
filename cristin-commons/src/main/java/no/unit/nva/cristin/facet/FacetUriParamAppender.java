@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.facet;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
@@ -28,13 +29,15 @@ public class FacetUriParamAppender {
     public FacetUriParamAppender(URI nvaUri, CristinFacet cristinFacet) {
         this.nvaUri = nvaUri;
         this.cristinFacet = cristinFacet;
-        uriWithFacetKeys = UriWrapper.fromUri(nvaUri);
+        if (nonNull(nvaUri)) {
+            uriWithFacetKeys = UriWrapper.fromUri(nvaUri);
+        }
     }
 
     public FacetUriParamAppender create() {
         var facetEnum = getCorrectFacetEnumFromCristinFacet();
-        if (facetEnum.isEmpty()) {
-            // No match on facet
+        if (facetEnum.isEmpty() || isNull(nvaUri)) {
+            // No match on facet or uri is null
             return this;
         }
 
@@ -57,8 +60,8 @@ public class FacetUriParamAppender {
         return this;
     }
 
-    public UriWrapper getUriWithFacetKeys() {
-        return uriWithFacetKeys;
+    public Optional<UriWrapper> getUriWithFacetKeys() {
+        return Optional.ofNullable(uriWithFacetKeys);
     }
 
     private Optional<CristinFacetKey> getCorrectFacetEnumFromCristinFacet() {
