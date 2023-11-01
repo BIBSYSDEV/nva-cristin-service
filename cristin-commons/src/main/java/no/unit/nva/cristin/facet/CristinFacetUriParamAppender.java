@@ -27,12 +27,11 @@ public class CristinFacetUriParamAppender {
         }
     }
 
-    public CristinFacetUriParamAppender addParam(String key, String value) {
+    private void addParam(String key, String value) {
         var paramEnum = CristinFacetParamKey.fromKey(key);
-        paramEnum.ifPresent(param ->
-                                splitOnComma(value).forEach(valuePart -> appendParamToUri(param.getKey(), valuePart)));
-
-        return this;
+        paramEnum.ifPresent(
+            param -> splitOnComma(value).forEach(valuePart -> appendParamToUri(param.getKey(), valuePart))
+        );
     }
 
     private List<String> splitOnComma(String value) {
