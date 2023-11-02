@@ -18,7 +18,7 @@ public class FacetUriParamAppenderTest {
         URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?name=tor&sector_facet=UC");
 
     private static final URI idUriWithMultipleFacet =
-        URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?name=tor&sector_facet=UC,INSTITUTE");
+        URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?name=tor&sector_facet=INSTITUTE,UC");
 
     private static final URI idUriWithMultipleDifferentFacets =
         URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?name=tor&organization_facet=uio&sector_facet=UC");
@@ -89,6 +89,19 @@ public class FacetUriParamAppenderTest {
                      .orElse(null);
 
         assertEquals(idUriWithMultipleDifferentFacets, actual);
+    }
+
+    @Test
+    void shouldNotDuplicateValuesWhenAppendingAnotherFacetValueToIdUri() {
+        CristinFacet cristinFacet = new CristinSectorFacet("UC", null);
+
+        var actual = new FacetUriParamAppender(idUriWithSingleFacet, cristinFacet)
+                         .create()
+                         .getUriWithFacetKeys()
+                         .map(UriWrapper::getUri)
+                         .orElse(null);
+
+        assertEquals(idUriWithSingleFacet, actual);
     }
 
 }

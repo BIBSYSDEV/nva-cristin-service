@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -82,7 +83,8 @@ public class FacetUriParamAppender {
     private Map<String, String> getCombinedMap(Map<String, List<String>> queryMap) {
         var combinedMap = new HashMap<String, String>();
         for (Map.Entry<String, List<String>> entry : queryMap.entrySet()) {
-            combinedMap.put(entry.getKey(), String.join(",", entry.getValue()));
+            var uniqueValues = new ArrayList<>(new HashSet<>(entry.getValue()));
+            combinedMap.put(entry.getKey(), String.join(",", uniqueValues));
         }
 
         return combinedMap;
