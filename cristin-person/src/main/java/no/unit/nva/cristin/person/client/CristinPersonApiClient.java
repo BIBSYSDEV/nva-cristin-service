@@ -1,7 +1,11 @@
 package no.unit.nva.cristin.person.client;
 
+import java.net.HttpURLConnection;
 import java.util.stream.Stream;
+import no.unit.nva.client.ClientProvider;
+import no.unit.nva.client.ClientVersion;
 import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -37,7 +41,9 @@ import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.attempt.Try.attempt;
 
-public class CristinPersonApiClient extends ApiClient {
+public class CristinPersonApiClient extends ApiClient
+    implements ClientVersion,
+               CristinAuthorizedQueryClient<Map<String, String>, Person> {
 
     public static final String IDENTITY_NUMBER_PATH = "identityNumber";
     public static final String ERROR_MESSAGE_NO_MATCH_FOUND_FOR_SUPPLIED_PAYLOAD = "No match found for supplied "
@@ -62,7 +68,7 @@ public class CristinPersonApiClient extends ApiClient {
      * @throws ApiGatewayException if something went wrong
      */
     public SearchResponse<Person> generateQueryResponse(Map<String, String> requestQueryParams)
-            throws ApiGatewayException {
+        throws ApiGatewayException {
 
         var startRequestTime = System.currentTimeMillis();
         var response = queryPersons(requestQueryParams);
@@ -118,7 +124,21 @@ public class CristinPersonApiClient extends ApiClient {
                 : combineResultsWithQueryInCaseEnrichmentFails(personsFromQuery, enrichedCristinPersons);
     }
 
-    
+    @Override
+    public String getClientVersion() {
+        return ClientProvider.VERSION_ONE;
+    }
+
+    @Override
+    public SearchResponse<Person> executeQuery(Map<String, String> params) throws ApiGatewayException {
+        return generateQueryResponse(params);
+    }
+
+    @Override
+    public SearchResponse<Person> executeAuthorizedQuery(Map<String, String> params) throws ApiGatewayException {
+        return authorizedGenerateQueryResponse(params);
+    }
+
     protected List<CristinPerson> combineResultsWithQueryInCaseEnrichmentFails(List<CristinPerson> personsFromQuery,
                                                                                List<CristinPerson> enrichedPersons) {
         final var enrichedPersonIds =
@@ -195,21 +215,22 @@ public class CristinPersonApiClient extends ApiClient {
         return response;
     }
 
-    private List<URI> extractCristinUrisFromPersons(List<CristinPerson> personsFromQuery) {
+    protected List<URI> extractCristinUrisFromPersons(List<CristinPerson> personsFromQuery) {
         return personsFromQuery.stream()
                 .map(CristinPerson::getCristinPersonId)
                 .map(CristinPersonQuery::fromId)
                 .collect(Collectors.toList());
     }
 
-    private List<CristinPerson> mapResponsesToCristinPersons(List<HttpResponse<String>> responses) {
+    protected List<CristinPerson> mapResponsesToCristinPersons(List<HttpResponse<String>> responses) {
         return responses.stream()
-                .map(attempt(response -> getDeserializedResponse(response, CristinPerson.class)))
-                .map(Try::orElseThrow)
-                .collect(Collectors.toList());
+                   .filter(response -> response.statusCode() == HttpURLConnection.HTTP_OK)
+                   .map(attempt(response -> getDeserializedResponse(response, CristinPerson.class)))
+                   .map(Try::orElseThrow)
+                   .collect(Collectors.toList());
     }
 
-    private boolean allPersonsWereEnriched(List<CristinPerson> personsFromQuery,
+    protected boolean allPersonsWereEnriched(List<CristinPerson> personsFromQuery,
                                            List<CristinPerson> enrichedCristinPersons) {
         return personsFromQuery.size() == enrichedCristinPersons.size();
     }

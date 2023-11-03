@@ -47,8 +47,8 @@ public class CristinFacetUriParamAppenderTest {
 
     @Test
     void shouldAppendParamsOfSingleValueToSingleValueOutputParam() {
-        params.put("organization_facet", "uio");
-        params.put("sector_facet", "UC");
+        params.put("organizationFacet", "uio");
+        params.put("sectorFacet", "UC");
 
         var actual = new CristinFacetUriParamAppender(originalUri, params)
                          .getAppendedUri()
@@ -59,8 +59,8 @@ public class CristinFacetUriParamAppenderTest {
 
     @Test
     void shouldAppendCommaSeparatedValuesAsMultipleParamsOfEqualKey() {
-        params.put("organization_facet", "ntnu,uio");
-        params.put("sector_facet", "UC");
+        params.put("organizationFacet", "ntnu,uio");
+        params.put("sectorFacet", "UC");
 
         var actual = new CristinFacetUriParamAppender(originalUri, params)
                          .getAppendedUri()

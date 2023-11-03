@@ -4,16 +4,14 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.net.HttpHeaders;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.stream.IntStream;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.facet.CristinFacetConverter;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonSearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.query.v2.QueryPersonWithFacetsClient;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.AccessRight;
@@ -38,12 +36,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import static com.google.common.net.HttpHeaders.ACCEPT;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
+import static no.unit.nva.cristin.model.query.CristinFacetParamKey.INSTITUTION_PARAM;
+import static no.unit.nva.cristin.model.query.CristinFacetParamKey.SECTOR_PARAM;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
@@ -70,6 +71,8 @@ import static org.mockito.Mockito.when;
 
 public class QueryCristinPersonHandlerTest {
 
+    public static final String RESPONSE_WITH_FACETS = IoUtils.stringFromResources(
+        Path.of("cristinQueryPersonDataAndFacets.json"));
     private static final String RANDOM_NAME = "John Smith";
     private static final String NVA_API_QUERY_PERSON_JSON =
         "nvaApiQueryPersonResponse.json";
@@ -82,6 +85,10 @@ public class QueryCristinPersonHandlerTest {
     private static final String EXPECTED_CRISTIN_URI_WITH_ADDITIONAL_PARAMS =
         "https://api.cristin-test.uio.no/v2/persons?per_page=5&institution=uio&name=John+Smith&verified=true&page=1";
     private static final String ORGANIZATION_UIO = "uio";
+    public static final String SECTOR_FACET_UC = "UC";
+    public static final String INSTITUTION_FACET_185 = "185";
+    public static final String SECTOR_INSTITUTE = "INSTITUTE";
+    public static final String VERSION_2023_11_03 = "application/json; version=2023-11-03";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -90,13 +97,17 @@ public class QueryCristinPersonHandlerTest {
     private QueryCristinPersonHandler handler;
     private final List<String> generatedNINs =
         List.of("04031839594", "23047748038", "07021702867", "04011679604", "20106514977");
+    private DefaultPersonQueryClientProvider clientProvider;
 
     @BeforeEach
     void setUp() {
+        clientProvider = new DefaultPersonQueryClientProvider();
+        clientProvider = spy(clientProvider);
         apiClient = new CristinPersonApiClientStub();
+        doReturn(apiClient).when(clientProvider).getVersionOne();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        handler = new QueryCristinPersonHandler(apiClient, environment);
+        handler = new QueryCristinPersonHandler(clientProvider, environment);
     }
 
     @SuppressWarnings("unchecked")
@@ -119,7 +130,8 @@ public class QueryCristinPersonHandlerTest {
     void shouldHideInternalExceptionFromClientWhenUnknownErrorOccur() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
         doThrow(new RuntimeException()).when(apiClient).getEnrichedPersonsUsingQueryResponse(any());
-        handler = new QueryCristinPersonHandler(apiClient, environment);
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, environment);
 
         var gatewayResponse = sendDefaultQuery();
 
@@ -133,7 +145,8 @@ public class QueryCristinPersonHandlerTest {
         apiClient = spy(apiClient);
         var response = new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(response).when(apiClient).fetchQueryResults(any());
-        handler = new QueryCristinPersonHandler(apiClient, environment);
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, environment);
 
         var gatewayResponse = sendDefaultQuery();
 
@@ -147,7 +160,8 @@ public class QueryCristinPersonHandlerTest {
         apiClient = spy(apiClient);
         var response = new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(CompletableFuture.completedFuture(response)).when(apiClient).fetchGetResultAsync(any());
-        handler = new QueryCristinPersonHandler(apiClient, environment);
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, environment);
         var searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
 
         // Query response has size of 2, and will return that even if trying to enrich those 2 returns empty
@@ -166,7 +180,8 @@ public class QueryCristinPersonHandlerTest {
         doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HttpURLConnection.HTTP_OK,
             generateHeaders())).when(apiClient).queryPersons(any());
         doReturn(Collections.emptyList()).when(apiClient).fetchQueryResultsOneByOne(any());
-        handler = new QueryCristinPersonHandler(apiClient, environment);
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, environment);
         var searchResponse = sendDefaultQuery().getBodyObject(SearchResponse.class);
 
         assertThat(0, equalTo(searchResponse.getHits().size()));
@@ -175,7 +190,8 @@ public class QueryCristinPersonHandlerTest {
     @Test
     void shouldProduceCorrectCristinUriFromParams() throws IOException, ApiGatewayException {
         apiClient = spy(apiClient);
-        handler = new QueryCristinPersonHandler(apiClient, environment);
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, environment);
         sendDefaultQuery();
         verify(apiClient).fetchQueryResults(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_PARAMS).getUri());
     }
@@ -184,7 +200,8 @@ public class QueryCristinPersonHandlerTest {
     void shouldProduceCorrectCristinUriFromParamsWithAdditionalOptionalParams() throws IOException,
                                                                                        ApiGatewayException {
         apiClient = spy(apiClient);
-        handler = new QueryCristinPersonHandler(apiClient, environment);
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, environment);
         sendQueryWithAdditionalParams();
 
         verify(apiClient).fetchQueryResults(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_ADDITIONAL_PARAMS).getUri());
@@ -195,7 +212,8 @@ public class QueryCristinPersonHandlerTest {
         var clientMock = mock(HttpClient.class);
         when(clientMock.<String>send(any(), any())).thenThrow(new HttpConnectTimeoutException(EMPTY_STRING));
         CristinPersonApiClient apiClient = new CristinPersonApiClient(clientMock);
-        handler = new QueryCristinPersonHandler(apiClient, environment);
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, environment);
         var gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, gatewayResponse.getStatusCode());
@@ -209,14 +227,15 @@ public class QueryCristinPersonHandlerTest {
         var apiClient = mock(CristinPersonApiClient.class);
         var searchResponse = randomPersons();
         doReturn(searchResponse).when(apiClient).generateQueryResponse(any());
-        handler = new QueryCristinPersonHandler(apiClient, new Environment());
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, new Environment());
         var input = queryMissingAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         assertThat(gatewayResponse.getStatusCode(), equalTo(HttpURLConnection.HTTP_OK));
-        verify(apiClient, times(0)).authorizedGenerateQueryResponse(any());
-        verify(apiClient, times(1)).generateQueryResponse(any());
+        verify(apiClient, times(0)).executeAuthorizedQuery(any());
+        verify(apiClient, times(1)).executeQuery(any());
     }
 
     @Test
@@ -224,15 +243,16 @@ public class QueryCristinPersonHandlerTest {
         throws IOException, ApiGatewayException {
         var apiClient = mock(CristinPersonApiClient.class);
         var searchResponse = randomPersons();
-        doReturn(searchResponse).when(apiClient).authorizedGenerateQueryResponse(any());
-        handler = new QueryCristinPersonHandler(apiClient, new Environment());
+        doReturn(searchResponse).when(apiClient).executeAuthorizedQuery(any());
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, new Environment());
         var input = queryWithAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         assertThat(gatewayResponse.getStatusCode(), equalTo(HttpURLConnection.HTTP_OK));
-        verify(apiClient, times(1)).authorizedGenerateQueryResponse(any());
-        verify(apiClient, times(0)).generateQueryResponse(any());
+        verify(apiClient, times(1)).executeAuthorizedQuery(any());
+        verify(apiClient, times(0)).executeQuery(any());
     }
 
     @Test
@@ -243,7 +263,8 @@ public class QueryCristinPersonHandlerTest {
         doReturn(queryResponse).when(apiClient).fetchGetResultWithAuthentication(any());
         var getResponse = generateDummyGetResponseWithNin();
         doReturn(List.of(getResponse)).when(apiClient).authorizedFetchQueryResultsOneByOne(any());
-        handler = new QueryCristinPersonHandler(apiClient, new Environment());
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, new Environment());
         var input = queryWithAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
@@ -260,7 +281,8 @@ public class QueryCristinPersonHandlerTest {
         doReturn(queryResponse).when(apiClient).queryPersons(any());
         var getResponse = generateDummyGetResponseWithoutNin();
         doReturn(List.of(getResponse)).when(apiClient).fetchQueryResultsOneByOne(any());
-        handler = new QueryCristinPersonHandler(apiClient, new Environment());
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, new Environment());
         var input = queryMissingAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
@@ -283,7 +305,8 @@ public class QueryCristinPersonHandlerTest {
         doReturn(List.of(getResponse)).when(apiClient).authorizedFetchQueryResultsOneByOne(any());
         doReturn(List.of(getResponse)).when(apiClient).fetchQueryResultsOneByOne(any());
 
-        handler = new QueryCristinPersonHandler(apiClient, new Environment());
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, new Environment());
         var input = queryMissingAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME));
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
@@ -295,14 +318,19 @@ public class QueryCristinPersonHandlerTest {
     }
 
     @Test
-    void testtest() throws Exception {
-        var json = IoUtils.stringFromResources(Path.of("cristinQueryPersonDataAndFacets.json"));
-        var pojo = OBJECT_MAPPER.readValue(json, CristinPersonSearchResponse.class);
-        var nvaIdUri = URI.create("https://api.dev.nva.aws.unit.no/cristin/person?name=tore&sector_facet=UC");
-        var facets = new CristinFacetConverter(nvaIdUri).convert(pojo.facets()).getConverted();
-        var searchResponse = new SearchResponse<Person>(randomUri()).withFacets(facets);
+    void shouldAddFacetsToSearchResponse() throws Exception {
+        var apiClient = spy(QueryPersonWithFacetsClient.class);
+        var queryResponse = dummyFacetHttpResponse();
+        doReturn(queryResponse).when(apiClient).fetchQueryResults(any());
+        var ignoreEnriched = new HttpResponseFaker(EMPTY_STRING, 404);
+        doReturn(List.of(ignoreEnriched)).when(apiClient).fetchQueryResultsOneByOne(any());
+        doReturn(apiClient).when(clientProvider).getVersion20231103();
+        handler = new QueryCristinPersonHandler(clientProvider, new Environment());
 
-        System.out.println(OBJECT_MAPPER.writeValueAsString(searchResponse));
+        var actual = sendQueryWithFacets().getBodyObject(SearchResponse.class);
+
+        assertThat(actual.getFacets().size(), equalTo(2));
+        assertThat(actual.getHits().size(), equalTo(2));
     }
 
     private SearchResponse<Person> randomPersons() {
@@ -377,15 +405,14 @@ public class QueryCristinPersonHandlerTest {
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
-    @SuppressWarnings("rawtypes")
-    private GatewayResponse<SearchResponse> sendQueryWithAdditionalParams() throws IOException {
+    private void sendQueryWithAdditionalParams() throws IOException {
         try (var input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME,
                                                            ORGANIZATION, ORGANIZATION_UIO,
                                                            VERIFIED, Boolean.TRUE.toString()))) {
             handler.handleRequest(input, output, context);
         }
 
-        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
     private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
@@ -399,4 +426,31 @@ public class QueryCristinPersonHandlerTest {
         return java.net.http.HttpHeaders.of(HttpResponseFaker.headerMap(ZERO_VALUE, LINK_EXAMPLE_VALUE),
                                             HttpResponseFaker.filter());
     }
+
+    @SuppressWarnings("rawtypes")
+    private GatewayResponse<SearchResponse> sendQueryWithFacets() throws IOException {
+        var params = Map.of(NAME, RANDOM_NAME,
+                            SECTOR_PARAM.getNvaKey(), multiValuedFacetParam(),
+                            INSTITUTION_PARAM.getNvaKey(), INSTITUTION_FACET_185);
+        var acceptHeader = Map.of(ACCEPT, VERSION_2023_11_03);
+
+        var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                        .withBody(null)
+                        .withQueryParameters(params)
+                        .withHeaders(acceptHeader)
+                        .build();
+
+        handler.handleRequest(input, output, context);
+
+        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
+    }
+
+    private static String multiValuedFacetParam() {
+        return String.join(",", SECTOR_FACET_UC, SECTOR_INSTITUTE);
+    }
+
+    private HttpResponse<String> dummyFacetHttpResponse() {
+        return new HttpResponseFaker(RESPONSE_WITH_FACETS, 200);
+    }
+
 }

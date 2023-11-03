@@ -7,8 +7,8 @@ import nva.commons.core.SingletonCollector;
 
 public enum CristinFacetKey implements FacetKey {
 
-    INSTITUTION("institution_idfacet", "organization_facet"),
-    SECTOR("sector_idfacet", "sector_facet");
+    INSTITUTION("institution_idfacet", "organizationFacet"),
+    SECTOR("sector_idfacet", "sectorFacet");
 
     private final String cristinKey;
     private final String nvaKey;
