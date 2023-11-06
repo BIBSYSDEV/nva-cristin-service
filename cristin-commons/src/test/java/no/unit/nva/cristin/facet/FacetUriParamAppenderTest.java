@@ -24,6 +24,15 @@ public class FacetUriParamAppenderTest {
     private static final URI idUriWithMultipleDifferentFacets =
         URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?name=tor&organizationFacet=uio&sectorFacet=UC");
 
+    private static final URI idUriWithMultipleFacetUnSorted =
+        URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?sectorFacet=UC,INSTITUTE&name=tor");
+
+    private static final URI idUriWithMultipleFacetAppendedAndSorted =
+        URI.create("https://api.dev.nva.aws.unit.no/cristin/person/"
+                   + "?name=tor"
+                   + "&organizationFacet=uio"
+                   + "&sectorFacet=INSTITUTE,UC");
+
     @Test
     void shouldDoNothingOnNullValueUri() {
         var actual = new FacetUriParamAppender(null, null)
@@ -73,7 +82,6 @@ public class FacetUriParamAppenderTest {
     }
 
     @Test
-    @Disabled // TODO: Fix parameter order
     void shouldAppendMultipleFacetsToIdUri() {
         CristinFacet institutionFacet = new CristinInstitutionFacet("uio", null);
         CristinFacet sectorFacet = new CristinSectorFacet("UC", null);
@@ -104,6 +112,19 @@ public class FacetUriParamAppenderTest {
                          .orElse(null);
 
         assertEquals(idUriWithSingleFacet, actual);
+    }
+
+    @Test
+    void shouldSortUriParametersAlphabeticallyWhenHasNewFacets() {
+        CristinFacet institutionFacet = new CristinInstitutionFacet("uio", null);
+
+        var actual = new FacetUriParamAppender(idUriWithMultipleFacetUnSorted, institutionFacet)
+                         .create()
+                         .getUriWithFacetKeys()
+                         .map(UriWrapper::getUri)
+                         .orElse(null);
+
+        assertEquals(idUriWithMultipleFacetAppendedAndSorted, actual);
     }
 
 }

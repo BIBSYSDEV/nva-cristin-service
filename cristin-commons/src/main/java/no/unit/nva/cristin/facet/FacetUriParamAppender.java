@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import no.unit.nva.cristin.model.query.CristinFacet;
 import no.unit.nva.cristin.model.query.CristinFacetKey;
 import nva.commons.core.paths.UriWrapper;
@@ -81,9 +82,10 @@ public class FacetUriParamAppender {
     }
 
     private Map<String, String> getCombinedMap(Map<String, List<String>> queryMap) {
-        var combinedMap = new HashMap<String, String>();
+        var combinedMap = new TreeMap<String, String>();
         for (Map.Entry<String, List<String>> entry : queryMap.entrySet()) {
             var uniqueValues = new ArrayList<>(new HashSet<>(entry.getValue()));
+            Collections.sort(uniqueValues);
             combinedMap.put(entry.getKey(), String.join(",", uniqueValues));
         }
 
