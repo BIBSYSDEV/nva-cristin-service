@@ -25,7 +25,7 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
     implements ClientVersion, CristinAuthorizedQueryClient<Map<String, String>, Person> {
 
     public static final String FACETS_PATH = "facets";
-    public static final String CLIENT_VERSION = "2023-11-03-facets";
+    public static final String VERSION_WITH_FACETS = "2023-11-03-facets";
 
     public QueryPersonWithFacetsClient() {
         super(defaultHttpClient());
@@ -92,7 +92,7 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
 
     @Override
     public String getClientVersion() {
-        return CLIENT_VERSION;
+        return VERSION_WITH_FACETS;
     }
 
     private static URI appendFacetsToUri(Map<String, String> parameters, URI cristinUri) {

@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.query;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.person.query.version.facet.QueryPersonWithFacetsClient.VERSION_WITH_FACETS;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import java.util.Map;
 import no.unit.nva.client.ClientProvider;
@@ -15,14 +16,15 @@ public class DefaultPersonQueryClientProvider
     implements ClientProvider<CristinAuthorizedQueryClient<Map<String, String>, Person>> {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultPersonQueryClientProvider.class);
-    public static final String VERSION_WITH_FACETS = QueryPersonWithFacetsClient.CLIENT_VERSION;
+    public static final String VERSION_FACETS_NAME_ALIAS = "facets";
+    public static final String VERSION_FACETS_DATE_ALIAS = "2023-11-03";
 
     @Override
     public CristinAuthorizedQueryClient<Map<String, String>, Person> getClient(String apiVersion) {
         return switch (nonNull(apiVersion) ? apiVersion : EMPTY_STRING) {
-            case VERSION_WITH_FACETS -> {
+            case VERSION_WITH_FACETS, VERSION_FACETS_NAME_ALIAS, VERSION_FACETS_DATE_ALIAS -> {
                 logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_WITH_FACETS);
-                yield getVersion20231103();
+                yield getVersionWithFacets();
             }
             case VERSION_ONE -> {
                 logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_ONE);
@@ -39,7 +41,7 @@ public class DefaultPersonQueryClientProvider
         return new CristinPersonApiClient();
     }
 
-    public CristinAuthorizedQueryClient<Map<String, String>, Person> getVersion20231103() {
+    public CristinAuthorizedQueryClient<Map<String, String>, Person> getVersionWithFacets() {
         return new QueryPersonWithFacetsClient();
     }
 

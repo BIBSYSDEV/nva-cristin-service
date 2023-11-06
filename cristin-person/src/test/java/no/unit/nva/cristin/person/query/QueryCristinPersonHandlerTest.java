@@ -35,6 +35,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.google.common.net.HttpHeaders.ACCEPT;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
@@ -89,6 +91,8 @@ public class QueryCristinPersonHandlerTest {
     public static final String INSTITUTION_FACET_185 = "185";
     public static final String SECTOR_INSTITUTE = "INSTITUTE";
     public static final String VERSION_2023_11_03_FACETS = "application/json; version=2023-11-03-facets";
+    public static final String VERSION_NAME_FACETS = "application/json; version=facets";
+    public static final String VERSION_DATE_FACETS = "application/json; version=2023-11-03";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -317,18 +321,19 @@ public class QueryCristinPersonHandlerTest {
         generatedNINs.forEach(nin -> assertThat(responseBody, not(containsString(nin))));
     }
 
-    @Test
-    void shouldAddFacetsToSearchResponse() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {VERSION_DATE_FACETS, VERSION_2023_11_03_FACETS, VERSION_NAME_FACETS})
+    void shouldAddFacetsToSearchResponse(String acceptHeader) throws Exception {
         var apiClient = spy(QueryPersonWithFacetsClient.class);
         var queryResponse = dummyFacetHttpResponse();
         doReturn(queryResponse).when(apiClient).fetchQueryResults(any());
         var ignoreEnriched = new HttpResponseFaker(EMPTY_STRING, 404);
         doReturn(List.of(ignoreEnriched)).when(apiClient).fetchQueryResultsOneByOne(any());
-        doReturn(apiClient).when(clientProvider).getVersion20231103();
+        doReturn(apiClient).when(clientProvider).getVersionWithFacets();
         handler = new QueryCristinPersonHandler(clientProvider, new Environment());
         var isAnAuthorizedQuery = false;
 
-        var actual = sendQueryWithFacets(isAnAuthorizedQuery).getBodyObject(SearchResponse.class);
+        var actual = sendQueryWithFacets(isAnAuthorizedQuery, acceptHeader).getBodyObject(SearchResponse.class);
 
         assertThat(actual.getFacets().size(), equalTo(2));
         assertThat(actual.getHits().size(), equalTo(2));
@@ -341,11 +346,12 @@ public class QueryCristinPersonHandlerTest {
         doReturn(queryResponse).when(apiClient).fetchQueryResults(any());
         var ignoreEnriched = new HttpResponseFaker(EMPTY_STRING, 404);
         doReturn(List.of(ignoreEnriched)).when(apiClient).fetchQueryResultsOneByOne(any());
-        doReturn(apiClient).when(clientProvider).getVersion20231103();
+        doReturn(apiClient).when(clientProvider).getVersionWithFacets();
         handler = new QueryCristinPersonHandler(clientProvider, new Environment());
         var isAnAuthorizedQuery = true;
 
-        var actual = sendQueryWithFacets(isAnAuthorizedQuery).getBodyObject(SearchResponse.class);
+        var actual = sendQueryWithFacets(isAnAuthorizedQuery, VERSION_2023_11_03_FACETS)
+                         .getBodyObject(SearchResponse.class);
 
         verify(apiClient, times(1)).executeAuthorizedQuery(any());
         assertThat(actual.getFacets().size(), equalTo(2));
@@ -447,11 +453,13 @@ public class QueryCristinPersonHandlerTest {
     }
 
     @SuppressWarnings("rawtypes")
-    private GatewayResponse<SearchResponse> sendQueryWithFacets(boolean authorized) throws IOException {
+    private GatewayResponse<SearchResponse> sendQueryWithFacets(boolean authorized, String acceptValue)
+        throws IOException {
+
         var params = Map.of(NAME, RANDOM_NAME,
                             SECTOR_PARAM.getNvaKey(), multiValuedFacetParam(),
                             INSTITUTION_PARAM.getNvaKey(), INSTITUTION_FACET_185);
-        var acceptHeader = Map.of(ACCEPT, VERSION_2023_11_03_FACETS);
+        var acceptHeader = Map.of(ACCEPT, acceptValue);
 
         var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                         .withBody(null)

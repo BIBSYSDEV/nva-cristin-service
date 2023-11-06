@@ -10,9 +10,8 @@ import java.util.Optional;
 import no.unit.nva.cristin.model.query.CristinFacet;
 import no.unit.nva.cristin.model.query.CristinFacetKey;
 import no.unit.nva.facet.Facet;
-import no.unit.nva.facet.FacetConverter;
 
-public class CristinFacetConverter implements FacetConverter {
+public class CristinFacetConverter {
 
     private final Map<String, List<Facet>> converted;
     private final URI nvaIdUri;
@@ -60,7 +59,6 @@ public class CristinFacetConverter implements FacetConverter {
         return new CristinFacetAdapter(cristinFacet, nvaIdUri);
     }
 
-    @Override
     public Map<String, List<Facet>> getConverted() {
         return converted;
     }

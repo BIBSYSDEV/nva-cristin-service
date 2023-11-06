@@ -2,7 +2,6 @@ package no.unit.nva.cristin.person.client;
 
 import java.net.HttpURLConnection;
 import java.util.stream.Stream;
-import no.unit.nva.client.ClientProvider;
 import no.unit.nva.client.ClientVersion;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
@@ -48,6 +47,7 @@ public class CristinPersonApiClient extends ApiClient
     public static final String IDENTITY_NUMBER_PATH = "identityNumber";
     public static final String ERROR_MESSAGE_NO_MATCH_FOUND_FOR_SUPPLIED_PAYLOAD = "No match found for supplied "
             + "payload";
+    public static final String VERSION_ONE = "1";
 
     /**
      * Create CristinPersonApiClient with default HTTP client.
@@ -126,7 +126,7 @@ public class CristinPersonApiClient extends ApiClient
 
     @Override
     public String getClientVersion() {
-        return ClientProvider.VERSION_ONE;
+        return VERSION_ONE;
     }
 
     @Override
