@@ -5,7 +5,6 @@ import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PERSON_QUERY_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.List;
@@ -32,10 +31,6 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
         super(defaultHttpClient());
     }
 
-    public QueryPersonWithFacetsClient(HttpClient client) {
-        super(client);
-    }
-
     /**
      * Creates a SearchResponse based on fetch from Cristin upstream including search facets.
      *
@@ -59,14 +54,23 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
                                   .convert(mappedResponse.facets())
                                   .getConverted();
 
-        var result = new SearchResponse<Person>(id)
+        return new SearchResponse<Person>(id)
                    .withContext(PERSON_QUERY_CONTEXT)
                    .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
                    .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
                    .withFacets(convertedFacets)
                    .withHits(persons);
+    }
 
-        return result;
+    /**
+     * Returns the same data as the open data query. We do not support query with authorized data in this version as
+     * facet search is meant only for open data for the time being
+     */
+    @Override
+    public SearchResponse<Person> executeAuthorizedQuery(Map<String, String> requestQueryParams)
+        throws ApiGatewayException {
+
+        return executeQuery(requestQueryParams);
     }
 
     /**

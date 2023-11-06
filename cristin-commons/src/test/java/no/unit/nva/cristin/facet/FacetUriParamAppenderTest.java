@@ -7,7 +7,6 @@ import no.unit.nva.cristin.model.query.CristinFacet;
 import no.unit.nva.cristin.model.query.CristinInstitutionFacet;
 import no.unit.nva.cristin.model.query.CristinSectorFacet;
 import nva.commons.core.paths.UriWrapper;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class FacetUriParamAppenderTest {
