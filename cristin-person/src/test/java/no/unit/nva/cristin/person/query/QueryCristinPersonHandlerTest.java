@@ -11,7 +11,7 @@ import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.cristin.person.query.v2.QueryPersonWithFacetsClient;
+import no.unit.nva.cristin.person.query.version.facet.QueryPersonWithFacetsClient;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.AccessRight;
@@ -88,7 +88,7 @@ public class QueryCristinPersonHandlerTest {
     public static final String SECTOR_FACET_UC = "UC";
     public static final String INSTITUTION_FACET_185 = "185";
     public static final String SECTOR_INSTITUTE = "INSTITUTE";
-    public static final String VERSION_2023_11_03 = "application/json; version=2023-11-03";
+    public static final String VERSION_2023_11_03_FACETS = "application/json; version=2023-11-03-facets";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -451,7 +451,7 @@ public class QueryCristinPersonHandlerTest {
         var params = Map.of(NAME, RANDOM_NAME,
                             SECTOR_PARAM.getNvaKey(), multiValuedFacetParam(),
                             INSTITUTION_PARAM.getNvaKey(), INSTITUTION_FACET_185);
-        var acceptHeader = Map.of(ACCEPT, VERSION_2023_11_03);
+        var acceptHeader = Map.of(ACCEPT, VERSION_2023_11_03_FACETS);
 
         var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                         .withBody(null)

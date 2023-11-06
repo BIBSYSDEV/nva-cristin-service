@@ -93,7 +93,7 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
         if (requesterIsUserAdministrator(requestInfo)) {
             logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-            return apiClient.executeAuthorizedQuery(requestQueryParameters); // TODO: Add to new client version as well
+            return apiClient.executeAuthorizedQuery(requestQueryParameters);
         } else {
             return apiClient.executeQuery(requestQueryParameters);
         }

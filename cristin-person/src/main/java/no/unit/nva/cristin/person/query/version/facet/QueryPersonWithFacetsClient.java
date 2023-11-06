@@ -1,4 +1,4 @@
-package no.unit.nva.cristin.person.query.v2;
+package no.unit.nva.cristin.person.query.version.facet;
 
 import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
@@ -25,7 +25,7 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
     implements ClientVersion, CristinAuthorizedQueryClient<Map<String, String>, Person> {
 
     public static final String FACETS_PATH = "facets";
-    public static final String CLIENT_VERSION = "2023-11-03";
+    public static final String CLIENT_VERSION = "2023-11-03-facets";
 
     public QueryPersonWithFacetsClient() {
         super(defaultHttpClient());
