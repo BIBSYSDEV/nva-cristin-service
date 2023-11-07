@@ -98,7 +98,7 @@ Feature: API tests for Cristin persons query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['name', 'organization', 'page', 'results', 'verified']"
+    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['name', 'organization', 'organizationFacet', 'page', 'results', 'sectorFacet', 'verified']"
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
@@ -194,3 +194,30 @@ Feature: API tests for Cristin persons query
     And match searchString contains 'name'
     And match searchString contains 'page'
     And match searchString contains 'results'
+
+  Scenario: Query returns facets when requesting version with facets
+    Given path '/person/'
+    And header Accept = 'application/json; version=2023-11-03-facets'
+    And param name = queryString
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.facets == '#present'
+    And match response.facets.organizationFacet[0].id == '#present'
+    And match response.facets.organizationFacet[0].key == '#present'
+    And match response.facets.organizationFacet[0].count == '#present'
+    And match response.facets.organizationFacet[0].labels == '#present'
+
+  Scenario: Query returns open data only when requesting version with facets
+    Given path '/person/'
+    And header Accept = 'application/json; version=2023-11-03-facets'
+    And param name = queryString
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.hits[0].NationalIdentificationNumber != '#present'
+    * string identifiers = response['hits'][0].identifiers
+    And match identifiers contains 'CristinIdentifier'
+    And match identifiers !contains 'NationalIdentificationNumber'
+    And match response.facets == '#present'
+    And match response.facets.organizationFacet[0].id == '#present'
