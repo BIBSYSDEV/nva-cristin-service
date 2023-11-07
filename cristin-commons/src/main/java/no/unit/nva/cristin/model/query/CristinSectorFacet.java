@@ -24,4 +24,9 @@ public class CristinSectorFacet extends CristinFacet {
     public Map<String, String> getLabels() {
         return name;
     }
+
+    @Override
+    public CristinFacetKey getCristinFacetKey() {
+        return CristinFacetKey.SECTOR;
+    }
 }

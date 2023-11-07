@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.model.query;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -27,5 +28,8 @@ public abstract class CristinFacet {
 
     @JsonProperty("labels")
     public abstract Map<String, String> getLabels();
+
+    @JsonIgnore
+    public abstract CristinFacetKey getCristinFacetKey();
 
 }

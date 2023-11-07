@@ -19,6 +19,9 @@ import nva.commons.core.paths.UriWrapper;
 
 public class FacetUriParamAppender {
 
+    public static final String QUERY_PARAMETER_DELIMITER = "&";
+    public static final String QUERY_PARAMETER_ASSIGNER = "=";
+    public static final String QUERY_VALUE_DELIMITER = ",";
     private final URI nvaUri;
     private final CristinFacet cristinFacet;
     private UriWrapper uriWithFacetKeys;
@@ -37,16 +40,16 @@ public class FacetUriParamAppender {
     }
 
     public FacetUriParamAppender create() {
-        var facetEnum = getCorrectFacetEnumFromCristinFacet();
-        if (facetEnum.isEmpty() || isNull(nvaUri)) {
-            // No match on facet or uri is null
+        if (isNull(cristinFacet) || isNull(nvaUri)) {
             return this;
         }
+
+        var facetEnum = getCorrectFacetEnumFromCristinFacet();
 
         var queryParam = nvaUri.getQuery();
         var queryParamMap = nonNull(queryParam) ? getQueryMap(queryParam) : new HashMap<String, List<String>>();
 
-        var facetName = facetEnum.get().getNvaKey();
+        var facetName = facetEnum.getNvaKey();
         var facetContentKey = cristinFacet.getKey();
 
         if (queryParamMap.containsKey(facetName)) {
@@ -66,16 +69,16 @@ public class FacetUriParamAppender {
         return Optional.ofNullable(uriWithFacetKeys);
     }
 
-    private Optional<CristinFacetKey> getCorrectFacetEnumFromCristinFacet() {
-        return CristinFacetKey.fromCristinFacet(cristinFacet);
+    private CristinFacetKey getCorrectFacetEnumFromCristinFacet() {
+        return cristinFacet.getCristinFacetKey();
     }
 
     private Map<String, List<String>> getQueryMap(String query) {
         Map<String, List<String>> map = new HashMap<>();
-        Arrays.stream(query.split("&"))
+        Arrays.stream(query.split(QUERY_PARAMETER_DELIMITER))
             .forEach(pair -> {
-                String[] keyValue = pair.split("=");
-                List<String> values = Arrays.asList(keyValue[1].split(","));
+                String[] keyValue = pair.split(QUERY_PARAMETER_ASSIGNER);
+                List<String> values = Arrays.asList(keyValue[1].split(QUERY_VALUE_DELIMITER));
                 map.put(keyValue[0], new ArrayList<>(values));
             });
         return map;
@@ -86,7 +89,7 @@ public class FacetUriParamAppender {
         for (Map.Entry<String, List<String>> entry : queryMap.entrySet()) {
             var uniqueValues = new ArrayList<>(new HashSet<>(entry.getValue()));
             Collections.sort(uniqueValues);
-            combinedMap.put(entry.getKey(), String.join(",", uniqueValues));
+            combinedMap.put(entry.getKey(), String.join(QUERY_VALUE_DELIMITER, uniqueValues));
         }
 
         return combinedMap;

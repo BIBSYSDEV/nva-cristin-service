@@ -7,7 +7,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class CristinFacetUriParamAppenderTest {
+class CristinFacetUriParamAppenderTest {
 
     private final URI originalUri =
         URI.create("https://api.cristin-test.uio.no/v2/persons/facets?name=aud");

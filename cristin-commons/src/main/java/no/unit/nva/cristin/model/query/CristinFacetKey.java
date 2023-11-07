@@ -48,14 +48,4 @@ public enum CristinFacetKey implements FacetKey {
                    .collect(SingletonCollector.collectOrElse(null)));
     }
 
-    public static Optional<CristinFacetKey> fromCristinFacet(CristinFacet cristinFacet) {
-        if (cristinFacet instanceof CristinSectorFacet) {
-            return Optional.of(CristinFacetKey.SECTOR);
-        } else if (cristinFacet instanceof CristinInstitutionFacet) {
-            return Optional.of(CristinFacetKey.INSTITUTION);
-        } else {
-            return Optional.empty();
-        }
-    }
-
 }

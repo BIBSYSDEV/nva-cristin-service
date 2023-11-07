@@ -3,13 +3,12 @@ package no.unit.nva.cristin.facet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import java.net.URI;
-import no.unit.nva.cristin.model.query.CristinFacet;
 import no.unit.nva.cristin.model.query.CristinInstitutionFacet;
 import no.unit.nva.cristin.model.query.CristinSectorFacet;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.Test;
 
-public class FacetUriParamAppenderTest {
+class FacetUriParamAppenderTest {
 
     private static final URI idUriWithoutFacet =
         URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?name=tor");
@@ -56,7 +55,7 @@ public class FacetUriParamAppenderTest {
 
     @Test
     void shouldAppendSingleFacetValueToIdUri() {
-        CristinFacet cristinFacet = new CristinSectorFacet("UC", null);
+        var cristinFacet = new CristinSectorFacet("UC", null);
 
         var actual = new FacetUriParamAppender(idUriWithoutFacet, cristinFacet)
                          .create()
@@ -69,7 +68,7 @@ public class FacetUriParamAppenderTest {
 
     @Test
     void shouldAppendAnotherFacetValueToIdUriWhenAlreadyHasValueForThatFacet() {
-        CristinFacet cristinFacet = new CristinSectorFacet("INSTITUTE", null);
+        var cristinFacet = new CristinSectorFacet("INSTITUTE", null);
 
         var actual = new FacetUriParamAppender(idUriWithSingleFacet, cristinFacet)
                          .create()
@@ -82,8 +81,8 @@ public class FacetUriParamAppenderTest {
 
     @Test
     void shouldAppendMultipleFacetsToIdUri() {
-        CristinFacet institutionFacet = new CristinInstitutionFacet("uio", null);
-        CristinFacet sectorFacet = new CristinSectorFacet("UC", null);
+        var institutionFacet = new CristinInstitutionFacet("uio", null);
+        var sectorFacet = new CristinSectorFacet("UC", null);
 
         var actual = new FacetUriParamAppender(idUriWithoutFacet, institutionFacet)
                          .create()
@@ -102,7 +101,7 @@ public class FacetUriParamAppenderTest {
 
     @Test
     void shouldNotDuplicateValuesWhenAppendingAnotherFacetValueToIdUri() {
-        CristinFacet cristinFacet = new CristinSectorFacet("UC", null);
+        var cristinFacet = new CristinSectorFacet("UC", null);
 
         var actual = new FacetUriParamAppender(idUriWithSingleFacet, cristinFacet)
                          .create()
@@ -115,7 +114,7 @@ public class FacetUriParamAppenderTest {
 
     @Test
     void shouldSortUriParametersAlphabeticallyWhenHasNewFacets() {
-        CristinFacet institutionFacet = new CristinInstitutionFacet("uio", null);
+        var institutionFacet = new CristinInstitutionFacet("uio", null);
 
         var actual = new FacetUriParamAppender(idUriWithMultipleFacetUnSorted, institutionFacet)
                          .create()
