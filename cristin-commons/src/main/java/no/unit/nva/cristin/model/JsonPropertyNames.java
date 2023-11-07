@@ -71,5 +71,6 @@ public class JsonPropertyNames {
     public static final String USER = "user";
     public static final String LABELS = "labels";
     public static final String COUNTRY = "country";
+    public static final String FACETS = "facets";
 
 }

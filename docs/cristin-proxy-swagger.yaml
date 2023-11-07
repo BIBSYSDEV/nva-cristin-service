@@ -829,6 +829,39 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: sectorFacet
+          in: query
+          description: Narrow down to sector. Works only for version 2023-11-03-facets
+          required: false
+          schema:
+            type: string
+          example: 'UC'
+        - name: organizationFacet
+          in: query
+          description: Narrow down to organization. Works only for version 2023-11-03-facets
+          required: false
+          schema:
+            type: string
+          example: 'uio'
+        - name: Accept
+          in: header
+          description: Requested response format and version of the returned payload
+          required: false
+          schema:
+            type: string
+          examples:
+            versionOne:
+              value: application/json; version=1
+              description: Version 1 of the Api
+            version20231103WithFacets:
+              value: application/json; version=2023-11-03-facets
+              description: Version with search facets. Header value also accepts version=[2023-11-03, facets]
+            versionOneJsonLd:
+              value: application/ld+json; version=1
+              description: Version 1 of the Api
+            version20231103WithFacetsJsonLd:
+              value: application/ld+json; version=2023-11-03-facets
+              description: Version with search facets. Header value also accepts version=[2023-11-03, facets]
       responses:
         200:
           description: successful operation
@@ -845,6 +878,18 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonsExample'
+            application/json; version=2023-11-03-facets:
+              schema:
+                $ref: '#/components/schemas/PersonsWithFacets'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonsWithFacetsExample'
+            application/ld+json; version=2023-11-03-facets:
+              schema:
+                $ref: '#/components/schemas/PersonsWithFacets'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonsWithFacetsExample'
         400:
           $ref: '#/components/responses/400'
         500:
@@ -2513,6 +2558,43 @@ components:
           description: The list of persons returned by the query
           items:
             $ref: '#/components/schemas/Person'
+    PersonsWithFacets:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of persons returned by the query
+          items:
+            $ref: '#/components/schemas/Person'
+        facets:
+          $ref: '#/components/schemas/Facets'
     Person:
       type: object
       properties:
@@ -2599,7 +2681,7 @@ components:
               format: date-time
     PersonPost:
       type: object
-      required: [ identifiers, names ]
+      required: [ names ]
       properties:
         identifiers:
           type: array
@@ -3195,6 +3277,32 @@ components:
           type: string
           pattern: '.+'
           description: Last name
+    Facets:
+      type: object
+      pattern: '.+'
+      description: Facets used to narrow down the list of search results
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/Facet'
+    Facet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uri
+          description: Facet uri to narrow down on this particular facet
+        key:
+          type: string
+          description: The facet key
+        count:
+          type: integer
+          description: Number of hits on this facet
+        labels:
+          type: array
+          description: Titles in different languages
+          items:
+            $ref: '#/components/schemas/Languages'
   examples:
     ProjectsExample:
       value:
@@ -3678,6 +3786,50 @@ components:
               - type: '4837'
                 label:
                   'en': 'Supply Chain'
+    PersonsWithFacetsExample:
+      value:
+        '@context': 'https://example.org/person-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?name=Ola+Nordmann&page=1&results=5'
+        size: 150
+        searchString: 'name=Ola+Nordmann&page=1&results=5'
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?name=Ola+Nordmann&page=2&results=5'
+        previousResults: ''
+        hits:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
+            type: 'Person'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '359084'
+            names:
+              - type: 'FirstName'
+                value: 'Kjell Ola'
+              - type: 'LastName'
+                value: 'Nordmann'
+            affiliations:
+              - type: 'Affiliation'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+                active: true
+                role:
+                  type: 'Role'
+                  labels:
+                    en: 'Researcher'
+                    nb: 'Forsker'
+                    nn: 'Forskar'
+        facets:
+          organizationFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/person?name=john&organizationFacet=186&page=1&results=5'
+              key: '186'
+              count: '5'
+              labels:
+                en: 'UiT The Arctic University of Norway'
+          sectorFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/person?name=john&sectorFacet=UC&page=1&results=5'
+              key: 'UC'
+              count: '3'
+              labels:
+                nb: 'Universitet og Høgskoler'
     PersonExample:
       value:
         '@context': 'https://example.org/person-context.json'

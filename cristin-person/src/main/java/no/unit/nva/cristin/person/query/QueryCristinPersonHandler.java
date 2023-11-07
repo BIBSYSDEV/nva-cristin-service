@@ -2,11 +2,11 @@ package no.unit.nva.cristin.person.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Optional;
+import no.unit.nva.client.ClientProvider;
+import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -26,22 +26,31 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
+import static no.unit.nva.cristin.model.query.CristinFacetParamKey.INSTITUTION_PARAM;
+import static no.unit.nva.cristin.model.query.CristinFacetParamKey.SECTOR_PARAM;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
+import static no.unit.nva.utils.AccessUtils.requesterIsUserAdministrator;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
-import static nva.commons.core.attempt.Try.attempt;
+import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
+import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;
 
 public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
     private static final Logger logger = LoggerFactory.getLogger(QueryCristinPersonHandler.class);
 
-    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(NAME, ORGANIZATION,  PAGE, NUMBER_OF_RESULTS,
-                                                                     VERIFIED);
+    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(NAME,
+                                                                     ORGANIZATION,
+                                                                     PAGE,
+                                                                     NUMBER_OF_RESULTS,
+                                                                     VERIFIED,
+                                                                     SECTOR_PARAM.getNvaKey(),
+                                                                     INSTITUTION_PARAM.getNvaKey());
     public static final String BOOLEAN_TRUE = "true";
     public static final String BOOLEAN_FALSE = "false";
 
-    private final transient CristinPersonApiClient apiClient;
+    private final transient ClientProvider<CristinAuthorizedQueryClient<Map<String, String>, Person>> clientProvider;
 
     @JacocoGenerated
     @SuppressWarnings("unused")
@@ -51,16 +60,18 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
     @JacocoGenerated
     public QueryCristinPersonHandler(Environment environment) {
-        this(new CristinPersonApiClient(), environment);
+        this(new DefaultPersonQueryClientProvider(), environment);
     }
 
-    public QueryCristinPersonHandler(CristinPersonApiClient apiClient, Environment environment) {
+    public QueryCristinPersonHandler(
+        ClientProvider<CristinAuthorizedQueryClient<Map<String, String>, Person>> clientProvider,
+        Environment environment
+    ) {
         super(Void.class, environment);
-        this.apiClient = apiClient;
+        this.clientProvider = clientProvider;
     }
 
     @Override
-    
     protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
@@ -71,11 +82,21 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         var numberOfResults = getValidNumberOfResults(requestInfo);
         var organization = getValidOrganization(requestInfo).orElse(null);
         var verified = getValidVerified(requestInfo).orElse(null);
+        var sectorFacet = requestInfo.getQueryParameterOpt(SECTOR_PARAM.getNvaKey()).orElse(null);
+        var organizationFacet = requestInfo.getQueryParameterOpt(INSTITUTION_PARAM.getNvaKey()).orElse(null);
 
-        var requestQueryParameters = buildParametersMap(name, page, numberOfResults, organization, verified);
+        var requestQueryParameters = buildParametersMap(name, page, numberOfResults, organization, verified,
+                                                        sectorFacet, organizationFacet);
 
-        return attempt(() -> getAuthorizedSearchResponse(requestInfo, requestQueryParameters))
-                   .orElse(list -> apiClient.generateQueryResponse(requestQueryParameters));
+        var apiVersion = getApiVersion(requestInfo);
+        var apiClient = clientProvider.getClient(apiVersion);
+
+        if (requesterIsUserAdministrator(requestInfo)) {
+            logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
+            return apiClient.executeAuthorizedQuery(requestQueryParameters);
+        } else {
+            return apiClient.executeQuery(requestQueryParameters);
+        }
     }
 
     @Override
@@ -102,7 +123,9 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
                                                    String page,
                                                    String numberOfResults,
                                                    String organization,
-                                                   String verified) {
+                                                   String verified,
+                                                   String sectorFacet,
+                                                   String organizationFacet) {
 
         var requestQueryParameters = new ConcurrentHashMap<String, String>();
 
@@ -115,16 +138,18 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         if (nonNull(verified)) {
             requestQueryParameters.put(VERIFIED, verified);
         }
+        if (nonNull(sectorFacet)) {
+            requestQueryParameters.put(SECTOR_PARAM.getNvaKey(), sectorFacet);
+        }
+        if (nonNull(organizationFacet)) {
+            requestQueryParameters.put(INSTITUTION_PARAM.getNvaKey(), organizationFacet);
+        }
 
         return requestQueryParameters;
     }
 
-    private SearchResponse<Person> getAuthorizedSearchResponse(RequestInfo requestInfo,
-                                                               Map<String, String> requestQueryParams)
-        throws ApiGatewayException {
-        AccessUtils.validateIdentificationNumberAccess(requestInfo);
-        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-        return apiClient.authorizedGenerateQueryResponse(requestQueryParams);
+    private String getApiVersion(RequestInfo requestInfo) {
+        return extractVersionFromRequestInfo(requestInfo, ACCEPT_HEADER_KEY_NAME);
     }
 
 }
