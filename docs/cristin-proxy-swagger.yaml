@@ -831,14 +831,14 @@ paths:
             type: boolean
         - name: sectorFacet
           in: query
-          description: Narrow down to sector. Works only for version 2023-11-03-facets
+          description: Narrow down to sector. Works only for version 2023-11-03-aggregations
           required: false
           schema:
             type: string
           example: 'UC'
         - name: organizationFacet
           in: query
-          description: Narrow down to organization. Works only for version 2023-11-03-facets
+          description: Narrow down to organization. Works only for version 2023-11-03-aggregations
           required: false
           schema:
             type: string
@@ -853,15 +853,15 @@ paths:
             versionOne:
               value: application/json; version=1
               description: Version 1 of the Api
-            version20231103WithFacets:
-              value: application/json; version=2023-11-03-facets
-              description: Version with search facets. Header value also accepts version=[2023-11-03, facets]
+            version20231103WithAggregations:
+              value: application/json; version=2023-11-03-aggregations
+              description: Version with search aggregations. Header value also accepts version=[2023-11-03, aggregations]
             versionOneJsonLd:
               value: application/ld+json; version=1
               description: Version 1 of the Api
-            version20231103WithFacetsJsonLd:
-              value: application/ld+json; version=2023-11-03-facets
-              description: Version with search facets. Header value also accepts version=[2023-11-03, facets]
+            version20231103WithAggregationsJsonLd:
+              value: application/ld+json; version=2023-11-03-aggregations
+              description: Version with search aggregations. Header value also accepts version=[2023-11-03, aggregations]
       responses:
         200:
           description: successful operation
@@ -878,13 +878,13 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonsExample'
-            application/json; version=2023-11-03-facets:
+            application/json; version=2023-11-03-aggregations:
               schema:
                 $ref: '#/components/schemas/PersonsWithFacets'
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonsWithFacetsExample'
-            application/ld+json; version=2023-11-03-facets:
+            application/ld+json; version=2023-11-03-aggregations:
               schema:
                 $ref: '#/components/schemas/PersonsWithFacets'
               examples:
@@ -2593,7 +2593,7 @@ components:
           description: The list of persons returned by the query
           items:
             $ref: '#/components/schemas/Person'
-        facets:
+        aggregations:
           $ref: '#/components/schemas/Facets'
     Person:
       type: object
@@ -3280,7 +3280,7 @@ components:
     Facets:
       type: object
       pattern: '.+'
-      description: Facets used to narrow down the list of search results
+      description: Aggregations used to narrow down the list of search results
       additionalProperties:
         type: array
         items:
@@ -3291,13 +3291,13 @@ components:
         id:
           type: string
           format: uri
-          description: Facet uri to narrow down on this particular facet
+          description: Aggregation uri to narrow down on this particular facet
         key:
           type: string
-          description: The facet key
+          description: The aggregation key
         count:
           type: integer
-          description: Number of hits on this facet
+          description: Number of hits on this aggregation
         labels:
           type: array
           description: Titles in different languages
@@ -3817,7 +3817,7 @@ components:
                     en: 'Researcher'
                     nb: 'Forsker'
                     nn: 'Forskar'
-        facets:
+        aggregations:
           organizationFacet:
             - id: 'https://api.dev.nva.aws.unit.no/cristin/person?name=john&organizationFacet=186&page=1&results=5'
               key: '186'

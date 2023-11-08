@@ -61,7 +61,7 @@ public class SearchResponse<E> implements JsonSerializable {
     private List<E> hits;
     @JsonProperty
     @JsonInclude(NON_NULL)
-    private Map<String, List<Facet>> facets;
+    private Map<String, List<Facet>> aggregations;
 
     private SearchResponse() {
 
@@ -140,12 +140,12 @@ public class SearchResponse<E> implements JsonSerializable {
         this.hits = hits;
     }
 
-    public Map<String, List<Facet>> getFacets() {
-        return facets;
+    public Map<String, List<Facet>> getAggregations() {
+        return aggregations;
     }
 
-    public void setFacets(Map<String, List<Facet>> facets) {
-        this.facets = facets;
+    public void setAggregations(Map<String, List<Facet>> aggregations) {
+        this.aggregations = aggregations;
     }
 
     public SearchResponse<E> withContext(String context) {
@@ -168,8 +168,8 @@ public class SearchResponse<E> implements JsonSerializable {
         return this;
     }
 
-    public SearchResponse<E> withFacets(Map<String, List<Facet>> facets) {
-        this.facets = facets;
+    public SearchResponse<E> withAggregations(Map<String, List<Facet>> aggregations) {
+        this.aggregations = aggregations;
         return this;
     }
 
@@ -255,7 +255,7 @@ public class SearchResponse<E> implements JsonSerializable {
                && Objects.equals(getNextResults(), that.getNextResults())
                && Objects.equals(getPreviousResults(), that.getPreviousResults())
                && Objects.equals(getHits(), that.getHits())
-               && Objects.equals(getFacets(), that.getFacets());
+               && Objects.equals(getAggregations(), that.getAggregations());
     }
 
     @Override
@@ -268,7 +268,7 @@ public class SearchResponse<E> implements JsonSerializable {
                             getNextResults(),
                             getPreviousResults(),
                             getHits(),
-                            getFacets());
+                            getAggregations());
     }
 
     @Override

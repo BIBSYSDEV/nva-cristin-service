@@ -25,7 +25,7 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
     implements ClientVersion, CristinAuthorizedQueryClient<Map<String, String>, Person> {
 
     public static final String FACETS_PATH = "facets";
-    public static final String VERSION_WITH_FACETS = "2023-11-03-facets";
+    public static final String VERSION_WITH_AGGREGATIONS = "2023-11-03-aggregations";
 
     public QueryPersonWithFacetsClient() {
         super(defaultHttpClient());
@@ -58,7 +58,7 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
                    .withContext(PERSON_QUERY_CONTEXT)
                    .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
                    .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
-                   .withFacets(convertedFacets)
+                   .withAggregations(convertedFacets)
                    .withHits(persons);
     }
 
@@ -92,7 +92,7 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
 
     @Override
     public String getClientVersion() {
-        return VERSION_WITH_FACETS;
+        return VERSION_WITH_AGGREGATIONS;
     }
 
     private static URI appendFacetsToUri(Map<String, String> parameters, URI cristinUri) {

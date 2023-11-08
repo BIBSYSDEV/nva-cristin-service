@@ -195,22 +195,22 @@ Feature: API tests for Cristin persons query
     And match searchString contains 'page'
     And match searchString contains 'results'
 
-  Scenario: Query returns facets when requesting version with facets
+  Scenario: Query returns aggregations when requesting version with aggregations
     Given path '/person/'
-    And header Accept = 'application/json; version=2023-11-03-facets'
+    And header Accept = 'application/json; version=2023-11-03-aggregations'
     And param name = queryString
     When method GET
     Then status 200
     And match response == '#object'
-    And match response.facets == '#present'
-    And match response.facets.organizationFacet[0].id == '#present'
-    And match response.facets.organizationFacet[0].key == '#present'
-    And match response.facets.organizationFacet[0].count == '#present'
-    And match response.facets.organizationFacet[0].labels == '#present'
+    And match response.aggregations == '#present'
+    And match response.aggregations.organizationFacet[0].id == '#present'
+    And match response.aggregations.organizationFacet[0].key == '#present'
+    And match response.aggregations.organizationFacet[0].count == '#present'
+    And match response.aggregations.organizationFacet[0].labels == '#present'
 
-  Scenario: Query returns open data only when requesting version with facets
+  Scenario: Query returns open data only when requesting version with aggregations
     Given path '/person/'
-    And header Accept = 'application/json; version=2023-11-03-facets'
+    And header Accept = 'application/json; version=2023-11-03-aggregations'
     And param name = queryString
     When method GET
     Then status 200
@@ -219,5 +219,5 @@ Feature: API tests for Cristin persons query
     * string identifiers = response['hits'][0].identifiers
     And match identifiers contains 'CristinIdentifier'
     And match identifiers !contains 'NationalIdentificationNumber'
-    And match response.facets == '#present'
-    And match response.facets.organizationFacet[0].id == '#present'
+    And match response.aggregations == '#present'
+    And match response.aggregations.organizationFacet[0].id == '#present'

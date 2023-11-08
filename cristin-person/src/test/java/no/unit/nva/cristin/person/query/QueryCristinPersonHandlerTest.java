@@ -90,9 +90,9 @@ public class QueryCristinPersonHandlerTest {
     public static final String SECTOR_FACET_UC = "UC";
     public static final String INSTITUTION_FACET_185 = "185";
     public static final String SECTOR_INSTITUTE = "INSTITUTE";
-    public static final String VERSION_2023_11_03_FACETS = "application/json; version=2023-11-03-facets";
-    public static final String VERSION_NAME_FACETS = "application/json; version=facets";
-    public static final String VERSION_DATE_FACETS = "application/json; version=2023-11-03";
+    public static final String VERSION_2023_11_03_AGGREGATIONS = "application/json; version=2023-11-03-aggregations";
+    public static final String VERSION_NAME_AGGREGATIONS = "application/json; version=aggregations";
+    public static final String VERSION_DATE_AGGREGATIONS = "application/json; version=2023-11-03";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -322,7 +322,7 @@ public class QueryCristinPersonHandlerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {VERSION_DATE_FACETS, VERSION_2023_11_03_FACETS, VERSION_NAME_FACETS})
+    @ValueSource(strings = {VERSION_DATE_AGGREGATIONS, VERSION_2023_11_03_AGGREGATIONS, VERSION_NAME_AGGREGATIONS})
     void shouldAddFacetsToSearchResponse(String acceptHeader) throws Exception {
         var apiClient = spy(QueryPersonWithFacetsClient.class);
         var queryResponse = dummyFacetHttpResponse();
@@ -335,7 +335,7 @@ public class QueryCristinPersonHandlerTest {
 
         var actual = sendQueryWithFacets(isAnAuthorizedQuery, acceptHeader).getBodyObject(SearchResponse.class);
 
-        assertThat(actual.getFacets().size(), equalTo(2));
+        assertThat(actual.getAggregations().size(), equalTo(2));
         assertThat(actual.getHits().size(), equalTo(2));
     }
 
@@ -350,11 +350,11 @@ public class QueryCristinPersonHandlerTest {
         handler = new QueryCristinPersonHandler(clientProvider, new Environment());
         var isAnAuthorizedQuery = true;
 
-        var actual = sendQueryWithFacets(isAnAuthorizedQuery, VERSION_2023_11_03_FACETS)
+        var actual = sendQueryWithFacets(isAnAuthorizedQuery, VERSION_2023_11_03_AGGREGATIONS)
                          .getBodyObject(SearchResponse.class);
 
         verify(apiClient, times(1)).executeAuthorizedQuery(any());
-        assertThat(actual.getFacets().size(), equalTo(2));
+        assertThat(actual.getAggregations().size(), equalTo(2));
         assertThat(actual.getHits().size(), equalTo(2));
     }
 
