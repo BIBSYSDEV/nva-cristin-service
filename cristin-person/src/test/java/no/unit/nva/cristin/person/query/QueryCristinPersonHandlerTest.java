@@ -4,9 +4,11 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.net.HttpHeaders;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.stream.IntStream;
 import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.model.query.CristinFacetKey;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -37,12 +39,14 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 
 import static com.google.common.net.HttpHeaders.ACCEPT;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.query.CristinFacetParamKey.INSTITUTION_PARAM;
@@ -59,6 +63,7 @@ import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -93,6 +98,9 @@ public class QueryCristinPersonHandlerTest {
     public static final String VERSION_2023_11_03_AGGREGATIONS = "application/json; version=2023-11-03-aggregations";
     public static final String VERSION_NAME_AGGREGATIONS = "application/json; version=aggregations";
     public static final String VERSION_DATE_AGGREGATIONS = "application/json; version=2023-11-03";
+    public static final String EMPTY_OBJECT = "{}";
+    public static final String DELIMITER = ",";
+    public static final String EQUALS = "=";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -358,6 +366,49 @@ public class QueryCristinPersonHandlerTest {
         assertThat(actual.getHits().size(), equalTo(2));
     }
 
+    @Test
+    void shouldReturnEmptyResponseWhenEmptyUpstream() throws Exception {
+        var apiClient = spy(QueryPersonWithFacetsClient.class);
+        var queryResponse = new HttpResponseFaker(EMPTY_OBJECT, 200);
+        doReturn(queryResponse).when(apiClient).fetchQueryResults(any());
+        var ignoreEnriched = new HttpResponseFaker(EMPTY_STRING, 404);
+        doReturn(List.of(ignoreEnriched)).when(apiClient).fetchQueryResultsOneByOne(any());
+        doReturn(apiClient).when(clientProvider).getVersionWithFacets();
+        handler = new QueryCristinPersonHandler(clientProvider, new Environment());
+        var isAnAuthorizedQuery = false;
+
+        var actual = sendQueryWithFacets(isAnAuthorizedQuery, VERSION_2023_11_03_AGGREGATIONS)
+                         .getBodyObject(SearchResponse.class);
+
+        assertThat(actual.getId(), not(nullValue()));
+        assertThat(actual.getHits().size(), equalTo(0));
+    }
+
+    @Test
+    void shouldAddOrganizationBothAsFacetAndAsRegularParamAndSupportCombiningThemAsCommaSeparated() throws Exception {
+        var apiClient = spy(QueryPersonWithFacetsClient.class);
+        var queryResponse = dummyFacetHttpResponse();
+        doReturn(queryResponse).when(apiClient).fetchQueryResults(any());
+        var ignoreEnriched = new HttpResponseFaker(EMPTY_STRING, 404);
+        doReturn(List.of(ignoreEnriched)).when(apiClient).fetchQueryResultsOneByOne(any());
+        doReturn(apiClient).when(clientProvider).getVersionWithFacets();
+        handler = new QueryCristinPersonHandler(clientProvider, new Environment());
+        var isAnAuthorizedQuery = false;
+
+        final var actual = sendQueryWithFacets(isAnAuthorizedQuery, VERSION_2023_11_03_AGGREGATIONS)
+                         .getBodyObject(SearchResponse.class);
+
+        var captor = ArgumentCaptor.forClass(URI.class);
+        verify(apiClient).fetchQueryResults(captor.capture());
+
+        assertThat(captor.getValue().toString(), containsString(INSTITUTION + EQUALS + ORGANIZATION_UIO));
+        assertThat(captor.getValue().toString(), containsString(INSTITUTION + EQUALS + INSTITUTION_FACET_185));
+        assertThat(actual.getId().toString(),
+                   containsString(ORGANIZATION + EQUALS + ORGANIZATION_UIO));
+        assertThat(actual.getId().toString(),
+                   containsString(CristinFacetKey.INSTITUTION.getNvaKey() + EQUALS + INSTITUTION_FACET_185));
+    }
+
     private SearchResponse<Person> randomPersons() {
         var persons = new ArrayList<Person>();
         IntStream.range(0, 5).mapToObj(i -> randomPerson()).forEach(persons::add);
@@ -369,7 +420,7 @@ public class QueryCristinPersonHandlerTest {
                    .withId(randomUri())
                    .build();
     }
-    
+
     private HttpResponse<String> generateDummyQueryResponseWithNin() throws JsonProcessingException {
         var cristinPersons = List.of(randomCristinPersonWithNin(randomElement(generatedNINs)));
         return new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(cristinPersons), 200);
@@ -458,7 +509,8 @@ public class QueryCristinPersonHandlerTest {
 
         var params = Map.of(NAME, RANDOM_NAME,
                             SECTOR_PARAM.getNvaKey(), multiValuedFacetParam(),
-                            INSTITUTION_PARAM.getNvaKey(), INSTITUTION_FACET_185);
+                            INSTITUTION_PARAM.getNvaKey(), INSTITUTION_FACET_185,
+                            ORGANIZATION, ORGANIZATION_UIO);
         var acceptHeader = Map.of(ACCEPT, acceptValue);
 
         var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
@@ -478,7 +530,7 @@ public class QueryCristinPersonHandlerTest {
     }
 
     private static String multiValuedFacetParam() {
-        return String.join(",", SECTOR_FACET_UC, SECTOR_INSTITUTE);
+        return String.join(DELIMITER, SECTOR_FACET_UC, SECTOR_INSTITUTE);
     }
 
     private HttpResponse<String> dummyFacetHttpResponse() {
