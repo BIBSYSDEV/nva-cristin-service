@@ -29,6 +29,7 @@ import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.IParameterKey;
 import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.KeyEncoding;
+import no.unit.nva.cristin.model.query.CristinFacetParamKey;
 
 public enum ParameterKeyProject implements IParameterKey {
     INVALID(null),
@@ -78,7 +79,10 @@ public enum ParameterKeyProject implements IParameterKey {
         ERROR_MESSAGE_INVALID_NUMBER,
         KeyEncoding.NONE),
     PAGE_SORT(JsonPropertyNames.PROJECT_SORT),
-    CREATOR(PROJECT_CREATOR_PARAM, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE);
+    CREATOR(PROJECT_CREATOR_PARAM, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE),
+    SECTOR_FACET(CristinFacetParamKey.SECTOR_PARAM.getKey(), CristinFacetParamKey.SECTOR_PARAM.getNvaKey()),
+    INSTITUTION_FACET(CristinFacetParamKey.INSTITUTION_PARAM.getKey(),
+                      CristinFacetParamKey.INSTITUTION_PARAM.getNvaKey());
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
 
@@ -107,6 +111,10 @@ public enum ParameterKeyProject implements IParameterKey {
 
     ParameterKeyProject(String cristinKey) {
         this(cristinKey, null, PATTERN_IS_NON_EMPTY, null, KeyEncoding.NONE);
+    }
+
+    ParameterKeyProject(String cristinKey, String nvaKey) {
+        this(cristinKey, nvaKey, PATTERN_IS_NON_EMPTY, null, KeyEncoding.NONE);
     }
 
     ParameterKeyProject(String cristinKey, String nvaKey, String pattern) {

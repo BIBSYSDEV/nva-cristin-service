@@ -14,8 +14,10 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.INSTITUTION_FACET;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.ORGANIZATION;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QUERY;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.SECTOR_FACET;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.TITLE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS;
 import static no.unit.nva.cristin.projects.query.QueryCristinProjectClientStub.CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE;
@@ -76,6 +78,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -789,6 +792,28 @@ class QueryCristinProjectHandlerTest {
         var creatorPersonId = responseHits.get(0).getCreator().getIdentity().getId().toString();
 
         assertThat(creatorPersonId, containsString(CREATOR_IDENTIFIER));
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    @Disabled
+    void shouldAddFacetParamsToCristinQuery() throws IOException, ApiGatewayException {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        handler = new QueryCristinProjectHandler(cristinApiClientStub, new Environment());
+        final var queryParams = Map.of("query", "hello",
+                                       "sectorFacet", "UC,INSTITUTE",
+                                       "organizationFacet", "185,20754");
+        try (var input = requestWithQueryParameters(queryParams)) {
+            handler.handleRequest(input, output, context);
+        }
+        var captor = ArgumentCaptor.forClass(URI.class);
+
+        verify(cristinApiClientStub).fetchQueryResults(captor.capture());
+        var actualURI = captor.getValue().toString();
+        assertThat(actualURI, containsString(SECTOR_FACET.getKey() + EQUAL_OPERATOR + "UC,INSTITUTE"));
+        assertThat(actualURI, containsString(INSTITUTION_FACET.getKey() + EQUAL_OPERATOR + "185,20754"));
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 

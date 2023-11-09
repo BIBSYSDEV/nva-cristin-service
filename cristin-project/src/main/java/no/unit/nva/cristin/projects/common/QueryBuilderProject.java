@@ -108,6 +108,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
                  USER, PAGE_CURRENT,
                  PAGE_ITEMS_PER_PAGE, PAGE_SORT -> query.setValue(qpKey, value);
             case CREATOR -> withCreator(value);
+            case SECTOR_FACET, INSTITUTION_FACET -> query.setFacet(qpKey, value);
             default -> invalidKeys.add(key);
         }
     }
