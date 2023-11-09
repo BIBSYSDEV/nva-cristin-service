@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.model.cristin;
 
+import static java.util.Objects.nonNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
@@ -13,7 +14,7 @@ public record CristinPersonSearchResponse(CristinPerson[] data,
     @JsonCreator
     public CristinPersonSearchResponse(@JsonProperty("data") CristinPerson[] data,
                                        @JsonProperty("facets") Map<String, CristinFacet[]> facets) {
-        this.data = data.clone();
+        this.data = nonNull(data) ? data.clone() : new CristinPerson[0];
         this.facets = facets;
     }
 

@@ -7,8 +7,10 @@ import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import java.net.URI;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import no.unit.nva.client.ClientVersion;
 import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
 import no.unit.nva.cristin.facet.CristinFacetConverter;
@@ -25,7 +27,7 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
     implements ClientVersion, CristinAuthorizedQueryClient<Map<String, String>, Person> {
 
     public static final String FACETS_PATH = "facets";
-    public static final String VERSION_WITH_FACETS = "2023-11-03-facets";
+    public static final String VERSION_WITH_AGGREGATIONS = "2023-11-03-aggregations";
 
     public QueryPersonWithFacetsClient() {
         super(defaultHttpClient());
@@ -45,7 +47,7 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
         var startRequestTime = System.currentTimeMillis();
         var response = queryPersons(requestQueryParams);
         var mappedResponse = deserializeResponse(response);
-        var personsData = Arrays.asList(mappedResponse.data());
+        var personsData = getPersonsData(mappedResponse);
         var cristinPersons = enrichPersons(personsData);
         var persons = mapCristinPersonsToNvaPersons(cristinPersons);
         var endRequestTime = System.currentTimeMillis();
@@ -58,7 +60,7 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
                    .withContext(PERSON_QUERY_CONTEXT)
                    .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
                    .usingHeadersAndQueryParams(response.headers(), requestQueryParams)
-                   .withFacets(convertedFacets)
+                   .withAggregations(convertedFacets)
                    .withHits(persons);
     }
 
@@ -92,7 +94,7 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
 
     @Override
     public String getClientVersion() {
-        return VERSION_WITH_FACETS;
+        return VERSION_WITH_AGGREGATIONS;
     }
 
     private static URI appendFacetsToUri(Map<String, String> parameters, URI cristinUri) {
@@ -104,6 +106,12 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
 
     private CristinPersonSearchResponse deserializeResponse(HttpResponse<String> response) throws BadGatewayException {
         return getDeserializedResponse(response, CristinPersonSearchResponse.class);
+    }
+
+    private static List<CristinPerson> getPersonsData(CristinPersonSearchResponse mappedResponse) {
+        return Optional.ofNullable(mappedResponse.data())
+                   .map(Arrays::asList)
+                   .orElse(Collections.emptyList());
     }
 
     /**
