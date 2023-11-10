@@ -92,6 +92,7 @@ Feature: API tests for Cristin projects query
       | 'application/xml'         |
       | 'application/rdf+xml'     |
 
+    # TODO: Add facet params here
   Scenario: Query with bad parameter returns Bad Request
     Given path '/project/'
     And param notValidParam = 'someValue'

@@ -233,7 +233,8 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      */
     public boolean areEqual(CristinQuery<T> other) {
         if (queryParameters.size() != other.queryParameters.size()
-            || pathParameters.size() != other.pathParameters.size()) {
+            || pathParameters.size() != other.pathParameters.size()
+            || facetParameters.size() != other.facetParameters.size())  {
             return false;
         }
 
@@ -242,6 +243,9 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
                 .allMatch(e -> e.getValue().equals(other.getValue(e.getKey())))
             &&
             pathParameters.entrySet().stream()
+                .allMatch(e -> e.getValue().equals(other.getValue(e.getKey())))
+            &&
+            facetParameters.entrySet().stream()
                 .allMatch(e -> e.getValue().equals(other.getValue(e.getKey())));
     }
 
@@ -252,7 +256,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      * @return true if map contains key
      */
     public boolean containsKey(T key) {
-        return queryParameters.containsKey(key) || pathParameters.containsKey(key);
+        return queryParameters.containsKey(key) || pathParameters.containsKey(key) || facetParameters.containsKey(key);
     }
 
     /**

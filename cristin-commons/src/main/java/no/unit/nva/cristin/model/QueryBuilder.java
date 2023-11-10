@@ -66,6 +66,9 @@ public abstract class QueryBuilder<T extends Enum<T> & IParameterKey> {
         for (var entry : query.queryParameters.entrySet()) {
             throwInvalidParamererValue(entry);
         }
+        for (var entry : query.facetParameters.entrySet()) {
+            throwInvalidParamererValue(entry);
+        }
         if (!requiredMissing().isEmpty()) {
             throw new BadRequestException(requiredMissingMessage(getMissingKeys()));
         }

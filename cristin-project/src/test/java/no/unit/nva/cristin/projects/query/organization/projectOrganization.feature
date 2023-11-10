@@ -19,6 +19,7 @@ Feature: API tests for list Project pr Organization
     And match response.status == 400
     And match response.detail == 'Invalid path parameter for identifier, needs to be organization identifier matching pattern /(?:\\d+.){3}\\d+/, e.g. (100.0.0.0)'
 
+     # TODO: Add facet params here
   Scenario: Get returns status Bad request when sending illegal parameter
     Given path '/organization/'+dummyOrganizationIdentifier+'/projects'
     And param invalidParam = 'someValue'
