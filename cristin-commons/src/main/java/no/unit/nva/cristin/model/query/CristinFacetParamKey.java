@@ -8,7 +8,8 @@ import nva.commons.core.SingletonCollector;
 public enum CristinFacetParamKey implements FacetKey {
 
     INSTITUTION_PARAM("institution", "organizationFacet"),
-    SECTOR_PARAM("sector", "sectorFacet");
+    SECTOR_PARAM("sector", "sectorFacet"),
+    COORDINATING_PARAM("facet_coordinating", "coordinatingFacet");
 
     private final String cristinKey;
     private final String nvaKey;

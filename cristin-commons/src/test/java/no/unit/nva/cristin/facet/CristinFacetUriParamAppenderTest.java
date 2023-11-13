@@ -18,6 +18,13 @@ class CristinFacetUriParamAppenderTest {
     private final URI uriWithSingleFacetValue =
         URI.create("https://api.cristin-test.uio.no/v2/persons/facets?name=aud&institution=uio&sector=UC");
 
+    private final URI uriWithAllFacetValues =
+        URI.create("https://api.cristin-test.uio.no/v2/persons/facets?name=aud"
+                   + "&institution=ntnu"
+                   + "&institution=uio"
+                   + "&facet_coordinating=185.90.0.0"
+                   + "&sector=UC");
+
     private Map<String, String> params;
 
     @BeforeEach
@@ -67,6 +74,19 @@ class CristinFacetUriParamAppenderTest {
                          .getUri();
 
         assertEquals(uriWithMultipleFacetValues, actual);
+    }
+
+    @Test
+    void shouldAppendAllSupportedParams() {
+        params.put("organizationFacet", "ntnu,uio");
+        params.put("sectorFacet", "UC");
+        params.put("coordinatingFacet", "185.90.0.0");
+
+        var actual = new CristinFacetUriParamAppender(originalUri, params)
+                         .getAppendedUri()
+                         .getUri();
+
+        assertEquals(uriWithAllFacetValues, actual);
     }
 
 }

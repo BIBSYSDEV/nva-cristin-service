@@ -23,6 +23,7 @@ public class FacetUriParamAppender {
     public static final String QUERY_PARAMETER_ASSIGNER = "=";
     public static final String QUERY_VALUE_DELIMITER = ",";
     private final URI nvaUri;
+    private final String cristinFacetKey;
     private final CristinFacet cristinFacet;
     private UriWrapper uriWithFacetKeys;
 
@@ -31,8 +32,9 @@ public class FacetUriParamAppender {
      * to the enum for Cristin facets. If the facet is already present, it adds the new one to the existing query
      * param as a comma separated list of facet keys. Returns a new uri with the added facet data.
      */
-    public FacetUriParamAppender(URI nvaUri, CristinFacet cristinFacet) {
+    public FacetUriParamAppender(URI nvaUri, String cristinFacetKey, CristinFacet cristinFacet) {
         this.nvaUri = nvaUri;
+        this.cristinFacetKey = cristinFacetKey;
         this.cristinFacet = cristinFacet;
         if (nonNull(nvaUri)) {
             uriWithFacetKeys = UriWrapper.fromUri(nvaUri);
@@ -70,7 +72,7 @@ public class FacetUriParamAppender {
     }
 
     private CristinFacetKey getCorrectFacetEnumFromCristinFacet() {
-        return cristinFacet.getCristinFacetKey();
+        return CristinFacetKey.fromKey(cristinFacetKey).orElseThrow();
     }
 
     private Map<String, List<String>> getQueryMap(String query) {

@@ -9,12 +9,13 @@ import no.unit.nva.facet.Facet;
 import nva.commons.core.paths.UriWrapper;
 
 @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
-public record CristinFacetAdapter(@JsonIgnore CristinFacet cristinFacet,
+public record CristinFacetAdapter(@JsonIgnore String cristinFacetKey,
+                                  @JsonIgnore CristinFacet cristinFacet,
                                   @JsonIgnore URI nvaIdUri) implements Facet, JsonSerializable {
 
     @Override
     public URI getId() {
-        return new FacetUriParamAppender(nvaIdUri, cristinFacet)
+        return new FacetUriParamAppender(nvaIdUri, cristinFacetKey, cristinFacet)
                    .create()
                    .getUriWithFacetKeys()
                    .map(UriWrapper::getUri)

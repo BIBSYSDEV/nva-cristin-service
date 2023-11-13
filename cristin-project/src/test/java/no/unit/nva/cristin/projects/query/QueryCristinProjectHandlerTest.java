@@ -14,7 +14,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
-import static no.unit.nva.cristin.projects.common.ParameterKeyProject.INSTITUTION_FACET;
+import static no.unit.nva.cristin.model.query.CristinFacetKey.COORDINATING;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.ORGANIZATION;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QUERY;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.SECTOR_FACET;
@@ -65,10 +65,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.common.client.ApiClient;
+import no.unit.nva.cristin.facet.CristinFacetConverter;
 import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.cristin.projects.model.cristin.query.CristinProjectSearchResponse;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
@@ -802,7 +804,7 @@ class QueryCristinProjectHandlerTest {
         handler = new QueryCristinProjectHandler(cristinApiClientStub, new Environment());
         final var queryParams = Map.of("query", "hello",
                                        "sectorFacet", "UC,INSTITUTE",
-                                       "organizationFacet", "185,20754");
+                                       "coordinatingFacet", "185.90.0.0");
         try (var input = requestWithQueryParameters(queryParams)) {
             handler.handleRequest(input, output, context);
         }
@@ -811,10 +813,26 @@ class QueryCristinProjectHandlerTest {
         verify(cristinApiClientStub).fetchQueryResults(captor.capture());
         var actualURI = captor.getValue().toString();
         assertThat(actualURI, containsString(SECTOR_FACET.getKey() + EQUAL_OPERATOR + "UC,INSTITUTE"));
-        assertThat(actualURI, containsString(INSTITUTION_FACET.getKey() + EQUAL_OPERATOR + "185,20754"));
+        assertThat(actualURI, containsString(COORDINATING.getKey() + EQUAL_OPERATOR + "185.90.0.0"));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    @Disabled
+    void testtest() throws Exception {
+        var json = IoUtils.stringFromResources(Path.of("cristinQueryProjectDataAndFacets.json"));
+        var deserialized = OBJECT_MAPPER.readValue(json, CristinProjectSearchResponse.class);
+
+        var convertedFacets = new CristinFacetConverter(URI.create(""))
+                                  .convert(deserialized.facets())
+                                  .getConverted();
+
+        var searchResponse = new SearchResponse<CristinProject>(URI.create(""))
+                                 .withAggregations(convertedFacets);
+
+        assertThat(searchResponse, equalTo(""));
     }
 
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
