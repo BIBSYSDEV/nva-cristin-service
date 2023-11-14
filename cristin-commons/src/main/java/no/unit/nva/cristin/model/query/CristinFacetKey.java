@@ -9,7 +9,13 @@ public enum CristinFacetKey implements FacetKey {
 
     INSTITUTION("institution_idfacet", "organizationFacet"),
     SECTOR("sector_idfacet", "sectorFacet"),
-    COORDINATING("institution_coordinating_idfacet", "coordinatingFacet");
+    COORDINATING("institution_coordinating_idfacet", "coordinatingFacet"),
+    RESPONSIBLE("institution_responsible_idfacet", "responsibleFacet"),
+    CATEGORY("category_idfacet", "categoryFacet"),
+    HEALTH("health_project_type_idfacet", "healthProjectFacet"),
+    PARTICIPANT("person_idfacet", "participantFacet"),
+    PARTICIPATING_PERSON_ORG("person_institution_idfacet", "participantOrgFacet"),
+    FUNDING_SOURCE("funding_source_idfacet", "fundingSourceFacet");
 
     private final String cristinKey;
     private final String nvaKey;
