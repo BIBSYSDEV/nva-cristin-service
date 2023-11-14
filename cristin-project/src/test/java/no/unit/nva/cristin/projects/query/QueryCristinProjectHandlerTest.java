@@ -147,47 +147,17 @@ class QueryCristinProjectHandlerTest {
     private Context context;
     private ByteArrayOutputStream output;
     private QueryCristinProjectHandler handler;
-
-    private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
-        return Stream.of(
-            Arguments.of(LINK_EXAMPLE_VALUE,
-                         exampleUriFromPageAndResults("201", "1"),
-                         exampleUriFromPageAndResults("199", "1"),
-                         "200", "1"),
-            Arguments.of(LINK_EXAMPLE_VALUE,
-                         exampleUriFromPageAndResults("6", "3"),
-                         exampleUriFromPageAndResults("4", "3"),
-                         "5", "3"),
-            Arguments.of(LINK_EXAMPLE_VALUE,
-                         EMPTY_STRING,
-                         exampleUriFromPageAndResults("24", "10"),
-                         "25", "10"),
-            Arguments.of(LINK_EXAMPLE_VALUE,
-                         exampleUriFromPageAndResults("2", "5"),
-                         EMPTY_STRING,
-                         "1", "5"),
-            Arguments.of(LINK_EXAMPLE_VALUE,
-                         exampleUriFromPageAndResults("10", "7"),
-                         exampleUriFromPageAndResults("8", "7"),
-                         "9", "7"),
-            Arguments.of(Constants.REL_NEXT,
-                         exampleUriFromPageAndResults("2", "5"),
-                         EMPTY_STRING,
-                         "1", "5")
-        );
-    }
-
-    private static String exampleUriFromPageAndResults(String page, String results) {
-        String url = "https://api.dev.nva.aws.unit.no/cristin/project?page=%s&title=reindeer&results=%s";
-        return String.format(url, page, results);
-    }
+    private DefaultProjectQueryClientProvider clientProvider;
 
     @BeforeEach
     void setUp() {
+        clientProvider = new DefaultProjectQueryClientProvider();
+        clientProvider = spy(clientProvider);
         cristinApiClientStub = new QueryCristinProjectClientStub();
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
     }
 
     @ParameterizedTest
@@ -210,7 +180,8 @@ class QueryCristinProjectHandlerTest {
         cristinApiClientStub = spy(cristinApiClientStub);
         doThrow(RuntimeException.class).when(cristinApiClientStub)
             .getEnrichedProjectsUsingQueryResponse(any());
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
 
         var gatewayResponse = sendDefaultQuery();
 
@@ -226,7 +197,8 @@ class QueryCristinProjectHandlerTest {
             new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(CompletableFuture.completedFuture(response))
             .when(cristinApiClientStub).fetchGetResultAsync(any());
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
         var gatewayResponse = sendDefaultQuery();
         var expected = OBJECT_MAPPER.readTree(getBodyFromResource(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON));
         var actual = OBJECT_MAPPER.readTree(gatewayResponse.getBody());
@@ -347,7 +319,8 @@ class QueryCristinProjectHandlerTest {
 
         doThrow(RuntimeException.class)
             .when(cristinApiClientStub).fetchQueryResults(any(URI.class));
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
         var gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
@@ -361,7 +334,8 @@ class QueryCristinProjectHandlerTest {
 
         doReturn(new HttpResponseFaker(EMPTY_STRING))
             .when(cristinApiClientStub).fetchQueryResults(any(URI.class));
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
         var gatewayResponse = sendDefaultQuery();
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
@@ -547,7 +521,8 @@ class QueryCristinProjectHandlerTest {
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any());
 
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
 
         try (var input = requestWithQueryParameters(Map.of(JsonPropertyNames.QUERY, GRANT_ID_EXAMPLE))) {
             handler.handleRequest(input, output, context);
@@ -566,7 +541,8 @@ class QueryCristinProjectHandlerTest {
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any());
 
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
 
         try (var input = requestWithQueryParameters(Map.of(JsonPropertyNames.QUERY,
                                                                    GRANT_ID_EXAMPLE + RANDOM_TITLE))) {
@@ -586,7 +562,8 @@ class QueryCristinProjectHandlerTest {
             getBodyFromResource(CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_FILE)))
             .when(cristinApiClientStub).queryProjects(any());
 
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
 
         try (var input = requestWithQueryParameters(Map.of(JsonPropertyNames.QUERY, GRANT_ID_EXAMPLE))) {
             handler.handleRequest(input, output, context);
@@ -688,7 +665,8 @@ class QueryCristinProjectHandlerTest {
         when(mockHttpClient.<String>send(any(), any())).thenReturn(queryResponse);
         when(mockHttpClient.<String>sendAsync(any(), any())).thenReturn(CompletableFuture.completedFuture(getResponse));
         var apiClient = spy(new QueryCristinProjectApiClient(mockHttpClient));
-        handler = new QueryCristinProjectHandler(apiClient, environment);
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
         sendDefaultQuery();
 
         var captor = ArgumentCaptor.forClass(HttpRequest.class);
@@ -733,7 +711,8 @@ class QueryCristinProjectHandlerTest {
     @Test
     void shouldAddParamsToCristinQueryForFilteringAndReturnOk() throws IOException, ApiGatewayException {
         cristinApiClientStub = spy(cristinApiClientStub);
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, new Environment());
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, new Environment());
         final var queryParams = Map.of("query", "hello",
                                  "funding", FUNDING_SAMPLE,
                                  "biobank", BIOBANK_SAMPLE,
@@ -769,7 +748,8 @@ class QueryCristinProjectHandlerTest {
         doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HTTP_BAD_REQUEST))
             .when(cristinApiClientStub)
             .fetchQueryResults(any());
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
         var gatewayResponse = sendBadParameterRequestQuery();
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
@@ -784,7 +764,8 @@ class QueryCristinProjectHandlerTest {
 
         cristinApiClientStub =
             new QueryCristinProjectClientStub(OBJECT_MAPPER.writeValueAsString(deserialized));
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
         var gatewayResponse = sendDefaultQuery();
 
         List<NvaProject> responseHits =
@@ -801,7 +782,8 @@ class QueryCristinProjectHandlerTest {
     @Disabled
     void shouldAddFacetParamsToCristinQuery() throws IOException, ApiGatewayException {
         cristinApiClientStub = spy(cristinApiClientStub);
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, new Environment());
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, new Environment());
         final var queryParams = Map.of("query", "hello",
                                        "sectorFacet", "UC,INSTITUTE",
                                        "coordinatingFacet", "185.90.0.0");
@@ -835,13 +817,48 @@ class QueryCristinProjectHandlerTest {
         assertThat(searchResponse, equalTo(""));
     }
 
+    private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
+        return Stream.of(
+            Arguments.of(LINK_EXAMPLE_VALUE,
+                         exampleUriFromPageAndResults("201", "1"),
+                         exampleUriFromPageAndResults("199", "1"),
+                         "200", "1"),
+            Arguments.of(LINK_EXAMPLE_VALUE,
+                         exampleUriFromPageAndResults("6", "3"),
+                         exampleUriFromPageAndResults("4", "3"),
+                         "5", "3"),
+            Arguments.of(LINK_EXAMPLE_VALUE,
+                         EMPTY_STRING,
+                         exampleUriFromPageAndResults("24", "10"),
+                         "25", "10"),
+            Arguments.of(LINK_EXAMPLE_VALUE,
+                         exampleUriFromPageAndResults("2", "5"),
+                         EMPTY_STRING,
+                         "1", "5"),
+            Arguments.of(LINK_EXAMPLE_VALUE,
+                         exampleUriFromPageAndResults("10", "7"),
+                         exampleUriFromPageAndResults("8", "7"),
+                         "9", "7"),
+            Arguments.of(Constants.REL_NEXT,
+                         exampleUriFromPageAndResults("2", "5"),
+                         EMPTY_STRING,
+                         "1", "5")
+        );
+    }
+
+    private static String exampleUriFromPageAndResults(String page, String results) {
+        String url = "https://api.dev.nva.aws.unit.no/cristin/project?page=%s&title=reindeer&results=%s";
+        return String.format(url, page, results);
+    }
+
     private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
         cristinApiClientStub = spy(cristinApiClientStub);
         doReturn(new HttpResponseFaker(EMPTY_LIST_STRING, HTTP_OK, generateHeaders(ZERO_VALUE, LINK_EXAMPLE_VALUE)))
             .when(cristinApiClientStub).queryProjects(any());
         doReturn(Collections.emptyList())
             .when(cristinApiClientStub).fetchQueryResultsOneByOne(any());
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
     }
 
     private void modifyQueryResponseToClient(String body, java.net.http.HttpHeaders headers)
@@ -852,7 +869,8 @@ class QueryCristinProjectHandlerTest {
         response = spy(response);
         doReturn(headers).when(response).headers();
         doReturn(response).when(cristinApiClientStub).fetchQueryResults(any(URI.class));
-        handler = new QueryCristinProjectHandler(cristinApiClientStub, environment);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, environment);
     }
 
     private java.net.http.HttpHeaders generateHeaders(String totalCount, String link) {

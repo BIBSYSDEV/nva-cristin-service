@@ -80,13 +80,16 @@ public enum ParameterKeyProject implements IParameterKey {
         KeyEncoding.NONE),
     PAGE_SORT(JsonPropertyNames.PROJECT_SORT),
     CREATOR(PROJECT_CREATOR_PARAM, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE),
+    // Facets from here onward
     SECTOR_FACET(CristinFacetParamKey.SECTOR_PARAM.getKey(), CristinFacetParamKey.SECTOR_PARAM.getNvaKey());
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
+    public static final int IGNORE_FACET_PARAMETER_INDEX = 28;
 
     public static final Set<ParameterKeyProject> VALID_QUERY_PARAMETERS =
         Arrays.stream(ParameterKeyProject.values())
             .filter(ParameterKeyProject::ignorePathKeys)
+            .filter(ParameterKeyProject::ignoreFacetKeys)
             .collect(Collectors.toSet());
 
     public static final Set<String> VALID_QUERY_PARAMETER_KEYS =
@@ -178,6 +181,10 @@ public enum ParameterKeyProject implements IParameterKey {
 
     private static boolean ignorePathKeys(ParameterKeyProject f) {
         return f.ordinal() > IGNORE_PATH_PARAMETER_INDEX;
+    }
+
+    private static boolean ignoreFacetKeys(ParameterKeyProject f) {
+        return f.ordinal() < IGNORE_FACET_PARAMETER_INDEX;
     }
 
     public static class QueryParameterConstant {
