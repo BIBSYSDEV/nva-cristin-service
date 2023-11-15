@@ -7,6 +7,7 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
+import static no.unit.nva.cristin.model.Constants.CATEGORY_PARAM;
 import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PROJECT_CREATOR_PARAM;
@@ -16,7 +17,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
 import static no.unit.nva.cristin.model.query.CristinFacetKey.COORDINATING;
-import static no.unit.nva.cristin.model.query.CristinFacetParamKey.SECTOR_PARAM;
+import static no.unit.nva.cristin.model.query.CristinFacetParamKey.PARTICIPANT_PARAM;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.ORGANIZATION;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QUERY;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.SECTOR_FACET;
@@ -725,13 +726,15 @@ class QueryCristinProjectHandlerTest {
         doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
         handler = new QueryCristinProjectHandler(clientProvider, new Environment());
         final var queryParams = Map.of("query", "hello",
-                                 "funding", FUNDING_SAMPLE,
-                                 "biobank", BIOBANK_SAMPLE,
-                                 "keyword", KEYWORD_SAMPLE,
-                                 "results", "5",
-                                 "unit", UNIT_ID_SAMPLE,
-                                 "sort", START_DATE,
-                                 "creator", CREATOR_IDENTIFIER);
+                                       "funding", FUNDING_SAMPLE,
+                                       "biobank", BIOBANK_SAMPLE,
+                                       "keyword", KEYWORD_SAMPLE,
+                                       "results", "5",
+                                       "unit", UNIT_ID_SAMPLE,
+                                       "sort", START_DATE,
+                                       "creator", CREATOR_IDENTIFIER,
+                                       "participant", CREATOR_IDENTIFIER,
+                                       "category", "PHD");
         try (var input = requestWithQueryParameters(queryParams)) {
             handler.handleRequest(input, output, context);
         }
@@ -747,6 +750,9 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualURI, containsString(PROJECT_UNIT + EQUAL_OPERATOR + UNIT_ID_SAMPLE));
         assertThat(actualURI, containsString(PROJECT_SORT + EQUAL_OPERATOR + START_DATE));
         assertThat(actualURI, containsString(PROJECT_CREATOR_PARAM + EQUAL_OPERATOR + CREATOR_IDENTIFIER));
+        assertThat(actualURI,
+                   containsString(PARTICIPANT_PARAM.getKey() + EQUAL_OPERATOR + CREATOR_IDENTIFIER));
+        assertThat(actualURI, containsString(CATEGORY_PARAM + EQUAL_OPERATOR + "PHD"));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                                                                SearchResponse.class);
@@ -792,24 +798,26 @@ class QueryCristinProjectHandlerTest {
     @Test
     @Disabled
     void shouldAddFacetParamsToCristinQuery() throws IOException, ApiGatewayException {
-        cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        var apiClient = spy(QueryProjectWithFacetsClient.class);
+        var queryResponse = new HttpResponseFaker("{}", 200);
+        doReturn(queryResponse).when(apiClient).fetchQueryResults(any());
+        var ignoreEnriched = new HttpResponseFaker(EMPTY_STRING, 404);
+        doReturn(List.of(ignoreEnriched)).when(apiClient).fetchQueryResultsOneByOne(any());
+        doReturn(apiClient).when(clientProvider).getVersionWithFacets();
         handler = new QueryCristinProjectHandler(clientProvider, new Environment());
         final var queryParams = Map.of("query", "hello",
                                        "sectorFacet", "UC,INSTITUTE",
                                        "coordinatingFacet", "185.90.0.0");
-        try (var input = requestWithQueryParameters(queryParams)) {
-            handler.handleRequest(input, output, context);
-        }
+        var response = sendQueryWithFacets(queryParams, VERSION_2023_11_03_AGGREGATIONS);
         var captor = ArgumentCaptor.forClass(URI.class);
 
-        verify(cristinApiClientStub).fetchQueryResults(captor.capture());
+        verify(apiClient).fetchQueryResults(captor.capture());
         var actualURI = captor.getValue().toString();
-        assertThat(actualURI, containsString(SECTOR_FACET.getKey() + EQUAL_OPERATOR + "UC,INSTITUTE"));
+        assertThat(actualURI, containsString(SECTOR_FACET.getKey() + EQUAL_OPERATOR + "INSTITUTE"));
+        assertThat(actualURI, containsString(SECTOR_FACET.getKey() + EQUAL_OPERATOR + "UC"));
         assertThat(actualURI, containsString(COORDINATING.getKey() + EQUAL_OPERATOR + "185.90.0.0"));
 
-        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
-        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertEquals(HTTP_OK, response.getStatusCode());
     }
 
     @ParameterizedTest
@@ -824,7 +832,7 @@ class QueryCristinProjectHandlerTest {
         doReturn(apiClient).when(clientProvider).getVersionWithFacets();
         handler = new QueryCristinProjectHandler(clientProvider, new Environment());
 
-        var actual = sendQueryWithFacets(acceptHeader).getBodyObject(SearchResponse.class);
+        var actual = sendQueryWithFacets(null, null).getBodyObject(SearchResponse.class);
 
         assertThat(actual.getAggregations().size(), equalTo(2));
         assertThat(actual.getHits().size(), equalTo(2));
@@ -862,6 +870,38 @@ class QueryCristinProjectHandlerTest {
                                  .withAggregations(convertedFacets);
 
         assertThat(searchResponse, equalTo(""));
+    }
+
+    @Test
+    void shouldAllowBothFacetAndRegularParamsToCoexistAsOneWhenHavingSameCristinKey()
+        throws IOException, ApiGatewayException {
+
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, new Environment());
+        final var queryParams = Map.of("query", "hello",
+                                       "funding_source", "NFR",
+                                       "fundingSourceFacet", "REK",
+                                       "participant", "12345",
+                                       "participantFacet", "98765",
+                                       "category", "PHD",
+                                       "categoryFacet", "Master");
+        try (var input = requestWithQueryParameters(queryParams)) {
+            handler.handleRequest(input, output, context);
+        }
+        var captor = ArgumentCaptor.forClass(URI.class);
+
+        verify(cristinApiClientStub).fetchQueryResults(captor.capture());
+        var actualURI = captor.getValue().toString();
+        assertThat(actualURI, containsString("funding_source=NFR"));
+        assertThat(actualURI, containsString("funding_source=REK"));
+        assertThat(actualURI, containsString("participant=12345"));
+        assertThat(actualURI, containsString("participant=98765"));
+        assertThat(actualURI, containsString("category=PHD"));
+        assertThat(actualURI, containsString("category=Master"));
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {
@@ -962,14 +1002,14 @@ class QueryCristinProjectHandlerTest {
     }
 
     @SuppressWarnings("rawtypes")
-    private GatewayResponse<SearchResponse> sendQueryWithFacets(String acceptValue) throws IOException {
-        var params = Map.of(QUERY.getNvaKey(), RANDOM_TITLE,
-                            SECTOR_PARAM.getNvaKey(), "UC");
+    private GatewayResponse<SearchResponse> sendQueryWithFacets(Map<String, String> facetParams, String acceptValue)
+        throws IOException {
+
         var acceptHeader = Map.of(ACCEPT, acceptValue);
 
         var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                         .withBody(null)
-                        .withQueryParameters(params)
+                        .withQueryParameters(facetParams)
                         .withHeaders(acceptHeader)
                         .build();
 
