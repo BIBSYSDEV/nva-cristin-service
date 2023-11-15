@@ -92,8 +92,8 @@ public enum ParameterKeyProject implements IParameterKey {
     HEALTH_FACET(CristinFacetParamKey.HEALTH_PARAM.getKey(), CristinFacetParamKey.HEALTH_PARAM.getNvaKey()),
     PARTICIPANT_FACET(CristinFacetParamKey.PARTICIPANT_PARAM.getKey(),
                       CristinFacetParamKey.PARTICIPANT_PARAM.getNvaKey()),
-    PARTICIPATING_PERSON_FACET(CristinFacetParamKey.PARTICIPATING_PERSON_ORG_PARAM.getKey(),
-                               CristinFacetParamKey.PARTICIPATING_PERSON_ORG_PARAM.getNvaKey()),
+    PARTICIPATING_PERSON_ORG_FACET(CristinFacetParamKey.PARTICIPATING_PERSON_ORG_PARAM.getKey(),
+                                   CristinFacetParamKey.PARTICIPATING_PERSON_ORG_PARAM.getNvaKey()),
     FUNDING_SOURCE_FACET(CristinFacetParamKey.FUNDING_SOURCE_PARAM.getKey(),
                          CristinFacetParamKey.FUNDING_SOURCE_PARAM.getNvaKey());
 

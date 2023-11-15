@@ -116,7 +116,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
             case CREATOR -> withCreator(value);
             case SECTOR_FACET, COORDINATING_FACET,
                      RESPONSIBLE_FACET, HEALTH_FACET,
-                     PARTICIPATING_PERSON_FACET -> query.setFacet(qpKey, value);
+                     PARTICIPATING_PERSON_ORG_FACET -> query.setFacet(qpKey, value);
             default -> invalidKeys.add(key);
         }
     }

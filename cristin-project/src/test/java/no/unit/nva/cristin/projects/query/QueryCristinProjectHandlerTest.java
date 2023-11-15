@@ -16,10 +16,16 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.FUNDING;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
-import static no.unit.nva.cristin.model.query.CristinFacetKey.COORDINATING;
 import static no.unit.nva.cristin.model.query.CristinFacetParamKey.PARTICIPANT_PARAM;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.CATEGORY_FACET;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.COORDINATING_FACET;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING_SOURCE_FACET;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.HEALTH_FACET;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.ORGANIZATION;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PARTICIPANT_FACET;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PARTICIPATING_PERSON_ORG_FACET;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QUERY;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.RESPONSIBLE_FACET;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.SECTOR_FACET;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.TITLE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS;
@@ -796,7 +802,6 @@ class QueryCristinProjectHandlerTest {
     }
 
     @Test
-    @Disabled
     void shouldAddFacetParamsToCristinQuery() throws IOException, ApiGatewayException {
         var apiClient = spy(QueryProjectWithFacetsClient.class);
         var queryResponse = new HttpResponseFaker("{}", 200);
@@ -807,21 +812,32 @@ class QueryCristinProjectHandlerTest {
         handler = new QueryCristinProjectHandler(clientProvider, new Environment());
         final var queryParams = Map.of("query", "hello",
                                        "sectorFacet", "UC,INSTITUTE",
-                                       "coordinatingFacet", "185.90.0.0");
-        var response = sendQueryWithFacets(queryParams, VERSION_2023_11_03_AGGREGATIONS);
+                                       "coordinatingFacet", "185.90.0.0",
+                                       "responsibleFacet", "20754.0.0.0",
+                                       "categoryFacet", "PHD",
+                                       "healthProjectFacet", "CLINICAL",
+                                       "participantFacet", "5678",
+                                       "participantOrgFacet", "194",
+                                       "fundingSourceFacet", "REK");
+        final var response = sendQueryWithFacets(queryParams, VERSION_2023_11_03_AGGREGATIONS);
         var captor = ArgumentCaptor.forClass(URI.class);
 
         verify(apiClient).fetchQueryResults(captor.capture());
         var actualURI = captor.getValue().toString();
         assertThat(actualURI, containsString(SECTOR_FACET.getKey() + EQUAL_OPERATOR + "INSTITUTE"));
         assertThat(actualURI, containsString(SECTOR_FACET.getKey() + EQUAL_OPERATOR + "UC"));
-        assertThat(actualURI, containsString(COORDINATING.getKey() + EQUAL_OPERATOR + "185.90.0.0"));
+        assertThat(actualURI, containsString(COORDINATING_FACET.getKey() + EQUAL_OPERATOR + "185.90.0.0"));
+        assertThat(actualURI, containsString(RESPONSIBLE_FACET.getKey() + EQUAL_OPERATOR + "20754.0.0.0"));
+        assertThat(actualURI, containsString(CATEGORY_FACET.getKey() + EQUAL_OPERATOR + "PHD"));
+        assertThat(actualURI, containsString(HEALTH_FACET.getKey() + EQUAL_OPERATOR + "CLINICAL"));
+        assertThat(actualURI, containsString(PARTICIPANT_FACET.getKey() + EQUAL_OPERATOR + "5678"));
+        assertThat(actualURI, containsString(PARTICIPATING_PERSON_ORG_FACET.getKey() + EQUAL_OPERATOR + "194"));
+        assertThat(actualURI, containsString(FUNDING_SOURCE_FACET.getKey() + EQUAL_OPERATOR + "REK"));
 
         assertEquals(HTTP_OK, response.getStatusCode());
     }
 
     @ParameterizedTest
-    @Disabled
     @ValueSource(strings = {VERSION_DATE_AGGREGATIONS, VERSION_2023_11_03_AGGREGATIONS, VERSION_NAME_AGGREGATIONS})
     void shouldAddFacetsToSearchResponse(String acceptHeader) throws Exception {
         var apiClient = spy(QueryProjectWithFacetsClient.class);
@@ -832,10 +848,20 @@ class QueryCristinProjectHandlerTest {
         doReturn(apiClient).when(clientProvider).getVersionWithFacets();
         handler = new QueryCristinProjectHandler(clientProvider, new Environment());
 
-        var actual = sendQueryWithFacets(null, null).getBodyObject(SearchResponse.class);
+        final var queryParams = Map.of("query", "hello",
+                                       "sectorFacet", "UC,INSTITUTE",
+                                       "coordinatingFacet", "185.90.0.0",
+                                       "responsibleFacet", "20754.0.0.0",
+                                       "categoryFacet", "PHD",
+                                       "healthProjectFacet", "CLINICAL",
+                                       "participantFacet", "5678",
+                                       "participantOrgFacet", "194",
+                                       "fundingSourceFacet", "REK");
 
-        assertThat(actual.getAggregations().size(), equalTo(2));
-        assertThat(actual.getHits().size(), equalTo(2));
+        var actual = sendQueryWithFacets(queryParams, acceptHeader).getBodyObject(SearchResponse.class);
+
+        assertThat(actual.getAggregations().size(), equalTo(8));
+        assertThat(actual.getHits().size(), equalTo(1));
     }
 
     @Test

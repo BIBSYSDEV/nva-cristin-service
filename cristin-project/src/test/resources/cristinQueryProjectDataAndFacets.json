@@ -8,7 +8,8 @@
     "main_language" : "no",
     "start_date" : "2011-02-01T00:00:00.000Z",
     "end_date" : "2014-02-01T00:00:00.000Z",
-    "url" : "https://api.cristin-test.uio.no/v2/projects/323870"
+    "url" : "https://api.cristin-test.uio.no/v2/projects/323870",
+    "status": "ACTIVE"
   } ],
   "facets" : {
     "institution_coordinating_idfacet" : [ {
