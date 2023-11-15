@@ -80,4 +80,5 @@ public class Constants {
     public static final String FHI_BIOBANK_REGISTRY = "FHI-BiobankRegistry";
     public static final String PROJECT_CREATOR_PARAM = "creator";
     public static final String FACETS_PATH = "facets";
+    public static final String CATEGORY_PARAM = "category";
 }

@@ -6,6 +6,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_NUM
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
 import static no.unit.nva.cristin.common.ErrorMessages.INVALID_URI_MESSAGE;
+import static no.unit.nva.cristin.model.Constants.CATEGORY_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
 import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
@@ -80,11 +81,12 @@ public enum ParameterKeyProject implements IParameterKey {
         KeyEncoding.NONE),
     PAGE_SORT(JsonPropertyNames.PROJECT_SORT),
     CREATOR(PROJECT_CREATOR_PARAM, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE),
+    CATEGORY(CATEGORY_PARAM),
     // Facets from here onward
     SECTOR_FACET(CristinFacetParamKey.SECTOR_PARAM.getKey(), CristinFacetParamKey.SECTOR_PARAM.getNvaKey());
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
-    public static final int IGNORE_FACET_PARAMETER_INDEX = 28;
+    public static final int IGNORE_FACET_PARAMETER_INDEX = 29;
 
     public static final Set<ParameterKeyProject> VALID_QUERY_PARAMETERS =
         Arrays.stream(ParameterKeyProject.values())
