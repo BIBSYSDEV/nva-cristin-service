@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects.query;
 
+import static com.google.common.net.HttpHeaders.ACCEPT;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -15,6 +16,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_KEYWORD;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_UNIT;
 import static no.unit.nva.cristin.model.query.CristinFacetKey.COORDINATING;
+import static no.unit.nva.cristin.model.query.CristinFacetParamKey.SECTOR_PARAM;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.ORGANIZATION;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.QUERY;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.SECTOR_FACET;
@@ -62,6 +64,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.common.client.ApiClient;
@@ -69,10 +72,12 @@ import no.unit.nva.cristin.facet.CristinFacetConverter;
 import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.SearchResponse;
+import no.unit.nva.cristin.model.query.CristinFacetParamKey;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.query.CristinProjectSearchResponse;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
+import no.unit.nva.cristin.projects.query.version.facet.QueryProjectWithFacetsClient;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
@@ -87,6 +92,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
@@ -141,6 +147,11 @@ class QueryCristinProjectHandlerTest {
     public static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON = "cristinQueryProjectsResponse.json";
     public static final String CRISTIN_GET_PROJECT_RESPONSE_JSON = "cristinGetProjectResponse.json";
     public static final String CREATOR_IDENTIFIER = "12345";
+    public static final String VERSION_2023_11_03_AGGREGATIONS = "application/json; version=2023-11-03-aggregations";
+    public static final String VERSION_NAME_AGGREGATIONS = "application/json; version=aggregations";
+    public static final String VERSION_DATE_AGGREGATIONS = "application/json; version=2023-11-03";
+    public static final String RESPONSE_WITH_FACETS = IoUtils.stringFromResources(
+        Path.of("cristinQueryProjectDataAndFacets.json"));
 
     private final Environment environment = new Environment();
     private QueryCristinProjectApiClient cristinApiClientStub;
@@ -801,6 +812,42 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
+    @ParameterizedTest
+    @Disabled
+    @ValueSource(strings = {VERSION_DATE_AGGREGATIONS, VERSION_2023_11_03_AGGREGATIONS, VERSION_NAME_AGGREGATIONS})
+    void shouldAddFacetsToSearchResponse(String acceptHeader) throws Exception {
+        var apiClient = spy(QueryProjectWithFacetsClient.class);
+        var queryResponse = dummyFacetHttpResponse();
+        doReturn(queryResponse).when(apiClient).fetchQueryResults(any());
+        var ignoreEnriched = new HttpResponseFaker(EMPTY_STRING, 404);
+        doReturn(List.of(ignoreEnriched)).when(apiClient).fetchQueryResultsOneByOne(any());
+        doReturn(apiClient).when(clientProvider).getVersionWithFacets();
+        handler = new QueryCristinProjectHandler(clientProvider, new Environment());
+
+        var actual = sendQueryWithFacets(acceptHeader).getBodyObject(SearchResponse.class);
+
+        assertThat(actual.getAggregations().size(), equalTo(2));
+        assertThat(actual.getHits().size(), equalTo(2));
+    }
+
+    @Test
+    void shouldReturnErrorMessageWithAllFacetParamsMentioned() throws Exception {
+        var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                        .withBody(null)
+                        .withQueryParameters(Map.of(INVALID_QUERY_PARAM_KEY, INVALID_QUERY_PARAM_VALUE))
+                        .withHeaders(Map.of(ACCEPT, VERSION_NAME_AGGREGATIONS))
+                        .build();
+
+        handler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
+        var body = gatewayResponse.getBodyObject(Problem.class);
+
+        Stream.of(CristinFacetParamKey.values())
+            .dropWhile(hasUnsupportedFacet())
+            .forEach(facetKey -> assertThat(body.getDetail(), containsString(facetKey.getNvaKey())));
+    }
+
     @Test
     @Disabled
     void testtest() throws Exception {
@@ -877,6 +924,7 @@ class QueryCristinProjectHandlerTest {
         return java.net.http.HttpHeaders.of(HttpResponseFaker.headerMap(totalCount, link), HttpResponseFaker.filter());
     }
 
+    @SuppressWarnings("rawtypes")
     private GatewayResponse<SearchResponse> sendDefaultQuery() throws IOException {
         try (var input = requestWithQueryParameters(Map.of(JsonPropertyNames.QUERY, RANDOM_TITLE))) {
             handler.handleRequest(input, output, context);
@@ -884,6 +932,7 @@ class QueryCristinProjectHandlerTest {
         return GatewayResponse.fromOutputStream(output, SearchResponse.class);
     }
 
+    @SuppressWarnings("rawtypes")
     private GatewayResponse<SearchResponse> sendBadParameterRequestQuery() throws IOException {
         try (var input = requestWithQueryParameters(Map.of(
             JsonPropertyNames.QUERY, RANDOM_TITLE,
@@ -907,4 +956,30 @@ class QueryCristinProjectHandlerTest {
     private static Stream<? extends Arguments> queryResponseWithFundingFileReader() {
         return Stream.of(Arguments.of(API_QUERY_RESPONSE_JSON));
     }
+
+    private HttpResponse<String> dummyFacetHttpResponse() {
+        return new HttpResponseFaker(RESPONSE_WITH_FACETS, 200);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private GatewayResponse<SearchResponse> sendQueryWithFacets(String acceptValue) throws IOException {
+        var params = Map.of(QUERY.getNvaKey(), RANDOM_TITLE,
+                            SECTOR_PARAM.getNvaKey(), "UC");
+        var acceptHeader = Map.of(ACCEPT, acceptValue);
+
+        var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                        .withBody(null)
+                        .withQueryParameters(params)
+                        .withHeaders(acceptHeader)
+                        .build();
+
+        handler.handleRequest(input, output, context);
+
+        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
+    }
+
+    private static Predicate<CristinFacetParamKey> hasUnsupportedFacet() {
+        return facetKey -> facetKey.equals(CristinFacetParamKey.INSTITUTION_PARAM);
+    }
+
 }

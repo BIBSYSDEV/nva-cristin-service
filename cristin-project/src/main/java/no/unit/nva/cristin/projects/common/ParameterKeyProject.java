@@ -83,7 +83,19 @@ public enum ParameterKeyProject implements IParameterKey {
     CREATOR(PROJECT_CREATOR_PARAM, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE),
     CATEGORY(CATEGORY_PARAM),
     // Facets from here onward
-    SECTOR_FACET(CristinFacetParamKey.SECTOR_PARAM.getKey(), CristinFacetParamKey.SECTOR_PARAM.getNvaKey());
+    SECTOR_FACET(CristinFacetParamKey.SECTOR_PARAM.getKey(), CristinFacetParamKey.SECTOR_PARAM.getNvaKey()),
+    COORDINATING_FACET(CristinFacetParamKey.COORDINATING_PARAM.getKey(),
+                       CristinFacetParamKey.COORDINATING_PARAM.getNvaKey()),
+    RESPONSIBLE_FACET(CristinFacetParamKey.RESPONSIBLE_PARAM.getKey(),
+                      CristinFacetParamKey.RESPONSIBLE_PARAM.getNvaKey()),
+    CATEGORY_FACET(CristinFacetParamKey.CATEGORY_PARAM.getKey(), CristinFacetParamKey.CATEGORY_PARAM.getNvaKey()),
+    HEALTH_FACET(CristinFacetParamKey.HEALTH_PARAM.getKey(), CristinFacetParamKey.HEALTH_PARAM.getNvaKey()),
+    PARTICIPANT_FACET(CristinFacetParamKey.PARTICIPANT_PARAM.getKey(),
+                      CristinFacetParamKey.PARTICIPANT_PARAM.getNvaKey()),
+    PARTICIPATING_PERSON_FACET(CristinFacetParamKey.PARTICIPATING_PERSON_ORG_PARAM.getKey(),
+                               CristinFacetParamKey.PARTICIPATING_PERSON_ORG_PARAM.getNvaKey()),
+    FUNDING_SOURCE_FACET(CristinFacetParamKey.FUNDING_SOURCE_PARAM.getKey(),
+                         CristinFacetParamKey.FUNDING_SOURCE_PARAM.getNvaKey());
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
     public static final int IGNORE_FACET_PARAMETER_INDEX = 29;
@@ -91,7 +103,6 @@ public enum ParameterKeyProject implements IParameterKey {
     public static final Set<ParameterKeyProject> VALID_QUERY_PARAMETERS =
         Arrays.stream(ParameterKeyProject.values())
             .filter(ParameterKeyProject::ignorePathKeys)
-            .filter(ParameterKeyProject::ignoreFacetKeys)
             .collect(Collectors.toSet());
 
     public static final Set<String> VALID_QUERY_PARAMETER_KEYS =
@@ -101,6 +112,13 @@ public enum ParameterKeyProject implements IParameterKey {
             .collect(Collectors.toSet());
 
     public static final Set<String> VALID_QUERY_PARAMETER_NVA_KEYS =
+        VALID_QUERY_PARAMETERS.stream()
+            .filter(ParameterKeyProject::ignoreFacetKeys)
+            .sorted()
+            .map(ParameterKeyProject::getNvaKey)
+            .collect(Collectors.toSet());
+
+    public static final Set<String> VALID_QUERY_PARAMETER_NVA_KEYS_AND_FACETS =
         VALID_QUERY_PARAMETERS.stream()
             .sorted()
             .map(ParameterKeyProject::getNvaKey)

@@ -33,6 +33,7 @@ import static no.unit.nva.cristin.projects.common.ParameterKeyProject.STATUS;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.TITLE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.USER;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS_AND_FACETS;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.keyFromString;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
@@ -47,6 +48,8 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 
 @SuppressWarnings({"PMD.GodClass"})
 public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
+
+    public Set<String> allValidKeys = VALID_QUERY_PARAMETER_NVA_KEYS;
 
     public QueryBuilderProject() {
         super(new QueryProject());
@@ -100,22 +103,31 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
             case QUERY -> withQuery(value);
             case STATUS -> withStatus(value);
             case APPROVAL_REFERENCE_ID, APPROVED_BY,
-                 FUNDING, FUNDING_SOURCE,
-                 GRANT_ID, INSTITUTION,
-                 LEVELS, MODIFIED_SINCE,
-                 NAME, PROJECT_MANAGER,
-                 PROJECT_UNIT, TITLE,
-                 USER, PAGE_CURRENT,
-                 PAGE_ITEMS_PER_PAGE, PAGE_SORT -> query.setValue(qpKey, value);
+                     FUNDING, FUNDING_SOURCE,
+                     GRANT_ID, INSTITUTION,
+                     LEVELS, MODIFIED_SINCE,
+                     NAME, PROJECT_MANAGER,
+                     PROJECT_UNIT, TITLE,
+                     USER, PAGE_CURRENT,
+                     PAGE_ITEMS_PER_PAGE, PAGE_SORT,
+                     CATEGORY -> query.setValue(qpKey, value);
             case CREATOR -> withCreator(value);
             case SECTOR_FACET -> query.setFacet(qpKey, value);
             default -> invalidKeys.add(key);
         }
     }
 
+    /**
+     * Adds facet keys as valid query parameter keys in error handling messages.
+     */
+    public QueryBuilderProject usingFacetKeys() {
+        allValidKeys = VALID_QUERY_PARAMETER_NVA_KEYS_AND_FACETS;
+        return this;
+    }
+
     @Override
     protected Set<String> validKeys() {
-        return VALID_QUERY_PARAMETER_NVA_KEYS;
+        return allValidKeys;
     }
 
     @Override

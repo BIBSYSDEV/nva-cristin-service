@@ -14,6 +14,7 @@ import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.ParameterKeyProject;
 import no.unit.nva.cristin.projects.common.QueryProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.projects.query.version.facet.QueryProjectWithFacetsClient;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
@@ -52,14 +53,20 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
     protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 
-        final var cristinQuery = (QueryProject)
-            QueryProject.builder()
-                .fromRequestInfo(requestInfo)
-                .withRequiredParameters(REQUIRED_QUERY_PARAMETER)
-                .build();
-
         var apiVersion = getApiVersion(requestInfo);
-        return clientProvider.getClient(apiVersion).executeQuery(cristinQuery);
+        var client = clientProvider.getClient(apiVersion);
+        var queryBuilder = QueryProject.builder();
+
+        if (client instanceof QueryProjectWithFacetsClient) {
+            queryBuilder.usingFacetKeys();
+        }
+
+        var cristinQuery = (QueryProject) queryBuilder
+                                              .fromRequestInfo(requestInfo)
+                                              .withRequiredParameters(REQUIRED_QUERY_PARAMETER)
+                                              .build();
+
+        return client.executeQuery(cristinQuery);
     }
 
     @Override
