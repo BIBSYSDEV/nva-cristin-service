@@ -75,13 +75,11 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.common.client.ApiClient;
-import no.unit.nva.cristin.facet.CristinFacetConverter;
 import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.model.query.CristinFacetParamKey;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
-import no.unit.nva.cristin.projects.model.cristin.query.CristinProjectSearchResponse;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.projects.query.version.facet.QueryProjectWithFacetsClient;
@@ -92,7 +90,6 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -880,22 +877,6 @@ class QueryCristinProjectHandlerTest {
         Stream.of(CristinFacetParamKey.values())
             .dropWhile(hasUnsupportedFacet())
             .forEach(facetKey -> assertThat(body.getDetail(), containsString(facetKey.getNvaKey())));
-    }
-
-    @Test
-    @Disabled
-    void testtest() throws Exception {
-        var json = IoUtils.stringFromResources(Path.of("cristinQueryProjectDataAndFacets.json"));
-        var deserialized = OBJECT_MAPPER.readValue(json, CristinProjectSearchResponse.class);
-
-        var convertedFacets = new CristinFacetConverter(URI.create(""))
-                                  .convert(deserialized.facets())
-                                  .getConverted();
-
-        var searchResponse = new SearchResponse<CristinProject>(URI.create(""))
-                                 .withAggregations(convertedFacets);
-
-        assertThat(searchResponse, equalTo(""));
     }
 
     @Test
