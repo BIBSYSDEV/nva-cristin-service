@@ -40,6 +40,7 @@ import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -909,6 +910,36 @@ class QueryCristinProjectHandlerTest {
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldConvertRegularParamsToFacetParamsWhenTheyMatchAndAreUsingFacetsVersion() throws Exception {
+        var apiClient = spy(QueryProjectWithFacetsClient.class);
+        var queryResponse = dummyFacetHttpResponse();
+        doReturn(queryResponse).when(apiClient).fetchQueryResults(any());
+        var ignoreEnriched = new HttpResponseFaker(EMPTY_STRING, 404);
+        doReturn(List.of(ignoreEnriched)).when(apiClient).fetchQueryResultsOneByOne(any());
+        doReturn(apiClient).when(clientProvider).getVersionWithFacets();
+        handler = new QueryCristinProjectHandler(clientProvider, new Environment());
+
+        final var queryParams = Map.of("query", "hello",
+                                       "categoryFacet", "RESEARCH,TEST",
+                                       "category", "MORERESEARCH",
+                                       "participant", "1234");
+
+        var actual = sendQueryWithFacets(queryParams, VERSION_NAME_AGGREGATIONS).getBodyObject(SearchResponse.class);
+
+        var actualId = actual.getId();
+
+        assertThat(actualId.toString(), containsString("RESEARCH"));
+        assertThat(actualId.toString(), containsString("TEST"));
+        assertThat(actualId.toString(), containsString("MORERESEARCH"));
+        assertThat(actualId.toString(), containsString("categoryFacet"));
+        assertThat(actualId.toString(), not(containsString("category=")));
+
+        assertThat(actualId.toString(), containsString("1234"));
+        assertThat(actualId.toString(), containsString("participantFacet"));
+        assertThat(actualId.toString(), not(containsString("participant=")));
     }
 
     private static Stream<Arguments> provideDifferentPaginationValuesAndAssertNextAndPreviousResultsIsCorrect() {

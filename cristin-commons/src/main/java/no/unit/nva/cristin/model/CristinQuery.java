@@ -147,7 +147,30 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
                 .flatMap(Collection::stream)
                 .filter(this::ignoreNvaPathParameters)
                 .collect(Collectors.toMap(this::toNvaQueryName, this::toNvaQueryValue));
-        return new TreeMap<>(results);
+
+        var resultsWithConvertedKeys = new TreeMap<>(results);
+
+        results.keySet().forEach(key -> {
+            switch (key) {
+                case "category" -> {
+                    resultsWithConvertedKeys.put("categoryFacet", results.get(key));
+                    resultsWithConvertedKeys.remove(key);
+                }
+                case "funding_source" -> {
+                    resultsWithConvertedKeys.put("fundingSourceFacet", results.get(key));
+                    resultsWithConvertedKeys.remove(key);
+                }
+                case "participant" -> {
+                    resultsWithConvertedKeys.put("participantFacet", results.get(key));
+                    resultsWithConvertedKeys.remove(key);
+                }
+                default -> {
+                    // do nothing
+                }
+            }
+        });
+
+        return resultsWithConvertedKeys;
     }
 
     /**

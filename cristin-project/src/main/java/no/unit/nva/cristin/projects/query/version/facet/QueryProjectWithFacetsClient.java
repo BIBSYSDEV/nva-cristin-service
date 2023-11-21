@@ -17,11 +17,16 @@ import no.unit.nva.cristin.projects.model.cristin.query.CristinProjectSearchResp
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryProjectWithFacetsClient extends CristinProjectApiClient
     implements ClientVersion, CristinQueryApiClient<QueryProject, NvaProject> {
 
+    private static final Logger logger = LoggerFactory.getLogger(QueryProjectWithFacetsClient.class);
+
     public static final String VERSION_WITH_AGGREGATIONS = "2023-11-03-aggregations";
+    public static final String CALLING_UPSTREAM_URI = "Calling upstream uri: ";
 
     @Override
     public String getClientVersion() {
@@ -52,6 +57,7 @@ public class QueryProjectWithFacetsClient extends CristinProjectApiClient
 
     protected HttpResponse<String> queryProjects(QueryProject queryProject) throws ApiGatewayException {
         var response = fetchQueryResults(queryProject.toCristinFacetURI());
+        logger.info(CALLING_UPSTREAM_URI + queryProject.toCristinFacetURI());
         var id = queryProject.toNvaFacetURI();
         checkHttpStatusCode(id, response.statusCode(), response.body());
         return response;
