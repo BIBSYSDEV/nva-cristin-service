@@ -56,8 +56,9 @@ public class QueryProjectWithFacetsClient extends CristinProjectApiClient
     }
 
     protected HttpResponse<String> queryProjects(QueryProject queryProject) throws ApiGatewayException {
-        var response = fetchQueryResults(queryProject.toCristinFacetURI());
-        logger.info(CALLING_UPSTREAM_URI + queryProject.toCristinFacetURI());
+        var cristinUri = queryProject.toCristinFacetURI();
+        logger.info(CALLING_UPSTREAM_URI + cristinUri);
+        var response = fetchQueryResults(cristinUri);
         var id = queryProject.toNvaFacetURI();
         checkHttpStatusCode(id, response.statusCode(), response.body());
         return response;
