@@ -203,8 +203,8 @@ public enum ParameterKeyProject implements IParameterKey {
         return f.ordinal() > IGNORE_PATH_PARAMETER_INDEX;
     }
 
-    private static boolean ignoreFacetKeys(ParameterKeyProject f) {
-        return f.ordinal() < IGNORE_FACET_PARAMETER_INDEX;
+    private static boolean ignoreFacetKeys(ParameterKeyProject keys) {
+        return keys.ordinal() < IGNORE_FACET_PARAMETER_INDEX;
     }
 
     public static class QueryParameterConstant {

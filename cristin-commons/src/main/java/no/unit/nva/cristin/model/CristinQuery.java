@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.FACETS_PATH;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
+import static no.unit.nva.utils.CristinQueryUtils.convertSupportedParamKeysToFacetParamKeys;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
@@ -148,29 +149,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
                 .filter(this::ignoreNvaPathParameters)
                 .collect(Collectors.toMap(this::toNvaQueryName, this::toNvaQueryValue));
 
-        var resultsWithConvertedKeys = new TreeMap<>(results);
-
-        results.keySet().forEach(key -> {
-            switch (key) {
-                case "category" -> {
-                    resultsWithConvertedKeys.put("categoryFacet", results.get(key));
-                    resultsWithConvertedKeys.remove(key);
-                }
-                case "funding_source" -> {
-                    resultsWithConvertedKeys.put("fundingSourceFacet", results.get(key));
-                    resultsWithConvertedKeys.remove(key);
-                }
-                case "participant" -> {
-                    resultsWithConvertedKeys.put("participantFacet", results.get(key));
-                    resultsWithConvertedKeys.remove(key);
-                }
-                default -> {
-                    // do nothing
-                }
-            }
-        });
-
-        return resultsWithConvertedKeys;
+        return convertSupportedParamKeysToFacetParamKeys(results);
     }
 
     /**
