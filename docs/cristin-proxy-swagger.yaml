@@ -34,7 +34,7 @@ paths:
         - name: query
           in: query
           description: Search string. Either title search or grant id search
-          required: true
+          required: false
           schema:
             type: string
             pattern: '.+'
@@ -167,6 +167,87 @@ paths:
           required: false
           schema:
             type: string
+        - name: category
+          in: query
+          description: Project category
+          required: false
+          schema:
+            type: string
+        - name: categoryFacet
+          in: query
+          description: Narrow down on project category. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: 'APPLIEDRESEARCH'
+        - name: coordinatingFacet
+          in: query
+          description: Narrow down on coordinating organization. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: '185.90.0.0'
+        - name: fundingSourceFacet
+          in: query
+          description: Narrow down on funding source. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: 'NFR'
+        - name: healthProjectFacet
+          in: query
+          description: Narrow down on health project. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: 'DRUGSTUDY'
+        - name: participantFacet
+          in: query
+          description: Narrow down on participant. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: '1234'
+        - name: participantOrgFacet
+          in: query
+          description: Narrow down on participant organization. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: '185'
+        - name: responsibleFacet
+          in: query
+          description: Narrow down on responsible organization. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: '185.90.0.0'
+        - name: sectorFacet
+          in: query
+          description: Narrow down on sector. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: 'UC'
+        - name: Accept
+          in: header
+          description: Requested response format and version of the returned payload
+          required: false
+          schema:
+            type: string
+          examples:
+            versionOne:
+              value: application/json; version=1
+              description: Version 1 of the Api
+            version20231103WithAggregations:
+              value: application/json; version=2023-11-03-aggregations
+              description: Version with search facets. Header value also accepts version=[2023-11-03, aggregations]
+            versionOneJsonLd:
+              value: application/ld+json; version=1
+              description: Version 1 of the Api
+            version20231103WithAggregationsJsonLd:
+              value: application/ld+json; version=2023-11-03-aggregations
+              description: Version with search facets. Header value also accepts version=[2023-11-03, aggregations]
       responses:
         200:
           description: successful operation
@@ -183,6 +264,18 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/ProjectsExample'
+            application/json; version=2023-11-03-aggregations:
+              schema:
+                $ref: '#/components/schemas/ProjectsWithFacets'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectsWithFacetsExample'
+            application/ld+json; version=2023-11-03-aggregations:
+              schema:
+                $ref: '#/components/schemas/ProjectsWithFacets'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectsWithFacetsExample'
         400:
           $ref: '#/components/responses/400'
         500:
@@ -1828,6 +1921,43 @@ components:
           description: The list of projects returned by the query
           items:
             $ref: '#/components/schemas/Project'
+    ProjectsWithFacets:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of projects returned by the query
+          items:
+            $ref: '#/components/schemas/Project'
+        aggregations:
+          $ref: '#/components/schemas/Facets'
     Project:
       type: object
       properties:
@@ -3418,6 +3548,98 @@ components:
                 authorityName:
                   en: 'Regional committees for medical and health research ethics'
             webPage: 'https://www.example.org'
+    ProjectsWithFacetsExample:
+      value:
+        '@context': 'https://bibsysdev.github.io/src/project-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/project?query=helse&language=nb&page=1&results=5'
+        size: 150
+        searchString: 'query=helse&language=nb&page=1&results=5'
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/project?query=helse&language=nb&page=2&results=5'
+        previousResults: ''
+        hits:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/project/359084'
+            type: 'Project'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '359084'
+            title: 'Example Title'
+            language: 'http://lexvo.org/id/iso639-3/nno'
+            startDate: '2012-01-09T00:00:00Z'
+            coordinatingInstitution:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+              type: 'Organization'
+              labels:
+                'nb': 'OsloMet - storbyuniversitetet'
+            contributors:
+              - type: 'ProjectManager'
+                identity:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+                  type: 'Person'
+                  firstName: 'Ola'
+                  lastName: 'Nordmann'
+                affiliation:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                  type: 'Organization'
+                  labels:
+                    'nb': 'OsloMet - storbyuniversitetet'
+            status: CONCLUDED
+            published: true
+            publishable: true
+            created:
+              sourceShortName: "REK"
+              date: "2019-12-31T09:45:17Z"
+        aggregations:
+          sectorFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/person?name=john&sectorFacet=UC&page=1&results=5'
+              key: 'UC'
+              count: '3'
+              labels:
+                nb: 'Universitet og Høgskoler'
+          categoryFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?categoryFacet=APPLIEDRESEARCH&page=1&results=5'
+              key: 'APPLIEDRESEARCH'
+              count: '3'
+              labels:
+                en: 'Applied Research'
+                nb: 'Anvendt forskning'
+          healthProjectFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?healthProjectFacet=OTHERSTUDY&page=1&results=5'
+              key: 'OTHERSTUDY'
+              count: '3'
+              labels:
+                en: 'Other study'
+          coordinatingFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?coordinatingFacet=2012.0.0.0&page=1&results=5'
+              key: '2012.0.0.0'
+              count: '3'
+              labels:
+                en: 'Oslo University Hospital'
+          fundingSourceFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?fundingSourceFacet=NFR&page=1&results=5'
+              key: 'NFR'
+              count: '3'
+              labels:
+                en: 'Research Council of Norway (RCN)'
+          participantOrgFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?participantOrgFacet=194&page=1&results=5'
+              key: '194'
+              count: '3'
+              labels:
+                en: 'Norwegian University of Science and Technology'
+          participantFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?participantFacet=1234&page=1&results=5'
+              key: '1234'
+              count: '3'
+              labels:
+                en: 'Helge Pettersen'
+          responsibleFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?responsibleFacet=185.90.0.0&page=1&results=5'
+              key: '185.90.0.0'
+              count: '3'
+              labels:
+                en: 'Oslo University'
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'

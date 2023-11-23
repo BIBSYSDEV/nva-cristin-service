@@ -18,6 +18,19 @@ class CristinFacetUriParamAppenderTest {
     private final URI uriWithSingleFacetValue =
         URI.create("https://api.cristin-test.uio.no/v2/persons/facets?name=aud&institution=uio&sector=UC");
 
+    private final URI uriWithAllFacetValues =
+        URI.create("https://api.cristin-test.uio.no/v2/persons/facets?name=aud"
+                   + "&category=PHD"
+                   + "&facet_health=OTHERSTUDY"
+                   + "&institution=ntnu"
+                   + "&institution=uio"
+                   + "&facet_coordinating=185.90.0.0"
+                   + "&funding_source=REK"
+                   + "&sector=UC"
+                   + "&facet_participating=194"
+                   + "&participant=1234"
+                   + "&facet_responsible=20754.0.0.0");
+
     private Map<String, String> params;
 
     @BeforeEach
@@ -67,6 +80,26 @@ class CristinFacetUriParamAppenderTest {
                          .getUri();
 
         assertEquals(uriWithMultipleFacetValues, actual);
+    }
+
+    @Test
+    void shouldAppendAllSupportedParams() {
+        params.put("organizationFacet", "ntnu,uio");
+        params.put("sectorFacet", "UC");
+        params.put("coordinatingFacet", "185.90.0.0");
+        params.put("responsibleFacet", "20754.0.0.0");
+        params.put("categoryFacet", "PHD");
+        params.put("healthProjectFacet", "OTHERSTUDY");
+        params.put("participantFacet", "1234");
+        params.put("participantOrgFacet", "194");
+        params.put("fundingSourceFacet", "REK");
+
+
+        var actual = new CristinFacetUriParamAppender(originalUri, params)
+                         .getAppendedUri()
+                         .getUri();
+
+        assertEquals(uriWithAllFacetValues, actual);
     }
 
 }

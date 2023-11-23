@@ -6,6 +6,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_NUM
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
 import static no.unit.nva.cristin.common.ErrorMessages.INVALID_URI_MESSAGE;
+import static no.unit.nva.cristin.model.Constants.CATEGORY_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
 import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
@@ -29,6 +30,7 @@ import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.IParameterKey;
 import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.KeyEncoding;
+import no.unit.nva.cristin.model.query.CristinFacetParamKey;
 
 public enum ParameterKeyProject implements IParameterKey {
     INVALID(null),
@@ -78,9 +80,25 @@ public enum ParameterKeyProject implements IParameterKey {
         ERROR_MESSAGE_INVALID_NUMBER,
         KeyEncoding.NONE),
     PAGE_SORT(JsonPropertyNames.PROJECT_SORT),
-    CREATOR(PROJECT_CREATOR_PARAM, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE);
+    CREATOR(PROJECT_CREATOR_PARAM, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE),
+    CATEGORY(CATEGORY_PARAM),
+    // Facets from here onward
+    SECTOR_FACET(CristinFacetParamKey.SECTOR_PARAM.getKey(), CristinFacetParamKey.SECTOR_PARAM.getNvaKey()),
+    COORDINATING_FACET(CristinFacetParamKey.COORDINATING_PARAM.getKey(),
+                       CristinFacetParamKey.COORDINATING_PARAM.getNvaKey()),
+    RESPONSIBLE_FACET(CristinFacetParamKey.RESPONSIBLE_PARAM.getKey(),
+                      CristinFacetParamKey.RESPONSIBLE_PARAM.getNvaKey()),
+    CATEGORY_FACET(CristinFacetParamKey.CATEGORY_PARAM.getKey(), CristinFacetParamKey.CATEGORY_PARAM.getNvaKey()),
+    HEALTH_FACET(CristinFacetParamKey.HEALTH_PARAM.getKey(), CristinFacetParamKey.HEALTH_PARAM.getNvaKey()),
+    PARTICIPANT_FACET(CristinFacetParamKey.PARTICIPANT_PARAM.getKey(),
+                      CristinFacetParamKey.PARTICIPANT_PARAM.getNvaKey()),
+    PARTICIPATING_PERSON_ORG_FACET(CristinFacetParamKey.PARTICIPATING_PERSON_ORG_PARAM.getKey(),
+                                   CristinFacetParamKey.PARTICIPATING_PERSON_ORG_PARAM.getNvaKey()),
+    FUNDING_SOURCE_FACET(CristinFacetParamKey.FUNDING_SOURCE_PARAM.getKey(),
+                         CristinFacetParamKey.FUNDING_SOURCE_PARAM.getNvaKey());
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
+    public static final int IGNORE_FACET_PARAMETER_INDEX = 29;
 
     public static final Set<ParameterKeyProject> VALID_QUERY_PARAMETERS =
         Arrays.stream(ParameterKeyProject.values())
@@ -95,6 +113,13 @@ public enum ParameterKeyProject implements IParameterKey {
 
     public static final Set<String> VALID_QUERY_PARAMETER_NVA_KEYS =
         VALID_QUERY_PARAMETERS.stream()
+            .filter(ParameterKeyProject::ignoreFacetKeys)
+            .sorted()
+            .map(ParameterKeyProject::getNvaKey)
+            .collect(Collectors.toSet());
+
+    public static final Set<String> VALID_QUERY_PARAMETER_NVA_KEYS_AND_FACETS =
+        VALID_QUERY_PARAMETERS.stream()
             .sorted()
             .map(ParameterKeyProject::getNvaKey)
             .collect(Collectors.toSet());
@@ -107,6 +132,10 @@ public enum ParameterKeyProject implements IParameterKey {
 
     ParameterKeyProject(String cristinKey) {
         this(cristinKey, null, PATTERN_IS_NON_EMPTY, null, KeyEncoding.NONE);
+    }
+
+    ParameterKeyProject(String cristinKey, String nvaKey) {
+        this(cristinKey, nvaKey, PATTERN_IS_NON_EMPTY, null, KeyEncoding.NONE);
     }
 
     ParameterKeyProject(String cristinKey, String nvaKey, String pattern) {
@@ -172,6 +201,10 @@ public enum ParameterKeyProject implements IParameterKey {
 
     private static boolean ignorePathKeys(ParameterKeyProject f) {
         return f.ordinal() > IGNORE_PATH_PARAMETER_INDEX;
+    }
+
+    private static boolean ignoreFacetKeys(ParameterKeyProject keys) {
+        return keys.ordinal() < IGNORE_FACET_PARAMETER_INDEX;
     }
 
     public static class QueryParameterConstant {

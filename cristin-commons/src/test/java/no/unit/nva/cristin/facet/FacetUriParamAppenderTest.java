@@ -3,8 +3,9 @@ package no.unit.nva.cristin.facet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import java.net.URI;
+import no.unit.nva.cristin.model.query.CristinFacetKey;
 import no.unit.nva.cristin.model.query.CristinInstitutionFacet;
-import no.unit.nva.cristin.model.query.CristinSectorFacet;
+import no.unit.nva.cristin.model.query.CristinCodeFacet;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +34,7 @@ class FacetUriParamAppenderTest {
 
     @Test
     void shouldDoNothingOnNullValueUri() {
-        var actual = new FacetUriParamAppender(null, null)
+        var actual = new FacetUriParamAppender(null, null, null)
                          .create()
                          .getUriWithFacetKeys()
                          .map(UriWrapper::getUri)
@@ -44,7 +45,7 @@ class FacetUriParamAppenderTest {
 
     @Test
     void shouldDoNothingOnNullValue() {
-        var actual = new FacetUriParamAppender(idUriWithoutFacet, null)
+        var actual = new FacetUriParamAppender(idUriWithoutFacet, null, null)
                          .create()
                          .getUriWithFacetKeys()
                          .map(UriWrapper::getUri)
@@ -55,9 +56,9 @@ class FacetUriParamAppenderTest {
 
     @Test
     void shouldAppendSingleFacetValueToIdUri() {
-        var cristinFacet = new CristinSectorFacet("UC", null);
+        var cristinFacet = new CristinCodeFacet("UC", null);
 
-        var actual = new FacetUriParamAppender(idUriWithoutFacet, cristinFacet)
+        var actual = new FacetUriParamAppender(idUriWithoutFacet, CristinFacetKey.SECTOR.getKey(), cristinFacet)
                          .create()
                          .getUriWithFacetKeys()
                          .map(UriWrapper::getUri)
@@ -68,9 +69,9 @@ class FacetUriParamAppenderTest {
 
     @Test
     void shouldAppendAnotherFacetValueToIdUriWhenAlreadyHasValueForThatFacet() {
-        var cristinFacet = new CristinSectorFacet("INSTITUTE", null);
+        var cristinFacet = new CristinCodeFacet("INSTITUTE", null);
 
-        var actual = new FacetUriParamAppender(idUriWithSingleFacet, cristinFacet)
+        var actual = new FacetUriParamAppender(idUriWithSingleFacet, CristinFacetKey.SECTOR.getKey(), cristinFacet)
                          .create()
                          .getUriWithFacetKeys()
                          .map(UriWrapper::getUri)
@@ -82,15 +83,17 @@ class FacetUriParamAppenderTest {
     @Test
     void shouldAppendMultipleFacetsToIdUri() {
         var institutionFacet = new CristinInstitutionFacet("uio", null);
-        var sectorFacet = new CristinSectorFacet("UC", null);
+        var sectorFacet = new CristinCodeFacet("UC", null);
 
-        var actual = new FacetUriParamAppender(idUriWithoutFacet, institutionFacet)
+        var actual = new FacetUriParamAppender(idUriWithoutFacet,
+                                               CristinFacetKey.INSTITUTION.getKey(),
+                                               institutionFacet)
                          .create()
                          .getUriWithFacetKeys()
                          .map(UriWrapper::getUri)
                          .orElse(null);
 
-        actual = new FacetUriParamAppender(actual, sectorFacet)
+        actual = new FacetUriParamAppender(actual, CristinFacetKey.SECTOR.getKey(), sectorFacet)
                      .create()
                      .getUriWithFacetKeys()
                      .map(UriWrapper::getUri)
@@ -101,9 +104,9 @@ class FacetUriParamAppenderTest {
 
     @Test
     void shouldNotDuplicateValuesWhenAppendingAnotherFacetValueToIdUri() {
-        var cristinFacet = new CristinSectorFacet("UC", null);
+        var cristinFacet = new CristinCodeFacet("UC", null);
 
-        var actual = new FacetUriParamAppender(idUriWithSingleFacet, cristinFacet)
+        var actual = new FacetUriParamAppender(idUriWithSingleFacet, CristinFacetKey.SECTOR.getKey(), cristinFacet)
                          .create()
                          .getUriWithFacetKeys()
                          .map(UriWrapper::getUri)
@@ -116,7 +119,9 @@ class FacetUriParamAppenderTest {
     void shouldSortUriParametersAlphabeticallyWhenHasNewFacets() {
         var institutionFacet = new CristinInstitutionFacet("uio", null);
 
-        var actual = new FacetUriParamAppender(idUriWithMultipleFacetUnSorted, institutionFacet)
+        var actual = new FacetUriParamAppender(idUriWithMultipleFacetUnSorted,
+                                               CristinFacetKey.INSTITUTION.getKey(),
+                                               institutionFacet)
                          .create()
                          .getUriWithFacetKeys()
                          .map(UriWrapper::getUri)

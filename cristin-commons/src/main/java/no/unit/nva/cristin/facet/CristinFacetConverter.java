@@ -48,15 +48,15 @@ public class CristinFacetConverter {
     }
 
     private List<Facet> convertCristinFacetHavingKey(Map<String, CristinFacet[]> input, String cristinFacetKey) {
-        return toFacets(input.get(cristinFacetKey));
+        return toFacets(cristinFacetKey, input.get(cristinFacetKey));
     }
 
-    private List<Facet> toFacets(CristinFacet... cristinFacets) {
-        return Arrays.stream(cristinFacets).map(this::toFacet).toList();
+    private List<Facet> toFacets(String cristinFacetKey, CristinFacet... cristinFacets) {
+        return Arrays.stream(cristinFacets).map(cristinFacet -> toFacet(cristinFacetKey, cristinFacet)).toList();
     }
 
-    private Facet toFacet(CristinFacet cristinFacet) {
-        return new CristinFacetAdapter(cristinFacet, nvaIdUri);
+    private Facet toFacet(String cristinFacetKey, CristinFacet cristinFacet) {
+        return new CristinFacetAdapter(cristinFacetKey, cristinFacet, nvaIdUri);
     }
 
     public Map<String, List<Facet>> getConverted() {

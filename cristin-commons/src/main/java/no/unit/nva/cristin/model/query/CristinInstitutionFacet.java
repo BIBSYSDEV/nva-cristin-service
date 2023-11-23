@@ -25,9 +25,4 @@ public class CristinInstitutionFacet extends CristinFacet {
         return institutionName;
     }
 
-    @Override
-    public CristinFacetKey getCristinFacetKey() {
-        return CristinFacetKey.INSTITUTION;
-    }
-
 }

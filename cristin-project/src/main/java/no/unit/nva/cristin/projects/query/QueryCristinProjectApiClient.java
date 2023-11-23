@@ -1,15 +1,19 @@
 package no.unit.nva.cristin.projects.query;
 
+import static no.unit.nva.client.ClientProvider.VERSION_ONE;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import no.unit.nva.client.ClientVersion;
+import no.unit.nva.cristin.common.client.CristinQueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
 import no.unit.nva.cristin.projects.common.QueryProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 
-public class QueryCristinProjectApiClient extends CristinProjectApiClient {
+public class QueryCristinProjectApiClient extends CristinProjectApiClient
+    implements ClientVersion, CristinQueryApiClient<QueryProject, NvaProject> {
 
     public QueryCristinProjectApiClient() {
         super();
@@ -17,6 +21,16 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
 
     public QueryCristinProjectApiClient(HttpClient client) {
         super(client);
+    }
+
+    @Override
+    public SearchResponse<NvaProject> executeQuery(QueryProject queryProject) throws ApiGatewayException {
+        return queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(queryProject);
+    }
+
+    @Override
+    public String getClientVersion() {
+        return VERSION_ONE;
     }
 
     /**
