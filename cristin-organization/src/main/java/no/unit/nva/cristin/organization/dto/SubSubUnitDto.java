@@ -22,6 +22,7 @@ public class SubSubUnitDto {
     @JsonIgnore
     private URI sourceUri;
     private String country;
+    private String acronym;
 
     /**
      * The JSON and default creator of the class.
@@ -33,6 +34,7 @@ public class SubSubUnitDto {
      * @param parentUnits the direct and indirect ascendants of the unit.
      * @param subUnits    the (direct) children of the unit.
      * @param country     the country code of the unit.
+     * @param acronym     the acronym of the unit.
      */
     @JsonCreator
     public SubSubUnitDto(@JsonProperty("cristin_unit_id") String id,
@@ -41,7 +43,8 @@ public class SubSubUnitDto {
                          @JsonProperty("parent_unit") InstitutionDto parentUnit,
                          @JsonProperty("parent_units") List<InstitutionDto> parentUnits,
                          @JsonProperty("subunits") List<SubUnitDto> subUnits,
-                         @JsonProperty("country") String country) {
+                         @JsonProperty("country") String country,
+                         @JsonProperty("acronym") String acronym) {
         this.id = id;
         this.unitName = unitName;
         this.institution = institution;
@@ -49,6 +52,7 @@ public class SubSubUnitDto {
         this.parentUnits = parentUnits;
         this.subUnits = subUnits;
         this.country = country;
+        this.acronym = acronym;
     }
 
     @JacocoGenerated
@@ -127,6 +131,14 @@ public class SubSubUnitDto {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getAcronym() {
+        return acronym;
+    }
+
+    public void setAcronym(String acronym) {
+        this.acronym = acronym;
     }
 
     public static SubSubUnitDto fromJson(String json) {
