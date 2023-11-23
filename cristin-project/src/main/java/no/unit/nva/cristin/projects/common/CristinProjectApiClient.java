@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.common;
 import static java.util.Arrays.asList;
 import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static nva.commons.core.attempt.Try.attempt;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -66,24 +67,25 @@ public class CristinProjectApiClient extends ApiClient {
                    .collect(Collectors.toSet());
     }
 
-    private boolean allProjectsWereEnriched(List<CristinProject> projectsFromQuery,
+    protected boolean allProjectsWereEnriched(List<CristinProject> projectsFromQuery,
                                             List<CristinProject> enrichedCristinProjects) {
         return projectsFromQuery.size() == enrichedCristinProjects.size();
     }
 
-    private List<URI> extractCristinUrisFromProjects(List<CristinProject> projectsFromQuery) {
+    protected List<URI> extractCristinUrisFromProjects(List<CristinProject> projectsFromQuery) {
         return projectsFromQuery.stream()
                    .map(CristinProject::getCristinProjectId)
                    .map(CristinQuery::fromIdentifier)
                    .toList();
     }
 
-    private List<CristinProject> mapValidResponsesToCristinProjects(List<HttpResponse<String>> responses) {
+    protected List<CristinProject> mapValidResponsesToCristinProjects(List<HttpResponse<String>> responses) {
         return responses.stream()
-                .map(attempt(response -> getDeserializedResponse(response, CristinProject.class)))
-                .map(Try::orElseThrow)
-                .filter(CristinProject::hasValidContent)
-                .toList();
+                   .filter(response -> response.statusCode() == HttpURLConnection.HTTP_OK)
+                   .map(attempt(response -> getDeserializedResponse(response, CristinProject.class)))
+                   .map(Try::orElseThrow)
+                   .filter(CristinProject::hasValidContent)
+                   .toList();
     }
 
     protected List<NvaProject> mapValidCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {

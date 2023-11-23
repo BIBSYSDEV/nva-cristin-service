@@ -33,7 +33,7 @@ import static nva.commons.core.StringUtils.EMPTY_STRING;
 @JsonPropertyOrder({
     JsonPropertyNames.CONTEXT, JsonPropertyNames.ID, JsonPropertyNames.SIZE, JsonPropertyNames.SEARCH_STRING,
     JsonPropertyNames.PROCESSING_TIME, JsonPropertyNames.FIRST_RECORD, JsonPropertyNames.NEXT_RESULTS,
-    JsonPropertyNames.PREVIOUS_RESULTS, JsonPropertyNames.HITS, JsonPropertyNames.FACETS})
+    JsonPropertyNames.PREVIOUS_RESULTS, JsonPropertyNames.HITS, JsonPropertyNames.AGGREGATIONS})
 public class SearchResponse<E> implements JsonSerializable {
 
     @JsonIgnore

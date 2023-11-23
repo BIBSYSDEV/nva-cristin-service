@@ -5,6 +5,8 @@ import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
 import static no.unit.nva.cristin.model.Constants.STRING_COMMA;
 import static no.unit.nva.cristin.model.Constants.STRING_SPACE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.BIOBANK;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.CATEGORY;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING_SOURCE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.IGNORE_PATH_PARAMETER_INDEX;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.KEYWORD;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.ORGANIZATION;
@@ -29,7 +31,9 @@ public class QueryProject extends CristinQuery<ParameterKeyProject> {
 
     @Override
     protected String toCristinQueryValue(Entry<ParameterKeyProject, String> entry) {
-        if (entry.getKey().equals(BIOBANK) || entry.getKey().equals(KEYWORD) || entry.getKey().equals(PARTICIPANT)) {
+        if (entry.getKey().equals(BIOBANK) || entry.getKey().equals(KEYWORD) || entry.getKey().equals(PARTICIPANT)
+            || entry.getKey().equals(CATEGORY) || entry.getKey().equals(FUNDING_SOURCE)) {
+
             final var key = entry.getKey().getKey() + EQUAL_OPERATOR;
             return Arrays.stream(entry.getValue().split(STRING_COMMA))
                        .collect(Collectors.joining("&" + key));

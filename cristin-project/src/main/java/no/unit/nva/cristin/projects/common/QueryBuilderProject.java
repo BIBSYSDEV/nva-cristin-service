@@ -8,6 +8,7 @@ import static no.unit.nva.cristin.model.CristinQuery.getUnitIdFromOrganization;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVAL_REFERENCE_ID;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVED_BY;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.BIOBANK;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.CATEGORY;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.CREATOR;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING_SOURCE;
@@ -33,6 +34,7 @@ import static no.unit.nva.cristin.projects.common.ParameterKeyProject.STATUS;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.TITLE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.USER;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS_AND_FACETS;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.keyFromString;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
@@ -47,6 +49,8 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 
 @SuppressWarnings({"PMD.GodClass"})
 public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
+
+    public Set<String> allValidKeys = VALID_QUERY_PARAMETER_NVA_KEYS;
 
     public QueryBuilderProject() {
         super(new QueryProject());
@@ -96,25 +100,38 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
             case BIOBANK -> withBiobank(value);
             case KEYWORD -> withKeyword(value);
             case LANGUAGE -> logger.info("Ignoring language parameter -> " + value);
-            case PARTICIPANT -> withParticipant(value);
+            case PARTICIPANT, PARTICIPANT_FACET -> withParticipant(value);
             case QUERY -> withQuery(value);
             case STATUS -> withStatus(value);
+            case CATEGORY, CATEGORY_FACET -> withCategory(value);
+            case FUNDING_SOURCE, FUNDING_SOURCE_FACET -> withFundingSource(value);
             case APPROVAL_REFERENCE_ID, APPROVED_BY,
-                 FUNDING, FUNDING_SOURCE,
-                 GRANT_ID, INSTITUTION,
-                 LEVELS, MODIFIED_SINCE,
-                 NAME, PROJECT_MANAGER,
-                 PROJECT_UNIT, TITLE,
-                 USER, PAGE_CURRENT,
-                 PAGE_ITEMS_PER_PAGE, PAGE_SORT -> query.setValue(qpKey, value);
+                     FUNDING,
+                     GRANT_ID, INSTITUTION,
+                     LEVELS, MODIFIED_SINCE,
+                     NAME, PROJECT_MANAGER,
+                     PROJECT_UNIT, TITLE,
+                     USER, PAGE_CURRENT,
+                     PAGE_ITEMS_PER_PAGE, PAGE_SORT -> query.setValue(qpKey, value);
             case CREATOR -> withCreator(value);
+            case SECTOR_FACET, COORDINATING_FACET,
+                     RESPONSIBLE_FACET, HEALTH_FACET,
+                     PARTICIPATING_PERSON_ORG_FACET -> query.setFacet(qpKey, value);
             default -> invalidKeys.add(key);
         }
     }
 
+    /**
+     * Adds facet keys as valid query parameter keys in error handling messages.
+     */
+    public QueryBuilderProject usingFacetKeys() {
+        allValidKeys = VALID_QUERY_PARAMETER_NVA_KEYS_AND_FACETS;
+        return this;
+    }
+
     @Override
     protected Set<String> validKeys() {
-        return VALID_QUERY_PARAMETER_NVA_KEYS;
+        return allValidKeys;
     }
 
     @Override
@@ -178,7 +195,11 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
      * Setter funding source code.
      */
     public QueryBuilderProject withFundingSource(String fundingSource) {
-        query.setValue(FUNDING_SOURCE, fundingSource);
+        var fundingSources =
+            query.containsKey(FUNDING_SOURCE)
+                ? query.getValue(FUNDING_SOURCE) + "," + fundingSource
+                : fundingSource;
+        query.setValue(FUNDING_SOURCE, fundingSources);
         return this;
     }
 
@@ -302,6 +323,18 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
                 ? query.getValue(PARTICIPANT) + "," + participant
                 : participant;
         query.setValue(PARTICIPANT, participants);
+        return this;
+    }
+
+    /**
+     * Setter a category of the project by name. [withDuplicates]
+     */
+    public QueryBuilderProject withCategory(String category) {
+        var categories =
+            query.containsKey(CATEGORY)
+                ? query.getValue(CATEGORY) + "," + category
+                : category;
+        query.setValue(CATEGORY, categories);
         return this;
     }
 
