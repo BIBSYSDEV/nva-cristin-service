@@ -243,6 +243,7 @@ public class CristinOrganizationApiClient
                    .withHasPart(getSubUnits(subSubUnitDto))
                    .withLabels(subSubUnitDto.getUnitName())
                    .withCountry(subSubUnitDto.getCountry())
+                   .withAcronym(subSubUnitDto.getAcronym())
                    .build();
     }
 

@@ -83,6 +83,8 @@ class FetchCristinOrganizationHandlerTest {
     public static final String NVA_GET_RESPONSE_WITH_SUB_UNITS_20230526_JSON =
         "nvaGetResponseWithSubUnits20230526.json";
     public static final String NORWEGIAN_LANGUAGE_KEY_UPPERCASE = "NO";
+    public static final String ACRONYM_UIO = "UIO";
+    public static final String ACRONYM_KLM_MBK = "KLM-MBK";
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
@@ -206,6 +208,7 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(actualOrganization.getLabels().get(ENGLISH_LANGUAGE_KEY),
                    containsString(DEPARTMENT_OF_MEDICAL_BIOCHEMISTRY));
         assertThat(actualOrganization.getCountry(), equalTo(NORWEGIAN_LANGUAGE_KEY_UPPERCASE));
+        assertThat(actualOrganization.getAcronym(), equalTo(ACRONYM_UIO));
     }
 
 
@@ -237,6 +240,7 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(actualOrganization.getHasPart(), equalTo(null));
         assertThat(actualOrganization.getPartOf(), equalTo(null));
         assertThat(actualOrganization.getCountry(), equalTo(NORWEGIAN_LANGUAGE_KEY_UPPERCASE));
+        assertThat(actualOrganization.getAcronym(), equalTo(ACRONYM_KLM_MBK));
     }
 
     @Test
