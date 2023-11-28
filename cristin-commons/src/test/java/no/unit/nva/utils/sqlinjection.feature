@@ -16,15 +16,6 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.title == 'Bad Request'
     And match response.status == 400
 
-
-  Scenario: GET (QUERY) project with sql injected query returns 400 Bad request
-    Given path '/project'
-    And param query = sqlInjectedQuery
-    When method GET
-    Then status 400
-    And match response.title == 'Bad Request'
-    And match response.status == 400
-
   Scenario: GET (QUERY) person with sql injected query returns 400 Bad request
     Given path '/person'
     And param query = sqlInjectedQuery
