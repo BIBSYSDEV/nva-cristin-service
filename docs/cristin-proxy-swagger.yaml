@@ -173,6 +173,24 @@ paths:
           required: false
           schema:
             type: string
+        - name: grantId
+          in: query
+          description: Project funding identifier
+          required: false
+          schema:
+            type: number
+        - name: project_code
+          in: query
+          description: Project funding identifier. Same as grantId
+          required: false
+          schema:
+            type: number
+        - name: cristinId
+          in: query
+          description: Project identifier in Cristin
+          required: false
+          schema:
+            type: number
         - name: categoryFacet
           in: query
           description: Narrow down on project category. Works only for version 2023-11-03-aggregations
@@ -846,6 +864,24 @@ paths:
           required: false
           schema:
             type: string
+        - name: grantId
+          in: query
+          description: Project funding identifier
+          required: false
+          schema:
+            type: number
+        - name: project_code
+          in: query
+          description: Project funding identifier. Same as grantId
+          required: false
+          schema:
+            type: number
+        - name: cristinId
+          in: query
+          description: Project identifier in Cristin
+          required: false
+          schema:
+            type: number
       responses:
         200:
           description: successful operation
