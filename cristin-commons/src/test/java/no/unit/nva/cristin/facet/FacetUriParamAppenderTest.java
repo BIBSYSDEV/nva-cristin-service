@@ -3,6 +3,7 @@ package no.unit.nva.cristin.facet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import java.net.URI;
+import java.util.Objects;
 import no.unit.nva.cristin.model.query.CristinFacetKey;
 import no.unit.nva.cristin.model.query.CristinInstitutionFacet;
 import no.unit.nva.cristin.model.query.CristinCodeFacet;
@@ -31,6 +32,8 @@ class FacetUriParamAppenderTest {
                    + "?name=tor"
                    + "&organizationFacet=uio"
                    + "&sectorFacet=INSTITUTE,UC");
+
+    private static final URI idUriWithTitleHavingComma = generateUriWithCommaParamValue();
 
     @Test
     void shouldDoNothingOnNullValueUri() {
@@ -128,6 +131,31 @@ class FacetUriParamAppenderTest {
                          .orElse(null);
 
         assertEquals(idUriWithMultipleFacetAppendedAndSorted, actual);
+    }
+
+    @Test
+    void shouldExcludeParamsForSortingOnCommaWhenCommaIsPartOfTheSearchValue() {
+        var institutionFacet = new CristinInstitutionFacet("uio", null);
+
+        var actual = new FacetUriParamAppender(idUriWithTitleHavingComma,
+                                               CristinFacetKey.INSTITUTION.getKey(),
+                                               institutionFacet)
+                         .create()
+                         .getUriWithFacetKeys()
+                         .map(UriWrapper::getUri)
+                         .orElse(null);
+
+        var expected = "https://api.dev.nva.aws.unit.no/cristin/project/?organizationFacet=uio"
+                       + "&title=Et%20prestisjefylt,%20stort%20og%20viktig%20prosjekt";
+
+        Objects.requireNonNull(actual);
+        assertEquals(expected, actual.toString());
+    }
+
+    private static URI generateUriWithCommaParamValue() {
+        return UriWrapper.fromUri("https://api.dev.nva.aws.unit.no/cristin/project/")
+                      .addQueryParameter("title", "Et prestisjefylt, stort og viktig prosjekt")
+                      .getUri();
     }
 
 }
