@@ -7,8 +7,12 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAT
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
 import static no.unit.nva.cristin.common.ErrorMessages.INVALID_URI_MESSAGE;
 import static no.unit.nva.cristin.model.Constants.CATEGORY_PARAM;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_ID_CRISTIN_PARAM;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_ID_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
+import static no.unit.nva.cristin.model.Constants.GRANT_ID_CRISTIN_PARAM;
+import static no.unit.nva.cristin.model.Constants.GRANT_ID_PARAM;
 import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_DATE;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_LANGUAGE;
@@ -46,7 +50,7 @@ public enum ParameterKeyProject implements IParameterKey {
     BIOBANK(JsonPropertyNames.BIOBANK_ID),
     FUNDING(JsonPropertyNames.FUNDING),
     FUNDING_SOURCE(JsonPropertyNames.FUNDING_SOURCE),
-    GRANT_ID("project_code", null, PATTERN_IS_NUMBER),
+    GRANT_ID(GRANT_ID_CRISTIN_PARAM, GRANT_ID_PARAM, PATTERN_IS_NUMBER),
     INSTITUTION(JsonPropertyNames.INSTITUTION),
     KEYWORD(JsonPropertyNames.PROJECT_KEYWORD),
     LANGUAGE(QUERY_PARAMETER_LANGUAGE, JsonPropertyNames.LANGUAGE, PATTERN_IS_LANGUAGE),
@@ -82,6 +86,10 @@ public enum ParameterKeyProject implements IParameterKey {
     PAGE_SORT(JsonPropertyNames.PROJECT_SORT),
     CREATOR(PROJECT_CREATOR_PARAM, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE),
     CATEGORY(CATEGORY_PARAM),
+    CRISTIN_ID(CRISTIN_ID_CRISTIN_PARAM, CRISTIN_ID_PARAM,
+               PATTERN_IS_NUMBER,
+               ERROR_MESSAGE_INVALID_NUMBER,
+               KeyEncoding.NONE),
     // Facets from here onward
     SECTOR_FACET(CristinFacetParamKey.SECTOR_PARAM.getKey(), CristinFacetParamKey.SECTOR_PARAM.getNvaKey()),
     COORDINATING_FACET(CristinFacetParamKey.COORDINATING_PARAM.getKey(),
@@ -98,7 +106,7 @@ public enum ParameterKeyProject implements IParameterKey {
                          CristinFacetParamKey.FUNDING_SOURCE_PARAM.getNvaKey());
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
-    public static final int IGNORE_FACET_PARAMETER_INDEX = 29;
+    public static final int IGNORE_FACET_PARAMETER_INDEX = 30;
 
     public static final Set<ParameterKeyProject> VALID_QUERY_PARAMETERS =
         Arrays.stream(ParameterKeyProject.values())

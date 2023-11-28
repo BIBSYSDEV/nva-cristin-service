@@ -81,4 +81,8 @@ public class Constants {
     public static final String PROJECT_CREATOR_PARAM = "creator";
     public static final String FACETS_PATH = "facets";
     public static final String CATEGORY_PARAM = "category";
+    public static final String GRANT_ID_PARAM = "grantId";
+    public static final String GRANT_ID_CRISTIN_PARAM = "project_code";
+    public static final String CRISTIN_ID_PARAM = "cristinId";
+    public static final String CRISTIN_ID_CRISTIN_PARAM = "id";
 }
