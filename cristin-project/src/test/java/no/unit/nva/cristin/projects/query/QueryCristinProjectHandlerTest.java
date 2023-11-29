@@ -924,7 +924,7 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualId.toString(), not(containsString("participant=")));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Special character string \"{0}\" should return results")
     @MethodSource("differentQueryParamsProvider")
     void shouldReturnResultsEvenWhenUsingSpecialCharacters(String param, String processedParam) throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);

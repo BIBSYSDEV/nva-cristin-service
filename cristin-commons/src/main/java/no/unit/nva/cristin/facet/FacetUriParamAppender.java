@@ -22,7 +22,7 @@ public class FacetUriParamAppender {
     public static final String QUERY_PARAMETER_DELIMITER = "&";
     public static final String QUERY_PARAMETER_ASSIGNER = "=";
     public static final String QUERY_VALUE_DELIMITER = ",";
-    public static final List<String> KEYS_THAT_SHOULD_NOT_BE_SPLIT = List.of("title");
+    public static final List<String> KEYS_THAT_SHOULD_NOT_BE_SPLIT = List.of("title", "query", "name");
     private final URI nvaUri;
     private final String cristinFacetKey;
     private final CristinFacet cristinFacet;
