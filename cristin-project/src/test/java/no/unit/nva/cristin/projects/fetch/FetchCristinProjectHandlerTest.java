@@ -83,8 +83,6 @@ public class FetchCristinProjectHandlerTest {
     private static final String DEFAULT_IDENTIFIER = "9999";
     private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
     private static final String DEFAULT_ACCEPT_HEADER = "*/*";
-    public static final String FIELD_STATUS = "status";
-    public static final String NOT_LEGAL_STATUS = "not_legal_status";
     public static final String INVALID_QUERY_PARAM_KEY = "invalid";
     public static final String INVALID_QUERY_PARAM_VALUE = "value";
     public static final String PERSON_ID = "12345";
@@ -333,19 +331,6 @@ public class FetchCristinProjectHandlerTest {
     }
 
     @Test
-    void handlerReturnsBadGatewayWhenCristinProjectHasInvalidStatusValue() throws Exception {
-        final var fetchHandler =
-                new FetchCristinProjectHandler(createCristinApiClientWithResponseContainingError(), environment);
-        try (var input = requestWithIdentifier(of(IDENTIFIER, DEFAULT_IDENTIFIER))) {
-            var outputStream = new ByteArrayOutputStream();
-            fetchHandler.handleRequest(input, outputStream, mock(Context.class));
-            final var gatewayResponse =
-                GatewayResponse.fromOutputStream(outputStream, NvaProject.class);
-            assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
-        }
-    }
-
-    @Test
     void handlerReturnsNvaProjectWithSummaryWhenCristinProjectHasAcademicSummary() throws Exception {
         final var summaryLanguage = randomLanguageCode();
         final var summary = randomSummary();
@@ -456,15 +441,6 @@ public class FetchCristinProjectHandlerTest {
                 OBJECT_MAPPER.readTree(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
         ObjectNode summaryNode = JsonNodeFactory.instance.objectNode().put(language, summary);
         ((ObjectNode) cristinProjectSource).set(CRISTIN_ACADEMIC_SUMMARY, summaryNode);
-        return new FetchCristinProjectClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
-    }
-
-
-    private FetchCristinProjectClientStub createCristinApiClientWithResponseContainingError()
-        throws JsonProcessingException {
-        JsonNode cristinProjectSource =
-                OBJECT_MAPPER.readTree(IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE)));
-        ((ObjectNode) cristinProjectSource).put(FIELD_STATUS, NOT_LEGAL_STATUS);
         return new FetchCristinProjectClientStub(OBJECT_MAPPER.writeValueAsString(cristinProjectSource));
     }
 

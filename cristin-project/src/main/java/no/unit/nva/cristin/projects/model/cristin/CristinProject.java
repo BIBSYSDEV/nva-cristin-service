@@ -13,7 +13,6 @@ import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder;
-import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.utils.CustomInstantSerializer;
 import nva.commons.core.StringUtils;
@@ -380,8 +379,7 @@ public class CristinProject implements JsonSerializable {
      */
     public boolean hasValidContent() {
         return StringUtils.isNotBlank(cristinProjectId)
-                && !getTitle().isEmpty()
-                && ProjectStatus.isValidStatus(status);
+                && !getTitle().isEmpty();
     }
 
     public NvaProject toNvaProject() {
