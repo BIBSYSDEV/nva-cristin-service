@@ -69,6 +69,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinRole;
 import no.unit.nva.cristin.projects.fetch.FetchCristinProjectApiClient;
@@ -96,7 +97,6 @@ class UpdateCristinProjectHandlerTest {
     public static final String PATCH_REQUEST_JSON = "nvaApiPatchRequest.json";
     public static final String CRISTIN_PATCH_REQUEST_JSON = "cristinPatchRequest.json";
     public static final String UNSUPPORTED_FIELD = "unsupportedField";
-    public static final String STATUS_ACTIVE = "ACTIVE";
     public static final String LANGUAGE_NORWEGIAN = "nb";
     public static final String USER_IDENTIFIER = "12345";
     public static final String CRISTIN_PRO_PARTICIPANT_CODE = "PRO_PARTICIPANT";
@@ -477,8 +477,9 @@ class UpdateCristinProjectHandlerTest {
 
     private void injectRequiredFields(CristinProject cristinProject) {
         cristinProject.setCristinProjectId(randomInteger(999999).toString());
-        cristinProject.setStatus(STATUS_ACTIVE);
         cristinProject.setTitle(Map.of(LANGUAGE_NORWEGIAN, randomString()));
+        cristinProject.setStartDate(randomInstant());
+        cristinProject.setCoordinatingInstitution(CristinOrganization.fromIdentifier("12345"));
     }
 
     private CristinProject cristinProjectWithCreatorData() {
@@ -502,6 +503,8 @@ class UpdateCristinProjectHandlerTest {
         var cristinProject = basicCristinProject();
         var participant = getParticipant(userIdentifier, roleCode);
         cristinProject.setParticipants(List.of(participant));
+        cristinProject.setStartDate(randomInstant());
+        cristinProject.setCoordinatingInstitution(CristinOrganization.fromIdentifier("185"));
 
         return cristinProject;
     }

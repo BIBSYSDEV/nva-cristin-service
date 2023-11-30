@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
@@ -377,9 +378,13 @@ public class CristinProject implements JsonSerializable {
      *
      * @return project has enough data to be considered valid
      */
-    public boolean hasValidContent() {
+    public boolean hasEnrichedContent() {
         return StringUtils.isNotBlank(cristinProjectId)
-                && !getTitle().isEmpty();
+               && !getTitle().isEmpty()
+               // Participants are required for creating new projects but not required when fetching existing
+               //&& !getParticipants().isEmpty()
+               && nonNull(getStartDate())
+               && nonNull(getCoordinatingInstitution());
     }
 
     public NvaProject toNvaProject() {

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import java.net.http.HttpClient;
+import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.Funding;
@@ -53,6 +54,7 @@ import static no.unit.nva.cristin.projects.fetch.FetchCristinProjectHandler.ERRO
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
 import static no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder.FUNDING_SOURCES;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
@@ -77,8 +79,6 @@ public class FetchCristinProjectHandlerTest {
         "nvaApiGetResponseOneNvaProject.json";
     private static final String CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON =
         "cristinProjectWithoutInstitutionAndParticipants.json";
-    private static final String API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON =
-        "nvaApiGetResponseWithMissingFields.json";
     private static final String NOT_AN_ID = "Not an ID";
     private static final String DEFAULT_IDENTIFIER = "9999";
     private static final String JSON_WITH_MISSING_REQUIRED_DATA = "{\"cristin_project_id\": \"456789\"}";
@@ -86,7 +86,6 @@ public class FetchCristinProjectHandlerTest {
     public static final String INVALID_QUERY_PARAM_KEY = "invalid";
     public static final String INVALID_QUERY_PARAM_VALUE = "value";
     public static final String PERSON_ID = "12345";
-    public static final String STATUS_ACTIVE = "ACTIVE";
     public static final String LANGUAGE_NB = "nb";
 
     private FetchCristinProjectApiClient cristinApiClientStub;
@@ -175,23 +174,6 @@ public class FetchCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_SERVER_ERROR));
-    }
-
-    @Test
-    void handlerReturnsNvaProjectWithoutParticipantsAndCoordinatingInstitutionIfTheyAreMissingFromBackend()
-        throws Exception {
-
-        cristinApiClientStub = spy(cristinApiClientStub);
-
-        doReturn(new HttpResponseFaker(getBodyFromResource(CRISTIN_PROJECT_WITHOUT_INSTITUTION_AND_PARTICIPANTS_JSON)))
-            .when(cristinApiClientStub).fetchGetResult(any(URI.class));
-
-        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
-        GatewayResponse<NvaProject> gatewayResponse = sendQueryWithId(DEFAULT_IDENTIFIER);
-
-        String expected = getBodyFromResource(API_RESPONSE_GET_PROJECT_WITH_MISSING_FIELDS_JSON);
-        assertEquals(OBJECT_MAPPER.readValue(expected, NvaProject.class),
-                gatewayResponse.getBodyObject(NvaProject.class));
     }
 
     @Test
@@ -495,8 +477,9 @@ public class FetchCristinProjectHandlerTest {
     private CristinProject basicCristinProjectWithOnlyRequiredFields() {
         var cristinProject = new CristinProject();
         cristinProject.setCristinProjectId(randomInteger(999999).toString());
-        cristinProject.setStatus(STATUS_ACTIVE);
         cristinProject.setTitle(Map.of(LANGUAGE_NB, randomString()));
+        cristinProject.setStartDate(randomInstant());
+        cristinProject.setCoordinatingInstitution(CristinOrganization.fromIdentifier("185"));
         return cristinProject;
     }
 
