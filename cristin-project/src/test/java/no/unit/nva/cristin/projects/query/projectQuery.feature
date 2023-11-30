@@ -101,7 +101,7 @@ Feature: API tests for Cristin projects query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'category\', \'creator\', \'depth\', \'funding\', \'funding_source\', \'institution\', \'keyword\', \'language\', \'modified_since\', \'name\', \'organization\', \'page\', \'participant\', \'project_code\', \'project_manager\', \'query\', \'results\', \'sort\', \'status\', \'title\', \'unit\', \'user\']'
+    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'category\', \'creator\', \'cristinId\', \'depth\', \'funding\', \'funding_source\', \'grantId\', \'institution\', \'keyword\', \'language\', \'modified_since\', \'name\', \'organization\', \'page\', \'participant\', \'project_manager\', \'query\', \'results\', \'sort\', \'status\', \'title\', \'unit\', \'user\']'
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request

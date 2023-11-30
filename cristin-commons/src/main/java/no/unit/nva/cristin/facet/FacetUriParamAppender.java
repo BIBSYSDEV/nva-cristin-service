@@ -22,6 +22,7 @@ public class FacetUriParamAppender {
     public static final String QUERY_PARAMETER_DELIMITER = "&";
     public static final String QUERY_PARAMETER_ASSIGNER = "=";
     public static final String QUERY_VALUE_DELIMITER = ",";
+    public static final List<String> KEYS_THAT_SHOULD_NOT_BE_SPLIT = List.of("title", "query", "name");
     private final URI nvaUri;
     private final String cristinFacetKey;
     private final CristinFacet cristinFacet;
@@ -79,12 +80,30 @@ public class FacetUriParamAppender {
         Map<String, List<String>> map = new HashMap<>();
         Arrays.stream(query.split(QUERY_PARAMETER_DELIMITER))
             .forEach(pair -> {
-                String[] keyValue = pair.split(QUERY_PARAMETER_ASSIGNER);
-                List<String> values = Arrays.asList(keyValue[1].split(QUERY_VALUE_DELIMITER));
+                var keyValue = splitQueryParamString(pair);
+                var values = shouldSplitOnComma(keyValue[0]) ? splitOnComma(keyValue[1]) : keepValueAsIs(keyValue[1]);
                 map.put(keyValue[0], new ArrayList<>(values));
             });
         return map;
     }
+
+    private String[] splitQueryParamString(String pair) {
+        return pair.split(QUERY_PARAMETER_ASSIGNER);
+    }
+
+    private boolean shouldSplitOnComma(String keyFromParam) {
+        return KEYS_THAT_SHOULD_NOT_BE_SPLIT.stream()
+                   .noneMatch(keyNotToBeSplit -> keyNotToBeSplit.equals(keyFromParam));
+    }
+
+    private static List<String> splitOnComma(String value) {
+        return Arrays.asList(value.split(QUERY_VALUE_DELIMITER));
+    }
+
+    private static List<String> keepValueAsIs(String value) {
+        return Collections.singletonList(value);
+    }
+
 
     private Map<String, String> getCombinedMap(Map<String, List<String>> queryMap) {
         var combinedMap = new TreeMap<String, String>();
