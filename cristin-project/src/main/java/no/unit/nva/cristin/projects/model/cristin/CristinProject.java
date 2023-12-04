@@ -381,8 +381,6 @@ public class CristinProject implements JsonSerializable {
     public boolean hasEnrichedContent() {
         return StringUtils.isNotBlank(cristinProjectId)
                && !getTitle().isEmpty()
-               // Participants are required for creating new projects but not required when fetching existing
-               //&& !getParticipants().isEmpty()
                && nonNull(getStartDate())
                && nonNull(getCoordinatingInstitution());
     }
