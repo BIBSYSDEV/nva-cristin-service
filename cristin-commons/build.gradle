@@ -27,6 +27,9 @@ dependencies {
     implementation libs.aws.sdk2.spi
     implementation libs.apache.http.core
 
+    implementation libs.vavr
+    implementation libs.resilience4j.retry
+
 }
 tasks.named('test', Test) {
     useJUnitPlatform {

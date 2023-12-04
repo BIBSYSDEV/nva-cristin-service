@@ -23,6 +23,8 @@ com-auth0-jwks = { strictly = '0.20.2' }
 wiremock = { strictly = '2.35.0' }
 apache-http-core = { strictly = '4.4.16' }
 json-assert = { strictly = '1.5.1' }
+vavrVersion = '0.10.4'
+resilience4jRetry = '2.1.0'
 
 [libraries]
 
@@ -89,6 +91,9 @@ aws-sdk2-urlconnection = { group = 'software.amazon.awssdk', name = 'url-connect
 wiremock = { group = 'com.github.tomakehurst', name = 'wiremock-jre8', version.ref = 'wiremock' }
 
 apache-http-core = { group = 'org.apache.httpcomponents', name = 'httpcore', version.ref = 'apache-http-core' }
+
+vavr = { group = 'io.vavr', name = 'vavr', version.ref = 'vavrVersion' }
+resilience4j-retry = { group = 'io.github.resilience4j', name = 'resilience4j-retry', version.ref = 'resilience4jRetry' }
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
