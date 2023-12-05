@@ -9,6 +9,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.http.HttpClient;
@@ -43,6 +45,7 @@ class ApiClientTest {
         mockResponseWithErrorStatusCodeTheFirstTwoTimesButReturnsSuccessStatusCodeTheLastTime();
         var response = apiClient.getSuccessfulResponseOrThrowException(httpRequest);
 
+        verify(httpClient, times(3)).send(any(), any());
         assertThat(response.body(),  equalTo(EMPTY_ARRAY));
     }
 
@@ -51,6 +54,7 @@ class ApiClientTest {
         mockResponseWithOnlyErrorStatusCodeOnAllAttempts();
         var response = apiClient.getSuccessfulResponseOrThrowException(httpRequest);
 
+        verify(httpClient, times(3)).send(any(), any());
         assertThat(response.statusCode(), equalTo(HttpURLConnection.HTTP_INTERNAL_ERROR));
     }
 
@@ -59,6 +63,7 @@ class ApiClientTest {
         mockResponseThatThrowsExceptionOnTheFirstAttemptsButThenSucceeds();
         var response = apiClient.getSuccessfulResponseOrThrowException(httpRequest);
 
+        verify(httpClient, times(3)).send(any(), any());
         assertThat(response.body(),  equalTo(EMPTY_ARRAY));
     }
 
@@ -68,6 +73,7 @@ class ApiClientTest {
 
         assertThrows(FailedHttpRequestException.class,
                      () -> apiClient.getSuccessfulResponseOrThrowException(httpRequest));
+        verify(httpClient, times(3)).send(any(), any());
     }
 
 

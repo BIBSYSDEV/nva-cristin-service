@@ -142,26 +142,25 @@ public class ApiClient {
         throws FailedHttpRequestException {
 
         try {
-            var response = fetchResponseWithRetry(httpRequest);
-            return response;
+            return fetchResponseWithRetry(httpRequest);
         } catch (Exception ex) {
             logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), ex);
             throw new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
     }
 
-    private HttpResponse<String> fetchResponseWithRetry(HttpRequest httpRequest) throws FailedHttpRequestException {
+    private HttpResponse<String> fetchResponseWithRetry(HttpRequest httpRequest) {
         var retryRegistry = HttpClientProvider.defaultRetryRegistry();
         var retryWithDefaultConfig = retryRegistry.retry("executeRequest");
         Supplier<HttpResponse<String>> supplier = () -> executeRequest(httpRequest);
 
         return ofSupplier(Retry.decorateSupplier(retryWithDefaultConfig, supplier))
-                   .getOrElseThrow(() -> new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
+                   .getOrElseThrow(throwable -> new RuntimeException(throwable.getMessage()));
     }
 
     protected HttpResponse<String> executeRequest(HttpRequest httpRequest) {
         return of(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8)))
-                   .getOrElseThrow(() -> new RuntimeException());
+                   .getOrElseThrow(throwable -> new RuntimeException(throwable.getMessage()));
     }
 
     /**

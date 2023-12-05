@@ -41,7 +41,8 @@ public class HttpClientProvider {
 
     @SuppressWarnings("rawtypes")
     private static Predicate<HttpResponse> resultStatusIsServerError() {
-        return httpResponse -> isNull(httpResponse) || httpResponse.statusCode() >= 500 && httpResponse.statusCode() <= 599;
+        return httpResponse -> isNull(httpResponse)
+                               || httpResponse.statusCode() >= 500 && httpResponse.statusCode() <= 599;
     }
 
 }
