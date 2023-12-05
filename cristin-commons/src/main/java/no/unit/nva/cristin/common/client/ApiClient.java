@@ -1,8 +1,10 @@
 package no.unit.nva.cristin.common.client;
 
+import io.github.resilience4j.retry.Retry;
+import java.util.function.Supplier;
+import no.unit.nva.client.HttpClientProvider;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.exception.FailedHttpRequestException;
-import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.exception.UnauthorizedException;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
@@ -20,7 +22,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +29,12 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static io.vavr.control.Try.of;
+import static io.vavr.control.Try.ofSupplier;
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.basicAuthHeader;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME;
@@ -135,17 +139,29 @@ public class ApiClient {
     }
 
     protected HttpResponse<String> getSuccessfulResponseOrThrowException(HttpRequest httpRequest)
-        throws GatewayTimeoutException, FailedHttpRequestException {
+        throws FailedHttpRequestException {
 
         try {
-            return client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8));
-        } catch (HttpTimeoutException timeoutException) {
-            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), timeoutException);
-            throw new GatewayTimeoutException();
-        } catch (IOException | InterruptedException otherException) {
-            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), otherException);
-            throw new FailedHttpRequestException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+            var response = fetchResponseWithRetry(httpRequest);
+            return response;
+        } catch (Exception ex) {
+            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), ex);
+            throw new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
+    }
+
+    private HttpResponse<String> fetchResponseWithRetry(HttpRequest httpRequest) throws FailedHttpRequestException {
+        var retryRegistry = HttpClientProvider.defaultRetryRegistry();
+        var retryWithDefaultConfig = retryRegistry.retry("executeRequest");
+        Supplier<HttpResponse<String>> supplier = () -> executeRequest(httpRequest);
+
+        return ofSupplier(Retry.decorateSupplier(retryWithDefaultConfig, supplier))
+                   .getOrElseThrow(() -> new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
+    }
+
+    protected HttpResponse<String> executeRequest(HttpRequest httpRequest) {
+        return of(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8)))
+                   .getOrElseThrow(() -> new RuntimeException());
     }
 
     /**
@@ -171,7 +187,7 @@ public class ApiClient {
 
     private <T> BadGatewayException logAndThrowDeserializationError(HttpResponse<String> response, Failure<T> failure) {
         logError(ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(), failure.getException());
-        return new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
     }
 
     protected void logError(String message, String data, Exception failure) {
@@ -236,7 +252,7 @@ public class ApiClient {
             throw new BadGatewayException(RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER);
         } else if (remoteServerHasInternalProblems(statusCode)) {
             logBackendFetchFail(getUriAsString(uri), statusCode, body);
-            throw new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+            throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         } else if (errorIsUnknown(statusCode)) {
             logBackendFetchFail(getUriAsString(uri), statusCode, body);
             throw new RuntimeException();

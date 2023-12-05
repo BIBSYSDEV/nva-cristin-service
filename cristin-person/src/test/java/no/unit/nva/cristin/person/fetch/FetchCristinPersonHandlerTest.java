@@ -44,7 +44,6 @@ import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
-import static no.unit.nva.exception.GatewayTimeoutException.ERROR_MESSAGE_GATEWAY_TIMEOUT;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
@@ -193,16 +192,16 @@ public class FetchCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnGatewayTimeoutWhenFetchFromUpstreamServerTimesOut() throws Exception {
+    void shouldReturnHttpRequestFailedExceptionWhenFetchFromUpstreamServerTimesOut() throws Exception {
         var clientMock = mock(HttpClient.class);
         when(clientMock.<String>send(any(), any())).thenThrow(new HttpConnectTimeoutException(EMPTY_STRING));
         var apiClient = new CristinPersonApiClient(clientMock);
         handler = new FetchCristinPersonHandler(apiClient, environment);
         var gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
 
-        assertEquals(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, gatewayResponse.getStatusCode());
+        assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_GATEWAY_TIMEOUT));
+        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_BACKEND_FETCH_FAILED));
     }
 
     @Test
