@@ -84,13 +84,13 @@ public class CristinProjectApiClient extends ApiClient {
                    .filter(response -> response.statusCode() == HttpURLConnection.HTTP_OK)
                    .map(attempt(response -> getDeserializedResponse(response, CristinProject.class)))
                    .map(Try::orElseThrow)
-                   .filter(CristinProject::hasValidContent)
+                   .filter(CristinProject::hasEnrichedContent)
                    .toList();
     }
 
     protected List<NvaProject> mapValidCristinProjectsToNvaProjects(List<CristinProject> cristinProjects) {
         return cristinProjects.stream()
-                .filter(CristinProject::hasValidContent)
+                .filter(CristinProject::hasEnrichedContent)
                 .map(CristinProject::toNvaProject)
                 .toList();
     }

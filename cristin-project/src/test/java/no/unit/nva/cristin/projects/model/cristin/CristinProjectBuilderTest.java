@@ -35,7 +35,7 @@ class CristinProjectBuilderTest {
         final var cristinProject = expected.toCristinProject();
 
         assertNotNull(cristinProject);
-        assertTrue(cristinProject.hasValidContent());
+        assertTrue(cristinProject.hasEnrichedContent());
 
         var actual = cristinProject.toNvaProject();
         addFieldsNotSupportedByToCristinProject(expected, actual);

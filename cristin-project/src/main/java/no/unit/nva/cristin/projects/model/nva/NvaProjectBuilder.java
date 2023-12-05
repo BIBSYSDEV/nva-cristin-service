@@ -334,6 +334,7 @@ public class NvaProjectBuilder {
     }
 
     private ProjectStatus extractProjectStatus() {
-        return ProjectStatus.fromCristinStatus(cristinProject.getStatus());
+        return attempt(() ->  ProjectStatus.fromCristinStatus(cristinProject.getStatus()))
+                   .orElse(fail -> null);
     }
 }
