@@ -109,8 +109,7 @@ class ApiClientTest {
     void shouldThrowCorrectExceptionWhenAllAttemptsFailAsync() {
         mockResponseThatThrowsExceptionOnAllRequestsAsync();
 
-        assertThrows(RuntimeException.class,
-                     () -> apiClient.fetchGetResultAsync(randomUri()).get());
+        assertThrows(RuntimeException.class, () -> apiClient.fetchGetResultAsync(randomUri()).get());
         verify(httpClient, times(3)).sendAsync(any(), any());
     }
 

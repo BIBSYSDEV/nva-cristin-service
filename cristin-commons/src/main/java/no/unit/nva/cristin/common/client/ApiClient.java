@@ -104,13 +104,11 @@ public class ApiClient {
         var retryWithDefaultConfigAsync = retryRegistryAsync.retry("executeRequestAsync");
         Supplier<CompletableFuture<HttpResponse<String>>> supplier = () -> executeRequestAsync(httpRequest);
 
-        return ofSupplier(Retry.decorateSupplier(retryWithDefaultConfigAsync, supplier))
-                   .getOrElseThrow(throwable -> new RuntimeException(throwable.getMessage()));
+        return ofSupplier(Retry.decorateSupplier(retryWithDefaultConfigAsync, supplier)).get();
     }
 
     private CompletableFuture<HttpResponse<String>> executeRequestAsync(HttpRequest httpRequest) {
-        return of(() -> client.sendAsync(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8)))
-                   .getOrElseThrow(throwable -> new RuntimeException(throwable.getMessage()));
+        return of(() -> client.sendAsync(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).get();
     }
 
     /**
@@ -236,10 +234,11 @@ public class ApiClient {
         List<CompletableFuture<HttpResponse<String>>> responsesContainer) {
 
         return responsesContainer.stream()
-            .map(attempt(CompletableFuture::get))
-            .map(Try::get)
-            .filter(this::isSuccessfulRequest)
-            .collect(Collectors.toList());
+                   .map(attempt(CompletableFuture::get))
+                   .filter(Try::isSuccess)
+                   .map(Try::get)
+                   .filter(this::isSuccessfulRequest)
+                   .collect(Collectors.toList());
     }
 
     private boolean isSuccessfulRequest(HttpResponse<String> response) {
