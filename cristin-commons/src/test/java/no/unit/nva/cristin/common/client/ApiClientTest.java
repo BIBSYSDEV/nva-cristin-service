@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.common.client;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Test;
 class ApiClientTest {
 
     public static final String EMPTY_ARRAY = "[]";
+
     private ApiClient apiClient;
     private HttpClient httpClient;
     private HttpRequest httpRequest;
@@ -76,6 +78,42 @@ class ApiClientTest {
         verify(httpClient, times(3)).send(any(), any());
     }
 
+    @Test
+    void shouldTryRetrievingResponseSeveralTimesBeforeSucceedingAsync() throws Exception {
+        mockResponseWithErrorStatusCodeTheFirstTwoTimesButReturnsSuccessStatusCodeTheLastTimeAsync();
+        var response = apiClient.fetchGetResultAsync(randomUri()).get();
+
+        verify(httpClient, times(3)).sendAsync(any(), any());
+        assertThat(response.body(),  equalTo(EMPTY_ARRAY));
+    }
+
+    @Test
+    void shouldReturnServerErrorStatusCodeWhenAllRetriesReturnsServerErrorAsync() throws Exception {
+        mockResponseWithOnlyErrorStatusCodeOnAllAttemptsAsync();
+        var response = apiClient.fetchGetResultAsync(randomUri()).get();
+
+        verify(httpClient, times(3)).sendAsync(any(), any());
+        assertThat(response.statusCode(), equalTo(HttpURLConnection.HTTP_INTERNAL_ERROR));
+    }
+
+    @Test
+    void shouldThrowsSomeExceptionsBeforeSucceedingAsync() throws Exception {
+        mockResponseThatThrowsExceptionOnTheFirstAttemptsButThenSucceedsAsync();
+        var response = apiClient.fetchGetResultAsync(randomUri()).get();
+
+        verify(httpClient, times(3)).sendAsync(any(), any());
+        assertThat(response.body(),  equalTo(EMPTY_ARRAY));
+    }
+
+    @Test
+    void shouldThrowCorrectExceptionWhenAllAttemptsFailAsync() {
+        mockResponseThatThrowsExceptionOnAllRequestsAsync();
+
+        assertThrows(RuntimeException.class,
+                     () -> apiClient.fetchGetResultAsync(randomUri()).get());
+        verify(httpClient, times(3)).sendAsync(any(), any());
+    }
+
 
     private void mockResponseWithErrorStatusCodeTheFirstTwoTimesButReturnsSuccessStatusCodeTheLastTime()
         throws IOException, InterruptedException {
@@ -107,6 +145,46 @@ class ApiClientTest {
         doThrow(ioException()).doThrow(timeoutException()).doThrow(interruptedException())
             .when(httpClient)
             .send(any(), any());
+
+        apiClient = new ApiClient(httpClient);
+    }
+
+    private void mockResponseWithErrorStatusCodeTheFirstTwoTimesButReturnsSuccessStatusCodeTheLastTimeAsync() {
+        var badResponseAsync = completedFuture(createBadResponse());
+        var okResponseAsync = completedFuture(createOkResponse());
+
+        doReturn(badResponseAsync, badResponseAsync, okResponseAsync)
+            .when(httpClient).sendAsync(any(),any());
+
+        apiClient = new ApiClient(httpClient);
+    }
+
+    private void mockResponseWithOnlyErrorStatusCodeOnAllAttemptsAsync() {
+        var badResponseAsync = completedFuture(createBadResponse());
+
+        doReturn(badResponseAsync, badResponseAsync, badResponseAsync)
+            .when(httpClient).sendAsync(any(),any());
+
+        apiClient = new ApiClient(httpClient);
+    }
+
+    private void mockResponseThatThrowsExceptionOnTheFirstAttemptsButThenSucceedsAsync() {
+        var okResponseAsync = completedFuture(createOkResponse());
+        var uncheckedException = new RuntimeException();
+
+        doThrow(uncheckedException).doThrow(uncheckedException).doReturn(okResponseAsync)
+            .when(httpClient)
+            .sendAsync(any(), any());
+
+        apiClient = new ApiClient(httpClient);
+    }
+
+    private void mockResponseThatThrowsExceptionOnAllRequestsAsync() {
+        var uncheckedException = new RuntimeException();
+
+        doThrow(uncheckedException).doThrow(uncheckedException).doThrow(uncheckedException)
+            .when(httpClient)
+            .sendAsync(any(), any());
 
         apiClient = new ApiClient(httpClient);
     }

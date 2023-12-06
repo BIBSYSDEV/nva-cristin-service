@@ -2,7 +2,6 @@ package no.unit.nva.cristin.common.client;
 
 import io.github.resilience4j.retry.Retry;
 import java.util.function.Supplier;
-import no.unit.nva.client.HttpClientProvider;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.UnauthorizedException;
@@ -33,6 +32,8 @@ import static io.vavr.control.Try.of;
 import static io.vavr.control.Try.ofSupplier;
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static no.unit.nva.client.RetryConfigProvider.defaultRetryRegistry;
+import static no.unit.nva.client.RetryConfigProvider.defaultRetryRegistryAsync;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.basicAuthHeader;
@@ -75,12 +76,12 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
-        return client.sendAsync(
-            HttpRequest.newBuilder(addLanguage(uri))
-                .GET()
-                .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
-                .build(),
-            BodyHandlers.ofString(StandardCharsets.UTF_8));
+        var httpRequest = HttpRequest.newBuilder(addLanguage(uri))
+                              .GET()
+                              .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                              .build();
+
+        return fetchAsyncResponseWithRetry(httpRequest);
     }
 
     /**
@@ -89,13 +90,27 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public CompletableFuture<HttpResponse<String>> authenticatedFetchGetResultAsync(URI uri) {
-        return client.sendAsync(
-            HttpRequest.newBuilder(addLanguage(uri))
-                .GET()
-                .header(AUTHORIZATION, basicAuthHeader())
-                .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
-                .build(),
-            BodyHandlers.ofString(StandardCharsets.UTF_8));
+        var httpRequest = HttpRequest.newBuilder(addLanguage(uri))
+                              .GET()
+                              .header(AUTHORIZATION, basicAuthHeader())
+                              .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                              .build();
+
+        return fetchAsyncResponseWithRetry(httpRequest);
+    }
+
+    private CompletableFuture<HttpResponse<String>> fetchAsyncResponseWithRetry(HttpRequest httpRequest) {
+        var retryRegistryAsync = defaultRetryRegistryAsync();
+        var retryWithDefaultConfigAsync = retryRegistryAsync.retry("executeRequestAsync");
+        Supplier<CompletableFuture<HttpResponse<String>>> supplier = () -> executeRequestAsync(httpRequest);
+
+        return ofSupplier(Retry.decorateSupplier(retryWithDefaultConfigAsync, supplier))
+                   .getOrElseThrow(throwable -> new RuntimeException(throwable.getMessage()));
+    }
+
+    private CompletableFuture<HttpResponse<String>> executeRequestAsync(HttpRequest httpRequest) {
+        return of(() -> client.sendAsync(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8)))
+                   .getOrElseThrow(throwable -> new RuntimeException(throwable.getMessage()));
     }
 
     /**
@@ -150,7 +165,7 @@ public class ApiClient {
     }
 
     private HttpResponse<String> fetchResponseWithRetry(HttpRequest httpRequest) {
-        var retryRegistry = HttpClientProvider.defaultRetryRegistry();
+        var retryRegistry = defaultRetryRegistry();
         var retryWithDefaultConfig = retryRegistry.retry("executeRequest");
         Supplier<HttpResponse<String>> supplier = () -> executeRequest(httpRequest);
 
@@ -158,7 +173,7 @@ public class ApiClient {
                    .getOrElseThrow(throwable -> new RuntimeException(throwable.getMessage()));
     }
 
-    protected HttpResponse<String> executeRequest(HttpRequest httpRequest) {
+    private HttpResponse<String> executeRequest(HttpRequest httpRequest) {
         return of(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8)))
                    .getOrElseThrow(throwable -> new RuntimeException(throwable.getMessage()));
     }
