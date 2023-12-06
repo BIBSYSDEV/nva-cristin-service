@@ -130,7 +130,6 @@ class QueryCristinProjectHandlerTest {
     private static final String URI_WITH_TEN_NUMBER_OF_RESULTS =
         "https://api.dev.nva.aws.unit.no/cristin/project?page=1&results=10&title=reindeer";
     private static final String ALLOW_ALL_ORIGIN = "*";
-    private static final String API_RESPONSE_NON_ENRICHED_PROJECTS_JSON = "nvaApiGetResponseNonEnrichedProjects.json";
     private static final String API_QUERY_RESPONSE_NO_PROJECTS_FOUND_JSON =
         "nvaApiGetQueryResponseNoProjectsFound.json";
     private static final String SAMPLE_NVA_ORGANIZATION =
@@ -207,7 +206,7 @@ class QueryCristinProjectHandlerTest {
     }
 
     @Test
-    void handlerReturnsNonEnrichedBodyWhenEnrichingFails() throws Exception {
+    void handlerReturnsNoResultsWhenEnrichingFails() throws Exception {
         cristinApiClientStub = spy(cristinApiClientStub);
         var response = new HttpResponseFaker(EMPTY_STRING, HttpURLConnection.HTTP_INTERNAL_ERROR);
         doReturn(CompletableFuture.completedFuture(response))
@@ -215,9 +214,9 @@ class QueryCristinProjectHandlerTest {
         doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
         handler = new QueryCristinProjectHandler(clientProvider, environment);
         var gatewayResponse = sendDefaultQuery();
-        var expected = OBJECT_MAPPER.readTree(getBodyFromResource(API_RESPONSE_NON_ENRICHED_PROJECTS_JSON));
-        var actual = OBJECT_MAPPER.readTree(gatewayResponse.getBody());
-        assertEquals(expected, actual);
+        var actual = gatewayResponse.getBodyObject(SearchResponse.class);
+
+        assertEquals(0, actual.getHits().size());
     }
 
     @Test

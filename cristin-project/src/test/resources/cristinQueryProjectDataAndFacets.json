@@ -9,7 +9,23 @@
     "start_date" : "2011-02-01T00:00:00.000Z",
     "end_date" : "2014-02-01T00:00:00.000Z",
     "url" : "https://api.cristin-test.uio.no/v2/projects/323870",
-    "status": "ACTIVE"
+    "status": "ACTIVE",
+    "coordinating_institution" : {
+      "institution" : {
+        "cristin_institution_id" : "1936",
+        "institution_name" : {
+          "en" : "Bergen Hospital Trust - Haukeland University Hospital"
+        },
+        "url" : "https://api.cristin-test.uio.no/v2/institutions/1936"
+      },
+      "unit" : {
+        "cristin_unit_id" : "1936.0.0.0",
+        "unit_name" : {
+          "en" : "Bergen Hospital Trust - Haukeland University Hospital"
+        },
+        "url" : "https://api.cristin-test.uio.no/v2/units/1936.0.0.0"
+      }
+    }
   } ],
   "facets" : {
     "institution_coordinating_idfacet" : [ {
