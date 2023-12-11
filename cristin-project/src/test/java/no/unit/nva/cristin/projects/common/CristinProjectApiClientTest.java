@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects.common;
 
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.exception.FailedHttpRequestException;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import org.junit.jupiter.api.Test;
 
@@ -67,7 +68,7 @@ public class CristinProjectApiClientTest {
     void returnsFetchGetResultHandlesException() throws IOException, InterruptedException {
         var mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(), any())).thenThrow(new RuntimeException(""));
-        assertThrows(RuntimeException.class,
+        assertThrows(FailedHttpRequestException.class,
                      () -> new CristinProjectApiClient(mockHttpClient).fetchGetResult(LOCALHOST_URI));
     }
 
@@ -87,7 +88,7 @@ public class CristinProjectApiClientTest {
     void returnsFetchQueryResultsHandlesException() throws IOException, InterruptedException {
         var mockHttpClient = mock(HttpClient.class);
         when(mockHttpClient.send(any(), any())).thenThrow(new RuntimeException(""));
-        assertThrows(RuntimeException.class,
+        assertThrows(FailedHttpRequestException.class,
                      () -> new CristinProjectApiClient(mockHttpClient).fetchQueryResults(LOCALHOST_URI));
     }
 

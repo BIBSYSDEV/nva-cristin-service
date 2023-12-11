@@ -1,8 +1,9 @@
 package no.unit.nva.cristin.common.client;
 
+import io.github.resilience4j.retry.Retry;
+import java.util.function.Supplier;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.exception.FailedHttpRequestException;
-import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.exception.UnauthorizedException;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
@@ -20,7 +21,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +28,14 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static io.vavr.control.Try.of;
+import static io.vavr.control.Try.ofSupplier;
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static no.unit.nva.client.RetryConfigProvider.defaultRetryRegistry;
+import static no.unit.nva.client.RetryConfigProvider.defaultRetryRegistryAsync;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.basicAuthHeader;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME;
@@ -71,12 +76,12 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public CompletableFuture<HttpResponse<String>> fetchGetResultAsync(URI uri) {
-        return client.sendAsync(
-            HttpRequest.newBuilder(addLanguage(uri))
-                .GET()
-                .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
-                .build(),
-            BodyHandlers.ofString(StandardCharsets.UTF_8));
+        var httpRequest = HttpRequest.newBuilder(addLanguage(uri))
+                              .GET()
+                              .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                              .build();
+
+        return fetchAsyncResponseWithRetry(httpRequest);
     }
 
     /**
@@ -85,13 +90,25 @@ public class ApiClient {
      * @return response containing data from requested URI or error
      */
     public CompletableFuture<HttpResponse<String>> authenticatedFetchGetResultAsync(URI uri) {
-        return client.sendAsync(
-            HttpRequest.newBuilder(addLanguage(uri))
-                .GET()
-                .header(AUTHORIZATION, basicAuthHeader())
-                .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
-                .build(),
-            BodyHandlers.ofString(StandardCharsets.UTF_8));
+        var httpRequest = HttpRequest.newBuilder(addLanguage(uri))
+                              .GET()
+                              .header(AUTHORIZATION, basicAuthHeader())
+                              .header(CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME, CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE)
+                              .build();
+
+        return fetchAsyncResponseWithRetry(httpRequest);
+    }
+
+    private CompletableFuture<HttpResponse<String>> fetchAsyncResponseWithRetry(HttpRequest httpRequest) {
+        var retryRegistryAsync = defaultRetryRegistryAsync();
+        var retryWithDefaultConfigAsync = retryRegistryAsync.retry("executeRequestAsync");
+        Supplier<CompletableFuture<HttpResponse<String>>> supplier = () -> executeRequestAsync(httpRequest);
+
+        return ofSupplier(Retry.decorateSupplier(retryWithDefaultConfigAsync, supplier)).get();
+    }
+
+    private CompletableFuture<HttpResponse<String>> executeRequestAsync(HttpRequest httpRequest) {
+        return of(() -> client.sendAsync(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8))).get();
     }
 
     /**
@@ -135,17 +152,28 @@ public class ApiClient {
     }
 
     protected HttpResponse<String> getSuccessfulResponseOrThrowException(HttpRequest httpRequest)
-        throws GatewayTimeoutException, FailedHttpRequestException {
+        throws FailedHttpRequestException {
 
         try {
-            return client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8));
-        } catch (HttpTimeoutException timeoutException) {
-            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), timeoutException);
-            throw new GatewayTimeoutException();
-        } catch (IOException | InterruptedException otherException) {
-            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), otherException);
-            throw new FailedHttpRequestException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+            return fetchResponseWithRetry(httpRequest);
+        } catch (Exception ex) {
+            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), ex);
+            throw new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
+    }
+
+    private HttpResponse<String> fetchResponseWithRetry(HttpRequest httpRequest) {
+        var retryRegistry = defaultRetryRegistry();
+        var retryWithDefaultConfig = retryRegistry.retry("executeRequest");
+        Supplier<HttpResponse<String>> supplier = () -> executeRequest(httpRequest);
+
+        return ofSupplier(Retry.decorateSupplier(retryWithDefaultConfig, supplier))
+                   .getOrElseThrow(throwable -> new RuntimeException(throwable.getMessage()));
+    }
+
+    private HttpResponse<String> executeRequest(HttpRequest httpRequest) {
+        return of(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8)))
+                   .getOrElseThrow(throwable -> new RuntimeException(throwable.getMessage()));
     }
 
     /**
@@ -171,7 +199,7 @@ public class ApiClient {
 
     private <T> BadGatewayException logAndThrowDeserializationError(HttpResponse<String> response, Failure<T> failure) {
         logError(ErrorMessages.ERROR_MESSAGE_READING_RESPONSE_FAIL, response.body(), failure.getException());
-        return new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+        return new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
     }
 
     protected void logError(String message, String data, Exception failure) {
@@ -206,10 +234,11 @@ public class ApiClient {
         List<CompletableFuture<HttpResponse<String>>> responsesContainer) {
 
         return responsesContainer.stream()
-            .map(attempt(CompletableFuture::get))
-            .map(Try::get)
-            .filter(this::isSuccessfulRequest)
-            .collect(Collectors.toList());
+                   .map(attempt(CompletableFuture::get))
+                   .filter(Try::isSuccess)
+                   .map(Try::get)
+                   .filter(this::isSuccessfulRequest)
+                   .collect(Collectors.toList());
     }
 
     private boolean isSuccessfulRequest(HttpResponse<String> response) {
@@ -236,7 +265,7 @@ public class ApiClient {
             throw new BadGatewayException(RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER);
         } else if (remoteServerHasInternalProblems(statusCode)) {
             logBackendFetchFail(getUriAsString(uri), statusCode, body);
-            throw new BadGatewayException(ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED);
+            throw new BadGatewayException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         } else if (errorIsUnknown(statusCode)) {
             logBackendFetchFail(getUriAsString(uri), statusCode, body);
             throw new RuntimeException();
