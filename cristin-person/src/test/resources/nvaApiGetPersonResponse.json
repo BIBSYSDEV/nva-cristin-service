@@ -31,7 +31,9 @@
     }
   ],
   "contactDetails": {
-    "telephone": "+4799885566"
+    "telephone": "+4799885566",
+    "email": "kjell@ola.no",
+    "webPage": "https://www.kjell.no"
   },
   "image": "https://api.cristin.no/v2/persons/359084/picture",
   "affiliations": [

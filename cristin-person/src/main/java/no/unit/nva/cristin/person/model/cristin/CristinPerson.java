@@ -70,6 +70,8 @@ public class CristinPerson implements JsonSerializable {
     private List<CristinTypedLabel> keywords;
     private Map<String, String> background;
     private CristinPersonNvi personNvi;
+    private String email;
+    private String webPage;
 
     public String getCristinPersonId() {
         return cristinPersonId;
@@ -200,6 +202,22 @@ public class CristinPerson implements JsonSerializable {
         this.personNvi = personNvi;
     }
 
+    public Optional<String> getEmail() {
+        return Optional.ofNullable(email);
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Optional<String> getWebPage() {
+        return Optional.ofNullable(webPage);
+    }
+
+    public void setWebPage(String webPage) {
+        this.webPage = webPage;
+    }
+
     /**
      * Creates a Nva person model from a Cristin person model. If the person is not publicly viewable, only returns
      * identifier.
@@ -262,7 +280,13 @@ public class CristinPerson implements JsonSerializable {
     }
 
     private ContactDetails extractContactDetails() {
-        return getTel().map(ContactDetails::new).orElse(null);
+        if (getTel().isPresent() || getEmail().isPresent() || getWebPage().isPresent()) {
+            return new ContactDetails(getTel().orElse(null),
+                                      getEmail().orElse(null),
+                                      getWebPage().orElse(null));
+        }
+
+        return null;
     }
 
     private URI extractIdUri() {
