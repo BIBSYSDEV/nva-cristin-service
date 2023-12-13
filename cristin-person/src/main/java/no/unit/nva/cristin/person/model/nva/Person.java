@@ -259,6 +259,12 @@ public class Person implements JsonSerializable {
             cristinPerson.setPersonNvi(cristinPersonNvi);
         }
 
+        if (nonNull(getContactDetails())) {
+            cristinPerson.setTel(getContactDetails().getTelephone().orElse(null));
+            cristinPerson.setEmail(getContactDetails().getEmail().orElse(null));
+            cristinPerson.setWebPage(getContactDetails().getWebPage().orElse(null));
+        }
+
         return cristinPerson;
     }
 
