@@ -11,6 +11,7 @@ import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.paths.UriWrapper;
@@ -488,7 +489,7 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     private InputStream createRequest(String body, String scope, URI orgId,
-                                      String... accessRight)
+                                      AccessRight... accessRight)
         throws JsonProcessingException {
 
         var customerId = randomUri();

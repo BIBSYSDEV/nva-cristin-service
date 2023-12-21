@@ -25,8 +25,8 @@ import static nva.commons.core.attempt.Try.attempt;
 
 public class AccessUtils {
 
-    public static final String EDIT_OWN_INSTITUTION_USERS = "EDIT_OWN_INSTITUTION_USERS";
-    public static final String MANAGE_OWN_PROJECTS = AccessRight.MANAGE_OWN_PROJECTS.toString();
+    public static final AccessRight EDIT_OWN_INSTITUTION_USERS = AccessRight.EDIT_OWN_INSTITUTION_USERS;
+    public static final AccessRight MANAGE_OWN_PROJECTS = AccessRight.MANAGE_OWN_PROJECTS;
     public static final String ACCESS_TOKEN_CLAIMS_SCOPE_FIELD = "scope";
     public static final String ACCESS_TOKEN_CLAIMS_FIELD = "claims";
     public static final String AUTHORIZER_FIELD = "authorizer";
@@ -46,7 +46,7 @@ public class AccessUtils {
     public static final String COGNITO_AUTHENTICATION_DOMAIN = "COGNITO_AUTHENTICATION_DOMAIN";
     public static final String COGNITO_TOKEN_ENDPOINT = "oauth2/token";
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
-    public static final String ADMINISTRATE_APPLICATION = "ADMINISTRATE_APPLICATION";
+    public static final AccessRight ADMINISTRATE_APPLICATION = AccessRight.ADMINISTRATE_APPLICATION;
 
     /**
      * Validate if Requester is authorized to use IdentificationNumber to access a user.

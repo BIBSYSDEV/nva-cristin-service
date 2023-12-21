@@ -16,6 +16,7 @@ import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.Environment;
@@ -383,7 +384,7 @@ public class FetchCristinProjectHandlerTest {
 
     @Test
     void shouldReturnForbiddenForRestrictedProjectWhenUserHasLegacyRights() throws Exception {
-        final String legacyAccessRight = "EDIT_OWN_INSTITUTION_PROJECTS";
+        final AccessRight legacyAccessRight = AccessRight.EDIT_OWN_INSTITUTION_PROJECTS;
         cristinApiClientStub = spy(cristinApiClientStub);
         doReturn(new HttpResponseFaker(EMPTY_STRING, HTTP_UNAUTHORIZED)).when(cristinApiClientStub)
             .fetchGetResult(any());
@@ -453,13 +454,13 @@ public class FetchCristinProjectHandlerTest {
         return IoUtils.stringFromResources(Path.of(resource));
     }
 
-    private GatewayResponse<NvaProject> sendQueryWithPersonIdAndAccessRight(String accessRight) throws IOException {
+    private GatewayResponse<NvaProject> sendQueryWithPersonIdAndAccessRight(AccessRight accessRight) throws IOException {
         var input = requestWithPersonIdAndAccessRight(accessRight);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, NvaProject.class);
     }
 
-    private InputStream requestWithPersonIdAndAccessRight(String accessRight)
+    private InputStream requestWithPersonIdAndAccessRight(AccessRight accessRight)
         throws JsonProcessingException {
 
         var customerId = randomUri();
