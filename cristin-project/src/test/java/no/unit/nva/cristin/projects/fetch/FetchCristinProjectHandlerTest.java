@@ -454,7 +454,8 @@ public class FetchCristinProjectHandlerTest {
         return IoUtils.stringFromResources(Path.of(resource));
     }
 
-    private GatewayResponse<NvaProject> sendQueryWithPersonIdAndAccessRight(AccessRight accessRight) throws IOException {
+    private GatewayResponse<NvaProject> sendQueryWithPersonIdAndAccessRight(AccessRight accessRight)
+        throws IOException {
         var input = requestWithPersonIdAndAccessRight(accessRight);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, NvaProject.class);

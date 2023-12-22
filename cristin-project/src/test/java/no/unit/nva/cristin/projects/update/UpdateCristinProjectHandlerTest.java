@@ -309,6 +309,7 @@ class UpdateCristinProjectHandlerTest {
                    .withPathParameters(validPath)
                    .build();
     }
+
     private InputStream generateInputWithPayloadAndRequesterPersonCristinId(AccessRight accessRight)
         throws JsonProcessingException {
 
