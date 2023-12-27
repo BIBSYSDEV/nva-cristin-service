@@ -56,6 +56,7 @@ import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.DateInfo;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
@@ -550,7 +551,6 @@ class CreateCristinProjectHandlerTest {
         var input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
                         .withBody(randomNvaProject)
                         .withCurrentCustomer(customerId)
-                        .withAccessRights(customerId, NO_ACCESS)
                         .build();
         handler.handleRequest(input, output, context);
         var response = GatewayResponse.fromOutputStream(output, Object.class);
@@ -567,7 +567,7 @@ class CreateCristinProjectHandlerTest {
         var input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
                         .withBody(randomNvaProject)
                         .withCurrentCustomer(customerId)
-                        .withAccessRights(customerId, "EDIT_OWN_INSTITUTION_PROJECTS")
+                        .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_PROJECTS)
                         .build();
         handler.handleRequest(input, output, context);
         var response = GatewayResponse.fromOutputStream(output, Object.class);

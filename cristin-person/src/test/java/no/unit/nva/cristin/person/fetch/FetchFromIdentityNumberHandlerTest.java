@@ -45,6 +45,7 @@ import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.exception.UnauthorizedException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
@@ -197,7 +198,7 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     private GatewayResponse<Person> sendQueryWithUnauthorizedAccessRight() throws IOException {
-        try (var input = requestWithParams(defaultBody(), EMPTY_MAP, randomString())) {
+        try (var input = requestWithParams(defaultBody(), EMPTY_MAP, AccessRight.MANAGE_IMPORT)) {
             handler.handleRequest(input, output, context);
         }
         return GatewayResponse.fromOutputStream(output, Person.class);
@@ -212,7 +213,7 @@ public class FetchFromIdentityNumberHandlerTest {
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
-    private InputStream requestWithParams(TypedValue body, Map<String, String> queryParams, String accessRight)
+    private InputStream requestWithParams(TypedValue body, Map<String, String> queryParams, AccessRight accessRight)
         throws JsonProcessingException {
         var customerId = randomUri();
         return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)

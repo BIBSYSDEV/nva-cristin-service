@@ -263,7 +263,7 @@ class ListCristinOrganizationPersonsHandlerTest {
         return new HandlerRequestBuilder<Void>(restApiMapper)
                    .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                    .withCurrentCustomer(customerId)
-                   .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS.toString())
+                   .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS)
                    .build();
     }
 

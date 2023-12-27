@@ -78,6 +78,7 @@ import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
@@ -102,7 +103,6 @@ class UpdateCristinProjectHandlerTest {
     public static final String CRISTIN_PRO_PARTICIPANT_CODE = "PRO_PARTICIPANT";
     public static final String CRISTIN_PRO_MANAGER_CODE = "PRO_MANAGER";
     public static final String ANOTHER_IDENTIFIER_THAN_USER = "999888";
-    public static final String NO_ACCESS = "noAccess";
     public static final String NOT_SOME_WEBPAGE = "<script>1</script>";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
@@ -228,15 +228,6 @@ class UpdateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldReturnForbiddenOnUpdateOfProjectWhenHavingLegacyAccessRight() throws IOException {
-        final var legacyAccessRight = "EDIT_OWN_INSTITUTION_PROJECTS";
-        var input = IoUtils.stringFromResources(Path.of(PATCH_REQUEST_JSON));
-        var gatewayResponse = sendQuery(input, legacyAccessRight);
-
-        assertEquals(HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
-    }
-
-    @Test
     void shouldAllowCreatorWithCorrectRoleToEditOwnProject() throws Exception {
         var fetchedProjectJson = cristinProjectWithCreatorData().toString();
         mockFetchResponse(fetchedProjectJson);
@@ -279,7 +270,7 @@ class UpdateCristinProjectHandlerTest {
             cristinProjectWithParticipantRoles(ANOTHER_IDENTIFIER_THAN_USER, CRISTIN_PRO_MANAGER_CODE).toString();
         mockFetchResponse(fetchedProjectJson);
 
-        var input = generateInputWithPayloadAndRequesterPersonCristinId(NO_ACCESS);
+        var input = generateInputWithPayloadAndRequesterPersonCristinId();
         handler.handleRequest(input, output, context);
         var response =  GatewayResponse.fromOutputStream(output, Void.class);
 
@@ -291,7 +282,7 @@ class UpdateCristinProjectHandlerTest {
         var fetchedProjectJson = cristinProjectWithManagerAndCreatorAsTheSame().toString();
         mockFetchResponse(fetchedProjectJson);
 
-        var input = generateInputWithPayloadAndRequesterPersonCristinId(NO_ACCESS);
+        var input = generateInputWithPayloadAndRequesterPersonCristinId();
         handler.handleRequest(input, output, context);
         var response =  GatewayResponse.fromOutputStream(output, Void.class);
 
@@ -304,7 +295,22 @@ class UpdateCristinProjectHandlerTest {
             .when(httpClientMockFetch).<String>send(any(),any());
     }
 
-    private InputStream generateInputWithPayloadAndRequesterPersonCristinId(String accessRight)
+    private InputStream generateInputWithPayloadAndRequesterPersonCristinId()
+        throws JsonProcessingException {
+
+        var body = IoUtils.stringFromResources(Path.of(PATCH_REQUEST_JSON));
+        var customerId = randomUri();
+        var personCristinId = UriWrapper.fromUri(randomUri()).addChild(USER_IDENTIFIER).getUri();
+
+        return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+                   .withBody(body)
+                   .withCurrentCustomer(customerId)
+                   .withPersonCristinId(personCristinId)
+                   .withPathParameters(validPath)
+                   .build();
+    }
+
+    private InputStream generateInputWithPayloadAndRequesterPersonCristinId(AccessRight accessRight)
         throws JsonProcessingException {
 
         var body = IoUtils.stringFromResources(Path.of(PATCH_REQUEST_JSON));
@@ -335,13 +341,13 @@ class UpdateCristinProjectHandlerTest {
         return sendQuery(body, MANAGE_OWN_PROJECTS);
     }
 
-    private GatewayResponse<Void> sendQuery(String body, String accessRight) throws IOException {
+    private GatewayResponse<Void> sendQuery(String body, AccessRight accessRight) throws IOException {
         var input = createRequest(body, accessRight);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
-    private InputStream createRequest(String body, String accessRight) throws JsonProcessingException {
+    private InputStream createRequest(String body, AccessRight accessRight) throws JsonProcessingException {
         var customerId = randomUri();
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                    .withBody(body)

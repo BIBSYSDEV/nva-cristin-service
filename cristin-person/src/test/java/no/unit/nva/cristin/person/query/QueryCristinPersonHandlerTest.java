@@ -460,7 +460,7 @@ public class QueryCristinPersonHandlerTest {
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                    .withQueryParameters(queryParameters)
                    .withCurrentCustomer(customerId)
-                   .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS.toString())
+                   .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS)
                    .build();
     }
 
@@ -520,7 +520,7 @@ public class QueryCristinPersonHandlerTest {
         if (authorized) {
             var customerId = randomUri();
             input.withCurrentCustomer(customerId)
-                .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS.toString());
+                .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS);
         }
 
         handler.handleRequest(input.build(), output, context);
