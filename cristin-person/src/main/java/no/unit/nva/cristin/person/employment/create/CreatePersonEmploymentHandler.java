@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
+import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
@@ -68,7 +69,7 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
     }
 
     private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {
-        if (!AccessUtils.requesterIsUserAdministrator(requestInfo) && !requestInfo.userIsApplicationAdmin()) {
+        if (!AccessUtils.requesterIsUserAdministrator(requestInfo) && !requestInfo.userIsAuthorized(MANAGE_CUSTOMERS)) {
             throw new ForbiddenException();
         }
     }
@@ -76,7 +77,7 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
     private String fullAccessValueOrInstitutionNumber(RequestInfo requestInfo)
         throws BadRequestException, ForbiddenException {
 
-        return requestInfo.userIsApplicationAdmin()
+        return requestInfo.userIsAuthorized(MANAGE_CUSTOMERS)
                    ? CAN_UPDATE_ANY_INSTITUTION : extractCristinInstitutionIdentifier(requestInfo);
     }
 }

@@ -46,7 +46,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.ioutils.IoUtils.stringFromResources;
 import static nva.commons.core.paths.UriWrapper.fromUri;
@@ -350,7 +350,7 @@ public class FetchCristinPersonHandlerTest {
                         .withBody(null)
                         .withPathParameters(VALID_PATH_PARAM)
                         .withCurrentCustomer(customerId)
-                        .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                        .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
                         .build();
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Person.class);

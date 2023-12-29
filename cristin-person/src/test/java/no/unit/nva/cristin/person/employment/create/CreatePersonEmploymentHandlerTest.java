@@ -8,8 +8,8 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.ADMINISTRATE_APPLICATION;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -126,7 +126,7 @@ public class CreatePersonEmploymentHandlerTest {
     }
 
     @Test
-    void shouldBeAllowedToCreateEmploymentAtAllInstitutionsWhenIsApplicationAdministrator() throws IOException {
+    void shouldBeAllowedToCreateEmploymentAtAllInstitutionsWhenIsAdministrator() throws IOException {
         var dummyEmployment = randomEmployment();
         var gatewayResponse = queryAsAppAdmin(dummyEmployment);
 
@@ -150,7 +150,7 @@ public class CreatePersonEmploymentHandlerTest {
         return new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
             .withBody(body)
             .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+            .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
             .withPathParameters(validPath)
             .build();
     }
@@ -171,7 +171,7 @@ public class CreatePersonEmploymentHandlerTest {
                                 .withBody(body)
                                 .withCurrentCustomer(customerId)
                                 .withTopLevelCristinOrgId(TOP_ORG_ID)
-                                .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                                .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
                                 .withPathParameters(validPath)
                                 .build();
         handler.handleRequest(input, output, context);
@@ -184,7 +184,7 @@ public class CreatePersonEmploymentHandlerTest {
         var input = new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
                         .withBody(body)
                         .withCurrentCustomer(customerId)
-                        .withAccessRights(customerId, ADMINISTRATE_APPLICATION)
+                        .withAccessRights(customerId, MANAGE_CUSTOMERS)
                         .withPathParameters(validPath)
                         .build();
         handler.handleRequest(input, output, context);

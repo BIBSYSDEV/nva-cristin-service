@@ -6,7 +6,7 @@ import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.institution.update.UpdatePersonInstitutionInfoClient.EMPTY_JSON;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -104,7 +104,7 @@ public class UpdatePersonInstitutionInfoHandlerTest {
         return new HandlerRequestBuilder<PersonInstInfoPatch>(OBJECT_MAPPER)
             .withBody(body)
             .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+            .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
             .withPathParameters(pathParam)
             .build();
     }

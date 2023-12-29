@@ -1,7 +1,6 @@
 package no.unit.nva.utils;
 
 import no.unit.nva.commons.json.JsonUtils;
-import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.core.Environment;
@@ -21,12 +20,11 @@ import java.util.Base64;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.http.HttpRequest.newBuilder;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class AccessUtils {
 
-    public static final AccessRight EDIT_OWN_INSTITUTION_USERS = AccessRight.EDIT_OWN_INSTITUTION_USERS;
-    public static final AccessRight MANAGE_OWN_PROJECTS = AccessRight.MANAGE_OWN_PROJECTS;
     public static final String ACCESS_TOKEN_CLAIMS_SCOPE_FIELD = "scope";
     public static final String ACCESS_TOKEN_CLAIMS_FIELD = "claims";
     public static final String AUTHORIZER_FIELD = "authorizer";
@@ -46,7 +44,6 @@ public class AccessUtils {
     public static final String COGNITO_AUTHENTICATION_DOMAIN = "COGNITO_AUTHENTICATION_DOMAIN";
     public static final String COGNITO_TOKEN_ENDPOINT = "oauth2/token";
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
-    public static final AccessRight ADMINISTRATE_APPLICATION = AccessRight.ADMINISTRATE_APPLICATION;
 
     /**
      * Validate if Requester is authorized to use IdentificationNumber to access a user.
@@ -58,7 +55,7 @@ public class AccessUtils {
         if (requesterHasNoAccessRightToUseNationalIdentificationNumber(requestInfo)) {
             String nvaUsername = attempt(requestInfo::getUserName).orElse(fail -> null);
             logger.warn(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT,
-                    nvaUsername, EDIT_OWN_INSTITUTION_USERS);
+                    nvaUsername, MANAGE_OWN_AFFILIATION);
             throw new ForbiddenException();
         }
     }
@@ -71,11 +68,11 @@ public class AccessUtils {
      * @return true if user administrator otherwise false
      */
     public static boolean requesterIsUserAdministrator(RequestInfo requestInfo) {
-        return requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS) || requestInfo.clientIsInternalBackend();
+        return requestInfo.userIsAuthorized(MANAGE_OWN_AFFILIATION) || requestInfo.clientIsInternalBackend();
     }
 
     private static boolean requesterHasNoAccessRightToUseNationalIdentificationNumber(RequestInfo requestInfo) {
-        return !(requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS) || requestInfo.clientIsInternalBackend());
+        return !(requestInfo.userIsAuthorized(MANAGE_OWN_AFFILIATION) || requestInfo.clientIsInternalBackend());
     }
 
     /**
