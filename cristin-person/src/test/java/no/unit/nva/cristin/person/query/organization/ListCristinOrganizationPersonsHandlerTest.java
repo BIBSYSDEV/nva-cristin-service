@@ -14,7 +14,6 @@ import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.UriUtils;
-import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
@@ -49,6 +48,7 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_ID
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
@@ -263,7 +263,7 @@ class ListCristinOrganizationPersonsHandlerTest {
         return new HandlerRequestBuilder<Void>(restApiMapper)
                    .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                    .withCurrentCustomer(customerId)
-                   .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS)
+                   .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
                    .build();
     }
 

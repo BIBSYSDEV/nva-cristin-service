@@ -1,6 +1,5 @@
 package no.unit.nva.cognito;
 
-import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.AccessRight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +28,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_RESOURCES;
 
 public class CognitoUtil {
 
@@ -138,7 +139,7 @@ public class CognitoUtil {
     }
 
     private static String constructAccessRights() {
-        return Stream.of(AccessUtils.EDIT_OWN_INSTITUTION_USERS, AccessUtils.MANAGE_OWN_PROJECTS)
+        return Stream.of(MANAGE_OWN_AFFILIATION, MANAGE_OWN_RESOURCES)
             .map(AccessRight::toPersistedString)
             .collect(Collectors.joining(MULTI_VALUE_DELIMITER));
     }

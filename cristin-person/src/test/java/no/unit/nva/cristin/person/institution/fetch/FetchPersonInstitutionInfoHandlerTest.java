@@ -12,7 +12,7 @@ import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -190,7 +190,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
         var customerId = randomUri();
         try (var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                                      .withCurrentCustomer(customerId)
-                                     .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                                     .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
                                      .withQueryParameters(Map.of(randomString(), randomString()))
                                      .withPathParameters(
                                          Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID))
@@ -220,7 +220,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
             .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+            .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
             .withPathParameters(pathParams)
             .build();
     }

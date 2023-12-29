@@ -4,7 +4,7 @@ import static no.unit.nva.cristin.model.Constants.EMPLOYMENT_ID;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -86,7 +86,7 @@ class DeletePersonEmploymentHandlerTest {
 
         return new HandlerRequestBuilder<CristinPersonEmployment>(OBJECT_MAPPER)
             .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+            .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
             .withBody(null)
             .withPathParameters(Map.of(PERSON_ID, INVALID_PERSON_ID, EMPLOYMENT_ID, VALID_EMPLOYMENT_ID))
             .build();
@@ -97,7 +97,7 @@ class DeletePersonEmploymentHandlerTest {
 
         return new HandlerRequestBuilder<CristinPersonEmployment>(OBJECT_MAPPER)
             .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+            .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
             .withBody(null)
             .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, EMPLOYMENT_ID, INVALID_EMPLOYMENT_ID))
             .build();

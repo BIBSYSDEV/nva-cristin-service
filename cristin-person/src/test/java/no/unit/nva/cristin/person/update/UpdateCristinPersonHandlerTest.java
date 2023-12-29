@@ -58,8 +58,7 @@ import static no.unit.nva.cristin.person.update.PersonPatchValidator.RESERVED_MU
 import static no.unit.nva.cristin.person.update.UpdateCristinPersonHandler.ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.ADMINISTRATE_APPLICATION;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.apigateway.RequestInfoConstants.BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
@@ -460,8 +459,7 @@ public class UpdateCristinPersonHandlerTest {
     }
 
     private GatewayResponse<Void> sendQueryAsInstAdminWithSomeOrgId(String body, URI orgId) throws IOException {
-        try (var input = createRequest(body, null, orgId, EDIT_OWN_INSTITUTION_USERS,
-                                       ADMINISTRATE_APPLICATION)) {
+        try (var input = createRequest(body, null, orgId, MANAGE_OWN_AFFILIATION)) {
             handler.handleRequest(input, output, context);
         }
         return GatewayResponse.fromOutputStream(output, Void.class);
@@ -509,7 +507,7 @@ public class UpdateCristinPersonHandlerTest {
             .withBody(body)
             .withPathParameters(pathParam)
             .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+            .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
             .build();
     }
 

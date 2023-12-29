@@ -21,7 +21,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.POPULAR_SCIENTIFIC_SUM
 import static no.unit.nva.cristin.model.JsonPropertyNames.PROJECT_CATEGORIES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.RELATED_PROJECTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
-import static no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck.MANAGE_OWN_PROJECTS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinContactInfo.CRISTIN_CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.EQUIPMENT;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
@@ -44,6 +43,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.validation.PatchValidator.COULD_NOT_PARSE_LANGUAGE_FIELD;
 import static no.unit.nva.validation.PatchValidator.ILLEGAL_VALUE_FOR_PROPERTY;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_RESOURCES;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -232,7 +232,7 @@ class UpdateCristinProjectHandlerTest {
         var fetchedProjectJson = cristinProjectWithCreatorData().toString();
         mockFetchResponse(fetchedProjectJson);
 
-        var input = generateInputWithPayloadAndRequesterPersonCristinId(MANAGE_OWN_PROJECTS);
+        var input = generateInputWithPayloadAndRequesterPersonCristinId(MANAGE_OWN_RESOURCES);
         handler.handleRequest(input, output, context);
         var response =  GatewayResponse.fromOutputStream(output, Void.class);
 
@@ -244,7 +244,7 @@ class UpdateCristinProjectHandlerTest {
         var fetchedProjectJson = cristinProjectWithManagerData().toString();
         mockFetchResponse(fetchedProjectJson);
 
-        var input = generateInputWithPayloadAndRequesterPersonCristinId(MANAGE_OWN_PROJECTS);
+        var input = generateInputWithPayloadAndRequesterPersonCristinId(MANAGE_OWN_RESOURCES);
         handler.handleRequest(input, output, context);
         var response =  GatewayResponse.fromOutputStream(output, Void.class);
 
@@ -257,7 +257,7 @@ class UpdateCristinProjectHandlerTest {
         var fetchedProjectJson = cristinProjectWithRegularParticipantData().toString();
         mockFetchResponse(fetchedProjectJson);
 
-        var input = generateInputWithPayloadAndRequesterPersonCristinId(MANAGE_OWN_PROJECTS);
+        var input = generateInputWithPayloadAndRequesterPersonCristinId(MANAGE_OWN_RESOURCES);
         handler.handleRequest(input, output, context);
         var response =  GatewayResponse.fromOutputStream(output, Void.class);
 
@@ -338,7 +338,7 @@ class UpdateCristinProjectHandlerTest {
     }
 
     private GatewayResponse<Void> sendQuery(String body) throws IOException {
-        return sendQuery(body, MANAGE_OWN_PROJECTS);
+        return sendQuery(body, MANAGE_OWN_RESOURCES);
     }
 
     private GatewayResponse<Void> sendQuery(String body, AccessRight accessRight) throws IOException {

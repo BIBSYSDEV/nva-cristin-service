@@ -4,12 +4,11 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAY
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.fetch.FetchFromIdentityNumberHandler.NIN_TYPE;
-import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_FIELD;
 import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_SCOPE_FIELD;
 import static no.unit.nva.utils.AccessUtils.AUTHORIZER_FIELD;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -207,7 +206,7 @@ public class FetchFromIdentityNumberHandlerTest {
     private GatewayResponse<Person> sendQuery(TypedValue body, Map<String, String> queryParams)
         throws IOException {
 
-        try (var input = requestWithParams(body, queryParams, EDIT_OWN_INSTITUTION_USERS)) {
+        try (var input = requestWithParams(body, queryParams, MANAGE_OWN_AFFILIATION)) {
             handler.handleRequest(input, output, context);
         }
         return GatewayResponse.fromOutputStream(output, Person.class);
@@ -239,7 +238,7 @@ public class FetchFromIdentityNumberHandlerTest {
         var customerId = randomUri();
         return new HandlerRequestBuilder<Map<String, String>>(OBJECT_MAPPER)
              .withCurrentCustomer(customerId)
-            .withAccessRights(customerId,EDIT_OWN_INSTITUTION_USERS)
+            .withAccessRights(customerId,MANAGE_OWN_AFFILIATION)
             .withBody(INVALID_PAYLOAD)
             .build();
     }

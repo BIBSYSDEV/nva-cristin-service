@@ -23,7 +23,7 @@ import static no.unit.nva.cristin.person.model.nva.Person.mapEmploymentsToCristi
 import static no.unit.nva.testutils.RandomDataGenerator.randomBoolean;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.apigateway.RequestInfoConstants.BACKEND_SCOPE_AS_DEFINED_IN_IDENTITY_SERVICE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
@@ -65,6 +65,7 @@ import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.model.TypedLabel;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.paths.UriWrapper;
@@ -520,7 +521,7 @@ public class CreateCristinPersonHandlerTest {
         return new HandlerRequestBuilder<Person>(OBJECT_MAPPER)
             .withBody(body)
             .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+            .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
             .build();
     }
 
@@ -575,7 +576,7 @@ public class CreateCristinPersonHandlerTest {
                    .withBody(body)
                    .withCurrentCustomer(customerId)
                    .withTopLevelCristinOrgId(cristinOrgId)
-                   .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                   .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
                    .build();
     }
 
@@ -605,7 +606,7 @@ public class CreateCristinPersonHandlerTest {
                              .withCurrentCustomer(customerId)
                              .withPersonCristinId(UriWrapper.fromUri(randomUri()).addChild(DUMMY_CRISTIN_ID).getUri())
                              .withTopLevelCristinOrgId(UriWrapper.fromUri(ONE_ORGANIZATION).getUri())
-                             .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                             .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
                              .build()) {
             handler.handleRequest(input, output, context);
             return GatewayResponse.fromOutputStream(output, Person.class);
