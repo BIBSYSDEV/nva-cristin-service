@@ -33,32 +33,32 @@ Feature: API tests for creating sample Cristin Projects
           'type': 'ProjectManager',
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684651'
           },
           'affiliation': {
             'type': 'Organization',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
           }
         },
         {
           'type': 'ProjectParticipant',
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684652'
           },
           'affiliation': {
             'type': 'Organization',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
           }
         },
         {
           'type': 'ProjectParticipant',
           'identity': {
             'type': 'Person',
-            'email': 'ola.borte.moen@example.org',
+            'email': 'nameless@example.org',
             'phone': '12345678',
-            'firstName':'Ola',
-            'lastName':'Borte'
+            'firstName':'name',
+            'lastName':'less'
           }
         }
       ],
@@ -131,7 +131,7 @@ Feature: API tests for creating sample Cristin Projects
         }
       ],
       'relatedProjects': [
-        'https://api.dev.nva.aws.unit.no/cristin/project/6721135'
+        'https://api.dev.nva.aws.unit.no/cristin/project/2057063'
       ],
       'contactInfo': {
         'type': 'ContactInfo',
@@ -188,7 +188,7 @@ Feature: API tests for creating sample Cristin Projects
           'type': 'ProjectManager',
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684651'
           }
         }
       ]

@@ -14,14 +14,14 @@ Feature: API tests for Cristin Person Update
     * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
     * def simpleUserToken = tokenGenerator.loginUser(simple_user_name, simple_user_password, cognitoClientAppId)
     * def invalidToken = 'just-a-invalid-token-for-now'
-    * def personIdentifier = '1135903'
-    * def nviPersonIdentifier = '1138175'
+    * def personIdentifier = '1684653'
+    * def nviPersonIdentifier = '1684654'
 
     * def updateFieldsRequest =
     """
     {
-      'firstName': 'Helge',
-      'lastName': 'Pettersen',
+      'firstName': 'Cristin Test',
+      'lastName': 'Bruker',
       'preferredFirstName': null,
       'keywords': [
         {
@@ -146,7 +146,7 @@ Feature: API tests for Cristin Person Update
           'type': 'https://api.dev.nva.aws.unit.no/cristin/position#1087',
           'organization': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0',
           'startDate': '2008-01-01T00:00:00Z',
-          'endDate': '2025-12-31T00:00:00Z',
+          'endDate': '2030-12-31T00:00:00Z',
           'fullTimeEquivalentPercentage': 100
         }
       ]
