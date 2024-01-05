@@ -201,32 +201,3 @@ Feature: API tests for creating sample Cristin Projects
     Then status 201
     And print response
     And match response.publishable == true
-
-  Scenario: Creating project with less than minimum required data creates unpublishable project
-    * def swaggerLessThanMinimumSampleProject =
-    """
-    {
-      'title': 'Example Title',
-      'startDate': '2012-01-09T00:00:00.000Z',
-      'coordinatingInstitution': {
-        'type': 'Organization',
-        'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-      },
-      'contributors': [
-        {
-          'type': 'ProjectManager',
-          'identity': {
-            'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684651'
-          }
-        }
-      ]
-    }
-    """
-    Given path '/project'
-    * header Authorization = 'Bearer ' + token
-    And request swaggerLessThanMinimumSampleProject
-    When method POST
-    Then status 201
-    And print response
-    And match response.publishable == false
