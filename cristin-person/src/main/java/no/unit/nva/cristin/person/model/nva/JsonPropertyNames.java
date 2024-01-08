@@ -21,4 +21,7 @@ public class JsonPropertyNames {
     public static final String KEYWORDS = "keywords";
     public static final String BACKGROUND = "background";
     public static final String NVI = "nvi";
+    public static final String CRISTIN_TELEPHONE = "tel";
+    public static final String CRISTIN_WEB_PAGE = "web_page";
+
 }

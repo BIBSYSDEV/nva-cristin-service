@@ -9,13 +9,17 @@ import nva.commons.core.JacocoGenerated;
 @JacocoGenerated
 public class ContactDetails {
 
+    public static final String TELEPHONE = "telephone";
+    public static final String EMAIL = "email";
+    public static final String WEB_PAGE = "webPage";
+
     private final String telephone;
     private final String email;
     private final String webPage;
 
     @JsonCreator
-    public ContactDetails(@JsonProperty("telephone") String telephone, @JsonProperty("email") String email,
-                          @JsonProperty("webPage") String webPage) {
+    public ContactDetails(@JsonProperty(TELEPHONE) String telephone, @JsonProperty(EMAIL) String email,
+                          @JsonProperty(WEB_PAGE) String webPage) {
         this.telephone = telephone;
         this.email = email;
         this.webPage = webPage;
