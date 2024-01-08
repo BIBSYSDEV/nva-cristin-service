@@ -2795,6 +2795,11 @@ components:
             telephone:
               type: string
               pattern: '\+?\d+'
+            email:
+              type: string
+            webPage:
+              type: string
+              format: uri
         image:
           $ref: '#/components/schemas/Id'
         affiliations:
@@ -2888,6 +2893,18 @@ components:
               $ref: '#/components/schemas/Id'
             verifiedAt:
               $ref: '#/components/schemas/Id'
+        contactDetails:
+          type: object
+          description: Contact information
+          properties:
+            telephone:
+              type: string
+              pattern: '\+?\d+'
+            email:
+              type: string
+            webPage:
+              type: string
+              format: uri
     PersonPostResponse:
       type: object
       properties:
@@ -2952,6 +2969,18 @@ components:
             verifiedDate:
               type: string
               format: date-time
+        contactDetails:
+          type: object
+          description: Contact information
+          properties:
+            telephone:
+              type: string
+              pattern: '\+?\d+'
+            email:
+              type: string
+            webPage:
+              type: string
+              format: uri
     PersonPatch:
       type: object
       properties:
@@ -2997,6 +3026,21 @@ components:
               $ref: '#/components/schemas/Id'
             verifiedAt:
               $ref: '#/components/schemas/Id'
+        contactDetails:
+          type: object
+          description: Contact information
+          properties:
+            telephone:
+              type: string
+              nullable: true
+              pattern: '\+?\d+'
+            email:
+              type: string
+              nullable: true
+            webPage:
+              type: string
+              nullable: true
+              format: uri
     PersonNIN:
       type: object
       properties:
@@ -4099,6 +4143,8 @@ components:
             value: 'Nordmann'
         contactDetails:
           telephone: '+4799885566'
+          email: 'example@email.org'
+          webPage: 'www.example.org'
         image: 'https://api.cristin.no/v2/persons/359084/picture'
         affiliations:
           - type: 'Affiliation'
@@ -4174,6 +4220,10 @@ components:
             id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
           verifiedAt:
             id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+        contactDetails:
+          telephone: '+4799885566'
+          email: 'example@email.org'
+          webPage: 'www.example.org'
     PersonPostExample:
       value:
         identifiers:
@@ -4205,6 +4255,10 @@ components:
             id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
           verifiedAt:
             id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+        contactDetails:
+          telephone: '+4799885566'
+          email: 'example@email.org'
+          webPage: 'www.example.org'
     PersonPostResponseExample:
       value:
         '@context': 'https://example.org/person-context.json'
@@ -4264,6 +4318,10 @@ components:
                 acronym: 'UIO'
                 country: 'NO'
           verifiedDate: '2023-10-03T15:00:30Z'
+        contactDetails:
+          telephone: '+4799885566'
+          email: 'example@email.org'
+          webPage: 'www.example.org'
     PersonOrganizationInfoExample:
       value:
         '@context': 'https://ontology.org'
