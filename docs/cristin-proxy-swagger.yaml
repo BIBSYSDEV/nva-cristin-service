@@ -876,6 +876,12 @@ paths:
           required: false
           schema:
             type: number
+        - name: multiple
+          in: query
+          description: Matches multiple fields using only this one param, those being 'cristinId', 'title', 'project_manager', 'participant' and 'grantId'
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
