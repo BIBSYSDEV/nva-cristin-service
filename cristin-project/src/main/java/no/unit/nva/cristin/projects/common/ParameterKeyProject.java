@@ -13,6 +13,7 @@ import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
 import static no.unit.nva.cristin.model.Constants.GRANT_ID_CRISTIN_PARAM;
 import static no.unit.nva.cristin.model.Constants.GRANT_ID_PARAM;
+import static no.unit.nva.cristin.model.Constants.MULTIPLE_PARAM;
 import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_DATE;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_LANGUAGE;
@@ -90,7 +91,8 @@ public enum ParameterKeyProject implements IParameterKey {
                PATTERN_IS_NUMBER,
                ERROR_MESSAGE_INVALID_NUMBER,
                KeyEncoding.NONE),
-    // Facets from here onward
+    MULTIPLE(MULTIPLE_PARAM),
+    // Facets from here onward. For each new param above this line, increment IGNORE_FACET_PARAMETER_INDEX by 1
     SECTOR_FACET(CristinFacetParamKey.SECTOR_PARAM.getKey(), CristinFacetParamKey.SECTOR_PARAM.getNvaKey()),
     COORDINATING_FACET(CristinFacetParamKey.COORDINATING_PARAM.getKey(),
                        CristinFacetParamKey.COORDINATING_PARAM.getNvaKey()),
@@ -106,7 +108,7 @@ public enum ParameterKeyProject implements IParameterKey {
                          CristinFacetParamKey.FUNDING_SOURCE_PARAM.getNvaKey());
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
-    public static final int IGNORE_FACET_PARAMETER_INDEX = 30;
+    public static final int IGNORE_FACET_PARAMETER_INDEX = 31;
 
     public static final Set<ParameterKeyProject> VALID_QUERY_PARAMETERS =
         Arrays.stream(ParameterKeyProject.values())

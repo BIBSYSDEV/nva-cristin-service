@@ -185,6 +185,12 @@ paths:
           required: false
           schema:
             type: number
+        - name: multiple
+          in: query
+          description: Matches multiple fields using only this one param, those being 'cristinId', 'title', 'project_manager', 'participant' and 'grantId'
+          required: false
+          schema:
+            type: string
         - name: categoryFacet
           in: query
           description: Narrow down on project category. Works only for version 2023-11-03-aggregations
