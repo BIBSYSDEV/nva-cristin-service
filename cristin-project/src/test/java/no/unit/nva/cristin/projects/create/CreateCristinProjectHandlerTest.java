@@ -13,7 +13,6 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaP
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomOrganization;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomPerson;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
-import static no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck.MANAGE_OWN_PROJECTS;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_ONE;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_THREE;
 import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.DRUGSTUDY;
@@ -21,6 +20,8 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_RESOURCES;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -56,6 +57,7 @@ import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.DateInfo;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
@@ -550,7 +552,6 @@ class CreateCristinProjectHandlerTest {
         var input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
                         .withBody(randomNvaProject)
                         .withCurrentCustomer(customerId)
-                        .withAccessRights(customerId, NO_ACCESS)
                         .build();
         handler.handleRequest(input, output, context);
         var response = GatewayResponse.fromOutputStream(output, Object.class);
@@ -567,7 +568,7 @@ class CreateCristinProjectHandlerTest {
         var input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
                         .withBody(randomNvaProject)
                         .withCurrentCustomer(customerId)
-                        .withAccessRights(customerId, "EDIT_OWN_INSTITUTION_PROJECTS")
+                        .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
                         .build();
         handler.handleRequest(input, output, context);
         var response = GatewayResponse.fromOutputStream(output, Object.class);
@@ -596,7 +597,7 @@ class CreateCristinProjectHandlerTest {
                         .withCurrentCustomer(customer)
                         .withPersonCristinId(CRISTIN_PERSON_ID)
                         .withTopLevelCristinOrgId(CRISTIN_ORG_ID)
-                        .withAccessRights(customer, MANAGE_OWN_PROJECTS)
+                        .withAccessRights(customer, MANAGE_OWN_RESOURCES)
                         .build();
     }
 
@@ -608,7 +609,7 @@ class CreateCristinProjectHandlerTest {
                    .withBody(nvaProject)
                    .withCurrentCustomer(customer)
                    .withPersonCristinId(CRISTIN_PERSON_ID)
-                   .withAccessRights(customer, MANAGE_OWN_PROJECTS)
+                   .withAccessRights(customer, MANAGE_OWN_RESOURCES)
                    .build();
     }
 
@@ -680,7 +681,7 @@ class CreateCristinProjectHandlerTest {
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
             .withBody(body)
             .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, MANAGE_OWN_PROJECTS)
+            .withAccessRights(customerId, MANAGE_OWN_RESOURCES)
             .build();
     }
 
@@ -697,7 +698,7 @@ class CreateCristinProjectHandlerTest {
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                    .withBody(expected)
                    .withCurrentCustomer(customerId)
-                   .withAccessRights(customerId, MANAGE_OWN_PROJECTS)
+                   .withAccessRights(customerId, MANAGE_OWN_RESOURCES)
                    .build();
     }
 

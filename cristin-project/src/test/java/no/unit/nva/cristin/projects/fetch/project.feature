@@ -166,7 +166,7 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.approvals[0].authorityName == '#present'
 
   Scenario: Fetch returns project with webpage
-    Given path '/project/14336587'
+    Given path '/project/2675101'
     When method GET
     Then status 200
     And match response == '#object'

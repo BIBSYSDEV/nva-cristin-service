@@ -1,6 +1,6 @@
 [versions]
-junit = { strictly = '5.9.3' }
-nva-commons = {strictly = '1.30.5'}
+junit = { strictly = '5.10.0' }
+nva-commons = {strictly = '1.36.7'}
 jackson = { strictly = '2.15.2' }
 mockito = { strictly = '5.3.1' }
 hamcrest = { strictly = '2.2' }
@@ -8,19 +8,19 @@ zalando = { strictly = '0.27.1' }
 javax-ws-rs = { strictly = '2.1.1' }
 jsoup = { strictly = '1.14.3' }
 aws-lambda-java-core = { strictly = '1.2.2' }
-google-guava = { strictly = '32.0.0-jre' }
+google-guava = { strictly = '32.1.2-jre' }
 karate-core = { strictly = '1.1.0' }
 karate-apache = { strictly = '0.9.6' }
 karate-junit5 = { strictly = '1.1.0' }
 log4jApi = { strictly = '2.17.2' }
-slf4j = { strictly = '1.8.0-beta4' }
+slf4j = { require = '2.0.5' }
 nva-language = { strictly = '1.0' }
 awsSdk = { strictly = '1.12.483' }
-awsSdk2 = { strictly = '2.20.102' }
+awsSdk2 = { strictly = '2.20.141' }
 bekkopen-nocommons = { strictly = '0.12.0' }
 com-auth0-jwt = { strictly = '3.18.3' }
 com-auth0-jwks = { strictly = '0.20.2' }
-wiremock = { strictly = '2.35.0' }
+wiremock = { strictly = '3.0.2' }
 apache-http-core = { strictly = '4.4.16' }
 json-assert = { strictly = '1.5.1' }
 vavrVersion = '0.10.4'
@@ -54,7 +54,7 @@ json-assert = { group = 'org.skyscreamer', name = 'jsonassert', version.ref = 'j
 nva-commons-core = { group = 'com.github.bibsysdev', name = 'core', version.ref = 'nva-commons' }
 nva-commons-apigateway = { group = 'com.github.bibsysdev', name = 'apigateway', version.ref = 'nva-commons' }
 nva-language = { group = 'com.github.bibsysdev', name = 'nva-language', version.ref = 'nva-language' }
-nva-secrets = { group = "com.github.bibsysdev", name = "secrets", version.ref = "nva-commons" }
+nva-secrets = { group = 'com.github.bibsysdev', name = 'secrets', version.ref = 'nva-commons' }
 nva-lambdaauthorizer = { group = 'com.github.bibsysdev', name = 'lambdaauthorizer', version.ref = 'nva-commons' }
 
 jackson-core = { group = 'com.fasterxml.jackson.core', name = 'jackson-core', version.ref = 'jackson' }
@@ -88,7 +88,7 @@ com-auth0-jwks = { group = 'com.auth0', name =  'jwks-rsa', version.ref= 'com-au
 
 aws-sdk2-urlconnection = { group = 'software.amazon.awssdk', name = 'url-connection-client', version.ref = 'awsSdk2' }
 
-wiremock = { group = 'com.github.tomakehurst', name = 'wiremock-jre8', version.ref = 'wiremock' }
+wiremock = { group = 'org.wiremock', name = 'wiremock', version.ref = 'wiremock' }
 
 apache-http-core = { group = 'org.apache.httpcomponents', name = 'httpcore', version.ref = 'apache-http-core' }
 

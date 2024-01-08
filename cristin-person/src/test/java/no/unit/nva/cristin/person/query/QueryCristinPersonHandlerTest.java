@@ -58,6 +58,7 @@ import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -460,7 +461,7 @@ public class QueryCristinPersonHandlerTest {
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                    .withQueryParameters(queryParameters)
                    .withCurrentCustomer(customerId)
-                   .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS.toString())
+                   .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
                    .build();
     }
 
@@ -520,7 +521,7 @@ public class QueryCristinPersonHandlerTest {
         if (authorized) {
             var customerId = randomUri();
             input.withCurrentCustomer(customerId)
-                .withAccessRights(customerId, AccessRight.EDIT_OWN_INSTITUTION_USERS.toString());
+                .withAccessRights(customerId, MANAGE_OWN_AFFILIATION);
         }
 
         handler.handleRequest(input.build(), output, context);

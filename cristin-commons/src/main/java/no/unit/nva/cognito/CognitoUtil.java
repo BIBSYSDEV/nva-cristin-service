@@ -1,6 +1,6 @@
 package no.unit.nva.cognito;
 
-import no.unit.nva.utils.AccessUtils;
+import nva.commons.apigateway.AccessRight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_RESOURCES;
 
 public class CognitoUtil {
 
@@ -39,8 +41,7 @@ public class CognitoUtil {
 
     public static final String ACCESS_RIGHTS_CLAIM_NAME = "custom:accessRights";
     public static final String MULTI_VALUE_DELIMITER = ",";
-    public static final String AT = "@";
-    public static final String ACCESS_RIGHTS_CLAIM_VALUE = constructAccessRights(CURRENT_CUSTOMER_CLAIM_VALUE);
+    public static final String ACCESS_RIGHTS_CLAIM_VALUE = constructAccessRights();
     public static final String PROBLEM_CREATING_USER_MESSAGE = "Problem creating user {}, {}";
     public static final String REGION = "eu-west-1";
     public static final String ADMIN_TESTUSER_ID_KEY = "ADMIN_TESTUSER_ID";
@@ -137,9 +138,9 @@ public class CognitoUtil {
         });
     }
 
-    private static String constructAccessRights(URI currentCustomerClaimValue) {
-        return Stream.of(AccessUtils.EDIT_OWN_INSTITUTION_USERS, AccessUtils.MANAGE_OWN_PROJECTS)
-            .map(right -> right + AT + currentCustomerClaimValue.toString())
+    private static String constructAccessRights() {
+        return Stream.of(MANAGE_OWN_AFFILIATION, MANAGE_OWN_RESOURCES)
+            .map(AccessRight::toPersistedString)
             .collect(Collectors.joining(MULTI_VALUE_DELIMITER));
     }
 

@@ -12,7 +12,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.FULL_TIME_PERCENTAGE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -159,7 +159,7 @@ public class UpdatePersonEmploymentHandlerTest {
                    .withBody(body)
                    .withCurrentCustomer(customerId)
                    .withTopLevelCristinOrgId(TOP_ORG_ID)
-                   .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                   .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
                    .withPathParameters(validPath)
                    .build();
     }

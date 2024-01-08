@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects.fetch;
 
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_RESOURCES;
 import static nva.commons.core.attempt.Try.attempt;
 import no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck;
 import no.unit.nva.access.HandlerAccessCheck;
@@ -15,11 +16,11 @@ public class FetchCristinProjectHandlerAccessCheck extends ProjectHandlerAccessC
 
     @Override
     public void verifyAccess(RequestInfo requestInfo) {
-        if (requestInfo.userIsAuthorized(MANAGE_OWN_PROJECTS)) {
+        if (requestInfo.userIsAuthorized(MANAGE_OWN_RESOURCES)) {
             verified = true;
         } else {
             var username = attempt(requestInfo::getUserName).orElse(fail -> NO_USERNAME_FOUND);
-            logger.info(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, username, MANAGE_OWN_PROJECTS);
+            logger.info(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, username, MANAGE_OWN_RESOURCES);
             verified = false;
         }
     }

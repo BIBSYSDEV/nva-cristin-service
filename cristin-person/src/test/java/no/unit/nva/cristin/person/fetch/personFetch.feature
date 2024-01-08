@@ -7,7 +7,7 @@ Feature: API tests for Cristin Person fetch
     * def illegalIdentifier = 'illegalIdentifier'
     * def nonExistingPersonId = '999999'
     * def validIdentifier = '738'
-    * def validOrcid = '0000-0002-3121-1236'
+    * def validOrcid = '0009-0003-1236-0353'
     * def nonExistingOrcid = '1111-1111-1111-1111'
     * def personIdRegex = 'https:\/\/[^\/]+\/[^\/]+\/person\/[0-9]+'
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
@@ -160,7 +160,7 @@ Feature: API tests for Cristin Person fetch
     And match identifiers !contains 'NationalIdentificationNumber'
 
   Scenario: Get returns supported fields in payload
-    * def samplePersonIdentifier = '1135903'
+    * def samplePersonIdentifier = '854279'
     Given path '/person/' + samplePersonIdentifier
     When method GET
     Then status 200

@@ -16,6 +16,7 @@ import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.Environment;
@@ -48,7 +49,6 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_UNSUPPORTED
 import static no.unit.nva.cristin.common.client.ApiClient.RETURNED_403_FORBIDDEN_TRY_AGAIN_LATER;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
-import static no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck.MANAGE_OWN_PROJECTS;
 import static no.unit.nva.cristin.projects.fetch.FetchCristinProjectClientStub.CRISTIN_GET_PROJECT_RESPONSE_JSON_FILE;
 import static no.unit.nva.cristin.projects.fetch.FetchCristinProjectHandler.ERROR_MESSAGE_CLIENT_SENT_UNSUPPORTED_QUERY_PARAM;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_ACADEMIC_SUMMARY;
@@ -59,6 +59,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_RESOURCES;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -358,7 +359,7 @@ public class FetchCristinProjectHandlerTest {
         doReturn(fakeAuthorizedClient).when(handler).authorizedApiClient();
 
         var gatewayResponse =
-            sendQueryWithPersonIdAndAccessRight(MANAGE_OWN_PROJECTS);
+            sendQueryWithPersonIdAndAccessRight(MANAGE_OWN_RESOURCES);
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_FORBIDDEN));
     }
 
@@ -377,28 +378,8 @@ public class FetchCristinProjectHandlerTest {
         doReturn(fakeAuthorizedClient).when(handler).authorizedApiClient();
 
         var gatewayResponse =
-            sendQueryWithPersonIdAndAccessRight(MANAGE_OWN_PROJECTS);
+            sendQueryWithPersonIdAndAccessRight(MANAGE_OWN_RESOURCES);
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
-    }
-
-    @Test
-    void shouldReturnForbiddenForRestrictedProjectWhenUserHasLegacyRights() throws Exception {
-        final String legacyAccessRight = "EDIT_OWN_INSTITUTION_PROJECTS";
-        cristinApiClientStub = spy(cristinApiClientStub);
-        doReturn(new HttpResponseFaker(EMPTY_STRING, HTTP_UNAUTHORIZED)).when(cristinApiClientStub)
-            .fetchGetResult(any());
-
-        var mockHttpClient = mock(HttpClient.class);
-        doReturn(fakeOkResponse()).when(mockHttpClient).<String>send(any(), any());
-        var fakeAuthorizedClient = new FetchCristinProjectApiClient(mockHttpClient);
-
-        handler = new FetchCristinProjectHandler(cristinApiClientStub, environment);
-        handler = spy(handler);
-        doReturn(fakeAuthorizedClient).when(handler).authorizedApiClient();
-
-        var gatewayResponse =
-            sendQueryWithPersonIdAndAccessRight(legacyAccessRight);
-        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_FORBIDDEN));
     }
 
     private HttpResponseFaker fakeOkResponse() {
@@ -453,13 +434,14 @@ public class FetchCristinProjectHandlerTest {
         return IoUtils.stringFromResources(Path.of(resource));
     }
 
-    private GatewayResponse<NvaProject> sendQueryWithPersonIdAndAccessRight(String accessRight) throws IOException {
+    private GatewayResponse<NvaProject> sendQueryWithPersonIdAndAccessRight(AccessRight accessRight)
+        throws IOException {
         var input = requestWithPersonIdAndAccessRight(accessRight);
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, NvaProject.class);
     }
 
-    private InputStream requestWithPersonIdAndAccessRight(String accessRight)
+    private InputStream requestWithPersonIdAndAccessRight(AccessRight accessRight)
         throws JsonProcessingException {
 
         var customerId = randomUri();
