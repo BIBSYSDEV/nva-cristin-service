@@ -66,7 +66,9 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
         if (clientCanUpdateAllFields(requestInfo)) {
             PersonPatchValidator.validate(objectNode);
             objectNode = filterInput(requestInfo, objectNode);
-            ObjectNode cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
+            var cristinJson = new CristinPersonPatchJsonCreator(objectNode)
+                                  .create()
+                                  .getOutput();
             checkHasFields(cristinJson);
 
             if (cristinJson.has(CRISTIN_EMPLOYMENTS) || cristinJson.has(PERSON_NVI)) {
@@ -76,11 +78,12 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
                 return apiClient.updatePersonInCristin(personId, cristinJson);
             }
         } else if (clientCanUpdateOwnData(requestInfo)) {
-            String personIdFromCognito = parseLastPartOfPersonCristinIdFromCognito(requestInfo).orElseThrow();
+            var personIdFromCognito = parseLastPartOfPersonCristinIdFromCognito(requestInfo).orElseThrow();
             checkIdentifiersMatch(personId, personIdFromCognito);
-            PersonPatchValidator.validateOrcidIfPresent(objectNode);
-            ObjectNode cristinJson =
-                new CristinPersonPatchJsonCreator(objectNode).createWithAllowedUserModifiableData().getOutput();
+            PersonPatchValidator.validateUserModifiableFields(objectNode);
+            var cristinJson = new CristinPersonPatchJsonCreator(objectNode)
+                                  .createWithAllowedUserModifiableData()
+                                  .getOutput();
             checkHasFields(cristinJson);
 
             return apiClient.updatePersonInCristin(personIdFromCognito, cristinJson);

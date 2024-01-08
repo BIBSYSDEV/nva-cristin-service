@@ -277,6 +277,32 @@ public class CristinPersonPatchJsonCreatorTest {
         assertThat(result.get(PERSON_NVI).isNull(), equalTo(true));
     }
 
+    @Test
+    void shouldAddAllSupportedFieldsForPersonModifyingThemselves() throws Exception {
+        var input = OBJECT_MAPPER.createObjectNode();
+        input.put(ORCID, VALID_ORCID);
+        input.put(PREFERRED_FIRST_NAME, SOME_PREFERRED_NAME);
+        input.putNull(PREFERRED_LAST_NAME);
+        var keyword = new TypedValue(randomString(), randomString());
+        input.putArray(KEYWORDS).add(OBJECT_MAPPER.readTree(keyword.toString()));
+        input.putObject(BACKGROUND).putNull(ENGLISH_LANG).put(NORWEGIAN_LANG, NORWEGIAN_LANG_CONTENT);
+
+        var result = new CristinPersonPatchJsonCreator(input).createWithAllowedUserModifiableData().getOutput();
+
+        assertEquals(VALID_ORCID, result.get(ORCID).get(ID).asText());
+        assertEquals(SOME_PREFERRED_NAME, result.get(CRISTIN_FIRST_NAME_PREFERRED).asText());
+        assertThat(result.has(CRISTIN_SURNAME_PREFERRED), equalTo(true));
+        assertThat(result.get(CRISTIN_SURNAME_PREFERRED).isNull(), equalTo(true));
+        assertThat(result.has(KEYWORDS), equalTo(true));
+        var keywordFromJson =
+            OBJECT_MAPPER.readValue(result.get(KEYWORDS).toString(), CristinTypedLabel[].class);
+        assertThat(keywordFromJson[0].getCode(), equalTo(keyword.getType()));
+        assertThat(result.has(BACKGROUND), equalTo(true));
+        assertThat(result.get(BACKGROUND).isObject(), equalTo(true));
+        assertThat(result.get(BACKGROUND).get(ENGLISH_LANG).isNull(), equalTo(true));
+        assertThat(result.get(BACKGROUND).get(NORWEGIAN_LANG).asText(), equalTo(NORWEGIAN_LANG_CONTENT));
+    }
+
     private static String getIdUriString(String identifier) {
         return UriWrapper.fromUri(randomUri()).addChild(identifier).toString();
     }
