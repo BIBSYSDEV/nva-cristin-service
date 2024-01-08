@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.organization.common.QueryParamConverter.translateToCristinApi;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
+import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -50,11 +51,15 @@ public class QueryCristinOrgClient20230526 extends ApiClient
         var organizations = getOrganizations(response);
         var totalProcessingTime = calculateProcessingTime(start, System.currentTimeMillis());
 
-        return new SearchResponse<Organization>(ORGANIZATION_ID_URI)
+        var searchResponse = new SearchResponse<Organization>(ORGANIZATION_ID_URI)
                    .withContext(ORGANIZATION_CONTEXT)
                    .withHits(organizations)
                    .usingHeadersAndQueryParams(response.headers(), params)
                    .withProcessingTime(totalProcessingTime);
+
+        searchResponse.setId(createIdUriFromParams(params, ORGANIZATION_PATH));
+
+        return searchResponse;
     }
 
     private HttpResponse<String> queryUpstream(URI uri) throws ApiGatewayException {
