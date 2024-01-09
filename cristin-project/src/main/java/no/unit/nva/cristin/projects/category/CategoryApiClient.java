@@ -24,7 +24,7 @@ import nva.commons.core.paths.UriWrapper;
 
 public class CategoryApiClient extends ApiClient implements CristinQueryApiClient<Void, TypedLabel> {
 
-    public static final String CATEGORY_PATH = "project/category";
+    public static final String CATEGORY_PATH = "category/project";
     public static final URI CATEGORY_ID_URI = getNvaApiUri(CATEGORY_PATH);
     public static final String CRISTIN_CATEGORIES_PATH = "projects/categories";
     public static final String CATEGORY_CONTEXT_JSON = "https://example.org/category-context.json";
