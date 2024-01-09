@@ -27,6 +27,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Project
+        - external
       summary: List projects matching query
       description: Returns a list of projects based on query parameters
       operationId: ListProjects
@@ -359,6 +360,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Project
+        - external
       summary: Find project by Identifier
       description: Returns a single project matching identifier parameter
       operationId: GetProjectByidentifier
@@ -462,6 +464,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: List organizations matching query
       description: Returns a list of organizations based on query parameters
       operationId: ListOrganizations
@@ -573,6 +576,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: Fetch Organization by identifier
       description: Returns a single Organization matching identifier parameter
       operationId: GetOrganizationByIdentifier
@@ -657,6 +661,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: Fetch Persons associated with an given organization
       description: Returns a list of persons belonging to specified organization
       operationId: GetPersonsByOrganization
@@ -740,6 +745,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: Fetch Projects associated with an given organization
       description: Returns a list of projects belonging to specified organization
       operationId: GetProjectsByOrganization
@@ -904,6 +910,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Person
+        - external
       summary: List persons matching query parameters
       description: Returns a list of persons based on query parameters
       operationId: ListPersons
@@ -1104,6 +1111,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Person
+        - external
       summary: Find person by identifier
       description: Returns a single person matching id parameter without NIN
       operationId: GetPersonById
@@ -1693,6 +1701,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - FundingSources
+        - external
       summary: List funding sources
       description: Returns all support funding sources
       operationId: ListFundingSources
@@ -1738,6 +1747,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - FundingSource
+        - external
       summary: Fetch a funding source by identifier
       description: Returns the funding source with the given identifier
       operationId: FetchFundingSource
