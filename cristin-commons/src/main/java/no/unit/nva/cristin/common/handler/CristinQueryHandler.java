@@ -75,7 +75,7 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
                 .map(UriUtils::escapeWhiteSpace);
     }
 
-    private boolean isValidQueryString(String str) {
+    protected boolean isValidQueryString(String str) {
         for (Character c : str.toCharArray()) {
             if (isUnsupportedCharacter(c)) {
                 return false;

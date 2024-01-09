@@ -7,6 +7,7 @@ import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -21,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
@@ -35,7 +38,6 @@ import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
 import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;
-import static nva.commons.core.attempt.Try.attempt;
 
 public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
@@ -78,7 +80,7 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
         validateQueryParameterKeys(requestInfo);
 
-        var name = attempt(() -> getValidName(requestInfo)).orElse(noValue -> null);
+        var name = getValidName(requestInfo);
         var page = getValidPage(requestInfo);
         var numberOfResults = getValidNumberOfResults(requestInfo);
         var organization = getValidOrganization(requestInfo).orElse(null);
@@ -110,6 +112,20 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         if (!VALID_QUERY_PARAMETERS.containsAll(requestInfo.getQueryParameters().keySet())) {
             throw new BadRequestException(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS));
         }
+    }
+
+    @Override
+    protected String getValidName(RequestInfo requestInfo) throws BadRequestException {
+        var name = requestInfo.getQueryParameterOpt(NAME);
+
+        if (name.isEmpty()) {
+            return null;
+        }
+
+        return name.filter(this::isValidQueryString)
+                   .map(UriUtils::escapeWhiteSpace)
+                   .orElseThrow(() -> new BadRequestException(
+                       invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
     private Optional<String> getValidVerified(RequestInfo requestInfo) {

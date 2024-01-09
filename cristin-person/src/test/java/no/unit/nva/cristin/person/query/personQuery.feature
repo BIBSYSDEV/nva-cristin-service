@@ -121,17 +121,6 @@ Feature: API tests for Cristin persons query
       | 'page'      | 'hello'             |
       | 'results'   | 'hello'             |
 
-  Scenario: Query with missing query parameter returns Bad Request
-    Given path '/person/'
-    And method GET
-    Then status 400
-    * def contentType = responseHeaders['Content-Type'][0]
-    And match contentType == PROBLEM_JSON_MEDIA_TYPE
-    And match response.title == 'Bad Request'
-    And match response.status == 400
-    And match response.detail == "Parameter 'name' has invalid value. May only contain alphanumeric characters, dash, comma, period, colon, semicolon and whitespace"
-    And match response.requestId == '#notnull'
-
   Scenario: Query returns correct pagination values and URIs
     Given path '/person/'
     And param name = queryString
