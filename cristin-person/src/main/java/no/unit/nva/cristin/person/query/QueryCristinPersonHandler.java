@@ -35,6 +35,7 @@ import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
 import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
@@ -77,7 +78,7 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
         validateQueryParameterKeys(requestInfo);
 
-        var name = getValidName(requestInfo);
+        var name = attempt(() -> getValidName(requestInfo)).orElse(noValue -> null);
         var page = getValidPage(requestInfo);
         var numberOfResults = getValidNumberOfResults(requestInfo);
         var organization = getValidOrganization(requestInfo).orElse(null);
@@ -129,7 +130,9 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
         var requestQueryParameters = new ConcurrentHashMap<String, String>();
 
-        requestQueryParameters.put(NAME, name);
+        if (nonNull(name)) {
+            requestQueryParameters.put(NAME, name);
+        }
         requestQueryParameters.put(PAGE, page);
         requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
         if (nonNull(organization)) {

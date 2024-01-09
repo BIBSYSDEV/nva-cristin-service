@@ -16,7 +16,6 @@ import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.query.version.facet.QueryPersonWithFacetsClient;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
@@ -407,6 +406,18 @@ public class QueryCristinPersonHandlerTest {
                    containsString(ORGANIZATION + EQUALS + ORGANIZATION_UIO));
         assertThat(actual.getId().toString(),
                    containsString(CristinFacetKey.INSTITUTION.getNvaKey() + EQUALS + INSTITUTION_FACET_185));
+    }
+
+    @Test
+    void shouldReturnAllResultsWhenCallingEndpointWithNoParameters() throws IOException {
+        var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                        .withBody(null)
+                        .build();
+        handler.handleRequest(input, output, context);
+
+        var actual = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        assertThat(actual.getStatusCode(), equalTo(HttpURLConnection.HTTP_OK));
     }
 
     private SearchResponse<Person> randomPersons() {

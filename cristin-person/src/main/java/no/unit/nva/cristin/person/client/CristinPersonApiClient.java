@@ -171,8 +171,10 @@ public class CristinPersonApiClient extends ApiClient
     protected URI generateQueryPersonsUrl(Map<String, String> parameters) {
         var cristinPersonQuery = new CristinPersonQuery()
                 .withFromPage(parameters.get(PAGE))
-                .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS))
-                .withName(parameters.get(NAME));
+                .withItemsPerPage(parameters.get(NUMBER_OF_RESULTS));
+        if (parameters.containsKey(NAME)) {
+            cristinPersonQuery = cristinPersonQuery.withName(parameters.get(NAME));
+        }
         if (parameters.containsKey(ORGANIZATION)) {
             cristinPersonQuery = cristinPersonQuery.withOrganization(parameters.get(ORGANIZATION));
         }
