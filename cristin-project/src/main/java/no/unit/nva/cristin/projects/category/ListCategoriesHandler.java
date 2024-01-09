@@ -1,7 +1,10 @@
 package no.unit.nva.cristin.projects.category;
 
+import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import com.amazonaws.services.lambda.runtime.Context;
+import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
+import java.util.List;
 import no.unit.nva.cristin.common.client.CristinQueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.TypedLabel;
@@ -34,6 +37,11 @@ public class ListCategoriesHandler extends ApiGatewayHandler<Void, SearchRespons
     @Override
     protected Integer getSuccessStatusCode(Void input, SearchResponse<TypedLabel> output) {
         return HttpURLConnection.HTTP_OK;
+    }
+
+    @Override
+    protected List<MediaType> listSupportedMediaTypes() {
+        return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
 }
