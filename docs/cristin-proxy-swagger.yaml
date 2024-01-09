@@ -2966,9 +2966,11 @@ components:
         preferredFirstName:
           type: string
           nullable: true
+          description: Can be modified by the user themselves, otherwise user administrator can do the update
         preferredLastName:
           type: string
           nullable: true
+          description: Can be modified by the user themselves, otherwise user administrator can do the update
         reserved:
           type: boolean
           description: If person should be hidden from public view
@@ -2980,6 +2982,7 @@ components:
         keywords:
           type: array
           nullable: true
+          description: Can be modified by the user themselves, otherwise user administrator can do the update
           items:
             type: object
             properties:
