@@ -464,6 +464,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Categories
+        - external
       summary: List categories
       description: Returns list of categories
       operationId: ListCategories

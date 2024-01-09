@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 class ListCategoriesHandlerTest {
 
     public static final int NINE_HITS = 9;
-    public static final String CRISTIN_KEYWORDS_RESPONSE_JSON = "cristinProjectCategoriesResponse.json";
+    public static final String CRISTIN_CATEGORIES_RESPONSE_JSON = "cristinProjectCategoriesResponse.json";
     public static final String EXPECTED_CRISTIN_URI =
         "https://api.cristin-test.uio.no/v2/projects/categories";
     public static final String NVA_QUERY_CATEGORIES_RESPONSE_JSON = "nvaProjectCategoriesResponse.json";
@@ -49,7 +49,7 @@ class ListCategoriesHandlerTest {
         var httpClient = mock(HttpClient.class);
         apiClient = new CategoryApiClient(httpClient);
         apiClient = spy(apiClient);
-        var fakeQueryResponse = IoUtils.stringFromResources(Path.of(CRISTIN_KEYWORDS_RESPONSE_JSON));
+        var fakeQueryResponse = IoUtils.stringFromResources(Path.of(CRISTIN_CATEGORIES_RESPONSE_JSON));
         doReturn(new HttpResponseFaker(fakeQueryResponse)).when(apiClient).fetchQueryResults(any());
         context = mock(Context.class);
         output = new ByteArrayOutputStream();

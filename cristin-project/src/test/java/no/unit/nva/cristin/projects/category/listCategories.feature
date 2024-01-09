@@ -20,7 +20,7 @@ Feature: API tests for listing of categories
       'Access-Control-Request-Headers': 'Content-Type, Authorization'
     }
   """
-    Given path '/project/category/'
+    Given path '/category/project/'
     When method OPTIONS
     Then status 200
     And match responseHeaders['Access-Control-Allow-Origin'][0] == '*'
@@ -37,7 +37,7 @@ Feature: API tests for listing of categories
 
   Scenario Outline: Query returns valid data and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
-    Given path '/project/category/'
+    Given path '/category/project/'
     When method GET
     Then status 200
     And match response == '#object'
