@@ -7,6 +7,7 @@ import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -21,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
@@ -111,6 +114,20 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         }
     }
 
+    @Override
+    protected String getValidName(RequestInfo requestInfo) throws BadRequestException {
+        var name = requestInfo.getQueryParameterOpt(NAME);
+
+        if (name.isEmpty()) {
+            return null;
+        }
+
+        return name.filter(this::isValidQueryString)
+                   .map(UriUtils::escapeWhiteSpace)
+                   .orElseThrow(() -> new BadRequestException(
+                       invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
+    }
+
     private Optional<String> getValidVerified(RequestInfo requestInfo) {
         return requestInfo.getQueryParameterOpt(VERIFIED).filter(this::hasEitherTrueFalse);
     }
@@ -129,7 +146,9 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
         var requestQueryParameters = new ConcurrentHashMap<String, String>();
 
-        requestQueryParameters.put(NAME, name);
+        if (nonNull(name)) {
+            requestQueryParameters.put(NAME, name);
+        }
         requestQueryParameters.put(PAGE, page);
         requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
         if (nonNull(organization)) {

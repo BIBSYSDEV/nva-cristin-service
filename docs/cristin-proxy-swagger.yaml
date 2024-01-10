@@ -953,7 +953,7 @@ paths:
         - name: name
           in: query
           description: Search string. First name and/or last name
-          required: true
+          required: false
           schema:
             type: string
             pattern: '.+'
