@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.HttpHeaders;
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
 import java.io.ByteArrayOutputStream;
@@ -46,6 +48,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMes
 import static no.unit.nva.client.ClientProvider.VERSION_2023_05_26;
 import static no.unit.nva.client.ClientProvider.VERSION_ONE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
@@ -225,6 +228,36 @@ class QueryCristinOrganizationHandlerTest {
         assertThat(readHitsAsTree(actualHits), equalTo(readHitsAsTree(expectedHits)));
     }
 
+    @Test
+    void shouldHaveCorrectCristinUriWithParamsOnVersionOne() throws Exception {
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
+        var input = generateHandlerRequestWithAdditionalQueryParameters(String.format(ACCEPT_HEADER_EXAMPLE,
+                                                                                      VERSION_ONE));
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(URI.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        verify(cristinApiClientVersionOne).sendRequestMultipleTimes(captor.capture());
+        assertThat(captor.getValue().getQuery(), containsString("sort=country+desc"));
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    @Test
+    void shouldHaveCorrectCristinUriWithParamsOnVersionTwo() throws Exception {
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
+        var input = generateHandlerRequestWithAdditionalQueryParameters(String.format(ACCEPT_HEADER_EXAMPLE,
+                                                                                      VERSION_2023_05_26));
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(URI.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        verify(queryCristinOrgClient20230526).fetchQueryResults(captor.capture());
+        assertThat(captor.getValue().getQuery(), containsString("sort=country+desc"));
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
     private List<Organization> convertHitsToProperFormat(SearchResponse<?> searchResponse) {
         return OBJECT_MAPPER.convertValue(searchResponse.getHits(), new TypeReference<>() {});
     }
@@ -277,6 +310,17 @@ class QueryCristinOrganizationHandlerTest {
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
                 .withQueryParameters(Map.of(QUERY, "Fysikk", DEPTH, "feil"))
                 .build();
+    }
+
+    private InputStream generateHandlerRequestWithAdditionalQueryParameters(String versionParam)
+        throws JsonProcessingException {
+
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type(),
+                                       ACCEPT_HEADER_KEY_NAME, versionParam))
+                   .withQueryParameters(Map.of(QUERY, "strangeQueryWithoutHits",
+                                               SORT, "country desc"))
+                   .build();
     }
 
     private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
