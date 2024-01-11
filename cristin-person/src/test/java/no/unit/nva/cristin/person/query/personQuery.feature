@@ -98,7 +98,7 @@ Feature: API tests for Cristin persons query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['name', 'organization', 'organizationFacet', 'page', 'results', 'sectorFacet', 'verified']"
+    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['name', 'organization', 'organizationFacet', 'page', 'results', 'sectorFacet', 'sort', 'verified']"
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
