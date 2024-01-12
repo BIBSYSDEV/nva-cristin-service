@@ -98,7 +98,7 @@ Feature: API tests for Cristin persons query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['name', 'organization', 'organizationFacet', 'page', 'results', 'sectorFacet', 'verified']"
+    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['name', 'organization', 'organizationFacet', 'page', 'results', 'sectorFacet', 'sort', 'verified']"
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
@@ -176,6 +176,7 @@ Feature: API tests for Cristin persons query
     Given path '/person/'
     And param name = 'daniel'
     And param organization = 'uio'
+    And param sort = 'name desc'
     When method GET
     Then status 200
     * string searchString = response.searchString
@@ -183,6 +184,7 @@ Feature: API tests for Cristin persons query
     And match searchString contains 'name'
     And match searchString contains 'page'
     And match searchString contains 'results'
+    And match searchString contains 'sort'
 
   Scenario: Query returns aggregations when requesting version with aggregations
     Given path '/person/'

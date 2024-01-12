@@ -30,6 +30,7 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PERSON_QUERY_CONTEXT;
+import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
@@ -180,6 +181,9 @@ public class CristinPersonApiClient extends ApiClient
         }
         if (parameters.containsKey(VERIFIED)) {
             cristinPersonQuery = cristinPersonQuery.withVerified(parameters.get(VERIFIED));
+        }
+        if (parameters.containsKey(SORT)) {
+            cristinPersonQuery.withSort(parameters.get(SORT));
         }
         return cristinPersonQuery.toURI();
     }

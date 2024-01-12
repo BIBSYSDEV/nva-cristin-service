@@ -113,13 +113,17 @@ paths:
             type: string
         - name: sort
           in: query
-          description: Sorts on 'start_date' and/or 'end_date'. See Search and sort. Default sort order is on 'cristin_project_id' in ascending order.
+          description: Sort results based on parameters.
           required: false
           schema:
             type: string
             enum:
               - start_date
+              - start_date asc
+              - start_date desc
               - end_date
+              - end_date asc
+              - end_date desc
         - name: unit
           in: query
           description: Unit id
@@ -537,6 +541,16 @@ paths:
             type: number
             default: '10'
           example: '10'
+        - name: sort
+          in: query
+          description: Sort results based on parameters.
+          required: false
+          schema:
+            type: string
+            enum:
+              - country
+              - country asc
+              - country desc
         - name: Accept
           in: header
           description: Requested response format and version of the returned payload
@@ -734,10 +748,17 @@ paths:
           example: 'daniel'
         - name: sort
           in: query
-          description: Sort results based on parameters
+          description: Sort results based on parameters.
           required: false
           schema:
             type: string
+            enum:
+              - id
+              - id asc
+              - id desc
+              - name
+              - name asc
+              - name desc
           examples:
             identifierDesc:
               value: 'id desc'
@@ -847,10 +868,17 @@ paths:
             type: string
         - name: sort
           in: query
-          description: Sorts on 'start_date' and/or 'end_date'. See Search and sort. Default sort order is on 'cristin_project_id' in ascending order.
+          description: Sort results based on parameters.
           required: false
           schema:
             type: string
+            enum:
+              - start_date
+              - start_date asc
+              - start_date desc
+              - end_date
+              - end_date asc
+              - end_date desc
         - name: unit
           in: query
           description: Unit id
@@ -1002,6 +1030,19 @@ paths:
           schema:
             type: string
           example: 'uio'
+        - name: sort
+          in: query
+          description: Sort results based on parameters.
+          required: false
+          schema:
+            type: string
+            enum:
+              - id
+              - id asc
+              - id desc
+              - name
+              - name asc
+              - name desc
         - name: Accept
           in: header
           description: Requested response format and version of the returned payload

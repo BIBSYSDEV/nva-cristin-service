@@ -72,6 +72,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.common.ErrorMessages;
@@ -710,16 +711,7 @@ class QueryCristinProjectHandlerTest {
         cristinApiClientStub = spy(cristinApiClientStub);
         doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
         handler = new QueryCristinProjectHandler(clientProvider, new Environment());
-        final var queryParams = Map.of("query", "hello",
-                                       "funding", FUNDING_SAMPLE,
-                                       "biobank", BIOBANK_SAMPLE,
-                                       "keyword", KEYWORD_SAMPLE,
-                                       "results", "5",
-                                       "unit", UNIT_ID_SAMPLE,
-                                       "sort", START_DATE,
-                                       "creator", CREATOR_IDENTIFIER,
-                                       "participant", CREATOR_IDENTIFIER,
-                                       "category", "PHD");
+        final var queryParams = createQueryParams();
         try (var input = requestWithQueryParameters(queryParams)) {
             handler.handleRequest(input, output, context);
         }
@@ -738,6 +730,7 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualURI,
                    containsString(PARTICIPANT_PARAM.getKey() + EQUAL_OPERATOR + CREATOR_IDENTIFIER));
         assertThat(actualURI, containsString(CATEGORY_PARAM + EQUAL_OPERATOR + "PHD"));
+        assertThat(actualURI, containsString("sort=start_date+desc"));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                                                                SearchResponse.class);
@@ -790,6 +783,7 @@ class QueryCristinProjectHandlerTest {
         doReturn(apiClient).when(clientProvider).getVersionWithFacets();
         handler = new QueryCristinProjectHandler(clientProvider, new Environment());
         final var queryParams = Map.of("query", "hello",
+                                       "sort", "start_date desc",
                                        "sectorFacet", "UC,INSTITUTE",
                                        "coordinatingFacet", "185.90.0.0",
                                        "responsibleFacet", "20754.0.0.0",
@@ -803,6 +797,7 @@ class QueryCristinProjectHandlerTest {
 
         verify(apiClient).fetchQueryResults(captor.capture());
         var actualURI = captor.getValue().toString();
+        assertThat(actualURI, containsString("sort=start_date+desc"));
         assertThat(actualURI, containsString(SECTOR_FACET.getKey() + EQUAL_OPERATOR + "INSTITUTE"));
         assertThat(actualURI, containsString(SECTOR_FACET.getKey() + EQUAL_OPERATOR + "UC"));
         assertThat(actualURI, containsString(COORDINATING_FACET.getKey() + EQUAL_OPERATOR + "185.90.0.0"));
@@ -1079,6 +1074,21 @@ class QueryCristinProjectHandlerTest {
 
     private static Predicate<CristinFacetParamKey> hasUnsupportedFacet() {
         return facetKey -> facetKey.equals(CristinFacetParamKey.INSTITUTION_PARAM);
+    }
+
+    private static ConcurrentHashMap<String, String> createQueryParams() {
+        final var queryParams = new ConcurrentHashMap<>(Map.of("query", "hello",
+                                                               "funding", FUNDING_SAMPLE,
+                                                               "biobank", BIOBANK_SAMPLE,
+                                                               "keyword", KEYWORD_SAMPLE,
+                                                               "results", "5",
+                                                               "unit", UNIT_ID_SAMPLE,
+                                                               "sort", START_DATE,
+                                                               "creator", CREATOR_IDENTIFIER,
+                                                               "participant", CREATOR_IDENTIFIER,
+                                                               "category", "PHD"));
+        queryParams.put("sort", "start_date desc");
+        return queryParams;
     }
 
 }
