@@ -227,3 +227,10 @@ Feature: API tests for Cristin projects query
     And match response.aggregations.sectorFacet[0].key == '#present'
     And match response.aggregations.sectorFacet[0].count == '#present'
     And match response.aggregations.sectorFacet[0].labels == '#present'
+
+  Scenario: Query with multiple query parameter do return results
+    Given path '/project/'
+    And param multiple = 'covid'
+    When method GET
+    Then status 200
+    And match response.hits == '#[5]'
