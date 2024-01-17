@@ -16,7 +16,6 @@ import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.query.version.facet.QueryPersonWithFacetsClient;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
@@ -46,6 +45,7 @@ import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.INSTITUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
@@ -90,7 +90,8 @@ public class QueryCristinPersonHandlerTest {
     private static final String EXPECTED_CRISTIN_URI_WITH_PARAMS =
         "https://api.cristin-test.uio.no/v2/persons?per_page=5&name=John+Smith&page=1";
     private static final String EXPECTED_CRISTIN_URI_WITH_ADDITIONAL_PARAMS =
-        "https://api.cristin-test.uio.no/v2/persons?per_page=5&institution=uio&name=John+Smith&verified=true&page=1";
+        "https://api.cristin-test.uio.no/v2/persons?per_page=5&institution=uio&name=John+Smith&verified=true&page=1"
+        + "&sort=name+desc";
     private static final String ORGANIZATION_UIO = "uio";
     public static final String SECTOR_FACET_UC = "UC";
     public static final String INSTITUTION_FACET_185 = "185";
@@ -101,6 +102,7 @@ public class QueryCristinPersonHandlerTest {
     public static final String EMPTY_OBJECT = "{}";
     public static final String DELIMITER = ",";
     public static final String EQUALS = "=";
+    public static final String NAME_DESC = "name desc";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -409,6 +411,18 @@ public class QueryCristinPersonHandlerTest {
                    containsString(CristinFacetKey.INSTITUTION.getNvaKey() + EQUALS + INSTITUTION_FACET_185));
     }
 
+    @Test
+    void shouldReturnAllResultsWhenCallingEndpointWithNoParameters() throws IOException {
+        var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                        .withBody(null)
+                        .build();
+        handler.handleRequest(input, output, context);
+
+        var actual = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        assertThat(actual.getStatusCode(), equalTo(HttpURLConnection.HTTP_OK));
+    }
+
     private SearchResponse<Person> randomPersons() {
         var persons = new ArrayList<Person>();
         IntStream.range(0, 5).mapToObj(i -> randomPerson()).forEach(persons::add);
@@ -484,7 +498,8 @@ public class QueryCristinPersonHandlerTest {
     private void sendQueryWithAdditionalParams() throws IOException {
         try (var input = requestWithQueryParameters(Map.of(NAME, RANDOM_NAME,
                                                            ORGANIZATION, ORGANIZATION_UIO,
-                                                           VERIFIED, Boolean.TRUE.toString()))) {
+                                                           VERIFIED, Boolean.TRUE.toString(),
+                                                           SORT, NAME_DESC))) {
             handler.handleRequest(input, output, context);
         }
 

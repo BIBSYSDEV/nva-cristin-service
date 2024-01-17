@@ -27,6 +27,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Project
+        - external
       summary: List projects matching query
       description: Returns a list of projects based on query parameters
       operationId: ListProjects
@@ -112,13 +113,17 @@ paths:
             type: string
         - name: sort
           in: query
-          description: Sorts on 'start_date' and/or 'end_date'. See Search and sort. Default sort order is on 'cristin_project_id' in ascending order.
+          description: Sort results based on parameters.
           required: false
           schema:
             type: string
             enum:
               - start_date
+              - start_date asc
+              - start_date desc
               - end_date
+              - end_date asc
+              - end_date desc
         - name: unit
           in: query
           description: Unit id
@@ -185,6 +190,12 @@ paths:
           required: false
           schema:
             type: number
+        - name: multiple
+          in: query
+          description: Matches multiple fields using only this one param, those being 'cristinId', 'title', 'project_manager', 'participant' and 'grantId'
+          required: false
+          schema:
+            type: string
         - name: categoryFacet
           in: query
           description: Narrow down on project category. Works only for version 2023-11-03-aggregations
@@ -359,6 +370,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Project
+        - external
       summary: Find project by Identifier
       description: Returns a single project matching identifier parameter
       operationId: GetProjectByidentifier
@@ -453,6 +465,41 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /category/project:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListProjectCategoriesFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Categories
+        - external
+      summary: List categories
+      description: Returns list of categories
+      operationId: ListCategories
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categories'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/CategoriesExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Categories'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/CategoriesExample'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+        400:
+          $ref: '#/components/responses/400'
   /organization:
     get:
       x-amazon-apigateway-integration:
@@ -462,6 +509,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: List organizations matching query
       description: Returns a list of organizations based on query parameters
       operationId: ListOrganizations
@@ -499,6 +547,16 @@ paths:
             type: number
             default: '10'
           example: '10'
+        - name: sort
+          in: query
+          description: Sort results based on parameters.
+          required: false
+          schema:
+            type: string
+            enum:
+              - country
+              - country asc
+              - country desc
         - name: Accept
           in: header
           description: Requested response format and version of the returned payload
@@ -573,6 +631,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: Fetch Organization by identifier
       description: Returns a single Organization matching identifier parameter
       operationId: GetOrganizationByIdentifier
@@ -657,6 +716,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: Fetch Persons associated with an given organization
       description: Returns a list of persons belonging to specified organization
       operationId: GetPersonsByOrganization
@@ -694,10 +754,17 @@ paths:
           example: 'daniel'
         - name: sort
           in: query
-          description: Sort results based on parameters
+          description: Sort results based on parameters.
           required: false
           schema:
             type: string
+            enum:
+              - id
+              - id asc
+              - id desc
+              - name
+              - name asc
+              - name desc
           examples:
             identifierDesc:
               value: 'id desc'
@@ -740,6 +807,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: Fetch Projects associated with an given organization
       description: Returns a list of projects belonging to specified organization
       operationId: GetProjectsByOrganization
@@ -806,10 +874,17 @@ paths:
             type: string
         - name: sort
           in: query
-          description: Sorts on 'start_date' and/or 'end_date'. See Search and sort. Default sort order is on 'cristin_project_id' in ascending order.
+          description: Sort results based on parameters.
           required: false
           schema:
             type: string
+            enum:
+              - start_date
+              - start_date asc
+              - start_date desc
+              - end_date
+              - end_date asc
+              - end_date desc
         - name: unit
           in: query
           description: Unit id
@@ -870,6 +945,12 @@ paths:
           required: false
           schema:
             type: number
+        - name: multiple
+          in: query
+          description: Matches multiple fields using only this one param, those being 'cristinId', 'title', 'project_manager', 'participant' and 'grantId'
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -904,6 +985,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Person
+        - external
       summary: List persons matching query parameters
       description: Returns a list of persons based on query parameters
       operationId: ListPersons
@@ -911,7 +993,7 @@ paths:
         - name: name
           in: query
           description: Search string. First name and/or last name
-          required: true
+          required: false
           schema:
             type: string
             pattern: '.+'
@@ -960,6 +1042,19 @@ paths:
           schema:
             type: string
           example: 'uio'
+        - name: sort
+          in: query
+          description: Sort results based on parameters.
+          required: false
+          schema:
+            type: string
+            enum:
+              - id
+              - id asc
+              - id desc
+              - name
+              - name asc
+              - name desc
         - name: Accept
           in: header
           description: Requested response format and version of the returned payload
@@ -1104,6 +1199,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Person
+        - external
       summary: Find person by identifier
       description: Returns a single person matching id parameter without NIN
       operationId: GetPersonById
@@ -1693,6 +1789,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - FundingSources
+        - external
       summary: List funding sources
       description: Returns all support funding sources
       operationId: ListFundingSources
@@ -1738,6 +1835,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - FundingSource
+        - external
       summary: Fetch a funding source by identifier
       description: Returns the funding source with the given identifier
       operationId: FetchFundingSource
@@ -2995,9 +3093,11 @@ components:
         preferredFirstName:
           type: string
           nullable: true
+          description: Can be modified by the user themselves, otherwise user administrator can do the update
         preferredLastName:
           type: string
           nullable: true
+          description: Can be modified by the user themselves, otherwise user administrator can do the update
         reserved:
           type: boolean
           description: If person should be hidden from public view
@@ -3009,6 +3109,7 @@ components:
         keywords:
           type: array
           nullable: true
+          description: Can be modified by the user themselves, otherwise user administrator can do the update
           items:
             type: object
             properties:
@@ -3455,6 +3556,50 @@ components:
         type:
           type: string
           description: The keyword code
+        label:
+          $ref: '#/components/schemas/Languages'
+    Categories:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of categories returned by the query
+          items:
+            $ref: '#/components/schemas/Category'
+    Category:
+      type: object
+      description: Single category
+      properties:
+        type:
+          type: string
+          description: The category code
         label:
           $ref: '#/components/schemas/Languages'
     PersonSummary:
@@ -4640,6 +4785,22 @@ components:
           - type: '1972'
             label:
               en: 'Food Classification'
+    CategoriesExample:
+      value:
+        '@context': 'https://example.org/keyword-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/category/project/'
+        size: 150
+        processingTime: 800
+        firstRecord: 1
+        nextResults: ''
+        previousResults: ''
+        hits:
+          - type: 'BASICRESEARCH'
+            label:
+              en: 'Basic Research'
+          - type: 'ACADEMICDEV'
+            label:
+              en: 'Academic Development'
 
   securitySchemes:
     CognitoUserPool:

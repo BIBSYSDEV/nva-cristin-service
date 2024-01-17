@@ -56,6 +56,7 @@ Feature: API tests for Cristin Organization retrieve and search
     And param query = testOrganizationNameSearchTerm
     And param results = '2'
     And param page = '4'
+    And param sort = 'country desc'
     When method GET
     Then status 200
     And match response.hits == '#array'
@@ -96,6 +97,7 @@ Feature: API tests for Cristin Organization retrieve and search
     And param query = testOrganizationNameSearchTerm
     And param results = '2'
     And param page = '4'
+    And param sort = 'country desc'
     When method GET
     Then status 200
     And match response.hits == '#array'

@@ -98,7 +98,7 @@ Feature: API tests for Cristin persons query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['name', 'organization', 'organizationFacet', 'page', 'results', 'sectorFacet', 'verified']"
+    And match response.detail == "Invalid query parameter supplied. Valid parameters: ['name', 'organization', 'organizationFacet', 'page', 'results', 'sectorFacet', 'sort', 'verified']"
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
@@ -120,17 +120,6 @@ Feature: API tests for Cristin persons query
       | 'results'   | '-1'                |
       | 'page'      | 'hello'             |
       | 'results'   | 'hello'             |
-
-  Scenario: Query with missing query parameter returns Bad Request
-    Given path '/person/'
-    And method GET
-    Then status 400
-    * def contentType = responseHeaders['Content-Type'][0]
-    And match contentType == PROBLEM_JSON_MEDIA_TYPE
-    And match response.title == 'Bad Request'
-    And match response.status == 400
-    And match response.detail == "Parameter 'name' has invalid value. May only contain alphanumeric characters, dash, comma, period, colon, semicolon and whitespace"
-    And match response.requestId == '#notnull'
 
   Scenario: Query returns correct pagination values and URIs
     Given path '/person/'
@@ -187,6 +176,7 @@ Feature: API tests for Cristin persons query
     Given path '/person/'
     And param name = 'daniel'
     And param organization = 'uio'
+    And param sort = 'name desc'
     When method GET
     Then status 200
     * string searchString = response.searchString
@@ -194,6 +184,7 @@ Feature: API tests for Cristin persons query
     And match searchString contains 'name'
     And match searchString contains 'page'
     And match searchString contains 'results'
+    And match searchString contains 'sort'
 
   Scenario: Query returns aggregations when requesting version with aggregations
     Given path '/person/'
@@ -221,3 +212,15 @@ Feature: API tests for Cristin persons query
     And match identifiers !contains 'NationalIdentificationNumber'
     And match response.aggregations == '#present'
     And match response.aggregations.organizationFacet[0].id == '#present'
+
+  Scenario: Query returns all results when calling endpoint with no params
+    Given path '/person/'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response['@context'] == '#present'
+    And match response.id == '#present'
+    And match response.size == '#present'
+    And match response.hits == '#present'
+    And match response.hits[0].type == 'Person'
+    And match response.hits[0].id == '#regex ' + personIdRegex

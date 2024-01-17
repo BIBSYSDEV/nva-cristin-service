@@ -82,6 +82,10 @@ public class CristinPersonPatchJsonCreator {
      */
     public CristinPersonPatchJsonCreator createWithAllowedUserModifiableData() {
         addOrcid();
+        addPreferredFirstName();
+        addPreferredLastName();
+        addKeywords();
+        addBackgroundIfPresent();
 
         return this;
     }

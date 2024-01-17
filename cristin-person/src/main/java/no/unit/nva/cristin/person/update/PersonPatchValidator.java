@@ -67,6 +67,15 @@ public final class PersonPatchValidator {
     }
 
     /**
+     * Validate user modifiable fields according to rules of upstream json schema.
+     */
+    public static void validateUserModifiableFields(ObjectNode input) throws BadRequestException {
+        validateOrcidIfPresent(input);
+        validateKeywordsIfPresent(input);
+        validateDescription(input, BACKGROUND);
+    }
+
+    /**
      * Validate an orcid if present in input node.
      */
     public static void validateOrcidIfPresent(ObjectNode input) throws BadRequestException {

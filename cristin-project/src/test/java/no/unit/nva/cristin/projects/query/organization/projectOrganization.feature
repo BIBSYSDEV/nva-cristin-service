@@ -26,7 +26,7 @@ Feature: API tests for list Project pr Organization
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'category\', \'creator\', \'cristinId\', \'depth\', \'funding\', \'funding_source\', \'grantId\', \'institution\', \'keyword\', \'language\', \'modified_since\', \'name\', \'organization\', \'page\', \'participant\', \'project_manager\', \'query\', \'results\', \'sort\', \'status\', \'title\', \'unit\', \'user\']'
+    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'category\', \'creator\', \'cristinId\', \'depth\', \'funding\', \'funding_source\', \'grantId\', \'institution\', \'keyword\', \'language\', \'modified_since\', \'multiple\', \'name\', \'organization\', \'page\', \'participant\', \'project_manager\', \'query\', \'results\', \'sort\', \'status\', \'title\', \'unit\', \'user\']'
 
   Scenario: Get returns status OK and context in dummy response
     Given path '/organization/'+dummyOrganizationIdentifier+'/projects'
@@ -55,7 +55,7 @@ Feature: API tests for list Project pr Organization
 
   Scenario: Query with extended list of parameters and valid values returns OK
     Given path '/organization/'+realOrganizationIdentifier+'/projects'
-    And param sort = 'end_date'
+    And param sort = 'end_date desc'
     And param project_manager = 'St'
     And param participant = "olav h"
     And param funding_source = 'NRE'
