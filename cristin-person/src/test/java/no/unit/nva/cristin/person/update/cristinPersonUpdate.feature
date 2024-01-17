@@ -39,6 +39,11 @@ Feature: API tests for Cristin Person Update
       ],
       'background': {
         'en': 'My history as a researcher'
+      },
+      'contactDetails': {
+        'telephone': '11223344',
+        'email': 'test@example.org',
+        'webPage': 'www.example.org'
       }
     }
     """
