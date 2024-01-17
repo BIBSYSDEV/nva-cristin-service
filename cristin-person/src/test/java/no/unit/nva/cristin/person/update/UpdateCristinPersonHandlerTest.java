@@ -248,8 +248,6 @@ public class UpdateCristinPersonHandlerTest {
         var jsonObject = OBJECT_MAPPER.createObjectNode();
         jsonObject.put(FIRST_NAME, randomString());
         jsonObject.put(LAST_NAME, randomString());
-        jsonObject.put(PREFERRED_FIRST_NAME, randomString());
-        jsonObject.putNull(PREFERRED_LAST_NAME);
         jsonObject.put(RESERVED, true);
         var gatewayResponse = queryWithPersonCristinIdButNoAccessRights(validPath, jsonObject.toString());
 

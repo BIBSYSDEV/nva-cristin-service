@@ -232,6 +232,19 @@ Resources:
             Path: /project/{identifier}/
             Method: patch
 
+  NvaCristinListProjectCategoriesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-project
+      Handler: no.unit.nva.cristin.projects.category.ListCategoriesHandler::handleRequest
+      Events:
+        NvaCristinCategoryEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /category/project/
+            Method: get
+
   NvaCristinQueryOrganizationFunction:
     Type: AWS::Serverless::Function
     Properties:

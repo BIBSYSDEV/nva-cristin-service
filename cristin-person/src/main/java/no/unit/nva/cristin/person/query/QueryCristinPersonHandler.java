@@ -7,6 +7,7 @@ import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -21,7 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
+import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
+import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
@@ -46,7 +50,8 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
                                                                      NUMBER_OF_RESULTS,
                                                                      VERIFIED,
                                                                      SECTOR_PARAM.getNvaKey(),
-                                                                     INSTITUTION_PARAM.getNvaKey());
+                                                                     INSTITUTION_PARAM.getNvaKey(),
+                                                                     SORT);
     public static final String BOOLEAN_TRUE = "true";
     public static final String BOOLEAN_FALSE = "false";
 
@@ -84,9 +89,10 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         var verified = getValidVerified(requestInfo).orElse(null);
         var sectorFacet = requestInfo.getQueryParameterOpt(SECTOR_PARAM.getNvaKey()).orElse(null);
         var organizationFacet = requestInfo.getQueryParameterOpt(INSTITUTION_PARAM.getNvaKey()).orElse(null);
+        var sort = getSort(requestInfo);
 
         var requestQueryParameters = buildParametersMap(name, page, numberOfResults, organization, verified,
-                                                        sectorFacet, organizationFacet);
+                                                        sectorFacet, organizationFacet, sort);
 
         var apiVersion = getApiVersion(requestInfo);
         var apiClient = clientProvider.getClient(apiVersion);
@@ -111,6 +117,20 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         }
     }
 
+    @Override
+    protected String getValidName(RequestInfo requestInfo) throws BadRequestException {
+        var name = requestInfo.getQueryParameterOpt(NAME);
+
+        if (name.isEmpty()) {
+            return null;
+        }
+
+        return name.filter(this::isValidQueryString)
+                   .map(UriUtils::escapeWhiteSpace)
+                   .orElseThrow(() -> new BadRequestException(
+                       invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
+    }
+
     private Optional<String> getValidVerified(RequestInfo requestInfo) {
         return requestInfo.getQueryParameterOpt(VERIFIED).filter(this::hasEitherTrueFalse);
     }
@@ -119,17 +139,26 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         return BOOLEAN_FALSE.equalsIgnoreCase(verified) || BOOLEAN_TRUE.equalsIgnoreCase(verified);
     }
 
+    private String getSort(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(SORT)
+                   .map(UriUtils::escapeWhiteSpace)
+                   .orElse(null);
+    }
+
     private Map<String, String> buildParametersMap(String name,
                                                    String page,
                                                    String numberOfResults,
                                                    String organization,
                                                    String verified,
                                                    String sectorFacet,
-                                                   String organizationFacet) {
+                                                   String organizationFacet,
+                                                   String sort) {
 
         var requestQueryParameters = new ConcurrentHashMap<String, String>();
 
-        requestQueryParameters.put(NAME, name);
+        if (nonNull(name)) {
+            requestQueryParameters.put(NAME, name);
+        }
         requestQueryParameters.put(PAGE, page);
         requestQueryParameters.put(NUMBER_OF_RESULTS, numberOfResults);
         if (nonNull(organization)) {
@@ -143,6 +172,9 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         }
         if (nonNull(organizationFacet)) {
             requestQueryParameters.put(INSTITUTION_PARAM.getNvaKey(), organizationFacet);
+        }
+        if (nonNull(sort)) {
+            requestQueryParameters.put(SORT, sort);
         }
 
         return requestQueryParameters;

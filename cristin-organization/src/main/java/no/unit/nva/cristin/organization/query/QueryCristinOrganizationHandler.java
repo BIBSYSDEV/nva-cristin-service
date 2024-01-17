@@ -1,11 +1,13 @@
 package no.unit.nva.cristin.organization.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import java.util.Optional;
 import no.unit.nva.client.ClientProvider;
 import no.unit.nva.cristin.common.client.CristinQueryApiClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.Organization;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -19,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.client.ClientProvider.VERSION;
+import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
@@ -29,7 +32,8 @@ import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;
 
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
 
-    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH, VERSION);
+    private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH, VERSION,
+                                                                     SORT);
     private final transient ClientProvider<CristinQueryApiClient<Map<String, String>, Organization>> clientProvider;
 
     @JacocoGenerated
@@ -54,6 +58,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         requestQueryParams.put(DEPTH, getValidDepth(requestInfo));
         requestQueryParams.put(PAGE, getValidPage(requestInfo));
         requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
+        getSort(requestInfo).ifPresent(sort -> requestQueryParams.put(SORT, sort));
 
         var apiVersion = getApiVersion(requestInfo);
 
@@ -62,6 +67,11 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
 
     private String getApiVersion(RequestInfo requestInfo) {
         return extractVersionFromRequestInfo(requestInfo, ACCEPT_HEADER_KEY_NAME);
+    }
+
+    private Optional<String> getSort(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(SORT)
+                   .map(UriUtils::escapeWhiteSpace);
     }
 
     @Override

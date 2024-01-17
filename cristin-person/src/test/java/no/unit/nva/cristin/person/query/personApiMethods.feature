@@ -24,12 +24,6 @@ Feature: API tests for Cristin Person fetch
     When method TRACE
     Then status 405
 
-  Scenario: Supported method GET returns 400 bad request when missing query parameter
-    Given path '/person/'
-    When method GET
-    Then status 400
-    And match response.title == 'Bad Request'
-
   Scenario: Supported method POST returns 401 Unauthorized whe no authentication token
     Given path '/person/'
     When method POST

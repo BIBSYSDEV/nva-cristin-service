@@ -55,7 +55,7 @@ Feature: API tests for list Project pr Organization
 
   Scenario: Query with extended list of parameters and valid values returns OK
     Given path '/organization/'+realOrganizationIdentifier+'/projects'
-    And param sort = 'end_date'
+    And param sort = 'end_date desc'
     And param project_manager = 'St'
     And param participant = "olav h"
     And param funding_source = 'NRE'

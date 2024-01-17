@@ -45,6 +45,7 @@ import java.util.Set;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.model.QueryBuilder;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
 @SuppressWarnings({"PMD.GodClass"})
@@ -105,6 +106,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
             case STATUS -> withStatus(value);
             case CATEGORY, CATEGORY_FACET -> withCategory(value);
             case FUNDING_SOURCE, FUNDING_SOURCE_FACET -> withFundingSource(value);
+            case PAGE_SORT -> withItemSort(value);
             case APPROVAL_REFERENCE_ID, APPROVED_BY,
                      FUNDING,
                      GRANT_ID, INSTITUTION,
@@ -112,7 +114,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
                      NAME, PROJECT_MANAGER,
                      PROJECT_UNIT, TITLE,
                      USER, PAGE_CURRENT,
-                     PAGE_ITEMS_PER_PAGE, PAGE_SORT,
+                     PAGE_ITEMS_PER_PAGE,
                      CRISTIN_ID, MULTIPLE -> query.setValue(qpKey, value);
             case CREATOR -> withCreator(value);
             case SECTOR_FACET, COORDINATING_FACET,
@@ -240,7 +242,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
      * Setter sorting on 'start_date' and/or 'end_date'.
      */
     public QueryBuilderProject withItemSort(String sort) {
-        query.setValue(PAGE_SORT, sort);
+        query.setValue(PAGE_SORT, UriUtils.escapeWhiteSpace(sort));
         return this;
     }
 
