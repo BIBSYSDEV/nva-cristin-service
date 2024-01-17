@@ -85,4 +85,5 @@ public class Constants {
     public static final String GRANT_ID_CRISTIN_PARAM = "project_code";
     public static final String CRISTIN_ID_PARAM = "cristinId";
     public static final String CRISTIN_ID_CRISTIN_PARAM = "id";
+    public static final String MULTIPLE_PARAM = "multiple";
 }

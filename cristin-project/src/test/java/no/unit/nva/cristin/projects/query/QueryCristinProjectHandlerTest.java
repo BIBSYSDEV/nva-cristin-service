@@ -935,6 +935,25 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HTTP_OK, response.getStatusCode());
     }
 
+    @Test
+    void shouldAddParamMultipleToCristinQuery() throws IOException, ApiGatewayException {
+        cristinApiClientStub = spy(cristinApiClientStub);
+        doReturn(cristinApiClientStub).when(clientProvider).getVersionOne();
+        handler = new QueryCristinProjectHandler(clientProvider, new Environment());
+        final var queryParams = Map.of("multiple", "hello");
+        try (var input = requestWithQueryParameters(queryParams)) {
+            handler.handleRequest(input, output, context);
+        }
+        var captor = ArgumentCaptor.forClass(URI.class);
+
+        verify(cristinApiClientStub).fetchQueryResults(captor.capture());
+        var actualURI = captor.getValue().toString();
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        assertThat(actualURI, containsString("multiple=hello"));
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+    }
+
     private static Stream<Arguments> differentQueryParamsProvider() {
         return Stream.of(
             Arguments.of("årsstudium",

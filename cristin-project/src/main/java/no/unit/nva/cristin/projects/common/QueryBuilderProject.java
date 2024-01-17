@@ -115,7 +115,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
                      PROJECT_UNIT, TITLE,
                      USER, PAGE_CURRENT,
                      PAGE_ITEMS_PER_PAGE,
-                     CRISTIN_ID -> query.setValue(qpKey, value);
+                     CRISTIN_ID, MULTIPLE -> query.setValue(qpKey, value);
             case CREATOR -> withCreator(value);
             case SECTOR_FACET, COORDINATING_FACET,
                      RESPONSIBLE_FACET, HEALTH_FACET,
