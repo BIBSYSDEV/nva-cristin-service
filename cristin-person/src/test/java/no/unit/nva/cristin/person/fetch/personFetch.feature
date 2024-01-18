@@ -176,3 +176,14 @@ Feature: API tests for Cristin Person fetch
     And match response.type == 'Person'
     And match response.employments == '#present'
     And match response.employments[0].organization == '#present'
+
+  Scenario: Get returns more supported fields in payload for another user
+    * def sampleAnotherPersonIdentifier = '1684653'
+    Given path '/person/' + sampleAnotherPersonIdentifier
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.contactDetails == '#present'
+    And match response.contactDetails.telephone == '11223344'
+    And match response.contactDetails.email == 'test@example.org'
+    And match response.contactDetails.webPage == 'www.example.org'

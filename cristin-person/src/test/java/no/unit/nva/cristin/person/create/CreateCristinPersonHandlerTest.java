@@ -47,6 +47,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -63,11 +64,11 @@ import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.model.Organization;
-import no.unit.nva.model.TypedLabel;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
@@ -76,6 +77,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.zalando.problem.Problem;
 
 
@@ -93,8 +96,6 @@ public class CreateCristinPersonHandlerTest {
     private static final String ONE_ORGANIZATION = "https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0";
     private static final String LOG_MESSAGE_FOR_IDENTIFIERS = "Client has Cristin identifier 123456 from organization "
                                                               + "20754.0.0.0";
-    public static final String ENGLISH_LANG = "en";
-    public static final String ENGLISH_LANG_CONTENT = "My english background";
     public static final String VERIFIED_BY_ID_URI_NVI = "https://api.dev.nva.aws.unit.no/cristin/person/1234";
     public static final String VERIFIED_BY_NVI_CRISTIN_IDENTIFIER = "1234";
     public static final String ONE_ORGANIZATION_IDENTIFIER_LAST_PART = "20754.0.0.0";
@@ -374,46 +375,6 @@ public class CreateCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldAddKeywordsToCristinJsonWhenPresentInInput() throws Exception {
-        apiClient = spy(apiClient);
-        handler = new CreateCristinPersonHandler(apiClient, environment);
-
-        var dummyPerson = dummyPerson();
-        var dummyKeyword = randomKeyword();
-        dummyPerson.setKeywords(Set.of(dummyKeyword));
-
-        var actual = sendQuery(dummyPerson);
-
-        var captor = ArgumentCaptor.forClass(String.class);
-        verify(apiClient).post(any(), captor.capture());
-        var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
-        var codeFromCapture = capturedCristinPerson.getKeywords().get(0).getCode();
-
-        assertThat(codeFromCapture, equalTo(dummyKeyword.getType()));
-        assertThat(actual.getStatusCode(), equalTo(HTTP_CREATED));
-    }
-
-    @Test
-    void shouldAddBackgroundToCristinJsonWhenPresentInInput() throws Exception {
-        apiClient = spy(apiClient);
-        handler = new CreateCristinPersonHandler(apiClient, environment);
-
-        var dummyPerson = dummyPerson();
-        var dummyBackground = Map.of(ENGLISH_LANG, ENGLISH_LANG_CONTENT);
-        dummyPerson.setBackground(dummyBackground);
-
-        var actual = sendQuery(dummyPerson);
-
-        var captor = ArgumentCaptor.forClass(String.class);
-        verify(apiClient).post(any(), captor.capture());
-        var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
-        var backgroundFromCapture = capturedCristinPerson.getBackground();
-
-        assertThat(backgroundFromCapture.get(ENGLISH_LANG), equalTo(ENGLISH_LANG_CONTENT));
-        assertThat(actual.getStatusCode(), equalTo(HTTP_CREATED));
-    }
-
-    @Test
     void shouldAddPersonNviDataToCristinJsonWhenPresentInInput() throws Exception {
         apiClient = spy(apiClient);
         handler = new CreateCristinPersonHandler(apiClient, environment);
@@ -457,8 +418,25 @@ public class CreateCristinPersonHandlerTest {
         assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
     }
 
-    private TypedLabel randomKeyword() {
-        return new TypedLabel(randomString(), null);
+    @Test
+    void shouldHaveCorrectDataFromInputInUpstreamJson() throws Exception {
+        apiClient = spy(apiClient);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+
+        var inputJson = readFile("nvaApiCreatePersonRequestMoreFields.json");
+        var input = OBJECT_MAPPER.readValue(inputJson, Person.class);
+        var actual = sendQuery(input);
+
+        var captor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(any(), captor.capture());
+        var expectedCristinRequest = readFile("cristinCreatePersonRequest.json");
+
+        JSONAssert.assertEquals(expectedCristinRequest, captor.getValue(), JSONCompareMode.LENIENT);
+        assertThat(actual.getStatusCode(), equalTo(HTTP_CREATED));
+    }
+
+    private static String readFile(String file) {
+        return IoUtils.stringFromResources(Path.of(file));
     }
 
     private CristinAffiliation randomCristinAffiliation() {

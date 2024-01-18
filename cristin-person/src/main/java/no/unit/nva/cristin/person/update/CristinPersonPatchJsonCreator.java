@@ -7,7 +7,13 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PERSON_NVI;
+import static no.unit.nva.cristin.person.model.nva.ContactDetails.EMAIL;
+import static no.unit.nva.cristin.person.model.nva.ContactDetails.TELEPHONE;
+import static no.unit.nva.cristin.person.model.nva.ContactDetails.WEB_PAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CRISTIN_TELEPHONE;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CRISTIN_WEB_PAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NVI;
@@ -66,6 +72,7 @@ public class CristinPersonPatchJsonCreator {
         addKeywords();
         addBackgroundIfPresent();
         addNviIfPresent();
+        addContactDetailsIfPresent();
 
         return this;
     }
@@ -181,6 +188,50 @@ public class CristinPersonPatchJsonCreator {
             }).orElseThrow();
 
             output.set(PERSON_NVI, nviInCristinFormat);
+        }
+    }
+
+    private void addContactDetailsIfPresent() {
+        if (input.has(CONTACT_DETAILS) && !input.get(CONTACT_DETAILS).isNull()) {
+            addTelephoneIfPresent();
+            addEmailIfPresent();
+            addWebPageIfPresent();
+        }
+    }
+
+    private void addTelephoneIfPresent() {
+        var contactDetails = input.get(CONTACT_DETAILS);
+
+        if (contactDetails.has(TELEPHONE)) {
+            if (contactDetails.get(TELEPHONE).isNull()) {
+                output.putNull(CRISTIN_TELEPHONE);
+            } else {
+                output.put(CRISTIN_TELEPHONE, contactDetails.get(TELEPHONE).asText());
+            }
+        }
+    }
+
+    private void addEmailIfPresent() {
+        var contactDetails = input.get(CONTACT_DETAILS);
+
+        if (contactDetails.has(EMAIL)) {
+            if (contactDetails.get(EMAIL).isNull()) {
+                output.putNull(EMAIL);
+            } else {
+                output.put(EMAIL, contactDetails.get(EMAIL).asText());
+            }
+        }
+    }
+
+    private void addWebPageIfPresent() {
+        var contactDetails = input.get(CONTACT_DETAILS);
+
+        if (contactDetails.has(WEB_PAGE)) {
+            if (contactDetails.get(WEB_PAGE).isNull()) {
+                output.putNull(CRISTIN_WEB_PAGE);
+            } else {
+                output.put(CRISTIN_WEB_PAGE, contactDetails.get(WEB_PAGE).asText());
+            }
         }
     }
 

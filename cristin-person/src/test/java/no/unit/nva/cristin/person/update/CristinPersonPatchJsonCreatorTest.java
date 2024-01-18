@@ -14,7 +14,13 @@ import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PERSON_NVI;
 import static no.unit.nva.cristin.person.model.cristin.CristinPersonNvi.VERIFIED_AT;
 import static no.unit.nva.cristin.person.model.cristin.CristinPersonNvi.VERIFIED_BY;
 import static no.unit.nva.cristin.person.model.cristin.CristinPersonSummary.CRISTIN_PERSON_ID;
+import static no.unit.nva.cristin.person.model.nva.ContactDetails.EMAIL;
+import static no.unit.nva.cristin.person.model.nva.ContactDetails.TELEPHONE;
+import static no.unit.nva.cristin.person.model.nva.ContactDetails.WEB_PAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CRISTIN_TELEPHONE;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CRISTIN_WEB_PAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NVI;
@@ -52,6 +58,9 @@ public class CristinPersonPatchJsonCreatorTest {
     public static final String ENGLISH_LANG = "en";
     public static final String NORWEGIAN_LANG = "no";
     public static final String NORWEGIAN_LANG_CONTENT = "Norsk";
+    public static final String SOME_NUMBER = "11223344";
+    public static final String SOME_EMAIL = "hello@example.org";
+    public static final String SOME_WEBPAGE = "www.example.org";
 
     @Test
     void shouldParseInputJsonIntoCristinJsonWithCorrectMappingOfFields() {
@@ -63,6 +72,13 @@ public class CristinPersonPatchJsonCreatorTest {
         input.putNull(PREFERRED_LAST_NAME);
         input.put(RESERVED, true);
 
+        var contactDetails = OBJECT_MAPPER.createObjectNode();
+        contactDetails.put(TELEPHONE, SOME_NUMBER);
+        contactDetails.put(EMAIL, SOME_EMAIL);
+        contactDetails.put(WEB_PAGE, SOME_WEBPAGE);
+
+        input.set(CONTACT_DETAILS, contactDetails);
+
         var result = new CristinPersonPatchJsonCreator(input).create().getOutput();
 
         assertEquals(VALID_ORCID, result.get(ORCID).get(ID).asText());
@@ -72,6 +88,9 @@ public class CristinPersonPatchJsonCreatorTest {
         assertThat(result.has(CRISTIN_SURNAME_PREFERRED), equalTo(true));
         assertThat(result.get(CRISTIN_SURNAME_PREFERRED).isNull(), equalTo(true));
         assertThat(result.get(RESERVED).asBoolean(), equalTo(true));
+        assertThat(result.get(CRISTIN_TELEPHONE).asText(), equalTo(SOME_NUMBER));
+        assertThat(result.get(EMAIL).asText(), equalTo(SOME_EMAIL));
+        assertThat(result.get(CRISTIN_WEB_PAGE).asText(), equalTo(SOME_WEBPAGE));
     }
 
     @Test
