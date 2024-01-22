@@ -306,6 +306,12 @@ public class CristinPersonPatchJsonCreatorTest {
         input.putArray(KEYWORDS).add(OBJECT_MAPPER.readTree(keyword.toString()));
         input.putObject(BACKGROUND).putNull(ENGLISH_LANG).put(NORWEGIAN_LANG, NORWEGIAN_LANG_CONTENT);
 
+        var contactDetails = OBJECT_MAPPER.createObjectNode();
+        contactDetails.put(TELEPHONE, SOME_NUMBER);
+        contactDetails.put(EMAIL, SOME_EMAIL);
+        contactDetails.put(WEB_PAGE, SOME_WEBPAGE);
+        input.set(CONTACT_DETAILS, contactDetails);
+
         var result = new CristinPersonPatchJsonCreator(input).createWithAllowedUserModifiableData().getOutput();
 
         assertEquals(VALID_ORCID, result.get(ORCID).get(ID).asText());
@@ -320,6 +326,9 @@ public class CristinPersonPatchJsonCreatorTest {
         assertThat(result.get(BACKGROUND).isObject(), equalTo(true));
         assertThat(result.get(BACKGROUND).get(ENGLISH_LANG).isNull(), equalTo(true));
         assertThat(result.get(BACKGROUND).get(NORWEGIAN_LANG).asText(), equalTo(NORWEGIAN_LANG_CONTENT));
+        assertThat(result.get(CRISTIN_TELEPHONE).asText(), equalTo(SOME_NUMBER));
+        assertThat(result.get(EMAIL).asText(), equalTo(SOME_EMAIL));
+        assertThat(result.get(CRISTIN_WEB_PAGE).asText(), equalTo(SOME_WEBPAGE));
     }
 
     private static String getIdUriString(String identifier) {
