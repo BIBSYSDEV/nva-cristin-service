@@ -86,6 +86,7 @@ public class CristinPersonPatchJsonCreator {
         addPreferredLastName();
         addKeywords();
         addBackgroundIfPresent();
+        addContactDetailsIfPresent();
 
         return this;
     }
