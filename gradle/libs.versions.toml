@@ -17,7 +17,7 @@ slf4j = { require = '2.0.5' }
 nva-language = { strictly = '1.0' }
 awsSdk = { strictly = '1.12.483' }
 awsSdk2 = { strictly = '2.20.141' }
-bekkopen-nocommons = { strictly = '0.12.0' }
+bekkopen-nocommons = { strictly = '0.16.0' }
 com-auth0-jwt = { strictly = '3.18.3' }
 com-auth0-jwks = { strictly = '0.20.2' }
 wiremock = { strictly = '3.0.2' }

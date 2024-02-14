@@ -65,7 +65,6 @@ import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
@@ -87,6 +86,9 @@ public class CreateCristinPersonHandlerTest {
     private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
     private static final String ANOTHER_IDENTITY_NUMBER = "12111739534";
     private static final String INVALID_IDENTITY_NUMBER = "11223344556";
+    private static final String FOREIGN_IDENTITY_NUMBER = "47117631634";
+    private static final String ANOTHER_FOREIGN_IDENTITY_NUMBER = "61040918288";
+    private static final String EVEN_ANOTHER_FOREIGN_IDENTITY_NUMBER = "47060482343";
     private static final String EMPTY_JSON = "{}";
     private static final String DUMMY_FIRST_NAME = randomString();
     private static final String DUMMY_LAST_NAME = randomString();
@@ -435,6 +437,21 @@ public class CreateCristinPersonHandlerTest {
         assertThat(actual.getStatusCode(), equalTo(HTTP_CREATED));
     }
 
+    @ParameterizedTest(name = "Should accept identity number {0}")
+    @ValueSource(strings = {
+        DEFAULT_IDENTITY_NUMBER,
+        ANOTHER_IDENTITY_NUMBER,
+        FOREIGN_IDENTITY_NUMBER,
+        ANOTHER_FOREIGN_IDENTITY_NUMBER,
+        EVEN_ANOTHER_FOREIGN_IDENTITY_NUMBER
+    })
+    void shouldAcceptBothForeignAndNorwegianIdentityNumberAndReturnCreated(String identityNumber) throws IOException {
+        var input = dummyPerson(identityNumber);
+        var response = sendQuery(input);
+
+        assertEquals(HTTP_CREATED, response.getStatusCode());
+    }
+
     private static String readFile(String file) {
         return IoUtils.stringFromResources(Path.of(file));
     }
@@ -510,6 +527,15 @@ public class CreateCristinPersonHandlerTest {
                 new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
             .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DEFAULT_IDENTITY_NUMBER)))
             .build();
+    }
+
+    private Person dummyPerson(String identityNumber) {
+        return new Person.Builder()
+                   .withNames(Set.of(
+                       new TypedValue(FIRST_NAME, DUMMY_FIRST_NAME),
+                       new TypedValue(LAST_NAME, DUMMY_LAST_NAME)))
+                   .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, identityNumber)))
+                   .build();
     }
 
     private Person dummyPersonWithInvalidIdentityNumber() {

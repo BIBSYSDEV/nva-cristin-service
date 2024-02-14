@@ -34,6 +34,8 @@ import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.cristin.person.util.DNumberUtils.isDNumber;
+import static no.unit.nva.cristin.person.util.DNumberUtils.parseDNumber;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
@@ -139,6 +141,10 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     }
 
     private boolean identificationNumberIsValid(String number) {
+        if (isDNumber(number)) {
+            return FodselsnummerValidator.isValid(parseDNumber(number));
+        }
+
         return FodselsnummerValidator.isValid(number);
     }
 
