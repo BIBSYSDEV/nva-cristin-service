@@ -63,5 +63,29 @@
     "nb": "Akademisk Rådgiver ved UiO"
   },
   "email": "kjell@ola.no",
-  "web_page": "https://www.kjell.no"
+  "web_page": "https://www.kjell.no",
+  "place": {
+    "en": "Oslo University",
+    "nb": "Universitetet i Oslo"
+  },
+  "collaboration": {
+    "en": "NTNU in Trondheim",
+    "nb": "NTNU på lokasjon i Trondheim"
+  },
+  "countries": [
+    {
+      "code": "CA",
+      "name": {
+        "en": "Canada",
+        "nb": "Canada"
+      }
+    },
+    {
+      "code": "GB",
+      "name": {
+        "en": "United Kingdom",
+        "nb": "Storbritannia"
+      }
+    }
+  ]
 }
