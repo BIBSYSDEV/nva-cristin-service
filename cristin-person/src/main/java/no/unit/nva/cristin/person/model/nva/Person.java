@@ -296,7 +296,7 @@ public class Person implements JsonSerializable {
 
         cristinPerson.setDetailedAffiliations(mapEmploymentsToCristinEmployments(getEmployments()));
         cristinPerson.setReserved(getReserved());
-        cristinPerson.setKeywords(extractKeywordCodes(getKeywords()));
+        cristinPerson.setKeywords(extractCristinTypedLabel(getKeywords()));
         cristinPerson.setBackground(getBackground());
 
         if (nonNull(getNvi())) {
@@ -312,6 +312,10 @@ public class Person implements JsonSerializable {
             cristinPerson.setWebPage(getContactDetails().getWebPage().orElse(null));
         }
 
+        cristinPerson.setPlace(getPlace());
+        cristinPerson.setCollaboration(getCollaboration());
+        cristinPerson.setCountries(extractCristinTypedLabel(getCountries()));
+
         return cristinPerson;
     }
 
@@ -326,8 +330,8 @@ public class Person implements JsonSerializable {
         return CristinPersonSummary.builder().withCristinPersonId(personHavingVerifiedId).build();
     }
 
-    private List<CristinTypedLabel> extractKeywordCodes(Set<TypedLabel> keywords) {
-        return keywords.stream()
+    private List<CristinTypedLabel> extractCristinTypedLabel(Set<TypedLabel> typedLabels) {
+        return typedLabels.stream()
             .map(label -> new CristinTypedLabel(label.getType(), null))
             .collect(Collectors.toList());
     }

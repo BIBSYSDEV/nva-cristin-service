@@ -16,5 +16,21 @@
   },
   "tel": "+4799885566",
   "email": "kjell@ola.no",
-  "web_page": "https://www.kjell.no"
+  "web_page": "https://www.kjell.no",
+  "place": {
+    "en": "Oslo University",
+    "nb": "Universitetet i Oslo"
+  },
+  "collaboration": {
+    "en": "NTNU in Trondheim",
+    "nb": "NTNU på lokasjon i Trondheim"
+  },
+  "countries": [
+    {
+      "code": "CA"
+    },
+    {
+      "code": "GB"
+    }
+  ]
 }
