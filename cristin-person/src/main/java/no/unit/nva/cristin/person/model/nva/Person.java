@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.List;
+import java.util.Locale;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.model.CristinUnit;
@@ -332,8 +333,9 @@ public class Person implements JsonSerializable {
 
     private List<CristinTypedLabel> extractCristinTypedLabel(Set<TypedLabel> typedLabels) {
         return typedLabels.stream()
-            .map(label -> new CristinTypedLabel(label.getType(), null))
-            .collect(Collectors.toList());
+                   .filter(label -> nonNull(label.getType()))
+                   .map(label -> new CristinTypedLabel(label.getType().toUpperCase(Locale.ROOT), null))
+                   .collect(Collectors.toList());
     }
 
     private Map<String, String> convertTypedValuesToMap(Set<TypedValue> typedValueSet) {

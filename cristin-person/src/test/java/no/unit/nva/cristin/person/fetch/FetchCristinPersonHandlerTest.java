@@ -102,7 +102,7 @@ public class FetchCristinPersonHandlerTest {
         var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBody();
         var expected = stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
 
-        JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT);
+        JSONAssert.assertEquals(expected, actual, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
