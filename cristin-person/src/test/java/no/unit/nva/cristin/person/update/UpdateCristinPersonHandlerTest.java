@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.common.ErrorMessages;
@@ -14,6 +15,7 @@ import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,12 +43,14 @@ import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COUNTRIES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
+import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_COUNTRIES_FIELD;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_EMPLOYMENT_FIELD;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_KEYWORD_FIELD;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_NVI_FIELD;
@@ -77,38 +81,7 @@ import static org.mockito.Mockito.when;
 
 public class UpdateCristinPersonHandlerTest {
 
-    public static final String NVI_JSON_AT_185 = """
-        {
-            "preferredFirstName" : "Erik",
-            "nvi": {
-              "verifiedBy": {
-                "id": "https://api.dev.nva.aws.unit.no/cristin/person/12345",
-                "type": "Person",
-                "firstName": "Tor Inge",
-                "lastName": "Kristianslund"
-              },
-              "verifiedAt": {
-                "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0",
-                "type": "Organization",
-                "labels": {
-                  "en": "Faculty of Theology"
-                },
-                "partOf": [
-                  {
-                    "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
-                    "type": "Organization",
-                    "labels": {
-                      "en": "University of Oslo"
-                    },
-                    "acronym": "UIO",
-                    "country": "NO"
-                  }
-                ]
-              },
-              "verifiedDate": "2023-10-03T15:00:30Z"
-            }
-        }
-        """;
+    private static final String NVI_JSON_AT_185 = IoUtils.stringFromResources(Path.of("nvaApiPersonNviData.json"));
     private static final String PERSON_CRISTIN_ID = "123456";
     private static final URI PERSON_CRISTIN_ID_URI = UriWrapper.fromUri(randomUri()).addChild(PERSON_CRISTIN_ID)
                                                          .getUri();
@@ -116,8 +89,8 @@ public class UpdateCristinPersonHandlerTest {
     private static final String VALID_ORCID = "1234-1234-1234-1234";
     private static final String INVALID_ORCID = "1234";
     private static final String SOME_TEXT = "Hello";
-    public static final String UNSUPPORTED_FIELD = "unsupportedField";
-    public static final String INVALID_IDENTIFIER = "hello";
+    private static final String UNSUPPORTED_FIELD = "unsupportedField";
+    private static final String INVALID_IDENTIFIER = "hello";
     private static final String IDENTIFIER_NOT_MATCHING_COGNITO = "555666";
     private static final String SOME_ORGANIZATION = "185.90.0.0";
 
@@ -403,6 +376,18 @@ public class UpdateCristinPersonHandlerTest {
 
         verify(apiClient).patch(any(), captor.capture(), eq(clientInstitutionId));
     }
+
+    @Test
+    void shouldThrowBadRequestWhenPersonCountriesNotValid() throws IOException {
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
+        var invalidData = randomString();
+        jsonObject.put(COUNTRIES, invalidData);
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(COULD_NOT_PARSE_COUNTRIES_FIELD));
+    }
+
 
     private static Stream<Arguments> personNviBadRequestProvider() {
         return Stream.of(

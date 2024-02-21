@@ -1,0 +1,56 @@
+{
+  "orcid": "1234-1234-1234-1234",
+  "firstName": "Knut",
+  "lastName": "Hansen",
+  "preferredFirstName": "Knut Ivar",
+  "preferredLastName": null,
+  "reserved": true,
+  "contactDetails": {
+    "telephone": "11223344",
+    "email": "hello@example.org",
+    "webPage": "www.example.org"
+  },
+  "employments": [
+    {
+      "type": "https://www.example.com/engineer#1087",
+      "organization": "https://www.example.com/organization/185.90.0.0",
+      "startDate": "1974-04-29T19:09:44.800Z",
+      "endDate": "1975-08-30T21:45:42.458Z",
+      "fullTimeEquivalentPercentage": 70.0
+    }
+  ],
+  "keywords": [
+    {
+      "type": "1234",
+      "value": "Helse"
+    }
+  ],
+  "background": {
+    "en": null,
+    "no": "Norsk bakgrunn"
+  },
+  "place": {
+    "en": null,
+    "no": "Norsk sted"
+  },
+  "collaboration": {
+    "en": null,
+    "no": "Norsk samarbeid"
+  },
+  "countries": [
+    {
+      "type": "en",
+      "label": {
+        "nb": "England"
+      }
+    }
+  ],
+  "nvi": {
+    "verifiedBy": {
+      "id": "https://www.example.com/person/1234"
+    },
+    "verifiedAt": {
+      "id": "https://www.example.com/organization/20754.0.0.0"
+    }
+  }
+}

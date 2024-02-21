@@ -4,10 +4,13 @@ import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COLLABORATION;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COUNTRIES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NVI;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PLACE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.validation.PatchValidator.validateDescription;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,6 +23,7 @@ import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.PersonNvi;
 import no.unit.nva.cristin.person.model.nva.PersonSummary;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
+import no.unit.nva.model.TypedLabel;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.JacocoGenerated;
@@ -46,6 +50,9 @@ public final class PersonPatchValidator {
         "Person NVI data must have a valid Organization identifier";
     public static final String MUST_HAVE_A_VALID_PERSON_IDENTIFIER =
         "Person NVI data must have a valid Person identifier";
+    private static final String EXCEPTION_WHEN_VALIDATING_COUNTRIES = "Exception when validating countries: {}";
+    public static final String COULD_NOT_PARSE_COUNTRIES_FIELD = "Could not parse countries field because of "
+                                                               + "invalid data";
 
     @JacocoGenerated
     private PersonPatchValidator() {
@@ -64,6 +71,9 @@ public final class PersonPatchValidator {
         validateKeywordsIfPresent(input);
         validateDescription(input, BACKGROUND);
         validateNviIfPresent(input);
+        validateDescription(input, PLACE);
+        validateDescription(input, COLLABORATION);
+        validateCountriesIfPresent(input);
     }
 
     /**
@@ -73,6 +83,9 @@ public final class PersonPatchValidator {
         validateOrcidIfPresent(input);
         validateKeywordsIfPresent(input);
         validateDescription(input, BACKGROUND);
+        validateDescription(input, PLACE);
+        validateDescription(input, COLLABORATION);
+        validateCountriesIfPresent(input);
     }
 
     /**
@@ -163,5 +176,20 @@ public final class PersonPatchValidator {
 
     private static BadRequestException invalidIdentifier(String msg) {
         return new BadRequestException(msg);
+    }
+
+    private static void validateCountriesIfPresent(ObjectNode input) throws BadRequestException {
+        if (input.has(COUNTRIES) && !input.get(COUNTRIES).isNull()) {
+            parseCountries(input);
+        }
+    }
+
+    private static void parseCountries(ObjectNode input) throws BadRequestException {
+        try {
+            OBJECT_MAPPER.readValue(input.get(COUNTRIES).toString(), TypedLabel[].class);
+        } catch (JsonProcessingException e) {
+            logger.warn(EXCEPTION_WHEN_VALIDATING_COUNTRIES, e.getMessage());
+            throw new BadRequestException(COULD_NOT_PARSE_COUNTRIES_FIELD);
+        }
     }
 }
