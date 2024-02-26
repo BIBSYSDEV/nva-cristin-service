@@ -60,10 +60,10 @@ class ListCountriesHandlerTest {
 
     @Test
     void shouldReturnListOfCountriesWhenCallingUpstream() throws Exception {
-        var response = sendQuery();
-        var responseBody = response.getBodyObject(Countries.class);
-        var expected = IoUtils.stringFromResources(Path.of(NVA_COUNTRIES_RESPONSE_JSON));
-        var expectedList = asList(OBJECT_MAPPER.readValue(expected, Country[].class));
+        final var response = sendQuery();
+        final var responseBody = response.getBodyObject(Countries.class);
+        final var expected = IoUtils.stringFromResources(Path.of(NVA_COUNTRIES_RESPONSE_JSON));
+        final var expectedList = asList(OBJECT_MAPPER.readValue(expected, Country[].class));
 
         assertThat(response.getStatusCode(), equalTo(HTTP_OK));
         assertThat(responseBody.countries().size(), equalTo(THREE_HITS));
