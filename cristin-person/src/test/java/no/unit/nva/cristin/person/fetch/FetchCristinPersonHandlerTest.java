@@ -98,12 +98,11 @@ public class FetchCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseWhenCallingEndpointWithValidIdentifier() throws IOException {
-        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
-        var expectedString = stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
-        var expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
+    void shouldReturnResponseWhenCallingEndpointWithValidIdentifier() throws Exception {
+        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBody();
+        var expected = stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
 
-        assertThat(actual, equalTo(expected));
+        JSONAssert.assertEquals(expected, actual, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
@@ -279,6 +278,25 @@ public class FetchCristinPersonHandlerTest {
         assertThat(actual, equalTo(expected));
     }
 
+    @Test
+    void shouldNotHaveEmploymentFieldInResponseWhenNotInUpstreamPayload() throws IOException {
+        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
+
+        assertThat(actual.getEmployments(), equalTo(null));
+    }
+
+    @Test
+    void shouldReturnResponseContainingNviDataWhenPresentInUpstream() throws Exception {
+        var json = readFromResources(CRISTIN_PERSON_NVI_VERIFIED_JSON);
+        apiClient = spy(apiClient);
+        doReturn(new HttpResponseFaker(json)).when(apiClient).fetchGetResult(any(URI.class));
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBody();
+        var expected = readFromResources(NVA_API_GET_PERSON_NVI_VERIFIED_JSON);
+
+        JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT);
+    }
+
     private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {
         return responseBody.getIdentifiers().stream()
                    .filter(typedValue -> typedValue.getType().equals(NATIONAL_IDENTITY_NUMBER))
@@ -301,25 +319,6 @@ public class FetchCristinPersonHandlerTest {
             stringFromResources(Path.of(CRISTIN_QUERY_EMPLOYMENT_RESPONSE_JSON)), CristinPersonEmployment[].class));
         cristinPerson.setDetailedAffiliations(cristinPersonEmployments);
         return OBJECT_MAPPER.writeValueAsString(cristinPerson);
-    }
-
-    @Test
-    void shouldNotHaveEmploymentFieldInResponseWhenNotInUpstreamPayload() throws IOException {
-        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
-
-        assertThat(actual.getEmployments(), equalTo(null));
-    }
-
-    @Test
-    void shouldReturnResponseContainingNviDataWhenPresentInUpstream() throws Exception {
-        var json = readFromResources(CRISTIN_PERSON_NVI_VERIFIED_JSON);
-        apiClient = spy(apiClient);
-        doReturn(new HttpResponseFaker(json)).when(apiClient).fetchGetResult(any(URI.class));
-        handler = new FetchCristinPersonHandler(apiClient, environment);
-        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBody();
-        var expected = readFromResources(NVA_API_GET_PERSON_NVI_VERIFIED_JSON);
-
-        JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT);
     }
 
     private static String readFromResources(String json) {

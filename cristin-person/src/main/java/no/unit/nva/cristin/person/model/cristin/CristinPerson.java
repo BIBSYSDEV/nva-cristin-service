@@ -34,7 +34,7 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 
-@SuppressWarnings({"unused", "PMD.GodClass", "PMD.TooManyFields"})
+@SuppressWarnings({"unused", "PMD.GodClass", "PMD.TooManyFields", "PMD.ExcessivePublicCount"})
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPerson implements JsonSerializable {
@@ -72,6 +72,9 @@ public class CristinPerson implements JsonSerializable {
     private CristinPersonNvi personNvi;
     private String email;
     private String webPage;
+    private Map<String, String> place;
+    private Map<String, String> collaboration;
+    private List<CristinTypedLabel> countries;
 
     public String getCristinPersonId() {
         return cristinPersonId;
@@ -218,6 +221,30 @@ public class CristinPerson implements JsonSerializable {
         this.webPage = webPage;
     }
 
+    public Map<String, String> getPlace() {
+        return nonEmptyOrDefault(place);
+    }
+
+    public void setPlace(Map<String, String> place) {
+        this.place = place;
+    }
+
+    public Map<String, String> getCollaboration() {
+        return nonEmptyOrDefault(collaboration);
+    }
+
+    public void setCollaboration(Map<String, String> collaboration) {
+        this.collaboration = collaboration;
+    }
+
+    public List<CristinTypedLabel> getCountries() {
+        return nonEmptyOrDefault(countries);
+    }
+
+    public void setCountries(List<CristinTypedLabel> countries) {
+        this.countries = countries;
+    }
+
     /**
      * Creates a Nva person model from a Cristin person model. If the person is not publicly viewable, only returns
      * identifier.
@@ -240,6 +267,9 @@ public class CristinPerson implements JsonSerializable {
                    .withKeywords(extractKeywords())
                    .withBackground(extractBackground())
                    .withNvi(extractNvi())
+                   .withPlace(extractPlace())
+                   .withCollaboration(extractCollaboration())
+                   .withCountries(extractCountries())
                    .build();
     }
 
@@ -264,6 +294,9 @@ public class CristinPerson implements JsonSerializable {
                    .withKeywords(extractKeywords())
                    .withBackground(extractBackground())
                    .withNvi(extractNvi())
+                   .withPlace(extractPlace())
+                   .withCollaboration(extractCollaboration())
+                   .withCountries(extractCountries())
                    .build();
     }
 
@@ -342,6 +375,18 @@ public class CristinPerson implements JsonSerializable {
 
     private PersonNvi extractNvi() {
         return nonNull(getPersonNvi()) ? getPersonNvi().toPersonNvi() : null;
+    }
+
+    private Map<String, String> extractPlace() {
+        return new ConcurrentHashMap<>(getPlace());
+    }
+
+    private Map<String, String> extractCollaboration() {
+        return new ConcurrentHashMap<>(getCollaboration());
+    }
+
+    private Set<TypedLabel> extractCountries() {
+        return getCountries().stream().map(this::toTypedLabel).collect(Collectors.toSet());
     }
 
     @Override
