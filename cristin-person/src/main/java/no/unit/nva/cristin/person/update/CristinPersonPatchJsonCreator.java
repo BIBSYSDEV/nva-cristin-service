@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.update;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_EMPLOYMENTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
@@ -11,19 +12,23 @@ import static no.unit.nva.cristin.person.model.nva.ContactDetails.EMAIL;
 import static no.unit.nva.cristin.person.model.nva.ContactDetails.TELEPHONE;
 import static no.unit.nva.cristin.person.model.nva.ContactDetails.WEB_PAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COLLABORATION;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COUNTRIES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CRISTIN_TELEPHONE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CRISTIN_WEB_PAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NVI;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PLACE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.model.CristinTypedLabel;
@@ -38,6 +43,7 @@ import no.unit.nva.cristin.person.model.nva.PersonNvi;
 import no.unit.nva.cristin.person.model.nva.PersonSummary;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.model.Organization;
+import no.unit.nva.model.TypedLabel;
 import no.unit.nva.utils.UriUtils;
 
 public class CristinPersonPatchJsonCreator {
@@ -73,6 +79,9 @@ public class CristinPersonPatchJsonCreator {
         addBackgroundIfPresent();
         addNviIfPresent();
         addContactDetailsIfPresent();
+        addPlaceIfPresent();
+        addCollaborationIfPresent();
+        addCountriesIfPresent();
 
         return this;
     }
@@ -87,6 +96,9 @@ public class CristinPersonPatchJsonCreator {
         addKeywords();
         addBackgroundIfPresent();
         addContactDetailsIfPresent();
+        addPlaceIfPresent();
+        addCollaborationIfPresent();
+        addCountriesIfPresent();
 
         return this;
     }
@@ -260,5 +272,36 @@ public class CristinPersonPatchJsonCreator {
                    .map(PersonNvi::verifiedAt)
                    .map(Organization::getId)
                    .map(UriUtils::extractLastPathElement);
+    }
+
+    private void addPlaceIfPresent() {
+        if (input.has(PLACE)) {
+            output.set(PLACE, input.get(PLACE));
+        }
+    }
+
+    private void addCollaborationIfPresent() {
+        if (input.has(COLLABORATION)) {
+            output.set(COLLABORATION, input.get(COLLABORATION));
+        }
+    }
+
+    private void addCountriesIfPresent() {
+        if (input.has(COUNTRIES) && !input.get(COUNTRIES).isNull()) {
+            var countriesInCristinFormat =
+                attempt(() -> {
+                    var parsedInput =
+                        asList(OBJECT_MAPPER.readValue(input.get(COUNTRIES).toString(), TypedLabel[].class));
+                    return OBJECT_MAPPER.readTree(typedLabelsToCristinFormat(parsedInput).toString());
+                }).orElseThrow();
+            output.set(COUNTRIES, countriesInCristinFormat);
+        }
+    }
+
+    private List<CristinTypedLabel> typedLabelsToCristinFormat(List<TypedLabel> typedLabels) {
+        return typedLabels.stream()
+                   .filter(elm -> nonNull(elm.getType()))
+                   .map(elm -> new CristinTypedLabel(elm.getType().toUpperCase(Locale.ROOT), null))
+                   .collect(Collectors.toList());
     }
 }

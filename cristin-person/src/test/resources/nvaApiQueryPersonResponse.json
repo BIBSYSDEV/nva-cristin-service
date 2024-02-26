@@ -90,7 +90,31 @@
       "background": {
         "en": "Academic Advisor at UiO",
         "nb": "Akademisk Rådgiver ved UiO"
-      }
+      },
+      "place": {
+        "en": "Oslo University",
+        "nb": "Universitetet i Oslo"
+      },
+      "collaboration": {
+        "en": "NTNU in Trondheim",
+        "nb": "NTNU på lokasjon i Trondheim"
+      },
+      "countries": [
+        {
+          "type": "CA",
+          "label": {
+            "en": "Canada",
+            "nb": "Canada"
+          }
+        },
+        {
+          "type": "GB",
+          "label": {
+            "en": "United Kingdom",
+            "nb": "Storbritannia"
+          }
+        }
+      ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/person/359084",
@@ -174,7 +198,31 @@
       "background": {
         "en": "Academic Advisor at UiO",
         "nb": "Akademisk Rådgiver ved UiO"
-      }
+      },
+      "place": {
+        "en": "Oslo University",
+        "nb": "Universitetet i Oslo"
+      },
+      "collaboration": {
+        "en": "NTNU in Trondheim",
+        "nb": "NTNU på lokasjon i Trondheim"
+      },
+      "countries": [
+        {
+          "type": "CA",
+          "label": {
+            "en": "Canada",
+            "nb": "Canada"
+          }
+        },
+        {
+          "type": "GB",
+          "label": {
+            "en": "United Kingdom",
+            "nb": "Storbritannia"
+          }
+        }
+      ]
     }
   ]
 }

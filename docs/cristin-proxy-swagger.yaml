@@ -2969,6 +2969,20 @@ components:
             verifiedDate:
               type: string
               format: date-time
+        place:
+          $ref: '#/components/schemas/Languages'
+        collaboration:
+          $ref: '#/components/schemas/Languages'
+        countries:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The country code
+              label:
+                $ref: '#/components/schemas/Languages'
     PersonPost:
       type: object
       required: [ names ]
@@ -3036,6 +3050,18 @@ components:
             webPage:
               type: string
               format: uri
+        place:
+          $ref: '#/components/schemas/Languages'
+        collaboration:
+          $ref: '#/components/schemas/Languages'
+        countries:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The country code
     PersonPostResponse:
       type: object
       properties:
@@ -3112,6 +3138,20 @@ components:
             webPage:
               type: string
               format: uri
+        place:
+          $ref: '#/components/schemas/Languages'
+        collaboration:
+          $ref: '#/components/schemas/Languages'
+        countries:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The country code
+              label:
+                $ref: '#/components/schemas/Languages'
     PersonPatch:
       type: object
       properties:
@@ -3175,6 +3215,21 @@ components:
               type: string
               nullable: true
               format: uri
+        place:
+          $ref: '#/components/schemas/Languages'
+        collaboration:
+          $ref: '#/components/schemas/Languages'
+        countries:
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The country code
+              label:
+                $ref: '#/components/schemas/Languages'
     PersonNIN:
       type: object
       properties:
@@ -4261,6 +4316,20 @@ components:
             background:
               no: 'Min bakgrunn som forsker'
               en: 'My history as a researcher'
+            place:
+              no: 'Mitt arbeidssted'
+              en: 'My workplace'
+            collaboration:
+              no: 'Mine samarbeidende steder'
+              en: 'My places of collaboration'
+            countries:
+              - type: 'CA'
+                label:
+                  'en': 'Canada'
+              - type: 'GB'
+                label:
+                  'en': 'United Kingdom'
+                  'nb': 'Storbritannia'
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
             type: 'Person'
             identifiers:
@@ -4273,6 +4342,8 @@ components:
                 value: 'Nordmann'
             contactDetails:
               telephone: '+4744335566'
+              email: 'kjell@ola.no'
+              webPage: 'https://www.kjell.no'
             affiliations:
               - type: 'Affiliation'
                 organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
@@ -4407,6 +4478,20 @@ components:
                 acronym: 'UIO'
                 country: 'NO'
           verifiedDate: '2023-10-03T15:00:30Z'
+        place:
+          nb: 'Mitt arbeidssted'
+          en: 'My workplace'
+        collaboration:
+          nb: 'Mine samarbeidende steder'
+          en: 'My places of collaboration'
+        countries:
+          - type: 'CA'
+            label:
+              'en': 'Canada'
+          - type: 'GB'
+            label:
+              'en': 'United Kingdom'
+              'nb': 'Storbritannia'
     PersonPatchExample:
       value:
         orcid: '1234-1234-1234-1234'
@@ -4434,6 +4519,15 @@ components:
           telephone: '+4799885566'
           email: 'example@email.org'
           webPage: 'www.example.org'
+        place:
+          nb: 'Mitt arbeidssted'
+          en: 'null'
+        collaboration:
+          nb: 'Mine samarbeidende steder'
+          en: 'My places of collaboration'
+        countries:
+          - type: 'CA'
+          - type: 'GB'
     PersonPostExample:
       value:
         identifiers:
@@ -4469,6 +4563,13 @@ components:
           telephone: '+4799885566'
           email: 'example@email.org'
           webPage: 'www.example.org'
+        place:
+          nb: 'Mitt arbeidssted'
+          en: 'My workplace'
+        collaboration:
+          en: 'My places of collaboration'
+        countries:
+          - type: 'CA'
     PersonPostResponseExample:
       value:
         '@context': 'https://example.org/person-context.json'

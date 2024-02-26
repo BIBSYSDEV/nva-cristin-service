@@ -44,7 +44,23 @@ Feature: API tests for Cristin Person Update
         'telephone': '11223344',
         'email': 'test@example.org',
         'webPage': 'www.example.org'
-      }
+      },
+      'place': {
+        'nb': 'Min institusjon',
+        'en': 'My institution'
+      },
+      'collaboration': {
+        'nb': 'Mine samarbeidende institusjoner',
+        'en': null
+      },
+      'countries': [
+        {
+          'type': 'SE'
+        },
+        {
+          'type': 'NO'
+        }
+      ]
     }
     """
     Given url CRISTIN_BASE

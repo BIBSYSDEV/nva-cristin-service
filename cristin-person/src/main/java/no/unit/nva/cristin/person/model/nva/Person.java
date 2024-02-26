@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.List;
+import java.util.Locale;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.model.CristinUnit;
@@ -35,20 +36,23 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AFFILIATIONS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COLLABORATION;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COUNTRIES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NVI;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PLACE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 
 @JacocoGenerated
-@SuppressWarnings("PMD.ExcessivePublicCount")
+@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyFields", "PMD.GodClass"})
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS, RESERVED, EMPLOYMENTS,
-    VERIFIED, KEYWORDS, BACKGROUND})
+    VERIFIED, KEYWORDS, BACKGROUND, NVI, PLACE, COLLABORATION})
 public class Person implements JsonSerializable {
 
     @JsonProperty(TYPE)
@@ -80,6 +84,12 @@ public class Person implements JsonSerializable {
     private Map<String, String> background;
     @JsonProperty(NVI)
     private PersonNvi nvi;
+    @JsonProperty(PLACE)
+    private Map<String, String> place;
+    @JsonProperty(COLLABORATION)
+    private Map<String, String> collaboration;
+    @JsonProperty(COUNTRIES)
+    private Set<TypedLabel> countries;
 
     private Person() {
 
@@ -100,16 +110,27 @@ public class Person implements JsonSerializable {
      * @param keywords       Keywords related to this person.
      * @param background     Background information about this person.
      * @param nvi            NVI information about this person.
+     * @param place          Place information about this person.
+     * @param collaboration  Collaboration information about this person.
+     * @param countries      Countries this person is associated with.
      */
     @JsonCreator
     @SuppressWarnings("PMD.ExcessiveParameterList")
-    public Person(@JsonProperty(ID) URI id, @JsonProperty(IDENTIFIERS) Set<TypedValue> identifiers,
+    public Person(@JsonProperty(ID) URI id,
+                  @JsonProperty(IDENTIFIERS) Set<TypedValue> identifiers,
                   @JsonProperty(NAMES) Set<TypedValue> names,
-                  @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails, @JsonProperty(IMAGE) URI image,
-                  @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations, @JsonProperty(RESERVED) Boolean reserved,
-                  @JsonProperty(EMPLOYMENTS) Set<Employment> employments, @JsonProperty(VERIFIED) Boolean verified,
+                  @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails,
+                  @JsonProperty(IMAGE) URI image,
+                  @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations,
+                  @JsonProperty(RESERVED) Boolean reserved,
+                  @JsonProperty(EMPLOYMENTS) Set<Employment> employments,
+                  @JsonProperty(VERIFIED) Boolean verified,
                   @JsonProperty(KEYWORDS) Set<TypedLabel> keywords,
-                  @JsonProperty(BACKGROUND) Map<String, String> background, @JsonProperty(NVI) PersonNvi nvi) {
+                  @JsonProperty(BACKGROUND) Map<String, String> background,
+                  @JsonProperty(NVI) PersonNvi nvi,
+                  @JsonProperty(PLACE) Map<String, String> place,
+                  @JsonProperty(COLLABORATION) Map<String, String> collaboration,
+                  @JsonProperty(COUNTRIES) Set<TypedLabel> countries) {
         this.id = id;
         this.identifiers = identifiers;
         this.names = names;
@@ -122,6 +143,9 @@ public class Person implements JsonSerializable {
         this.keywords = keywords;
         this.background = background;
         this.nvi = nvi;
+        this.place = place;
+        this.collaboration = collaboration;
+        this.countries = countries;
     }
 
     public String getContext() {
@@ -232,6 +256,30 @@ public class Person implements JsonSerializable {
         this.nvi = nvi;
     }
 
+    public Map<String, String> getPlace() {
+        return nonEmptyOrDefault(place);
+    }
+
+    public void setPlace(Map<String, String> place) {
+        this.place = place;
+    }
+
+    public Map<String, String> getCollaboration() {
+        return nonEmptyOrDefault(collaboration);
+    }
+
+    public void setCollaboration(Map<String, String> collaboration) {
+        this.collaboration = collaboration;
+    }
+
+    public Set<TypedLabel> getCountries() {
+        return nonEmptyOrDefault(countries);
+    }
+
+    public void setCountries(Set<TypedLabel> countries) {
+        this.countries = countries;
+    }
+
     /**
      * Converts this object to an appropriate format for POST to Cristin.
      */
@@ -249,7 +297,7 @@ public class Person implements JsonSerializable {
 
         cristinPerson.setDetailedAffiliations(mapEmploymentsToCristinEmployments(getEmployments()));
         cristinPerson.setReserved(getReserved());
-        cristinPerson.setKeywords(extractKeywordCodes(getKeywords()));
+        cristinPerson.setKeywords(extractCristinTypedLabel(getKeywords()));
         cristinPerson.setBackground(getBackground());
 
         if (nonNull(getNvi())) {
@@ -265,6 +313,10 @@ public class Person implements JsonSerializable {
             cristinPerson.setWebPage(getContactDetails().getWebPage().orElse(null));
         }
 
+        cristinPerson.setPlace(getPlace());
+        cristinPerson.setCollaboration(getCollaboration());
+        cristinPerson.setCountries(extractCristinTypedLabel(getCountries()));
+
         return cristinPerson;
     }
 
@@ -279,10 +331,11 @@ public class Person implements JsonSerializable {
         return CristinPersonSummary.builder().withCristinPersonId(personHavingVerifiedId).build();
     }
 
-    private List<CristinTypedLabel> extractKeywordCodes(Set<TypedLabel> keywords) {
-        return keywords.stream()
-            .map(label -> new CristinTypedLabel(label.getType(), null))
-            .collect(Collectors.toList());
+    private List<CristinTypedLabel> extractCristinTypedLabel(Set<TypedLabel> typedLabels) {
+        return typedLabels.stream()
+                   .filter(label -> nonNull(label.getType()))
+                   .map(label -> new CristinTypedLabel(label.getType().toUpperCase(Locale.ROOT), null))
+                   .collect(Collectors.toList());
     }
 
     private Map<String, String> convertTypedValuesToMap(Set<TypedValue> typedValueSet) {
@@ -328,7 +381,10 @@ public class Person implements JsonSerializable {
                && Objects.equals(getVerified(), person.getVerified())
                && Objects.equals(getKeywords(), person.getKeywords())
                && Objects.equals(getBackground(), person.getBackground())
-               && Objects.equals(getNvi(), person.getNvi());
+               && Objects.equals(getNvi(), person.getNvi())
+               && Objects.equals(getPlace(), person.getPlace())
+               && Objects.equals(getCollaboration(), person.getCollaboration())
+               && Objects.equals(getCountries(), person.getCountries());
     }
 
     @JacocoGenerated
@@ -336,7 +392,7 @@ public class Person implements JsonSerializable {
     public int hashCode() {
         return Objects.hash(getId(), getContext(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
                             getAffiliations(), getReserved(), getEmployments(), getVerified(), getKeywords(),
-                            getBackground(), getNvi());
+                            getBackground(), getNvi(), getPlace(), getCollaboration(), getCountries());
     }
 
     @Override
@@ -415,6 +471,21 @@ public class Person implements JsonSerializable {
 
         public Builder withNvi(PersonNvi nvi) {
             person.setNvi(nvi);
+            return this;
+        }
+
+        public Builder withPlace(Map<String, String> place) {
+            person.setPlace(place);
+            return this;
+        }
+
+        public Builder withCollaboration(Map<String, String> collaboration) {
+            person.setCollaboration(collaboration);
+            return this;
+        }
+
+        public Builder withCountries(Set<TypedLabel> countries) {
+            person.setCountries(countries);
             return this;
         }
 
