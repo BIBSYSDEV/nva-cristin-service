@@ -4414,10 +4414,10 @@ components:
                 country: 'NO'
           verifiedDate: '2023-10-03T15:00:30Z'
         place:
-          no: 'Mitt arbeidssted'
+          nb: 'Mitt arbeidssted'
           en: 'My workplace'
         collaboration:
-          no: 'Mine samarbeidende steder'
+          nb: 'Mine samarbeidende steder'
           en: 'My places of collaboration'
         countries:
           - type: 'CA'
@@ -4455,10 +4455,10 @@ components:
           email: 'example@email.org'
           webPage: 'www.example.org'
         place:
-          no: 'Mitt arbeidssted'
+          nb: 'Mitt arbeidssted'
           en: 'null'
         collaboration:
-          no: 'Mine samarbeidende steder'
+          nb: 'Mine samarbeidende steder'
           en: 'My places of collaboration'
         countries:
           - type: 'CA'
@@ -4499,7 +4499,7 @@ components:
           email: 'example@email.org'
           webPage: 'www.example.org'
         place:
-          no: 'Mitt arbeidssted'
+          nb: 'Mitt arbeidssted'
           en: 'My workplace'
         collaboration:
           en: 'My places of collaboration'
