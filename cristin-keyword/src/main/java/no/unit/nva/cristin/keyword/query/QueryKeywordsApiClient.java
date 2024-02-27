@@ -2,8 +2,9 @@ package no.unit.nva.cristin.keyword.query;
 
 import static java.util.Arrays.asList;
 import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.cristin.keyword.KeywordConstants.CRISTIN_KEYWORDS_PATH;
+import static no.unit.nva.cristin.keyword.KeywordConstants.KEYWORD_ID_URI;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
-import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -22,9 +23,6 @@ import nva.commons.core.paths.UriWrapper;
 public class QueryKeywordsApiClient extends ApiClient
     implements CristinQueryApiClient<Map<String, String>, TypedLabel> {
 
-    public static final String KEYWORD_PATH = "keyword";
-    public static final URI KEYWORD_ID_URI = getNvaApiUri(KEYWORD_PATH);
-    public static final String CRISTIN_KEYWORDS_PATH = "keywords";
     public static final String KEYWORD_CONTEXT_JSON = "https://example.org/keyword-context.json";
 
     public QueryKeywordsApiClient() {
