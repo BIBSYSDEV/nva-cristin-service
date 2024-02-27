@@ -36,15 +36,12 @@ public class ListCountriesApiClient extends ApiClient {
     public Countries executeRequest() throws ApiGatewayException {
         Map<String, String> params = emptyMap();
         var queryUri = createCristinQueryUri(params, CRISTIN_COUNTRIES_PATH);
-        var start = System.currentTimeMillis();
         var response = queryUpstream(queryUri);
         var countries = getCountries(response);
-        var totalProcessingTime = calculateProcessingTime(start, System.currentTimeMillis());
 
         return new Countries(COUNTRY_CONTEXT_JSON,
                              COUNTRY_ID_URI,
                              countries.size(),
-                             totalProcessingTime,
                              countries);
     }
 

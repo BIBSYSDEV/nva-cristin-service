@@ -4,7 +4,6 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.HITS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
-import static no.unit.nva.cristin.model.JsonPropertyNames.PROCESSING_TIME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.SIZE;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,6 +16,5 @@ import java.util.List;
 public record Countries(@JsonProperty(CONTEXT) URI context,
                         @JsonProperty(ID) URI id,
                         @JsonProperty(SIZE) int size,
-                        @JsonProperty(PROCESSING_TIME) long processingTime,
                         @JsonProperty(HITS) List<Country> countries) {
 }

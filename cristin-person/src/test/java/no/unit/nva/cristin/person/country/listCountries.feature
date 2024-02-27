@@ -45,7 +45,6 @@ Feature: API tests for keywords query
     And match response['@context'] == '#present'
     And match response.id == '#present'
     And match response.size == '#present'
-    And match response.processingTime == '#present'
     And match response.hits == '#present'
     And match response.hits[0].type == '#present'
     And match response.hits[0].typeAlpha3 == '#present'
