@@ -1968,6 +1968,39 @@ paths:
           $ref: '#/components/responses/502'
         400:
           $ref: '#/components/responses/400'
+  /country:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListCountriesFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Countries
+        - external
+      summary: List supported countries
+      description: Returns list of supported countries
+      operationId: ListCountries
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Countries'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/CountriesExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Countries'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/CountriesExample'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 
 components:
   responses:
@@ -3701,6 +3734,38 @@ components:
           description: Titles in different languages
           items:
             $ref: '#/components/schemas/Languages'
+    Countries:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        hits:
+          type: array
+          description: The list of countries returned by the request
+          items:
+            $ref: '#/components/schemas/Country'
+    Country:
+      type: object
+      description: Single country
+      properties:
+        type:
+          type: string
+          description: The 2 letter country code
+        typeAlpha3:
+          type: string
+          description: The 3 letter alpha 3 country code
+        label:
+          $ref: '#/components/schemas/Languages'
   examples:
     ProjectsExample:
       value:
@@ -4902,6 +4967,22 @@ components:
           - type: 'ACADEMICDEV'
             label:
               en: 'Academic Development'
+    CountriesExample:
+      value:
+        '@context': 'https://example.org/country-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/country/'
+        size: 150
+        processingTime: 800
+        hits:
+          - type: 'CA'
+            typeAlpha3: 'CAN'
+            label:
+              en: 'Canada'
+          - type: 'NO'
+            typeAlpha3: 'NOR'
+            label:
+              nb: 'Norge'
+              en: 'Norway'
 
   securitySchemes:
     CognitoUserPool:
