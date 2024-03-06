@@ -1968,6 +1968,61 @@ paths:
           $ref: '#/components/responses/502'
         400:
           $ref: '#/components/responses/400'
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinCreateKeywordFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Keywords
+      summary: Create one keyword
+      description: Creates one keyword matching supplied payload
+      operationId: PostKeyword
+      security:
+        - CognitoUserPool: [ 'https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend','aws.cognito.signin.user.admin' ]
+      requestBody:
+        description: Payload containing labels
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeywordPost'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/KeywordPostExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/KeywordPost'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/KeywordPostExample'
+      responses:
+        201:
+          description: Successful creation of resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Keyword'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/KeywordExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Keyword'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/KeywordExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 
 components:
   responses:
@@ -3613,6 +3668,12 @@ components:
           description: The keyword code
         label:
           $ref: '#/components/schemas/Languages'
+    KeywordPost:
+      type: object
+      description: Single keyword. Needs to have label in both Norwegian 'nb' and English 'en'
+      properties:
+        label:
+          $ref: '#/components/schemas/Languages'
     Categories:
       type: object
       properties:
@@ -4886,6 +4947,17 @@ components:
           - type: '1972'
             label:
               en: 'Food Classification'
+    KeywordPostExample:
+      value:
+        label:
+          en: 'Cooking'
+          nb: 'Matlaging'
+    KeywordExample:
+      value:
+        type: '1234'
+        label:
+          en: 'Cooking'
+          nb: 'Matlaging'
     CategoriesExample:
       value:
         '@context': 'https://example.org/keyword-context.json'
