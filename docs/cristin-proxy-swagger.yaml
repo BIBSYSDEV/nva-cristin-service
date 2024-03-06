@@ -2,16 +2,16 @@ openapi: 3.0.3
 info:
   title: NVA Cristin Proxy API
   description: This API provides transformed Cristin data stored in [Cristin](https://api.cristin.no/v2).
-  termsOfService: https://nva.unit.no/terms/
+  termsOfService: https://nva.sikt.no/
   contact:
-    email: nva@unit.no
+    email: kontakt@sikt.no
   license:
     name: MIT/NLOD 2.0
-    url: https://link.to.license
+    url: https://data.norge.no/nlod/en/2.0
   version: 1.0.0
 externalDocs:
   description: Find out more about NVA
-  url: https://nva.unit.no
+  url: https://nva.sikt.no
 servers:
   - url: https://api.nva.unit.no/cristin
   - url: https://api.dev.nva.aws.unit.no/cristin
