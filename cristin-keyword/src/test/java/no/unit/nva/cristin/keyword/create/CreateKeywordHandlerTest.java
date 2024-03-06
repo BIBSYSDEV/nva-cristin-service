@@ -12,12 +12,15 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -32,15 +35,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 
 class CreateKeywordHandlerTest {
 
     public static final String EMPTY_JSON = "{}";
-    public static final String KEYWORD_TYPE = "HELSE";
+    public static final String KEYWORD_TYPE = "1234";
     public static final String EN_KEY = "en";
     public static final String NB_KEY = "nb";
     public static final String EN_VALUE = "Something about health";
     public static final String NB_VALUE = "Noe om helse";
+    public static final URI UPSTREAM_URI = URI.create("https://api.cristin-test.uio.no/v2/keywords");
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -73,6 +78,27 @@ class CreateKeywordHandlerTest {
     }
 
     @Test
+    void shouldHaveCorrectUriAndBodyWhenSendingToUpstream() throws Exception {
+        var responseJson = exampleCristinObjectToJson();
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
+        var apiClient = new CristinCreateKeywordApiClient(httpClientMock);
+        apiClient = spy(apiClient);
+        handler = new CreateKeywordHandler(environment, apiClient);
+        sendQuery(exampleObject());
+
+        var uriCaptor = ArgumentCaptor.forClass(URI.class);
+        var bodyCaptor = ArgumentCaptor.forClass(String.class);
+        verify(apiClient).post(uriCaptor.capture(), bodyCaptor.capture());
+
+        var actual = OBJECT_MAPPER.readValue(bodyCaptor.getValue(), CristinTypedLabel.class);
+
+        assertThat(uriCaptor.getValue(), equalTo(UPSTREAM_URI));
+        assertThat(actual.getCode(), equalTo(null));
+        assertThat(actual.getName().get(EN_KEY), equalTo(EN_VALUE));
+        assertThat(actual.getName().get(NB_KEY), equalTo(NB_VALUE));
+    }
+
+    @Test
     void shouldThrowForbiddenIfUserNotAuthorized() throws IOException {
         var input = exampleObject();
         var gatewayResponse = sendQueryWithoutAccessRights(input);
@@ -102,7 +128,7 @@ class CreateKeywordHandlerTest {
     }
 
     private static TypedLabel exampleObject() {
-        return new TypedLabel(KEYWORD_TYPE, exampleLabel());
+        return new TypedLabel(null, exampleLabel());
     }
 
     private static Map<String, String> exampleLabel() {
@@ -112,9 +138,8 @@ class CreateKeywordHandlerTest {
 
     private static Stream<Arguments> badRequestProvider() {
         return Stream.of(Arguments.of(new TypedLabel(null, null)),
-                         Arguments.of(new TypedLabel(KEYWORD_TYPE, null)),
-                         Arguments.of(new TypedLabel(KEYWORD_TYPE, Map.of(EN_KEY, EN_VALUE))),
-                         Arguments.of(new TypedLabel(KEYWORD_TYPE, Map.of(NB_KEY, NB_VALUE))));
+                         Arguments.of(new TypedLabel(null, Map.of(EN_KEY, EN_VALUE))),
+                         Arguments.of(new TypedLabel(null, Map.of(NB_KEY, NB_VALUE))));
     }
 
     private GatewayResponse<TypedLabel> sendQueryWithoutAccessRights(TypedLabel body) throws IOException {
