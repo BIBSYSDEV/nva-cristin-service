@@ -2,16 +2,16 @@ openapi: 3.0.3
 info:
   title: NVA Cristin Proxy API
   description: This API provides transformed Cristin data stored in [Cristin](https://api.cristin.no/v2).
-  termsOfService: https://nva.unit.no/terms/
+  termsOfService: https://nva.sikt.no/
   contact:
-    email: nva@unit.no
+    email: kontakt@sikt.no
   license:
     name: MIT/NLOD 2.0
-    url: https://link.to.license
+    url: https://data.norge.no/nlod/en/2.0
   version: 1.0.0
 externalDocs:
   description: Find out more about NVA
-  url: https://nva.unit.no
+  url: https://nva.sikt.no
 servers:
   - url: https://api.nva.unit.no/cristin
   - url: https://api.dev.nva.aws.unit.no/cristin
@@ -1968,6 +1968,61 @@ paths:
           $ref: '#/components/responses/502'
         400:
           $ref: '#/components/responses/400'
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinCreateKeywordFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Keywords
+      summary: Create one keyword
+      description: Creates one keyword matching supplied payload
+      operationId: PostKeyword
+      security:
+        - CognitoUserPool: [ 'https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend','aws.cognito.signin.user.admin' ]
+      requestBody:
+        description: Payload containing labels
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeywordPost'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/KeywordPostExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/KeywordPost'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/KeywordPostExample'
+      responses:
+        201:
+          description: Successful creation of resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Keyword'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/KeywordExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Keyword'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/KeywordExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
   /country:
     get:
       x-amazon-apigateway-integration:
@@ -3646,6 +3701,12 @@ components:
           description: The keyword code
         label:
           $ref: '#/components/schemas/Languages'
+    KeywordPost:
+      type: object
+      description: Single keyword. Needs to have label in both Norwegian 'nb' and English 'en'
+      properties:
+        label:
+          $ref: '#/components/schemas/Languages'
     Categories:
       type: object
       properties:
@@ -4951,6 +5012,17 @@ components:
           - type: '1972'
             label:
               en: 'Food Classification'
+    KeywordPostExample:
+      value:
+        label:
+          en: 'Cooking'
+          nb: 'Matlaging'
+    KeywordExample:
+      value:
+        type: '1234'
+        label:
+          en: 'Cooking'
+          nb: 'Matlaging'
     CategoriesExample:
       value:
         '@context': 'https://example.org/keyword-context.json'
