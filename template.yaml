@@ -133,6 +133,10 @@ Resources:
         - HttpMethod: 'GET'
           ResourcePath: '/~1keyword'
           CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1country'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
@@ -546,6 +550,19 @@ Resources:
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /keyword/
+            Method: get
+
+  NvaCristinListCountriesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.country.ListCountriesHandler::handleRequest
+      Events:
+        NvaCristinCountryEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /country/
             Method: get
 
   NvaCristinCreateKeywordFunction:
