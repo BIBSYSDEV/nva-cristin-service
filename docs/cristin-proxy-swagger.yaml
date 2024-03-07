@@ -2023,39 +2023,39 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
-    /country:
-      get:
-        x-amazon-apigateway-integration:
-          uri:
-            Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListCountriesFunction.Arn}/invocations
-          httpMethod: POST
-          type: "AWS_PROXY"
-        tags:
-          - Countries
-          - external
-        summary: List supported countries
-        description: Returns list of supported countries
-        operationId: ListCountries
-        responses:
-          200:
-            description: successful operation
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Countries'
-                examples:
-                  objectExample:
-                    $ref: '#/components/examples/CountriesExample'
-              application/ld+json:
-                schema:
-                  $ref: '#/components/schemas/Countries'
-                examples:
-                  objectExample:
-                    $ref: '#/components/examples/CountriesExample'
-          500:
-            $ref: '#/components/responses/500'
-          502:
-            $ref: '#/components/responses/502'
+  /country:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListCountriesFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Countries
+        - external
+      summary: List supported countries
+      description: Returns list of supported countries
+      operationId: ListCountries
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Countries'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/CountriesExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Countries'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/CountriesExample'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
 
 components:
   responses:
