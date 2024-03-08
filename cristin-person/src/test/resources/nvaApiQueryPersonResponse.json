@@ -114,6 +114,74 @@
             "nb": "Storbritannia"
           }
         }
+      ],
+      "awards": [
+        {
+          "title": "My first award",
+          "year": 2019,
+          "type": {
+            "type": "FORSKARBEID",
+            "label": {
+              "en": "Research activity",
+              "nb": "Forskningsarbeid"
+            }
+          },
+          "distribution": {
+            "type": "INTERNAT",
+            "label": {
+              "en": "International",
+              "nb": "Internasjonal"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.52.10.0",
+            "type": "Organization"
+          }
+        },
+        {
+          "title": "My second award",
+          "year": 2016,
+          "type": {
+            "type": "FORSKARBEID",
+            "label": {
+              "en": "Research activity",
+              "nb": "Forskningsarbeid"
+            }
+          },
+          "distribution": {
+            "type": "NATIONAL",
+            "label": {
+              "en": "National",
+              "nb": "Nasjonal"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.52.0.0",
+            "type": "Organization"
+          }
+        },
+        {
+          "title": "My third award",
+          "year": 2014,
+          "type": {
+            "type": "FORSKFORMIDL",
+            "label": {
+              "en": "Dissemination of research results",
+              "nb": "Forskningsformidling"
+            }
+          },
+          "distribution": {
+            "type": "INTERN",
+            "label": {
+              "en": "Own institution",
+              "nb": "Egen institusjon"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
+            "type": "Organization"
+          }
+        }
       ]
     },
     {
@@ -220,6 +288,74 @@
           "label": {
             "en": "United Kingdom",
             "nb": "Storbritannia"
+          }
+        }
+      ],
+      "awards": [
+        {
+          "title": "My first award",
+          "year": 2019,
+          "type": {
+            "type": "FORSKARBEID",
+            "label": {
+              "en": "Research activity",
+              "nb": "Forskningsarbeid"
+            }
+          },
+          "distribution": {
+            "type": "INTERNAT",
+            "label": {
+              "en": "International",
+              "nb": "Internasjonal"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.52.10.0",
+            "type": "Organization"
+          }
+        },
+        {
+          "title": "My second award",
+          "year": 2016,
+          "type": {
+            "type": "FORSKARBEID",
+            "label": {
+              "en": "Research activity",
+              "nb": "Forskningsarbeid"
+            }
+          },
+          "distribution": {
+            "type": "NATIONAL",
+            "label": {
+              "en": "National",
+              "nb": "Nasjonal"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.52.0.0",
+            "type": "Organization"
+          }
+        },
+        {
+          "title": "My third award",
+          "year": 2014,
+          "type": {
+            "type": "FORSKFORMIDL",
+            "label": {
+              "en": "Dissemination of research results",
+              "nb": "Forskningsformidling"
+            }
+          },
+          "distribution": {
+            "type": "INTERN",
+            "label": {
+              "en": "Own institution",
+              "nb": "Egen institusjon"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
+            "type": "Organization"
           }
         }
       ]

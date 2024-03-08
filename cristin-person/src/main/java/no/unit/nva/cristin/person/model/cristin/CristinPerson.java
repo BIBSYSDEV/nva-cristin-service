@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinTypedLabel;
+import no.unit.nva.cristin.person.model.cristin.adapter.CristinAwardToNvaFormat;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
+import no.unit.nva.cristin.person.model.nva.Award;
 import no.unit.nva.cristin.person.model.nva.ContactDetails;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -247,7 +249,7 @@ public class CristinPerson implements JsonSerializable {
     }
 
     public List<CristinAward> getAwards() {
-        return awards;
+        return nonEmptyOrDefault(awards);
     }
 
     public void setAwards(List<CristinAward> awards) {
@@ -279,6 +281,7 @@ public class CristinPerson implements JsonSerializable {
                    .withPlace(extractPlace())
                    .withCollaboration(extractCollaboration())
                    .withCountries(extractCountries())
+                   .withAwards(extractAwards())
                    .build();
     }
 
@@ -306,6 +309,7 @@ public class CristinPerson implements JsonSerializable {
                    .withPlace(extractPlace())
                    .withCollaboration(extractCollaboration())
                    .withCountries(extractCountries())
+                   .withAwards(extractAwards())
                    .build();
     }
 
@@ -396,6 +400,12 @@ public class CristinPerson implements JsonSerializable {
 
     private Set<TypedLabel> extractCountries() {
         return getCountries().stream().map(this::toTypedLabel).collect(Collectors.toSet());
+    }
+
+    private Set<Award> extractAwards() {
+        return getAwards().stream()
+                   .map(new CristinAwardToNvaFormat())
+                   .collect(Collectors.toSet());
     }
 
     @Override

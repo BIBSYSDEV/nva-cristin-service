@@ -35,6 +35,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AFFILIATIONS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AWARDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COLLABORATION;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
@@ -52,7 +53,7 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 @JacocoGenerated
 @SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyFields", "PMD.GodClass"})
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS, RESERVED, EMPLOYMENTS,
-    VERIFIED, KEYWORDS, BACKGROUND, NVI, PLACE, COLLABORATION})
+    VERIFIED, KEYWORDS, BACKGROUND, NVI, PLACE, COLLABORATION, COUNTRIES, AWARDS})
 public class Person implements JsonSerializable {
 
     @JsonProperty(TYPE)
@@ -90,6 +91,8 @@ public class Person implements JsonSerializable {
     private Map<String, String> collaboration;
     @JsonProperty(COUNTRIES)
     private Set<TypedLabel> countries;
+    @JsonProperty(AWARDS)
+    private Set<Award> awards;
 
     private Person() {
 
@@ -113,6 +116,7 @@ public class Person implements JsonSerializable {
      * @param place          Place information about this person.
      * @param collaboration  Collaboration information about this person.
      * @param countries      Countries this person is associated with.
+     * @param awards         Awards this person has received.
      */
     @JsonCreator
     @SuppressWarnings("PMD.ExcessiveParameterList")
@@ -130,7 +134,8 @@ public class Person implements JsonSerializable {
                   @JsonProperty(NVI) PersonNvi nvi,
                   @JsonProperty(PLACE) Map<String, String> place,
                   @JsonProperty(COLLABORATION) Map<String, String> collaboration,
-                  @JsonProperty(COUNTRIES) Set<TypedLabel> countries) {
+                  @JsonProperty(COUNTRIES) Set<TypedLabel> countries,
+                  @JsonProperty(AWARDS) Set<Award> awards) {
         this.id = id;
         this.identifiers = identifiers;
         this.names = names;
@@ -146,6 +151,7 @@ public class Person implements JsonSerializable {
         this.place = place;
         this.collaboration = collaboration;
         this.countries = countries;
+        this.awards = awards;
     }
 
     public String getContext() {
@@ -280,6 +286,14 @@ public class Person implements JsonSerializable {
         this.countries = countries;
     }
 
+    public Set<Award> getAwards() {
+        return nonEmptyOrDefault(awards);
+    }
+
+    public void setAwards(Set<Award> awards) {
+        this.awards = awards;
+    }
+
     /**
      * Converts this object to an appropriate format for POST to Cristin.
      */
@@ -384,7 +398,8 @@ public class Person implements JsonSerializable {
                && Objects.equals(getNvi(), person.getNvi())
                && Objects.equals(getPlace(), person.getPlace())
                && Objects.equals(getCollaboration(), person.getCollaboration())
-               && Objects.equals(getCountries(), person.getCountries());
+               && Objects.equals(getCountries(), person.getCountries())
+               && Objects.equals(getAwards(), person.getAwards());
     }
 
     @JacocoGenerated
@@ -392,7 +407,7 @@ public class Person implements JsonSerializable {
     public int hashCode() {
         return Objects.hash(getId(), getContext(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
                             getAffiliations(), getReserved(), getEmployments(), getVerified(), getKeywords(),
-                            getBackground(), getNvi(), getPlace(), getCollaboration(), getCountries());
+                            getBackground(), getNvi(), getPlace(), getCollaboration(), getCountries(), getAwards());
     }
 
     @Override
@@ -486,6 +501,11 @@ public class Person implements JsonSerializable {
 
         public Builder withCountries(Set<TypedLabel> countries) {
             person.setCountries(countries);
+            return this;
+        }
+
+        public Builder withAwards(Set<Award> awards) {
+            person.setAwards(awards);
             return this;
         }
 

@@ -112,7 +112,7 @@
           "url": "https://api.cristin-test.uio.no/v2/institutions/185"
         },
         "unit": {
-          "cristin_unit_id": "185.52.12.0",
+          "cristin_unit_id": "185.52.10.0",
           "url": "https://api.cristin-test.uio.no/v2/units/185.52.10.0"
         }
       }
@@ -140,7 +140,7 @@
           "url": "https://api.cristin-test.uio.no/v2/institutions/185"
         },
         "unit": {
-          "cristin_unit_id": "185.52.12.0",
+          "cristin_unit_id": "185.52.0.0",
           "url": "https://api.cristin-test.uio.no/v2/units/185.52.0.0"
         }
       }
@@ -168,7 +168,7 @@
           "url": "https://api.cristin-test.uio.no/v2/institutions/185"
         },
         "unit": {
-          "cristin_unit_id": "185.52.12.0",
+          "cristin_unit_id": "185.90.0.0",
           "url": "https://api.cristin-test.uio.no/v2/units/185.90.0.0"
         }
       }
