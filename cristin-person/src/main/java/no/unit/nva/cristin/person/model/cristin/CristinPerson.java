@@ -75,6 +75,7 @@ public class CristinPerson implements JsonSerializable {
     private Map<String, String> place;
     private Map<String, String> collaboration;
     private List<CristinTypedLabel> countries;
+    private List<CristinAward> awards;
 
     public String getCristinPersonId() {
         return cristinPersonId;
@@ -243,6 +244,14 @@ public class CristinPerson implements JsonSerializable {
 
     public void setCountries(List<CristinTypedLabel> countries) {
         this.countries = countries;
+    }
+
+    public List<CristinAward> getAwards() {
+        return awards;
+    }
+
+    public void setAwards(List<CristinAward> awards) {
+        this.awards = awards;
     }
 
     /**
