@@ -565,6 +565,20 @@ Resources:
             Path: /country/
             Method: get
 
+  NvaCristinCreateKeywordFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-keyword
+      Handler: no.unit.nva.cristin.keyword.create.CreateKeywordHandler::handleRequest
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinCreateKeywordEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /keyword/
+            Method: post
+
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
