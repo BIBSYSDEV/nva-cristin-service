@@ -1,0 +1,9 @@
+{
+  "@vocab": "https://nva.sikt.no/ontology/publication#",
+  "id": "@id",
+  "type": "@type",
+  "labels": {
+    "@id": "label",
+    "@container": "@language"
+  }
+}
