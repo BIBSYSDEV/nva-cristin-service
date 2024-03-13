@@ -1918,6 +1918,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Keywords
+        - external
       summary: Query keywords
       description: Returns paginated list of keywords
       operationId: QueryKeywords
@@ -2023,6 +2024,50 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /keyword/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Identifier of Keyword
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]+$'
+        example: '1197'
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchKeywordFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Keywords
+        - external
+      summary: Fetch keyword
+      description: Returns single keyword
+      operationId: FetchKeyword
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentifierWithLabels'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/SingleKeywordExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/IdentifierWithLabels'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/SingleKeywordExample'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+        400:
+          $ref: '#/components/responses/400'
   /country:
     get:
       x-amazon-apigateway-integration:
@@ -3035,7 +3080,7 @@ components:
             properties:
               type:
                 type: string
-                description: The country code
+                description: Two letter country code (ISO 3166-1 alpha-2)
               label:
                 $ref: '#/components/schemas/Languages'
     PersonPost:
@@ -3116,7 +3161,7 @@ components:
             properties:
               type:
                 type: string
-                description: The country code
+                description: Two letter country code (ISO 3166-1 alpha-2)
     PersonPostResponse:
       type: object
       properties:
@@ -3204,7 +3249,7 @@ components:
             properties:
               type:
                 type: string
-                description: The country code
+                description: Two letter country code (ISO 3166-1 alpha-2)
               label:
                 $ref: '#/components/schemas/Languages'
     PersonPatch:
@@ -3282,7 +3327,7 @@ components:
             properties:
               type:
                 type: string
-                description: The country code
+                description: Two letter country code (ISO 3166-1 alpha-2)
               label:
                 $ref: '#/components/schemas/Languages'
     PersonNIN:
@@ -3821,11 +3866,26 @@ components:
       properties:
         type:
           type: string
-          description: The 2 letter country code
+          description: Two letter country code (ISO 3166-1 alpha-2)
         typeAlpha3:
           type: string
           description: The 3 letter alpha 3 country code
         label:
+          $ref: '#/components/schemas/Languages'
+    IdentifierWithLabels:
+      type: object
+      description: Single element with id and labels
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        type:
+          type: string
+          description: Type of element
+        id:
+          $ref: '#/components/schemas/Id'
+        identifier:
+          type: string
+        labels:
           $ref: '#/components/schemas/Languages'
   examples:
     ProjectsExample:
@@ -5055,6 +5115,14 @@ components:
             label:
               nb: 'Norge'
               en: 'Norway'
+    SingleKeywordExample:
+      value:
+        '@context': 'https://bibsysdev.github.io/src/keyword-context.json'
+        type: 'Keyword'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/keyword/1197'
+        identifier: '1197'
+        labels:
+          en: 'Educational management'
 
   securitySchemes:
     CognitoUserPool:

@@ -545,24 +545,24 @@ Resources:
       CodeUri: cristin-keyword
       Handler: no.unit.nva.cristin.keyword.query.QueryKeywordsHandler::handleRequest
       Events:
-        NvaCristinKeywordEvent:
+        NvaCristinQueryKeywordEvent:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /keyword/
             Method: get
 
-  NvaCristinListCountriesFunction:
+  NvaCristinFetchKeywordFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.country.ListCountriesHandler::handleRequest
+      CodeUri: cristin-keyword
+      Handler: no.unit.nva.cristin.keyword.fetch.FetchKeywordHandler::handleRequest
       Events:
-        NvaCristinCountryEvent:
+        NvaCristinFetchKeywordEvent:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
-            Path: /country/
+            Path: /keyword/{id}
             Method: get
 
   NvaCristinCreateKeywordFunction:
@@ -578,6 +578,19 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /keyword/
             Method: post
+
+  NvaCristinListCountriesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.country.ListCountriesHandler::handleRequest
+      Events:
+        NvaCristinListCountriesEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /country/
+            Method: get
 
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
