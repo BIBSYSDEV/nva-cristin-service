@@ -10,7 +10,7 @@ import java.net.HttpURLConnection;
 import java.util.List;
 import no.unit.nva.access.HandlerAccessCheck;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.model.TypedLabel;
+import no.unit.nva.cristin.keyword.model.nva.Keyword;
 import no.unit.nva.validation.Validator;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unused")
-public class CreateKeywordHandler extends ApiGatewayHandler<TypedLabel, TypedLabel> {
+public class CreateKeywordHandler extends ApiGatewayHandler<Keyword, Keyword> {
 
     private static final Logger logger = LoggerFactory.getLogger(CreateKeywordHandler.class);
 
@@ -32,12 +32,12 @@ public class CreateKeywordHandler extends ApiGatewayHandler<TypedLabel, TypedLab
 
     public CreateKeywordHandler(Environment environment,
                                 CreateKeywordApiClient apiClient) {
-        super(TypedLabel.class, environment);
+        super(Keyword.class, environment);
         this.apiClient = apiClient;
     }
 
     @Override
-    protected TypedLabel processInput(TypedLabel input, RequestInfo requestInfo, Context context)
+    protected Keyword processInput(Keyword input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
         authorize(requestInfo);
@@ -48,7 +48,7 @@ public class CreateKeywordHandler extends ApiGatewayHandler<TypedLabel, TypedLab
     }
 
     @Override
-    protected Integer getSuccessStatusCode(TypedLabel input, TypedLabel output) {
+    protected Integer getSuccessStatusCode(Keyword input, Keyword output) {
         return HttpURLConnection.HTTP_CREATED;
     }
 
@@ -70,12 +70,12 @@ public class CreateKeywordHandler extends ApiGatewayHandler<TypedLabel, TypedLab
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
     }
 
-    private void validateInput(TypedLabel input) throws ApiGatewayException {
-        Validator<TypedLabel> validator = initValidator();
+    private void validateInput(Keyword input) throws ApiGatewayException {
+        Validator<Keyword> validator = initValidator();
         validator.validate(input);
     }
 
-    private Validator<TypedLabel> initValidator() {
+    private Validator<Keyword> initValidator() {
         return new CristinCreateKeywordValidator();
     }
 }

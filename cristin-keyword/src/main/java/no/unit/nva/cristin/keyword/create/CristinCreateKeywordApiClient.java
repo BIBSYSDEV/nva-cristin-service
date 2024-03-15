@@ -10,10 +10,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import no.unit.nva.cristin.common.client.PostApiClient;
+import no.unit.nva.cristin.keyword.model.nva.Keyword;
+import no.unit.nva.cristin.keyword.model.nva.adapter.KeywordFromCristin;
+import no.unit.nva.cristin.keyword.model.nva.adapter.KeywordToCristin;
 import no.unit.nva.cristin.model.CristinTypedLabel;
-import no.unit.nva.model.TypedLabel;
-import no.unit.nva.model.adapter.CristinTypedLabelToNvaFormat;
-import no.unit.nva.model.adapter.TypedLabelToCristinFormat;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.paths.UriWrapper;
@@ -25,7 +25,7 @@ public class CristinCreateKeywordApiClient extends PostApiClient implements Crea
     }
 
     @Override
-    public TypedLabel create(TypedLabel input) throws ApiGatewayException {
+    public Keyword create(Keyword input) throws ApiGatewayException {
         var payload = generatePayloadFromRequest(input);
         var uri = getPostUri();
         var response = post(uri, payload);
@@ -34,8 +34,8 @@ public class CristinCreateKeywordApiClient extends PostApiClient implements Crea
         return keywordFromResponse(response);
     }
 
-    private String generatePayloadFromRequest(TypedLabel input) {
-        return attempt(() -> OBJECT_MAPPER.writeValueAsString(new TypedLabelToCristinFormat().apply(input)))
+    private String generatePayloadFromRequest(Keyword input) {
+        return attempt(() -> OBJECT_MAPPER.writeValueAsString(new KeywordToCristin().apply(input)))
                    .orElseThrow();
     }
 
@@ -43,9 +43,9 @@ public class CristinCreateKeywordApiClient extends PostApiClient implements Crea
         return UriWrapper.fromUri(CRISTIN_API_URL).addChild(CRISTIN_KEYWORDS_PATH).getUri();
     }
 
-    private TypedLabel keywordFromResponse(HttpResponse<String> response) throws BadGatewayException {
+    private Keyword keywordFromResponse(HttpResponse<String> response) throws BadGatewayException {
         var responseCristinTypedLabel = getDeserializedResponse(response, CristinTypedLabel.class);
-        return new CristinTypedLabelToNvaFormat().apply(responseCristinTypedLabel);
+        return new KeywordFromCristin().apply(responseCristinTypedLabel);
     }
 
 }
