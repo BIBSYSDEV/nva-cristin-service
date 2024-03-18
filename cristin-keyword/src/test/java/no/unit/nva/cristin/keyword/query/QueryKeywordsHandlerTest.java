@@ -2,7 +2,6 @@ package no.unit.nva.cristin.keyword.query;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static java.util.Arrays.asList;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -18,14 +17,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import no.unit.nva.cristin.keyword.model.nva.Keyword;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.model.TypedLabel;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -34,6 +34,8 @@ import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class QueryKeywordsHandlerTest {
 
@@ -46,6 +48,8 @@ class QueryKeywordsHandlerTest {
         "https://api.cristin-test.uio.no/v2/keywords?per_page=100&name=biology&page=1";
     public static final String QUERY_VALUE = "biology";
     public static final String NVA_QUERY_KEYWORDS_RESPONSE_JSON = "nvaQueryKeywordsResponse.json";
+    public static final String EXPECTED_CONTEXT = "https://bibsysdev.github.io/src/keyword-search-context.json";
+    public static final String EXPECTED_ID = "https://api.dev.nva.aws.unit.no/cristin/keyword?page=1&results=100";
 
     private QueryKeywordsApiClient apiClient;
     private final Environment environment = new Environment();
@@ -66,7 +70,7 @@ class QueryKeywordsHandlerTest {
     }
 
     @Test
-    void shouldReturnListOfKeywordsAsDefaultWithoutSpecifyingAnyQueryParams() throws IOException {
+    void shouldReturnListOfKeywordsAsDefaultWithoutSpecifyingAnyQueryParams() throws Exception {
         Map<String, String> queryParams = Collections.emptyMap();
         var response = sendQuery(queryParams);
         var responseBody = response.getBodyObject(SearchResponse.class);
@@ -74,10 +78,12 @@ class QueryKeywordsHandlerTest {
         assertThat(response.getStatusCode(), equalTo(HTTP_OK));
         assertThat(responseBody.getHits().size(), equalTo(FIVE_HITS));
 
-        var hits = extractHitsFromSearchResponse(responseBody);
-        var expectedHits = readExpectedHitsFromResources();
+        var expected = IoUtils.stringFromResources(Path.of(NVA_QUERY_KEYWORDS_RESPONSE_JSON));
+        var actual = extractHitsFromSearchResponse(responseBody).toString();
 
-        assertThat(hits.containsAll(expectedHits), equalTo(true));
+        assertThat(responseBody.getContext(), equalTo(EXPECTED_CONTEXT));
+        assertThat(responseBody.getId(), equalTo(URI.create(EXPECTED_ID)));
+        JSONAssert.assertEquals(expected, actual, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
@@ -117,12 +123,7 @@ class QueryKeywordsHandlerTest {
     }
 
     @SuppressWarnings("rawtypes")
-    private List<TypedLabel> extractHitsFromSearchResponse(SearchResponse response) {
+    private List<Keyword> extractHitsFromSearchResponse(SearchResponse response) {
         return OBJECT_MAPPER.convertValue(response.getHits(), new TypeReference<>() {});
-    }
-
-    private List<TypedLabel> readExpectedHitsFromResources() throws JsonProcessingException {
-        var resource = IoUtils.stringFromResources(Path.of(NVA_QUERY_KEYWORDS_RESPONSE_JSON));
-        return asList(OBJECT_MAPPER.readValue(resource, TypedLabel[].class));
     }
 }

@@ -133,7 +133,7 @@ class CreateKeywordHandlerTest {
     }
 
     private static Keyword exampleObject() {
-        return new Keyword(null, exampleLabel());
+        return new Keyword.Builder().withLabels(exampleLabel()).build();
     }
 
     private static Map<String, String> exampleLabel() {
@@ -142,9 +142,9 @@ class CreateKeywordHandlerTest {
     }
 
     private static Stream<Arguments> badRequestProvider() {
-        return Stream.of(Arguments.of(new Keyword(null, null)),
-                         Arguments.of(new Keyword(null, Map.of(EN_KEY, EN_VALUE))),
-                         Arguments.of(new Keyword(null, Map.of(NB_KEY, NB_VALUE))));
+        return Stream.of(Arguments.of(new Keyword.Builder().build()),
+                         Arguments.of(new Keyword.Builder().withLabels(Map.of(EN_KEY, EN_VALUE)).build()),
+                         Arguments.of(new Keyword.Builder().withLabels(Map.of(NB_KEY, NB_VALUE)).build()));
     }
 
     private GatewayResponse<Keyword> sendQueryWithoutAccessRights(Keyword body) throws IOException {
