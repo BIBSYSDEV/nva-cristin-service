@@ -148,7 +148,7 @@ class CreateKeywordHandlerTest {
     }
 
     private GatewayResponse<Keyword> sendQueryWithoutAccessRights(Keyword body) throws IOException {
-        var input = new HandlerRequestBuilder<Keyword>(OBJECT_MAPPER).withBody(body)
+        var input = new HandlerRequestBuilder<>(OBJECT_MAPPER).withBody(body)
                         .build();
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Keyword.class);

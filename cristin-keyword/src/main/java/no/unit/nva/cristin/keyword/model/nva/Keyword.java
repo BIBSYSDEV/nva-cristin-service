@@ -34,6 +34,7 @@ public class Keyword extends IdentifierWithLabels implements JsonSerializable {
     }
 
     // Builder
+    @SuppressWarnings("UnusedReturnValue")
     public static class Builder {
 
         private String context;

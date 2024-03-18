@@ -55,6 +55,7 @@ public class IdentifierWithLabels {
     }
 
     // Builder
+    @SuppressWarnings("unused")
     public static class Builder {
 
         private String context;
