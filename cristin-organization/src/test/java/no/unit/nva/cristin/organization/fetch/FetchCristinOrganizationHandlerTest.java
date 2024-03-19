@@ -280,6 +280,26 @@ class FetchCristinOrganizationHandlerTest {
         JSONAssert.assertEquals(expectedResult, actual, JSONCompareMode.LENIENT);
     }
 
+    @Test
+    void shouldReturnVersion20230526AsDefault() throws IOException, ApiGatewayException {
+        var resource = stringFromResources(CRISTIN_GET_RESPONSE_JSON);
+        var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
+        var cristinSubsPayload = getFromResources(CRISTIN_GET_RESPONSE_SUB_UNITS_JSON);
+        var fakeSubUnitResponse = new HttpResponseFaker(cristinSubsPayload);
+
+        doReturn(fakeHttpResponse).doReturn(fakeSubUnitResponse)
+            .when(fetchOrgClient20230526).fetchGetResult(any());
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(SOME_IDENTIFIER), output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
+
+        verify(fetchOrgClient20230526, times(2)).fetchGetResult(any());
+        verify(cristinApiClient, times(0)).fetchGetResult(any());
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
     private Object getSubSubUnit(String subUnitFile) {
         return SubSubUnitDto.fromJson(IoUtils.stringFromResources(Path.of(subUnitFile)));
     }
