@@ -16,7 +16,8 @@ import no.unit.nva.utils.UriUtils;
 
 public class Keyword extends IdentifierWithLabels implements JsonSerializable {
 
-    public static final String type = "Keyword";
+    public static final String DEFAULT_CONTEXT = "https://bibsysdev.github.io/src/keyword-context.json";
+    public static final String KEYWORD_TYPE = "Keyword";
 
     @JsonCreator
     public Keyword(@JsonProperty(CONTEXT) String context,
@@ -34,7 +35,6 @@ public class Keyword extends IdentifierWithLabels implements JsonSerializable {
     }
 
     // Builder
-    @SuppressWarnings("UnusedReturnValue")
     public static class Builder {
 
         private String context;
@@ -43,11 +43,6 @@ public class Keyword extends IdentifierWithLabels implements JsonSerializable {
         private Map<String, String> labels;
 
         public Builder() {
-        }
-
-        public Builder withDefaultContext() {
-            this.context = "https://bibsysdev.github.io/src/keyword-context.json";
-            return this;
         }
 
         public Builder withContext(String context) {
@@ -67,7 +62,7 @@ public class Keyword extends IdentifierWithLabels implements JsonSerializable {
         }
 
         public Keyword build() {
-            return new Keyword(context, type, id, identifier, labels);
+            return new Keyword(context, KEYWORD_TYPE, id, identifier, labels);
         }
     }
 }

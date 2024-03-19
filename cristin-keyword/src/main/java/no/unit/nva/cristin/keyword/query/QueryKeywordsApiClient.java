@@ -61,7 +61,7 @@ public class QueryKeywordsApiClient extends ApiClient
         var cristinKeywords = asList(getDeserializedResponse(response, CristinTypedLabel[].class));
 
         return cristinKeywords.stream()
-                   .map(new KeywordFromCristin(false))
+                   .map(new KeywordFromCristin(null))
                    .collect(Collectors.toList());
     }
 

@@ -6,26 +6,21 @@ import no.unit.nva.cristin.model.CristinTypedLabel;
 
 public class KeywordFromCristin implements Function<CristinTypedLabel, Keyword> {
 
-    private final boolean useDefaultContext;
+    private final String context;
 
     public KeywordFromCristin() {
-        useDefaultContext = true;
+        context = Keyword.DEFAULT_CONTEXT;
     }
 
-    public KeywordFromCristin(boolean useDefaultContext) {
-        this.useDefaultContext = useDefaultContext;
+    public KeywordFromCristin(String context) {
+        this.context = context;
     }
 
     @Override
     public Keyword apply(CristinTypedLabel cristinTypedLabel) {
-        var builder = new Keyword.Builder();
-        if (useDefaultContext) {
-            builder.withDefaultContext();
-        } else {
-            builder.withContext(null);
-        }
-
-        return builder.withIdentifier(cristinTypedLabel.getCode())
+        return new Keyword.Builder()
+                   .withContext(context)
+                   .withIdentifier(cristinTypedLabel.getCode())
                    .withLabels(cristinTypedLabel.getName())
                    .build();
     }
