@@ -20,6 +20,7 @@ import java.util.Base64;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.http.HttpRequest.newBuilder;
+import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -44,6 +45,7 @@ public class AccessUtils {
     public static final String COGNITO_AUTHENTICATION_DOMAIN = "COGNITO_AUTHENTICATION_DOMAIN";
     public static final String COGNITO_TOKEN_ENDPOINT = "oauth2/token";
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
+    public static final String DOING_AUTHORIZED_REQUEST = "Client is doing authorized request";
 
     /**
      * Validate if Requester is authorized to use IdentificationNumber to access a user.
@@ -69,6 +71,10 @@ public class AccessUtils {
      */
     public static boolean requesterIsUserAdministrator(RequestInfo requestInfo) {
         return requestInfo.userIsAuthorized(MANAGE_OWN_AFFILIATION) || requestInfo.clientIsInternalBackend();
+    }
+
+    public static boolean clientIsCustomerAdministrator(RequestInfo requestInfo) {
+        return requestInfo.userIsAuthorized(MANAGE_CUSTOMERS);
     }
 
     private static boolean requesterHasNoAccessRightToUseNationalIdentificationNumber(RequestInfo requestInfo) {
