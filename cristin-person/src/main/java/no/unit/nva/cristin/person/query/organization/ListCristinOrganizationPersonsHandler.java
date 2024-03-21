@@ -1,10 +1,10 @@
 package no.unit.nva.cristin.person.query.organization;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import no.unit.nva.cognito.TokenValidator;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.utils.AccessUtils;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
@@ -31,10 +31,10 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
+import static no.unit.nva.utils.AccessUtils.requesterIsUserAdministrator;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
-import static nva.commons.core.attempt.Try.attempt;
 
 public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<Void, SearchResponse<Person>> {
 
@@ -42,9 +42,13 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
 
     public static final Pattern PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
     public static final Set<String> VALID_QUERY_PARAMETERS = Set.of(PAGE, NUMBER_OF_RESULTS, NAME, SORT);
+    public static final String IS_DOING_AUTHORIZED_REQUEST = "Client is doing authorized request";
+    public static final String TOKEN_BUT_DID_NOT_HAVE_ANY_ACCESS_RIGHTS =
+        "Client has token but did not have any access rights";
     private final transient CristinOrganizationPersonsClient apiClient;
 
     @JacocoGenerated
+    @SuppressWarnings("unused")
     public ListCristinOrganizationPersonsHandler() {
         this(new Environment());
     }
@@ -73,40 +77,20 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
     
     @Override
     protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
-            throws ApiGatewayException {
+        throws ApiGatewayException {
 
         validateHasIdentifierPathParameter(requestInfo);
         validateQueryParameterKeys(requestInfo);
+        var requestQueryParams = extractQueryParams(requestInfo);
+        logWhenMissingAccessRights(requestInfo);
 
-        var identifier = getValidId(requestInfo);
-        var page = getValidPage(requestInfo);
-        var numberOfResults = getValidNumberOfResults(requestInfo);
-        var name =
-            getNameIfPresent(requestInfo).orElse(null);
-        var sort =
-            getSortIfPresent(requestInfo).orElse(null);
-
-        var requestQueryParams =
-            buildParamMap(identifier, page, numberOfResults, name, sort);
-
-        return attempt(() -> getAuthorizedSearchResponse(requestInfo, requestQueryParams))
-                .orElse(list -> apiClient.generateQueryResponse(requestQueryParams));
-    }
-
-    private SearchResponse<Person> getAuthorizedSearchResponse(RequestInfo requestInfo,
-                                                               Map<String, String> requestQueryParams)
-            throws ApiGatewayException {
-        AccessUtils.validateIdentificationNumberAccess(requestInfo);
-        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-        return apiClient.authorizedGenerateQueryResponse(requestQueryParams);
-    }
-
-    private Optional<String> getNameIfPresent(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(NAME).map(UriUtils::escapeWhiteSpace);
-    }
-
-    private Optional<String> getSortIfPresent(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(SORT).map(UriUtils::escapeWhiteSpace);
+        if (clientIsAuthorized(requestInfo)) {
+            logger.info(IS_DOING_AUTHORIZED_REQUEST);
+            logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
+            return apiClient.authorizedGenerateQueryResponse(requestQueryParams);
+        } else {
+            return apiClient.generateQueryResponse(requestQueryParams);
+        }
     }
 
     /**
@@ -134,12 +118,30 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
         }
     }
 
+    private Map<String, String> extractQueryParams(RequestInfo requestInfo) throws BadRequestException {
+        var identifier = getValidId(requestInfo);
+        var page = getValidPage(requestInfo);
+        var numberOfResults = getValidNumberOfResults(requestInfo);
+        var name = getNameIfPresent(requestInfo).orElse(null);
+        var sort = getSortIfPresent(requestInfo).orElse(null);
+
+        return buildParamMap(identifier, page, numberOfResults, name, sort);
+    }
+
     private String getValidId(RequestInfo requestInfo) throws BadRequestException {
         final String identifier = requestInfo.getPathParameter(IDENTIFIER);
         if (PATTERN.matcher(identifier).matches()) {
             return identifier;
         }
         throw new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS);
+    }
+
+    private Optional<String> getNameIfPresent(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(NAME).map(UriUtils::escapeWhiteSpace);
+    }
+
+    private Optional<String> getSortIfPresent(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(SORT).map(UriUtils::escapeWhiteSpace);
     }
 
     private Map<String, String> buildParamMap(String identifier, String page, String numberOfResults, String name,
@@ -156,4 +158,17 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
         }
         return requestQueryParameters;
     }
+
+    private void logWhenMissingAccessRights(RequestInfo requestInfo) {
+        var tokenValidator = new TokenValidator(requestInfo);
+        if (tokenValidator.hasTokenButNoAccessRights()) {
+            logger.info(TOKEN_BUT_DID_NOT_HAVE_ANY_ACCESS_RIGHTS);
+            logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
+        }
+    }
+
+    private boolean clientIsAuthorized(RequestInfo requestInfo) {
+        return requesterIsUserAdministrator(requestInfo);
+    }
+
 }
