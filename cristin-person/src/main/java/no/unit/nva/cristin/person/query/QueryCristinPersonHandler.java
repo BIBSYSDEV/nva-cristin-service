@@ -54,9 +54,6 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
                                                                      SECTOR_PARAM.getNvaKey(),
                                                                      INSTITUTION_PARAM.getNvaKey(),
                                                                      SORT);
-    public static final String BOOLEAN_TRUE = "true";
-    public static final String BOOLEAN_FALSE = "false";
-
     private final transient ClientProvider<CristinAuthorizedQueryClient<Map<String, String>, Person>> clientProvider;
 
     @JacocoGenerated
@@ -131,8 +128,12 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
         return name.filter(this::isValidQueryString)
                    .map(UriUtils::escapeWhiteSpace)
-                   .orElseThrow(() -> new BadRequestException(
-                       invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
+                   .orElseThrow(QueryCristinPersonHandler::invalidNameException);
+    }
+
+    private static BadRequestException invalidNameException() {
+        return new BadRequestException(
+            invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE));
     }
 
     private Optional<String> getValidVerified(RequestInfo requestInfo) {
@@ -140,7 +141,7 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     }
 
     private boolean hasEitherTrueFalse(String verified) {
-        return BOOLEAN_FALSE.equalsIgnoreCase(verified) || BOOLEAN_TRUE.equalsIgnoreCase(verified);
+        return Boolean.FALSE.toString().equalsIgnoreCase(verified) || Boolean.TRUE.toString().equalsIgnoreCase(verified);
     }
 
     private String getSort(RequestInfo requestInfo) {
