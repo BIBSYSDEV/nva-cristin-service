@@ -364,7 +364,7 @@ public class FetchCristinPersonHandlerTest {
         return GatewayResponse.fromOutputStream(output, Person.class);
     }
 
-    public static Stream<Arguments> accessRightProvider() {
+    private static Stream<Arguments> accessRightProvider() {
         return Stream.of(Arguments.of(MANAGE_OWN_AFFILIATION),
                          Arguments.of(MANAGE_CUSTOMERS));
     }
