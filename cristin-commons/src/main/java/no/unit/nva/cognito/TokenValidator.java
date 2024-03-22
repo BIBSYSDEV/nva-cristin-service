@@ -1,8 +1,6 @@
 package no.unit.nva.cognito;
 
 import static nva.commons.core.attempt.Try.attempt;
-import java.util.List;
-import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.RequestInfo;
 
 public class TokenValidator {
@@ -18,16 +16,12 @@ public class TokenValidator {
         return token.isPresent();
     }
 
-    public List<AccessRight> extractAccessRightsUsingCognito(RequestInfo requestInfo) {
-        return requestInfo.getAccessRights();
-    }
-
     /**
      * Missing access rights might mean that client either has no access rights, or that Cognito is not responding on
      * our request.
      */
     public boolean hasTokenButNoAccessRights() {
-        return clientHasToken(requestInfo) && extractAccessRightsUsingCognito(requestInfo).isEmpty();
+        return clientHasToken(requestInfo) && requestInfo.getAccessRights().isEmpty();
     }
 
 }
