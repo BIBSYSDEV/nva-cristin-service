@@ -33,6 +33,8 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.query.CristinFacetParamKey.INSTITUTION_PARAM;
 import static no.unit.nva.cristin.model.query.CristinFacetParamKey.SECTOR_PARAM;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
+import static no.unit.nva.utils.AccessUtils.DOING_AUTHORIZED_REQUEST;
+import static no.unit.nva.utils.AccessUtils.clientIsCustomerAdministrator;
 import static no.unit.nva.utils.AccessUtils.requesterIsUserAdministrator;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
@@ -97,8 +99,10 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         var apiVersion = getApiVersion(requestInfo);
         var apiClient = clientProvider.getClient(apiVersion);
 
-        if (requesterIsUserAdministrator(requestInfo)) {
+        if (clientIsAuthorized(requestInfo)) {
+            logger.info(DOING_AUTHORIZED_REQUEST);
             logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
+
             return apiClient.executeAuthorizedQuery(requestQueryParameters);
         } else {
             return apiClient.executeQuery(requestQueryParameters);
@@ -182,6 +186,10 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
     private String getApiVersion(RequestInfo requestInfo) {
         return extractVersionFromRequestInfo(requestInfo, ACCEPT_HEADER_KEY_NAME);
+    }
+
+    private boolean clientIsAuthorized(RequestInfo requestInfo) {
+        return requesterIsUserAdministrator(requestInfo) || clientIsCustomerAdministrator(requestInfo);
     }
 
 }
