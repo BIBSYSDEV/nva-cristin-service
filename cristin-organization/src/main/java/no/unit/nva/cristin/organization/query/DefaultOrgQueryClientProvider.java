@@ -18,17 +18,20 @@ public class DefaultOrgQueryClientProvider
 
     @Override
     public CristinQueryApiClient<Map<String, String>, Organization> getClient(String apiVersion) {
-        switch (nonNull(apiVersion) ? apiVersion : EMPTY_STRING) {
-            case VERSION_2023_05_26:
+        return switch (nonNull(apiVersion) ? apiVersion : EMPTY_STRING) {
+            case VERSION_2023_05_26 -> {
                 logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_2023_05_26);
-                return getVersion20230526();
-            case VERSION_ONE:
+                yield getVersion20230526();
+            }
+            case VERSION_ONE -> {
                 logger.info(CLIENT_WANTS_VERSION_OF_THE_API_CLIENT, VERSION_ONE);
-                return getVersionOne();
-            default:
-                logger.info(CLIENT_DID_NOT_SPECIFY_VERSION_RETURNING_DEFAULT, VERSION_ONE);
-                return getVersionOne();
-        }
+                yield getVersionOne();
+            }
+            default -> {
+                logger.info(CLIENT_DID_NOT_SPECIFY_VERSION_RETURNING_DEFAULT, VERSION_2023_05_26);
+                yield getVersion20230526();
+            }
+        };
     }
 
     public CristinQueryApiClient<Map<String, String>, Organization> getVersionOne() {

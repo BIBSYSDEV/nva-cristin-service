@@ -85,6 +85,8 @@ class FetchCristinOrganizationHandlerTest {
     public static final String NORWEGIAN_LANGUAGE_KEY_UPPERCASE = "NO";
     public static final String ACRONYM_UIO = "UIO";
     public static final String ACRONYM_KLM_MBK = "KLM-MBK";
+    public static final String ERROR_MESSAGE_NOT_FOUND =
+        "The requested resource 'https://api.dev.nva.aws.unit.no/cristin/organization/1.0.0.0' was not found";
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
@@ -277,7 +279,63 @@ class FetchCristinOrganizationHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
         var actual = gatewayResponse.getBody();
 
-        JSONAssert.assertEquals(expectedResult, actual, JSONCompareMode.LENIENT);
+        JSONAssert.assertEquals(expectedResult, actual, JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    @Test
+    void shouldReturnVersion20230526AsDefault() throws IOException, ApiGatewayException {
+        var resource = stringFromResources(CRISTIN_GET_RESPONSE_JSON);
+        var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
+        var cristinSubsPayload = getFromResources(CRISTIN_GET_RESPONSE_SUB_UNITS_JSON);
+        var fakeSubUnitResponse = new HttpResponseFaker(cristinSubsPayload);
+
+        doReturn(fakeHttpResponse).doReturn(fakeSubUnitResponse)
+            .when(fetchOrgClient20230526).fetchGetResult(any());
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(SOME_IDENTIFIER), output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
+
+        verify(fetchOrgClient20230526, times(2)).fetchGetResult(any());
+        verify(cristinApiClient, times(0)).fetchGetResult(any());
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    @Test
+    void shouldReturnsNotFoundResponseWhenUpstreamReturnNotFoundAndVersionIs20230526() throws Exception {
+        var fakeHttpResponse = new HttpResponseFaker(EMPTY_JSON, HTTP_NOT_FOUND);
+        var fakeSubUnitHttpResponse = new HttpResponseFaker("[]", HTTP_OK);
+
+        doReturn(fakeHttpResponse).doReturn(fakeSubUnitHttpResponse).when(fetchOrgClient20230526).fetchGetResult(any());
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(NON_EXISTING_IDENTIFIER), output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
+        var actualDetail = getProblemDetail(gatewayResponse);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_NOT_FOUND));
+        assertThat(actualDetail, containsString(ERROR_MESSAGE_NOT_FOUND));
+    }
+
+    @Test
+    void shouldNotDisplayHasPartFieldWhenDepthNotWanted() throws Exception {
+        var resource = stringFromResources(CRISTIN_GET_RESPONSE_JSON);
+        var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
+
+        doReturn(fakeHttpResponse).when(fetchOrgClient20230526).fetchGetResult(any());
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequestWithoutDepth(),
+                                                      output,
+                                                      context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
+        var responseBody = gatewayResponse.getBodyObject(Organization.class);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+        assertThat(responseBody.getHasPart(), equalTo(null));
     }
 
     private Object getSubSubUnit(String subUnitFile) {
@@ -358,4 +416,19 @@ class FetchCristinOrganizationHandlerTest {
     private static String getFromResources(String filename) {
         return IoUtils.stringFromResources(Path.of(filename));
     }
+
+    private InputStream generateHandlerRequestWithoutDepth()
+        throws JsonProcessingException {
+
+        var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type());
+        var pathParameters = Map.of(IDENTIFIER, SOME_IDENTIFIER);
+        var queryParams = Map.of(DEPTH, NONE);
+
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                   .withHeaders(headers)
+                   .withPathParameters(pathParameters)
+                   .withQueryParameters(queryParams)
+                   .build();
+    }
+
 }

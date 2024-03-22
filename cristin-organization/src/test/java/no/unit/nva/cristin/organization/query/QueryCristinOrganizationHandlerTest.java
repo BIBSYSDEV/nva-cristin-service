@@ -189,7 +189,7 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnVersionOneAsDefault() throws Exception {
+    void shouldReturnVersion20230526AsDefault() throws Exception {
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
         var input = generateHandlerRequestWithRandomQueryParameter();
         queryCristinOrganizationHandler.handleRequest(input, output, context);
@@ -197,8 +197,8 @@ class QueryCristinOrganizationHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                                                                SearchResponse.class);
 
-        verify(clientProvider, times(1)).getVersionOne();
-        verify(clientProvider, times(0)).getVersion20230526();
+        verify(clientProvider, times(0)).getVersionOne();
+        verify(clientProvider, times(1)).getVersion20230526();
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 

@@ -36,7 +36,7 @@ public class Organization implements JsonSerializable {
     @JsonProperty(PART_OF)
     private final Set<Organization> partOf;
     @JsonProperty(HAS_PART)
-    private final Set<Organization> hasPart;
+    private Set<Organization> hasPart;
     @JsonProperty(CONTEXT)
     private String context;
     @JsonProperty(COUNTRY)
@@ -102,6 +102,10 @@ public class Organization implements JsonSerializable {
 
     public Set<Organization> getHasPart() {
         return hasPart;
+    }
+
+    public void setHasPart(Set<Organization> hasPart) {
+        this.hasPart = hasPart;
     }
 
     public String getType() {
