@@ -1,26 +1,26 @@
 [versions]
-junit = { strictly = '5.10.0' }
-nva-commons = {strictly = '1.36.7'}
+junit = { strictly = '5.10.2' }
+nva-commons = {strictly = '1.38.2'}
 jackson = { strictly = '2.15.2' }
 mockito = { strictly = '5.3.1' }
 hamcrest = { strictly = '2.2' }
 zalando = { strictly = '0.27.1' }
 javax-ws-rs = { strictly = '2.1.1' }
 jsoup = { strictly = '1.14.3' }
-aws-lambda-java-core = { strictly = '1.2.2' }
-google-guava = { strictly = '32.1.2-jre' }
+aws-lambda-java-core = { strictly = '1.2.3' }
+google-guava = { strictly = '33.0.0-jre' }
 karate-core = { strictly = '1.1.0' }
 karate-apache = { strictly = '0.9.6' }
 karate-junit5 = { strictly = '1.1.0' }
 log4jApi = { strictly = '2.17.2' }
-slf4j = { require = '2.0.5' }
+slf4j = { require = '2.0.12' }
 nva-language = { strictly = '1.0' }
-awsSdk = { strictly = '1.12.483' }
-awsSdk2 = { strictly = '2.20.141' }
+awsSdk = { strictly = '1.12.668' }
+awsSdk2 = { strictly = '2.24.12' }
 bekkopen-nocommons = { strictly = '0.12.0' }
-com-auth0-jwt = { strictly = '3.18.3' }
-com-auth0-jwks = { strictly = '0.20.2' }
-wiremock = { strictly = '3.0.2' }
+com-auth0-jwt = { strictly = '4.4.0' }
+com-auth0-jwks = { strictly = '0.22.1' }
+wiremock = { strictly = '3.4.1' }
 apache-http-core = { strictly = '4.4.16' }
 json-assert = { strictly = '1.5.1' }
 vavrVersion = '0.10.4'
