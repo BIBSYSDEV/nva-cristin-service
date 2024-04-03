@@ -107,17 +107,14 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     }
 
     private Map<String, String> extractQueryParameters(RequestInfo requestInfo) throws BadRequestException {
-        var name = getValidName(requestInfo);
-        var page = getValidPage(requestInfo);
-        var numberOfResults = getValidNumberOfResults(requestInfo);
-        var organization = getValidOrganization(requestInfo).orElse(null);
-        var verified = getValidVerified(requestInfo).orElse(null);
-        var sectorFacet = requestInfo.getQueryParameterOpt(SECTOR_PARAM.getNvaKey()).orElse(null);
-        var organizationFacet = requestInfo.getQueryParameterOpt(INSTITUTION_PARAM.getNvaKey()).orElse(null);
-        var sort = getSort(requestInfo);
-
-        return buildParametersMap(name, page, numberOfResults, organization, verified,
-                                  sectorFacet, organizationFacet, sort);
+        return buildParametersMap(getValidName(requestInfo),
+                                  getValidPage(requestInfo),
+                                  getValidNumberOfResults(requestInfo),
+                                  extractOrganization(requestInfo),
+                                  extractVerified(requestInfo),
+                                  extractSectorFacet(requestInfo),
+                                  extractOrganizationFacet(requestInfo),
+                                  getSort(requestInfo));
     }
 
     @Override
@@ -138,6 +135,14 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
             invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE));
     }
 
+    private String extractOrganization(RequestInfo requestInfo) {
+        return getValidOrganization(requestInfo).orElse(null);
+    }
+
+    private String extractVerified(RequestInfo requestInfo) {
+        return getValidVerified(requestInfo).orElse(null);
+    }
+
     private Optional<String> getValidVerified(RequestInfo requestInfo) {
         return requestInfo.getQueryParameterOpt(VERIFIED).filter(this::hasEitherTrueFalse);
     }
@@ -145,6 +150,14 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     private boolean hasEitherTrueFalse(String verified) {
         return Boolean.FALSE.toString().equalsIgnoreCase(verified)
                || Boolean.TRUE.toString().equalsIgnoreCase(verified);
+    }
+
+    private static String extractSectorFacet(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(SECTOR_PARAM.getNvaKey()).orElse(null);
+    }
+
+    private static String extractOrganizationFacet(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(INSTITUTION_PARAM.getNvaKey()).orElse(null);
     }
 
     private String getSort(RequestInfo requestInfo) {
