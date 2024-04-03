@@ -599,3 +599,80 @@ Resources:
       DomainName: !Ref ApiDomain
       RestApiId: !Ref NvaCristinProxyApi
       Stage: !Ref NvaCristinProxyApi.Stage
+
+  NvaCristinIntermediateStorageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      LifecycleConfiguration:
+        Rules:
+          - Status: 'Enabled'
+            ExpirationInDays: 7
+            Id: 'DeleteFilesAfter7Days'
+
+  NvaCristinIntermediateStorageBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref NvaCristinIntermediateStorageBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal: '*'
+            Action:
+              - "s3:GetObject"
+            Resource: !Sub 'arn:aws:s3:::${NvaCristinIntermediateStorageBucket}/units.json'
+
+  NvaCristinIntermediateStorageUnitsParameter:
+    Type: 'AWS::SSM::Parameter'
+    Properties:
+      Description: 'URL of the file in S3 bucket'
+      Name: '/NVA/S3/CristinIntermediateStorage/Units'
+      Type: 'String'
+      Value: !Sub 'https://s3.amazonaws.com/${NvaCristinIntermediateStorageBucket}/units.json'
+
+  NvaCristinIntermediateStorageBucketWritePolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: 'Managed policy for writing objects to S3 from Lambda'
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "s3:PutObject"
+            Resource: !Sub 'arn:aws:s3:::${NvaCristinIntermediateStorageBucket}/*'
+
+  NvaCristinUpdateIntermediateUnitsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-intermediate-storage
+      Handler: no.unit.nva.cristin.intermediate.storage.UpdateUnitsHandler::handleRequest
+      Policies:
+        - !Ref NvaCristinIntermediateStorageBucketWritePolicy
+      Environment:
+        Variables:
+          INTERMEDIATE_STORAGE_BUCKET_NAME: !Ref NvaCristinIntermediateStorageBucket
+          CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME: !Ref CristinBotFilterBypassHeaderName
+          CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE: !Ref CristinBotFilterBypassHeaderValue
+          CRISTIN_API_URL: !Ref CristinApiUrl
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'cron(0 5 * * ? *)'
+
+  NvaCristinUpdateIntermediateUnitsDeadMansSwitch:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Dead Mans Switch for NvaCristinUpdateIntermediateUnitsFunction
+      Namespace: 'AWS/Lambda'
+      MetricName: 'Invocations'
+      Dimensions:
+        - Name: 'FunctionName'
+          Value: !Ref NvaCristinUpdateIntermediateUnitsFunction
+      Statistic: 'SampleCount'
+      Period: '90000'
+      EvaluationPeriods: '1'
+      Threshold: '1'
+      ComparisonOperator: 'LessThanThreshold'
+      AlarmName: 'No success executions for NvaCristinUpdateIntermediateUnitsFunction last 25h'

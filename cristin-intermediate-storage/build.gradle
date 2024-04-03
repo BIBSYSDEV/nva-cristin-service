@@ -1,0 +1,13 @@
+dependencies {
+    implementation project(":cristin-commons")
+    implementation libs.aws.sdk2.s3
+    implementation libs.vavr
+    implementation libs.resilience4j.retry
+    implementation libs.nva.json
+
+    testImplementation libs.nva.testutils
+}
+
+test {
+    useJUnitPlatform()
+}

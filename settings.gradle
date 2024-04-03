@@ -7,4 +7,5 @@ include 'cristin-funding'
 include 'cristin-biobank'
 include 'cristin-testing'
 include 'cristin-keyword'
+include 'cristin-intermediate-storage'
 
