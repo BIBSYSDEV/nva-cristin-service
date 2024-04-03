@@ -19,6 +19,8 @@ import java.util.function.Supplier;
 import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.core.Environment;
 import nva.commons.core.useragent.UserAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for retrieving all Norwegian cristin units where you want to do repeated lookups and keep a large
@@ -26,7 +28,8 @@ import nva.commons.core.useragent.UserAgent;
  */
 public class CristinUnitsUtil {
 
-    private static final String API_ARGUMENTS = "?per_page=1000&country=NO&page=";
+    private static final Logger logger = LoggerFactory.getLogger(CristinUnitsUtil.class);
+    private static final String API_ARGUMENTS = "/units?per_page=1000&country=NO&page=";
     public static final String APPLICATION_JSON = "application/json";
     public static final String ACCEPT = "Accept";
     public static final String USER_AGENT = "User-Agent";
@@ -86,6 +89,7 @@ public class CristinUnitsUtil {
     }
 
     private String executeRequest(URI requestUri) {
+        logger.info("Fetching data from {}", requestUri);
         return of(() -> attempt(() -> httpClient.send(buildHttpRequest(requestUri),
                                                       BodyHandlers.ofString(StandardCharsets.UTF_8)))
                             .map(HttpResponse::body)

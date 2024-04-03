@@ -18,7 +18,7 @@ public class UpdateUnitsHandler implements RequestStreamHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(UpdateUnitsHandler.class);
     private static final String BUCKET_NAME_ENV = "INTERMEDIATE_STORAGE_BUCKET_NAME";
-    private static final String BUCKET_KEY_FILE_NAME = "units.json";
+    private static final String BUCKET_KEY_FILE_NAME = "units-norway.json";
     private static final String CRISTIN_API_URL_ENV = "CRISTIN_API_URL";
     public static final String CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME_ENV = "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME";
     public static final String CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE_ENV = "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE";

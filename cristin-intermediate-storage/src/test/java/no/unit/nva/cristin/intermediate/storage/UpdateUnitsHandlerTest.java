@@ -33,7 +33,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 public class UpdateUnitsHandlerTest {
     public static final String TEST_BUCKET = "test-bucket";
     public static final String DELIMITER = "\\A";
-    public static final String UNITS_JSON_FILENAME = "units.json";
+    public static final String UNITS_JSON_FILENAME = "units-norway.json";
     private Environment environment;
     private S3Client s3Client;
     private HttpClient httpClient;

@@ -621,7 +621,7 @@ Resources:
               AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
             Action:
               - "s3:GetObject"
-            Resource: !Sub 'arn:aws:s3:::${NvaCristinIntermediateStorageBucket}/units.json'
+            Resource: !Sub 'arn:aws:s3:::${NvaCristinIntermediateStorageBucket}/units-norway.json'
 
   NvaCristinIntermediateStorageUnitsParameter:
     Type: 'AWS::SSM::Parameter'
@@ -629,7 +629,7 @@ Resources:
       Description: 'URL of the file in S3 bucket'
       Name: '/NVA/S3/CristinIntermediateStorage/Units'
       Type: 'String'
-      Value: !Sub 'https://s3.amazonaws.com/${NvaCristinIntermediateStorageBucket}/units.json'
+      Value: !Sub 'https://s3.amazonaws.com/${NvaCristinIntermediateStorageBucket}/units-norway.json'
 
   NvaCristinIntermediateStorageBucketWritePolicy:
     Type: 'AWS::IAM::ManagedPolicy'
