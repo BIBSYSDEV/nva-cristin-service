@@ -626,10 +626,10 @@ Resources:
   NvaCristinIntermediateStorageUnitsParameter:
     Type: 'AWS::SSM::Parameter'
     Properties:
-      Description: 'URL of the file in S3 bucket'
+      Description: 'S3 URI of the file in S3 bucket'
       Name: '/NVA/S3/CristinIntermediateStorage/Units'
       Type: 'String'
-      Value: !Sub 'https://s3.amazonaws.com/${NvaCristinIntermediateStorageBucket}/units-norway.json'
+      Value: !Sub 's3://${NvaCristinIntermediateStorageBucket}/units-norway.json'
 
   NvaCristinIntermediateStorageBucketWritePolicy:
     Type: 'AWS::IAM::ManagedPolicy'
