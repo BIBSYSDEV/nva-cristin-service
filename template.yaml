@@ -663,6 +663,12 @@ Resources:
           Properties:
             Schedule: 'cron(0 5,12 * * ? *)'
 
+  NvaCristinUpdateIntermediateUnitsFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${NvaCristinUpdateIntermediateUnitsFunction}'
+      RetentionInDays: 90
+
   NvaCristinUpdateIntermediateUnitsDeadMansSwitch:
     Type: AWS::CloudWatch::Alarm
     Properties:
