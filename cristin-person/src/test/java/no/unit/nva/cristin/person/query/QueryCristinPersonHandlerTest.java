@@ -7,6 +7,7 @@ import com.google.common.net.HttpHeaders;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.model.query.CristinFacetKey;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
@@ -16,6 +17,7 @@ import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.query.version.facet.QueryPersonWithFacetsClient;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
@@ -37,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
@@ -58,6 +62,7 @@ import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
@@ -252,15 +257,16 @@ public class QueryCristinPersonHandlerTest {
         verify(apiClient, times(1)).executeQuery(any());
     }
 
-    @Test
-    void shouldCallAuthorizedQueryMethodWhenClientDoesHaveRequiredRights()
+    @ParameterizedTest(name = "Query returns 200 OK when having access right: {0}")
+    @MethodSource("accessRightProvider")
+    void shouldCallAuthorizedQueryMethodWhenClientDoesHaveRequiredRights(AccessRight accessRight)
         throws IOException, ApiGatewayException {
         var apiClient = mock(CristinPersonApiClient.class);
         var searchResponse = randomPersons();
         doReturn(searchResponse).when(apiClient).executeAuthorizedQuery(any());
         doReturn(apiClient).when(clientProvider).getVersionOne();
         handler = new QueryCristinPersonHandler(clientProvider, new Environment());
-        var input = queryWithAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME));
+        var input = queryWithAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME), accessRight);
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
@@ -269,8 +275,9 @@ public class QueryCristinPersonHandlerTest {
         verify(apiClient, times(0)).executeQuery(any());
     }
 
-    @Test
-    void shouldIncludeNationalIdentificationNumberInResponseWhenPresentInUpstream()
+    @ParameterizedTest(name = "Query returns authorized fields when having access right: {0}")
+    @MethodSource("accessRightProvider")
+    void shouldIncludeNationalIdentificationNumberInResponseWhenPresentInUpstream(AccessRight accessRight)
         throws ApiGatewayException, IOException {
         var apiClient = spy(CristinPersonApiClient.class);
         var queryResponse = generateDummyQueryResponseWithNin();
@@ -279,7 +286,7 @@ public class QueryCristinPersonHandlerTest {
         doReturn(List.of(getResponse)).when(apiClient).authorizedFetchQueryResultsOneByOne(any());
         doReturn(apiClient).when(clientProvider).getVersionOne();
         handler = new QueryCristinPersonHandler(clientProvider, new Environment());
-        var input = queryWithAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME));
+        var input = queryWithAccessRightToReadNIN(Map.of(NAME, RANDOM_NAME), accessRight);
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                                                                SearchResponse.class);
@@ -469,13 +476,14 @@ public class QueryCristinPersonHandlerTest {
         return cristinPerson;
     }
 
-    private InputStream queryWithAccessRightToReadNIN(Map<String, String> queryParameters)
+    private InputStream queryWithAccessRightToReadNIN(Map<String, String> queryParameters,
+                                                      AccessRight accessRight)
         throws JsonProcessingException {
         final var customerId = randomUri();
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                    .withQueryParameters(queryParameters)
                    .withCurrentCustomer(customerId)
-                   .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
+                   .withAccessRights(customerId, accessRight)
                    .build();
     }
 
@@ -550,6 +558,11 @@ public class QueryCristinPersonHandlerTest {
 
     private HttpResponse<String> dummyFacetHttpResponse() {
         return new HttpResponseFaker(RESPONSE_WITH_FACETS, 200);
+    }
+
+    private static Stream<Arguments> accessRightProvider() {
+        return Stream.of(Arguments.of(MANAGE_OWN_AFFILIATION),
+                         Arguments.of(MANAGE_CUSTOMERS));
     }
 
 }
