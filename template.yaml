@@ -634,6 +634,7 @@ Resources:
 
   NvaCristinIntermediateStorageBucketWritePolicy:
     Type: 'AWS::IAM::ManagedPolicy'
+    DependsOn: NvaCristinIntermediateStorageBucket
     Properties:
       Description: 'Managed policy for writing objects to S3 from Lambda'
       PolicyDocument:
