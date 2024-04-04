@@ -28,7 +28,7 @@ dependencies {
     implementation libs.apache.http.core
 
     implementation libs.vavr
-    implementation libs.resilience4j.retry
+    implementation libs.resilience4j.all
 
 }
 tasks.named('test', Test) {

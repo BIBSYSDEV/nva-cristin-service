@@ -1,13 +1,15 @@
 package no.unit.nva.cristin.intermediate.storage;
 
 import static io.vavr.control.Try.of;
-import static io.vavr.control.Try.ofSupplier;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.github.resilience4j.core.IntervalFunction;
-import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.decorators.Decorators;
+import io.github.resilience4j.ratelimiter.RateLimiterConfig;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryRegistry;
+import io.vavr.control.Try;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -15,6 +17,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.function.Supplier;
 import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.core.Environment;
@@ -29,13 +32,13 @@ import org.slf4j.LoggerFactory;
 public class CristinUnitsUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(CristinUnitsUtil.class);
-    private static final String API_ARGUMENTS = "/units?per_page=1000&country=NO&page=";
+    private static final String API_ARGUMENTS = "/units?lang=nb,nn,en&per_page=1000&country=NO&page=";
     public static final String APPLICATION_JSON = "application/json";
     public static final String ACCEPT = "Accept";
     public static final String USER_AGENT = "User-Agent";
     public static final String API_HOST = "CRISTIN_API_URL";
-    public static final String SIKT_EMIL = "support@sikt.no";
-    public static final URI GITHUB_REPO = URI.create("https://github.com/BIBSYSDEV/nva-publication-api");
+    public static final String SIKT_EMAIL = "support@sikt.no";
+    public static final URI GITHUB_REPO = URI.create("https://github.com/BIBSYSDEV/nva-cristin-service");
     private final URI apiUri;
     private final HttpClient httpClient;
     private final Environment environment;
@@ -80,12 +83,23 @@ public class CristinUnitsUtil {
     }
 
     private String fetchResponseWithRetry(URI requestUri) {
+        RateLimiterConfig config = RateLimiterConfig.custom()
+                                       .limitRefreshPeriod(Duration.ofMinutes(1))
+                                       .limitForPeriod(100)
+                                       .timeoutDuration(Duration.ofSeconds(10))
+                                       .build();
+        var rateLimiterRegistry = RateLimiterRegistry.of(config);
+        var rateLimiter = rateLimiterRegistry.rateLimiter("executeRequest");
         var retryRegistry = RetryRegistry.of(RetryConfig.custom().maxAttempts(5).intervalFunction(
             IntervalFunction.ofExponentialRandomBackoff()).build());
         var retryWithDefaultConfig = retryRegistry.retry("executeRequest");
-        Supplier<String> supplier = () -> executeRequest(requestUri);
 
-        return ofSupplier(Retry.decorateSupplier(retryWithDefaultConfig, supplier)).get();
+        Supplier<String> decoratedSupplier = Decorators.ofSupplier(() -> executeRequest(requestUri))
+                                                 .withRateLimiter(rateLimiter)
+                                                 .withRetry(retryWithDefaultConfig)
+                                                 .decorate();
+
+        return Try.ofSupplier(decoratedSupplier).get();
     }
 
     private String executeRequest(URI requestUri) {
@@ -111,7 +125,7 @@ public class CristinUnitsUtil {
         return UserAgent.newBuilder().client(caller)
                    .environment(this.environment.readEnv(API_HOST))
                    .repository(GITHUB_REPO)
-                   .email(SIKT_EMIL)
+                   .email(SIKT_EMAIL)
                    .version("1.0")
                    .build().toString();
     }

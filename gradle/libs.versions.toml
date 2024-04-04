@@ -24,7 +24,7 @@ wiremock = { strictly = '3.4.1' }
 apache-http-core = { strictly = '4.4.16' }
 json-assert = { strictly = '1.5.1' }
 vavrVersion = '0.10.4'
-resilience4jRetry = '2.1.0'
+resilience4j = '2.2.0'
 
 [libraries]
 
@@ -95,7 +95,7 @@ wiremock = { group = 'org.wiremock', name = 'wiremock', version.ref = 'wiremock'
 apache-http-core = { group = 'org.apache.httpcomponents', name = 'httpcore', version.ref = 'apache-http-core' }
 
 vavr = { group = 'io.vavr', name = 'vavr', version.ref = 'vavrVersion' }
-resilience4j-retry = { group = 'io.github.resilience4j', name = 'resilience4j-retry', version.ref = 'resilience4jRetry' }
+resilience4j-all = { group = 'io.github.resilience4j', name = 'resilience4j-all', version.ref = 'resilience4j' }
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
