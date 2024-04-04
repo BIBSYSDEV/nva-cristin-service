@@ -26,8 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utility class for retrieving all Norwegian cristin units where you want to do repeated lookups and keep a large
- * cache like migrations and other bulk operations.
+ * Utility class for retrieving all Norwegian cristin units where you want to do repeated lookups and keep a large cache
+ * like migrations and other bulk operations.
  */
 public class CristinUnitsUtil {
 
@@ -46,8 +46,12 @@ public class CristinUnitsUtil {
     private final String cristinBotFilterBypassHeaderName;
     private final String cristinBotFilterBypassHeaderValue;
 
-    public CristinUnitsUtil(HttpClient httpClient, URI apiUri, Environment environment, Class<?> caller,
-                            String cristinBotFilterBypassHeaderName, String cristinBotFilterBypassHeaderValue) {
+    public CristinUnitsUtil(HttpClient httpClient,
+                            URI apiUri,
+                            Environment environment,
+                            Class<?> caller,
+                            String cristinBotFilterBypassHeaderName,
+                            String cristinBotFilterBypassHeaderValue) {
         this.httpClient = httpClient;
         this.apiUri = apiUri;
         this.environment = environment;
@@ -83,15 +87,17 @@ public class CristinUnitsUtil {
     }
 
     private String fetchResponseWithRetry(URI requestUri) {
-        RateLimiterConfig config = RateLimiterConfig.custom()
-                                       .limitRefreshPeriod(Duration.ofMinutes(1))
-                                       .limitForPeriod(100)
-                                       .timeoutDuration(Duration.ofSeconds(10))
-                                       .build();
+        var config = RateLimiterConfig.custom()
+                         .limitRefreshPeriod(Duration.ofMinutes(1))
+                         .limitForPeriod(100)
+                         .timeoutDuration(Duration.ofSeconds(10))
+                         .build();
         var rateLimiterRegistry = RateLimiterRegistry.of(config);
         var rateLimiter = rateLimiterRegistry.rateLimiter("executeRequest");
-        var retryRegistry = RetryRegistry.of(RetryConfig.custom().maxAttempts(5).intervalFunction(
-            IntervalFunction.ofExponentialRandomBackoff()).build());
+        var retryRegistry = RetryRegistry.of(RetryConfig.custom()
+                                                 .maxAttempts(5)
+                                                 .intervalFunction(IntervalFunction.ofExponentialRandomBackoff())
+                                                 .build());
         var retryWithDefaultConfig = retryRegistry.retry("executeRequest");
 
         Supplier<String> decoratedSupplier = Decorators.ofSupplier(() -> executeRequest(requestUri))
@@ -104,29 +110,28 @@ public class CristinUnitsUtil {
 
     private String executeRequest(URI requestUri) {
         logger.info("Fetching data from {}", requestUri);
-        return of(() -> attempt(() -> httpClient.send(buildHttpRequest(requestUri),
-                                                      BodyHandlers.ofString(StandardCharsets.UTF_8)))
-                            .map(HttpResponse::body)
-                            .toOptional().orElseThrow()).get();
+        return of(() -> attempt(
+            () -> httpClient.send(buildHttpRequest(requestUri), BodyHandlers.ofString(StandardCharsets.UTF_8))).map(
+            HttpResponse::body).toOptional().orElseThrow()).get();
     }
 
     private HttpRequest buildHttpRequest(URI requestUri) {
         return HttpRequest.newBuilder()
                    .uri(requestUri)
-                   .headers(ACCEPT, APPLICATION_JSON,
-                            cristinBotFilterBypassHeaderName,
-                            cristinBotFilterBypassHeaderValue,
-                            USER_AGENT, getUserAgent())
+                   .headers(ACCEPT, APPLICATION_JSON, cristinBotFilterBypassHeaderName,
+                            cristinBotFilterBypassHeaderValue, USER_AGENT, getUserAgent())
                    .GET()
                    .build();
     }
 
     private String getUserAgent() {
-        return UserAgent.newBuilder().client(caller)
+        return UserAgent.newBuilder()
+                   .client(caller)
                    .environment(this.environment.readEnv(API_HOST))
                    .repository(GITHUB_REPO)
                    .email(SIKT_EMAIL)
                    .version("1.0")
-                   .build().toString();
+                   .build()
+                   .toString();
     }
 }

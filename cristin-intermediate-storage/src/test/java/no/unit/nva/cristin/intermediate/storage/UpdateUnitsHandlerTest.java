@@ -68,20 +68,20 @@ public class UpdateUnitsHandlerTest {
     }
 
     @Test
-    void unitCachedFileShouldUpdate() throws IOException {
+    void whenHandlerIsTriggeredS3ShouldReceiveFile() throws IOException {
         var handler = new UpdateUnitsHandler(environment, s3Client, httpClient);
 
         handler.handleRequest(input, output, context);
 
-        ArgumentCaptor<PutObjectRequest> putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
-        ArgumentCaptor<RequestBody> requestBodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
+        var putObjectRequestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
+        var requestBodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
 
         verify(s3Client).putObject(putObjectRequestCaptor.capture(), requestBodyCaptor.capture());
 
-        PutObjectRequest capturedPutObjectRequest = putObjectRequestCaptor.getValue();
-        RequestBody capturedRequestBody = requestBodyCaptor.getValue();
+        var capturedPutObjectRequest = putObjectRequestCaptor.getValue();
+        var capturedRequestBody = requestBodyCaptor.getValue();
         var contentStreamProvider = capturedRequestBody.contentStreamProvider();
-        String fileContent = getFileContent(contentStreamProvider);
+        var fileContent = getFileContent(contentStreamProvider);
 
         assertEquals(TEST_BUCKET, capturedPutObjectRequest.bucket());
         assertEquals(UNITS_JSON_FILENAME, capturedPutObjectRequest.key());

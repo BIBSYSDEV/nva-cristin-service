@@ -39,9 +39,9 @@ public class UpdateUnitsHandler implements RequestStreamHandler {
     @Override
     public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
         logger.info("Loading data...");
-        String jsonData = loadData();
+        var jsonData = loadData();
 
-        PutObjectRequest objectRequest = PutObjectRequest.builder()
+        var objectRequest = PutObjectRequest.builder()
                                              .bucket(environment.readEnv(BUCKET_NAME_ENV))
                                              .key(BUCKET_KEY_FILE_NAME)
                                              .build();
