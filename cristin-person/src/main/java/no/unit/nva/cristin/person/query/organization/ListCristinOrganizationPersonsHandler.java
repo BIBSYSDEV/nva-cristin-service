@@ -31,6 +31,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
+import static no.unit.nva.utils.AccessUtils.clientIsCustomerAdministrator;
 import static no.unit.nva.utils.AccessUtils.requesterIsUserAdministrator;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
@@ -168,7 +169,7 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
     }
 
     private boolean clientIsAuthorized(RequestInfo requestInfo) {
-        return requesterIsUserAdministrator(requestInfo);
+        return requesterIsUserAdministrator(requestInfo) || clientIsCustomerAdministrator(requestInfo);
     }
 
 }

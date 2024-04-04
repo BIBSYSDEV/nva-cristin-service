@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.fetch;
 
+import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -8,6 +9,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_FIELD;
 import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_SCOPE_FIELD;
 import static no.unit.nva.utils.AccessUtils.AUTHORIZER_FIELD;
+import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
@@ -37,6 +39,7 @@ import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -52,6 +55,9 @@ import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class FetchFromIdentityNumberHandlerTest {
 
@@ -171,7 +177,7 @@ public class FetchFromIdentityNumberHandlerTest {
         var request = requestWithBackendScope();
         handler.handleRequest(request, output, context);
         GatewayResponse<Person> response = GatewayResponse.fromOutputStream(output, Person.class);
-        assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
+        assertThat(response.getStatusCode(), is(equalTo(HTTP_OK)));
         Person person = response.getBodyObject(Person.class);
         assertThat(person, is(not(nullValue())));
     }
@@ -181,6 +187,14 @@ public class FetchFromIdentityNumberHandlerTest {
         var gatewayResponse = sendQueryWithUnauthorizedAccessRight();
 
         assertThat(gatewayResponse.getStatusCode(), equalTo(HttpURLConnection.HTTP_FORBIDDEN));
+    }
+
+    @ParameterizedTest(name = "Fetch returns 200 OK when having access right: {0}")
+    @MethodSource("accessRightProvider")
+    void shouldReturnOkWhenHavingRequiredAccessRights(AccessRight accessRight) throws Exception {
+        var actual = sendQueryWithAccessRight(defaultBody(), accessRight);
+
+        assertThat(actual.getStatusCode(), equalTo(HTTP_OK));
     }
 
     private InputStream requestWithBackendScope() throws JsonProcessingException {
@@ -242,4 +256,20 @@ public class FetchFromIdentityNumberHandlerTest {
             .withBody(INVALID_PAYLOAD)
             .build();
     }
+
+    private GatewayResponse<Person> sendQueryWithAccessRight(TypedValue body,
+                                                             AccessRight accessRight)
+        throws IOException {
+
+        try (var input = requestWithParams(body, EMPTY_MAP, accessRight)) {
+            handler.handleRequest(input, output, context);
+        }
+        return GatewayResponse.fromOutputStream(output, Person.class);
+    }
+
+    private static Stream<Arguments> accessRightProvider() {
+        return Stream.of(Arguments.of(MANAGE_OWN_AFFILIATION),
+                         Arguments.of(MANAGE_CUSTOMERS));
+    }
+
 }
