@@ -610,19 +610,19 @@ Resources:
             ExpirationInDays: 7
             Id: 'DeleteFilesAfter7Days'
 
- # NvaCristinIntermediateStorageBucketPolicy:
- #   Type: 'AWS::S3::BucketPolicy'
- #   Properties:
- #     Bucket: !Ref NvaCristinIntermediateStorageBucket
- #     PolicyDocument:
- #       Version: "2012-10-17"
- #       Statement:
- #         - Effect: "Allow"
- #           Principal:
- #             AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:*'
- #           Action:
- #             - "s3:GetObject"
- #           Resource: !Sub 'arn:aws:s3:::${NvaCristinIntermediateStorageBucket}/units-norway.json'
+  NvaCristinIntermediateStorageBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref NvaCristinIntermediateStorageBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              AWS: !Sub '${AWS::AccountId}'
+            Action:
+              - "s3:GetObject"
+            Resource: !Sub 'arn:aws:s3:::${NvaCristinIntermediateStorageBucket}/units-norway.json'
 
   NvaCristinIntermediateStorageUnitsParameter:
     Type: 'AWS::SSM::Parameter'
