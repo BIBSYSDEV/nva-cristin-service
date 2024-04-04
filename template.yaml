@@ -626,6 +626,7 @@ Resources:
 
   NvaCristinIntermediateStorageUnitsParameter:
     Type: 'AWS::SSM::Parameter'
+    DependsOn: NvaCristinIntermediateStorageBucket
     Properties:
       Description: 'S3 URI of the file in S3 bucket'
       Name: '/NVA/S3/CristinIntermediateStorage/Units'
