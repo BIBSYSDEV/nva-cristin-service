@@ -153,7 +153,7 @@ class FetchCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnBadRequestResponseOnIllegalIdentifierInPath() throws IOException {
-        var inputStream = new HandlerRequestBuilder<InputStream>(restApiMapper)
+        var inputStream = new HandlerRequestBuilder<>(restApiMapper)
                 .withBody(null)
                 .withHeaders(null)
                 .withPathParameters(Map.of("identifier", randomString()))
@@ -378,7 +378,7 @@ class FetchCristinOrganizationHandlerTest {
     private InputStream generateHandlerRequest(String organizationIdentifier) throws JsonProcessingException {
         var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type());
         var pathParameters = Map.of(IDENTIFIER, organizationIdentifier);
-        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+        return new HandlerRequestBuilder<>(restApiMapper)
                 .withHeaders(headers)
                 .withPathParameters(pathParameters)
                 .build();
@@ -390,7 +390,7 @@ class FetchCristinOrganizationHandlerTest {
         var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type());
         var pathParameters = Map.of(IDENTIFIER, organizationIdentifier);
         var queryParameters = Map.of(DEPTH, depth);
-        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+        return new HandlerRequestBuilder<>(restApiMapper)
                 .withHeaders(headers)
                 .withPathParameters(pathParameters)
                 .withQueryParameters(queryParameters)
@@ -399,7 +399,7 @@ class FetchCristinOrganizationHandlerTest {
 
 
     private InputStream generateHandlerRequestWithMissingPathParameter() throws JsonProcessingException {
-        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+        return new HandlerRequestBuilder<>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type()))
                 .build();
     }
@@ -418,7 +418,7 @@ class FetchCristinOrganizationHandlerTest {
         var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type(),
                              ACCEPT_HEADER_KEY_NAME, String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26));
         var pathParameters = Map.of(IDENTIFIER, SOME_IDENTIFIER);
-        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+        return new HandlerRequestBuilder<>(restApiMapper)
                    .withHeaders(headers)
                    .withPathParameters(pathParameters)
                    .withQueryParameters(queryParameters)
@@ -453,7 +453,7 @@ class FetchCristinOrganizationHandlerTest {
         var pathParameters = Map.of(IDENTIFIER, SOME_IDENTIFIER);
         var queryParams = Map.of(DEPTH, NONE);
 
-        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+        return new HandlerRequestBuilder<>(restApiMapper)
                    .withHeaders(headers)
                    .withPathParameters(pathParameters)
                    .withQueryParameters(queryParams)
