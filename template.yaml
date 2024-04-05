@@ -689,4 +689,4 @@ Resources:
       EvaluationPeriods: '1'
       Threshold: '1'
       ComparisonOperator: 'LessThanThreshold'
-      AlarmName: 'No successful executions for NvaCristinUpdateIntermediateUnitsFunction last 24h'
+      AlarmName: !Sub 'No successful executions for ${NvaCristinUpdateIntermediateUnitsFunction} last 24h'
