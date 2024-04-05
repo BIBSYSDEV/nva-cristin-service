@@ -1,5 +1,6 @@
 package no.unit.nva.model;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ACRONYM;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.COUNTRY;
@@ -12,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -34,9 +37,9 @@ public class Organization implements JsonSerializable {
     @JsonProperty(ACRONYM)
     private final String acronym;
     @JsonProperty(PART_OF)
-    private final Set<Organization> partOf;
+    private final List<Organization> partOf;
     @JsonProperty(HAS_PART)
-    private Set<Organization> hasPart;
+    private List<Organization> hasPart;
     @JsonProperty(CONTEXT)
     private String context;
     @JsonProperty(COUNTRY)
@@ -56,8 +59,8 @@ public class Organization implements JsonSerializable {
     public Organization(@JsonProperty(ID) URI id,
                         @JsonProperty(LABELS) Map<String, String> labels,
                         @JsonProperty(ACRONYM) String acronym,
-                        @JsonProperty(PART_OF) Set<Organization> partOf,
-                        @JsonProperty(HAS_PART) Set<Organization> hasPart,
+                        @JsonProperty(PART_OF) List<Organization> partOf,
+                        @JsonProperty(HAS_PART) List<Organization> hasPart,
                         @JsonProperty(COUNTRY) String country) {
         this.id = id;
         this.labels = labels;
@@ -96,15 +99,15 @@ public class Organization implements JsonSerializable {
         return acronym;
     }
 
-    public Set<Organization> getPartOf() {
+    public List<Organization> getPartOf() {
         return partOf;
     }
 
-    public Set<Organization> getHasPart() {
+    public List<Organization> getHasPart() {
         return hasPart;
     }
 
-    public void setHasPart(Set<Organization> hasPart) {
+    public void setHasPart(List<Organization> hasPart) {
         this.hasPart = hasPart;
     }
 
@@ -147,8 +150,8 @@ public class Organization implements JsonSerializable {
         private URI id;
         private Map<String, String> labels;
         private String acronym;
-        private Set<Organization> partOf;
-        private Set<Organization> hasPart;
+        private List<Organization> partOf;
+        private List<Organization> hasPart;
         private String country;
 
         public Builder withId(URI id) {
@@ -167,11 +170,25 @@ public class Organization implements JsonSerializable {
         }
 
         public Builder withPartOf(Set<Organization> partOf) {
+            if (nonNull(partOf)) {
+                this.partOf = new ArrayList<>(partOf);
+            }
+            return this;
+        }
+
+        public Builder withPartOf(List<Organization> partOf) {
             this.partOf = partOf;
             return this;
         }
 
         public Builder withHasPart(Set<Organization> hasPart) {
+            if (nonNull(hasPart)) {
+                this.hasPart = new ArrayList<>(hasPart);
+            }
+            return this;
+        }
+
+        public Builder withHasPart(List<Organization> hasPart) {
             this.hasPart = hasPart;
             return this;
         }

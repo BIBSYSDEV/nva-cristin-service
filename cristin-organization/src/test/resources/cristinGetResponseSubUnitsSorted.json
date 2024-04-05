@@ -1,0 +1,296 @@
+[
+  {
+    "cristin_unit_id": "185.15.0.11",
+    "unit_name": {
+      "en": "Fakultetsledelsen"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.11",
+    "acronym": "MN-LED",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.10"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.12",
+    "unit_name": {
+      "en": "Fakultetssekretariatet fellestiltak"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.12",
+    "acronym": "MN-FELLES",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.10"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.13",
+    "unit_name": {
+      "en": "Leksehjelp"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.13",
+    "acronym": "MN-LEKSEHJ",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.10"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.15",
+    "unit_name": {
+      "en": "Studies Section"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.15",
+    "acronym": "MN-STUDIE",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.10"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.16",
+    "unit_name": {
+      "en": "Communication and HR Section"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.16",
+    "acronym": "MN-KOMMHR",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.10"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.17",
+    "unit_name": {
+      "en": "Communication Section"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.17",
+    "acronym": "MN-KOMMSEK",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.16"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.18",
+    "unit_name": {
+      "en": "HR Section"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.18",
+    "acronym": "MN-HRSEK",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.16"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.19",
+    "unit_name": {
+      "en": "Section for Research"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.19",
+    "acronym": "MN-FA",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.10"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.21",
+    "unit_name": {
+      "en": "Finance Section"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.21",
+    "acronym": "MN-ØKSEK",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.10"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.22",
+    "unit_name": {
+      "en": "Department of Finance"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.22",
+    "acronym": "MN-INSTAVD",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.21"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.23",
+    "unit_name": {
+      "en": "Projects Department"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.23",
+    "acronym": "MN-PROAVD",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.21"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.24",
+    "unit_name": {
+      "en": "Accounting Department"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.24",
+    "acronym": "MN-REGNAVD",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.21"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.25",
+    "unit_name": {
+      "en": "IT-section"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.25",
+    "acronym": "MN-IT-SEK",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.10"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.28",
+    "unit_name": {
+      "en": "Personal/Arkiv/HMS"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.28",
+    "acronym": "LED-PERSON",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.11"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.29",
+    "unit_name": {
+      "en": "Kommunikasjon"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.29",
+    "acronym": "LED-KOMM",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.11"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.31",
+    "unit_name": {
+      "en": "Forskningsadministrasjon"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.31",
+    "acronym": "LED-FORSKA",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.10"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.32",
+    "unit_name": {
+      "en": "Studieadministrasjon"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.32",
+    "acronym": "LED-STUDAD",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.10"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.33",
+    "unit_name": {
+      "en": "Prosjektøkonomi"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.33",
+    "acronym": "LED-PROSJØ",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.36"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.34",
+    "unit_name": {
+      "en": "Regnskap"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.34",
+    "acronym": "LED-REGNSK",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.36"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.35",
+    "unit_name": {
+      "en": "Totaløkonomi virksomhetsstyring"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.35",
+    "acronym": "LED-TOTØK",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.36"
+    }
+  },
+  {
+    "cristin_unit_id": "185.15.0.36",
+    "unit_name": {
+      "en": "Økonomigruppen"
+    },
+    "institution": {
+      "acronym": "UIO"
+    },
+    "url": "https://api.cristin-test.uio.no/v2/units/185.15.0.36",
+    "acronym": "LED-ØKONOM",
+    "parent_unit": {
+      "cristin_unit_id": "185.15.0.10"
+    }
+  }
+]

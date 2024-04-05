@@ -18,6 +18,7 @@ import nva.commons.core.Environment;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -78,6 +79,7 @@ class FetchCristinOrganizationHandlerTest {
     public static final String SOME_IDENTIFIER = "1.2.3.4";
     public static final String CRISTIN_GET_RESPONSE_JSON = "cristinGetResponse.json";
     public static final String CRISTIN_GET_RESPONSE_SUB_UNITS_JSON = "cristinGetResponseSubUnits.json";
+    public static final String CRISTIN_GET_RESPONSE_SUB_UNITS_SORTED_JSON = "cristinGetResponseSubUnitsSorted.json";
     public static final Map<String, String> QUERY_PARAM_NO_DEPTH = Map.of(DEPTH, NONE);
     public static final String NVA_GET_RESPONSE_20230526_JSON = "nvaGetResponse20230526.json";
     public static final String NVA_GET_RESPONSE_WITH_SUB_UNITS_20230526_JSON =
@@ -336,6 +338,33 @@ class FetchCristinOrganizationHandlerTest {
 
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
         assertThat(responseBody.getHasPart(), equalTo(null));
+    }
+
+    @RepeatedTest(10)
+    void shouldReturnHitsInSortedOrderForVersion20230526() throws Exception {
+        doReturn(new HttpResponseFaker(getFromResources(CRISTIN_GET_RESPONSE_JSON)))
+            .doReturn(new HttpResponseFaker(getFromResources(CRISTIN_GET_RESPONSE_SUB_UNITS_SORTED_JSON)))
+            .when(fetchOrgClient20230526).fetchGetResult(any());
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
+        Map<String, String> queryParams = emptyMap();
+        var input = requestUsingV20230526(queryParams);
+        fetchCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
+        var actual = gatewayResponse.getBodyObject(Organization.class);
+        var hasParts = actual.getHasPart();
+
+        assertThat(hasParts.get(0).getId().toString(), containsString("185.15.0.11"));
+        assertThat(hasParts.get(1).getId().toString(), containsString("185.15.0.12"));
+        assertThat(hasParts.get(2).getId().toString(), containsString("185.15.0.13"));
+        assertThat(hasParts.get(3).getId().toString(), containsString("185.15.0.15"));
+        assertThat(hasParts.get(4).getId().toString(), containsString("185.15.0.16"));
+        assertThat(hasParts.get(5).getId().toString(), containsString("185.15.0.19"));
+        assertThat(hasParts.get(6).getId().toString(), containsString("185.15.0.21"));
+        assertThat(hasParts.get(7).getId().toString(), containsString("185.15.0.25"));
+        assertThat(hasParts.get(8).getId().toString(), containsString("185.15.0.31"));
+        assertThat(hasParts.get(9).getId().toString(), containsString("185.15.0.32"));
+        assertThat(hasParts.get(10).getId().toString(), containsString("185.15.0.36"));
     }
 
     private Object getSubSubUnit(String subUnitFile) {
