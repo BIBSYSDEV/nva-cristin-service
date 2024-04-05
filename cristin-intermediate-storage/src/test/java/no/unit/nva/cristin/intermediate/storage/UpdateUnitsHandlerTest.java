@@ -42,6 +42,7 @@ public class UpdateUnitsHandlerTest {
     private InputStream input;
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     void setUp() throws IOException, InterruptedException {
         this.environment = mock(Environment.class);
         this.s3Client = mock(S3Client.class);
@@ -61,10 +62,14 @@ public class UpdateUnitsHandlerTest {
                 return httpResponse;
             });
 
-        when(environment.readEnv("CRISTIN_API_URL")).thenReturn("https://api.unittest.nva.aws.sikt.no");
-        when(environment.readEnv("INTERMEDIATE_STORAGE_BUCKET_NAME")).thenReturn(TEST_BUCKET);
-        when(environment.readEnv("CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME")).thenReturn("cristinBotFilterBypassHeaderName");
-        when(environment.readEnv("CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE")).thenReturn("cristinBotFilterBypassHeaderValue");
+        when(environment.readEnv("CRISTIN_API_URL"))
+            .thenReturn("https://api.unittest.nva.aws.sikt.no");
+        when(environment.readEnv("INTERMEDIATE_STORAGE_BUCKET_NAME"))
+            .thenReturn(TEST_BUCKET);
+        when(environment.readEnv("CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME"))
+            .thenReturn("cristinBotFilterBypassHeaderName");
+        when(environment.readEnv("CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE"))
+            .thenReturn("cristinBotFilterBypassHeaderValue");
     }
 
     @Test
