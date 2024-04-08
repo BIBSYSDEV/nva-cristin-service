@@ -14,10 +14,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import no.unit.nva.commons.json.JsonSerializable;
 
 @SuppressWarnings({ "PMD.LinguisticNaming"})
@@ -169,27 +169,17 @@ public class Organization implements JsonSerializable {
             return this;
         }
 
-        public Builder withPartOf(Set<Organization> partOf) {
+        public Builder withPartOf(Collection<Organization> partOf) {
             if (nonNull(partOf)) {
                 this.partOf = new ArrayList<>(partOf);
             }
             return this;
         }
 
-        public Builder withPartOf(List<Organization> partOf) {
-            this.partOf = partOf;
-            return this;
-        }
-
-        public Builder withHasPart(Set<Organization> hasPart) {
+        public Builder withHasPart(Collection<Organization> hasPart) {
             if (nonNull(hasPart)) {
                 this.hasPart = new ArrayList<>(hasPart);
             }
-            return this;
-        }
-
-        public Builder withHasPart(List<Organization> hasPart) {
-            this.hasPart = hasPart;
             return this;
         }
 

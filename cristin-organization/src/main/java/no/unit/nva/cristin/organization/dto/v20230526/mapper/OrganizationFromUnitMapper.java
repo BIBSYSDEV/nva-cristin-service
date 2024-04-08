@@ -2,8 +2,10 @@ package no.unit.nva.cristin.organization.dto.v20230526.mapper;
 
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.organization.dto.v20230526.UnitDto;
@@ -27,23 +29,23 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
                    .withId(getNvaApiId(unitDto.getId(), ORGANIZATION_PATH))
                    .withLabels(unitDto.getUnitName())
                    .withAcronym(unitDto.getAcronym())
-                   .withHasPart(unitsToOrganizations(unitDto.getSubUnits()))
-                   .withPartOf(singleUnitToOrganizations(unitDto.getParentUnit()))
+                   .withHasPart(unitsToSetOfOrganizations(unitDto.getSubUnits()))
+                   .withPartOf(singleUnitToSetOfOrganizations(unitDto.getParentUnit()))
                    .withCountry(unitDto.getCountry())
                    .build();
     }
 
-    private List<Organization> unitsToOrganizations(List<UnitDto> unitDtos) {
+    private Set<Organization> unitsToSetOfOrganizations(List<UnitDto> unitDtos) {
         return unitDtos.stream()
                    .map(this::toOrganization)
-                   .collect(Collectors.toList());
+                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    private List<Organization> singleUnitToOrganizations(UnitDto unitDto) {
+    private Set<Organization> singleUnitToSetOfOrganizations(UnitDto unitDto) {
         return Optional.ofNullable(unitDto)
                    .map(this)
                    .stream()
-                   .collect(Collectors.toList());
+                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
 }
