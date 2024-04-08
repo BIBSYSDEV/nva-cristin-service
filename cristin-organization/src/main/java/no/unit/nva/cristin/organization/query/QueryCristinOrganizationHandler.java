@@ -42,36 +42,23 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         this(new DefaultOrgQueryClientProvider(), new Environment());
     }
 
-    public QueryCristinOrganizationHandler(ClientProvider<CristinQueryApiClient<Map<String, String>, Organization>>
-                                               clientProvider, Environment environment) {
+    public QueryCristinOrganizationHandler(
+        ClientProvider<CristinQueryApiClient<Map<String, String>, Organization>> clientProvider,
+        Environment environment
+    ) {
         super(Void.class, environment);
         this.clientProvider = clientProvider;
     }
 
     @Override
     protected SearchResponse<Organization> processInput(Void input, RequestInfo requestInfo, Context context)
-            throws ApiGatewayException {
+        throws ApiGatewayException {
 
         validateQueryParameterKeys(requestInfo);
-        Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
-        requestQueryParams.put(QUERY, getValidQuery(requestInfo));
-        requestQueryParams.put(DEPTH, getValidDepth(requestInfo));
-        requestQueryParams.put(PAGE, getValidPage(requestInfo));
-        requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
-        getSort(requestInfo).ifPresent(sort -> requestQueryParams.put(SORT, sort));
-
+        var requestQueryParams = extractQueryParameters(requestInfo);
         var apiVersion = getApiVersion(requestInfo);
 
         return clientProvider.getClient(apiVersion).executeQuery(requestQueryParams);
-    }
-
-    private String getApiVersion(RequestInfo requestInfo) {
-        return extractVersionFromRequestInfo(requestInfo, ACCEPT_HEADER_KEY_NAME);
-    }
-
-    private Optional<String> getSort(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(SORT)
-                   .map(UriUtils::escapeWhiteSpace);
     }
 
     @Override
@@ -84,6 +71,29 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     @Override
     protected Integer getSuccessStatusCode(Void input, SearchResponse<Organization> output) {
         return HttpURLConnection.HTTP_OK;
+    }
+
+    private ConcurrentHashMap<String, String> extractQueryParameters(RequestInfo requestInfo)
+        throws BadRequestException {
+
+        var requestQueryParams = new ConcurrentHashMap<String, String>();
+
+        requestQueryParams.put(QUERY, getValidQuery(requestInfo));
+        requestQueryParams.put(DEPTH, getValidDepth(requestInfo));
+        requestQueryParams.put(PAGE, getValidPage(requestInfo));
+        requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
+        getSort(requestInfo).ifPresent(sort -> requestQueryParams.put(SORT, sort));
+
+        return requestQueryParams;
+    }
+
+    private Optional<String> getSort(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(SORT)
+                   .map(UriUtils::escapeWhiteSpace);
+    }
+
+    private String getApiVersion(RequestInfo requestInfo) {
+        return extractVersionFromRequestInfo(requestInfo, ACCEPT_HEADER_KEY_NAME);
     }
 
 }
