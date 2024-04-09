@@ -621,11 +621,13 @@ Resources:
         Version: "2012-10-17"
         Statement:
           - Effect: "Allow"
-            Principal:
-              AWS: !Sub '${AWS::AccountId}'
+            Principal: "*"
             Action:
               - "s3:GetObject"
             Resource: !Sub 'arn:aws:s3:::${NvaCristinIntermediateStorageBucket}/units-norway.json'
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Sub '${AWS::AccountId}'
 
   NvaCristinIntermediateStorageUnitsParameter:
     Type: 'AWS::SSM::Parameter'
