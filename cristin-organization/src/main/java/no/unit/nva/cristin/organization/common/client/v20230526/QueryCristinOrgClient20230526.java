@@ -2,6 +2,7 @@ package no.unit.nva.cristin.organization.common.client.v20230526;
 
 import static java.util.Arrays.asList;
 import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.cristin.model.Constants.INCLUDE_SUB_UNITS;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.organization.common.QueryParamConverter.translateToCristinApi;
@@ -15,6 +16,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.common.client.CristinQueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
@@ -29,12 +31,20 @@ public class QueryCristinOrgClient20230526 extends ApiClient
 
     public static final URI ORGANIZATION_ID_URI = getNvaApiUri(ORGANIZATION_PATH);
 
+    private final FetchApiClient<Map<String, String>, Organization> fetchClient;
+
     public QueryCristinOrgClient20230526() {
         this(defaultHttpClient());
     }
 
     public QueryCristinOrgClient20230526(HttpClient client) {
+        this(client, new FetchCristinOrgClient20230526(client));
+    }
+
+    public QueryCristinOrgClient20230526(HttpClient client,
+                                         FetchApiClient<Map<String, String>, Organization> fetchClient) {
         super(client);
+        this.fetchClient = fetchClient;
     }
 
     /**
@@ -49,6 +59,10 @@ public class QueryCristinOrgClient20230526 extends ApiClient
         var start = System.currentTimeMillis();
         var response = queryUpstream(queryUri);
         var organizations = getOrganizations(response);
+        if (wantsSubUnits(params)) {
+            var subUnitEnricher = new OrganizationSubUnitEnricher(organizations, params, fetchClient);
+            organizations = subUnitEnricher.enrich().getResult();
+        }
         var totalProcessingTime = calculateProcessingTime(start, System.currentTimeMillis());
 
         var searchResponse = new SearchResponse<Organization>(ORGANIZATION_ID_URI)
@@ -75,6 +89,11 @@ public class QueryCristinOrgClient20230526 extends ApiClient
         return units.stream()
                    .map(new OrganizationFromUnitMapper())
                    .collect(Collectors.toList());
+    }
+
+    private boolean wantsSubUnits(Map<String, String> params) {
+        var includeSubUnits = params.get(INCLUDE_SUB_UNITS);
+        return Boolean.TRUE.toString().equalsIgnoreCase(includeSubUnits);
     }
 
 }

@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
+import no.unit.nva.cristin.organization.common.client.v20230526.FetchCristinOrgClient20230526;
 import no.unit.nva.cristin.organization.common.client.v20230526.QueryCristinOrgClient20230526;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
@@ -47,6 +48,8 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_DEPTH_INVAL
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.client.ClientProvider.VERSION_2023_05_26;
 import static no.unit.nva.client.ClientProvider.VERSION_ONE;
+import static no.unit.nva.cristin.model.Constants.FULL;
+import static no.unit.nva.cristin.model.Constants.INCLUDE_SUB_UNITS;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
@@ -74,17 +77,22 @@ class QueryCristinOrganizationHandlerTest {
     public static final String ACCEPT_HEADER_EXAMPLE = "application/json; version=%s";
     public static final String NVA_QUERY_RESPONSE_20230526_JSON = "nvaQueryResponse20230526.json";
     public static final String CRISTIN_QUERY_RESPONSE_V_2_JSON = "cristinQueryResponse.json";
+    public static final String CRISTIN_GET_RESPONSE_JSON = "cristinGetResponse.json";
+    public static final String CRISTIN_GET_RESPONSE_SUB_UNITS_JSON = "cristinGetResponseSubUnits.json";
+    public static final String MEDICAL_BIOCHEMISTRY = "Department of Medical Biochemistry";
+
     private QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private DefaultOrgQueryClientProvider clientProvider;
     private ByteArrayOutputStream output;
     private Context context;
     private CristinOrganizationApiClient cristinApiClientVersionOne;
     private QueryCristinOrgClient20230526 queryCristinOrgClient20230526;
+    private HttpClient httpClient;
 
     @BeforeEach
     void setUp() throws ApiGatewayException {
         context = mock(Context.class);
-        var httpClient = mock(HttpClient.class);
+        httpClient = mock(HttpClient.class);
         cristinApiClientVersionOne = new CristinOrganizationApiClient(httpClient);
         queryCristinOrgClient20230526 = new QueryCristinOrgClient20230526(httpClient);
         clientProvider = new DefaultOrgQueryClientProvider();
@@ -258,6 +266,31 @@ class QueryCristinOrganizationHandlerTest {
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 
+    @Test
+    void shouldHaveSubUnitsWhenRequested() throws Exception {
+        var fetchClient = mockFetchClient();
+        queryCristinOrgClient20230526 = new QueryCristinOrgClient20230526(httpClient, fetchClient);
+        queryCristinOrgClient20230526 = spy(queryCristinOrgClient20230526);
+
+        var fakeQueryResponseResource = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_V_2_JSON));
+        doReturn(new HttpResponseFaker(fakeQueryResponseResource))
+            .when(queryCristinOrgClient20230526).fetchQueryResults(any());
+
+        doReturn(queryCristinOrgClient20230526).when(clientProvider).getVersion20230526();
+
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
+        var input = handlerRequestWantingSubUnits();
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        var responseBody = gatewayResponse.getBodyObject(SearchResponse.class);
+        var actualHits = convertHitsToProperFormat(responseBody);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+        assertThat(actualHits.get(0).getHasPart().size(), equalTo(8));
+        assertThat(actualHits.get(1).getHasPart().size(), equalTo(8));
+    }
+
     private List<Organization> convertHitsToProperFormat(SearchResponse<?> searchResponse) {
         return OBJECT_MAPPER.convertValue(searchResponse.getHits(), new TypeReference<>() {});
     }
@@ -325,6 +358,32 @@ class QueryCristinOrganizationHandlerTest {
 
     private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
         return gatewayResponse.getBodyObject(Problem.class).getDetail();
+    }
+
+    private FetchCristinOrgClient20230526 mockFetchClient() throws ApiGatewayException {
+        var fetchOrgClient20230526 = new FetchCristinOrgClient20230526(httpClient);
+        fetchOrgClient20230526 = spy(fetchOrgClient20230526);
+        var fakeGetResponseResource = IoUtils.stringFromResources(Path.of(CRISTIN_GET_RESPONSE_JSON));
+        var fakeGetSubsResponseResource = IoUtils.stringFromResources(Path.of(CRISTIN_GET_RESPONSE_SUB_UNITS_JSON));
+
+        doReturn(new HttpResponseFaker(fakeGetResponseResource))
+            .doReturn(new HttpResponseFaker(fakeGetSubsResponseResource))
+            .doReturn(new HttpResponseFaker(fakeGetResponseResource))
+            .doReturn(new HttpResponseFaker(fakeGetSubsResponseResource))
+            .when(fetchOrgClient20230526).fetchGetResult(any());
+
+        return fetchOrgClient20230526;
+    }
+
+    private InputStream handlerRequestWantingSubUnits() throws JsonProcessingException {
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type(),
+                                       ACCEPT_HEADER_KEY_NAME,
+                                       String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26)))
+                   .withQueryParameters(Map.of(QUERY, MEDICAL_BIOCHEMISTRY,
+                                               DEPTH, FULL,
+                                               INCLUDE_SUB_UNITS, Boolean.TRUE.toString()))
+                   .build();
     }
 
 }
