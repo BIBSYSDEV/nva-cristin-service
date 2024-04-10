@@ -12,7 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.model.Organization;
 import no.unit.nva.utils.UriUtils;
-import nva.commons.core.attempt.Failure;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +21,8 @@ public class OrganizationSubUnitEnricher {
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationSubUnitEnricher.class);
 
-    public static final String ERROR_MSG_ENRICH_FAILED = "Enriching of query result failed. Please try again. Result "
-                                                         + "that failed is : {}";
-    public static final String EXCEPTION_THAT_WAS_THROWN = "Exception thrown: ";
+    public static final String COULD_NOT_BE_FOUND_IN_UPSTREAM =
+        "Organization from search result could not be found in upstream: {}";
 
     private final List<Organization> inputOrganizations;
     private final Map<String, String> queryParams;
@@ -38,14 +38,17 @@ public class OrganizationSubUnitEnricher {
         enrichedOrganizations = new ArrayList<>();
     }
 
-    public OrganizationSubUnitEnricher enrich() {
-        inputOrganizations.forEach(organization -> {
+    public OrganizationSubUnitEnricher enrich() throws ApiGatewayException {
+        for (Organization organization : inputOrganizations) {
             var identifier = extractIdentifier(organization);
             var enrichParams = extractParams(identifier);
-            var enriched = executeFetchUsingParams(enrichParams);
-
-            enrichedOrganizations.add(enriched);
-        });
+            try {
+                var enriched = fetchClient.executeFetch(enrichParams);
+                enrichedOrganizations.add(enriched);
+            } catch (NotFoundException notFoundException) {
+                logger.warn(COULD_NOT_BE_FOUND_IN_UPSTREAM, extractOrgId(organization));
+            }
+        }
 
         return this;
     }
@@ -66,21 +69,8 @@ public class OrganizationSubUnitEnricher {
         return enrichParams;
     }
 
-    private Organization executeFetchUsingParams(Map<String, String> enrichParams) {
-        // TODO: Keep original exception instead of using RuntimeException
-        return attempt(() -> fetchClient.executeFetch(enrichParams)).orElseThrow(this::logAndThrow);
-    }
-
-    private RuntimeException logAndThrow(Failure<Organization> fail) {
-        logger.error(ERROR_MSG_ENRICH_FAILED, extractFailedOrgId(fail));
-        logger.error(EXCEPTION_THAT_WAS_THROWN, fail.getException());
-
-        return new RuntimeException(ERROR_MSG_ENRICH_FAILED);
-    }
-
-    private static String extractFailedOrgId(Failure<Organization> fail) {
-        return Optional.ofNullable(fail)
-                   .map(Failure::get)
+    private static String extractOrgId(Organization organization) {
+        return Optional.ofNullable(organization)
                    .map(Organization::getId)
                    .map(Objects::toString)
                    .orElse(null);
