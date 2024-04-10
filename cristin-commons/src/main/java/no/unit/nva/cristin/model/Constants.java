@@ -86,6 +86,6 @@ public class Constants {
     public static final String CRISTIN_ID_PARAM = "cristinId";
     public static final String CRISTIN_ID_CRISTIN_PARAM = "id";
     public static final String MULTIPLE_PARAM = "multiple";
-    public static final String INCLUDE_SUB_UNITS = "includeSubUnits";
+    public static final String FULL_TREE = "fullTree";
 
 }

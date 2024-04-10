@@ -2,7 +2,7 @@ package no.unit.nva.cristin.organization.common.client.v20230526;
 
 import static java.util.Arrays.asList;
 import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
-import static no.unit.nva.cristin.model.Constants.INCLUDE_SUB_UNITS;
+import static no.unit.nva.cristin.model.Constants.FULL_TREE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.organization.common.QueryParamConverter.translateToCristinApi;
@@ -59,9 +59,9 @@ public class QueryCristinOrgClient20230526 extends ApiClient
         var start = System.currentTimeMillis();
         var response = queryUpstream(queryUri);
         var organizations = getOrganizations(response);
-        if (wantsSubUnits(params)) {
-            var subUnitEnricher = new OrganizationSubUnitEnricher(organizations, params, fetchClient);
-            organizations = subUnitEnricher.enrich().getResult();
+        if (wantsFullTree(params)) {
+            var organizationEnricher = new OrganizationEnricher(organizations, params, fetchClient);
+            organizations = organizationEnricher.enrich().getResult();
         }
         var totalProcessingTime = calculateProcessingTime(start, System.currentTimeMillis());
 
@@ -91,9 +91,9 @@ public class QueryCristinOrgClient20230526 extends ApiClient
                    .collect(Collectors.toList());
     }
 
-    private boolean wantsSubUnits(Map<String, String> params) {
-        var includeSubUnits = params.get(INCLUDE_SUB_UNITS);
-        return Boolean.TRUE.toString().equalsIgnoreCase(includeSubUnits);
+    private boolean wantsFullTree(Map<String, String> params) {
+        var includeFullTree = params.get(FULL_TREE);
+        return Boolean.TRUE.toString().equalsIgnoreCase(includeFullTree);
     }
 
 }

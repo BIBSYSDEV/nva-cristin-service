@@ -51,7 +51,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMes
 import static no.unit.nva.client.ClientProvider.VERSION_2023_05_26;
 import static no.unit.nva.client.ClientProvider.VERSION_ONE;
 import static no.unit.nva.cristin.model.Constants.FULL;
-import static no.unit.nva.cristin.model.Constants.INCLUDE_SUB_UNITS;
+import static no.unit.nva.cristin.model.Constants.FULL_TREE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
@@ -262,7 +262,7 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldHaveSubUnitsWhenRequested() throws Exception {
+    void shouldHaveFullTreeOfOrganizationsWhenRequested() throws Exception {
         var fetchClient = mockFetchClient();
         queryCristinOrgClient20230526 = new QueryCristinOrgClient20230526(httpClient, fetchClient);
         queryCristinOrgClient20230526 = spy(queryCristinOrgClient20230526);
@@ -274,7 +274,7 @@ class QueryCristinOrganizationHandlerTest {
         doReturn(queryCristinOrgClient20230526).when(clientProvider).getVersion20230526();
 
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
-        var input = handlerRequestWantingSubUnits();
+        var input = handlerRequestWantingFullTree();
         queryCristinOrganizationHandler.handleRequest(input, output, context);
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
@@ -299,7 +299,7 @@ class QueryCristinOrganizationHandlerTest {
         doReturn(queryCristinOrgClient20230526).when(clientProvider).getVersion20230526();
 
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
-        var input = handlerRequestWantingSubUnits();
+        var input = handlerRequestWantingFullTree();
         queryCristinOrganizationHandler.handleRequest(input, output, context);
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
@@ -424,14 +424,14 @@ class QueryCristinOrganizationHandlerTest {
         return fetchOrgClient20230526;
     }
 
-    private InputStream handlerRequestWantingSubUnits() throws JsonProcessingException {
+    private InputStream handlerRequestWantingFullTree() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                    .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type(),
                                        ACCEPT_HEADER_KEY_NAME,
                                        String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26)))
                    .withQueryParameters(Map.of(QUERY, MEDICAL_BIOCHEMISTRY,
                                                DEPTH, FULL,
-                                               INCLUDE_SUB_UNITS, Boolean.TRUE.toString()))
+                                               FULL_TREE, Boolean.TRUE.toString()))
                    .build();
     }
 

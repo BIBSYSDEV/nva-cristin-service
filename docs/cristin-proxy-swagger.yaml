@@ -557,9 +557,9 @@ paths:
               - country
               - country asc
               - country desc
-        - name: includeSubUnits
+        - name: fullTree
           in: query
-          description: Include all sub units for each search result
+          description: Include all parent and sub units for each search result
           required: false
           schema:
             type: boolean

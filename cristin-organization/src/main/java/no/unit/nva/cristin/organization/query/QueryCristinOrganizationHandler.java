@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.client.ClientProvider.VERSION;
-import static no.unit.nva.cristin.model.Constants.INCLUDE_SUB_UNITS;
+import static no.unit.nva.cristin.model.Constants.FULL_TREE;
 import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
@@ -34,7 +34,7 @@ import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
 
     private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH, VERSION,
-                                                                     SORT, INCLUDE_SUB_UNITS);
+                                                                     SORT, FULL_TREE);
     private final transient ClientProvider<CristinQueryApiClient<Map<String, String>, Organization>> clientProvider;
 
     @JacocoGenerated
@@ -84,7 +84,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         requestQueryParams.put(PAGE, getValidPage(requestInfo));
         requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
         getSort(requestInfo).ifPresent(sort -> requestQueryParams.put(SORT, sort));
-        requestQueryParams.put(INCLUDE_SUB_UNITS, getSubUnitParam(requestInfo));
+        requestQueryParams.put(FULL_TREE, getFullTreeParam(requestInfo));
 
         return requestQueryParams;
     }
@@ -94,8 +94,8 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
                    .map(UriUtils::escapeWhiteSpace);
     }
 
-    private static String getSubUnitParam(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(INCLUDE_SUB_UNITS).orElse(Boolean.FALSE.toString());
+    private static String getFullTreeParam(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(FULL_TREE).orElse(Boolean.FALSE.toString());
     }
 
     private String getApiVersion(RequestInfo requestInfo) {

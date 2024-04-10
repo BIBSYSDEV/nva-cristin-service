@@ -17,9 +17,9 @@ import nva.commons.apigateway.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OrganizationSubUnitEnricher {
+public class OrganizationEnricher {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrganizationSubUnitEnricher.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrganizationEnricher.class);
 
     public static final String COULD_NOT_BE_FOUND_IN_UPSTREAM =
         "Organization from search result could not be found in upstream: {}";
@@ -29,16 +29,16 @@ public class OrganizationSubUnitEnricher {
     private final FetchApiClient<Map<String, String>, Organization> fetchClient;
     private final List<Organization> enrichedOrganizations;
 
-    public OrganizationSubUnitEnricher(List<Organization> inputOrganizations,
-                                       Map<String, String> queryParams,
-                                       FetchApiClient<Map<String, String>, Organization> fetchClient) {
+    public OrganizationEnricher(List<Organization> inputOrganizations,
+                                Map<String, String> queryParams,
+                                FetchApiClient<Map<String, String>, Organization> fetchClient) {
         this.inputOrganizations = inputOrganizations;
         this.queryParams = queryParams;
         this.fetchClient = fetchClient;
         enrichedOrganizations = new ArrayList<>();
     }
 
-    public OrganizationSubUnitEnricher enrich() throws ApiGatewayException {
+    public OrganizationEnricher enrich() throws ApiGatewayException {
         for (Organization organization : inputOrganizations) {
             var identifier = extractIdentifier(organization);
             var enrichParams = extractParams(identifier);
