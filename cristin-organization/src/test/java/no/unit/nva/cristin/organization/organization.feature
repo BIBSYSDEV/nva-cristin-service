@@ -112,3 +112,11 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.labels.en == '#present'
     And match response.labels.nb == '#present'
     And match response.hasPart != '#[0]'
+
+  Scenario: GET organization query wanting sub units returns results enriched with sub units
+    Given path '/organization'
+    And param query = 'sikt'
+    And param includeSubUnits = true
+    When method GET
+    Then status 200
+    And match response.hits[0].hasPart != '#[0]'
