@@ -22,6 +22,7 @@ import nva.commons.core.Environment;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -74,6 +75,8 @@ class QueryCristinOrganizationHandlerTest {
     public static final String ACCEPT_HEADER_EXAMPLE = "application/json; version=%s";
     public static final String NVA_QUERY_RESPONSE_20230526_JSON = "nvaQueryResponse20230526.json";
     public static final String CRISTIN_QUERY_RESPONSE_V_2_JSON = "cristinQueryResponse.json";
+    public static final String CRISTIN_QUERY_RESPONSE_SORTED_ORDER = "cristinQueryResponseSortedOrder.json";
+
     private QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private DefaultOrgQueryClientProvider clientProvider;
     private ByteArrayOutputStream output;
@@ -153,13 +156,6 @@ class QueryCristinOrganizationHandlerTest {
         assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
 
-    private InputStream generateValidHandlerRequest() throws JsonProcessingException {
-        return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withQueryParameters(Map.of(QUERY, "Department of Medical Biochemistry", "depth", "full"))
-                .build();
-    }
-
     @Test
     void shouldReturnBadRequestOnIllegalDepth() throws IOException {
         var inputStream = generateHandlerRequestWithIllegalDepthParameter();
@@ -180,8 +176,7 @@ class QueryCristinOrganizationHandlerTest {
         var input = generateValidHandlerRequestWithVersionParam(requestedVersion);
         queryCristinOrganizationHandler.handleRequest(input, output, context);
 
-        var gatewayResponse = GatewayResponse.fromOutputStream(output,
-                                                               SearchResponse.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         verify(clientProvider, times(callsVersionOne)).getVersionOne();
         verify(clientProvider, times(callsVersionTwo)).getVersion20230526();
@@ -189,16 +184,15 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnVersionOneAsDefault() throws Exception {
+    void shouldReturnVersion20230526AsDefault() throws Exception {
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
         var input = generateHandlerRequestWithRandomQueryParameter();
         queryCristinOrganizationHandler.handleRequest(input, output, context);
 
-        var gatewayResponse = GatewayResponse.fromOutputStream(output,
-                                                               SearchResponse.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
-        verify(clientProvider, times(1)).getVersionOne();
-        verify(clientProvider, times(0)).getVersion20230526();
+        verify(clientProvider, times(0)).getVersionOne();
+        verify(clientProvider, times(1)).getVersion20230526();
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 
@@ -256,6 +250,29 @@ class QueryCristinOrganizationHandlerTest {
         verify(queryCristinOrgClient20230526).fetchQueryResults(captor.capture());
         assertThat(captor.getValue().getQuery(), containsString("sort=country+desc"));
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    @RepeatedTest(10)
+    void shouldReturnHitsInSortedOrderForVersion20230526() throws Exception {
+        var fakeQueryResponseResource = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_SORTED_ORDER));
+        doReturn(new HttpResponseFaker(fakeQueryResponseResource))
+            .when(queryCristinOrgClient20230526).fetchQueryResults(any());
+
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
+        var input = generateValidHandlerRequestWithVersionParam(String.format(ACCEPT_HEADER_EXAMPLE,
+                                                                              VERSION_2023_05_26));
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        var responseBody = gatewayResponse.getBodyObject(SearchResponse.class);
+        var actualHits = convertHitsToProperFormat(responseBody);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+        assertThat(actualHits.get(0).getId().toString(), containsString("185.90.1.0"));
+        assertThat(actualHits.get(1).getId().toString(), containsString("185.90.2.0"));
+        assertThat(actualHits.get(2).getId().toString(), containsString("185.90.3.0"));
+        assertThat(actualHits.get(3).getId().toString(), containsString("185.90.4.0"));
+        assertThat(actualHits.get(4).getId().toString(), containsString("185.90.5.0"));
     }
 
     private List<Organization> convertHitsToProperFormat(SearchResponse<?> searchResponse) {
@@ -325,6 +342,13 @@ class QueryCristinOrganizationHandlerTest {
 
     private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
         return gatewayResponse.getBodyObject(Problem.class).getDetail();
+    }
+
+    private InputStream generateValidHandlerRequest() throws JsonProcessingException {
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withQueryParameters(Map.of(QUERY, "Department of Medical Biochemistry", "depth", "full"))
+                   .build();
     }
 
 }

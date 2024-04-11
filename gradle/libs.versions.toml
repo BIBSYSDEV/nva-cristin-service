@@ -1,30 +1,30 @@
 [versions]
-junit = { strictly = '5.10.0' }
-nva-commons = {strictly = '1.36.7'}
+junit = { strictly = '5.10.2' }
+nva-commons = {strictly = '1.38.3'}
 jackson = { strictly = '2.15.2' }
 mockito = { strictly = '5.3.1' }
 hamcrest = { strictly = '2.2' }
 zalando = { strictly = '0.27.1' }
 javax-ws-rs = { strictly = '2.1.1' }
 jsoup = { strictly = '1.14.3' }
-aws-lambda-java-core = { strictly = '1.2.2' }
-google-guava = { strictly = '32.1.2-jre' }
+aws-lambda-java-core = { strictly = '1.2.3' }
+google-guava = { strictly = '33.0.0-jre' }
 karate-core = { strictly = '1.1.0' }
 karate-apache = { strictly = '0.9.6' }
 karate-junit5 = { strictly = '1.1.0' }
 log4jApi = { strictly = '2.17.2' }
-slf4j = { require = '2.0.5' }
+slf4j = { require = '2.0.12' }
 nva-language = { strictly = '1.0' }
-awsSdk = { strictly = '1.12.483' }
-awsSdk2 = { strictly = '2.20.141' }
+awsSdk = { strictly = '1.12.668' }
+awsSdk2 = { strictly = '2.24.12' }
 bekkopen-nocommons = { strictly = '0.12.0' }
-com-auth0-jwt = { strictly = '3.18.3' }
-com-auth0-jwks = { strictly = '0.20.2' }
-wiremock = { strictly = '3.0.2' }
+com-auth0-jwt = { strictly = '4.4.0' }
+com-auth0-jwks = { strictly = '0.22.1' }
+wiremock = { strictly = '3.4.1' }
 apache-http-core = { strictly = '4.4.16' }
 json-assert = { strictly = '1.5.1' }
 vavrVersion = '0.10.4'
-resilience4jRetry = '2.1.0'
+resilience4j = '2.2.0'
 
 [libraries]
 
@@ -57,6 +57,7 @@ nva-language = { group = 'com.github.bibsysdev', name = 'nva-language', version.
 nva-secrets = { group = 'com.github.bibsysdev', name = 'secrets', version.ref = 'nva-commons' }
 nva-lambdaauthorizer = { group = 'com.github.bibsysdev', name = 'lambdaauthorizer', version.ref = 'nva-commons' }
 
+
 jackson-core = { group = 'com.fasterxml.jackson.core', name = 'jackson-core', version.ref = 'jackson' }
 jackson-databind = { group = 'com.fasterxml.jackson.core', name = 'jackson-databind', version.ref = 'jackson' }
 jackson-annotations = { group = 'com.fasterxml.jackson.core', name = 'jackson-annotations', version.ref = 'jackson' }
@@ -72,6 +73,7 @@ aws-sdk-core = { group = 'com.amazonaws', name = 'aws-java-sdk-core', version.re
 aws-sdk2-core = { group = 'software.amazon.awssdk', name = 'sdk-core', version.ref = 'awsSdk2' }
 aws-sdk2-secrets = { group = 'software.amazon.awssdk', name = 'secretsmanager', version.ref = 'awsSdk2' }
 aws-sdk2-cognitoidp = { group = 'software.amazon.awssdk', name = 'cognitoidentityprovider', version.ref = 'awsSdk2' }
+aws-sdk2-s3 = { group = 'software.amazon.awssdk', name = 's3', version.ref = 'awsSdk2' }
 
 aws-sdk2-auth = {group = 'software.amazon.awssdk', name = 'auth', version.ref = 'awsSdk2' }
 aws-sdk2-awscore = {group = 'software.amazon.awssdk', name = 'aws-core', version.ref = 'awsSdk2' }
@@ -93,7 +95,7 @@ wiremock = { group = 'org.wiremock', name = 'wiremock', version.ref = 'wiremock'
 apache-http-core = { group = 'org.apache.httpcomponents', name = 'httpcore', version.ref = 'apache-http-core' }
 
 vavr = { group = 'io.vavr', name = 'vavr', version.ref = 'vavrVersion' }
-resilience4j-retry = { group = 'io.github.resilience4j', name = 'resilience4j-retry', version.ref = 'resilience4jRetry' }
+resilience4j-all = { group = 'io.github.resilience4j', name = 'resilience4j-all', version.ref = 'resilience4j' }
 
 [bundles]
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']

@@ -33,6 +33,8 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.query.CristinFacetParamKey.INSTITUTION_PARAM;
 import static no.unit.nva.cristin.model.query.CristinFacetParamKey.SECTOR_PARAM;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
+import static no.unit.nva.utils.AccessUtils.DOING_AUTHORIZED_REQUEST;
+import static no.unit.nva.utils.AccessUtils.clientIsCustomerAdministrator;
 import static no.unit.nva.utils.AccessUtils.requesterIsUserAdministrator;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
@@ -52,9 +54,6 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
                                                                      SECTOR_PARAM.getNvaKey(),
                                                                      INSTITUTION_PARAM.getNvaKey(),
                                                                      SORT);
-    public static final String BOOLEAN_TRUE = "true";
-    public static final String BOOLEAN_FALSE = "false";
-
     private final transient ClientProvider<CristinAuthorizedQueryClient<Map<String, String>, Person>> clientProvider;
 
     @JacocoGenerated
@@ -81,24 +80,14 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         throws ApiGatewayException {
 
         validateQueryParameterKeys(requestInfo);
-
-        var name = getValidName(requestInfo);
-        var page = getValidPage(requestInfo);
-        var numberOfResults = getValidNumberOfResults(requestInfo);
-        var organization = getValidOrganization(requestInfo).orElse(null);
-        var verified = getValidVerified(requestInfo).orElse(null);
-        var sectorFacet = requestInfo.getQueryParameterOpt(SECTOR_PARAM.getNvaKey()).orElse(null);
-        var organizationFacet = requestInfo.getQueryParameterOpt(INSTITUTION_PARAM.getNvaKey()).orElse(null);
-        var sort = getSort(requestInfo);
-
-        var requestQueryParameters = buildParametersMap(name, page, numberOfResults, organization, verified,
-                                                        sectorFacet, organizationFacet, sort);
-
+        var requestQueryParameters = extractQueryParameters(requestInfo);
         var apiVersion = getApiVersion(requestInfo);
         var apiClient = clientProvider.getClient(apiVersion);
 
-        if (requesterIsUserAdministrator(requestInfo)) {
+        if (clientIsAuthorized(requestInfo)) {
+            logger.info(DOING_AUTHORIZED_REQUEST);
             logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
+
             return apiClient.executeAuthorizedQuery(requestQueryParameters);
         } else {
             return apiClient.executeQuery(requestQueryParameters);
@@ -117,6 +106,17 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         }
     }
 
+    private Map<String, String> extractQueryParameters(RequestInfo requestInfo) throws BadRequestException {
+        return buildParametersMap(getValidName(requestInfo),
+                                  getValidPage(requestInfo),
+                                  getValidNumberOfResults(requestInfo),
+                                  extractOrganization(requestInfo),
+                                  extractVerified(requestInfo),
+                                  extractSectorFacet(requestInfo),
+                                  extractOrganizationFacet(requestInfo),
+                                  getSort(requestInfo));
+    }
+
     @Override
     protected String getValidName(RequestInfo requestInfo) throws BadRequestException {
         var name = requestInfo.getQueryParameterOpt(NAME);
@@ -127,8 +127,20 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
         return name.filter(this::isValidQueryString)
                    .map(UriUtils::escapeWhiteSpace)
-                   .orElseThrow(() -> new BadRequestException(
-                       invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
+                   .orElseThrow(QueryCristinPersonHandler::invalidNameException);
+    }
+
+    private static BadRequestException invalidNameException() {
+        return new BadRequestException(
+            invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE));
+    }
+
+    private String extractOrganization(RequestInfo requestInfo) {
+        return getValidOrganization(requestInfo).orElse(null);
+    }
+
+    private String extractVerified(RequestInfo requestInfo) {
+        return getValidVerified(requestInfo).orElse(null);
     }
 
     private Optional<String> getValidVerified(RequestInfo requestInfo) {
@@ -136,7 +148,16 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     }
 
     private boolean hasEitherTrueFalse(String verified) {
-        return BOOLEAN_FALSE.equalsIgnoreCase(verified) || BOOLEAN_TRUE.equalsIgnoreCase(verified);
+        return Boolean.FALSE.toString().equalsIgnoreCase(verified)
+               || Boolean.TRUE.toString().equalsIgnoreCase(verified);
+    }
+
+    private static String extractSectorFacet(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(SECTOR_PARAM.getNvaKey()).orElse(null);
+    }
+
+    private static String extractOrganizationFacet(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(INSTITUTION_PARAM.getNvaKey()).orElse(null);
     }
 
     private String getSort(RequestInfo requestInfo) {
@@ -182,6 +203,10 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
     private String getApiVersion(RequestInfo requestInfo) {
         return extractVersionFromRequestInfo(requestInfo, ACCEPT_HEADER_KEY_NAME);
+    }
+
+    private boolean clientIsAuthorized(RequestInfo requestInfo) {
+        return requesterIsUserAdministrator(requestInfo) || clientIsCustomerAdministrator(requestInfo);
     }
 
 }

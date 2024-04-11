@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.util.Optional;
+import java.util.stream.Stream;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonApiClientStub;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -13,6 +14,7 @@ import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
@@ -30,6 +32,9 @@ import java.net.http.HttpConnectTimeoutException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -46,6 +51,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.ioutils.IoUtils.stringFromResources;
@@ -210,7 +216,7 @@ public class FetchCristinPersonHandlerTest {
         doReturn(new HttpResponseFaker(cristinPersonWithEmploymentsAsJson()))
             .when(apiClient).fetchGetResultWithAuthentication(any(URI.class));
         handler = new FetchCristinPersonHandler(apiClient, environment);
-        var actual = sendAuthorizedQuery().getBodyObject(Person.class);
+        var actual = sendAuthorizedQuery(MANAGE_OWN_AFFILIATION).getBodyObject(Person.class);
 
         assertThat(actual.getEmployments().size(), equalTo(EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS));
     }
@@ -227,14 +233,17 @@ public class FetchCristinPersonHandlerTest {
         assertThat(actual.getEmployments(), equalTo(null));
     }
 
-    @Test
-    void shouldHaveNinInResponseWhenNinIsPresentInUpstreamAndClientIsAuthenticated() throws Exception {
+    @ParameterizedTest
+    @MethodSource("accessRightProvider")
+    void shouldHaveNinInResponseWhenNinIsPresentInUpstreamAndClientIsAuthenticated(AccessRight accessRight)
+        throws Exception {
+
         var cristinPerson = randomCristinPerson();
         apiClient = spy(apiClient);
         doReturn(new HttpResponseFaker(cristinPerson.toString(), 200))
             .when(apiClient).fetchGetResultWithAuthentication(any(URI.class));
         handler = new FetchCristinPersonHandler(apiClient, environment);
-        var gatewayResponse = sendAuthorizedQuery();
+        var gatewayResponse = sendAuthorizedQuery(accessRight);
         var responseBody = gatewayResponse.getBodyObject(Person.class);
         var ninObject = extractNinObjectFromIdentifiers(responseBody).orElseThrow();
 
@@ -343,16 +352,21 @@ public class FetchCristinPersonHandlerTest {
             .build();
     }
 
-    private GatewayResponse<Person> sendAuthorizedQuery() throws IOException {
+    private GatewayResponse<Person> sendAuthorizedQuery(AccessRight accessRight) throws IOException {
         var customerId = randomUri();
         var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
                         .withBody(null)
                         .withPathParameters(VALID_PATH_PARAM)
                         .withCurrentCustomer(customerId)
-                        .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
+                        .withAccessRights(customerId, accessRight)
                         .build();
         handler.handleRequest(input, output, context);
         return GatewayResponse.fromOutputStream(output, Person.class);
+    }
+
+    private static Stream<Arguments> accessRightProvider() {
+        return Stream.of(Arguments.of(MANAGE_OWN_AFFILIATION),
+                         Arguments.of(MANAGE_CUSTOMERS));
     }
 
 }
