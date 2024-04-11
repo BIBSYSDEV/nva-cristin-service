@@ -46,11 +46,11 @@ Feature: API tests for keywords query
     And match response.id == '#present'
     And match response.size == '#present'
     And match response.hits == '#present'
-    And match response.hits[0].type == '#present'
-    And match response.hits[0].typeAlpha3 == '#present'
-    And match response.hits[0].label == '#present'
-    And match response.hits[0].label['nb'] == '#present'
-    And match response.hits[0].label['en'] == '#present'
+    And match response.hits[0].identifier == '#present'
+    And match response.hits[0].identifierAlpha3 == '#present'
+    And match response.hits[0].labels == '#present'
+    And match response.hits[0].labels['nb'] == '#present'
+    And match response.hits[0].labels['en'] == '#present'
 
     Examples:
       | CONTENT_TYPE          |
