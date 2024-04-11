@@ -692,3 +692,8 @@ Resources:
       Threshold: '1'
       ComparisonOperator: 'LessThanThreshold'
       AlarmName: !Sub 'No successful executions for ${NvaCristinUpdateIntermediateUnitsFunction} last 24h'
+
+Outputs:
+  NvaCristinIntermediateStorageBucketName:
+    Description: The name of the S3 NvaCristinIntermediateStorageBucket
+    Value: !Ref NvaCristinIntermediateStorageBucket
