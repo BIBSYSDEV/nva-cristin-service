@@ -72,8 +72,7 @@ public class JsonPropertyNames {
     public static final String LABELS = "labels";
     public static final String COUNTRY = "country";
     public static final String AGGREGATIONS = "aggregations";
-    public static final String LABEL = "label";
-    public static final String TYPE_ALPHA_3 = "typeAlpha3";
+    public static final String IDENTIFIER_ALPHA_3 = "identifierAlpha3";
     public static final String CODE = "code";
     public static final String CODE_ALPHA_3 = "code_alpha3";
 }
