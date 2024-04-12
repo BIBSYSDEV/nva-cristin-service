@@ -120,7 +120,8 @@ Resources:
           CachingEnabled: false
         - HttpMethod: 'GET'
           ResourcePath: '/~1position'
-          CachingEnabled: false
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
         - HttpMethod: 'GET'
           ResourcePath: '/~1funding-sources'
           CacheTtlInSeconds: 300
@@ -137,7 +138,15 @@ Resources:
           ResourcePath: '/~1keyword'
           CachingEnabled: false
         - HttpMethod: 'GET'
+          ResourcePath: '/~1keyword~1{identifier}'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
           ResourcePath: '/~1country'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1category~1project'
           CacheTtlInSeconds: 300
           CachingEnabled: true
       DefinitionBody:
