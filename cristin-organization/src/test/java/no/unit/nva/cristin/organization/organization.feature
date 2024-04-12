@@ -120,3 +120,11 @@ Feature: API tests for Cristin Organization retrieve and search
     When method GET
     Then status 200
     And match response.hits[0].hasPart != '#[0]'
+
+  Scenario: GET organization query wanting whole tree of units returns more data
+    Given path '/organization'
+    And param query = 'sikt'
+    And param fullTree = true
+    When method GET
+    Then status 200
+    And match response.hits[0].country = 'NO'
