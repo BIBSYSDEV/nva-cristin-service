@@ -13,6 +13,7 @@ import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
 import no.unit.nva.cristin.organization.common.client.v20230526.FetchCristinOrgClient20230526;
+import no.unit.nva.cristin.organization.common.client.v20230526.OrganizationEnricher;
 import no.unit.nva.cristin.organization.common.client.v20230526.QueryCristinOrgClient20230526;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.Organization;
@@ -22,6 +23,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
+import nva.commons.logutils.LogUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -42,6 +44,7 @@ import java.util.Map;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static com.google.common.net.MediaType.JSON_UTF_8;
+import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -84,6 +87,7 @@ class QueryCristinOrganizationHandlerTest {
     public static final String CRISTIN_GET_RESPONSE_SUB_UNITS_JSON = "cristinGetResponseSubUnits.json";
     public static final String MEDICAL_BIOCHEMISTRY = "Department of Medical Biochemistry";
     public static final String EMPTY_OBJECT = "{}";
+    public static final String NOT_FOUND_LOG_MESSAGE = "Organization from search result could not be found in upstream";
 
     private QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private DefaultOrgQueryClientProvider clientProvider;
@@ -308,6 +312,51 @@ class QueryCristinOrganizationHandlerTest {
 
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
         assertThat(actualHits.size(), equalTo(1));
+    }
+
+    @Test
+    void shouldShowCorrectNotFoundLogMessageWhenIdentifierNotFoundInUpstream() throws Exception {
+        final var testAppender = LogUtils.getTestingAppender(OrganizationEnricher.class);
+
+        var fetchClient = mockFetchClientWithOneHitMissingInUpstream();
+        queryCristinOrgClient20230526 = new QueryCristinOrgClient20230526(httpClient, fetchClient);
+        queryCristinOrgClient20230526 = spy(queryCristinOrgClient20230526);
+
+        var fakeQueryResponseResource = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_V_2_JSON));
+        doReturn(new HttpResponseFaker(fakeQueryResponseResource))
+            .when(queryCristinOrgClient20230526).fetchQueryResults(any());
+
+        doReturn(queryCristinOrgClient20230526).when(clientProvider).getVersion20230526();
+
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
+        var input = handlerRequestWantingFullTree();
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        assertThat(testAppender.getMessages(), containsString(NOT_FOUND_LOG_MESSAGE));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenEnrichingFailWith5xxWhenWantingFullTree() throws Exception {
+        var fetchClient = new FetchCristinOrgClient20230526(httpClient);
+        fetchClient = spy(fetchClient);
+        doReturn(new HttpResponseFaker(EMPTY_OBJECT, HTTP_BAD_GATEWAY)).when(fetchClient).fetchGetResult(any());
+
+        queryCristinOrgClient20230526 = new QueryCristinOrgClient20230526(httpClient, fetchClient);
+        queryCristinOrgClient20230526 = spy(queryCristinOrgClient20230526);
+
+        var fakeQueryResponseResource = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_V_2_JSON));
+        doReturn(new HttpResponseFaker(fakeQueryResponseResource))
+            .when(queryCristinOrgClient20230526).fetchQueryResults(any());
+
+        doReturn(queryCristinOrgClient20230526).when(clientProvider).getVersion20230526();
+
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
+        var input = handlerRequestWantingFullTree();
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_BAD_GATEWAY));
     }
 
     @RepeatedTest(10)
