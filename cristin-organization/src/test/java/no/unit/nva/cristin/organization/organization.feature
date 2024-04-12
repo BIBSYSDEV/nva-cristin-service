@@ -127,4 +127,4 @@ Feature: API tests for Cristin Organization retrieve and search
     And param fullTree = true
     When method GET
     Then status 200
-    And match response.hits[0].country = 'NO'
+    And match response.hits[0].country == 'NO'
