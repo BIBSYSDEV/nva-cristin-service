@@ -12,6 +12,7 @@ google-guava = { strictly = '33.0.0-jre' }
 karate-core = { strictly = '1.1.0' }
 karate-apache = { strictly = '0.9.6' }
 karate-junit5 = { strictly = '1.1.0' }
+log4j = { strictly = '2.23.0' }
 log4jApi = { strictly = '2.17.2' }
 slf4j = { require = '2.0.12' }
 nva-language = { strictly = '1.0' }
@@ -81,6 +82,7 @@ aws-sdk2-regions = {group = 'software.amazon.awssdk', name = 'regions', version.
 aws-sdk2-spi = {group =  'software.amazon.awssdk', name='http-client-spi', version.ref='awsSdk2' }
 
 log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4jApi' }
+log4j-core = { group = 'org.apache.logging.log4j', name = 'log4j-core', version.ref = 'log4j' }
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
 
 bekkopen-nocommons = { group = 'no.bekk.bekkopen', name =  'nocommons', version.ref =  'bekkopen-nocommons' }

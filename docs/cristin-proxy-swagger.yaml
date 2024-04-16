@@ -557,6 +557,13 @@ paths:
               - country
               - country asc
               - country desc
+        - name: fullTree
+          in: query
+          description: Include all parent and sub units for each search result
+          required: false
+          schema:
+            type: boolean
+            default: false
         - name: Accept
           in: header
           description: Requested response format and version of the returned payload
