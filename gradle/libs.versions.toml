@@ -5,24 +5,24 @@ jackson = { strictly = '2.15.2' }
 mockito = { strictly = '5.11.0' }
 hamcrest = { strictly = '2.2' }
 zalando = { strictly = '0.27.1' }
-javax-ws-rs = { strictly = '2.1.1' }
-jsoup = { strictly = '1.14.3' }
+#javax-ws-rs = { strictly = '2.1.1' }
+#jsoup = { strictly = '1.14.3' }
 aws-lambda-java-core = { strictly = '1.2.3' }
 google-guava = { strictly = '33.0.0-jre' }
-karate-core = { strictly = '1.1.0' }
+karate-core = { strictly = '1.1.0' } # new 1.4.1
 karate-apache = { strictly = '0.9.6' }
-karate-junit5 = { strictly = '1.1.0' }
+karate-junit5 = { strictly = '1.1.0' } # new 1.4.1
 log4j = { strictly = '2.23.0' }
 log4jApi = { strictly = '2.23.0' }
 slf4j = { require = '2.0.12' }
 nva-language = { strictly = '1.0' }
 awsSdk = { strictly = '1.12.668' }
 awsSdk2 = { strictly = '2.24.12' }
-bekkopen-nocommons = { strictly = '0.12.0' }
+bekkopen-nocommons = { strictly = '0.16.0' }
 com-auth0-jwt = { strictly = '4.4.0' }
 com-auth0-jwks = { strictly = '0.22.1' }
 wiremock = { strictly = '3.4.1' }
-apache-http-core = { strictly = '4.4.16' }
+apache-http-core5 = { strictly = '5.2.4' }
 json-assert = { strictly = '1.5.1' }
 vavrVersion = '0.10.4'
 resilience4j = '2.2.0'
@@ -65,8 +65,8 @@ jackson-annotations = { group = 'com.fasterxml.jackson.core', name = 'jackson-an
 jackson-datatype-jdk8 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jdk8', version.ref = 'jackson' }
 jackson-datatype-jsr310 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jsr310', version.ref = 'jackson' }
 
-javax-ws-rs = { group = 'javax.ws.rs', name = 'javax.ws.rs-api', version.ref = 'javax-ws-rs' }
-jsoup = { group = 'org.jsoup', name = 'jsoup', version.ref = 'jsoup' }
+#javax-ws-rs = { group = 'javax.ws.rs', name = 'javax.ws.rs-api', version.ref = 'javax-ws-rs' }
+#jsoup = { group = 'org.jsoup', name = 'jsoup', version.ref = 'jsoup' }
 aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version.ref = 'aws-lambda-java-core' }
 google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'google-guava' }
 
@@ -94,7 +94,7 @@ aws-sdk2-urlconnection = { group = 'software.amazon.awssdk', name = 'url-connect
 
 wiremock = { group = 'org.wiremock', name = 'wiremock', version.ref = 'wiremock' }
 
-apache-http-core = { group = 'org.apache.httpcomponents', name = 'httpcore', version.ref = 'apache-http-core' }
+apache-http-core5 = { group = 'org.apache.httpcomponents.core5', name = 'httpcore5', version.ref = 'apache-http-core5' }
 
 vavr = { group = 'io.vavr', name = 'vavr', version.ref = 'vavrVersion' }
 resilience4j-all = { group = 'io.github.resilience4j', name = 'resilience4j-all', version.ref = 'resilience4j' }
@@ -103,4 +103,4 @@ resilience4j-all = { group = 'io.github.resilience4j', name = 'resilience4j-all'
 nvaCommons = ['nva-commons-core', 'nva-commons-apigateway']
 testing = ['junit-jupiter-api', 'junit-jupiter-params', 'junit-jupiter-engine', 'mockito-core', 'hamcrest', 'nva-testutils', 'nva-logutils', 'zalando', 'wiremock']
 jackson = ['jackson-core', 'jackson-databind', 'jackson-annotations', 'jackson-datatype-jdk8', 'jackson-datatype-jsr310']
-others = ['javax-ws-rs', 'slf4j-api', 'log4j-api', 'jsoup', 'aws-lambda-java-core', 'google-guava']
+others = ['slf4j-api', 'log4j-api', 'aws-lambda-java-core', 'google-guava']

@@ -2,7 +2,7 @@ package no.unit.nva.utils;
 
 import java.util.Optional;
 import nva.commons.apigateway.RequestInfo;
-import org.apache.http.entity.ContentType;
+import org.apache.hc.core5.http.ContentType;
 
 public class VersioningUtils {
 
