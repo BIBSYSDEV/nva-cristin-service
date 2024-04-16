@@ -1,17 +1,15 @@
 [versions]
 junit = { strictly = '5.10.2' }
 nva-commons = {strictly = '1.38.3'}
-jackson = { strictly = '2.15.2' }
+jackson = { strictly = '2.15.2' } # 2.16.1 Which nva-commons uses breaks some tests
 mockito = { strictly = '5.11.0' }
 hamcrest = { strictly = '2.2' }
 zalando = { strictly = '0.27.1' }
-#javax-ws-rs = { strictly = '2.1.1' }
-#jsoup = { strictly = '1.14.3' }
 aws-lambda-java-core = { strictly = '1.2.3' }
 google-guava = { strictly = '33.0.0-jre' }
-karate-core = { strictly = '1.1.0' } # new 1.4.1
+karate-core = { strictly = '1.4.1' }
 karate-apache = { strictly = '0.9.6' }
-karate-junit5 = { strictly = '1.1.0' } # new 1.4.1
+karate-junit5 = { strictly = '1.4.1' }
 log4j = { strictly = '2.23.0' }
 log4jApi = { strictly = '2.23.0' }
 slf4j = { require = '2.0.12' }
@@ -65,8 +63,6 @@ jackson-annotations = { group = 'com.fasterxml.jackson.core', name = 'jackson-an
 jackson-datatype-jdk8 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jdk8', version.ref = 'jackson' }
 jackson-datatype-jsr310 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jsr310', version.ref = 'jackson' }
 
-#javax-ws-rs = { group = 'javax.ws.rs', name = 'javax.ws.rs-api', version.ref = 'javax-ws-rs' }
-#jsoup = { group = 'org.jsoup', name = 'jsoup', version.ref = 'jsoup' }
 aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version.ref = 'aws-lambda-java-core' }
 google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'google-guava' }
 
