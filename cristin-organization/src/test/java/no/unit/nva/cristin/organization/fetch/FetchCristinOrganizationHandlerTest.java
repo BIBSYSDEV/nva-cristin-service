@@ -119,7 +119,6 @@ class FetchCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnsNotFoundResponseWhenUnitIsMissing() throws IOException {
-        cristinApiClient = spy(cristinApiClient);
         doReturn(Try.of(new HttpResponseFaker(EMPTY_JSON, HTTP_NOT_FOUND)))
             .when(cristinApiClient).sendRequestMultipleTimes(any());
         doReturn(cristinApiClient).when(clientProvider).getClient(any());
@@ -177,7 +176,6 @@ class FetchCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnOrganizationHierarchy() throws IOException, ApiGatewayException {
-        cristinApiClient = spy(cristinApiClient);
         final var level1 = getCristinUri("185.90.0.0", UNITS_PATH);
         doReturn(getSubSubUnit("unit_18_90_0_0.json"))
                 .when(cristinApiClient).getSubSubUnitDtoWithMultipleEfforts(level1);
@@ -221,7 +219,6 @@ class FetchCristinOrganizationHandlerTest {
         var resource = stringFromResources(LIST_OF_UNITS_JSON_FILE);
         var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
         var cristinUri = URI.create(CRISTIN_UNITS_URI);
-        cristinApiClient = spy(cristinApiClient);
         doReturn(Try.of(fakeHttpResponse)).when(cristinApiClient).sendRequestMultipleTimes(cristinUri);
         doReturn(cristinApiClient).when(clientProvider).getClient(any());
 

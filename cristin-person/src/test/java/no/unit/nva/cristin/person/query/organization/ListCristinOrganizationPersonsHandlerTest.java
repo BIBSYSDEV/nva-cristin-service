@@ -96,7 +96,6 @@ class ListCristinOrganizationPersonsHandlerTest {
     void setUp() throws Exception {
         context = mock(Context.class);
         var mockHttpClient = mock(HttpClient.class);
-        mockHttpClient = spy(mockHttpClient);
 
         HttpResponse<String> fakeResponse = new HttpResponseFaker(EMPTY_LIST_STRING, 200);
         doReturn(fakeResponse).when(mockHttpClient).send(any(), any());

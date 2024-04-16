@@ -144,8 +144,6 @@ class QueryCristinOrganizationHandlerTest {
 
     @Test
     void shouldReturnResponseOnQuery() throws Exception {
-        cristinApiClientVersionOne = spy(cristinApiClientVersionOne);
-
         final var first = getCristinUri("185.53.18.14", UNITS_PATH);
         doReturn(getOrganization("org_18_53_18_14.json")).when(cristinApiClientVersionOne).getOrganization(first);
         final var second = getCristinUri("2012.9.20.0", UNITS_PATH);
