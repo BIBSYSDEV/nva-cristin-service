@@ -25,7 +25,7 @@ dependencies {
     implementation libs.aws.sdk2.regions
     implementation libs.aws.sdk2.urlconnection
     implementation libs.aws.sdk2.spi
-    implementation libs.apache.http.core
+    implementation libs.apache.http.core5
 
     implementation libs.vavr
     implementation libs.resilience4j.all
