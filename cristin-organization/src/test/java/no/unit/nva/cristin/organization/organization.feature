@@ -49,7 +49,6 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 404
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'The resource \'0.1.2.3\' cannot be dereferenced'
 
   Scenario: GET organization with query and result returns list of search results limited to results with position
     Given path '/organization'
@@ -63,25 +62,16 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.size == '#number'
     And match response.hits == '#[2]' // hits array length == 0
 
-  Scenario: GET organization for known organization returns list of search results with depth
+  Scenario: GET organization with version 1 for known organization returns list of search results with depth
     Given path '/organization'
     And param query = existingOrganizationName
+    And header Accept = 'application/json; version=1'
     When method GET
     Then status 200
     And match response.size != '0'
     And match response.hits == '#array'
-    And match response.hits[0].partOf == '#notpresent'
     And match response.hits[0].hasPart  == '#present'
-
-  Scenario: GET organization for known organization returns list of search results without depth
-    Given path '/organization'
-    And param query = existingOrganizationIdentifier
-    And param depth = 'none'
-    When method GET
-    Then status 200
-    And match response.hits == '#array'
-    And match response.hits[0].partOf == '#notpresent'
-    And match response.hits[0].hasPart  == '#notpresent'
+    And match response.hits[0].hasPart != '#[0]'
 
   Scenario: GET organization for known organization returns name in multiple languages as default
     Given path '/organization/' + existingOrganizationIdentifier
@@ -112,7 +102,7 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 200
     And match response.labels.en == '#present'
     And match response.labels.nb == '#present'
-    And match response.hasPart == '#[0]'
+    And match response.hasPart == '#notpresent'
 
   Scenario: GET organization for known organization using version 2023-05-26 without depth param returns data with depth
     Given path '/organization/' + existingOrganizationIdentifier
@@ -122,3 +112,19 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.labels.en == '#present'
     And match response.labels.nb == '#present'
     And match response.hasPart != '#[0]'
+
+  Scenario: GET organization query wanting whole tree of units returns results enriched with parent and sub units
+    Given path '/organization'
+    And param query = 'sikt'
+    And param fullTree = true
+    When method GET
+    Then status 200
+    And match response.hits[0].hasPart != '#[0]'
+
+  Scenario: GET organization query wanting whole tree of units returns more data
+    Given path '/organization'
+    And param query = 'sikt'
+    And param fullTree = true
+    When method GET
+    Then status 200
+    And match response.hits[0].country == 'NO'

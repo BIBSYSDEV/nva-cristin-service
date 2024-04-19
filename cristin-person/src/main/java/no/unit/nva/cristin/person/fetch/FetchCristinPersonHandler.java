@@ -6,7 +6,6 @@ import java.util.List;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.utils.AccessUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -22,11 +21,13 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAT
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
+import static no.unit.nva.utils.AccessUtils.DOING_AUTHORIZED_REQUEST;
+import static no.unit.nva.utils.AccessUtils.clientIsCustomerAdministrator;
+import static no.unit.nva.utils.AccessUtils.requesterIsUserAdministrator;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 
-@SuppressWarnings("unused")
 public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
 
     private static final Logger logger = LoggerFactory.getLogger(FetchCristinPersonHandler.class);
@@ -34,6 +35,7 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
     private final transient CristinPersonApiClient apiClient;
 
     @JacocoGenerated
+    @SuppressWarnings("unused")
     public FetchCristinPersonHandler() {
         this(new Environment());
     }
@@ -51,18 +53,14 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
     @Override
     protected Person processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         validateQueryParameters(requestInfo);
-        String identifier = getValidId(requestInfo);
+        var identifier = getValidId(requestInfo);
 
-        return getPersonWithAuthorization(requestInfo, identifier);
-    }
-
-    private Person getPersonWithAuthorization(RequestInfo requestInfo, String identifier) throws ApiGatewayException {
-        if (AccessUtils.requesterIsUserAdministrator(requestInfo)) {
-            logger.info("requester is UserAdministrator");
+        if (clientIsAuthorized(requestInfo)) {
+            logger.info(DOING_AUTHORIZED_REQUEST);
             logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
+
             return apiClient.authorizedGenerateGetResponse(identifier);
         } else {
-            logger.debug("requester is NOT authorized");
             return apiClient.generateGetResponse(identifier);
         }
     }
@@ -84,7 +82,7 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
     }
 
     private String getValidId(RequestInfo requestInfo) throws BadRequestException {
-        String identifier = requestInfo.getPathParameter(ID);
+        var identifier = requestInfo.getPathParameter(ID);
         if (isValidIdentifier(identifier)) {
             return identifier;
         }
@@ -94,4 +92,9 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
     private boolean isValidIdentifier(String identifier) {
         return Utils.isPositiveInteger(identifier) || Utils.isOrcid(identifier);
     }
+
+    private boolean clientIsAuthorized(RequestInfo requestInfo) {
+        return requesterIsUserAdministrator(requestInfo) || clientIsCustomerAdministrator(requestInfo);
+    }
+
 }

@@ -31,6 +31,9 @@ Globals:
       AllowMethods: "'OPTIONS, GET, POST, PATCH, DELETE, PUT'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
 
+Conditions:
+  IsCustomDomainBasePathCristin: !Equals [ !Ref CustomDomainBasePath, "cristin" ]
+
 Parameters:
   CognitoAuthorizationUri:
     Type: 'AWS::SSM::Parameter::Value<String>'
@@ -117,7 +120,8 @@ Resources:
           CachingEnabled: false
         - HttpMethod: 'GET'
           ResourcePath: '/~1position'
-          CachingEnabled: false
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
         - HttpMethod: 'GET'
           ResourcePath: '/~1funding-sources'
           CacheTtlInSeconds: 300
@@ -134,7 +138,15 @@ Resources:
           ResourcePath: '/~1keyword'
           CachingEnabled: false
         - HttpMethod: 'GET'
+          ResourcePath: '/~1keyword~1{identifier}'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
           ResourcePath: '/~1country'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1category~1project'
           CacheTtlInSeconds: 300
           CachingEnabled: true
       DefinitionBody:
@@ -545,24 +557,24 @@ Resources:
       CodeUri: cristin-keyword
       Handler: no.unit.nva.cristin.keyword.query.QueryKeywordsHandler::handleRequest
       Events:
-        NvaCristinKeywordEvent:
+        NvaCristinQueryKeywordEvent:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /keyword/
             Method: get
 
-  NvaCristinListCountriesFunction:
+  NvaCristinFetchKeywordFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.country.ListCountriesHandler::handleRequest
+      CodeUri: cristin-keyword
+      Handler: no.unit.nva.cristin.keyword.fetch.FetchKeywordHandler::handleRequest
       Events:
-        NvaCristinCountryEvent:
+        NvaCristinFetchKeywordEvent:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
-            Path: /country/
+            Path: /keyword/{id}
             Method: get
 
   NvaCristinCreateKeywordFunction:
@@ -579,6 +591,19 @@ Resources:
             Path: /keyword/
             Method: post
 
+  NvaCristinListCountriesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.country.ListCountriesHandler::handleRequest
+      Events:
+        NvaCristinListCountriesEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /country/
+            Method: get
+
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
@@ -586,3 +611,98 @@ Resources:
       DomainName: !Ref ApiDomain
       RestApiId: !Ref NvaCristinProxyApi
       Stage: !Ref NvaCristinProxyApi.Stage
+
+  NvaCristinIntermediateStorageBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      LifecycleConfiguration:
+        Rules:
+          - Status: 'Enabled'
+            ExpirationInDays: 7
+            Id: 'DeleteFilesAfter7Days'
+
+  NvaCristinIntermediateStorageBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref NvaCristinIntermediateStorageBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal: "*"
+            Action:
+              - "s3:GetObject"
+            Resource: !Sub 'arn:aws:s3:::${NvaCristinIntermediateStorageBucket}/units-norway.json'
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Sub '${AWS::AccountId}'
+
+  NvaCristinIntermediateStorageUnitsParameter:
+    Type: 'AWS::SSM::Parameter'
+    DependsOn: NvaCristinIntermediateStorageBucket
+    Condition: IsCustomDomainBasePathCristin
+    Properties:
+      Description: 'S3 URI of the file in S3 bucket'
+      Name: '/NVA/S3/CristinIntermediateStorage/Units'
+      Type: 'String'
+      Value: !Sub 's3://${NvaCristinIntermediateStorageBucket}/units-norway.json'
+
+  NvaCristinIntermediateStorageBucketWritePolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    DependsOn: NvaCristinIntermediateStorageBucket
+    Properties:
+      Description: 'Managed policy for writing objects to S3 from Lambda'
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "s3:PutObject"
+            Resource: !Sub 'arn:aws:s3:::${NvaCristinIntermediateStorageBucket}/*'
+
+  NvaCristinUpdateIntermediateUnitsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-intermediate-storage
+      Handler: no.unit.nva.cristin.intermediate.storage.UpdateUnitsHandler::handleRequest
+      Policies:
+        - !Ref NvaCristinIntermediateStorageBucketWritePolicy
+      Environment:
+        Variables:
+          INTERMEDIATE_STORAGE_BUCKET_NAME: !Ref NvaCristinIntermediateStorageBucket
+          CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME: !Ref CristinBotFilterBypassHeaderName
+          CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE: !Ref CristinBotFilterBypassHeaderValue
+          CRISTIN_API_URL: !Ref CristinApiUrl
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'cron(0 5,12 * * ? *)'
+
+  NvaCristinUpdateIntermediateUnitsFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${NvaCristinUpdateIntermediateUnitsFunction}'
+      RetentionInDays: 90
+
+  NvaCristinUpdateIntermediateUnitsDeadMansSwitch:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Dead Mans Switch for NvaCristinUpdateIntermediateUnitsFunction
+      Namespace: 'AWS/Lambda'
+      MetricName: 'Invocations'
+      Dimensions:
+        - Name: 'FunctionName'
+          Value: !Ref NvaCristinUpdateIntermediateUnitsFunction
+      Statistic: 'SampleCount'
+      Period: '86400'
+      EvaluationPeriods: '1'
+      Threshold: '1'
+      ComparisonOperator: 'LessThanThreshold'
+      AlarmName: !Sub 'No successful executions for ${NvaCristinUpdateIntermediateUnitsFunction} last 24h'
+
+Outputs:
+  NvaCristinIntermediateStorageBucketName:
+    Description: The name of the S3 NvaCristinIntermediateStorageBucket
+    Value: !Ref NvaCristinIntermediateStorageBucket

@@ -7,6 +7,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
@@ -14,11 +15,15 @@ import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import no.unit.nva.utils.UriUtils;
+import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
@@ -48,6 +53,7 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_ID
 import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -90,7 +96,6 @@ class ListCristinOrganizationPersonsHandlerTest {
     void setUp() throws Exception {
         context = mock(Context.class);
         var mockHttpClient = mock(HttpClient.class);
-        mockHttpClient = spy(mockHttpClient);
 
         HttpResponse<String> fakeResponse = new HttpResponseFaker(EMPTY_LIST_STRING, 200);
         doReturn(fakeResponse).when(mockHttpClient).send(any(), any());
@@ -175,15 +180,17 @@ class ListCristinOrganizationPersonsHandlerTest {
     }
 
 
-    @Test
-    void shouldIncludeNationalIdentificationNumberInResponseForAuthenticatedUser()
-            throws IOException, ApiGatewayException {
+    @ParameterizedTest(name = "Authorized client having access right: {0} gets national identification number")
+    @MethodSource("accessRightProvider")
+    void shouldIncludeNationalIdentificationNumberInResponseForAuthenticatedUser(AccessRight accessRight)
+        throws IOException, ApiGatewayException {
+
         CristinOrganizationPersonsClient apiClient = mock(CristinOrganizationPersonsClient.class);
         SearchResponse<Person> searchResponse = randomPersonsWithNIN();
         doReturn(searchResponse).when(apiClient).authorizedGenerateQueryResponse(any());
 
         handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
-        var input = queryWithAccessRightToReadNIN();
+        var input = queryWithAccessRight(accessRight);
         handler.handleRequest(input, output, context);
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                 SearchResponse.class);
@@ -218,13 +225,14 @@ class ListCristinOrganizationPersonsHandlerTest {
         verify(cristinApiClient, times(1)).generateQueryResponse(any());
     }
 
-    @Test
-    void shouldDoAuthorizedQueriesWhenHavingRequiredAccessRight() throws Exception {
+    @ParameterizedTest(name = "Does authorized query when having access right: {0}")
+    @MethodSource("accessRightProvider")
+    void shouldDoAuthorizedQueriesWhenHavingRequiredAccessRight(AccessRight accessRight) throws Exception {
         cristinApiClient = spy(cristinApiClient);
         HttpResponse<String> fakeResponse = new HttpResponseFaker(EMPTY_LIST_STRING, 200);
         doReturn(fakeResponse).when(cristinApiClient).fetchGetResultWithAuthentication(any());
         handler = new ListCristinOrganizationPersonsHandler(cristinApiClient, new Environment());
-        var input = queryWithAccessRightToReadNIN();
+        var input = queryWithAccessRight(accessRight);
         handler.handleRequest(input, output, context);
 
         verify(cristinApiClient, times(1)).fetchGetResultWithAuthentication(any());
@@ -258,12 +266,12 @@ class ListCristinOrganizationPersonsHandlerTest {
                    .build();
     }
 
-    private InputStream queryWithAccessRightToReadNIN() throws JsonProcessingException {
+    private InputStream queryWithAccessRight(AccessRight accessRight) throws JsonProcessingException {
         final URI customerId = randomUri();
         return new HandlerRequestBuilder<Void>(restApiMapper)
                    .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                    .withCurrentCustomer(customerId)
-                   .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
+                   .withAccessRights(customerId, accessRight)
                    .build();
     }
 
@@ -314,6 +322,11 @@ class ListCristinOrganizationPersonsHandlerTest {
 
     private String getProblemDetail(GatewayResponse<Problem> gatewayResponse) throws JsonProcessingException {
         return gatewayResponse.getBodyObject(Problem.class).getDetail();
+    }
+
+    private static Stream<Arguments> accessRightProvider() {
+        return Stream.of(Arguments.of(MANAGE_OWN_AFFILIATION),
+                         Arguments.of(MANAGE_CUSTOMERS));
     }
 
 }

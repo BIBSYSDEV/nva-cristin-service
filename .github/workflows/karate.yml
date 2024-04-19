@@ -62,6 +62,14 @@ jobs:
         # Delete tests users after tests have run
       - name: Delete karate test users
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew deleteTestUsers --info
+      - name: Get NvaCristinIntermediateStorageBucket name
+        id: intermediate-bucket-name
+        run: |
+          BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name ${{env.STACK_NAME}} --query "Stacks[0].Outputs[?OutputKey=='NvaCristinIntermediateStorageBucketName'].OutputValue" --output text)
+          echo "NvaCristinIntermediateStorageBucketName=$BUCKET_NAME" >> $GITHUB_ENV
+      - name: Empty S3 NvaCristinIntermediateStorageBucket
+        run: |
+          aws s3 rm s3://$NvaCristinIntermediateStorageBucketName --recursive
         # Delete stack after running tests
       - name: Delete stack after running tests
         run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}
