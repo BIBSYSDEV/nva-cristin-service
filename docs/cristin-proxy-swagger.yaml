@@ -3090,6 +3090,40 @@ components:
                 description: Two letter country code (ISO 3166-1 alpha-2)
               label:
                 $ref: '#/components/schemas/Languages'
+        awards:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+                description: Title of the award
+              year:
+                type: integer
+                description: Year of the award
+              type:
+                type: object
+                properties:
+                  type:
+                    enum:
+                      - FORSKFORMIDL
+                      - FORSKARBEID
+                    description: The code for this type of activity. Can be FORSKFORMIDL (Dissemination of research results) or FORSKARBEID (Research activity)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              distribution:
+                type: object
+                properties:
+                  type:
+                    enum:
+                      - INTERNAT
+                      - NATIONAL
+                      - INTERN
+                    description: The code for the scope of award. Can be INTERNAT (International), NATIONAL (National) or INTERN (Own institution)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              affiliation:
+                $ref: '#/components/schemas/Organization'
     PersonPost:
       type: object
       required: [ names ]
@@ -3337,6 +3371,51 @@ components:
                 description: Two letter country code (ISO 3166-1 alpha-2)
               label:
                 $ref: '#/components/schemas/Languages'
+        awards:
+          type: array
+          nullable: true
+          items:
+            type: object
+            required:
+              - title
+              - year
+              - type
+              - distribution
+              - affiliation
+            properties:
+              title:
+                type: string
+                description: Title of the award
+              year:
+                type: integer
+                description: Year of the award
+              type:
+                type: object
+                required:
+                  - type
+                properties:
+                  type:
+                    enum:
+                      - FORSKFORMIDL
+                      - FORSKARBEID
+                    description: The code for this type of activity. Can be FORSKFORMIDL (Dissemination of research results) or FORSKARBEID (Research activity)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              distribution:
+                type: object
+                required:
+                  - type
+                properties:
+                  type:
+                    enum:
+                      - INTERNAT
+                      - NATIONAL
+                      - INTERN
+                    description: The code for the scope of award. Can be INTERNAT (International), NATIONAL (National) or INTERN (Own institution)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              affiliation:
+                $ref: '#/components/schemas/Organization'
     PersonNIN:
       type: object
       properties:
@@ -4458,6 +4537,21 @@ components:
                 label:
                   'en': 'United Kingdom'
                   'nb': 'Storbritannia'
+            awards:
+              - title: 'My first award'
+                year: '2014'
+                type:
+                  type: 'FORSKFORMIDL'
+                  label:
+                    'en': 'Dissemination of research results'
+                    'nb': 'Forskningsformidling'
+                distribution:
+                  type: 'NATIONAL'
+                  label:
+                    'en': 'National'
+                    'nb': 'Nasjonal'
+                affiliation:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
             type: 'Person'
             identifiers:
@@ -4620,6 +4714,21 @@ components:
             label:
               'en': 'United Kingdom'
               'nb': 'Storbritannia'
+        awards:
+          - title: 'My first award'
+            year: '2014'
+            type:
+              type: 'FORSKFORMIDL'
+              label:
+                'en': 'Dissemination of research results'
+                'nb': 'Forskningsformidling'
+            distribution:
+              type: 'NATIONAL'
+              label:
+                'en': 'National'
+                'nb': 'Nasjonal'
+            affiliation:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
     PersonPatchExample:
       value:
         orcid: '1234-1234-1234-1234'
@@ -4656,6 +4765,15 @@ components:
         countries:
           - type: 'CA'
           - type: 'GB'
+        awards:
+          - title: 'My first award'
+            year: '2014'
+            type:
+              type: 'FORSKFORMIDL'
+            distribution:
+              type: 'NATIONAL'
+            affiliation:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
     PersonPostExample:
       value:
         identifiers:
