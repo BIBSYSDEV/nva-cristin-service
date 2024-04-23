@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person.update;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AWARDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COLLABORATION;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COUNTRIES;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.person.employment.create.CreatePersonEmploymentValidator;
+import no.unit.nva.cristin.person.model.nva.Award;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.PersonNvi;
 import no.unit.nva.cristin.person.model.nva.PersonSummary;
@@ -30,6 +32,7 @@ import nva.commons.core.JacocoGenerated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("PMD.GodClass")
 public final class PersonPatchValidator {
 
     private static final Logger logger = LoggerFactory.getLogger(PersonPatchValidator.class);
@@ -53,6 +56,8 @@ public final class PersonPatchValidator {
     private static final String EXCEPTION_WHEN_VALIDATING_COUNTRIES = "Exception when validating countries: {}";
     public static final String COULD_NOT_PARSE_COUNTRIES_FIELD = "Could not parse countries field because of "
                                                                + "invalid data";
+    public static final String EXCEPTION_WHEN_VALIDATING_AWARDS = "Exception when validating awards: {}";
+    public static final String COULD_NOT_PARSE_AWARDS_FIELD = "Could not parse awards field because of invalid data";
 
     @JacocoGenerated
     private PersonPatchValidator() {
@@ -74,6 +79,7 @@ public final class PersonPatchValidator {
         validateDescription(input, PLACE);
         validateDescription(input, COLLABORATION);
         validateCountriesIfPresent(input);
+        validateAwardsIfPresent(input);
     }
 
     /**
@@ -86,6 +92,7 @@ public final class PersonPatchValidator {
         validateDescription(input, PLACE);
         validateDescription(input, COLLABORATION);
         validateCountriesIfPresent(input);
+        validateAwardsIfPresent(input);
     }
 
     /**
@@ -192,4 +199,20 @@ public final class PersonPatchValidator {
             throw new BadRequestException(COULD_NOT_PARSE_COUNTRIES_FIELD);
         }
     }
+
+    private static void validateAwardsIfPresent(ObjectNode input) throws BadRequestException {
+        if (input.has(AWARDS) && !input.get(AWARDS).isNull()) {
+            parseAwards(input);
+        }
+    }
+
+    private static void parseAwards(ObjectNode input) throws BadRequestException {
+        try {
+            OBJECT_MAPPER.readValue(input.get(AWARDS).toString(), Award[].class);
+        } catch (JsonProcessingException e) {
+            logger.warn(EXCEPTION_WHEN_VALIDATING_AWARDS, e.getMessage());
+            throw new BadRequestException(COULD_NOT_PARSE_AWARDS_FIELD);
+        }
+    }
+
 }

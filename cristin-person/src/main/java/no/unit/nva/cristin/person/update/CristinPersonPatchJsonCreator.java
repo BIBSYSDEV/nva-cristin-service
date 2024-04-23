@@ -11,6 +11,7 @@ import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PERSON_NVI;
 import static no.unit.nva.cristin.person.model.nva.ContactDetails.EMAIL;
 import static no.unit.nva.cristin.person.model.nva.ContactDetails.TELEPHONE;
 import static no.unit.nva.cristin.person.model.nva.ContactDetails.WEB_PAGE;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AWARDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COLLABORATION;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
@@ -38,10 +39,12 @@ import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonNvi;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonSummary;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonSummary.Builder;
+import no.unit.nva.cristin.person.model.nva.Award;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.PersonNvi;
 import no.unit.nva.cristin.person.model.nva.PersonSummary;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
+import no.unit.nva.cristin.person.model.nva.adapter.AwardToCristinFormat;
 import no.unit.nva.model.Organization;
 import no.unit.nva.model.TypedLabel;
 import no.unit.nva.utils.UriUtils;
@@ -82,6 +85,7 @@ public class CristinPersonPatchJsonCreator {
         addPlaceIfPresent();
         addCollaborationIfPresent();
         addCountriesIfPresent();
+        addAwardsIfPresent();
 
         return this;
     }
@@ -99,6 +103,7 @@ public class CristinPersonPatchJsonCreator {
         addPlaceIfPresent();
         addCollaborationIfPresent();
         addCountriesIfPresent();
+        addAwardsIfPresent();
 
         return this;
     }
@@ -304,4 +309,21 @@ public class CristinPersonPatchJsonCreator {
                    .map(elm -> new CristinTypedLabel(elm.getType().toUpperCase(Locale.ROOT), null))
                    .collect(Collectors.toList());
     }
+
+    private void addAwardsIfPresent() {
+        if (input.has(AWARDS)) {
+            if (input.get(AWARDS).isNull()) {
+                output.putNull(AWARDS);
+                return;
+            }
+
+            var awards = attempt(() -> asList(OBJECT_MAPPER.readValue(input.get(AWARDS).toString(), Award[].class)))
+                             .orElseThrow();
+            var cristinAwards = awards.stream().map(new AwardToCristinFormat()).collect(Collectors.toSet());
+            var cristinAwardsNode = attempt(() -> OBJECT_MAPPER.readTree(cristinAwards.toString())).orElseThrow();
+
+            output.set(AWARDS, cristinAwardsNode);
+        }
+    }
+
 }

@@ -43,6 +43,7 @@ import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.person.RandomPersonData.randomEmployment;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AWARDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COUNTRIES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
@@ -50,6 +51,7 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.ORCID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PREFERRED_LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
+import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_AWARDS_FIELD;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_COUNTRIES_FIELD;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_EMPLOYMENT_FIELD;
 import static no.unit.nva.cristin.person.update.PersonPatchValidator.COULD_NOT_PARSE_KEYWORD_FIELD;
@@ -388,6 +390,34 @@ public class UpdateCristinPersonHandlerTest {
         assertThat(gatewayResponse.getBody(), containsString(COULD_NOT_PARSE_COUNTRIES_FIELD));
     }
 
+    @Test
+    void shouldThrowBadRequestWhenPersonAwardsNotValid() throws IOException {
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
+        var invalidData = randomString();
+        jsonObject.put(AWARDS, invalidData);
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
+
+        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+        assertThat(gatewayResponse.getBody(), containsString(COULD_NOT_PARSE_AWARDS_FIELD));
+    }
+
+    @Test
+    void shouldAllowEmptyListOfPersonAwards() throws IOException {
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.putArray(AWARDS);
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
+
+        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldAllowNullableAwards() throws IOException {
+        var jsonObject = OBJECT_MAPPER.createObjectNode();
+        jsonObject.putNull(AWARDS);
+        var gatewayResponse = sendQuery(validPath, jsonObject.toString());
+
+        assertEquals(HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    }
 
     private static Stream<Arguments> personNviBadRequestProvider() {
         return Stream.of(

@@ -28,5 +28,30 @@
     {
       "code": "EN"
     }
+  ],
+  "awards": [
+    {
+      "title": "My first award",
+      "year": 2019,
+      "type": {
+        "code": "FORSKARBEID",
+        "name": {
+          "en": "Research activity",
+          "nb": "Forskningsarbeid"
+        }
+      },
+      "distribution": {
+        "code": "INTERNAT",
+        "name": {
+          "en": "International",
+          "nb": "Internasjonal"
+        }
+      },
+      "affiliation": {
+        "unit": {
+          "cristin_unit_id": "185.52.10.0"
+        }
+      }
+    }
   ]
 }
