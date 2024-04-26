@@ -18,7 +18,7 @@ public class AwardToCristinFormat implements Function<Award, CristinAward> {
             return null;
         }
 
-        var title = award.title();
+        var title = award.name();
         var year = award.year();
         var type = new TypedLabelToCristinFormat().apply(award.type());
         var distribution = new TypedLabelToCristinFormat().apply(award.distribution());

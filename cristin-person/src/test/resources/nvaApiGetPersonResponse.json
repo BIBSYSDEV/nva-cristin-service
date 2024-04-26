@@ -108,7 +108,7 @@
   ],
   "awards": [
     {
-      "title": "My first award",
+      "name": "My first award",
       "year": 2019,
       "type": {
         "type": "FORSKARBEID",
@@ -130,7 +130,7 @@
       }
     },
     {
-      "title": "My second award",
+      "name": "My second award",
       "year": 2016,
       "type": {
         "type": "FORSKARBEID",
@@ -152,7 +152,7 @@
       }
     },
     {
-      "title": "My third award",
+      "name": "My third award",
       "year": 2014,
       "type": {
         "type": "FORSKFORMIDL",

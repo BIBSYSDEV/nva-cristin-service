@@ -19,13 +19,13 @@ public class CristinAwardToNvaFormat implements Function<CristinAward, Award> {
             return null;
         }
 
-        var title = cristinAward.title();
+        var name = cristinAward.title();
         var year = cristinAward.year();
         var type = extractTypedLabel(cristinAward.type());
         var distribution = extractTypedLabel(cristinAward.distribution());
         var affiliation = extractAffiliation(cristinAward.affiliation());
 
-        return new Award(title, year, type, distribution, affiliation);
+        return new Award(name, year, type, distribution, affiliation);
     }
 
     private static TypedLabel extractTypedLabel(CristinTypedLabel cristinTypedLabel) {

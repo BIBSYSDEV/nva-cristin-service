@@ -35,7 +35,7 @@
   ],
   "awards": [
     {
-      "title": "My first award",
+      "name": "My first award",
       "year": 2019,
       "type": {
         "type": "FORSKARBEID",
