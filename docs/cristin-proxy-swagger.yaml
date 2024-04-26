@@ -3095,9 +3095,9 @@ components:
           items:
             type: object
             properties:
-              title:
+              name:
                 type: string
-                description: Title of the award
+                description: Name of the award
               year:
                 type: integer
                 description: Year of the award
@@ -3377,15 +3377,15 @@ components:
           items:
             type: object
             required:
-              - title
+              - name
               - year
               - type
               - distribution
               - affiliation
             properties:
-              title:
+              name:
                 type: string
-                description: Title of the award
+                description: Name of the award
               year:
                 type: integer
                 description: Year of the award
@@ -4538,7 +4538,7 @@ components:
                   'en': 'United Kingdom'
                   'nb': 'Storbritannia'
             awards:
-              - title: 'My first award'
+              - name: 'My first award'
                 year: '2014'
                 type:
                   type: 'ResearchDissemination'
@@ -4715,7 +4715,7 @@ components:
               'en': 'United Kingdom'
               'nb': 'Storbritannia'
         awards:
-          - title: 'My first award'
+          - name: 'My first award'
             year: '2014'
             type:
               type: 'ResearchDissemination'
@@ -4766,7 +4766,7 @@ components:
           - type: 'CA'
           - type: 'GB'
         awards:
-          - title: 'My first award'
+          - name: 'My first award'
             year: '2014'
             type:
               type: 'ResearchDissemination'
