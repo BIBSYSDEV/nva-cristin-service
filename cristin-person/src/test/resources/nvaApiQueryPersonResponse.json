@@ -120,14 +120,14 @@
           "name": "My first award",
           "year": 2019,
           "type": {
-            "type": "FORSKARBEID",
+            "type": "Research",
             "label": {
               "en": "Research activity",
               "nb": "Forskningsarbeid"
             }
           },
           "distribution": {
-            "type": "INTERNAT",
+            "type": "International",
             "label": {
               "en": "International",
               "nb": "Internasjonal"
@@ -142,14 +142,14 @@
           "name": "My second award",
           "year": 2016,
           "type": {
-            "type": "FORSKARBEID",
+            "type": "Research",
             "label": {
               "en": "Research activity",
               "nb": "Forskningsarbeid"
             }
           },
           "distribution": {
-            "type": "NATIONAL",
+            "type": "National",
             "label": {
               "en": "National",
               "nb": "Nasjonal"
@@ -164,14 +164,14 @@
           "name": "My third award",
           "year": 2014,
           "type": {
-            "type": "FORSKFORMIDL",
+            "type": "ResearchDissemination",
             "label": {
               "en": "Dissemination of research results",
               "nb": "Forskningsformidling"
             }
           },
           "distribution": {
-            "type": "INTERN",
+            "type": "Internal",
             "label": {
               "en": "Own institution",
               "nb": "Egen institusjon"
@@ -296,14 +296,14 @@
           "name": "My first award",
           "year": 2019,
           "type": {
-            "type": "FORSKARBEID",
+            "type": "Research",
             "label": {
               "en": "Research activity",
               "nb": "Forskningsarbeid"
             }
           },
           "distribution": {
-            "type": "INTERNAT",
+            "type": "International",
             "label": {
               "en": "International",
               "nb": "Internasjonal"
@@ -318,14 +318,14 @@
           "name": "My second award",
           "year": 2016,
           "type": {
-            "type": "FORSKARBEID",
+            "type": "Research",
             "label": {
               "en": "Research activity",
               "nb": "Forskningsarbeid"
             }
           },
           "distribution": {
-            "type": "NATIONAL",
+            "type": "National",
             "label": {
               "en": "National",
               "nb": "Nasjonal"
@@ -340,14 +340,14 @@
           "name": "My third award",
           "year": 2014,
           "type": {
-            "type": "FORSKFORMIDL",
+            "type": "ResearchDissemination",
             "label": {
               "en": "Dissemination of research results",
               "nb": "Forskningsformidling"
             }
           },
           "distribution": {
-            "type": "INTERN",
+            "type": "Internal",
             "label": {
               "en": "Own institution",
               "nb": "Egen institusjon"

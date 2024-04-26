@@ -34,18 +34,10 @@
       "title": "My first award",
       "year": 2019,
       "type": {
-        "code": "FORSKARBEID",
-        "name": {
-          "en": "Research activity",
-          "nb": "Forskningsarbeid"
-        }
+        "code": "FORSKARBEID"
       },
       "distribution": {
-        "code": "INTERNAT",
-        "name": {
-          "en": "International",
-          "nb": "Internasjonal"
-        }
+        "code": "INTERNAT"
       },
       "affiliation": {
         "unit": {

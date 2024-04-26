@@ -9,7 +9,6 @@ import no.unit.nva.cristin.person.model.cristin.CristinAward;
 import no.unit.nva.cristin.person.model.nva.Award;
 import no.unit.nva.model.Organization;
 import no.unit.nva.model.TypedLabel;
-import no.unit.nva.model.adapter.CristinTypedLabelToNvaFormat;
 
 public class CristinAwardToNvaFormat implements Function<CristinAward, Award> {
 
@@ -21,16 +20,26 @@ public class CristinAwardToNvaFormat implements Function<CristinAward, Award> {
 
         var name = cristinAward.title();
         var year = cristinAward.year();
-        var type = extractTypedLabel(cristinAward.type());
-        var distribution = extractTypedLabel(cristinAward.distribution());
+        var type = generateAwardTypeWithLabel(cristinAward.type());
+        var distribution = generateAwardDistributionWithLabel(cristinAward.distribution());
         var affiliation = extractAffiliation(cristinAward.affiliation());
 
         return new Award(name, year, type, distribution, affiliation);
     }
 
-    private static TypedLabel extractTypedLabel(CristinTypedLabel cristinTypedLabel) {
-        return Optional.ofNullable(cristinTypedLabel)
-                   .map(new CristinTypedLabelToNvaFormat())
+    private TypedLabel generateAwardTypeWithLabel(CristinTypedLabel cristinAwardType) {
+        return Optional.ofNullable(cristinAwardType)
+                   .map(CristinTypedLabel::getCode)
+                   .flatMap(CristinAwardTypeMapper::getNvaKey)
+                   .map(type -> new TypedLabel(type, cristinAwardType.getName()))
+                   .orElse(null);
+    }
+
+    private TypedLabel generateAwardDistributionWithLabel(CristinTypedLabel cristinAwardDistribution) {
+        return Optional.ofNullable(cristinAwardDistribution)
+                   .map(CristinTypedLabel::getCode)
+                   .flatMap(CristinAwardDistributionMapper::getNvaKey)
+                   .map(type -> new TypedLabel(type, cristinAwardDistribution.getName()))
                    .orElse(null);
     }
 

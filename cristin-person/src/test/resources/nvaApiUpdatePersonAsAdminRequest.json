@@ -58,14 +58,14 @@
       "name": "My first award",
       "year": 2019,
       "type": {
-        "type": "FORSKARBEID",
+        "type": "Research",
         "label": {
           "en": "Research activity",
           "nb": "Forskningsarbeid"
         }
       },
       "distribution": {
-        "type": "INTERNAT",
+        "type": "International",
         "label": {
           "en": "International",
           "nb": "Internasjonal"

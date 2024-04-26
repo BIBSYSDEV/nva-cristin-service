@@ -3106,9 +3106,9 @@ components:
                 properties:
                   type:
                     enum:
-                      - FORSKFORMIDL
-                      - FORSKARBEID
-                    description: The code for this type of activity. Can be FORSKFORMIDL (Dissemination of research results) or FORSKARBEID (Research activity)
+                      - ResearchDissemination
+                      - Research
+                    description: The code for this type of activity. Can be ResearchDissemination (Dissemination of research results) or Research (Research activity)
                   label:
                     $ref: '#/components/schemas/Languages'
               distribution:
@@ -3116,10 +3116,10 @@ components:
                 properties:
                   type:
                     enum:
-                      - INTERNAT
-                      - NATIONAL
-                      - INTERN
-                    description: The code for the scope of award. Can be INTERNAT (International), NATIONAL (National) or INTERN (Own institution)
+                      - International
+                      - National
+                      - Internal
+                    description: The code for the scope of award. Can be International (International), National (National) or Internal (Own institution)
                   label:
                     $ref: '#/components/schemas/Languages'
               affiliation:
@@ -3396,9 +3396,9 @@ components:
                 properties:
                   type:
                     enum:
-                      - FORSKFORMIDL
-                      - FORSKARBEID
-                    description: The code for this type of activity. Can be FORSKFORMIDL (Dissemination of research results) or FORSKARBEID (Research activity)
+                      - ResearchDissemination
+                      - Research
+                    description: The code for this type of activity. Can be ResearchDissemination (Dissemination of research results) or Research (Research activity)
                   label:
                     $ref: '#/components/schemas/Languages'
               distribution:
@@ -3408,10 +3408,10 @@ components:
                 properties:
                   type:
                     enum:
-                      - INTERNAT
-                      - NATIONAL
-                      - INTERN
-                    description: The code for the scope of award. Can be INTERNAT (International), NATIONAL (National) or INTERN (Own institution)
+                      - International
+                      - National
+                      - Internal
+                    description: The code for the scope of award. Can be International (International), National (National) or Internal (Own institution)
                   label:
                     $ref: '#/components/schemas/Languages'
               affiliation:
@@ -4541,12 +4541,12 @@ components:
               - title: 'My first award'
                 year: '2014'
                 type:
-                  type: 'FORSKFORMIDL'
+                  type: 'ResearchDissemination'
                   label:
                     'en': 'Dissemination of research results'
                     'nb': 'Forskningsformidling'
                 distribution:
-                  type: 'NATIONAL'
+                  type: 'National'
                   label:
                     'en': 'National'
                     'nb': 'Nasjonal'
@@ -4718,12 +4718,12 @@ components:
           - title: 'My first award'
             year: '2014'
             type:
-              type: 'FORSKFORMIDL'
+              type: 'ResearchDissemination'
               label:
                 'en': 'Dissemination of research results'
                 'nb': 'Forskningsformidling'
             distribution:
-              type: 'NATIONAL'
+              type: 'National'
               label:
                 'en': 'National'
                 'nb': 'Nasjonal'
@@ -4769,9 +4769,9 @@ components:
           - title: 'My first award'
             year: '2014'
             type:
-              type: 'FORSKFORMIDL'
+              type: 'ResearchDissemination'
             distribution:
-              type: 'NATIONAL'
+              type: 'National'
             affiliation:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
     PersonPostExample:
