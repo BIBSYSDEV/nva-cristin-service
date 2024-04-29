@@ -3,7 +3,7 @@ package no.unit.nva.cristin.projects.create;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.util.Objects.isNull;
-import static no.unit.nva.common.LogMessages.CLIENT_CREATED_RESOURCE_TEMPLATE;
+import static no.unit.nva.common.IdLogger.CLIENT_CREATED_RESOURCE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomApprovals;

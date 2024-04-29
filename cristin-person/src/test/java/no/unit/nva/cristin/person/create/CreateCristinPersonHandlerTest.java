@@ -3,7 +3,7 @@ package no.unit.nva.cristin.person.create;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
-import static no.unit.nva.common.LogMessages.CLIENT_CREATED_RESOURCE_TEMPLATE;
+import static no.unit.nva.common.IdLogger.CLIENT_CREATED_RESOURCE_TEMPLATE;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_BAD_REQUEST_RESPONSE;
 import static no.unit.nva.cristin.common.Utils.COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;

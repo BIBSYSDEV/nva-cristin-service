@@ -1,7 +1,5 @@
 package no.unit.nva.common;
 
-import static no.unit.nva.common.LogMessages.CLIENT_CREATED_RESOURCE_TEMPLATE;
-import static no.unit.nva.common.LogMessages.COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.util.Optional;
@@ -10,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class IdLogger {
+
+    public static final String COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE = "Could not extract identifier of newly created resource";
+    public static final String CLIENT_CREATED_RESOURCE_TEMPLATE = "Client created resource: %s";
 
     private static final Logger logger = LoggerFactory.getLogger(IdLogger.class);
 
