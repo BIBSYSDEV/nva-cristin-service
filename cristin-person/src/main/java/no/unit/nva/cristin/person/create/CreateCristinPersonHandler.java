@@ -2,8 +2,8 @@ package no.unit.nva.cristin.person.create;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
-import java.net.URI;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
+import no.unit.nva.common.IdLogger;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.employment.create.CreatePersonEmploymentValidator;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static no.unit.nva.common.LogMessages.CLIENT_CREATED_RESOURCE_TEMPLATE;
-import static no.unit.nva.common.LogMessages.COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE;
 import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
@@ -114,25 +112,9 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
 
     @Override
     protected Integer getSuccessStatusCode(Person input, Person output) {
-        attempt(() -> logCreatedIdentifier(output)).orElse(fail -> logCreatedError());
+        new IdLogger().logId(output);
 
         return HttpURLConnection.HTTP_CREATED;
-    }
-
-    protected Object logCreatedIdentifier(Person output) {
-        var identifier = extractCreatedIdentifier(output);
-        logger.info(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, identifier));
-
-        return null;
-    }
-
-    private URI extractCreatedIdentifier(Person output) {
-        return Optional.ofNullable(output).map(Person::getId).orElse(null);
-    }
-
-    private Object logCreatedError() {
-        logger.warn(COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE);
-        return null;
     }
 
     private void validateContainsPayload(Person input) throws BadRequestException {

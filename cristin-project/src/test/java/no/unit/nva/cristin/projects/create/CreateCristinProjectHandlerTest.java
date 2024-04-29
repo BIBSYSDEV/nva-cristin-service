@@ -4,7 +4,6 @@ import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.util.Objects.isNull;
 import static no.unit.nva.common.LogMessages.CLIENT_CREATED_RESOURCE_TEMPLATE;
-import static no.unit.nva.common.LogMessages.COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomApprovals;
@@ -29,7 +28,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -45,6 +43,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.List;
+import no.unit.nva.common.IdLogger;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
 import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
 import no.unit.nva.cristin.model.CristinDateInfo;
@@ -582,7 +581,7 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldLogIdentifierOfTheNewlyCreatedResource() throws Exception {
-        final var testAppender = LogUtils.getTestingAppender(CreateCristinProjectHandler.class);
+        final var testAppender = LogUtils.getTestingAppender(IdLogger.class);
 
         var expected = randomMinimalNvaProject();
         expected.setContext(NvaProject.PROJECT_CONTEXT);
@@ -597,27 +596,6 @@ class CreateCristinProjectHandlerTest {
         assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
         assertThat(testAppender.getMessages(),
                    containsString(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, identifier)));
-    }
-
-    @Test
-    void shouldIgnoreExceptionsWhenLoggingIdentifierOfTheNewlyCreatedResource() throws Exception {
-        final var testAppender = LogUtils.getTestingAppender(CreateCristinProjectHandler.class);
-        handler = spy(handler);
-        doThrow(RuntimeException.class).when(handler).logCreatedIdentifier(any());
-
-        var expected = randomMinimalNvaProject();
-        expected.setContext(NvaProject.PROJECT_CONTEXT);
-        var identifier = UriUtils.createNvaProjectId("111222");
-        expected.setId(identifier);
-        mockUpstreamUsingRequest(expected);
-
-        var requestProject = expected.toCristinProject().toNvaProject();
-        requestProject.setId(null);  // Cannot create with Id
-        var response = executeRequest(requestProject);
-
-        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
-        assertThat(testAppender.getMessages(),
-                   containsString(COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE));
     }
 
     private NvaContributor nvaContributorWithRole(String roleCode) {
