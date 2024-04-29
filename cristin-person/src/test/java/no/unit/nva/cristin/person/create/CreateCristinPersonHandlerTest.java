@@ -3,6 +3,8 @@ package no.unit.nva.cristin.person.create;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
+import static no.unit.nva.common.LogMessages.CLIENT_CREATED_RESOURCE_TEMPLATE;
+import static no.unit.nva.common.LogMessages.COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_BAD_REQUEST_RESPONSE;
 import static no.unit.nva.cristin.common.Utils.COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -65,11 +68,11 @@ import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
+import nva.commons.logutils.LogUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -433,6 +436,44 @@ public class CreateCristinPersonHandlerTest {
 
         JSONAssert.assertEquals(expectedCristinRequest, captor.getValue(), JSONCompareMode.LENIENT);
         assertThat(actual.getStatusCode(), equalTo(HTTP_CREATED));
+    }
+
+    @Test
+    void shouldLogIdentifierOfTheNewlyCreatedResource() throws IOException, InterruptedException {
+        final var testAppender = LogUtils.getTestingAppender(CreateCristinPersonHandler.class);
+
+        var responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
+        apiClient = new CreateCristinPersonApiClient(httpClientMock);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+        var gatewayResponse = sendQuery(dummyPerson());
+        var actual = gatewayResponse.getBodyObject(Person.class);
+
+        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
+        assertThat(actual.getNames().containsAll(dummyPerson().getNames()), equalTo(true));
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_CREATED));
+        assertThat(testAppender.getMessages(),
+                   containsString(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, actual.getId().toString())));
+    }
+
+    @Test
+    void shouldIgnoreExceptionsWhenLoggingIdentifierOfTheNewlyCreatedResource()
+        throws IOException, InterruptedException {
+
+        final var testAppender = LogUtils.getTestingAppender(CreateCristinPersonHandler.class);
+
+        var responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
+        apiClient = new CreateCristinPersonApiClient(httpClientMock);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+        handler = spy(handler);
+        doThrow(RuntimeException.class).when(handler).logCreatedIdentifier(any());
+        var gatewayResponse = sendQuery(dummyPerson());
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_CREATED));
+        assertThat(testAppender.getMessages(),
+                   containsString(COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE));
     }
 
     private static String readFile(String file) {
