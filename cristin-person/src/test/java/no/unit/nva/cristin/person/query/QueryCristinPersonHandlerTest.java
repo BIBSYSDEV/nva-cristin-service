@@ -2,7 +2,6 @@ package no.unit.nva.cristin.person.query;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.net.HttpHeaders;
 import java.net.URI;
 import java.util.ArrayList;
@@ -43,6 +42,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import static com.google.common.net.HttpHeaders.ACCEPT;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
@@ -129,20 +130,12 @@ public class QueryCristinPersonHandlerTest {
         handler = new QueryCristinPersonHandler(clientProvider, environment);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    void shouldReturnResponseWhenCallingEndpointWithNameParameter() throws IOException {
-        var actual = sendDefaultQuery().getBodyObject(SearchResponse.class);
-        var expectedString = IoUtils.stringFromResources(Path.of(NVA_API_QUERY_PERSON_JSON));
-        var expected = OBJECT_MAPPER.readValue(expectedString, SearchResponse.class);
+    void shouldReturnResponseWhenCallingEndpointWithNameParameter() throws Exception {
+        var actual = sendDefaultQuery().getBody();
+        var expected = IoUtils.stringFromResources(Path.of(NVA_API_QUERY_PERSON_JSON));
 
-        // Type casting problems when using generic types. Needed to convert. Was somehow converting to LinkedHashMap
-        List<Person> expectedPersons = OBJECT_MAPPER.convertValue(expected.getHits(), new TypeReference<>() {});
-        List<Person> actualPersons = OBJECT_MAPPER.convertValue(actual.getHits(), new TypeReference<>() {});
-        expected.setHits(expectedPersons);
-        actual.setHits(actualPersons);
-
-        assertEquals(expected, actual);
+        JSONAssert.assertEquals(expected, actual, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
@@ -420,7 +413,7 @@ public class QueryCristinPersonHandlerTest {
 
     @Test
     void shouldReturnAllResultsWhenCallingEndpointWithNoParameters() throws IOException {
-        var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+        var input = new HandlerRequestBuilder<>(OBJECT_MAPPER)
                         .withBody(null)
                         .build();
         handler.handleRequest(input, output, context);

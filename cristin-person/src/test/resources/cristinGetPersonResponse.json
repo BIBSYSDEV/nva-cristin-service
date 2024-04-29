@@ -87,5 +87,91 @@
         "nb": "Storbritannia"
       }
     }
+  ],
+  "awards": [
+    {
+      "title": "My first award",
+      "year": 2019,
+      "type": {
+        "code": "FORSKARBEID",
+        "name": {
+          "en": "Research activity",
+          "nb": "Forskningsarbeid"
+        }
+      },
+      "distribution": {
+        "code": "INTERNAT",
+        "name": {
+          "en": "International",
+          "nb": "Internasjonal"
+        }
+      },
+      "affiliation": {
+        "institution": {
+          "cristin_institution_id": "185",
+          "url": "https://api.cristin-test.uio.no/v2/institutions/185"
+        },
+        "unit": {
+          "cristin_unit_id": "185.52.10.0",
+          "url": "https://api.cristin-test.uio.no/v2/units/185.52.10.0"
+        }
+      }
+    },
+    {
+      "title": "My second award",
+      "year": 2016,
+      "type": {
+        "code": "FORSKARBEID",
+        "name": {
+          "en": "Research activity",
+          "nb": "Forskningsarbeid"
+        }
+      },
+      "distribution": {
+        "code": "NATIONAL",
+        "name": {
+          "en": "National",
+          "nb": "Nasjonal"
+        }
+      },
+      "affiliation": {
+        "institution": {
+          "cristin_institution_id": "185",
+          "url": "https://api.cristin-test.uio.no/v2/institutions/185"
+        },
+        "unit": {
+          "cristin_unit_id": "185.52.0.0",
+          "url": "https://api.cristin-test.uio.no/v2/units/185.52.0.0"
+        }
+      }
+    },
+    {
+      "title": "My third award",
+      "year": 2014,
+      "type": {
+        "code": "FORSKFORMIDL",
+        "name": {
+          "en": "Dissemination of research results",
+          "nb": "Forskningsformidling"
+        }
+      },
+      "distribution": {
+        "code": "INTERN",
+        "name": {
+          "en": "Own institution",
+          "nb": "Egen institusjon"
+        }
+      },
+      "affiliation": {
+        "institution": {
+          "cristin_institution_id": "185",
+          "url": "https://api.cristin-test.uio.no/v2/institutions/185"
+        },
+        "unit": {
+          "cristin_unit_id": "185.90.0.0",
+          "url": "https://api.cristin-test.uio.no/v2/units/185.90.0.0"
+        }
+      }
+    }
   ]
 }

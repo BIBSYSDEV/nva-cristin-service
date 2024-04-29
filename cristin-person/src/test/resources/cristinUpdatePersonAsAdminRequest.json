@@ -57,5 +57,22 @@
         "cristin_unit_id": "20754.0.0.0"
       }
     }
-  }
+  },
+  "awards": [
+    {
+      "title": "My first award",
+      "year": 2019,
+      "type": {
+        "code": "FORSKARBEID"
+      },
+      "distribution": {
+        "code": "INTERNAT"
+      },
+      "affiliation": {
+        "unit": {
+          "cristin_unit_id": "185.52.10.0"
+        }
+      }
+    }
+  ]
 }
