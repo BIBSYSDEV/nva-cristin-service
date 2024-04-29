@@ -2,6 +2,8 @@ package no.unit.nva.cristin.projects.create;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
+import java.net.URI;
+import java.util.Optional;
 import no.unit.nva.validation.Validator;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -22,6 +24,7 @@ import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, NvaProject> {
 
@@ -92,7 +95,25 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
      */
     @Override
     protected Integer getSuccessStatusCode(NvaProject input, NvaProject output) {
+        attempt(() -> logCreated(output)).orElse(fail -> logCreatedError());
+
         return HttpURLConnection.HTTP_CREATED;
+    }
+
+    protected Object logCreated(NvaProject output) {
+        var identifier = extractCreatedIdentifier(output);
+        logger.info("Client created resource: " + identifier);
+
+        return null;
+    }
+
+    private URI extractCreatedIdentifier(NvaProject output) {
+        return Optional.ofNullable(output).map(NvaProject::getId).orElse(null);
+    }
+
+    private static Object logCreatedError() {
+        logger.warn("Could not extract identifier of newly created resource");
+        return null;
     }
 
     @Override
