@@ -20,6 +20,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static no.unit.nva.common.LogMessages.CLIENT_CREATED_RESOURCE_TEMPLATE;
+import static no.unit.nva.common.LogMessages.COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
@@ -95,14 +97,14 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
      */
     @Override
     protected Integer getSuccessStatusCode(NvaProject input, NvaProject output) {
-        attempt(() -> logCreated(output)).orElse(fail -> logCreatedError());
+        attempt(() -> logCreatedIdentifier(output)).orElse(fail -> logCreatedError());
 
         return HttpURLConnection.HTTP_CREATED;
     }
 
-    protected Object logCreated(NvaProject output) {
+    protected Object logCreatedIdentifier(NvaProject output) {
         var identifier = extractCreatedIdentifier(output);
-        logger.info("Client created resource: " + identifier);
+        logger.info(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, identifier));
 
         return null;
     }
@@ -111,8 +113,8 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
         return Optional.ofNullable(output).map(NvaProject::getId).orElse(null);
     }
 
-    private static Object logCreatedError() {
-        logger.warn("Could not extract identifier of newly created resource");
+    private Object logCreatedError() {
+        logger.warn(COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE);
         return null;
     }
 

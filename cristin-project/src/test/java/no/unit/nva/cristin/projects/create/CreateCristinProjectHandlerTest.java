@@ -3,6 +3,8 @@ package no.unit.nva.cristin.projects.create;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.util.Objects.isNull;
+import static no.unit.nva.common.LogMessages.CLIENT_CREATED_RESOURCE_TEMPLATE;
+import static no.unit.nva.common.LogMessages.COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomApprovals;
@@ -84,8 +86,6 @@ class CreateCristinProjectHandlerTest {
     public static final URI CRISTIN_PERSON_ID = URI.create("https://api.dev.nva.aws.unit.no/cristin/person/12345");
     public static final URI CRISTIN_ORG_ID =
         URI.create("https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0");
-    public static final String CREATED_RESOURCE = "Client created resource: %s";
-    public static final String COULD_NOT_EXTRACT_IDENTIFIER = "Could not extract identifier of newly created resource";
 
     private final Environment environment = new Environment();
     private Context context;
@@ -595,14 +595,15 @@ class CreateCristinProjectHandlerTest {
         var response = executeRequest(requestProject);
 
         assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
-        assertThat(testAppender.getMessages(), containsString(String.format(CREATED_RESOURCE, identifier)));
+        assertThat(testAppender.getMessages(),
+                   containsString(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, identifier)));
     }
 
     @Test
     void shouldIgnoreExceptionsWhenLoggingIdentifierOfTheNewlyCreatedResource() throws Exception {
         final var testAppender = LogUtils.getTestingAppender(CreateCristinProjectHandler.class);
         handler = spy(handler);
-        doThrow(RuntimeException.class).when(handler).logCreated(any());
+        doThrow(RuntimeException.class).when(handler).logCreatedIdentifier(any());
 
         var expected = randomMinimalNvaProject();
         expected.setContext(NvaProject.PROJECT_CONTEXT);
@@ -615,7 +616,8 @@ class CreateCristinProjectHandlerTest {
         var response = executeRequest(requestProject);
 
         assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
-        assertThat(testAppender.getMessages(), containsString(COULD_NOT_EXTRACT_IDENTIFIER));
+        assertThat(testAppender.getMessages(),
+                   containsString(COULD_NOT_EXTRACT_IDENTIFIER_OF_NEWLY_CREATED_RESOURCE));
     }
 
     private NvaContributor nvaContributorWithRole(String roleCode) {
