@@ -82,7 +82,7 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
 
     private static String getPotentialPersonId(Person output) {
         return Optional.ofNullable(output)
-                   .map(Person::getId)
+                   .map(Person::id)
                    .map(URI::toString)
                    .orElse(null);
     }

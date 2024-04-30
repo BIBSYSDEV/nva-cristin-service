@@ -256,9 +256,10 @@ public class CristinPersonApiClient extends ApiClient
      * @return Person object with person data from upstream
      */
     public Person generateGetResponse(String identifier) throws ApiGatewayException {
-        var person = getCristinPerson(identifier).toPerson();
-        person.setContext(PERSON_CONTEXT);
-        return person;
+        return getCristinPerson(identifier)
+                         .toPersonBuilder()
+                         .withContext(PERSON_CONTEXT)
+                         .build();
     }
 
     /**
@@ -268,9 +269,10 @@ public class CristinPersonApiClient extends ApiClient
      * @return Person object with person data from upstream
      */
     public Person authorizedGenerateGetResponse(String identifier) throws ApiGatewayException {
-        var person = getCristinPersonWithAuthentication(identifier).toPersonWithAuthorizedFields();
-        person.setContext(PERSON_CONTEXT);
-        return person;
+        return getCristinPersonWithAuthentication(identifier)
+                         .toPersonBuilderWithAuthorizedFields()
+                         .withContext(PERSON_CONTEXT)
+                         .build();
     }
 
     protected CristinPerson getCristinPersonWithAuthentication(String identifier) throws ApiGatewayException {
@@ -302,9 +304,11 @@ public class CristinPersonApiClient extends ApiClient
         // Upstream uses a query for national id even though it only returns 1 hit
         var cristinPersons = queryUpstreamUsingIdentityNumber(nationalIdentificationNumber);
         throwNotFoundIfNoMatches(cristinPersons);
-        var person = enrichFirstMatchFromQueryResponse(cristinPersons).toPersonWithAuthorizedFields();
-        person.setContext(PERSON_CONTEXT);
-        return person;
+
+        return enrichFirstMatchFromQueryResponse(cristinPersons)
+                         .toPersonBuilderWithAuthorizedFields()
+                         .withContext(PERSON_CONTEXT)
+                         .build();
     }
 
     private List<CristinPerson> queryUpstreamUsingIdentityNumber(String identifier) throws ApiGatewayException {

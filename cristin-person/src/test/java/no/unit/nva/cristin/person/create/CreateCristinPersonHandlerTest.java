@@ -19,7 +19,6 @@ import static no.unit.nva.cristin.person.model.cristin.CristinPerson.LAST_NAME;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PREFERRED_FIRST_NAME;
 import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PREFERRED_LAST_NAME;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
-import static no.unit.nva.cristin.person.model.nva.Person.mapEmploymentsToCristinEmployments;
 import static no.unit.nva.testutils.RandomDataGenerator.randomBoolean;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
@@ -65,7 +64,6 @@ import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.exception.GatewayTimeoutException;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
@@ -127,7 +125,7 @@ public class CreateCristinPersonHandlerTest {
         var actual = gatewayResponse.getBodyObject(Person.class);
 
         assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
-        assertThat(actual.getNames().containsAll(dummyPerson().getNames()), equalTo(true));
+        assertThat(actual.names().containsAll(dummyPerson().names()), equalTo(true));
     }
 
     @Test
@@ -239,14 +237,13 @@ public class CreateCristinPersonHandlerTest {
         handler = new CreateCristinPersonHandler(apiClient, environment);
         var dummyPerson = dummyPerson();
         var dummyEmployments = randomEmployments();
-        dummyPerson.setEmployments(dummyEmployments);
+        dummyPerson = dummyPerson.copy().withEmployments(dummyEmployments).build();
         final var gatewayResponse =
             sendQueryWhileMockingCristinOrgIdOfClient(dummyPerson, URI.create(ONE_ORGANIZATION));
         var captor = ArgumentCaptor.forClass(String.class);
         verify(apiClient).post(any(), captor.capture(), any());
         var capturedCristinPerson = OBJECT_MAPPER.readValue(captor.getValue(), CristinPerson.class);
-        var expectedCristinEmployments =
-            mapEmploymentsToCristinEmployments(dummyEmployments);
+        var expectedCristinEmployments = dummyPerson.toCristinPerson().getDetailedAffiliations();
         Objects.requireNonNull(expectedCristinEmployments);
 
         assertNotNull(capturedCristinPerson.getDetailedAffiliations());
@@ -269,7 +266,7 @@ public class CreateCristinPersonHandlerTest {
         var actual = gatewayResponse.getBodyObject(Person.class);
 
         assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
-        assertThat(actual.getAffiliations().contains(dummyCristinPersonAffiliation.toAffiliation()),
+        assertThat(actual.affiliations().contains(dummyCristinPersonAffiliation.toAffiliation()),
                    equalTo(true));
     }
 
@@ -278,7 +275,9 @@ public class CreateCristinPersonHandlerTest {
         var dummyPerson = dummyPerson();
         var dummyEmployment = randomEmployment();
         dummyEmployment.setType(null);
-        dummyPerson.setEmployments(Set.of(dummyEmployment));
+        dummyPerson = dummyPerson.copy()
+                          .withEmployments(Set.of(dummyEmployment))
+                          .build();
         final var gatewayResponse = sendQuery(dummyPerson);
 
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
@@ -296,7 +295,7 @@ public class CreateCristinPersonHandlerTest {
         var actual = gatewayResponse.getBodyObject(Person.class);
 
         assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
-        assertThat(actual.getEmployments(), equalTo(Collections.emptySet()));
+        assertThat(actual.employments(), equalTo(Collections.emptySet()));
     }
 
     @Test
@@ -304,7 +303,7 @@ public class CreateCristinPersonHandlerTest {
         var dummyEmployments = randomEmployments();
         var personsOwnNin = ANOTHER_IDENTITY_NUMBER;
         var input = injectPersonNinIntoInput(personsOwnNin);
-        input.setEmployments(dummyEmployments);
+        input = input.copy().withEmployments(dummyEmployments).build();
         var gatewayResponse = sendQueryWithoutAccessRightsButWithPersonNin(input, personsOwnNin);
 
         assertEquals(HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
@@ -315,7 +314,7 @@ public class CreateCristinPersonHandlerTest {
         var dummyPerson = dummyPerson();
         var dummyEmployment = randomEmployment();
         dummyEmployment.setOrganization(URI.create(ANOTHER_ORGANIZATION));
-        dummyPerson.setEmployments(Set.of(dummyEmployment));
+        dummyPerson = dummyPerson.copy().withEmployments(Set.of(dummyEmployment)).build();
         final var gatewayResponse =
             sendQueryWhileMockingCristinOrgIdOfClient(dummyPerson, URI.create(EMPTY_STRING));
 
@@ -329,7 +328,7 @@ public class CreateCristinPersonHandlerTest {
         var dummyPerson = dummyPerson();
         var dummyEmployment = randomEmployment();
         dummyEmployment.setOrganization(URI.create(ANOTHER_ORGANIZATION));
-        dummyPerson.setEmployments(Set.of(dummyEmployment));
+        dummyPerson = dummyPerson.copy().withEmployments(Set.of(dummyEmployment)).build();
         final var gatewayResponse = sendQueryWhileActingAsInternalBackend(dummyPerson);
 
         assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
@@ -339,11 +338,13 @@ public class CreateCristinPersonHandlerTest {
     void shouldAllowEmptyListOfEmploymentsWhenUserActingAsThemselvesTryToCreateTheirOwnUser() throws IOException {
         var personsOwnNin = ANOTHER_IDENTITY_NUMBER;
         var input = injectPersonNinIntoInput(personsOwnNin);
-        input.setEmployments(Collections.emptySet());
+        input = input.copy()
+                    .withEmployments(Collections.emptySet())
+                    .build();
         var gatewayResponse = sendQueryWithoutAccessRightsButWithPersonNin(input, personsOwnNin);
 
-        assertThat(input.getEmployments(), equalTo(Collections.emptySet()));
-        assertThat(input.getEmployments().size(), equalTo(0));
+        assertThat(input.employments(), equalTo(Collections.emptySet()));
+        assertThat(input.employments().size(), equalTo(0));
         assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
     }
 
@@ -449,7 +450,9 @@ public class CreateCristinPersonHandlerTest {
 
     private Person injectPersonNinIntoInput(String personNin) {
         var input = dummyPerson();
-        input.setIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, personNin)));
+        input = dummyPerson().copy()
+                    .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, personNin)))
+                    .build();
         return input;
     }
 

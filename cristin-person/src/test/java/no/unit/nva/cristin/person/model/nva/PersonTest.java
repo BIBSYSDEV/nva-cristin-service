@@ -18,7 +18,6 @@ import java.util.Set;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
-import static no.unit.nva.cristin.person.model.nva.Person.mapEmploymentsToCristinEmployments;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,8 +59,7 @@ public class PersonTest {
     void shouldDeserializePersonWithEmploymentsCorrectly() throws IOException {
         var payload = IoUtils.stringFromResources(Path.of(NVA_API_CREATE_PERSON_REQUEST_JSON_FILE));
         var person = OBJECT_MAPPER.readValue(payload, Person.class);
-        var actualEmployments =
-            mapEmploymentsToCristinEmployments(person.getEmployments());
+        var actualEmployments = person.toCristinPerson().getDetailedAffiliations();
         var expectedEmployments = generateExpectedEmploymentsMatchingJson();
 
         assertThat(actualEmployments, equalTo(expectedEmployments));

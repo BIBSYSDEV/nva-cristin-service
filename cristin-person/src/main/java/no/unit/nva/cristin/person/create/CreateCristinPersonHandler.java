@@ -70,14 +70,14 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     @Override
     protected Person processInput(Person input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         validateContainsPayload(input);
-        validateContainsRequiredNames(extractIdentifiers(input.getNames()));
-        validateNoDuplicateNationalIdentifiers(input.getIdentifiers());
+        validateContainsRequiredNames(extractIdentifiers(input.names()));
+        validateNoDuplicateNationalIdentifiers(input.identifiers());
 
         if (suppliedInputPersonNinDoesNotMatchClientOwn(input, requestInfo)) {
             AccessUtils.validateIdentificationNumberAccess(requestInfo);
         }
 
-        var identificationNumber = extractIdentificationNumber(input.getIdentifiers()).orElse(null);
+        var identificationNumber = extractIdentificationNumber(input.identifiers()).orElse(null);
         if (nonNull(identificationNumber) && !identificationNumberIsValid(identificationNumber)) {
             throw new BadRequestException(ERROR_MESSAGE_IDENTIFIER_NOT_VALID);
         }
@@ -86,7 +86,7 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
 
         if (employmentsHasContent(input)) {
             AccessUtils.validateIdentificationNumberAccess(requestInfo);
-            for (Employment employment : input.getEmployments()) {
+            for (Employment employment : input.employments()) {
                 CreatePersonEmploymentValidator.validate(employment);
             }
         }
@@ -94,7 +94,7 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
         if (personNviDataHasContent(input)) {
             AccessUtils.validateIdentificationNumberAccess(requestInfo);
             Validator<PersonNvi> personNviValidator = new PersonNviValidator();
-            personNviValidator.validate(input.getNvi());
+            personNviValidator.validate(input.nvi());
         }
 
         if (employmentsHasContent(input) || personNviDataHasContent(input)) {
@@ -154,19 +154,19 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     private boolean suppliedInputPersonNinDoesNotMatchClientOwn(Person input, RequestInfo requestInfo) {
         var clientOwnPersonNin = attempt(requestInfo::getPersonNin).toOptional();
         if (clientOwnPersonNin.isPresent()) {
-            var ninFromPayload = extractIdentificationNumber(input.getIdentifiers()).orElse(null);
+            var ninFromPayload = extractIdentificationNumber(input.identifiers()).orElse(null);
             return isNull(ninFromPayload) || !Objects.equals(ninFromPayload, clientOwnPersonNin.get());
         }
         return true;
     }
 
     private boolean employmentsHasContent(Person input) {
-        var employments = input.getEmployments();
+        var employments = input.employments();
         return nonNull(employments) && !employments.isEmpty();
     }
 
     private boolean personNviDataHasContent(Person input) {
-        var personNvi = input.getNvi();
+        var personNvi = input.nvi();
         return nonNull(personNvi);
     }
 }

@@ -49,9 +49,11 @@ public class CreateCristinPersonApiClient extends PostApiClient {
 
     private Person createPersonFromResponse(HttpResponse<String> response) throws BadGatewayException {
         CristinPerson responseCristinPerson = getDeserializedResponse(response, CristinPerson.class);
-        Person createdPerson = responseCristinPerson.toPersonWithAuthorizedFields();
-        createdPerson.setContext(PERSON_CONTEXT);
-        return createdPerson;
+
+        return responseCristinPerson
+                   .toPersonBuilderWithAuthorizedFields()
+                   .withContext(PERSON_CONTEXT)
+                   .build();
     }
 
     private String generatePayloadFromRequest(Person person) {
