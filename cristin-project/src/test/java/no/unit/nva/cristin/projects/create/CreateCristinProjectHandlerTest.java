@@ -3,7 +3,7 @@ package no.unit.nva.cristin.projects.create;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.util.Objects.isNull;
-import static no.unit.nva.common.IdLogger.CLIENT_CREATED_RESOURCE_TEMPLATE;
+import static no.unit.nva.common.IdCreatedLogger.CLIENT_CREATED_RESOURCE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomApprovals;
@@ -43,7 +43,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.List;
-import no.unit.nva.common.IdLogger;
+import no.unit.nva.common.IdCreatedLogger;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
 import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
 import no.unit.nva.cristin.model.CristinDateInfo;
@@ -581,7 +581,7 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldLogIdentifierOfTheNewlyCreatedResource() throws Exception {
-        final var testAppender = LogUtils.getTestingAppender(IdLogger.class);
+        final var testAppender = LogUtils.getTestingAppender(IdCreatedLogger.class);
 
         var expected = randomMinimalNvaProject();
         expected.setContext(NvaProject.PROJECT_CONTEXT);

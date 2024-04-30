@@ -28,6 +28,7 @@ import static no.unit.nva.utils.AccessUtils.requesterIsUserAdministrator;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
+import static nva.commons.core.attempt.Try.attempt;
 
 @JacocoGenerated
 public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
@@ -75,8 +76,9 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
 
     @Override
     protected Integer getSuccessStatusCode(TypedValue input, Person output) {
-        var personCristinId = getPotentialPersonId(output);
+        var personCristinId = attempt(() -> getPotentialPersonId(output)).orElse(fail -> null);
         logger.info(FOUND_THE_FOLLOWING_RESOURCE, personCristinId);
+
         return HttpURLConnection.HTTP_OK;
     }
 
