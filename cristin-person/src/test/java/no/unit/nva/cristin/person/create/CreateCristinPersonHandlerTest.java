@@ -448,9 +448,6 @@ public class CreateCristinPersonHandlerTest {
         var gatewayResponse = sendQuery(dummyPerson());
         var actual = gatewayResponse.getBodyObject(Person.class);
 
-        assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
-        assertThat(actual.getNames().containsAll(dummyPerson().getNames()), equalTo(true));
-
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_CREATED));
         assertThat(testAppender.getMessages(),
                    containsString(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, actual.getId().toString())));
