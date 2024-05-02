@@ -15,6 +15,7 @@ import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonNvi;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonSummary;
 import no.unit.nva.model.TypedLabel;
+import no.unit.nva.model.UriId;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.core.JacocoGenerated;
 
@@ -54,7 +55,7 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 @SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyFields", "PMD.GodClass"})
 @JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS, RESERVED, EMPLOYMENTS,
     VERIFIED, KEYWORDS, BACKGROUND, NVI, PLACE, COLLABORATION, COUNTRIES, AWARDS})
-public class Person implements JsonSerializable {
+public class Person implements JsonSerializable, UriId {
 
     @JsonProperty(TYPE)
     private static final String type = "Person";
@@ -166,6 +167,7 @@ public class Person implements JsonSerializable {
         return nonNull(identifiers) ? identifiers : Collections.emptySet();
     }
 
+    @Override
     public URI getId() {
         return id;
     }
