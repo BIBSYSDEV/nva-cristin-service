@@ -20,11 +20,12 @@ import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.Organization;
 import no.unit.nva.model.DateInfo;
 import no.unit.nva.model.TypedLabel;
+import no.unit.nva.model.UriId;
 
 @SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyFields", "PMD.GodClass", "PMD"
         + ".ClassWithOnlyPrivateConstructorsShouldBeFinal"})
 @JsonInclude(ALWAYS)
-public class NvaProject implements JsonSerializable {
+public class NvaProject implements JsonSerializable, UriId {
 
     public static final String PROJECT_CONTEXT = PROJECT_LOOKUP_CONTEXT_URL;
 
@@ -119,6 +120,7 @@ public class NvaProject implements JsonSerializable {
         this.context = context;
     }
 
+    @Override
     public URI getId() {
         return id;
     }

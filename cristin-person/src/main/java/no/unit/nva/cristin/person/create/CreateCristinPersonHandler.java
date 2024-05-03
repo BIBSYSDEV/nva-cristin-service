@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person.create;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
+import no.unit.nva.common.IdCreatedLogger;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.employment.create.CreatePersonEmploymentValidator;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -111,6 +112,8 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
 
     @Override
     protected Integer getSuccessStatusCode(Person input, Person output) {
+        new IdCreatedLogger().logId(output);
+
         return HttpURLConnection.HTTP_CREATED;
     }
 

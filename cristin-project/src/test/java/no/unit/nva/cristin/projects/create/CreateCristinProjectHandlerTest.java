@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.create;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.util.Objects.isNull;
+import static no.unit.nva.common.IdCreatedLogger.CLIENT_CREATED_RESOURCE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomApprovals;
@@ -42,6 +43,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.List;
+import no.unit.nva.common.IdCreatedLogger;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
 import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
 import no.unit.nva.cristin.model.CristinDateInfo;
@@ -57,10 +59,11 @@ import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.DateInfo;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import nva.commons.apigateway.AccessRight;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
+import nva.commons.logutils.LogUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -574,6 +577,25 @@ class CreateCristinProjectHandlerTest {
         var response = GatewayResponse.fromOutputStream(output, Object.class);
 
         assertThat(response.getStatusCode(), equalTo(HTTP_FORBIDDEN));
+    }
+
+    @Test
+    void shouldLogIdentifierOfTheNewlyCreatedResource() throws Exception {
+        final var testAppender = LogUtils.getTestingAppender(IdCreatedLogger.class);
+
+        var expected = randomMinimalNvaProject();
+        expected.setContext(NvaProject.PROJECT_CONTEXT);
+        var identifier = UriUtils.createNvaProjectId("111222");
+        expected.setId(identifier);
+        mockUpstreamUsingRequest(expected);
+
+        var requestProject = expected.toCristinProject().toNvaProject();
+        requestProject.setId(null);  // Cannot create with Id
+        var response = executeRequest(requestProject);
+
+        assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
+        assertThat(testAppender.getMessages(),
+                   containsString(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, identifier)));
     }
 
     private NvaContributor nvaContributorWithRole(String roleCode) {

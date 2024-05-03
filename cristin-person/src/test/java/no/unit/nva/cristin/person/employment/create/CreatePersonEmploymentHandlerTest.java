@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.employment.create;
 
 import static java.net.HttpURLConnection.HTTP_CREATED;
+import static no.unit.nva.common.IdCreatedLogger.CLIENT_CREATED_RESOURCE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
@@ -13,6 +14,7 @@ import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -29,6 +31,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.Map;
+import no.unit.nva.common.IdCreatedLogger;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
@@ -38,12 +41,14 @@ import nva.commons.apigateway.RequestInfoConstants;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
+import nva.commons.logutils.LogUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class CreatePersonEmploymentHandlerTest {
 
-    private static final Map<String, String> validPath = Map.of(PERSON_ID, randomIntegerAsString());
+    private static final String SOME_PERSON_ID = "112233";
+    private static final Map<String, String> validPath = Map.of(PERSON_ID, SOME_PERSON_ID);
     private static final String EMPTY_JSON = "{}";
     private static final String validJson =
         IoUtils.stringFromResources(Path.of("nvaApiCreateEmploymentRequest.json"));
@@ -131,6 +136,27 @@ public class CreatePersonEmploymentHandlerTest {
         var gatewayResponse = queryAsAppAdmin(dummyEmployment);
 
         assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
+    }
+
+    @Test
+    void shouldLogIdentifierOfTheNewlyCreatedResource() throws Exception {
+        final var testAppender = LogUtils.getTestingAppender(IdCreatedLogger.class);
+
+        var employment = sampleEmployment();
+        var employmentId = "1234";
+        var fakeResponse = employment.toCristinEmployment();
+        fakeResponse.setId(employmentId);
+
+        when(httpClientMock.<String>send(any(), any()))
+            .thenReturn(new HttpResponseFaker(fakeResponse.toString(), 201));
+        var apiClient = new CreatePersonEmploymentClient(httpClientMock);
+        handler = new CreatePersonEmploymentHandler(apiClient, environment);
+
+        var gatewayResponse = sendQueryWithCristinOrgId(employment);
+        var idUri = "https://api.dev.nva.aws.unit.no/cristin/person/112233/employment/1234";
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_CREATED));
+        assertThat(testAppender.getMessages(), containsString(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, idUri)));
     }
 
     private static String randomIntegerAsString() {

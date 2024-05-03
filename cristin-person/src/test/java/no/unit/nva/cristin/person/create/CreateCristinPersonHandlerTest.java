@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person.create;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
+import static no.unit.nva.common.IdCreatedLogger.CLIENT_CREATED_RESOURCE_TEMPLATE;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_BAD_REQUEST_RESPONSE;
 import static no.unit.nva.cristin.common.Utils.COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -52,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import no.unit.nva.common.IdCreatedLogger;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.person.model.cristin.CristinAffiliation;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
@@ -68,6 +70,7 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
+import nva.commons.logutils.LogUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -434,6 +437,22 @@ public class CreateCristinPersonHandlerTest {
 
         JSONAssert.assertEquals(expectedCristinRequest, captor.getValue(), JSONCompareMode.LENIENT);
         assertThat(actual.getStatusCode(), equalTo(HTTP_CREATED));
+    }
+
+    @Test
+    void shouldLogIdentifierOfTheNewlyCreatedResource() throws IOException, InterruptedException {
+        final var testAppender = LogUtils.getTestingAppender(IdCreatedLogger.class);
+
+        var responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
+        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
+        apiClient = new CreateCristinPersonApiClient(httpClientMock);
+        handler = new CreateCristinPersonHandler(apiClient, environment);
+        var gatewayResponse = sendQuery(dummyPerson());
+        var actual = gatewayResponse.getBodyObject(Person.class);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_CREATED));
+        assertThat(testAppender.getMessages(),
+                   containsString(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, actual.getId().toString())));
     }
 
     private static String readFile(String file) {
