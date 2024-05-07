@@ -93,14 +93,14 @@
       "title": "My first award",
       "year": 2019,
       "type": {
-        "code": "FORSKARBEID",
+        "code": "RESEARCH",
         "name": {
           "en": "Research activity",
           "nb": "Forskningsarbeid"
         }
       },
       "distribution": {
-        "code": "INTERNAT",
+        "code": "INTERNATIONAL",
         "name": {
           "en": "International",
           "nb": "Internasjonal"
@@ -121,7 +121,7 @@
       "title": "My second award",
       "year": 2016,
       "type": {
-        "code": "FORSKARBEID",
+        "code": "RESEARCH",
         "name": {
           "en": "Research activity",
           "nb": "Forskningsarbeid"
@@ -149,14 +149,14 @@
       "title": "My third award",
       "year": 2014,
       "type": {
-        "code": "FORSKFORMIDL",
+        "code": "DISSEMINATION",
         "name": {
           "en": "Dissemination of research results",
           "nb": "Forskningsformidling"
         }
       },
       "distribution": {
-        "code": "INTERN",
+        "code": "INTERNAL",
         "name": {
           "en": "Own institution",
           "nb": "Egen institusjon"

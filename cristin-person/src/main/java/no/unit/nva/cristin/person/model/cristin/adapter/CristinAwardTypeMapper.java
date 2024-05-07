@@ -6,8 +6,8 @@ import nva.commons.core.SingletonCollector;
 
 public enum CristinAwardTypeMapper {
 
-    RESEARCH("FORSKARBEID", "Research"),
-    RESEARCH_DISSEMINATION("FORSKFORMIDL", "ResearchDissemination");
+    RESEARCH("RESEARCH", "Research"),
+    RESEARCH_DISSEMINATION("DISSEMINATION", "ResearchDissemination");
 
     private final String cristinKey;
     private final String nvaKey;
