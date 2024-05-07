@@ -6,9 +6,9 @@ import nva.commons.core.SingletonCollector;
 
 public enum CristinAwardDistributionMapper {
 
-    INTERNATIONAL("INTERNAT", "International"),
+    INTERNATIONAL("INTERNATIONAL", "International"),
     NATIONAL("NATIONAL", "National"),
-    INTERNAL("INTERN", "Internal");
+    INTERNAL("INTERNAL", "Internal");
 
     private final String cristinKey;
     private final String nvaKey;

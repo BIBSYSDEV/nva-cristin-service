@@ -180,12 +180,11 @@ public class FetchCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseWhenCallingEndpointWithValidOrcidIdentifier() throws IOException {
-        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_ORCID_PATH_PARAM).getBodyObject(Person.class);
-        var expectedString = stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
-        var expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
+    void shouldReturnResponseWhenCallingEndpointWithValidOrcidIdentifier() throws Exception {
+        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_ORCID_PATH_PARAM).getBody();
+        var expected = stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
 
-        assertThat(actual, equalTo(expected));
+        JSONAssert.assertEquals(expected, actual, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
