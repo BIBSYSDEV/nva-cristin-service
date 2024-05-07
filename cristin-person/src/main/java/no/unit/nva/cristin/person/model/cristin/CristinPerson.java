@@ -263,9 +263,13 @@ public class CristinPerson implements JsonSerializable {
      * @return Nva person model.
      */
     public Person toPerson() {
+        return toPersonBuilder().build();
+    }
+
+    public Person.Builder toPersonBuilder() {
         if (Boolean.TRUE.equals(getReserved())) {
             // Also preserving size of hits from upstream
-            return new Person.Builder().withId(extractIdUri()).build();
+            return new Person.Builder().withId(extractIdUri());
         }
         return new Person.Builder()
                    .withId(extractIdUri())
@@ -281,8 +285,7 @@ public class CristinPerson implements JsonSerializable {
                    .withPlace(extractPlace())
                    .withCollaboration(extractCollaboration())
                    .withCountries(extractCountries())
-                   .withAwards(extractAwards())
-                   .build();
+                   .withAwards(extractAwards());
     }
 
     /**
@@ -293,6 +296,10 @@ public class CristinPerson implements JsonSerializable {
      * @return Nva person model.
      */
     public Person toPersonWithAuthorizedFields() {
+        return toPersonBuilderWithAuthorizedFields().build();
+    }
+
+    public Person.Builder toPersonBuilderWithAuthorizedFields() {
         return new Person.Builder()
                    .withId(extractIdUri())
                    .withIdentifiers(extractAuthorizedIdentifiers())
@@ -309,8 +316,7 @@ public class CristinPerson implements JsonSerializable {
                    .withPlace(extractPlace())
                    .withCollaboration(extractCollaboration())
                    .withCountries(extractCountries())
-                   .withAwards(extractAwards())
-                   .build();
+                   .withAwards(extractAwards());
     }
 
     private Set<TypedLabel> extractKeywords() {

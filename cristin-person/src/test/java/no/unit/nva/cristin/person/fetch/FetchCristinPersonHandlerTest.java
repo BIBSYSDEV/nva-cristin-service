@@ -218,7 +218,7 @@ public class FetchCristinPersonHandlerTest {
         handler = new FetchCristinPersonHandler(apiClient, environment);
         var actual = sendAuthorizedQuery(MANAGE_OWN_AFFILIATION).getBodyObject(Person.class);
 
-        assertThat(actual.getEmployments().size(), equalTo(EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS));
+        assertThat(actual.employments().size(), equalTo(EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS));
     }
 
     @Test
@@ -230,7 +230,7 @@ public class FetchCristinPersonHandlerTest {
         handler = new FetchCristinPersonHandler(apiClient, environment);
         var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
 
-        assertThat(actual.getEmployments(), equalTo(null));
+        assertThat(actual.employments(), equalTo(null));
     }
 
     @ParameterizedTest
@@ -291,7 +291,7 @@ public class FetchCristinPersonHandlerTest {
     void shouldNotHaveEmploymentFieldInResponseWhenNotInUpstreamPayload() throws IOException {
         var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
 
-        assertThat(actual.getEmployments(), equalTo(null));
+        assertThat(actual.employments(), equalTo(null));
     }
 
     @Test
@@ -307,7 +307,7 @@ public class FetchCristinPersonHandlerTest {
     }
 
     private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {
-        return responseBody.getIdentifiers().stream()
+        return responseBody.identifiers().stream()
                    .filter(typedValue -> typedValue.getType().equals(NATIONAL_IDENTITY_NUMBER))
                    .findAny();
     }
