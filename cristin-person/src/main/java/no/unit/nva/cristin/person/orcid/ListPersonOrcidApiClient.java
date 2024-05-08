@@ -42,7 +42,7 @@ public class ListPersonOrcidApiClient extends ApiClient implements FetchApiClien
     }
 
     private HttpResponse<String> queryUpstream(URI uri) throws ApiGatewayException {
-        var response = fetchGetResult(uri);
+        var response = fetchGetResultWithAuthentication(uri);
         checkHttpStatusCode(PERSONS_ORCID_ID_URI, response.statusCode(), response.body());
 
         return response;

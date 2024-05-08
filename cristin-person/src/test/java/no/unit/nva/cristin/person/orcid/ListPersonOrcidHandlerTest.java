@@ -48,7 +48,7 @@ class ListPersonOrcidHandlerTest {
         apiClient = new ListPersonOrcidApiClient(httpClient);
         apiClient = spy(apiClient);
         var fakeCristinResponse = IoUtils.stringFromResources(Path.of(CRISTIN_PERSONS_ORCID_RESPONSE_JSON));
-        doReturn(new HttpResponseFaker(fakeCristinResponse)).when(apiClient).fetchGetResult(any());
+        doReturn(new HttpResponseFaker(fakeCristinResponse)).when(apiClient).fetchGetResultWithAuthentication(any());
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new ListPersonOrcidHandler(environment, apiClient);
@@ -67,7 +67,8 @@ class ListPersonOrcidHandlerTest {
     void shouldCallCorrectUpstreamUri() throws Exception {
         sendQuery();
 
-        verify(apiClient).fetchGetResult(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_DEFAULT_PARAMS).getUri());
+        verify(apiClient)
+            .fetchGetResultWithAuthentication(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_DEFAULT_PARAMS).getUri());
     }
 
     private GatewayResponse<PersonsOrcid> sendQuery() throws IOException {
