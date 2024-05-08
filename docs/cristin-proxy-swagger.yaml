@@ -1740,6 +1740,39 @@ paths:
         502:
           $ref: '#/components/responses/502'
 
+  /person/orcid:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonsOrcidFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Person
+      summary: Fetch person id's and orcid's
+      description: Retrieves person id's and orcid's for persons having orcid
+      operationId: FetchPersonsOrcid
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonsOrcid'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonsOrcidExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/PersonsOrcid'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonsOrcidExample'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+
   /position:
     get:
       x-amazon-apigateway-integration:
@@ -3973,6 +4006,34 @@ components:
           type: string
         labels:
           $ref: '#/components/schemas/Languages'
+    PersonsOrcid:
+      type: object
+      description: Person id's with their orcid's
+      properties:
+        type:
+          type: string
+          description: Always PersonsOrcid
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned
+        hits:
+          type: array
+          description: The list of persons orcid returned by the request
+          items:
+            $ref: '#/components/schemas/PersonOrcid'
+    PersonOrcid:
+      type: object
+      description: Single person id and their orcid
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        orcid:
+          $ref: '#/components/schemas/Id'
   examples:
     ProjectsExample:
       value:
@@ -5248,6 +5309,17 @@ components:
         identifier: '1197'
         labels:
           en: 'Educational management'
+    PersonsOrcidExample:
+      value:
+        '@context': 'https://example.org/persons-orcid-context.json'
+        type: 'PersonsOrcid'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/orcid'
+        size: 2
+        hits:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/456738'
+            orcid: 'https://api.dev.nva.aws.unit.no/cristin/person/1234-1234-1234-1234'
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/1306958'
+            orcid: 'https://api.dev.nva.aws.unit.no/cristin/person/2222-3333-4444-5555'
 
   securitySchemes:
     CognitoUserPool:
