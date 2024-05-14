@@ -52,5 +52,29 @@
     "verifiedAt": {
       "id": "https://www.example.com/organization/20754.0.0.0"
     }
-  }
+  },
+  "awards": [
+    {
+      "name": "My first award",
+      "year": 2019,
+      "type": {
+        "type": "Research",
+        "label": {
+          "en": "Research activity",
+          "nb": "Forskningsarbeid"
+        }
+      },
+      "distribution": {
+        "type": "International",
+        "label": {
+          "en": "International",
+          "nb": "Internasjonal"
+        }
+      },
+      "affiliation": {
+        "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.52.10.0",
+        "type": "Organization"
+      }
+    }
+  ]
 }

@@ -19,7 +19,6 @@ public class JsonPropertyNames {
     public static final String CRISTIN_EMPLOYMENTS = "detailed_affiliations";
     public static final String CRISTIN_END_DATE = "end_date";
     public static final String CRISTIN_INSTITUTION_ID = "cristin_institution_id";
-    public static final String CRISTIN_QUERY_PARAMETER_LANGUAGE_KEY = "lang";
     public static final String CRISTIN_START_DATE = "start_date";
     public static final String CRISTIN_UNIT_ID = "cristin_unit_id";
     public static final String DEPTH = "depth";
@@ -75,4 +74,6 @@ public class JsonPropertyNames {
     public static final String IDENTIFIER_ALPHA_3 = "identifierAlpha3";
     public static final String CODE = "code";
     public static final String CODE_ALPHA_3 = "code_alpha3";
+    public static final String YEAR = "year";
+    public static final String DISTRIBUTION = "distribution";
 }

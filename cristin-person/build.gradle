@@ -17,6 +17,8 @@ dependencies {
     testImplementation libs.karate.junit5
     testImplementation libs.bundles.testing
     testImplementation libs.json.assert
+    testImplementation libs.nva.logutils
+    testImplementation libs.log4j.core
 }
 
 tasks.named('test', Test) {

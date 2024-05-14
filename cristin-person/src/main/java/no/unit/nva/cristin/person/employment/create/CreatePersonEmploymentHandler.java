@@ -12,6 +12,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
+import no.unit.nva.common.IdCreatedLogger;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.utils.AccessUtils;
@@ -60,6 +61,8 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
 
     @Override
     protected Integer getSuccessStatusCode(Employment input, Employment output) {
+        new IdCreatedLogger().logId(output);
+
         return HttpURLConnection.HTTP_CREATED;
     }
 

@@ -1,5 +1,6 @@
 package no.unit.nva.model.adapter;
 
+import static java.util.Objects.nonNull;
 import java.util.function.Function;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.model.TypedLabel;
@@ -8,7 +9,7 @@ public class TypedLabelToCristinFormat implements Function<TypedLabel, CristinTy
 
     @Override
     public CristinTypedLabel apply(TypedLabel typedLabel) {
-        return new CristinTypedLabel(typedLabel.getType(), typedLabel.getLabel());
+        return nonNull(typedLabel) ? new CristinTypedLabel(typedLabel.getType(), typedLabel.getLabel()) : null;
     }
 
 }

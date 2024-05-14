@@ -180,12 +180,11 @@ public class FetchCristinPersonHandlerTest {
     }
 
     @Test
-    void shouldReturnResponseWhenCallingEndpointWithValidOrcidIdentifier() throws IOException {
-        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_ORCID_PATH_PARAM).getBodyObject(Person.class);
-        var expectedString = stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
-        var expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
+    void shouldReturnResponseWhenCallingEndpointWithValidOrcidIdentifier() throws Exception {
+        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_ORCID_PATH_PARAM).getBody();
+        var expected = stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
 
-        assertThat(actual, equalTo(expected));
+        JSONAssert.assertEquals(expected, actual, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
@@ -218,7 +217,7 @@ public class FetchCristinPersonHandlerTest {
         handler = new FetchCristinPersonHandler(apiClient, environment);
         var actual = sendAuthorizedQuery(MANAGE_OWN_AFFILIATION).getBodyObject(Person.class);
 
-        assertThat(actual.getEmployments().size(), equalTo(EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS));
+        assertThat(actual.employments().size(), equalTo(EXPECTED_HITS_SIZE_FOR_EMPLOYMENTS));
     }
 
     @Test
@@ -230,7 +229,7 @@ public class FetchCristinPersonHandlerTest {
         handler = new FetchCristinPersonHandler(apiClient, environment);
         var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
 
-        assertThat(actual.getEmployments(), equalTo(null));
+        assertThat(actual.employments(), equalTo(null));
     }
 
     @ParameterizedTest
@@ -291,7 +290,7 @@ public class FetchCristinPersonHandlerTest {
     void shouldNotHaveEmploymentFieldInResponseWhenNotInUpstreamPayload() throws IOException {
         var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
 
-        assertThat(actual.getEmployments(), equalTo(null));
+        assertThat(actual.employments(), equalTo(null));
     }
 
     @Test
@@ -307,7 +306,7 @@ public class FetchCristinPersonHandlerTest {
     }
 
     private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {
-        return responseBody.getIdentifiers().stream()
+        return responseBody.identifiers().stream()
                    .filter(typedValue -> typedValue.getType().equals(NATIONAL_IDENTITY_NUMBER))
                    .findAny();
     }

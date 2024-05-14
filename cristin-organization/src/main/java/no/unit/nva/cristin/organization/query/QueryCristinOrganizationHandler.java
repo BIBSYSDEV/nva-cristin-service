@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.client.ClientProvider.VERSION;
+import static no.unit.nva.cristin.model.Constants.FULL_TREE;
 import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
@@ -33,7 +34,7 @@ import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;
 public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, SearchResponse<Organization>> {
 
     private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS, DEPTH, VERSION,
-                                                                     SORT);
+                                                                     SORT, FULL_TREE);
     private final transient ClientProvider<CristinQueryApiClient<Map<String, String>, Organization>> clientProvider;
 
     @JacocoGenerated
@@ -42,36 +43,23 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         this(new DefaultOrgQueryClientProvider(), new Environment());
     }
 
-    public QueryCristinOrganizationHandler(ClientProvider<CristinQueryApiClient<Map<String, String>, Organization>>
-                                               clientProvider, Environment environment) {
+    public QueryCristinOrganizationHandler(
+        ClientProvider<CristinQueryApiClient<Map<String, String>, Organization>> clientProvider,
+        Environment environment
+    ) {
         super(Void.class, environment);
         this.clientProvider = clientProvider;
     }
 
     @Override
     protected SearchResponse<Organization> processInput(Void input, RequestInfo requestInfo, Context context)
-            throws ApiGatewayException {
+        throws ApiGatewayException {
 
         validateQueryParameterKeys(requestInfo);
-        Map<String, String> requestQueryParams = new ConcurrentHashMap<>();
-        requestQueryParams.put(QUERY, getValidQuery(requestInfo));
-        requestQueryParams.put(DEPTH, getValidDepth(requestInfo));
-        requestQueryParams.put(PAGE, getValidPage(requestInfo));
-        requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
-        getSort(requestInfo).ifPresent(sort -> requestQueryParams.put(SORT, sort));
-
+        var requestQueryParams = extractQueryParameters(requestInfo);
         var apiVersion = getApiVersion(requestInfo);
 
         return clientProvider.getClient(apiVersion).executeQuery(requestQueryParams);
-    }
-
-    private String getApiVersion(RequestInfo requestInfo) {
-        return extractVersionFromRequestInfo(requestInfo, ACCEPT_HEADER_KEY_NAME);
-    }
-
-    private Optional<String> getSort(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(SORT)
-                   .map(UriUtils::escapeWhiteSpace);
     }
 
     @Override
@@ -84,6 +72,34 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     @Override
     protected Integer getSuccessStatusCode(Void input, SearchResponse<Organization> output) {
         return HttpURLConnection.HTTP_OK;
+    }
+
+    private ConcurrentHashMap<String, String> extractQueryParameters(RequestInfo requestInfo)
+        throws BadRequestException {
+
+        var requestQueryParams = new ConcurrentHashMap<String, String>();
+
+        requestQueryParams.put(QUERY, getValidQuery(requestInfo));
+        requestQueryParams.put(DEPTH, getValidDepth(requestInfo));
+        requestQueryParams.put(PAGE, getValidPage(requestInfo));
+        requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
+        getSort(requestInfo).ifPresent(sort -> requestQueryParams.put(SORT, sort));
+        requestQueryParams.put(FULL_TREE, getFullTreeParam(requestInfo));
+
+        return requestQueryParams;
+    }
+
+    private Optional<String> getSort(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(SORT)
+                   .map(UriUtils::escapeWhiteSpace);
+    }
+
+    private static String getFullTreeParam(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(FULL_TREE).orElse(Boolean.FALSE.toString());
+    }
+
+    private String getApiVersion(RequestInfo requestInfo) {
+        return extractVersionFromRequestInfo(requestInfo, ACCEPT_HEADER_KEY_NAME);
     }
 
 }

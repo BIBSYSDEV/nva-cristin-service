@@ -290,7 +290,6 @@ class UpdateCristinProjectHandlerTest {
     }
 
     private void mockFetchResponse(String fetchedProjectJson) throws IOException, InterruptedException {
-        fetchApiClient = spy(fetchApiClient);
         doReturn(new HttpResponseFaker(fetchedProjectJson, HTTP_OK))
             .when(httpClientMockFetch).<String>send(any(),any());
     }

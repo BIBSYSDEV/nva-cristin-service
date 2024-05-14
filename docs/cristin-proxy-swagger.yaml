@@ -557,6 +557,13 @@ paths:
               - country
               - country asc
               - country desc
+        - name: fullTree
+          in: query
+          description: Include all parent and sub units for each search result
+          required: false
+          schema:
+            type: boolean
+            default: false
         - name: Accept
           in: header
           description: Requested response format and version of the returned payload
@@ -3083,6 +3090,40 @@ components:
                 description: Two letter country code (ISO 3166-1 alpha-2)
               label:
                 $ref: '#/components/schemas/Languages'
+        awards:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the award
+              year:
+                type: integer
+                description: Year of the award
+              type:
+                type: object
+                properties:
+                  type:
+                    enum:
+                      - ResearchDissemination
+                      - Research
+                    description: The code for this type of activity. Can be ResearchDissemination (Dissemination of research results) or Research (Research activity)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              distribution:
+                type: object
+                properties:
+                  type:
+                    enum:
+                      - International
+                      - National
+                      - Internal
+                    description: The code for the scope of award. Can be International (International), National (National) or Internal (Own institution)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              affiliation:
+                $ref: '#/components/schemas/Organization'
     PersonPost:
       type: object
       required: [ names ]
@@ -3330,6 +3371,51 @@ components:
                 description: Two letter country code (ISO 3166-1 alpha-2)
               label:
                 $ref: '#/components/schemas/Languages'
+        awards:
+          type: array
+          nullable: true
+          items:
+            type: object
+            required:
+              - name
+              - year
+              - type
+              - distribution
+              - affiliation
+            properties:
+              name:
+                type: string
+                description: Name of the award
+              year:
+                type: integer
+                description: Year of the award
+              type:
+                type: object
+                required:
+                  - type
+                properties:
+                  type:
+                    enum:
+                      - ResearchDissemination
+                      - Research
+                    description: The code for this type of activity. Can be ResearchDissemination (Dissemination of research results) or Research (Research activity)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              distribution:
+                type: object
+                required:
+                  - type
+                properties:
+                  type:
+                    enum:
+                      - International
+                      - National
+                      - Internal
+                    description: The code for the scope of award. Can be International (International), National (National) or Internal (Own institution)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              affiliation:
+                $ref: '#/components/schemas/Organization'
     PersonNIN:
       type: object
       properties:
@@ -4462,6 +4548,21 @@ components:
                 label:
                   'en': 'United Kingdom'
                   'nb': 'Storbritannia'
+            awards:
+              - name: 'My first award'
+                year: '2014'
+                type:
+                  type: 'ResearchDissemination'
+                  label:
+                    'en': 'Dissemination of research results'
+                    'nb': 'Forskningsformidling'
+                distribution:
+                  type: 'National'
+                  label:
+                    'en': 'National'
+                    'nb': 'Nasjonal'
+                affiliation:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
             type: 'Person'
             identifiers:
@@ -4624,6 +4725,21 @@ components:
             label:
               'en': 'United Kingdom'
               'nb': 'Storbritannia'
+        awards:
+          - name: 'My first award'
+            year: '2014'
+            type:
+              type: 'ResearchDissemination'
+              label:
+                'en': 'Dissemination of research results'
+                'nb': 'Forskningsformidling'
+            distribution:
+              type: 'National'
+              label:
+                'en': 'National'
+                'nb': 'Nasjonal'
+            affiliation:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
     PersonPatchExample:
       value:
         orcid: '1234-1234-1234-1234'
@@ -4660,6 +4776,15 @@ components:
         countries:
           - type: 'CA'
           - type: 'GB'
+        awards:
+          - name: 'My first award'
+            year: '2014'
+            type:
+              type: 'ResearchDissemination'
+            distribution:
+              type: 'National'
+            affiliation:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
     PersonPostExample:
       value:
         identifiers:
