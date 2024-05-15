@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.funding.sources.model.nva;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static no.unit.nva.cristin.model.JsonPropertyNames.LABELS;
 import static nva.commons.core.attempt.Try.attempt;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -30,7 +31,7 @@ public class FundingSource {
     private final URI id;
     @JsonProperty(IDENTIFIER_FIELD)
     private final String identifier;
-    @JsonProperty(NAME_FIELD)
+    @JsonProperty(LABELS)
     private final Map<String, String> labels;
 
     @JsonCreator
@@ -48,6 +49,18 @@ public class FundingSource {
 
     public String getIdentifier() {
         return identifier;
+    }
+
+    /**
+     * Get labels.
+     *
+     * @deprecated Use {@link FundingSource#getLabels()}} instead.
+     */
+    @Deprecated
+    @JsonGetter
+    @JsonProperty(NAME_FIELD)
+    public Map<String, String> getName() {
+        return labels;
     }
 
     public Map<String, String> getLabels() {
