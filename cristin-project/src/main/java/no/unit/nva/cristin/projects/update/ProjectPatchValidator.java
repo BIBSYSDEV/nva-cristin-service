@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
-import java.util.Map;
-import no.unit.nva.Validator;
+import no.unit.nva.validation.Validator;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.PatchValidator;
+import no.unit.nva.validation.PatchValidator;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
 import java.util.List;
@@ -52,8 +51,9 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
                                                                                 + "field 'type'";
     public static final String MUST_BE_A_LIST_OF_IDENTIFIERS = "RelatedProjects must be a list of identifiers, "
                                                                + "numeric or URI";
-    public static final String NOT_A_VALID_KEY_VALUE_FIELD = "%s not a valid key value field";
     public static final String NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS = "%s not a valid list of key value fields";
+    public static final String WEB_PAGE = "webPage";
+    public static final String NOT_A_VALID_URI = "Field %s is not a valid URI";
 
     /**
      * Validate changes to Project, both nullable fields and values.
@@ -79,6 +79,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         validateDescription(input, EQUIPMENT);
         validateResearchResponsibleOrganizationsIfPresent(input);
         validateExtraLanguages(input);
+        validateWebPage(input);
     }
 
     private static void validateTitleAndLanguage(ObjectNode input) throws BadRequestException {
@@ -102,8 +103,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     private static void validateContributors(ObjectNode input) throws BadRequestException {
         validateNotNullIfPresent(input, CONTRIBUTORS);
         if (propertyHasValue(input, CONTRIBUTORS)) {
-            TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
-            };
+            var typeRef = new TypeReference<List<NvaContributor>>() { };
             validateJsonReadable(typeRef, input.get(CONTRIBUTORS).toString(), CONTRIBUTORS);
         }
     }
@@ -136,7 +136,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
 
     private void validateKeywordsIfPresent(ObjectNode input) throws BadRequestException {
         if (input.has(KEYWORDS)) {
-            var keywords = input.get(KEYWORDS);
+            final var keywords = input.get(KEYWORDS);
             validateIsArray(keywords, KEYWORDS);
             validateKeywords(keywords);
         }
@@ -188,13 +188,6 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         }
     }
 
-    private void validateDescription(ObjectNode input, String fieldName) throws BadRequestException {
-        if (input.has(fieldName)) {
-            var description = input.get(fieldName);
-            attempt(() -> convertToMap(description)).orElseThrow(failure -> notAMapException(fieldName));
-        }
-    }
-
     private void validateResearchResponsibleOrganizationsIfPresent(ObjectNode input) throws BadRequestException {
         if (input.has(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)
             && !input.get(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH).isNull()) {
@@ -216,14 +209,6 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
         organizations.forEach(node -> extractLastPathElement(URI.create(node.get(ID).asText())));
     }
 
-    private BadRequestException notAMapException(String fieldName) {
-        return new BadRequestException(format(NOT_A_VALID_KEY_VALUE_FIELD, fieldName));
-    }
-
-    public static Map<String, String> convertToMap(JsonNode node) {
-        return OBJECT_MAPPER.convertValue(node, new TypeReference<>() {});
-    }
-
     private void validateExtraLanguages(ObjectNode input) throws BadRequestException {
         if (input.has(ALTERNATIVE_TITLES) && !input.get(ALTERNATIVE_TITLES).isNull()) {
             var alternativeTitles = input.get(ALTERNATIVE_TITLES);
@@ -236,5 +221,16 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
 
     private BadRequestException notAListOfMapsException() {
         return new BadRequestException(format(NOT_A_VALID_LIST_OF_KEY_VALUE_FIELDS, ALTERNATIVE_TITLES));
+    }
+
+    private void validateWebPage(ObjectNode input) throws BadRequestException {
+        if (input.has(WEB_PAGE) && !input.get(WEB_PAGE).isNull()) {
+            var webPage = input.get(WEB_PAGE).asText();
+            attempt(() -> URI.create(webPage)).orElseThrow(failure -> fieldIsNotUri());
+        }
+    }
+
+    private BadRequestException fieldIsNotUri() {
+        return new BadRequestException(format(NOT_A_VALID_URI, WEB_PAGE));
     }
 }

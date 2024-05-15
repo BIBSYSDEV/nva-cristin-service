@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import no.unit.nva.Validator;
+import no.unit.nva.validation.Validator;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.model.Organization;
@@ -23,6 +23,7 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         HasId("project identifier not allowed"),
         NoTitle("title required"),
         InvalidStartDate("start date invalid"),
+        InvalidEndDate("end date invalid"),
         HasNoContributors("contributors required"),
         HasNoCoordinatingOrganization("coordinating organization required");
         private final String label;
@@ -68,6 +69,9 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
         if (invalidStartDate(project.getStartDate())) {
             results.add(ValidatedResult.InvalidStartDate);
         }
+        if (invalidEndDate(project.getEndDate())) {
+            results.add(ValidatedResult.InvalidEndDate);
+        }
         if (hasNoContributors(project.getContributors())) {
             results.add(ValidatedResult.HasNoContributors);
         }
@@ -87,6 +91,10 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
 
     private boolean invalidStartDate(Instant startDate) {
         return isNull(startDate);
+    }
+
+    private boolean invalidEndDate(Instant endDate) {
+        return isNull(endDate);
     }
 
     private boolean hasId(NvaProject project) {

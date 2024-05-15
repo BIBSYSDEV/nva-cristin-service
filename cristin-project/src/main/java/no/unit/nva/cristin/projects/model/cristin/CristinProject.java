@@ -11,8 +11,8 @@ import no.unit.nva.cristin.model.CristinDateInfo;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
+import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder;
-import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.utils.CustomInstantSerializer;
 import nva.commons.core.StringUtils;
@@ -21,12 +21,26 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused", "PMD.ExcessivePublicCount", "PMD.GodClass"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinProject implements JsonSerializable {
 
+    public static final String CRISTIN_PROJECT_ID = "cristin_project_id";
+    public static final String PUBLISHABLE = "publishable";
+    public static final String PUBLISHED = "published";
+    public static final String CRISTIN_START_DATE = "start_date";
+    public static final String CRISTIN_END_DATE = "end_date";
+    public static final String CREATED = "created";
+    public static final String CRISTIN_LAST_MODIFIED = "last_modified";
+    public static final String COORDINATING_INSTITUTION = "coordinating_institution";
+    public static final String CRISTIN_CONTACT_INFO = "contact_info";
+    public static final String CRISTIN_TOTAL_FUNDING_AMOUNT = "total_funding_amount";
+    public static final String PARTICIPANTS = "participants";
     public static final String METHOD = "method";
     public static final String EQUIPMENT = "equipment";
     public static final String CRISTIN_PROJECT_CATEGORIES = "project_categories";
@@ -44,25 +58,39 @@ public class CristinProject implements JsonSerializable {
     public static final String CRISTIN_POPULAR_SCIENTIFIC_SUMMARY = "popular_scientific_summary";
     public static final String CRISTIN_MAIN_LANGUAGE = "main_language";
     public static final String CREATOR = "creator";
+    public static final String CRISTIN_EXTERNAL_URL = "external_url";
 
+    @JsonProperty(CRISTIN_PROJECT_ID)
     private String cristinProjectId;
+    @JsonProperty(PUBLISHABLE)
     private Boolean publishable;
+    @JsonProperty(PUBLISHED)
     private Boolean published;
+    @JsonProperty(TITLE)
     private Map<String, String> title;
     @JsonProperty(CRISTIN_MAIN_LANGUAGE)
     private String mainLanguage;
+    @JsonProperty(CRISTIN_START_DATE)
     @JsonSerialize(using = CustomInstantSerializer.class)
     private Instant startDate;
+    @JsonProperty(CRISTIN_END_DATE)
     @JsonSerialize(using = CustomInstantSerializer.class)
     private Instant endDate;
+    @JsonProperty(STATUS)
     private String status;
+    @JsonProperty(CREATED)
     private CristinDateInfo created;
+    @JsonProperty(CRISTIN_LAST_MODIFIED)
     private CristinDateInfo lastModified;
+    @JsonProperty(COORDINATING_INSTITUTION)
     private CristinOrganization coordinatingInstitution;
     @JsonProperty(PROJECT_FUNDING_SOURCES)
     private List<CristinFundingSource> projectFundingSources;
+    @JsonProperty(CRISTIN_CONTACT_INFO)
     private CristinContactInfo contactInfo;
+    @JsonProperty(CRISTIN_TOTAL_FUNDING_AMOUNT)
     private CristinFundingAmount totalFundingAmount;
+    @JsonProperty(PARTICIPANTS)
     private List<CristinPerson> participants;
     @JsonProperty(CRISTIN_ACADEMIC_SUMMARY)
     private Map<String, String> academicSummary;
@@ -94,6 +122,8 @@ public class CristinProject implements JsonSerializable {
     private Boolean exemptFromPublicDisclosure;
     @JsonProperty(CREATOR)
     private CristinPerson creator;
+    @JsonProperty(CRISTIN_EXTERNAL_URL)
+    private String externalUrl;
 
     public String getCristinProjectId() {
         return cristinProjectId;
@@ -335,15 +365,24 @@ public class CristinProject implements JsonSerializable {
         this.creator = creator;
     }
 
+    public String getExternalUrl() {
+        return externalUrl;
+    }
+
+    public void setExternalUrl(String externalUrl) {
+        this.externalUrl = externalUrl;
+    }
+
     /**
      * Verifies CristinProject has enough data to be considered as valid.
      *
      * @return project has enough data to be considered valid
      */
-    public boolean hasValidContent() {
+    public boolean hasEnrichedContent() {
         return StringUtils.isNotBlank(cristinProjectId)
-                && !getTitle().isEmpty()
-                && ProjectStatus.isValidStatus(status);
+               && !getTitle().isEmpty()
+               && nonNull(getStartDate())
+               && nonNull(getCoordinatingInstitution());
     }
 
     public NvaProject toNvaProject() {
@@ -388,7 +427,8 @@ public class CristinProject implements JsonSerializable {
                && Objects.equals(getClinicalTrialPhase(), that.getClinicalTrialPhase())
                && Objects.equals(getApprovals(), that.getApprovals())
                && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure())
-               && Objects.equals(getCreator(), that.getCreator());
+               && Objects.equals(getCreator(), that.getCreator())
+               && Objects.equals(getExternalUrl(), that.getExternalUrl());
     }
 
     @Override
@@ -401,7 +441,7 @@ public class CristinProject implements JsonSerializable {
                             getMethod(), getEquipment(), getProjectCategories(), getKeywords(), getExternalSources(),
                             getRelatedProjects(), getInstitutionsResponsibleForResearch(), getHealthProjectType(),
                             getHealthProjectTypeName(), getClinicalTrialPhase(), getApprovals(),
-                            getExemptFromPublicDisclosure(), getCreator());
+                            getExemptFromPublicDisclosure(), getCreator(), getExternalUrl());
     }
 
     @Override

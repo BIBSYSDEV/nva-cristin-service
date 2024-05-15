@@ -2,35 +2,31 @@
   "@context": "https://bibsysdev.github.io/src/organization-context.json",
   "type": "Organization",
   "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.10",
-  "name": {
+  "labels": {
     "en": "Fakultetsadministrasjonen"
   },
   "partOf": [
     {
       "type": "Organization",
       "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.15.0.0",
-      "name": {
+      "labels": {
         "en": "Faculty of Mathematics and Natural Sciences"
       },
       "partOf": [
         {
           "type": "Organization",
           "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
-          "name": {
+          "labels": {
             "en": "University of Oslo"
           },
           "partOf": [],
-          "labels": {
-            "en": "University of Oslo"
-          }
+          "hasPart": [],
+          "country" : "NO"
         }
       ],
-      "labels": {
-        "en": "Faculty of Mathematics and Natural Sciences"
-      }
+      "hasPart": [],
+      "country" : "NO"
     }
   ],
-  "labels": {
-    "en": "Fakultetsadministrasjonen"
-  }
+  "country" : "NO"
 }

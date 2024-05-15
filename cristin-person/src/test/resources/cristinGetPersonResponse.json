@@ -43,5 +43,135 @@
         "nb": "Overingeniør"
       }
     }
+  ],
+  "keywords": [
+    {
+      "code": "3548",
+      "name": {
+        "en": "Decision support"
+      }
+    },
+    {
+      "code": "5156",
+      "name": {
+        "en": "Risk management"
+      }
+    }
+  ],
+  "background": {
+    "en": "Academic Advisor at UiO",
+    "nb": "Akademisk Rådgiver ved UiO"
+  },
+  "email": "kjell@ola.no",
+  "web_page": "https://www.kjell.no",
+  "place": {
+    "en": "Oslo University",
+    "nb": "Universitetet i Oslo"
+  },
+  "collaboration": {
+    "en": "NTNU in Trondheim",
+    "nb": "NTNU på lokasjon i Trondheim"
+  },
+  "countries": [
+    {
+      "code": "CA",
+      "name": {
+        "en": "Canada",
+        "nb": "Canada"
+      }
+    },
+    {
+      "code": "GB",
+      "name": {
+        "en": "United Kingdom",
+        "nb": "Storbritannia"
+      }
+    }
+  ],
+  "awards": [
+    {
+      "title": "My first award",
+      "year": 2019,
+      "type": {
+        "code": "RESEARCH",
+        "name": {
+          "en": "Research activity",
+          "nb": "Forskningsarbeid"
+        }
+      },
+      "distribution": {
+        "code": "INTERNATIONAL",
+        "name": {
+          "en": "International",
+          "nb": "Internasjonal"
+        }
+      },
+      "affiliation": {
+        "institution": {
+          "cristin_institution_id": "185",
+          "url": "https://api.cristin-test.uio.no/v2/institutions/185"
+        },
+        "unit": {
+          "cristin_unit_id": "185.52.10.0",
+          "url": "https://api.cristin-test.uio.no/v2/units/185.52.10.0"
+        }
+      }
+    },
+    {
+      "title": "My second award",
+      "year": 2016,
+      "type": {
+        "code": "RESEARCH",
+        "name": {
+          "en": "Research activity",
+          "nb": "Forskningsarbeid"
+        }
+      },
+      "distribution": {
+        "code": "NATIONAL",
+        "name": {
+          "en": "National",
+          "nb": "Nasjonal"
+        }
+      },
+      "affiliation": {
+        "institution": {
+          "cristin_institution_id": "185",
+          "url": "https://api.cristin-test.uio.no/v2/institutions/185"
+        },
+        "unit": {
+          "cristin_unit_id": "185.52.0.0",
+          "url": "https://api.cristin-test.uio.no/v2/units/185.52.0.0"
+        }
+      }
+    },
+    {
+      "title": "My third award",
+      "year": 2014,
+      "type": {
+        "code": "DISSEMINATION",
+        "name": {
+          "en": "Dissemination of research results",
+          "nb": "Forskningsformidling"
+        }
+      },
+      "distribution": {
+        "code": "INTERNAL",
+        "name": {
+          "en": "Own institution",
+          "nb": "Egen institusjon"
+        }
+      },
+      "affiliation": {
+        "institution": {
+          "cristin_institution_id": "185",
+          "url": "https://api.cristin-test.uio.no/v2/institutions/185"
+        },
+        "unit": {
+          "cristin_unit_id": "185.90.0.0",
+          "url": "https://api.cristin-test.uio.no/v2/units/185.90.0.0"
+        }
+      }
+    }
   ]
 }

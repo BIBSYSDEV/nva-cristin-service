@@ -40,7 +40,9 @@
         }
       ],
       "contactDetails": {
-        "telephone": "+4799885566"
+        "telephone": "+4799885566",
+        "email": "kjell@ola.no",
+        "webPage": "https://www.kjell.no"
       },
       "image": "https://api.cristin.no/v2/persons/359084/picture",
       "affiliations": [
@@ -70,7 +72,117 @@
           }
         }
       ],
-      "verified": true
+      "verified": true,
+      "keywords": [
+        {
+          "type": "3548",
+          "label": {
+            "en": "Decision support"
+          }
+        },
+        {
+          "type": "5156",
+          "label": {
+            "en": "Risk management"
+          }
+        }
+      ],
+      "background": {
+        "en": "Academic Advisor at UiO",
+        "nb": "Akademisk Rådgiver ved UiO"
+      },
+      "place": {
+        "en": "Oslo University",
+        "nb": "Universitetet i Oslo"
+      },
+      "collaboration": {
+        "en": "NTNU in Trondheim",
+        "nb": "NTNU på lokasjon i Trondheim"
+      },
+      "countries": [
+        {
+          "type": "CA",
+          "label": {
+            "en": "Canada",
+            "nb": "Canada"
+          }
+        },
+        {
+          "type": "GB",
+          "label": {
+            "en": "United Kingdom",
+            "nb": "Storbritannia"
+          }
+        }
+      ],
+      "awards": [
+        {
+          "name": "My first award",
+          "year": 2019,
+          "type": {
+            "type": "Research",
+            "label": {
+              "en": "Research activity",
+              "nb": "Forskningsarbeid"
+            }
+          },
+          "distribution": {
+            "type": "International",
+            "label": {
+              "en": "International",
+              "nb": "Internasjonal"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.52.10.0",
+            "type": "Organization"
+          }
+        },
+        {
+          "name": "My second award",
+          "year": 2016,
+          "type": {
+            "type": "Research",
+            "label": {
+              "en": "Research activity",
+              "nb": "Forskningsarbeid"
+            }
+          },
+          "distribution": {
+            "type": "National",
+            "label": {
+              "en": "National",
+              "nb": "Nasjonal"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.52.0.0",
+            "type": "Organization"
+          }
+        },
+        {
+          "name": "My third award",
+          "year": 2014,
+          "type": {
+            "type": "ResearchDissemination",
+            "label": {
+              "en": "Dissemination of research results",
+              "nb": "Forskningsformidling"
+            }
+          },
+          "distribution": {
+            "type": "Internal",
+            "label": {
+              "en": "Own institution",
+              "nb": "Egen institusjon"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
+            "type": "Organization"
+          }
+        }
+      ]
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/person/359084",
@@ -104,7 +216,9 @@
         }
       ],
       "contactDetails": {
-        "telephone": "+4799885566"
+        "telephone": "+4799885566",
+        "email": "kjell@ola.no",
+        "webPage": "https://www.kjell.no"
       },
       "image": "https://api.cristin.no/v2/persons/359084/picture",
       "affiliations": [
@@ -134,7 +248,117 @@
           }
         }
       ],
-      "verified": true
+      "verified": true,
+      "keywords": [
+        {
+          "type": "3548",
+          "label": {
+            "en": "Decision support"
+          }
+        },
+        {
+          "type": "5156",
+          "label": {
+            "en": "Risk management"
+          }
+        }
+      ],
+      "background": {
+        "en": "Academic Advisor at UiO",
+        "nb": "Akademisk Rådgiver ved UiO"
+      },
+      "place": {
+        "en": "Oslo University",
+        "nb": "Universitetet i Oslo"
+      },
+      "collaboration": {
+        "en": "NTNU in Trondheim",
+        "nb": "NTNU på lokasjon i Trondheim"
+      },
+      "countries": [
+        {
+          "type": "CA",
+          "label": {
+            "en": "Canada",
+            "nb": "Canada"
+          }
+        },
+        {
+          "type": "GB",
+          "label": {
+            "en": "United Kingdom",
+            "nb": "Storbritannia"
+          }
+        }
+      ],
+      "awards": [
+        {
+          "name": "My first award",
+          "year": 2019,
+          "type": {
+            "type": "Research",
+            "label": {
+              "en": "Research activity",
+              "nb": "Forskningsarbeid"
+            }
+          },
+          "distribution": {
+            "type": "International",
+            "label": {
+              "en": "International",
+              "nb": "Internasjonal"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.52.10.0",
+            "type": "Organization"
+          }
+        },
+        {
+          "name": "My second award",
+          "year": 2016,
+          "type": {
+            "type": "Research",
+            "label": {
+              "en": "Research activity",
+              "nb": "Forskningsarbeid"
+            }
+          },
+          "distribution": {
+            "type": "National",
+            "label": {
+              "en": "National",
+              "nb": "Nasjonal"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.52.0.0",
+            "type": "Organization"
+          }
+        },
+        {
+          "name": "My third award",
+          "year": 2014,
+          "type": {
+            "type": "ResearchDissemination",
+            "label": {
+              "en": "Dissemination of research results",
+              "nb": "Forskningsformidling"
+            }
+          },
+          "distribution": {
+            "type": "Internal",
+            "label": {
+              "en": "Own institution",
+              "nb": "Egen institusjon"
+            }
+          },
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0",
+            "type": "Organization"
+          }
+        }
+      ]
     }
   ]
 }

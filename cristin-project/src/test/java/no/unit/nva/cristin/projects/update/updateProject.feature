@@ -26,7 +26,7 @@ Feature: API tests for Cristin Project Update
           'type': 'ProjectManager',
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/538786'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684652'
           }
         }
       ],
@@ -50,7 +50,7 @@ Feature: API tests for Cristin Project Update
         }
       ],
       'relatedProjects': [
-        'https://api.dev.nva.aws.unit.no/cristin/project/483302'
+        'https://api.dev.nva.aws.unit.no/cristin/project/2057063'
       ],
       'academicSummary': {
         'en': 'Some academic summary',
@@ -86,13 +86,14 @@ Feature: API tests for Cristin Project Update
         {
           'nn': null
         }
-      ]
+      ],
+      'webPage': 'https://www.change.org'
     }
     """
     Given url CRISTIN_BASE
 
   Scenario: Update returns status 204 No Content on successful update of project
-    Given path '/project/10910700'
+    Given path '/project/2675095'
     * header Authorization = 'Bearer ' + token
     And request swaggerSampleProject
     When method PATCH

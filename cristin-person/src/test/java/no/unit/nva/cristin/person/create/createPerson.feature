@@ -62,7 +62,7 @@ Feature: API tests for Cristin Person creation
     And request sampleSimplePerson
     When method POST
     Then status 400
-    And response.detail = 'NationalIdentificationNumber is not valid'
+    And response.detail = 'Required field NationalIdentificationNumber is not valid'
 
   Scenario: Create person returns status 401 Unauthorized for valid payload but unauthorized user
     Given path '/person/'

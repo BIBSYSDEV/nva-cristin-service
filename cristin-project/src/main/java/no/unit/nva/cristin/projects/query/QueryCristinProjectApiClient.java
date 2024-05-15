@@ -1,19 +1,19 @@
 package no.unit.nva.cristin.projects.query;
 
+import static no.unit.nva.client.ClientProvider.VERSION_ONE;
 import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import no.unit.nva.client.ClientVersion;
+import no.unit.nva.cristin.common.client.CristinQueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.projects.common.CristinProjectApiClient;
 import no.unit.nva.cristin.projects.common.QueryProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class QueryCristinProjectApiClient extends CristinProjectApiClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(QueryCristinProjectApiClient.class);
+public class QueryCristinProjectApiClient extends CristinProjectApiClient
+    implements ClientVersion, CristinQueryApiClient<QueryProject, NvaProject> {
 
     public QueryCristinProjectApiClient() {
         super();
@@ -21,6 +21,16 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
 
     public QueryCristinProjectApiClient(HttpClient client) {
         super(client);
+    }
+
+    @Override
+    public SearchResponse<NvaProject> executeQuery(QueryProject queryProject) throws ApiGatewayException {
+        return queryCristinProjectsIntoWrapperObjectWithAdditionalMetadata(queryProject);
+    }
+
+    @Override
+    public String getClientVersion() {
+        return VERSION_ONE;
     }
 
     /**
@@ -49,12 +59,8 @@ public class QueryCristinProjectApiClient extends CristinProjectApiClient {
                    .withProcessingTime(processingTime);
     }
 
-    protected HttpResponse<String> queryProjects(QueryProject queryProject)
-        throws ApiGatewayException {
-
-        logger.info("requests -> " + queryProject.toURI().toString());
-
-        HttpResponse<String> response = fetchQueryResults(queryProject.toURI());
+    protected HttpResponse<String> queryProjects(QueryProject queryProject) throws ApiGatewayException {
+        var response = fetchQueryResults(queryProject.toURI());
         checkHttpStatusCode(queryProject.toNvaURI(), response.statusCode(), response.body());
 
         return response;

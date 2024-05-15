@@ -15,7 +15,6 @@ import java.util.Objects;
 public class PositionCode implements JsonSerializable {
 
     private final URI id;
-    private final Map<String, String> name;
     private final Map<String, String> labels;
     private final boolean enabled;
 
@@ -23,20 +22,15 @@ public class PositionCode implements JsonSerializable {
      * Creates a PositionCode for serialization to client.
      */
     @JsonCreator
-    public PositionCode(@JsonProperty("id") URI id, @JsonProperty("name") Map<String, String> name,
-                        @JsonProperty("labels") Map<String, String> labels, @JsonProperty("enabled") boolean enabled) {
+    public PositionCode(@JsonProperty("id") URI id, @JsonProperty("labels") Map<String, String> labels,
+                        @JsonProperty("enabled") boolean enabled) {
         this.id = id;
-        this.name = name;
         this.labels = labels;
         this.enabled = enabled;
     }
 
     public URI getId() {
         return id;
-    }
-
-    public Map<String, String> getName() {
-        return Utils.nonEmptyOrDefault(name);
     }
 
     public Map<String, String> getLabels() {
@@ -58,7 +52,6 @@ public class PositionCode implements JsonSerializable {
         }
         PositionCode that = (PositionCode) o;
         return Objects.equals(getId(), that.getId())
-               && getName().equals(that.getName())
                && getLabels().equals(that.getLabels())
                && Objects.equals(isEnabled(), that.isEnabled());
     }
@@ -71,6 +64,6 @@ public class PositionCode implements JsonSerializable {
     @JacocoGenerated
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getLabels(), isEnabled());
+        return Objects.hash(getId(), getLabels(), isEnabled());
     }
 }

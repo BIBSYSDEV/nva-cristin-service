@@ -101,7 +101,7 @@ Feature: API tests for Cristin projects query
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'creator\', \'depth\', \'funding\', \'funding_source\', \'institution\', \'keyword\', \'language\', \'modified_since\', \'name\', \'organization\', \'page\', \'participant\', \'project_code\', \'project_manager\', \'query\', \'results\', \'sort\', \'status\', \'title\', \'unit\', \'user\']'
+    And match response.detail == 'Invalid query parameter supplied. Valid parameters: [\'approval_reference_id\', \'approved_by\', \'biobank\', \'category\', \'creator\', \'cristinId\', \'depth\', \'funding\', \'funding_source\', \'grantId\', \'institution\', \'keyword\', \'language\', \'modified_since\', \'multiple\', \'name\', \'organization\', \'page\', \'participant\', \'project_manager\', \'query\', \'results\', \'sort\', \'status\', \'title\', \'unit\', \'user\']'
     And match response.requestId == '#notnull'
 
   Scenario Outline: Query with correct parameters but bad values returns Bad Request
@@ -195,7 +195,7 @@ Feature: API tests for Cristin projects query
   Scenario: Query with extended list of parameters and valid values returns OK
     Given path '/project/'
     And param query = queryString
-    And param sort = 'end_date'
+    And param sort = 'end_date desc'
     And param biobank = '234567'
     And param project_manager = 'St'
     And param participant = "olav h"
@@ -215,4 +215,22 @@ Feature: API tests for Cristin projects query
     And match response.status == 400
     And match response.detail == 'Upstream returned 400 (Bad Request). That might indicate bad query parameters'
 
+  Scenario: Query returns aggregations when requesting version with aggregations
+    Given path '/project/'
+    And header Accept = 'application/json; version=2023-11-03-aggregations'
+    And param query = queryString
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.aggregations == '#present'
+    And match response.aggregations.sectorFacet[0].id == '#present'
+    And match response.aggregations.sectorFacet[0].key == '#present'
+    And match response.aggregations.sectorFacet[0].count == '#present'
+    And match response.aggregations.sectorFacet[0].labels == '#present'
 
+  Scenario: Query with multiple query parameter do return results
+    Given path '/project/'
+    And param multiple = 'covid'
+    When method GET
+    Then status 200
+    And match response.hits == '#[5]'

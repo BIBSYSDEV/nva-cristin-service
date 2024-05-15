@@ -1,253 +1,115 @@
 package no.unit.nva.cristin.person.model.nva;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.ArrayList;
-import java.util.List;
-import no.unit.nva.commons.json.JsonSerializable;
-import no.unit.nva.cristin.person.model.cristin.CristinPerson;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
-import nva.commons.core.JacocoGenerated;
-
-import java.net.URI;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.common.Utils.distinctByKey;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIERS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AFFILIATIONS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.AWARDS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.BACKGROUND;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COLLABORATION;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.CONTACT_DETAILS;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COUNTRIES;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.IMAGE;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.KEYWORDS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NAMES;
-import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NVI;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PLACE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.RESERVED;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.person.model.cristin.CristinPerson;
+import no.unit.nva.cristin.person.model.nva.adapter.PersonToCristinFormat;
+import no.unit.nva.model.TypedLabel;
+import no.unit.nva.model.UriId;
 
-@JacocoGenerated
-@JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS})
-public class Person implements JsonSerializable {
+@SuppressWarnings("PMD.TooManyFields")
+@JsonPropertyOrder({CONTEXT, ID, TYPE, IDENTIFIERS, NAMES, CONTACT_DETAILS, IMAGE, AFFILIATIONS, RESERVED, EMPLOYMENTS,
+    VERIFIED, KEYWORDS, BACKGROUND, NVI, PLACE, COLLABORATION, COUNTRIES, AWARDS})
+public record Person(@JsonProperty(CONTEXT) String context,
+                     @JsonProperty(ID) URI id,
+                     @JsonProperty(IDENTIFIERS) Set<TypedValue> identifiers,
+                     @JsonProperty(NAMES) Set<TypedValue> names,
+                     @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails,
+                     @JsonProperty(IMAGE) URI image,
+                     @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations,
+                     @JsonProperty(RESERVED) Boolean reserved,
+                     @JsonProperty(EMPLOYMENTS) Set<Employment> employments,
+                     @JsonProperty(VERIFIED) Boolean verified,
+                     @JsonProperty(KEYWORDS) Set<TypedLabel> keywords,
+                     @JsonProperty(BACKGROUND) Map<String, String> background,
+                     @JsonProperty(NVI) PersonNvi nvi,
+                     @JsonProperty(PLACE) Map<String, String> place,
+                     @JsonProperty(COLLABORATION) Map<String, String> collaboration,
+                     @JsonProperty(COUNTRIES) Set<TypedLabel> countries,
+                     @JsonProperty(AWARDS) Set<Award> awards) implements JsonSerializable, UriId {
+
+    public static final String type = "Person";
 
     @JsonProperty(TYPE)
-    private static final String type = "Person";
-    @JsonProperty(ID)
-    private URI id;
-    @JsonInclude(NON_NULL)
-    @JsonProperty(CONTEXT)
-    private String context;
-    @JsonProperty(IDENTIFIERS)
-    private Set<TypedValue> identifiers;
-    @JsonProperty(NAMES)
-    private Set<TypedValue> names;
-    @JsonProperty(CONTACT_DETAILS)
-    private ContactDetails contactDetails;
-    @JsonProperty(IMAGE)
-    private URI image;
-    @JsonProperty(AFFILIATIONS)
-    private List<Affiliation> affiliations;
-    @JsonProperty(RESERVED)
-    private Boolean reserved;
-    @JsonProperty(EMPLOYMENTS)
-    private Set<Employment> employments;
-    @JsonProperty(VERIFIED)
-    private Boolean verified;
-
-    private Person() {
-
-    }
-
-    /**
-     * Creates a Person for serialization to client.
-     *
-     * @param id             Identifier of Person.
-     * @param identifiers    Different identifiers related to this object.
-     * @param names          Different names for this Person.
-     * @param contactDetails How to contact this Person.
-     * @param image          URI to picture of this Person.
-     * @param affiliations   This person's organization affiliations.
-     * @param reserved       If person is a reserved person, meaning not publicly viewable.
-     * @param employments    This person's detailed employment data at each organization.
-     * @param verified       If this person is a verified person.
-     */
-    @JsonCreator
-    public Person(@JsonProperty(ID) URI id, @JsonProperty(IDENTIFIERS) Set<TypedValue> identifiers,
-                  @JsonProperty(NAMES) Set<TypedValue> names,
-                  @JsonProperty(CONTACT_DETAILS) ContactDetails contactDetails, @JsonProperty(IMAGE) URI image,
-                  @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations, @JsonProperty(RESERVED) Boolean reserved,
-                  @JsonProperty(EMPLOYMENTS) Set<Employment> employments, @JsonProperty(VERIFIED) Boolean verified) {
-        this.id = id;
-        this.identifiers = identifiers;
-        this.names = names;
-        this.contactDetails = contactDetails;
-        this.image = image;
-        this.affiliations = affiliations;
-        this.reserved = reserved;
-        this.employments = employments;
-        this.verified = verified;
-    }
-
-    public String getContext() {
-        return context;
-    }
-
-    public void setContext(String context) {
-        this.context = context;
-    }
-
-    public Set<TypedValue> getIdentifiers() {
-        return nonNull(identifiers) ? identifiers : Collections.emptySet();
-    }
-
-    public URI getId() {
-        return id;
-    }
-
-    public String getType() {
+    public String type() {
         return type;
     }
 
-    public void setIdentifiers(Set<TypedValue> identifiers) {
-        this.identifiers = identifiers;
-    }
-
-    public List<Affiliation> getAffiliations() {
-        return nonNull(affiliations) ? affiliations : Collections.emptyList();
-    }
-
-    public ContactDetails getContactDetails() {
-        return contactDetails;
-    }
-
-    public URI getImage() {
-        return image;
-    }
-
-    public void setId(URI id) {
-        this.id = id;
-    }
-
-    public void setAffiliations(List<Affiliation> affiliations) {
-        this.affiliations = affiliations;
-    }
-
-    public Set<TypedValue> getNames() {
-        return nonNull(names) ? names : Collections.emptySet();
-    }
-
-    public void setContactDetails(ContactDetails contactDetails) {
-        this.contactDetails = contactDetails;
-    }
-
-    public void setImage(URI image) {
-        this.image = image;
-    }
-
-    public void setNames(Set<TypedValue> names) {
-        this.names = names;
-    }
-
-    public Boolean getReserved() {
-        return reserved;
-    }
-
-    public void setReserved(Boolean reserved) {
-        this.reserved = reserved;
-    }
-
-    public Set<Employment> getEmployments() {
-        return employments;
-    }
-
-    public void setEmployments(Set<Employment> employments) {
-        this.employments = employments;
-    }
-
-    public Boolean getVerified() {
-        return verified;
-    }
-
-    public void setVerified(Boolean verified) {
-        this.verified = verified;
-    }
-
-    /**
-     * Converts this object to an appropriate format for POST to Cristin.
-     */
-    public CristinPerson toCristinPerson() {
-        var cristinPerson = new CristinPerson();
-
-        var namesMap = convertTypedValuesToMap(getNames());
-        cristinPerson.setFirstName(namesMap.get(CristinPerson.FIRST_NAME));
-        cristinPerson.setSurname(namesMap.get(CristinPerson.LAST_NAME));
-        cristinPerson.setFirstNamePreferred(namesMap.get(CristinPerson.PREFERRED_FIRST_NAME));
-        cristinPerson.setSurnamePreferred(namesMap.get(CristinPerson.PREFERRED_LAST_NAME));
-
-        var identifierMap = convertTypedValuesToMap(getIdentifiers());
-        cristinPerson.setNorwegianNationalId(identifierMap.get(NATIONAL_IDENTITY_NUMBER));
-
-        cristinPerson.setDetailedAffiliations(mapEmploymentsToCristinEmployments(getEmployments()));
-        cristinPerson.setReserved(getReserved());
-
-        return cristinPerson;
-    }
-
-    private Map<String, String> convertTypedValuesToMap(Set<TypedValue> typedValueSet) {
-        return typedValueSet.stream()
-            .filter(TypedValue::hasData)
-            .filter(distinctByKey(TypedValue::getType))
-            .collect(Collectors.toMap(TypedValue::getType, TypedValue::getValue));
-    }
-
-    /**
-     * Converts NVA formatted employments to Cristin formatted employments.
-     */
-    public static List<CristinPersonEmployment> mapEmploymentsToCristinEmployments(Set<Employment> employments) {
-        if (isNull(employments)) {
-            return null;
-        }
-        return new ArrayList<>(employments).stream()
-                   .map(Employment::toCristinEmployment)
-                   .collect(Collectors.toList());
-    }
-
-    @JacocoGenerated
+    @JsonInclude(NON_NULL)
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Person)) {
-            return false;
-        }
-        Person person = (Person) o;
-        return Objects.equals(getId(), person.getId())
-               && Objects.equals(getContext(), person.getContext())
-               && Objects.equals(getIdentifiers(), person.getIdentifiers())
-               && Objects.equals(getNames(), person.getNames())
-               && Objects.equals(getContactDetails(), person.getContactDetails())
-               && Objects.equals(getImage(), person.getImage())
-               && Objects.equals(getAffiliations(), person.getAffiliations())
-               && Objects.equals(getReserved(), person.getReserved())
-               && Objects.equals(getEmployments(), person.getEmployments())
-               && Objects.equals(getVerified(), person.getVerified());
+    public String context() {
+        return context;
     }
 
-    @JacocoGenerated
     @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getContext(), getIdentifiers(), getNames(), getContactDetails(), getImage(),
-                            getAffiliations(), getReserved(), getEmployments(), getVerified());
+    public Set<TypedValue> identifiers() {
+        return nonEmptyOrDefault(identifiers);
+    }
+
+    @Override
+    public List<Affiliation> affiliations() {
+        return nonEmptyOrDefault(affiliations);
+    }
+
+    @Override
+    public Set<TypedValue> names() {
+        return nonEmptyOrDefault(names);
+    }
+
+    @Override
+    public Set<TypedLabel> keywords() {
+        return nonEmptyOrDefault(keywords);
+    }
+
+    @Override
+    public Map<String, String> background() {
+        return nonEmptyOrDefault(background);
+    }
+
+    @Override
+    public Map<String, String> place() {
+        return nonEmptyOrDefault(place);
+    }
+
+    @Override
+    public Map<String, String> collaboration() {
+        return nonEmptyOrDefault(collaboration);
+    }
+
+    @Override
+    public Set<TypedLabel> countries() {
+        return nonEmptyOrDefault(countries);
+    }
+
+    @Override
+    public Set<Award> awards() {
+        return nonEmptyOrDefault(awards);
     }
 
     @Override
@@ -255,68 +117,150 @@ public class Person implements JsonSerializable {
         return toJsonString();
     }
 
-    @JacocoGenerated
+    @Override
+    public URI getId() {
+        return id;
+    }
+
+    public CristinPerson toCristinPerson() {
+        return new PersonToCristinFormat().apply(this);
+    }
+
     public static final class Builder {
 
-        private final transient Person person;
+        private String context;
+        private URI id;
+        private Set<TypedValue> identifiers;
+        private Set<TypedValue> names;
+        private ContactDetails contactDetails;
+        private URI image;
+        private List<Affiliation> affiliations;
+        private Boolean reserved;
+        private Set<Employment> employments;
+        private Boolean verified;
+        private Set<TypedLabel> keywords;
+        private Map<String, String> background;
+        private PersonNvi nvi;
+        private Map<String, String> place;
+        private Map<String, String> collaboration;
+        private Set<TypedLabel> countries;
+        private Set<Award> awards;
 
         public Builder() {
-            person = new Person();
+
         }
 
         public Builder withContext(String context) {
-            person.setContext(context);
+            this.context = context;
             return this;
         }
 
         public Builder withId(URI id) {
-            person.setId(id);
+            this.id = id;
             return this;
         }
 
         public Builder withIdentifiers(Set<TypedValue> identifiers) {
-            person.setIdentifiers(identifiers);
+            this.identifiers = identifiers;
             return this;
         }
 
         public Builder withNames(Set<TypedValue> names) {
-            person.setNames(names);
+            this.names = names;
             return this;
         }
 
         public Builder withContactDetails(ContactDetails contactDetails) {
-            person.setContactDetails(contactDetails);
+            this.contactDetails = contactDetails;
             return this;
         }
 
         public Builder withImage(URI image) {
-            person.setImage(image);
+            this.image = image;
             return this;
         }
 
         public Builder withAffiliations(List<Affiliation> affiliations) {
-            person.setAffiliations(affiliations);
+            this.affiliations = affiliations;
             return this;
         }
 
         public Builder withReserved(Boolean reserved) {
-            person.setReserved(reserved);
+            this.reserved = reserved;
             return this;
         }
 
         public Builder withEmployments(Set<Employment> employments) {
-            person.setEmployments(employments);
+            this.employments = employments;
             return this;
         }
 
         public Builder withVerified(Boolean verified) {
-            person.setVerified(verified);
+            this.verified = verified;
+            return this;
+        }
+
+        public Builder withKeywords(Set<TypedLabel> keywords) {
+            this.keywords = keywords;
+            return this;
+        }
+
+        public Builder withBackground(Map<String, String> background) {
+            this.background = background;
+            return this;
+        }
+
+        public Builder withNvi(PersonNvi nvi) {
+            this.nvi = nvi;
+            return this;
+        }
+
+        public Builder withPlace(Map<String, String> place) {
+            this.place = place;
+            return this;
+        }
+
+        public Builder withCollaboration(Map<String, String> collaboration) {
+            this.collaboration = collaboration;
+            return this;
+        }
+
+        public Builder withCountries(Set<TypedLabel> countries) {
+            this.countries = countries;
+            return this;
+        }
+
+        public Builder withAwards(Set<Award> awards) {
+            this.awards = awards;
             return this;
         }
 
         public Person build() {
-            return person;
+            return new Person(context, id, identifiers, names, contactDetails, image, affiliations, reserved,
+                              employments, verified, keywords, background, nvi, place, collaboration, countries,
+                              awards);
         }
+
+    }
+
+    public Builder copy() {
+        return new Builder().withContext(context)
+                            .withId(id)
+                            .withIdentifiers(identifiers)
+                            .withNames(names)
+                            .withContactDetails(contactDetails)
+                            .withImage(image)
+                            .withAffiliations(affiliations)
+                            .withReserved(reserved)
+                            .withEmployments(employments)
+                            .withVerified(verified)
+                            .withKeywords(keywords)
+                            .withBackground(background)
+                            .withNvi(nvi)
+                            .withPlace(place)
+                            .withCollaboration(collaboration)
+                            .withCountries(countries)
+                            .withAwards(awards);
     }
 
 }

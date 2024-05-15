@@ -18,4 +18,14 @@ public class JsonPropertyNames {
     public static final String CRISTIN_FULL_TIME_PERCENTAGE = "fte_percentage";
     public static final String EMPLOYMENTS = "employments";
     public static final String VERIFIED = "verified";
+    public static final String KEYWORDS = "keywords";
+    public static final String BACKGROUND = "background";
+    public static final String NVI = "nvi";
+    public static final String CRISTIN_TELEPHONE = "tel";
+    public static final String CRISTIN_WEB_PAGE = "web_page";
+    public static final String PLACE = "place";
+    public static final String COLLABORATION = "collaboration";
+    public static final String COUNTRIES = "countries";
+    public static final String AWARDS = "awards";
+
 }

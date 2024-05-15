@@ -21,7 +21,7 @@ import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.model.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
-import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
+import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.model.ApprovalStatus;
 import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.Organization;
@@ -42,12 +42,13 @@ import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
-import static no.unit.nva.utils.ContributorRoleMapping.getNvaRole;
+import static no.unit.nva.cristin.projects.model.nva.ContributorRoleMapping.getNvaRole;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.StringUtils.isNotBlank;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class NvaProjectBuilder {
 
@@ -125,7 +126,6 @@ public class NvaProjectBuilder {
                    .withStartDate(cristinProject.getStartDate())
                    .withEndDate(cristinProject.getEndDate())
                    .withFunding(extractFunding())
-                   .withNewFunding(extractFunding())
                    .withCoordinatingInstitution(extractCoordinatingInstitution())
                    .withContributors(extractContributors())
                    .withStatus(extractProjectStatus())
@@ -150,7 +150,12 @@ public class NvaProjectBuilder {
                    .withApprovals(extractApprovals(cristinProject.getApprovals()))
                    .withExemptFromPublicDisclosure(cristinProject.getExemptFromPublicDisclosure())
                    .withCreator(extractCreator(cristinProject.getCreator()))
+                   .withWebPage(extractWebPage(cristinProject.getExternalUrl()))
                    .build();
+    }
+
+    private URI extractWebPage(String externalUrl) {
+        return attempt(() -> URI.create(externalUrl)).orElse(fail -> null);
     }
 
     private NvaContributor extractCreator(CristinPerson creator) {
@@ -329,6 +334,7 @@ public class NvaProjectBuilder {
     }
 
     private ProjectStatus extractProjectStatus() {
-        return ProjectStatus.fromCristinStatus(cristinProject.getStatus());
+        return attempt(() ->  ProjectStatus.fromCristinStatus(cristinProject.getStatus()))
+                   .orElse(fail -> null);
     }
 }

@@ -4,7 +4,6 @@ import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import no.unit.nva.cristin.organization.dto.v20230526.UnitDto;
@@ -26,23 +25,27 @@ public class OrganizationFromUnitMapper implements Function<UnitDto, Organizatio
     private Organization toOrganization(UnitDto unitDto) {
         return new Organization.Builder()
                    .withId(getNvaApiId(unitDto.getId(), ORGANIZATION_PATH))
-                   .withName(unitDto.getUnitName())
                    .withLabels(unitDto.getUnitName())
                    .withAcronym(unitDto.getAcronym())
                    .withHasPart(unitsToOrganizations(unitDto.getSubUnits()))
-                   .withPartOf(parentToSetOfOrganizations(unitDto.getParentUnit()))
+                   .withPartOf(singleUnitToOrganizations(unitDto.getParentUnit()))
+                   .withCountry(unitDto.getCountry())
                    .build();
     }
 
-    private Set<Organization> unitsToOrganizations(List<UnitDto> unitDtos) {
-        return unitDtos.stream().map(this::toOrganization).collect(Collectors.toSet());
+    private List<Organization> unitsToOrganizations(List<UnitDto> unitDtos) {
+        return unitDtos.stream()
+                   .map(this::toOrganization)
+                   .distinct()
+                   .collect(Collectors.toList());
     }
 
-    private Set<Organization> parentToSetOfOrganizations(UnitDto parent) {
-        return Optional.ofNullable(parent)
+    private List<Organization> singleUnitToOrganizations(UnitDto unitDto) {
+        return Optional.ofNullable(unitDto)
                    .map(this)
                    .stream()
-                   .collect(Collectors.toSet());
+                   .distinct()
+                   .collect(Collectors.toList());
     }
 
 }

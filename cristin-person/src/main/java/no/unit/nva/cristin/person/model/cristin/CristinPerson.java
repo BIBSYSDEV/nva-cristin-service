@@ -3,12 +3,19 @@ package no.unit.nva.cristin.person.model.cristin;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.model.CristinTypedLabel;
+import no.unit.nva.cristin.person.model.cristin.adapter.CristinAwardToNvaFormat;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
+import no.unit.nva.cristin.person.model.nva.Award;
 import no.unit.nva.cristin.person.model.nva.ContactDetails;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.PersonNvi;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
+import no.unit.nva.model.TypedLabel;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
 
@@ -22,13 +29,14 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "PMD.GodClass", "PMD.TooManyFields", "PMD.ExcessivePublicCount"})
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPerson implements JsonSerializable {
@@ -45,6 +53,8 @@ public class CristinPerson implements JsonSerializable {
     public static final String PREFERRED_FIRST_NAME = "PreferredFirstName";
     @JsonIgnore
     public static final String PREFERRED_LAST_NAME = "PreferredLastName";
+    @JsonIgnore
+    public static final String PERSON_NVI = "person_nvi";
 
     private String cristinPersonId;
     private CristinOrcid orcid;
@@ -59,6 +69,15 @@ public class CristinPerson implements JsonSerializable {
     private String norwegianNationalId;
     private List<CristinPersonEmployment> detailedAffiliations;
     private Boolean identifiedCristinPerson;
+    private List<CristinTypedLabel> keywords;
+    private Map<String, String> background;
+    private CristinPersonNvi personNvi;
+    private String email;
+    private String webPage;
+    private Map<String, String> place;
+    private Map<String, String> collaboration;
+    private List<CristinTypedLabel> countries;
+    private List<CristinAward> awards;
 
     public String getCristinPersonId() {
         return cristinPersonId;
@@ -165,6 +184,78 @@ public class CristinPerson implements JsonSerializable {
         this.identifiedCristinPerson = identifiedCristinPerson;
     }
 
+    public List<CristinTypedLabel> getKeywords() {
+        return nonEmptyOrDefault(keywords);
+    }
+
+    public void setKeywords(List<CristinTypedLabel> keywords) {
+        this.keywords = keywords;
+    }
+
+    public Map<String, String> getBackground() {
+        return nonEmptyOrDefault(background);
+    }
+
+    public void setBackground(Map<String, String> background) {
+        this.background = background;
+    }
+
+    public CristinPersonNvi getPersonNvi() {
+        return personNvi;
+    }
+
+    public void setPersonNvi(CristinPersonNvi personNvi) {
+        this.personNvi = personNvi;
+    }
+
+    public Optional<String> getEmail() {
+        return Optional.ofNullable(email);
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Optional<String> getWebPage() {
+        return Optional.ofNullable(webPage);
+    }
+
+    public void setWebPage(String webPage) {
+        this.webPage = webPage;
+    }
+
+    public Map<String, String> getPlace() {
+        return nonEmptyOrDefault(place);
+    }
+
+    public void setPlace(Map<String, String> place) {
+        this.place = place;
+    }
+
+    public Map<String, String> getCollaboration() {
+        return nonEmptyOrDefault(collaboration);
+    }
+
+    public void setCollaboration(Map<String, String> collaboration) {
+        this.collaboration = collaboration;
+    }
+
+    public List<CristinTypedLabel> getCountries() {
+        return nonEmptyOrDefault(countries);
+    }
+
+    public void setCountries(List<CristinTypedLabel> countries) {
+        this.countries = countries;
+    }
+
+    public List<CristinAward> getAwards() {
+        return nonEmptyOrDefault(awards);
+    }
+
+    public void setAwards(List<CristinAward> awards) {
+        this.awards = awards;
+    }
+
     /**
      * Creates a Nva person model from a Cristin person model. If the person is not publicly viewable, only returns
      * identifier.
@@ -172,8 +263,13 @@ public class CristinPerson implements JsonSerializable {
      * @return Nva person model.
      */
     public Person toPerson() {
+        return toPersonBuilder().build();
+    }
+
+    public Person.Builder toPersonBuilder() {
         if (Boolean.TRUE.equals(getReserved())) {
-            return new Person.Builder().withId(extractIdUri()).build(); // Also preserving size of hits from upstream
+            // Also preserving size of hits from upstream
+            return new Person.Builder().withId(extractIdUri());
         }
         return new Person.Builder()
                    .withId(extractIdUri())
@@ -183,7 +279,13 @@ public class CristinPerson implements JsonSerializable {
                    .withImage(extractImage())
                    .withAffiliations(extractAffiliations())
                    .withVerified(getIdentifiedCristinPerson())
-                   .build();
+                   .withKeywords(extractKeywords())
+                   .withBackground(extractBackground())
+                   .withNvi(extractNvi())
+                   .withPlace(extractPlace())
+                   .withCollaboration(extractCollaboration())
+                   .withCountries(extractCountries())
+                   .withAwards(extractAwards());
     }
 
     /**
@@ -194,6 +296,10 @@ public class CristinPerson implements JsonSerializable {
      * @return Nva person model.
      */
     public Person toPersonWithAuthorizedFields() {
+        return toPersonBuilderWithAuthorizedFields().build();
+    }
+
+    public Person.Builder toPersonBuilderWithAuthorizedFields() {
         return new Person.Builder()
                    .withId(extractIdUri())
                    .withIdentifiers(extractAuthorizedIdentifiers())
@@ -204,7 +310,21 @@ public class CristinPerson implements JsonSerializable {
                    .withReserved(getReserved())
                    .withEmployments(extractEmployments())
                    .withVerified(getIdentifiedCristinPerson())
-                   .build();
+                   .withKeywords(extractKeywords())
+                   .withBackground(extractBackground())
+                   .withNvi(extractNvi())
+                   .withPlace(extractPlace())
+                   .withCollaboration(extractCollaboration())
+                   .withCountries(extractCountries())
+                   .withAwards(extractAwards());
+    }
+
+    private Set<TypedLabel> extractKeywords() {
+        return getKeywords().stream().map(this::toTypedLabel).collect(Collectors.toSet());
+    }
+
+    private TypedLabel toTypedLabel(CristinTypedLabel cristinTypedLabel) {
+        return new TypedLabel(cristinTypedLabel.getCode(), cristinTypedLabel.getName());
     }
 
     private Set<TypedValue> extractAuthorizedIdentifiers() {
@@ -212,7 +332,13 @@ public class CristinPerson implements JsonSerializable {
     }
 
     private ContactDetails extractContactDetails() {
-        return getTel().map(ContactDetails::new).orElse(null);
+        if (getTel().isPresent() || getEmail().isPresent() || getWebPage().isPresent()) {
+            return new ContactDetails(getTel().orElse(null),
+                                      getEmail().orElse(null),
+                                      getWebPage().orElse(null));
+        }
+
+        return null;
     }
 
     private URI extractIdUri() {
@@ -259,6 +385,32 @@ public class CristinPerson implements JsonSerializable {
         }
         return getDetailedAffiliations().stream()
                    .map(cristinEmployment -> cristinEmployment.toEmployment(getCristinPersonId()))
+                   .collect(Collectors.toSet());
+    }
+
+    private Map<String, String> extractBackground() {
+        return nonNull(getBackground()) ? new ConcurrentHashMap<>(getBackground()) : Collections.emptyMap();
+    }
+
+    private PersonNvi extractNvi() {
+        return nonNull(getPersonNvi()) ? getPersonNvi().toPersonNvi() : null;
+    }
+
+    private Map<String, String> extractPlace() {
+        return new ConcurrentHashMap<>(getPlace());
+    }
+
+    private Map<String, String> extractCollaboration() {
+        return new ConcurrentHashMap<>(getCollaboration());
+    }
+
+    private Set<TypedLabel> extractCountries() {
+        return getCountries().stream().map(this::toTypedLabel).collect(Collectors.toSet());
+    }
+
+    private Set<Award> extractAwards() {
+        return getAwards().stream()
+                   .map(new CristinAwardToNvaFormat())
                    .collect(Collectors.toSet());
     }
 

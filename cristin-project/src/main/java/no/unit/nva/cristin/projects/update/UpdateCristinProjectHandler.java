@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
 import java.net.http.HttpClient;
 import java.util.Map;
-import no.unit.nva.Validator;
+import no.unit.nva.validation.Validator;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.projects.fetch.FetchCristinProjectApiClient;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.utils.HandlerAccessCheck;
-import no.unit.nva.utils.ResourceAccessCheck;
+import no.unit.nva.access.HandlerAccessCheck;
+import no.unit.nva.access.ResourceAccessCheck;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -38,9 +38,8 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
 
     public static final String ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD =
             "No supported fields in payload, not doing anything";
-    public static final String ACCESS_RIGHT_OR_PROJECT_OWNERSHIP_ALLOWING_UPDATE = "User has required rights by "
-                                                                                   + "either access right or project "
-                                                                                   + "ownership, allowing update";
+    public static final String BOTH_ACCESS_RIGHT_AND_PROJECT_OWNERSHIP_ALLOWING_UPDATE =
+        "User has required rights by both access right and project ownership, allowing update";
 
     private final transient UpdateCristinProjectApiClient cristinApiClient;
     private final transient FetchCristinProjectApiClient fetchApiClient;
@@ -70,20 +69,8 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
     @Override
     protected Void processInput(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
 
-        HandlerAccessCheck handlerAccessCheck = new UpdateProjectHandlerAccessCheck();
-        handlerAccessCheck.verifyAccess(requestInfo);
-
-        if (!handlerAccessCheck.isVerified()) {
-            var projectFromUpstream =
-                fetchApiClient.queryOneCristinProjectUsingIdIntoNvaProject(getValidIdentifier(requestInfo));
-
-            ResourceAccessCheck<NvaProject> resourceAccessCheck = new UpdateProjectResourceAccessCheck();
-            resourceAccessCheck.verifyAccess(projectFromUpstream,
-                                             Map.of(USER_IDENTIFIER, extractCristinIdentifier(requestInfo)));
-
-            if (!resourceAccessCheck.isVerified()) {
-                throw new ForbiddenException();
-            }
+        if (missingHandlerOrResourceAccess(requestInfo)) {
+            throw new ForbiddenException();
         }
 
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
@@ -97,7 +84,7 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
             throw new BadRequestException(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD);
         }
 
-        logger.info(ACCESS_RIGHT_OR_PROJECT_OWNERSHIP_ALLOWING_UPDATE);
+        logger.info(BOTH_ACCESS_RIGHT_AND_PROJECT_OWNERSHIP_ALLOWING_UPDATE);
 
         return cristinApiClient.updateProjectInCristin(getValidIdentifier(requestInfo), cristinJson);
     }
@@ -114,6 +101,28 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
 
     private boolean noSupportedValuesPresent(ObjectNode cristinJson) {
         return cristinJson.isEmpty();
+    }
+
+    private boolean missingHandlerOrResourceAccess(RequestInfo requestInfo) throws ApiGatewayException {
+        return !hasHandlerAccess(requestInfo) || !hasResourceAccess(requestInfo);
+    }
+
+    private boolean hasHandlerAccess(RequestInfo requestInfo) throws ApiGatewayException {
+        HandlerAccessCheck handlerAccessCheck = new UpdateProjectHandlerAccessCheck();
+        handlerAccessCheck.verifyAccess(requestInfo);
+
+        return handlerAccessCheck.isVerified();
+    }
+
+    protected boolean hasResourceAccess(RequestInfo requestInfo) throws ApiGatewayException {
+        var projectFromUpstream =
+            fetchApiClient.queryOneCristinProjectUsingIdIntoNvaProject(getValidIdentifier(requestInfo));
+
+        ResourceAccessCheck<NvaProject> resourceAccessCheck = new UpdateProjectResourceAccessCheck();
+        resourceAccessCheck.verifyAccess(projectFromUpstream,
+                                         Map.of(USER_IDENTIFIER, extractCristinIdentifier(requestInfo)));
+
+        return resourceAccessCheck.isVerified();
     }
 
 }

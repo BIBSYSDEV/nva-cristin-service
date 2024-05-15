@@ -1,0 +1,26 @@
+[
+  {
+    "type": "AD",
+    "typeAlpha3": "AND",
+    "label": {
+      "en": "Andorra",
+      "nb": "Andorra"
+    }
+  },
+  {
+    "type": "AE",
+    "typeAlpha3": "ARE",
+    "label": {
+      "en": "United Arab Emirates",
+      "nb": "Arabiske Emirater"
+    }
+  },
+  {
+    "type": "AF",
+    "typeAlpha3": "AFG",
+    "label": {
+      "en": "Afghanistan",
+      "nb": "Afghanistan"
+    }
+  }
+]

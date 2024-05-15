@@ -1,22 +1,24 @@
 package no.unit.nva.cristin.organization.common.client.v20230526;
 
 import static java.util.Arrays.asList;
-import static no.unit.nva.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
 import static no.unit.nva.cristin.model.Constants.NONE;
+import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Map;
 import no.unit.nva.cristin.common.client.ApiClient;
-import no.unit.nva.cristin.common.client.FetchApiClient;
+import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.cristin.organization.dto.v20230526.UnitDto;
 import no.unit.nva.cristin.organization.dto.v20230526.mapper.OrganizationFromUnitMapper;
 import no.unit.nva.model.Organization;
@@ -48,6 +50,7 @@ public class FetchCristinOrgClient20230526 extends ApiClient
         var identifier = params.get(IDENTIFIER);
         var fetchUri = getCristinUri(identifier);
         var response = fetchGetResult(fetchUri);
+        checkHttpStatusCode(getNvaApiId(identifier, ORGANIZATION_PATH), response.statusCode(), response.body());
         if (wantsDepth(params)) {
             var fetchSubsUri = createCristinQueryUri(translateParamsForSubUnits(identifier), UNITS_PATH);
             var responseWithSubs = fetchGetResult(fetchSubsUri);
@@ -58,6 +61,7 @@ public class FetchCristinOrgClient20230526 extends ApiClient
         } else {
             var organization = getSingleLevelOrganization(response);
             organization.setContext(ORGANIZATION_CONTEXT);
+            organization.setHasPart(null);
 
             return organization;
         }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.facet.Facet;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
@@ -17,6 +18,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.google.common.net.HttpHeaders.LINK;
 import static no.unit.nva.cristin.model.Constants.REL_NEXT;
 import static no.unit.nva.cristin.model.Constants.REL_PREV;
@@ -25,13 +27,13 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "PMD.GodClass"})
 @JacocoGenerated
 @JsonInclude(ALWAYS)
 @JsonPropertyOrder({
     JsonPropertyNames.CONTEXT, JsonPropertyNames.ID, JsonPropertyNames.SIZE, JsonPropertyNames.SEARCH_STRING,
     JsonPropertyNames.PROCESSING_TIME, JsonPropertyNames.FIRST_RECORD, JsonPropertyNames.NEXT_RESULTS,
-    JsonPropertyNames.PREVIOUS_RESULTS, JsonPropertyNames.HITS})
+    JsonPropertyNames.PREVIOUS_RESULTS, JsonPropertyNames.HITS, JsonPropertyNames.AGGREGATIONS})
 public class SearchResponse<E> implements JsonSerializable {
 
     @JsonIgnore
@@ -57,6 +59,9 @@ public class SearchResponse<E> implements JsonSerializable {
     private URI previousResults;
     @JsonProperty
     private List<E> hits;
+    @JsonProperty
+    @JsonInclude(NON_NULL)
+    private Map<String, List<Facet>> aggregations;
 
     private SearchResponse() {
 
@@ -127,12 +132,20 @@ public class SearchResponse<E> implements JsonSerializable {
         this.previousResults = previousResults;
     }
 
-    public List<?> getHits() {
+    public List<E> getHits() {
         return hits;
     }
 
     public void setHits(List<E> hits) {
         this.hits = hits;
+    }
+
+    public Map<String, List<Facet>> getAggregations() {
+        return aggregations;
+    }
+
+    public void setAggregations(Map<String, List<Facet>> aggregations) {
+        this.aggregations = aggregations;
     }
 
     public SearchResponse<E> withContext(String context) {
@@ -152,6 +165,11 @@ public class SearchResponse<E> implements JsonSerializable {
 
     public SearchResponse<E> withSize(int size) {
         this.size = size;
+        return this;
+    }
+
+    public SearchResponse<E> withAggregations(Map<String, List<Facet>> aggregations) {
+        this.aggregations = aggregations;
         return this;
     }
 
@@ -226,30 +244,31 @@ public class SearchResponse<E> implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SearchResponse)) {
+        if (!(o instanceof SearchResponse<?> that)) {
             return false;
         }
-        SearchResponse<?> that = (SearchResponse<?>) o;
         return Objects.equals(getContext(), that.getContext())
-                && Objects.equals(getId(), that.getId())
-                && Objects.equals(getSize(), that.getSize())
-                && Objects.equals(getProcessingTime(), that.getProcessingTime())
-                && Objects.equals(getFirstRecord(), that.getFirstRecord())
-                && Objects.equals(getNextResults(), that.getNextResults())
-                && Objects.equals(getPreviousResults(), that.getPreviousResults())
-                && Objects.equals(getHits(), that.getHits());
+               && Objects.equals(getId(), that.getId())
+               && Objects.equals(getSize(), that.getSize())
+               && Objects.equals(getProcessingTime(), that.getProcessingTime())
+               && Objects.equals(getFirstRecord(), that.getFirstRecord())
+               && Objects.equals(getNextResults(), that.getNextResults())
+               && Objects.equals(getPreviousResults(), that.getPreviousResults())
+               && Objects.equals(getHits(), that.getHits())
+               && Objects.equals(getAggregations(), that.getAggregations());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getContext(),
-                getId(),
-                getSize(),
-                getProcessingTime(),
-                getFirstRecord(),
-                getNextResults(),
-                getPreviousResults(),
-                getHits());
+                            getId(),
+                            getSize(),
+                            getProcessingTime(),
+                            getFirstRecord(),
+                            getNextResults(),
+                            getPreviousResults(),
+                            getHits(),
+                            getAggregations());
     }
 
     @Override

@@ -7,6 +7,7 @@ import nva.commons.core.JacocoGenerated;
 import java.net.URI;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class SubUnitDto {
     /*
     {
@@ -23,6 +24,7 @@ public class SubUnitDto {
     private Map<String, String> institution;
     private URI uri;
     private String acronym;
+    private String country;
 
     @JsonIgnore
     private URI sourceUri;
@@ -35,17 +37,20 @@ public class SubUnitDto {
      * @param institution the institution properties.
      * @param uri         the institution URI.
      * @param acronym     the institution Acronym.
+     * @param country     the country code of the unit.
      */
     public SubUnitDto(@JsonProperty("cristin_unit_id") String id,
                       @JsonProperty("unit_name") Map<String, String> name,
                       @JsonProperty("institution") Map<String, String> institution,
                       @JsonProperty("url") String uri,
-                      @JsonProperty("acronym") String acronym) {
+                      @JsonProperty("acronym") String acronym,
+                      @JsonProperty("country") String country) {
         this.id = id;
         this.name = name;
         this.institution = institution;
         this.uri = URI.create(uri);
         this.acronym = acronym;
+        this.country = country;
     }
 
     @JacocoGenerated
@@ -108,6 +113,11 @@ public class SubUnitDto {
         this.sourceUri = sourceUri;
     }
 
+    public String getCountry() {
+        return country;
+    }
 
-
+    public void setCountry(String country) {
+        this.country = country;
+    }
 }

@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.nio.file.Path;
 import nva.commons.core.ioutils.IoUtils;
 
+@SuppressWarnings({"PMD.NullAssignment"})
 public final class CristinFundingSourcesStubs {
 
     private StubMapping stubMapping;

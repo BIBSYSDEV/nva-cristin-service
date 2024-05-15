@@ -1,4 +1,4 @@
-Feature: API tests for Cristin Project retrieve and search
+Feature: API tests for creating sample Cristin Projects
 
   Background:
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
@@ -33,32 +33,32 @@ Feature: API tests for Cristin Project retrieve and search
           'type': 'ProjectManager',
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684651'
           },
           'affiliation': {
             'type': 'Organization',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
           }
         },
         {
           'type': 'ProjectParticipant',
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684652'
           },
           'affiliation': {
             'type': 'Organization',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
           }
         },
         {
           'type': 'ProjectParticipant',
           'identity': {
             'type': 'Person',
-            'email': 'ola.borte.moen@example.org',
+            'email': 'nameless@example.org',
             'phone': '12345678',
-            'firstName':'Ola',
-            'lastName':'Borte'
+            'firstName':'name',
+            'lastName':'less'
           }
         }
       ],
@@ -111,16 +111,6 @@ Feature: API tests for Cristin Project retrieve and search
           }
         }
       ],
-      'newFunding': [
-        {
-          'type': 'SomeRandomValue',
-          'source': 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR',
-          'identifier': '1234',
-          'labels': {
-            'en': 'Research Council of Norway (RCN)'
-          }
-        }
-      ],
       'keywords': [
         {
           'type': '5686'
@@ -141,7 +131,7 @@ Feature: API tests for Cristin Project retrieve and search
         }
       ],
       'relatedProjects': [
-        'https://api.dev.nva.aws.unit.no/cristin/project/6721135'
+        'https://api.dev.nva.aws.unit.no/cristin/project/2057063'
       ],
       'contactInfo': {
         'type': 'ContactInfo',
@@ -149,7 +139,8 @@ Feature: API tests for Cristin Project retrieve and search
         'organization': 'Universitetet i Oslo',
         'email': 'navn.navnesen@uio.no',
         'phone': '99223344'
-      }
+      },
+      'webPage': 'https://www.example.org'
     }
     """
     Given url CRISTIN_BASE
@@ -197,7 +188,7 @@ Feature: API tests for Cristin Project retrieve and search
           'type': 'ProjectManager',
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684651'
           }
         }
       ]
@@ -208,3 +199,5 @@ Feature: API tests for Cristin Project retrieve and search
     And request swaggerMinimumSampleProject
     When method POST
     Then status 201
+    And print response
+    And match response.publishable == true

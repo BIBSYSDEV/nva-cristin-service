@@ -76,8 +76,7 @@ public class Utils {
      * A function that can be used to filter out duplicate values based on a given key.
      */
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
-        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+        return t -> new ConcurrentHashMap<Object, Boolean>().putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     /**
@@ -144,7 +143,7 @@ public class Utils {
 
     /**
      * Extracts institution string composed of digits from data stored in RequestInfo to be used as value in a header
-     * sent to upstream which describes which institution the user is allowed to change employments at.
+     * sent to upstream which describes which institution the user is allowed to change certain data at.
      *
      * @param requestInfo information from request used to verify allowed permissions
      * @return String with allowed institution to change. Or constant 'any' if internal backend with full access

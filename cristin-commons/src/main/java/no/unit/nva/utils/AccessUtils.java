@@ -20,12 +20,12 @@ import java.util.Base64;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.http.HttpRequest.newBuilder;
+import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class AccessUtils {
 
-    public static final String EDIT_OWN_INSTITUTION_USERS = "EDIT_OWN_INSTITUTION_USERS";
-    public static final String EDIT_OWN_INSTITUTION_PROJECTS = "EDIT_OWN_INSTITUTION_PROJECTS";
     public static final String ACCESS_TOKEN_CLAIMS_SCOPE_FIELD = "scope";
     public static final String ACCESS_TOKEN_CLAIMS_FIELD = "claims";
     public static final String AUTHORIZER_FIELD = "authorizer";
@@ -45,7 +45,7 @@ public class AccessUtils {
     public static final String COGNITO_AUTHENTICATION_DOMAIN = "COGNITO_AUTHENTICATION_DOMAIN";
     public static final String COGNITO_TOKEN_ENDPOINT = "oauth2/token";
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
-    public static final String ADMINISTRATE_APPLICATION = "ADMINISTRATE_APPLICATION";
+    public static final String DOING_AUTHORIZED_REQUEST = "Client is doing authorized request";
 
     /**
      * Validate if Requester is authorized to use IdentificationNumber to access a user.
@@ -55,23 +55,9 @@ public class AccessUtils {
      */
     public static void validateIdentificationNumberAccess(RequestInfo requestInfo) throws ForbiddenException {
         if (requesterHasNoAccessRightToUseNationalIdentificationNumber(requestInfo)) {
-            String nvaUsername = attempt(requestInfo::getNvaUsername).orElse(fail -> null);
+            String nvaUsername = attempt(requestInfo::getUserName).orElse(fail -> null);
             logger.warn(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT,
-                    nvaUsername, EDIT_OWN_INSTITUTION_USERS);
-            throw new ForbiddenException();
-        }
-    }
-
-    /**
-     * Validate if Requester is authorized to create or change a project.
-     *
-     * @param requestInfo information from request
-     * @throws ForbiddenException thrown when user has no access to create or change projects
-     */
-    public static void verifyRequesterCanEditProjects(RequestInfo requestInfo) throws ForbiddenException {
-        if (requesterHasNoAccessRightToEditProjects(requestInfo)) {
-            String nvaUsername = attempt(requestInfo::getNvaUsername).orElse(fail -> null);
-            logger.warn(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, nvaUsername, EDIT_OWN_INSTITUTION_PROJECTS);
+                    nvaUsername, MANAGE_OWN_AFFILIATION);
             throw new ForbiddenException();
         }
     }
@@ -84,15 +70,15 @@ public class AccessUtils {
      * @return true if user administrator otherwise false
      */
     public static boolean requesterIsUserAdministrator(RequestInfo requestInfo) {
-        return requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS) || requestInfo.clientIsInternalBackend();
+        return requestInfo.userIsAuthorized(MANAGE_OWN_AFFILIATION) || requestInfo.clientIsInternalBackend();
+    }
+
+    public static boolean clientIsCustomerAdministrator(RequestInfo requestInfo) {
+        return requestInfo.userIsAuthorized(MANAGE_CUSTOMERS);
     }
 
     private static boolean requesterHasNoAccessRightToUseNationalIdentificationNumber(RequestInfo requestInfo) {
-        return !(requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_USERS) || requestInfo.clientIsInternalBackend());
-    }
-
-    private static boolean requesterHasNoAccessRightToEditProjects(RequestInfo requestInfo) {
-        return !requestInfo.userIsAuthorized(EDIT_OWN_INSTITUTION_PROJECTS);
+        return !(requestInfo.userIsAuthorized(MANAGE_OWN_AFFILIATION) || requestInfo.clientIsInternalBackend());
     }
 
     /**

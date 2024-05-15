@@ -6,8 +6,14 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_NUM
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
 import static no.unit.nva.cristin.common.ErrorMessages.INVALID_URI_MESSAGE;
+import static no.unit.nva.cristin.model.Constants.CATEGORY_PARAM;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_ID_CRISTIN_PARAM;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_ID_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_PER_PAGE_PARAM;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_QUERY_NAME_PARAM;
+import static no.unit.nva.cristin.model.Constants.GRANT_ID_CRISTIN_PARAM;
+import static no.unit.nva.cristin.model.Constants.GRANT_ID_PARAM;
+import static no.unit.nva.cristin.model.Constants.MULTIPLE_PARAM;
 import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_DATE;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_LANGUAGE;
@@ -29,6 +35,7 @@ import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.IParameterKey;
 import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.KeyEncoding;
+import no.unit.nva.cristin.model.query.CristinFacetParamKey;
 
 public enum ParameterKeyProject implements IParameterKey {
     INVALID(null),
@@ -44,7 +51,7 @@ public enum ParameterKeyProject implements IParameterKey {
     BIOBANK(JsonPropertyNames.BIOBANK_ID),
     FUNDING(JsonPropertyNames.FUNDING),
     FUNDING_SOURCE(JsonPropertyNames.FUNDING_SOURCE),
-    GRANT_ID("project_code", null, PATTERN_IS_NUMBER),
+    GRANT_ID(GRANT_ID_CRISTIN_PARAM, GRANT_ID_PARAM, PATTERN_IS_NUMBER),
     INSTITUTION(JsonPropertyNames.INSTITUTION),
     KEYWORD(JsonPropertyNames.PROJECT_KEYWORD),
     LANGUAGE(QUERY_PARAMETER_LANGUAGE, JsonPropertyNames.LANGUAGE, PATTERN_IS_LANGUAGE),
@@ -54,7 +61,7 @@ public enum ParameterKeyProject implements IParameterKey {
          CRISTIN_QUERY_NAME_PARAM,
          PATTERN_IS_TITLE,
          String.format(ERROR_MESSAGE_INVALID_CHARACTERS,JsonPropertyNames.TITLE),
-        KeyEncoding.ENCODE_DECODE),
+         KeyEncoding.NONE),
     ORGANIZATION(PARENT_UNIT_ID,JsonPropertyNames.ORGANIZATION,PATTERN_IS_URL,INVALID_URI_MESSAGE,KeyEncoding.DECODE),
     PARTICIPANT(JsonPropertyNames.PROJECT_PARTICIPANT),
     PROJECT_MANAGER(JsonPropertyNames.PROJECT_MANAGER),
@@ -63,13 +70,13 @@ public enum ParameterKeyProject implements IParameterKey {
           null,
           PATTERN_IS_NON_EMPTY,
           String.format(ERROR_MESSAGE_INVALID_CHARACTERS,JsonPropertyNames.QUERY),
-        KeyEncoding.ENCODE_DECODE),
+          KeyEncoding.NONE),
     STATUS(JsonPropertyNames.STATUS, null, Constants.PATTERN_IS_STATUS, null, KeyEncoding.DECODE),
     TITLE(JsonPropertyNames.TITLE,
         null,
-        PATTERN_IS_TITLE,
+        PATTERN_IS_NON_EMPTY,
         String.format(ERROR_MESSAGE_INVALID_CHARACTERS, JsonPropertyNames.TITLE),
-        KeyEncoding.ENCODE_DECODE),
+        KeyEncoding.NONE),
     USER(JsonPropertyNames.USER),
     PAGE_CURRENT(JsonPropertyNames.PAGE, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE),
     PAGE_ITEMS_PER_PAGE(CRISTIN_PER_PAGE_PARAM,
@@ -78,9 +85,30 @@ public enum ParameterKeyProject implements IParameterKey {
         ERROR_MESSAGE_INVALID_NUMBER,
         KeyEncoding.NONE),
     PAGE_SORT(JsonPropertyNames.PROJECT_SORT),
-    CREATOR(PROJECT_CREATOR_PARAM, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE);
+    CREATOR(PROJECT_CREATOR_PARAM, null, PATTERN_IS_NUMBER, ERROR_MESSAGE_INVALID_NUMBER, KeyEncoding.NONE),
+    CATEGORY(CATEGORY_PARAM),
+    CRISTIN_ID(CRISTIN_ID_CRISTIN_PARAM, CRISTIN_ID_PARAM,
+               PATTERN_IS_NUMBER,
+               ERROR_MESSAGE_INVALID_NUMBER,
+               KeyEncoding.NONE),
+    MULTIPLE(MULTIPLE_PARAM),
+    // Facets from here onward. For each new param above this line, increment IGNORE_FACET_PARAMETER_INDEX by 1
+    SECTOR_FACET(CristinFacetParamKey.SECTOR_PARAM.getKey(), CristinFacetParamKey.SECTOR_PARAM.getNvaKey()),
+    COORDINATING_FACET(CristinFacetParamKey.COORDINATING_PARAM.getKey(),
+                       CristinFacetParamKey.COORDINATING_PARAM.getNvaKey()),
+    RESPONSIBLE_FACET(CristinFacetParamKey.RESPONSIBLE_PARAM.getKey(),
+                      CristinFacetParamKey.RESPONSIBLE_PARAM.getNvaKey()),
+    CATEGORY_FACET(CristinFacetParamKey.CATEGORY_PARAM.getKey(), CristinFacetParamKey.CATEGORY_PARAM.getNvaKey()),
+    HEALTH_FACET(CristinFacetParamKey.HEALTH_PARAM.getKey(), CristinFacetParamKey.HEALTH_PARAM.getNvaKey()),
+    PARTICIPANT_FACET(CristinFacetParamKey.PARTICIPANT_PARAM.getKey(),
+                      CristinFacetParamKey.PARTICIPANT_PARAM.getNvaKey()),
+    PARTICIPATING_PERSON_ORG_FACET(CristinFacetParamKey.PARTICIPATING_PERSON_ORG_PARAM.getKey(),
+                                   CristinFacetParamKey.PARTICIPATING_PERSON_ORG_PARAM.getNvaKey()),
+    FUNDING_SOURCE_FACET(CristinFacetParamKey.FUNDING_SOURCE_PARAM.getKey(),
+                         CristinFacetParamKey.FUNDING_SOURCE_PARAM.getNvaKey());
 
     public static final int IGNORE_PATH_PARAMETER_INDEX = 3;
+    public static final int IGNORE_FACET_PARAMETER_INDEX = 31;
 
     public static final Set<ParameterKeyProject> VALID_QUERY_PARAMETERS =
         Arrays.stream(ParameterKeyProject.values())
@@ -95,6 +123,13 @@ public enum ParameterKeyProject implements IParameterKey {
 
     public static final Set<String> VALID_QUERY_PARAMETER_NVA_KEYS =
         VALID_QUERY_PARAMETERS.stream()
+            .filter(ParameterKeyProject::ignoreFacetKeys)
+            .sorted()
+            .map(ParameterKeyProject::getNvaKey)
+            .collect(Collectors.toSet());
+
+    public static final Set<String> VALID_QUERY_PARAMETER_NVA_KEYS_AND_FACETS =
+        VALID_QUERY_PARAMETERS.stream()
             .sorted()
             .map(ParameterKeyProject::getNvaKey)
             .collect(Collectors.toSet());
@@ -107,6 +142,10 @@ public enum ParameterKeyProject implements IParameterKey {
 
     ParameterKeyProject(String cristinKey) {
         this(cristinKey, null, PATTERN_IS_NON_EMPTY, null, KeyEncoding.NONE);
+    }
+
+    ParameterKeyProject(String cristinKey, String nvaKey) {
+        this(cristinKey, nvaKey, PATTERN_IS_NON_EMPTY, null, KeyEncoding.NONE);
     }
 
     ParameterKeyProject(String cristinKey, String nvaKey, String pattern) {
@@ -172,6 +211,10 @@ public enum ParameterKeyProject implements IParameterKey {
 
     private static boolean ignorePathKeys(ParameterKeyProject f) {
         return f.ordinal() > IGNORE_PATH_PARAMETER_INDEX;
+    }
+
+    private static boolean ignoreFacetKeys(ParameterKeyProject keys) {
+        return keys.ordinal() < IGNORE_FACET_PARAMETER_INDEX;
     }
 
     public static class QueryParameterConstant {

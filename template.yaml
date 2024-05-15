@@ -9,7 +9,7 @@ Globals:
   Function:
     Timeout: 40
     MemorySize: 1798
-    Runtime: java11
+    Runtime: java17
     Architectures:
       - arm64
     Environment:
@@ -28,8 +28,11 @@ Globals:
   Api:
     Cors:
       AllowOrigin: "'*'"
-      AllowMethods: "'OPTIONS, GET, POST, PATCH, DELETE'"
+      AllowMethods: "'OPTIONS, GET, POST, PATCH, DELETE, PUT'"
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token, Access-Control-Allow-Origin'"
+
+Conditions:
+  IsCustomDomainBasePathCristin: !Equals [ !Ref CustomDomainBasePath, "cristin" ]
 
 Parameters:
   CognitoAuthorizationUri:
@@ -87,6 +90,65 @@ Resources:
   NvaCristinProxyApi:
     Type: AWS::Serverless::Api
     Properties:
+      CacheClusterEnabled: true
+      CacheClusterSize: "0.5"
+      MethodSettings:
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1organization~1{identifier}'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1organization'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1organization~1persons'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1organization~1projects'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1person~1{id}'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1person~1{id}~1organization~1{orgId}'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1person~1{id}~1employment'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1person~1{id}~1picture'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1position'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1funding-sources'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1funding-sources~1{identifier}'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1biobank~1{identifier}'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1keyword'
+          CachingEnabled: false
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1keyword~1{identifier}'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1country'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
+        - HttpMethod: 'GET'
+          ResourcePath: '/~1category~1project'
+          CacheTtlInSeconds: 300
+          CachingEnabled: true
       DefinitionBody:
         'Fn::Transform':
           Name: AWS::Include
@@ -94,13 +156,12 @@ Resources:
             Location: ./docs/cristin-proxy-swagger.yaml
       AccessLogSetting:
         DestinationArn: !GetAtt ApiAccessLogGroup.Arn
-        Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "requestTime": "$context.requestTime", "requestTimeEpoch": "$context.requestTimeEpoch", "httpMethod": "$context.httpMethod", "path": "$context.path", "status": "$context.status",  "error.message": "$context.error.message" }'
+        Format: '{ "apiId": "$context.apiId", "requestId": "$context.requestId", "integrationId": "$context.integration.requestId", "time": "$context.requestTime", "timeEpoch": "$context.requestTimeEpoch", "ip": "$context.identity.sourceIp", "method": "$context.httpMethod", "path": "$context.path", "status": "$context.status", "latency": "$context.integration.latency", "userAgent": "$context.identity.userAgent", "error.message": "$context.error.message" }'
       StageName: Prod
       Auth:
         DefaultAuthorizer: NONE
-      EndpointConfiguration: Regional
-
-
+      EndpointConfiguration:
+        Type: REGIONAL
 
   ReadCristinAuthenticationRole:
     Type: AWS::IAM::Role
@@ -132,7 +193,6 @@ Resources:
                   - secretsmanager:GetSecretValue
                 Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:CristinClientBasicAuth*'
 
-
   NvaCristinProjectsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -145,10 +205,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /project/
             Method: get
-            RequestParameters:
-              - method.request.querystring.query
-              - method.request.querystring.page
-              - method.request.querystring.results
 
   NvaCristinCreateProjectsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -191,6 +247,20 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /project/{identifier}/
             Method: patch
+
+  NvaCristinListProjectCategoriesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-project
+      Handler: no.unit.nva.cristin.projects.category.ListCategoriesHandler::handleRequest
+      Events:
+        NvaCristinCategoryEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /category/project/
+            Method: get
+
   NvaCristinQueryOrganizationFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -203,57 +273,25 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /organization/
             Method: get
-            RequestParameters:
-              - method.request.querystring.query
-              - method.request.querystring.page
-              - method.request.querystring.results
-              - method.request.querystring.depth
+
   NvaCristinFetchOrganization:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-organization
       Handler: no.unit.nva.cristin.organization.fetch.FetchCristinOrganizationHandler::handleRequest
-      AutoPublishAlias: live
-      DeploymentPreference:
-        Enabled: true
-        Type: AllAtOnce
       Events:
-        NvaCristinOneProjectEvent:
+        NvaCristinFetchOrganizationEvent:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /organization/{id}
             Method: get
-            RequestParameters:
-              - method.request.querystring.depth
-
-  NvaCristinFetchOrganizationTarget:
-    Type: AWS::ApplicationAutoScaling::ScalableTarget
-    Properties:
-      MaxCapacity: 10
-      MinCapacity: 1
-      ResourceId: !Sub function:${NvaCristinFetchOrganization}:live
-      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lambda.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_LambdaConcurrency
-      ScalableDimension: lambda:function:ProvisionedConcurrency
-      ServiceNamespace: lambda
-    DependsOn: NvaCristinFetchOrganizationAliaslive
-
-  NvaCristinFetchOrganizationScalingPolicy:
-    Type: AWS::ApplicationAutoScaling::ScalingPolicy
-    Properties:
-      PolicyName: NvaCristinFetchOrganizationScalingPolicy
-      PolicyType: TargetTrackingScaling
-      ScalingTargetId: !Ref NvaCristinFetchOrganizationTarget
-      TargetTrackingScalingPolicyConfiguration:
-        TargetValue: 0.70
-        PredefinedMetricSpecification:
-          PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
 
   NvaCristinListOrganizationPersonsFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.ListCristinOrganizationPersonsHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.query.organization.ListCristinOrganizationPersonsHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaListOrganizationPersonsEvent:
@@ -262,9 +300,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /organization/{id}/persons
             Method: get
-            RequestParameters:
-              - method.request.querystring.page
-              - method.request.querystring.results
 
   NvaCristinListOrganizationProjectsFunction:
     Type: AWS::Serverless::Function
@@ -278,15 +313,12 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /organization/{identifier}/projects
             Method: get
-            RequestParameters:
-              - method.request.querystring.page
-              - method.request.querystring.results
 
   NvaCristinQueryPersonFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.QueryCristinPersonHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.query.QueryCristinPersonHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinQueryPersonEvent:
@@ -295,17 +327,12 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/
             Method: get
-            RequestParameters:
-              - method.request.querystring.name
-              - method.request.querystring.organization
-              - method.request.querystring.page
-              - method.request.querystring.results
 
   NvaCristinFetchPersonFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.FetchCristinPersonHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.fetch.FetchCristinPersonHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
       Events:
         NvaCristinFetchPersonEvent:
@@ -319,12 +346,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.handler.FetchFromIdentityNumberHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.fetch.FetchFromIdentityNumberHandler::handleRequest
       Role: !GetAtt ReadCristinAuthenticationRole.Arn
-      AutoPublishAlias: live
-      DeploymentPreference:
-        Enabled: true
-        Type: AllAtOnce
       Events:
         NvaCristinFetchPersonUsingNinEvent:
           Type: Api
@@ -332,29 +355,6 @@ Resources:
             RestApiId: !Ref NvaCristinProxyApi
             Path: /person/identityNumber/
             Method: post
-
-  NvaCristinFetchPersonUsingNinTarget:
-    Type: AWS::ApplicationAutoScaling::ScalableTarget
-    Properties:
-      MaxCapacity: 10
-      MinCapacity: 1
-      ResourceId: !Sub function:${NvaCristinFetchPersonUsingNin}:live
-      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/lambda.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_LambdaConcurrency
-      ScalableDimension: lambda:function:ProvisionedConcurrency
-      ServiceNamespace: lambda
-    DependsOn: NvaCristinFetchPersonUsingNinAliaslive
-
-  NvaCristinFetchPersonUsingNinScalingPolicy:
-    Type: AWS::ApplicationAutoScaling::ScalingPolicy
-    Properties:
-      PolicyName: NvaCristinFetchPersonUsingNinScalingPolicy
-      PolicyType: TargetTrackingScaling
-      ScalingTargetId: !Ref NvaCristinFetchPersonUsingNinTarget
-      TargetTrackingScalingPolicyConfiguration:
-        TargetValue: 0.90
-        PredefinedMetricSpecification:
-          PredefinedMetricType: LambdaProvisionedConcurrencyUtilization
-
 
   NvaCristinCreatePersonFunction:
     Type: AWS::Serverless::Function
@@ -398,7 +398,6 @@ Resources:
             Path: /person/{id}/organization/{orgId}/
             Method: get
 
-
   NvaCristinUpdatePersonInstitutionInfoFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -417,7 +416,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: cristin-person
-      Handler: no.unit.nva.cristin.person.affiliations.handler.PositionCodesHandler::handleRequest
+      Handler: no.unit.nva.cristin.person.affiliations.PositionCodesHandler::handleRequest
       Events:
         NvaCristinFetchPositionsEvent:
           Type: Api
@@ -483,9 +482,9 @@ Resources:
             Method: patch
 
   NvaCristinListFundingSourcesFunction:
-    Description: Function for listing all funding sources
     Type: AWS::Serverless::Function
     Properties:
+      Description: Function for listing all funding sources
       CodeUri: cristin-funding
       Handler: no.unit.nva.cristin.funding.sources.query.ListFundingSourcesHandler::handleRequest
       Events:
@@ -497,9 +496,9 @@ Resources:
             Method: get
 
   NvaCristinFetchFundingSourceFunction:
-    Description: Function for fetching a funding source by identifier
     Type: AWS::Serverless::Function
     Properties:
+      Description: Function for fetching a funding source by identifier
       CodeUri: cristin-funding
       Handler: no.unit.nva.cristin.funding.sources.fetch.FetchFundingSourceHandler::handleRequest
       Events:
@@ -511,9 +510,9 @@ Resources:
             Method: get
 
   NvaCristinFetchBiobankFunction:
-    Description: Function for fetching a Biobank by identifier
     Type: AWS::Serverless::Function
     Properties:
+      Description: Function for fetching a Biobank by identifier
       CodeUri: cristin-biobank
       Handler: no.unit.nva.biobank.fetch.FetchBiobankHandler::handleRequest
       Events:
@@ -552,6 +551,59 @@ Resources:
             Path: /person/{id}/picture/
             Method: get
 
+  NvaCristinQueryKeywordFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-keyword
+      Handler: no.unit.nva.cristin.keyword.query.QueryKeywordsHandler::handleRequest
+      Events:
+        NvaCristinQueryKeywordEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /keyword/
+            Method: get
+
+  NvaCristinFetchKeywordFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-keyword
+      Handler: no.unit.nva.cristin.keyword.fetch.FetchKeywordHandler::handleRequest
+      Events:
+        NvaCristinFetchKeywordEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /keyword/{id}
+            Method: get
+
+  NvaCristinCreateKeywordFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-keyword
+      Handler: no.unit.nva.cristin.keyword.create.CreateKeywordHandler::handleRequest
+      Role: !GetAtt ReadCristinAuthenticationRole.Arn
+      Events:
+        NvaCristinCreateKeywordEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /keyword/
+            Method: post
+
+  NvaCristinListCountriesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-person
+      Handler: no.unit.nva.cristin.person.country.ListCountriesHandler::handleRequest
+      Events:
+        NvaCristinListCountriesEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref NvaCristinProxyApi
+            Path: /country/
+            Method: get
+
   NvaCristinProxyBasePathMapping:
     Type: AWS::ApiGateway::BasePathMapping
     Properties:
@@ -560,5 +612,97 @@ Resources:
       RestApiId: !Ref NvaCristinProxyApi
       Stage: !Ref NvaCristinProxyApi.Stage
 
+  NvaCristinIntermediateStorageBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      LifecycleConfiguration:
+        Rules:
+          - Status: 'Enabled'
+            ExpirationInDays: 7
+            Id: 'DeleteFilesAfter7Days'
 
+  NvaCristinIntermediateStorageBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref NvaCristinIntermediateStorageBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal: "*"
+            Action:
+              - "s3:GetObject"
+            Resource: !Sub 'arn:aws:s3:::${NvaCristinIntermediateStorageBucket}/units-norway.json'
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Sub '${AWS::AccountId}'
 
+  NvaCristinIntermediateStorageUnitsParameter:
+    Type: 'AWS::SSM::Parameter'
+    DependsOn: NvaCristinIntermediateStorageBucket
+    Condition: IsCustomDomainBasePathCristin
+    Properties:
+      Description: 'S3 URI of the file in S3 bucket'
+      Name: '/NVA/S3/CristinIntermediateStorage/Units'
+      Type: 'String'
+      Value: !Sub 's3://${NvaCristinIntermediateStorageBucket}/units-norway.json'
+
+  NvaCristinIntermediateStorageBucketWritePolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    DependsOn: NvaCristinIntermediateStorageBucket
+    Properties:
+      Description: 'Managed policy for writing objects to S3 from Lambda'
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "s3:PutObject"
+            Resource: !Sub 'arn:aws:s3:::${NvaCristinIntermediateStorageBucket}/*'
+
+  NvaCristinUpdateIntermediateUnitsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cristin-intermediate-storage
+      Handler: no.unit.nva.cristin.intermediate.storage.UpdateUnitsHandler::handleRequest
+      Policies:
+        - !Ref NvaCristinIntermediateStorageBucketWritePolicy
+      Environment:
+        Variables:
+          INTERMEDIATE_STORAGE_BUCKET_NAME: !Ref NvaCristinIntermediateStorageBucket
+          CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME: !Ref CristinBotFilterBypassHeaderName
+          CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE: !Ref CristinBotFilterBypassHeaderValue
+          CRISTIN_API_URL: !Ref CristinApiUrl
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Schedule: 'cron(0 5,12 * * ? *)'
+
+  NvaCristinUpdateIntermediateUnitsFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${NvaCristinUpdateIntermediateUnitsFunction}'
+      RetentionInDays: 90
+
+  NvaCristinUpdateIntermediateUnitsDeadMansSwitch:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Dead Mans Switch for NvaCristinUpdateIntermediateUnitsFunction
+      Namespace: 'AWS/Lambda'
+      MetricName: 'Invocations'
+      Dimensions:
+        - Name: 'FunctionName'
+          Value: !Ref NvaCristinUpdateIntermediateUnitsFunction
+      Statistic: 'SampleCount'
+      Period: '86400'
+      EvaluationPeriods: '1'
+      Threshold: '1'
+      ComparisonOperator: 'LessThanThreshold'
+      AlarmName: !Sub 'No successful executions for ${NvaCristinUpdateIntermediateUnitsFunction} last 24h'
+
+Outputs:
+  NvaCristinIntermediateStorageBucketName:
+    Description: The name of the S3 NvaCristinIntermediateStorageBucket
+    Value: !Ref NvaCristinIntermediateStorageBucket

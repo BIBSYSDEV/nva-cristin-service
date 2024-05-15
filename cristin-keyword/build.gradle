@@ -1,0 +1,19 @@
+dependencies {
+    implementation project(":cristin-commons")
+    implementation libs.nva.json
+    implementation libs.nva.commons.apigateway
+    implementation libs.google.guava
+    implementation libs.aws.lambda.java.core
+
+    testImplementation libs.karate.core
+    testImplementation libs.karate.junit5
+    testImplementation libs.json.assert
+
+    testImplementation project(":cristin-testing")
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform {
+        excludeTags 'karateTest'
+    }
+}

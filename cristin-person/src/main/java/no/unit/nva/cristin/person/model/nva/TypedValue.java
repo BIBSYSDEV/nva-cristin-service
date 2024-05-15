@@ -3,10 +3,11 @@ package no.unit.nva.cristin.person.model.nva;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
+import no.unit.nva.commons.json.JsonSerializable;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
-public class TypedValue {
+public class TypedValue implements JsonSerializable {
 
     private final String type;
     private final String value;
@@ -48,4 +49,8 @@ public class TypedValue {
         return Objects.hash(getType(), getValue());
     }
 
+    @Override
+    public String toString() {
+        return toJsonString();
+    }
 }

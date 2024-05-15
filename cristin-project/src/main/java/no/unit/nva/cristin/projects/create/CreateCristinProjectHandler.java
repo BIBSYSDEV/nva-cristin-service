@@ -2,10 +2,11 @@ package no.unit.nva.cristin.projects.create;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
-import no.unit.nva.Validator;
+import no.unit.nva.common.IdCreatedLogger;
+import no.unit.nva.validation.Validator;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.utils.HandlerAccessCheck;
+import no.unit.nva.access.HandlerAccessCheck;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
@@ -92,6 +93,8 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
      */
     @Override
     protected Integer getSuccessStatusCode(NvaProject input, NvaProject output) {
+        new IdCreatedLogger().logId(output);
+
         return HttpURLConnection.HTTP_CREATED;
     }
 

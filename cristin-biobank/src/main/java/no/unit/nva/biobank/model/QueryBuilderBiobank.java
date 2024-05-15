@@ -21,23 +21,19 @@ public class QueryBuilderBiobank extends QueryBuilder<ParameterKeyBiobank> {
     protected void assignDefaultValues() {
         requiredMissing().forEach(key -> {
             switch (key) {
-                case PAGE_CURRENT:
-                    query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
-                    break;
-                case PAGE_ITEMS_PER_PAGE:
-                    query.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
-                    break;
-                default:
-                    break;
+                case PAGE_CURRENT -> query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
+                case PAGE_ITEMS_PER_PAGE -> query.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
+                default -> {
+                }
             }
         });
     }
 
     @Override
     protected void setPath(String key, String value) {
-        var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
 
         if (key.equals(PATH_IDENTITY.getNvaKey())) {
+            final var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
             withPathIdentity(nonNullValue);
         } else {
             invalidKeys.add(key);
@@ -46,7 +42,7 @@ public class QueryBuilderBiobank extends QueryBuilder<ParameterKeyBiobank> {
 
     @Override
     protected void setValue(String key, String value) {
-        var parameterKey = keyFromString(key, value);
+        final var parameterKey = keyFromString(key, value);
         if (parameterKey.equals(INVALID)) {
             invalidKeys.add(key);
         } else if (parameterKey.equals(LANGUAGE)) {

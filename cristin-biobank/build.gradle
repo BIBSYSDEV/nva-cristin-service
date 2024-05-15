@@ -1,6 +1,3 @@
-plugins {
-    id 'java'
-}
 
 dependencies {
     implementation project(":cristin-commons")
@@ -18,28 +15,8 @@ dependencies {
 }
 
 
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform {
         excludeTags 'karateTest'
     }
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    finalizedBy jacocoTestReport
-}
-
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
-}
-
-test{
-    environment "COGNITO_URI", "https://example.cognito.org"
-    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
-    environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
 }

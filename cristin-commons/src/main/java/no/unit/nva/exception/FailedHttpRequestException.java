@@ -6,7 +6,6 @@ import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 
 public class FailedHttpRequestException extends ApiGatewayException {
 
-
     public FailedHttpRequestException(String message) {
         super(message);
     }

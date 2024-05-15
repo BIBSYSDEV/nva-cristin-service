@@ -66,7 +66,7 @@ public class CristinUnit {
      */
     public Organization toOrganization() {
         URI id = getNvaApiId(getCristinUnitId(), ORGANIZATION_PATH);
-        return new Organization.Builder().withId(id).withName(getUnitName()).withLabels(getUnitName()).build();
+        return new Organization.Builder().withId(id).withLabels(getUnitName()).build();
     }
 
     /**

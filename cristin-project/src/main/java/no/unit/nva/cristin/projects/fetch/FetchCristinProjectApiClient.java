@@ -43,7 +43,7 @@ public class FetchCristinProjectApiClient extends CristinProjectApiClient {
         throws ApiGatewayException {
 
         return Optional.of(getProject(id))
-                   .filter(CristinProject::hasValidContent)
+                   .filter(CristinProject::hasEnrichedContent)
                    .map(NvaProjectBuilder::new)
                    .map(builder -> builder.withContext(PROJECT_LOOKUP_CONTEXT_URL))
                    .map(NvaProjectBuilder::build)

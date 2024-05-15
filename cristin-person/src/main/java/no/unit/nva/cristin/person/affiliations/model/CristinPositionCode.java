@@ -49,7 +49,7 @@ public class CristinPositionCode {
     }
 
     public PositionCode toPositionCode() {
-        return new PositionCode(UriUtils.createNvaPositionId(getCode()), getName(), getName(), isEnabled());
+        return new PositionCode(UriUtils.createNvaPositionId(getCode()), getName(), isEnabled());
     }
 
     @Override

@@ -9,7 +9,7 @@ import no.unit.nva.cristin.model.CristinOrganization;
 import java.util.HashMap;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.model.CristinPerson;
-import no.unit.nva.cristin.projects.model.cristin.CristinTypedLabel;
+import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.language.Language;
@@ -48,6 +48,7 @@ import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizat
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinContactInfo.CRISTIN_CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_ACADEMIC_SUMMARY;
+import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_EXTERNAL_URL;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_MAIN_LANGUAGE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_POPULAR_SCIENTIFIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_PROJECT_CATEGORIES;
@@ -60,12 +61,14 @@ import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_
 import static no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder.extractFundingSourceCode;
 import static no.unit.nva.cristin.projects.model.nva.ContactInfo.CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
+import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.WEB_PAGE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.convertToMap;
 import static no.unit.nva.language.LanguageConstants.UNDEFINED_LANGUAGE;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.CustomInstantSerializer.addMillisToInstantString;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.core.attempt.Try.attempt;
+
 
 public class CristinProjectPatchJsonCreator {
 
@@ -101,6 +104,7 @@ public class CristinProjectPatchJsonCreator {
         addEquipmentIfPresent();
         addContactInfoIfPresent();
         addResponsibleInstitutionsIfPresent();
+        addWebPageIfPresent();
 
         return this;
     }
@@ -110,10 +114,10 @@ public class CristinProjectPatchJsonCreator {
         var cristinTitles = new HashMap<String, String>();
 
         if (input.has(LANGUAGE)) {
-            var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
-            var title = input.get(TITLE);
+            final var language = getLanguageByUri(URI.create(input.get(LANGUAGE).asText()));
             if (nonNull(language) && isSupportedLanguage(language)) {
                 output.put(CRISTIN_MAIN_LANGUAGE, language.getIso6391Code());
+                final var title = input.get(TITLE);
                 if (nonNull(title)) {
                     cristinTitles.put(language.getIso6391Code(), title.asText());
                 }
@@ -128,7 +132,9 @@ public class CristinProjectPatchJsonCreator {
             }
         }
 
-        output.putPOJO(TITLE, cristinTitles);
+        if (!cristinTitles.isEmpty()) {
+            output.putPOJO(TITLE, cristinTitles);
+        }
     }
 
     private boolean isSupportedLanguage(Language language) {
@@ -149,10 +155,11 @@ public class CristinProjectPatchJsonCreator {
 
     private void addContributorsIfPresent() {
         if (input.has(CONTRIBUTORS)) {
-            TypeReference<List<NvaContributor>> typeRef = new TypeReference<>() {
-            };
             var contributors =
-                    attempt(() -> OBJECT_MAPPER.readValue(input.get(CONTRIBUTORS).toString(), typeRef)).orElseThrow();
+                    attempt(() -> {
+                        var typeRef = new TypeReference<List<NvaContributor>>() { };
+                        return OBJECT_MAPPER.readValue(input.get(CONTRIBUTORS).toString(), typeRef);
+                    }).orElseThrow();
             output.set(PARTICIPANTS, OBJECT_MAPPER.valueToTree(extractContributors(contributors)));
         }
     }
@@ -318,5 +325,12 @@ public class CristinProjectPatchJsonCreator {
 
     private Organization extractOrganization(JsonNode institution) {
         return new Organization.Builder().withId(URI.create(institution.get(ID).asText())).build();
+    }
+
+    private void addWebPageIfPresent() {
+        if (input.has(WEB_PAGE)) {
+            var webPage = input.get(WEB_PAGE);
+            output.set(CRISTIN_EXTERNAL_URL, webPage);
+        }
     }
 }

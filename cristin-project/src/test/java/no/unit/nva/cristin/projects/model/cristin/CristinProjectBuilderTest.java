@@ -2,9 +2,7 @@ package no.unit.nva.cristin.projects.model.cristin;
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import org.junit.jupiter.api.Test;
@@ -24,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+
 class CristinProjectBuilderTest {
 
     public static final String ONE_CRISTIN_PROJECT = "cristinGetProjectResponse.json";
@@ -36,13 +35,12 @@ class CristinProjectBuilderTest {
         final var cristinProject = expected.toCristinProject();
 
         assertNotNull(cristinProject);
-        assertTrue(cristinProject.hasValidContent());
+        assertTrue(cristinProject.hasEnrichedContent());
 
         var actual = cristinProject.toNvaProject();
-        var ignored = addFieldsToIgnoreListNotSupportedByCristinPost();
         addFieldsNotSupportedByToCristinProject(expected, actual);
 
-        assertThat(actual, doesNotHaveEmptyValuesIgnoringFields(ignored));
+        assertThat(actual, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
         assertEquals(expected, actual);
     }
 
@@ -76,16 +74,4 @@ class CristinProjectBuilderTest {
         actual.setFundingAmount(expected.getFundingAmount());
     }
 
-    private Set<String> addFieldsToIgnoreListNotSupportedByCristinPost() {
-        var ignoreList = new HashSet<>(IGNORE_LIST);
-
-        ignoreList.add(".created.sourceShortName");
-        ignoreList.add(".created.date");
-        ignoreList.add(".lastModified.sourceShortName");
-        ignoreList.add(".lastModified.date");
-        ignoreList.add("lastModified");
-        ignoreList.add("created");
-
-        return ignoreList;
-    }
 }

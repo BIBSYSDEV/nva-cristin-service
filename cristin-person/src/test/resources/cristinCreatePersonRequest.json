@@ -1,0 +1,36 @@
+{
+  "first_name" : "Kjell Ola",
+  "surname" : "Nordmann",
+  "affiliations" : [ ],
+  "keywords" : [
+    {
+      "code": "4245"
+    },
+    {
+      "code": "5686"
+    }
+  ],
+  "background" : {
+    "no": "Min bakgrunn som forsker",
+    "en": "My history as a researcher"
+  },
+  "tel": "+4799885566",
+  "email": "kjell@ola.no",
+  "web_page": "https://www.kjell.no",
+  "place": {
+    "en": "Oslo University",
+    "nb": "Universitetet i Oslo"
+  },
+  "collaboration": {
+    "en": "NTNU in Trondheim",
+    "nb": "NTNU på lokasjon i Trondheim"
+  },
+  "countries": [
+    {
+      "code": "CA"
+    },
+    {
+      "code": "GB"
+    }
+  ]
+}

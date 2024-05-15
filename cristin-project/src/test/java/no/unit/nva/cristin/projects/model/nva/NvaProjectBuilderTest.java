@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
 public class NvaProjectBuilderTest {
 
     private static final String API_RESPONSE_ONE_NVA_PROJECT_JSON =
@@ -71,7 +72,7 @@ public class NvaProjectBuilderTest {
         cristinProject.setProjectFundingSources(List.of(cristinFunding));
         var nvaProject = new NvaProjectBuilder(cristinProject).build();
 
-        var actual = nvaProject.getNewFunding().get(0).getSource().toString();
+        var actual = nvaProject.getFunding().get(0).getSource().toString();
 
         assertThat(actual, equalTo(URI_ENCODED_FUNDING_SOURCE_URI));
     }

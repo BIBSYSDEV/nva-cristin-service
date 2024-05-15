@@ -1,8 +1,9 @@
 package no.unit.nva.cristin.projects.update;
 
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_RESOURCES;
 import static nva.commons.core.attempt.Try.attempt;
 import no.unit.nva.cristin.projects.common.ProjectHandlerAccessCheck;
-import no.unit.nva.utils.HandlerAccessCheck;
+import no.unit.nva.access.HandlerAccessCheck;
 import nva.commons.apigateway.RequestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,17 +12,15 @@ public class UpdateProjectHandlerAccessCheck extends ProjectHandlerAccessCheck i
 
     private static final Logger logger = LoggerFactory.getLogger(UpdateProjectHandlerAccessCheck.class);
 
-    public static final String ACCESS_RIGHT_EDIT_ALL_PROJECTS = "EDIT_ALL_PROJECTS";
-
     private transient boolean verified;
 
     @Override
     public void verifyAccess(RequestInfo requestInfo) {
-        if (requestInfo.userIsAuthorized(ACCESS_RIGHT_EDIT_ALL_PROJECTS) || hasLegacyAccessRight(requestInfo)) {
+        if (requestInfo.userIsAuthorized(MANAGE_OWN_RESOURCES)) {
             verified = true;
         } else {
             var username = attempt(requestInfo::getUserName).orElse(fail -> NO_USERNAME_FOUND);
-            logger.info(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, username, ACCESS_RIGHT_EDIT_ALL_PROJECTS);
+            logger.info(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, username, MANAGE_OWN_RESOURCES);
             verified = false;
         }
     }

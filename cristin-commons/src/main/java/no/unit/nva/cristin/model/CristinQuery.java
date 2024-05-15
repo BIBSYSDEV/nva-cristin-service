@@ -4,8 +4,10 @@ import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
+import static no.unit.nva.cristin.model.Constants.FACETS_PATH;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
+import static no.unit.nva.utils.CristinQueryUtils.convertSupportedParamKeysToFacetParamKeys;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
@@ -23,6 +25,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import no.unit.nva.cristin.facet.CristinFacetUriParamAppender;
 import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +36,13 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
     protected static final Logger logger = LoggerFactory.getLogger(CristinQuery.class);
     protected final transient Map<T, String> pathParameters;
     protected final transient Map<T, String> queryParameters;
+    protected final transient Map<T, String> facetParameters;
     protected final transient Set<T> otherRequiredKeys;
 
     protected CristinQuery() {
         queryParameters = new ConcurrentHashMap<>();
         pathParameters = new ConcurrentHashMap<>();
+        facetParameters = new ConcurrentHashMap<>();
         otherRequiredKeys = new HashSet<>();
     }
 
@@ -75,6 +80,17 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
     }
 
     /**
+     * Builds identifier URI in NVA format with added query and facet parameters.
+     */
+    public URI toNvaFacetURI() {
+        return new UriWrapper(HTTPS, DOMAIN_NAME)
+                   .addChild(BASE_PATH)
+                   .addChild(getNvaPathAsArray())
+                   .addQueryParameters(toNvaParametersWithAddedFacets())
+                   .getUri();
+    }
+
+    /**
      * Builds URI to search Cristin projects based on parameters supplied to the builder methods.
      *
      * @return an URI to NVA (default) Projects with parameters.
@@ -85,6 +101,27 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
                 .addChild(getCristinPath())
                 .addQueryParameters(toParameters())
                 .getUri();
+    }
+
+    /**
+     * Builds URI to search Cristin projects based on facets and parameters supplied to the builder methods.
+     *
+     * @return a URI to NVA (default) Projects with parameters and facets.
+     */
+    public URI toCristinFacetURI() {
+        var baseUri = UriWrapper.fromUri(CRISTIN_API_URL)
+                          .addChild(getCristinPath())
+                          .addChild(FACETS_PATH)
+                          .addQueryParameters(toParameters())
+                          .getUri();
+
+        return appendFacetsToUri(toFacetParameters(), baseUri);
+    }
+
+    private static URI appendFacetsToUri(Map<String, String> parameters, URI cristinUri) {
+        return new CristinFacetUriParamAppender(cristinUri, parameters)
+                   .getAppendedUri()
+                   .getUri();
     }
 
     /**
@@ -101,6 +138,21 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
     }
 
     /**
+     * NVA Query and Facet Parameters with string Keys.
+     *
+     * @return Map
+     */
+    public Map<String, String> toNvaParametersWithAddedFacets() {
+        var results =
+            Stream.of(queryParameters.entrySet(), facetParameters.entrySet())
+                .flatMap(Collection::stream)
+                .filter(this::ignoreNvaPathParameters)
+                .collect(Collectors.toMap(this::toNvaQueryName, this::toNvaQueryValue));
+
+        return convertSupportedParamKeysToFacetParamKeys(results);
+    }
+
+    /**
      * Cristin Query Parameters with string Keys.
      *
      * @return Map of String and String
@@ -111,6 +163,20 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
                 .flatMap(Collection::stream)
                 .filter(this::ignorePathParameters)
                 .collect(Collectors.toMap(this::toCristinQueryName, this::toCristinQueryValue));
+        return new TreeMap<>(results);
+    }
+
+    /**
+     * Cristin Facet Parameters with string Keys.
+     *
+     * @return Map of String and String
+     */
+    public Map<String, String> toFacetParameters() {
+        var results =
+            facetParameters.entrySet()
+                .stream()
+                .collect(Collectors.toMap(this::toCristinQueryName, this::toCristinQueryValue));
+
         return new TreeMap<>(results);
     }
 
@@ -139,6 +205,18 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
     }
 
     /**
+     * Add a key value pair to Facet Parameter Map.
+     *
+     * @param key   to add to.
+     * @param value to assign
+     */
+    public void setFacet(T key, String value) {
+        if (nonNull(value)) {
+            facetParameters.put(key, key.encoding() != KeyEncoding.NONE ? decodeUTF(value) : value);
+        }
+    }
+
+    /**
      * Builds URI to search Cristin projects based on parameters supplied to the builder methods.
      *
      * @param key   to add to.
@@ -157,7 +235,8 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      */
     public boolean areEqual(CristinQuery<T> other) {
         if (queryParameters.size() != other.queryParameters.size()
-            || pathParameters.size() != other.pathParameters.size()) {
+            || pathParameters.size() != other.pathParameters.size()
+            || facetParameters.size() != other.facetParameters.size())  {
             return false;
         }
 
@@ -166,6 +245,9 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
                 .allMatch(e -> e.getValue().equals(other.getValue(e.getKey())))
             &&
             pathParameters.entrySet().stream()
+                .allMatch(e -> e.getValue().equals(other.getValue(e.getKey())))
+            &&
+            facetParameters.entrySet().stream()
                 .allMatch(e -> e.getValue().equals(other.getValue(e.getKey())));
     }
 
@@ -176,7 +258,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      * @return true if map contains key
      */
     public boolean containsKey(T key) {
-        return queryParameters.containsKey(key) || pathParameters.containsKey(key);
+        return queryParameters.containsKey(key) || pathParameters.containsKey(key) || facetParameters.containsKey(key);
     }
 
     /**
@@ -193,13 +275,12 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
     }
 
     private String[] getNvaPathAsArray() {
-        final var pathSize = this.pathParameters.size();
         return
             this.pathParameters
                 .entrySet()
                 .stream()
                 .sorted(byOrdinalDesc())
-                .flatMap(entry -> Stream.of(getNvaPathItem(pathSize, entry), entry.getValue()))
+                .flatMap(entry -> Stream.of(getNvaPathItem(this.pathParameters.size(), entry), entry.getValue()))
                 .filter(entry -> !entry.isEmpty())
                 .toArray(String[]::new);
     }

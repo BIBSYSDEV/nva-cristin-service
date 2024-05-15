@@ -3,6 +3,7 @@ package no.unit.nva.cristin.projects.create;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.util.Objects.isNull;
+import static no.unit.nva.common.IdCreatedLogger.CLIENT_CREATED_RESOURCE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.SOME_UNIT_IDENTIFIER;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomApprovals;
@@ -13,15 +14,15 @@ import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNvaP
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomOrganization;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomPerson;
 import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.someOrganizationFromUnitIdentifier;
-import static no.unit.nva.cristin.projects.create.CreateProjectHandlerAccessCheck.ACCESS_RIGHT_CREATE_PROJECT;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_ONE;
 import static no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase.PHASE_THREE;
 import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.DRUGSTUDY;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_PROJECTS;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_RESOURCES;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -42,6 +43,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
 import java.util.List;
+import no.unit.nva.common.IdCreatedLogger;
 import no.unit.nva.cristin.projects.create.CreateCristinProjectValidator.ValidatedResult;
 import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
 import no.unit.nva.cristin.model.CristinDateInfo;
@@ -57,13 +59,16 @@ import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.DateInfo;
 import no.unit.nva.model.Organization;
 import no.unit.nva.testutils.HandlerRequestBuilder;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
+import nva.commons.logutils.LogUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
+
 
 class CreateCristinProjectHandlerTest {
 
@@ -163,6 +168,7 @@ class CreateCristinProjectHandlerTest {
         randomNvaProject.setCoordinatingInstitution(null);
         randomNvaProject.setContributors(null);
         randomNvaProject.setStartDate(null);
+        randomNvaProject.setEndDate(null);
 
         var response = executeRequest(randomNvaProject);
 
@@ -170,6 +176,7 @@ class CreateCristinProjectHandlerTest {
         assertThat(response.getBody(), containsString(ValidatedResult.HasNoCoordinatingOrganization.getLabel()));
         assertThat(response.getBody(), containsString(ValidatedResult.HasNoContributors.getLabel()));
         assertThat(response.getBody(), containsString(ValidatedResult.InvalidStartDate.getLabel()));
+        assertThat(response.getBody(), containsString(ValidatedResult.InvalidEndDate.getLabel()));
     }
 
     @Test
@@ -277,14 +284,15 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenHealthProjectDataTypePresentButInvalid() throws Exception {
-        String json = getProjectPostRequestJsonSample();
-        String jsonToReplace = HEALTH_PROJECT_TYPE_JSON_FIELD;
+        var json = getProjectPostRequestJsonSample();
+        var jsonToReplace = HEALTH_PROJECT_TYPE_JSON_FIELD;
 
-        String expected = json.replace(String.format(jsonToReplace, DRUGSTUDY.getType()),
+        var expected = json.replace(String.format(jsonToReplace, DRUGSTUDY.getType()),
                                        String.format(jsonToReplace, INVALIDVALUE));
 
-        var input = getInputStreamFromString(expected);
-        handler.handleRequest(input, output, context);
+        try (var input = getInputStreamFromString(expected)) {
+            handler.handleRequest(input, output, context);
+        }
         var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
@@ -293,15 +301,15 @@ class CreateCristinProjectHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenHealthProjectDataClinicalPhasePresentButInvalid() throws Exception {
-        String json = getProjectPostRequestJsonSample();
-        String jsonToReplace = CLINICAL_TRIAL_PHASE_JSON_FIELD;
+        var json = getProjectPostRequestJsonSample();
+        var jsonToReplace = CLINICAL_TRIAL_PHASE_JSON_FIELD;
 
-        String expected = json.replace(String.format(jsonToReplace, PHASE_THREE.getPhase()),
+        var expected = json.replace(String.format(jsonToReplace, PHASE_THREE.getPhase()),
                                        String.format(jsonToReplace, INVALIDVALUE));
 
-
-        InputStream input = getInputStreamFromString(expected);
-        handler.handleRequest(input, output, context);
+        try (InputStream input = getInputStreamFromString(expected)) {
+            handler.handleRequest(input, output, context);
+        }
         var response = GatewayResponse.fromOutputStream(output, Problem.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
@@ -547,7 +555,6 @@ class CreateCristinProjectHandlerTest {
         var input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
                         .withBody(randomNvaProject)
                         .withCurrentCustomer(customerId)
-                        .withAccessRights(customerId, NO_ACCESS)
                         .build();
         handler.handleRequest(input, output, context);
         var response = GatewayResponse.fromOutputStream(output, Object.class);
@@ -556,7 +563,7 @@ class CreateCristinProjectHandlerTest {
     }
 
     @Test
-    void shouldAllowUsersWithLegacyAccessRightForBackwardsCompatibility() throws Exception {
+    void shouldNotAllowUsersWithLegacyAccessRightForBackwardsCompatibility() throws Exception {
         var randomNvaProject = randomNvaProject();
         randomNvaProject.setId(null);
         mockUpstreamUsingRequest(randomNvaProject);
@@ -564,12 +571,31 @@ class CreateCristinProjectHandlerTest {
         var input = new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
                         .withBody(randomNvaProject)
                         .withCurrentCustomer(customerId)
-                        .withAccessRights(customerId, EDIT_OWN_INSTITUTION_PROJECTS)
+                        .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
                         .build();
         handler.handleRequest(input, output, context);
         var response = GatewayResponse.fromOutputStream(output, Object.class);
 
+        assertThat(response.getStatusCode(), equalTo(HTTP_FORBIDDEN));
+    }
+
+    @Test
+    void shouldLogIdentifierOfTheNewlyCreatedResource() throws Exception {
+        final var testAppender = LogUtils.getTestingAppender(IdCreatedLogger.class);
+
+        var expected = randomMinimalNvaProject();
+        expected.setContext(NvaProject.PROJECT_CONTEXT);
+        var identifier = UriUtils.createNvaProjectId("111222");
+        expected.setId(identifier);
+        mockUpstreamUsingRequest(expected);
+
+        var requestProject = expected.toCristinProject().toNvaProject();
+        requestProject.setId(null);  // Cannot create with Id
+        var response = executeRequest(requestProject);
+
         assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
+        assertThat(testAppender.getMessages(),
+                   containsString(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, identifier)));
     }
 
     private NvaContributor nvaContributorWithRole(String roleCode) {
@@ -593,7 +619,7 @@ class CreateCristinProjectHandlerTest {
                         .withCurrentCustomer(customer)
                         .withPersonCristinId(CRISTIN_PERSON_ID)
                         .withTopLevelCristinOrgId(CRISTIN_ORG_ID)
-                        .withAccessRights(customer, ACCESS_RIGHT_CREATE_PROJECT)
+                        .withAccessRights(customer, MANAGE_OWN_RESOURCES)
                         .build();
     }
 
@@ -605,7 +631,7 @@ class CreateCristinProjectHandlerTest {
                    .withBody(nvaProject)
                    .withCurrentCustomer(customer)
                    .withPersonCristinId(CRISTIN_PERSON_ID)
-                   .withAccessRights(customer, ACCESS_RIGHT_CREATE_PROJECT)
+                   .withAccessRights(customer, MANAGE_OWN_RESOURCES)
                    .build();
     }
 
@@ -634,7 +660,8 @@ class CreateCristinProjectHandlerTest {
         var cristinProject = request.toCristinProject();
         addMockedResponseFieldsToCristinProject(cristinProject, request);
         var httpResponse = new HttpResponseFaker(OBJECT_MAPPER.writeValueAsString(cristinProject), 201);
-        when(mockHttpClient.send(any(), any())).thenAnswer(response -> httpResponse);
+        when(mockHttpClient.send(any(), any()))
+            .thenAnswer(response -> httpResponse);
     }
 
     private void addMockedResponseFieldsToCristinProject(CristinProject cristinProject, NvaProject request) {
@@ -676,7 +703,7 @@ class CreateCristinProjectHandlerTest {
         return new HandlerRequestBuilder<NvaProject>(OBJECT_MAPPER)
             .withBody(body)
             .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, ACCESS_RIGHT_CREATE_PROJECT)
+            .withAccessRights(customerId, MANAGE_OWN_RESOURCES)
             .build();
     }
 
@@ -693,7 +720,7 @@ class CreateCristinProjectHandlerTest {
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                    .withBody(expected)
                    .withCurrentCustomer(customerId)
-                   .withAccessRights(customerId, ACCESS_RIGHT_CREATE_PROJECT)
+                   .withAccessRights(customerId, MANAGE_OWN_RESOURCES)
                    .build();
     }
 

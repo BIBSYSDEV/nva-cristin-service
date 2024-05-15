@@ -18,7 +18,9 @@ public interface IParameterKey {
 
     static Predicate<IParameterKey> hasValidValue(String value) {
         return f -> {
-            var encoded = f.encoding() == KeyEncoding.ENCODE_DECODE ? URLDecoder.decode(value, StandardCharsets.UTF_8) : value;
+            var encoded = f.encoding() == KeyEncoding.ENCODE_DECODE
+                              ? URLDecoder.decode(value, StandardCharsets.UTF_8)
+                              : value;
             return encoded.matches(f.getPattern());
         };
     }

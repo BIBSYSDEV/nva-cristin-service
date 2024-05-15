@@ -124,9 +124,6 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.funding[0].source == '#present'
     And match response.funding[0].identifier == '#present'
     And match response.funding[0].labels == '#present'
-    And match response.newFunding[0].source == '#present'
-    And match response.newFunding[0].identifier == '#present'
-    And match response.newFunding[0].labels == '#present'
 
   Scenario: Fetch returns method and equipment
     Given path '/project/284612'
@@ -151,7 +148,7 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 200
     And match response == '#object'
     And match response.institutionsResponsibleForResearch[0].id == '#present'
-    And match response.institutionsResponsibleForResearch[0].name == '#present'
+    And match response.institutionsResponsibleForResearch[0].labels == '#present'
 
   Scenario: Fetch returns project with additional health data and approvals
     Given path '/project/538881'
@@ -167,3 +164,18 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.approvals[0].applicationCode == 'EthicalApproval'
     And match response.approvals[0].identifier == '2017/800'
     And match response.approvals[0].authorityName == '#present'
+
+  Scenario: Fetch returns project with webpage
+    Given path '/project/2675101'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.webPage == '#present'
+    And match response.webPage == 'https://www.example.org'
+
+  Scenario: Fetch returns project without webpage when not present in upstream
+    Given path '/project/550767'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.webPage != '#present'

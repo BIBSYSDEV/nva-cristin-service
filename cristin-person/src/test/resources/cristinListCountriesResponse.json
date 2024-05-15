@@ -1,0 +1,26 @@
+[
+  {
+    "code": "AD",
+    "code_alpha3": "AND",
+    "name": {
+      "en": "Andorra",
+      "nb": "Andorra"
+    }
+  },
+  {
+    "code": "AE",
+    "code_alpha3": "ARE",
+    "name": {
+      "en": "United Arab Emirates",
+      "nb": "Arabiske Emirater"
+    }
+  },
+  {
+    "code": "AF",
+    "code_alpha3": "AFG",
+    "name": {
+      "en": "Afghanistan",
+      "nb": "Afghanistan"
+    }
+  }
+]

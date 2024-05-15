@@ -1,3 +1,4 @@
+
 dependencies {
     implementation libs.nva.json
     implementation libs.nva.core
@@ -17,6 +18,8 @@ dependencies {
 
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
+    testImplementation libs.nva.logutils
+    testImplementation libs.log4j.core
 
     implementation libs.nva.testutils
     implementation libs.aws.sdk2.auth
@@ -24,26 +27,16 @@ dependencies {
     implementation libs.aws.sdk2.regions
     implementation libs.aws.sdk2.urlconnection
     implementation libs.aws.sdk2.spi
-    implementation libs.apache.http.core
+    implementation libs.apache.http.core5
 
+    implementation libs.vavr
+    implementation libs.resilience4j.all
 
 }
-tasks.named('test') {
+tasks.named('test', Test) {
     useJUnitPlatform {
         excludeTags 'karateTest', 'integrationTest', 'createTestUsers', 'deleteTestUsers'
     }
-    failFast = true
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
-    finalizedBy jacocoTestReport
 }
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java'
-        }
-    }
-}
+
 

@@ -2,16 +2,16 @@ openapi: 3.0.3
 info:
   title: NVA Cristin Proxy API
   description: This API provides transformed Cristin data stored in [Cristin](https://api.cristin.no/v2).
-  termsOfService: https://nva.unit.no/terms/
+  termsOfService: https://nva.sikt.no/
   contact:
-    email: nva@unit.no
+    email: kontakt@sikt.no
   license:
     name: MIT/NLOD 2.0
-    url: https://link.to.license
+    url: https://data.norge.no/nlod/en/2.0
   version: 1.0.0
 externalDocs:
   description: Find out more about NVA
-  url: https://nva.unit.no
+  url: https://nva.sikt.no
 servers:
   - url: https://api.nva.unit.no/cristin
   - url: https://api.dev.nva.aws.unit.no/cristin
@@ -27,6 +27,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Project
+        - external
       summary: List projects matching query
       description: Returns a list of projects based on query parameters
       operationId: ListProjects
@@ -34,7 +35,7 @@ paths:
         - name: query
           in: query
           description: Search string. Either title search or grant id search
-          required: true
+          required: false
           schema:
             type: string
             pattern: '.+'
@@ -112,13 +113,17 @@ paths:
             type: string
         - name: sort
           in: query
-          description: Sorts on 'start_date' and/or 'end_date'. See Search and sort. Default sort order is on 'cristin_project_id' in ascending order.
+          description: Sort results based on parameters.
           required: false
           schema:
             type: string
             enum:
               - start_date
+              - start_date asc
+              - start_date desc
               - end_date
+              - end_date asc
+              - end_date desc
         - name: unit
           in: query
           description: Unit id
@@ -167,6 +172,105 @@ paths:
           required: false
           schema:
             type: string
+        - name: category
+          in: query
+          description: Project category
+          required: false
+          schema:
+            type: string
+        - name: grantId
+          in: query
+          description: Project funding identifier
+          required: false
+          schema:
+            type: number
+        - name: cristinId
+          in: query
+          description: Project identifier in Cristin
+          required: false
+          schema:
+            type: number
+        - name: multiple
+          in: query
+          description: Matches multiple fields using only this one param, those being 'cristinId', 'title', 'project_manager', 'participant' and 'grantId'
+          required: false
+          schema:
+            type: string
+        - name: categoryFacet
+          in: query
+          description: Narrow down on project category. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: 'APPLIEDRESEARCH'
+        - name: coordinatingFacet
+          in: query
+          description: Narrow down on coordinating organization. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: '185.90.0.0'
+        - name: fundingSourceFacet
+          in: query
+          description: Narrow down on funding source. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: 'NFR'
+        - name: healthProjectFacet
+          in: query
+          description: Narrow down on health project. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: 'DRUGSTUDY'
+        - name: participantFacet
+          in: query
+          description: Narrow down on participant. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: '1234'
+        - name: participantOrgFacet
+          in: query
+          description: Narrow down on participant organization. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: '185'
+        - name: responsibleFacet
+          in: query
+          description: Narrow down on responsible organization. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: '185.90.0.0'
+        - name: sectorFacet
+          in: query
+          description: Narrow down on sector. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: 'UC'
+        - name: Accept
+          in: header
+          description: Requested response format and version of the returned payload
+          required: false
+          schema:
+            type: string
+          examples:
+            versionOne:
+              value: application/json; version=1
+              description: Version 1 of the Api
+            version20231103WithAggregations:
+              value: application/json; version=2023-11-03-aggregations
+              description: Version with search facets. Header value also accepts version=[2023-11-03, aggregations]
+            versionOneJsonLd:
+              value: application/ld+json; version=1
+              description: Version 1 of the Api
+            version20231103WithAggregationsJsonLd:
+              value: application/ld+json; version=2023-11-03-aggregations
+              description: Version with search facets. Header value also accepts version=[2023-11-03, aggregations]
       responses:
         200:
           description: successful operation
@@ -183,6 +287,18 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/ProjectsExample'
+            application/json; version=2023-11-03-aggregations:
+              schema:
+                $ref: '#/components/schemas/ProjectsWithFacets'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectsWithFacetsExample'
+            application/ld+json; version=2023-11-03-aggregations:
+              schema:
+                $ref: '#/components/schemas/ProjectsWithFacets'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/ProjectsWithFacetsExample'
         400:
           $ref: '#/components/responses/400'
         500:
@@ -254,6 +370,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Project
+        - external
       summary: Find project by Identifier
       description: Returns a single project matching identifier parameter
       operationId: GetProjectByidentifier
@@ -298,7 +415,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Project
-      summary: Update project matching identifier
+      summary: Update project matching identifier. Only allowed for project creator or manager
       description: Updates project data
       operationId: UpdateProject
       parameters:
@@ -348,6 +465,41 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /category/project:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListProjectCategoriesFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Categories
+        - external
+      summary: List categories
+      description: Returns list of categories
+      operationId: ListCategories
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categories'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/CategoriesExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Categories'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/CategoriesExample'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+        400:
+          $ref: '#/components/responses/400'
   /organization:
     get:
       x-amazon-apigateway-integration:
@@ -357,6 +509,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: List organizations matching query
       description: Returns a list of organizations based on query parameters
       operationId: ListOrganizations
@@ -394,6 +547,23 @@ paths:
             type: number
             default: '10'
           example: '10'
+        - name: sort
+          in: query
+          description: Sort results based on parameters.
+          required: false
+          schema:
+            type: string
+            enum:
+              - country
+              - country asc
+              - country desc
+        - name: fullTree
+          in: query
+          description: Include all parent and sub units for each search result
+          required: false
+          schema:
+            type: boolean
+            default: false
         - name: Accept
           in: header
           description: Requested response format and version of the returned payload
@@ -452,11 +622,23 @@ paths:
     get:
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchOrganization.Arn}:live/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchOrganization.Arn}/invocations
         httpMethod: POST
+        requestParameters:
+          integration.request.path.identifier:
+            'method.request.path.identifier'
+          integration.request.querystring.depth:
+            'method.request.querystring.depth'
+          integration.request.header.Accept:
+            'method.request.header.Accept'
+        cacheKeyParameters:
+          - 'method.request.path.identifier'
+          - 'method.request.querystring.depth'
+          - 'method.request.header.Accept'
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: Fetch Organization by identifier
       description: Returns a single Organization matching identifier parameter
       operationId: GetOrganizationByIdentifier
@@ -541,6 +723,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: Fetch Persons associated with an given organization
       description: Returns a list of persons belonging to specified organization
       operationId: GetPersonsByOrganization
@@ -578,10 +761,17 @@ paths:
           example: 'daniel'
         - name: sort
           in: query
-          description: Sort results based on parameters
+          description: Sort results based on parameters.
           required: false
           schema:
             type: string
+            enum:
+              - id
+              - id asc
+              - id desc
+              - name
+              - name asc
+              - name desc
           examples:
             identifierDesc:
               value: 'id desc'
@@ -624,6 +814,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Organization
+        - external
       summary: Fetch Projects associated with an given organization
       description: Returns a list of projects belonging to specified organization
       operationId: GetProjectsByOrganization
@@ -690,10 +881,17 @@ paths:
             type: string
         - name: sort
           in: query
-          description: Sorts on 'start_date' and/or 'end_date'. See Search and sort. Default sort order is on 'cristin_project_id' in ascending order.
+          description: Sort results based on parameters.
           required: false
           schema:
             type: string
+            enum:
+              - start_date
+              - start_date asc
+              - start_date desc
+              - end_date
+              - end_date asc
+              - end_date desc
         - name: unit
           in: query
           description: Unit id
@@ -742,6 +940,24 @@ paths:
           required: false
           schema:
             type: string
+        - name: grantId
+          in: query
+          description: Project funding identifier
+          required: false
+          schema:
+            type: number
+        - name: cristinId
+          in: query
+          description: Project identifier in Cristin
+          required: false
+          schema:
+            type: number
+        - name: multiple
+          in: query
+          description: Matches multiple fields using only this one param, those being 'cristinId', 'title', 'project_manager', 'participant' and 'grantId'
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -776,6 +992,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Person
+        - external
       summary: List persons matching query parameters
       description: Returns a list of persons based on query parameters
       operationId: ListPersons
@@ -783,7 +1000,7 @@ paths:
         - name: name
           in: query
           description: Search string. First name and/or last name
-          required: true
+          required: false
           schema:
             type: string
             pattern: '.+'
@@ -812,6 +1029,58 @@ paths:
             type: number
             default: '5'
           example: '10'
+        - name: verified
+          in: query
+          description: Verified or not verified persons
+          required: false
+          schema:
+            type: boolean
+        - name: sectorFacet
+          in: query
+          description: Narrow down to sector. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: 'UC'
+        - name: organizationFacet
+          in: query
+          description: Narrow down to organization. Works only for version 2023-11-03-aggregations
+          required: false
+          schema:
+            type: string
+          example: 'uio'
+        - name: sort
+          in: query
+          description: Sort results based on parameters.
+          required: false
+          schema:
+            type: string
+            enum:
+              - id
+              - id asc
+              - id desc
+              - name
+              - name asc
+              - name desc
+        - name: Accept
+          in: header
+          description: Requested response format and version of the returned payload
+          required: false
+          schema:
+            type: string
+          examples:
+            versionOne:
+              value: application/json; version=1
+              description: Version 1 of the Api
+            version20231103WithAggregations:
+              value: application/json; version=2023-11-03-aggregations
+              description: Version with search aggregations. Header value also accepts version=[2023-11-03, aggregations]
+            versionOneJsonLd:
+              value: application/ld+json; version=1
+              description: Version 1 of the Api
+            version20231103WithAggregationsJsonLd:
+              value: application/ld+json; version=2023-11-03-aggregations
+              description: Version with search aggregations. Header value also accepts version=[2023-11-03, aggregations]
       responses:
         200:
           description: successful operation
@@ -828,6 +1097,18 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonsExample'
+            application/json; version=2023-11-03-aggregations:
+              schema:
+                $ref: '#/components/schemas/PersonsWithFacets'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonsWithFacetsExample'
+            application/ld+json; version=2023-11-03-aggregations:
+              schema:
+                $ref: '#/components/schemas/PersonsWithFacets'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/PersonsWithFacetsExample'
         400:
           $ref: '#/components/responses/400'
         500:
@@ -899,6 +1180,24 @@ paths:
           type: string
           pattern: '^[0-9]+$|[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9|Xx]'
         example: '359084'
+      - name: Accept
+        in: header
+        description: Requested response format and version of the returned payload
+        examples:
+          applicationJson:
+            value: application/json
+            description: application/json
+          applicationLdPlusJson:
+            value: application/ld+json
+            description: application/ld+json
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        description: Bearer token authorization that can allow exposure of national identity number
+        required: false
+        schema:
+          type: string
     get:
       x-amazon-apigateway-integration:
         uri:
@@ -907,6 +1206,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - Person
+        - external
       summary: Find person by identifier
       description: Returns a single person matching id parameter without NIN
       operationId: GetPersonById
@@ -991,7 +1291,7 @@ paths:
     post:
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonUsingNin.Arn}:live/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPersonUsingNin.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
@@ -1365,7 +1665,7 @@ paths:
       security:
         - CognitoUserPool: [ 'https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend','aws.cognito.signin.user.admin' ]
       requestBody:
-        description: Payload containing base64 encoded binary image. Max size of image is currently 256kb and must be a jpeg image
+        description: Payload containing base64 encoded binary image. Max size of image is currently 1024kb and must be a jpeg image
         required: true
         content:
           application/json:
@@ -1496,6 +1796,7 @@ paths:
         type: "AWS_PROXY"
       tags:
         - FundingSources
+        - external
       summary: List funding sources
       description: Returns all support funding sources
       operationId: ListFundingSources
@@ -1533,9 +1834,15 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchFundingSourceFunction.Arn}/invocations
         httpMethod: POST
+        requestParameters:
+          integration.request.path.identifier:
+            'method.request.path.identifier'
+        cacheKeyParameters:
+          - 'method.request.path.identifier'
         type: "AWS_PROXY"
       tags:
         - FundingSource
+        - external
       summary: Fetch a funding source by identifier
       description: Returns the funding source with the given identifier
       operationId: FetchFundingSource
@@ -1576,6 +1883,11 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchBiobankFunction.Arn}/invocations
         httpMethod: POST
+        requestParameters:
+          integration.request.path.identifier:
+            'method.request.path.identifier'
+        cacheKeyParameters:
+          - 'method.request.path.identifier'
         type: "AWS_PROXY"
       tags:
         - Biobank
@@ -1604,6 +1916,199 @@ paths:
           $ref: '#/components/responses/500'
         502:
           $ref: '#/components/responses/502'
+  /keyword:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinQueryKeywordFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Keywords
+        - external
+      summary: Query keywords
+      description: Returns paginated list of keywords
+      operationId: QueryKeywords
+      parameters:
+        - name: query
+          in: query
+          description: Search string for matching keywords
+          required: false
+          schema:
+            type: string
+            pattern: '.+'
+          example: 'Biology'
+        - name: page
+          in: query
+          description: Current page requested
+          required: false
+          schema:
+            type: number
+            default: '1'
+          example: '3'
+        - name: results
+          in: query
+          description: Results per page
+          required: false
+          schema:
+            type: number
+            default: '100'
+          example: '5'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Keywords'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/KeywordsExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Keywords'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/KeywordsExample'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+        400:
+          $ref: '#/components/responses/400'
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinCreateKeywordFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Keywords
+      summary: Create one keyword
+      description: Creates one keyword matching supplied payload
+      operationId: PostKeyword
+      security:
+        - CognitoUserPool: [ 'https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend','aws.cognito.signin.user.admin' ]
+      requestBody:
+        description: Payload containing labels
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeywordPost'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/KeywordPostExample'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/KeywordPost'
+            examples:
+              objectExample:
+                $ref: '#/components/examples/KeywordPostExample'
+      responses:
+        201:
+          description: Successful creation of resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Keyword'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/KeywordExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Keyword'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/KeywordExample'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+  /keyword/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Identifier of Keyword
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]+$'
+        example: '1197'
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchKeywordFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Keywords
+        - external
+      summary: Fetch keyword
+      description: Returns single keyword
+      operationId: FetchKeyword
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentifierWithLabels'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/SingleKeywordExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/IdentifierWithLabels'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/SingleKeywordExample'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+        400:
+          $ref: '#/components/responses/400'
+  /country:
+    get:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinListCountriesFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Countries
+        - external
+      summary: List supported countries
+      description: Returns list of supported countries
+      operationId: ListCountries
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Countries'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/CountriesExample'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Countries'
+              examples:
+                objectExample:
+                  $ref: '#/components/examples/CountriesExample'
+        500:
+          $ref: '#/components/responses/500'
+        502:
+          $ref: '#/components/responses/502'
+
 components:
   responses:
     400:
@@ -1678,6 +2183,43 @@ components:
           description: The list of projects returned by the query
           items:
             $ref: '#/components/schemas/Project'
+    ProjectsWithFacets:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of projects returned by the query
+          items:
+            $ref: '#/components/schemas/Project'
+        aggregations:
+          $ref: '#/components/schemas/Facets'
     Project:
       type: object
       properties:
@@ -1746,22 +2288,7 @@ components:
                   - LocalProjectManager
                 description: Type of contributor.
               identity:
-                type: object
-                properties:
-                  id:
-                    $ref: '#/components/schemas/Id'
-                  type:
-                    type: string
-                    pattern: 'Person'
-                    description: Type of identity. Always Person
-                  firstName:
-                    type: string
-                    pattern: '.+'
-                    description: First name
-                  lastName:
-                    type: string
-                    pattern: '.+'
-                    description: Last name
+                $ref: '#/components/schemas/PersonSummary'
               affiliation:
                 $ref: '#/components/schemas/Organization'
         status:
@@ -1907,24 +2434,13 @@ components:
               type: string
               description: Type. Always ProjectCreator
             identity:
-              type: object
-              properties:
-                id:
-                  $ref: '#/components/schemas/Id'
-                type:
-                  type: string
-                  pattern: 'Person'
-                  description: Type of identity. Always Person
-                firstName:
-                  type: string
-                  pattern: '.+'
-                  description: First name
-                lastName:
-                  type: string
-                  pattern: '.+'
-                  description: Last name
+              $ref: '#/components/schemas/PersonSummary'
             affiliation:
               $ref: '#/components/schemas/Organization'
+        webPage:
+          type: string
+          format: uri
+          description: Project webpage
     ProjectPost:
       type: object
       properties:
@@ -2069,6 +2585,10 @@ components:
               type: string
             phone:
               type: string
+        webPage:
+          type: string
+          format: uri
+          description: Project webpage
     ProjectPatch:
       type: object
       properties:
@@ -2167,6 +2687,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Organization'
+        webPage:
+          type: string
+          format: uri
+          description: Project webpage
     Problem:
       type: object
       description: NVA error reporting object
@@ -2252,10 +2776,6 @@ components:
           type: string
           pattern: 'Organization'
           description: Always Organization
-        name:
-          type: array
-          items:
-            $ref: '#/components/schemas/Languages'
         labels:
           type: array
           items:
@@ -2264,6 +2784,9 @@ components:
           type: string
           pattern: '.*'
           description: 'Short mnemonic identifying Organization'
+        country:
+          type: string
+          description: Two letter country code (ISO 3166-1 alpha-2)
         partOf:
           description: List of Organizations this organization is part of
           type: array
@@ -2427,6 +2950,43 @@ components:
           description: The list of persons returned by the query
           items:
             $ref: '#/components/schemas/Person'
+    PersonsWithFacets:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of persons returned by the query
+          items:
+            $ref: '#/components/schemas/Person'
+        aggregations:
+          $ref: '#/components/schemas/Facets'
     Person:
       type: object
       properties:
@@ -2473,6 +3033,11 @@ components:
             telephone:
               type: string
               pattern: '\+?\d+'
+            email:
+              type: string
+            webPage:
+              type: string
+              format: uri
         image:
           $ref: '#/components/schemas/Id'
         affiliations:
@@ -2488,9 +3053,80 @@ components:
         verified:
           type: boolean
           description: Whether we can document the existence of the person
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
+              label:
+                $ref: '#/components/schemas/Languages'
+        background:
+          $ref: '#/components/schemas/Languages'
+        nvi:
+          type: object
+          description: Person NVI data
+          properties:
+            verifiedBy:
+              $ref: '#/components/schemas/PersonSummary'
+            verifiedAt:
+              $ref: '#/components/schemas/Organization'
+            verifiedDate:
+              type: string
+              format: date-time
+        place:
+          $ref: '#/components/schemas/Languages'
+        collaboration:
+          $ref: '#/components/schemas/Languages'
+        countries:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: Two letter country code (ISO 3166-1 alpha-2)
+              label:
+                $ref: '#/components/schemas/Languages'
+        awards:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the award
+              year:
+                type: integer
+                description: Year of the award
+              type:
+                type: object
+                properties:
+                  type:
+                    enum:
+                      - ResearchDissemination
+                      - Research
+                    description: The code for this type of activity. Can be ResearchDissemination (Dissemination of research results) or Research (Research activity)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              distribution:
+                type: object
+                properties:
+                  type:
+                    enum:
+                      - International
+                      - National
+                      - Internal
+                    description: The code for the scope of award. Can be International (International), National (National) or Internal (Own institution)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              affiliation:
+                $ref: '#/components/schemas/Organization'
     PersonPost:
       type: object
-      required: [ identifiers, names ]
+      required: [ names ]
       properties:
         identifiers:
           type: array
@@ -2525,6 +3161,48 @@ components:
           description: Employments for this person
           items:
             $ref: '#/components/schemas/PersonEmployment'
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
+        background:
+          $ref: '#/components/schemas/Languages'
+        nvi:
+          type: object
+          description: Person NVI data
+          properties:
+            verifiedBy:
+              $ref: '#/components/schemas/Id'
+            verifiedAt:
+              $ref: '#/components/schemas/Id'
+        contactDetails:
+          type: object
+          description: Contact information
+          properties:
+            telephone:
+              type: string
+              pattern: '\+?\d+'
+            email:
+              type: string
+            webPage:
+              type: string
+              format: uri
+        place:
+          $ref: '#/components/schemas/Languages'
+        collaboration:
+          $ref: '#/components/schemas/Languages'
+        countries:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: Two letter country code (ISO 3166-1 alpha-2)
     PersonPostResponse:
       type: object
       properties:
@@ -2566,6 +3244,55 @@ components:
           description: Employments for this person
           items:
             $ref: '#/components/schemas/PersonEmployment'
+        keywords:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
+              label:
+                $ref: '#/components/schemas/Languages'
+        background:
+          $ref: '#/components/schemas/Languages'
+        nvi:
+          type: object
+          description: Person NVI data
+          properties:
+            verifiedBy:
+              $ref: '#/components/schemas/PersonSummary'
+            verifiedAt:
+              $ref: '#/components/schemas/Organization'
+            verifiedDate:
+              type: string
+              format: date-time
+        contactDetails:
+          type: object
+          description: Contact information
+          properties:
+            telephone:
+              type: string
+              pattern: '\+?\d+'
+            email:
+              type: string
+            webPage:
+              type: string
+              format: uri
+        place:
+          $ref: '#/components/schemas/Languages'
+        collaboration:
+          $ref: '#/components/schemas/Languages'
+        countries:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: Two letter country code (ISO 3166-1 alpha-2)
+              label:
+                $ref: '#/components/schemas/Languages'
     PersonPatch:
       type: object
       properties:
@@ -2580,9 +3307,11 @@ components:
         preferredFirstName:
           type: string
           nullable: true
+          description: Can be modified by the user themselves, otherwise user administrator can do the update
         preferredLastName:
           type: string
           nullable: true
+          description: Can be modified by the user themselves, otherwise user administrator can do the update
         reserved:
           type: boolean
           description: If person should be hidden from public view
@@ -2591,6 +3320,102 @@ components:
           description: Employments for this person. Only for authorized users
           items:
             $ref: '#/components/schemas/PersonEmployment'
+        keywords:
+          type: array
+          nullable: true
+          description: Can be modified by the user themselves, otherwise user administrator can do the update
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The keyword code
+        background:
+          $ref: '#/components/schemas/Languages'
+        nvi:
+          type: object
+          nullable: true
+          description: Person NVI data
+          properties:
+            verifiedBy:
+              $ref: '#/components/schemas/Id'
+            verifiedAt:
+              $ref: '#/components/schemas/Id'
+        contactDetails:
+          type: object
+          description: Contact information
+          properties:
+            telephone:
+              type: string
+              nullable: true
+              pattern: '\+?\d+'
+            email:
+              type: string
+              nullable: true
+            webPage:
+              type: string
+              nullable: true
+              format: uri
+        place:
+          $ref: '#/components/schemas/Languages'
+        collaboration:
+          $ref: '#/components/schemas/Languages'
+        countries:
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                description: Two letter country code (ISO 3166-1 alpha-2)
+              label:
+                $ref: '#/components/schemas/Languages'
+        awards:
+          type: array
+          nullable: true
+          items:
+            type: object
+            required:
+              - name
+              - year
+              - type
+              - distribution
+              - affiliation
+            properties:
+              name:
+                type: string
+                description: Name of the award
+              year:
+                type: integer
+                description: Year of the award
+              type:
+                type: object
+                required:
+                  - type
+                properties:
+                  type:
+                    enum:
+                      - ResearchDissemination
+                      - Research
+                    description: The code for this type of activity. Can be ResearchDissemination (Dissemination of research results) or Research (Research activity)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              distribution:
+                type: object
+                required:
+                  - type
+                properties:
+                  type:
+                    enum:
+                      - International
+                      - National
+                      - Internal
+                    description: The code for the scope of award. Can be International (International), National (National) or Internal (Own institution)
+                  label:
+                    $ref: '#/components/schemas/Languages'
+              affiliation:
+                $ref: '#/components/schemas/Organization'
     PersonNIN:
       type: object
       properties:
@@ -2662,11 +3487,6 @@ components:
       properties:
         id:
           type: string
-        name:
-          type: array
-          description: Titles in different languages
-          items:
-            $ref: '#/components/schemas/Languages'
         labels:
           type: array
           description: Titles in different languages
@@ -2760,11 +3580,6 @@ components:
                 type: integer
                 format: int32
                 description: Cristin ID of project
-        name:
-          type: array
-          description: Names in different languages
-          items:
-            $ref: '#/components/schemas/Languages'
         labels:
           type: array
           description: Names in different languages
@@ -2972,7 +3787,192 @@ components:
       properties:
         base64Data:
           type: string
-          description: Base64 encoded string created from a binary
+          description: Base64 encoded string created from a binary. Can be set to empty string for deletion of picture
+    Keywords:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of organizations returned by the query
+          items:
+            $ref: '#/components/schemas/Keyword'
+    Keyword:
+      type: object
+      description: Single keyword
+      properties:
+        type:
+          type: string
+          description: The keyword code
+        label:
+          $ref: '#/components/schemas/Languages'
+    KeywordPost:
+      type: object
+      description: Single keyword. Needs to have label in both Norwegian 'nb' and English 'en'
+      properties:
+        label:
+          $ref: '#/components/schemas/Languages'
+    Categories:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        searchString:
+          type: string
+          description: The query string used
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        firstRecord:
+          type: integer
+          format: int32
+          description: The first record in the current page
+        nextResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the next page in the query results
+        previousResults:
+          type: string
+          pattern: 'https:\/\/.*$'
+          description: URI to the previous page in the query results
+        hits:
+          type: array
+          description: The list of categories returned by the query
+          items:
+            $ref: '#/components/schemas/Category'
+    Category:
+      type: object
+      description: Single category
+      properties:
+        type:
+          type: string
+          description: The category code
+        label:
+          $ref: '#/components/schemas/Languages'
+    PersonSummary:
+      type: object
+      description: Minimal person data
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        type:
+          type: string
+          pattern: 'Person'
+          description: Type of identity. Always Person
+        firstName:
+          type: string
+          pattern: '.+'
+          description: First name
+        lastName:
+          type: string
+          pattern: '.+'
+          description: Last name
+    Facets:
+      type: object
+      pattern: '.+'
+      description: Aggregations used to narrow down the list of search results
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/Facet'
+    Facet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uri
+          description: Aggregation uri to narrow down on this particular facet
+        key:
+          type: string
+          description: The aggregation key
+        count:
+          type: integer
+          description: Number of hits on this aggregation
+        labels:
+          type: array
+          description: Titles in different languages
+          items:
+            $ref: '#/components/schemas/Languages'
+    Countries:
+      type: object
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        id:
+          $ref: '#/components/schemas/Id'
+        size:
+          type: integer
+          format: int32
+          description: Number of results returned from query
+        processingTime:
+          type: integer
+          format: int32
+          description: Processing time in milliseconds for the query to complete
+        hits:
+          type: array
+          description: The list of countries returned by the request
+          items:
+            $ref: '#/components/schemas/Country'
+    Country:
+      type: object
+      description: Single country
+      properties:
+        type:
+          type: string
+          description: Two letter country code (ISO 3166-1 alpha-2)
+        typeAlpha3:
+          type: string
+          description: The 3 letter alpha 3 country code
+        label:
+          $ref: '#/components/schemas/Languages'
+    IdentifierWithLabels:
+      type: object
+      description: Single element with id and labels
+      properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
+        type:
+          type: string
+          description: Type of element
+        id:
+          $ref: '#/components/schemas/Id'
+        identifier:
+          type: string
+        labels:
+          $ref: '#/components/schemas/Languages'
   examples:
     ProjectsExample:
       value:
@@ -3005,8 +4005,6 @@ components:
             coordinatingInstitution:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
-              name:
-                'nb': 'OsloMet - storbyuniversitetet'
               labels:
                 'nb': 'OsloMet - storbyuniversitetet'
             contributors:
@@ -3019,8 +4017,6 @@ components:
                 affiliation:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
-                  name:
-                    'nb': 'OsloMet - storbyuniversitetet'
                   labels:
                     'nb': 'OsloMet - storbyuniversitetet'
               - type: 'ProjectParticipant'
@@ -3032,8 +4028,6 @@ components:
                 affiliation:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
-                  name:
-                    'nb': 'OsloMet - storbyuniversitetet'
                   labels:
                     'nb': 'OsloMet - storbyuniversitetet'
             status: CONCLUDED
@@ -3093,6 +4087,99 @@ components:
                 identifier: '2017/800'
                 authorityName:
                   en: 'Regional committees for medical and health research ethics'
+            webPage: 'https://www.example.org'
+    ProjectsWithFacetsExample:
+      value:
+        '@context': 'https://bibsysdev.github.io/src/project-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/project?query=helse&language=nb&page=1&results=5'
+        size: 150
+        searchString: 'query=helse&language=nb&page=1&results=5'
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/project?query=helse&language=nb&page=2&results=5'
+        previousResults: ''
+        hits:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/project/359084'
+            type: 'Project'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '359084'
+            title: 'Example Title'
+            language: 'http://lexvo.org/id/iso639-3/nno'
+            startDate: '2012-01-09T00:00:00Z'
+            coordinatingInstitution:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+              type: 'Organization'
+              labels:
+                'nb': 'OsloMet - storbyuniversitetet'
+            contributors:
+              - type: 'ProjectManager'
+                identity:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
+                  type: 'Person'
+                  firstName: 'Ola'
+                  lastName: 'Nordmann'
+                affiliation:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                  type: 'Organization'
+                  labels:
+                    'nb': 'OsloMet - storbyuniversitetet'
+            status: CONCLUDED
+            published: true
+            publishable: true
+            created:
+              sourceShortName: "REK"
+              date: "2019-12-31T09:45:17Z"
+        aggregations:
+          sectorFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/person?name=john&sectorFacet=UC&page=1&results=5'
+              key: 'UC'
+              count: '3'
+              labels:
+                nb: 'Universitet og Høgskoler'
+          categoryFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?categoryFacet=APPLIEDRESEARCH&page=1&results=5'
+              key: 'APPLIEDRESEARCH'
+              count: '3'
+              labels:
+                en: 'Applied Research'
+                nb: 'Anvendt forskning'
+          healthProjectFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?healthProjectFacet=OTHERSTUDY&page=1&results=5'
+              key: 'OTHERSTUDY'
+              count: '3'
+              labels:
+                en: 'Other study'
+          coordinatingFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?coordinatingFacet=2012.0.0.0&page=1&results=5'
+              key: '2012.0.0.0'
+              count: '3'
+              labels:
+                en: 'Oslo University Hospital'
+          fundingSourceFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?fundingSourceFacet=NFR&page=1&results=5'
+              key: 'NFR'
+              count: '3'
+              labels:
+                en: 'Research Council of Norway (RCN)'
+          participantOrgFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?participantOrgFacet=194&page=1&results=5'
+              key: '194'
+              count: '3'
+              labels:
+                en: 'Norwegian University of Science and Technology'
+          participantFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?participantFacet=1234&page=1&results=5'
+              key: '1234'
+              count: '3'
+              labels:
+                en: 'Helge Pettersen'
+          responsibleFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/project?responsibleFacet=185.90.0.0&page=1&results=5'
+              key: '185.90.0.0'
+              count: '3'
+              labels:
+                en: 'Oslo University'
     ProjectExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -3116,8 +4203,6 @@ components:
         coordinatingInstitution:
           id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
           type: 'Organization'
-          name:
-            'nb': 'OsloMet - storbyuniversitetet'
           labels:
             'nb': 'OsloMet - storbyuniversitetet'
         contributors:
@@ -3130,8 +4215,6 @@ components:
             affiliation:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
-              name:
-                'nb': 'OsloMet - storbyuniversitetet'
               labels:
                 'nb': 'OsloMet - storbyuniversitetet'
           - type: 'ProjectParticipant'
@@ -3143,8 +4226,6 @@ components:
             affiliation:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
-              name:
-                'nb': 'OsloMet - storbyuniversitetet'
               labels:
                 'nb': 'OsloMet - storbyuniversitetet'
         status: CONCLUDED
@@ -3214,6 +4295,7 @@ components:
           affiliation:
             id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             type: 'Organization'
+        webPage: 'https://www.example.org'
     ProjectPatchExample:
       value:
         title: 'Updated Title'
@@ -3256,6 +4338,7 @@ components:
           phone: '44223355'
         institutionsResponsibleForResearch:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+        webPage: 'https://www.example.org'
     ProjectPostExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-context.json'
@@ -3331,6 +4414,7 @@ components:
           organization: 'Universitetet i Oslo'
           email: 'navn.navnesen@uio.no'
           phone: '99223344'
+        webPage: 'https://www.example.org'
     OrganizationsExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
@@ -3344,9 +4428,6 @@ components:
         hits:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             type: 'Organization'
-            name:
-              'nb': 'OsloMet - storbyuniversitetet'
-              'en': 'Oslomet - Oslo Metropolitan University'
             labels:
               'nb': 'OsloMet - storbyuniversitetet'
               'en': 'Oslomet - Oslo Metropolitan University'
@@ -3354,52 +4435,38 @@ components:
             partOf:
               - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                 type: 'Organization'
-                name:
-                  'nb': 'OsloMet - storbyuniversitetet'
-                  'en': 'Oslomet - Oslo Metropolitan University'
                 labels:
                   'nb': 'OsloMet - storbyuniversitetet'
                   'en': 'Oslomet - Oslo Metropolitan University'
             hasPart:
               - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.16.2.0'
                 type: 'Organization'
-                name:
+                labels:
                   'en': 'Norwegian Social Research'
                   'nb': 'Velferdsforskningsinstituttet NOVA'
-                labels:
-                  'nb': 'OsloMet - storbyuniversitetet'
-                  'en': 'Oslomet - Oslo Metropolitan University'
 
     OrganizationExample:
       value:
         '@context': 'https://api.dev.nva.aws.unit.no/cristin/organization'
         id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
         type: 'Organization'
-        name:
-          'nb': 'OsloMet - storbyuniversitetet'
-          'en': 'Oslomet - Oslo Metropolitan University'
         labels:
           'nb': 'OsloMet - storbyuniversitetet'
           'en': 'Oslomet - Oslo Metropolitan University'
         acronym: 'OSLOMET'
+        country: 'NO'
         partOf:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
             type: 'Organization'
-            name:
-              'nb': 'OsloMet - storbyuniversitetet'
-              'en': 'Oslomet - Oslo Metropolitan University'
             labels:
               'nb': 'OsloMet - storbyuniversitetet'
               'en': 'Oslomet - Oslo Metropolitan University'
         hasPart:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.16.2.0'
             type: 'Organization'
-            name:
+            labels:
               'en': 'Norwegian Social Research'
               'nb': 'Velferdsforskningsinstituttet NOVA'
-            labels:
-              'nb': 'OsloMet - storbyuniversitetet'
-              'en': 'Oslomet - Oslo Metropolitan University'
     PersonsExample:
       value:
         '@context': 'https://example.org/person-search-context.json'
@@ -3449,6 +4516,42 @@ components:
                     en: 'Head Engineer'
                     nb: 'Overingeniør'
             verified: true
+            keywords:
+              - type: '4837'
+                label:
+                  'en': 'Supply Chain'
+            background:
+              no: 'Min bakgrunn som forsker'
+              en: 'My history as a researcher'
+            place:
+              no: 'Mitt arbeidssted'
+              en: 'My workplace'
+            collaboration:
+              no: 'Mine samarbeidende steder'
+              en: 'My places of collaboration'
+            countries:
+              - type: 'CA'
+                label:
+                  'en': 'Canada'
+              - type: 'GB'
+                label:
+                  'en': 'United Kingdom'
+                  'nb': 'Storbritannia'
+            awards:
+              - name: 'My first award'
+                year: '2014'
+                type:
+                  type: 'ResearchDissemination'
+                  label:
+                    'en': 'Dissemination of research results'
+                    'nb': 'Forskningsformidling'
+                distribution:
+                  type: 'National'
+                  label:
+                    'en': 'National'
+                    'nb': 'Nasjonal'
+                affiliation:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/567987'
             type: 'Person'
             identifiers:
@@ -3461,6 +4564,8 @@ components:
                 value: 'Nordmann'
             contactDetails:
               telephone: '+4744335566'
+              email: 'kjell@ola.no'
+              webPage: 'https://www.kjell.no'
             affiliations:
               - type: 'Affiliation'
                 organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
@@ -3470,6 +4575,54 @@ components:
                   labels:
                     en: 'Consultant'
             verified: true
+            keywords:
+              - type: '4837'
+                label:
+                  'en': 'Supply Chain'
+    PersonsWithFacetsExample:
+      value:
+        '@context': 'https://example.org/person-search-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/person/?name=Ola+Nordmann&page=1&results=5'
+        size: 150
+        searchString: 'name=Ola+Nordmann&page=1&results=5'
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/person/?name=Ola+Nordmann&page=2&results=5'
+        previousResults: ''
+        hits:
+          - id: 'https://api.dev.nva.aws.unit.no/cristin/person/359084'
+            type: 'Person'
+            identifiers:
+              - type: 'CristinIdentifier'
+                value: '359084'
+            names:
+              - type: 'FirstName'
+                value: 'Kjell Ola'
+              - type: 'LastName'
+                value: 'Nordmann'
+            affiliations:
+              - type: 'Affiliation'
+                organization: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+                active: true
+                role:
+                  type: 'Role'
+                  labels:
+                    en: 'Researcher'
+                    nb: 'Forsker'
+                    nn: 'Forskar'
+        aggregations:
+          organizationFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/person?name=john&organizationFacet=186&page=1&results=5'
+              key: '186'
+              count: '5'
+              labels:
+                en: 'UiT The Arctic University of Norway'
+          sectorFacet:
+            - id: 'https://api.dev.nva.aws.unit.no/cristin/person?name=john&sectorFacet=UC&page=1&results=5'
+              key: 'UC'
+              count: '3'
+              labels:
+                nb: 'Universitet og Høgskoler'
     PersonExample:
       value:
         '@context': 'https://example.org/person-context.json'
@@ -3493,6 +4646,8 @@ components:
             value: 'Nordmann'
         contactDetails:
           telephone: '+4799885566'
+          email: 'example@email.org'
+          webPage: 'www.example.org'
         image: 'https://api.cristin.no/v2/persons/359084/picture'
         affiliations:
           - type: 'Affiliation'
@@ -3519,6 +4674,61 @@ components:
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
         verified: true
+        keywords:
+          - type: '4837'
+            label:
+              'en': 'Supply Chain'
+        background:
+          no: 'Min bakgrunn som forsker'
+          en: 'My history as a researcher'
+        nvi:
+          verifiedBy:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+            type: 'Person'
+            firstName: 'Tor Inge'
+            lastName: 'Kristianslund'
+          verifiedAt:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+            type: 'Organization'
+            labels:
+              en: 'Faculty of Theology'
+            partOf:
+              - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
+                type: 'Organization'
+                labels:
+                  en: 'University of Oslo'
+                acronym: 'UIO'
+                country: 'NO'
+          verifiedDate: '2023-10-03T15:00:30Z'
+        place:
+          nb: 'Mitt arbeidssted'
+          en: 'My workplace'
+        collaboration:
+          nb: 'Mine samarbeidende steder'
+          en: 'My places of collaboration'
+        countries:
+          - type: 'CA'
+            label:
+              'en': 'Canada'
+          - type: 'GB'
+            label:
+              'en': 'United Kingdom'
+              'nb': 'Storbritannia'
+        awards:
+          - name: 'My first award'
+            year: '2014'
+            type:
+              type: 'ResearchDissemination'
+              label:
+                'en': 'Dissemination of research results'
+                'nb': 'Forskningsformidling'
+            distribution:
+              type: 'National'
+              label:
+                'en': 'National'
+                'nb': 'Nasjonal'
+            affiliation:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
     PersonPatchExample:
       value:
         orcid: '1234-1234-1234-1234'
@@ -3531,6 +4741,39 @@ components:
             startDate: '2008-01-01T00:00:00Z'
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
+        keywords:
+          - type: '4245'
+          - type: '5686'
+        background:
+          no: 'Min bakgrunn som forsker'
+          en: 'null'
+        nvi:
+          verifiedBy:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+          verifiedAt:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+        contactDetails:
+          telephone: '+4799885566'
+          email: 'example@email.org'
+          webPage: 'www.example.org'
+        place:
+          nb: 'Mitt arbeidssted'
+          en: 'null'
+        collaboration:
+          nb: 'Mine samarbeidende steder'
+          en: 'My places of collaboration'
+        countries:
+          - type: 'CA'
+          - type: 'GB'
+        awards:
+          - name: 'My first award'
+            year: '2014'
+            type:
+              type: 'ResearchDissemination'
+            distribution:
+              type: 'National'
+            affiliation:
+              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
     PersonPostExample:
       value:
         identifiers:
@@ -3551,6 +4794,28 @@ components:
             startDate: '2008-01-01T00:00:00Z'
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
+        keywords:
+          - type: '4245'
+          - type: '5686'
+        background:
+          no: 'Min bakgrunn som forsker'
+          en: 'My history as a researcher'
+        nvi:
+          verifiedBy:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+          verifiedAt:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+        contactDetails:
+          telephone: '+4799885566'
+          email: 'example@email.org'
+          webPage: 'www.example.org'
+        place:
+          nb: 'Mitt arbeidssted'
+          en: 'My workplace'
+        collaboration:
+          en: 'My places of collaboration'
+        countries:
+          - type: 'CA'
     PersonPostResponseExample:
       value:
         '@context': 'https://example.org/person-context.json'
@@ -3584,6 +4849,36 @@ components:
             startDate: '2008-01-01T00:00:00Z'
             endDate: '2019-12-31T00:00:00Z'
             fullTimeEquivalentPercentage: 100.0
+        keywords:
+          - type: '4837'
+            label:
+              'en': 'Supply Chain'
+        background:
+          no: 'Min bakgrunn som forsker'
+          en: 'My history as a researcher'
+        nvi:
+          verifiedBy:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+            type: 'Person'
+            firstName: 'Tor Inge'
+            lastName: 'Kristianslund'
+          verifiedAt:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+            type: 'Organization'
+            labels:
+              en: 'Faculty of Theology'
+            partOf:
+              - id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
+                type: 'Organization'
+                labels:
+                  en: 'University of Oslo'
+                acronym: 'UIO'
+                country: 'NO'
+          verifiedDate: '2023-10-03T15:00:30Z'
+        contactDetails:
+          telephone: '+4799885566'
+          email: 'example@email.org'
+          webPage: 'www.example.org'
     PersonOrganizationInfoExample:
       value:
         '@context': 'https://ontology.org'
@@ -3603,14 +4898,10 @@ components:
         "@context": "https://bibsysdev.github.io/src/position-context.json"
         positions:
           - id: "https://api.{env.}nva.aws.unit.no/positions#9308"
-            name:
-              nb: "Overstyrmann"
             labels:
               nb: "Overstyrmann"
             enabled: false
           - id: "https://api.{env.}nva.aws.unit.no/positions#VITRÅDGIVER"
-            name:
-              en: "Academic adviser"
             labels:
               en: "Academic adviser"
             enabled: true
@@ -3682,9 +4973,6 @@ components:
           }
           ],
           "biobankType": "SPECIFICBIOBANK",
-          "name": {
-            "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
-          },
           "labels": {
             "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
           },
@@ -3827,8 +5115,6 @@ components:
             coordinatingInstitution:
               id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               type: 'Organization'
-              name:
-                'nb': 'OsloMet - storbyuniversitetet'
               labels:
                 'nb': 'OsloMet - storbyuniversitetet'
             contributors:
@@ -3841,8 +5127,6 @@ components:
                 affiliation:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
-                  name:
-                    'nb': 'OsloMet - storbyuniversitetet'
                   labels:
                     'nb': 'OsloMet - storbyuniversitetet'
               - type: 'ProjectParticipant'
@@ -3854,8 +5138,6 @@ components:
                 affiliation:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
                   type: 'Organization'
-                  name:
-                    'nb': 'OsloMet - storbyuniversitetet'
                   labels:
                     'nb': 'OsloMet - storbyuniversitetet'
             status: CONCLUDED
@@ -3899,6 +5181,73 @@ components:
     BinaryExample:
       value:
         base64Data: '/9j/4AAQSkZJRgABAQEAeAB4AAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAEAAAAAAAD'
+    KeywordsExample:
+      value:
+        '@context': 'https://example.org/keyword-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/keywords/?page=1&query=food%results=5'
+        size: 150
+        processingTime: 800
+        firstRecord: 1
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/keywords/?page=2&query=food%results=5'
+        previousResults: ''
+        hits:
+          - type: '1971'
+            label:
+              en: 'Food'
+          - type: '1972'
+            label:
+              en: 'Food Classification'
+    KeywordPostExample:
+      value:
+        label:
+          en: 'Cooking'
+          nb: 'Matlaging'
+    KeywordExample:
+      value:
+        type: '1234'
+        label:
+          en: 'Cooking'
+          nb: 'Matlaging'
+    CategoriesExample:
+      value:
+        '@context': 'https://example.org/keyword-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/category/project/'
+        size: 150
+        processingTime: 800
+        firstRecord: 1
+        nextResults: ''
+        previousResults: ''
+        hits:
+          - type: 'BASICRESEARCH'
+            label:
+              en: 'Basic Research'
+          - type: 'ACADEMICDEV'
+            label:
+              en: 'Academic Development'
+    CountriesExample:
+      value:
+        '@context': 'https://example.org/country-context.json'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/country/'
+        size: 150
+        processingTime: 800
+        hits:
+          - type: 'CA'
+            typeAlpha3: 'CAN'
+            label:
+              en: 'Canada'
+          - type: 'NO'
+            typeAlpha3: 'NOR'
+            label:
+              nb: 'Norge'
+              en: 'Norway'
+    SingleKeywordExample:
+      value:
+        '@context': 'https://bibsysdev.github.io/src/keyword-context.json'
+        type: 'Keyword'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/keyword/1197'
+        identifier: '1197'
+        labels:
+          en: 'Educational management'
 
   securitySchemes:
     CognitoUserPool:

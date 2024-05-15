@@ -8,5 +8,6 @@
     "acronym" : "UIO"
   },
   "url" : "https://api.cristin-test.uio.no/v2/units/185.53.18.14",
-  "acronym" : "KLM-MBK"
+  "acronym" : "KLM-MBK",
+  "country": "NO"
 } ]

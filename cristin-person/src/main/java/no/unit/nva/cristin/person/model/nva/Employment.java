@@ -12,11 +12,12 @@ import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
+import no.unit.nva.model.UriId;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.StringUtils;
 
 @JacocoGenerated
-public class Employment implements JsonSerializable {
+public class Employment implements JsonSerializable, UriId {
 
     @JsonProperty(CONTEXT)
     private String context;
@@ -46,6 +47,7 @@ public class Employment implements JsonSerializable {
         this.context = context;
     }
 
+    @Override
     public URI getId() {
         return id;
     }
@@ -106,10 +108,9 @@ public class Employment implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Employment)) {
+        if (!(o instanceof Employment that)) {
             return false;
         }
-        Employment that = (Employment) o;
         return Objects.equals(getContext(), that.getContext())
                && Objects.equals(getId(), that.getId())
                && Objects.equals(getType(), that.getType())

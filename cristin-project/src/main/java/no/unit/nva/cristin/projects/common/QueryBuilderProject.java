@@ -8,6 +8,7 @@ import static no.unit.nva.cristin.model.CristinQuery.getUnitIdFromOrganization;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVAL_REFERENCE_ID;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.APPROVED_BY;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.BIOBANK;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.CATEGORY;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.CREATOR;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING_SOURCE;
@@ -33,6 +34,7 @@ import static no.unit.nva.cristin.projects.common.ParameterKeyProject.STATUS;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.TITLE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.USER;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS;
+import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUERY_PARAMETER_NVA_KEYS_AND_FACETS;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.keyFromString;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
@@ -43,10 +45,13 @@ import java.util.Set;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.model.QueryBuilder;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
 @SuppressWarnings({"PMD.GodClass"})
 public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
+
+    public Set<String> allValidKeys = VALID_QUERY_PARAMETER_NVA_KEYS;
 
     public QueryBuilderProject() {
         super(new QueryProject());
@@ -56,30 +61,24 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
     protected void assignDefaultValues() {
         requiredMissing().forEach(key -> {
             switch (key) {
-                case PATH_ORGANISATION:
+                case PATH_ORGANISATION -> {
                     if (query.containsKey(PATH_IDENTITY)) {
                         query.setPath(key, query.getValue(PATH_IDENTITY));
                         query.removeValue(PATH_IDENTITY);
                     }
-                    break;
-                case PATH_PROJECT:
-                    query.setPath(key, EMPTY_STRING);
-                    break;
-                case PAGE_CURRENT:
-                    query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
-                    break;
-                case PAGE_ITEMS_PER_PAGE:
-                    query.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
-                    break;
-                default:
-                    break;
+                }
+                case PATH_PROJECT -> query.setPath(key, EMPTY_STRING);
+                case PAGE_CURRENT -> query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
+                case PAGE_ITEMS_PER_PAGE -> query.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
+                default -> {
+                }
             }
         });
     }
 
     @Override
     protected void setPath(String key, String value) {
-        var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
+        final var nonNullValue = nonNull(value) ? value : EMPTY_STRING;
 
         if (key.equals(PATH_IDENTITY.getNvaKey())) {
             withPathIdentity(nonNullValue);
@@ -96,64 +95,46 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
     protected void setValue(String key, String value) {
         var qpKey = keyFromString(key,value);
         switch (qpKey) {
-            case PATH_IDENTITY:
-            case PATH_PROJECT:
-                withPathIdentity(value);
-                break;
-            case PATH_ORGANISATION:
-                withPathOrganization(value);
-                break;
-            case ORGANIZATION:
-                withOrganization(value);
-                break;
-            case BIOBANK:
-                withBiobank(value);
-                break;
-            case KEYWORD:
-                withKeyword(value);
-                break;
-            case LANGUAGE:
-                logger.info("Ignoring language parameter -> " + value);
-                break;
-            case PARTICIPANT:
-                withParticipant(value);
-                break;
-            case QUERY:
-                withQuery(value);
-                break;
-            case STATUS:
-                withStatus(value);
-                break;
-            case APPROVAL_REFERENCE_ID:
-            case APPROVED_BY:
-            case FUNDING:
-            case FUNDING_SOURCE:
-            case GRANT_ID:
-            case INSTITUTION:
-            case LEVELS:
-            case MODIFIED_SINCE:
-            case NAME:
-            case PROJECT_MANAGER:
-            case PROJECT_UNIT:
-            case TITLE:
-            case USER:
-            case PAGE_CURRENT:
-            case PAGE_ITEMS_PER_PAGE:
-            case PAGE_SORT:
-                query.setValue(qpKey, value);
-                break;
-            case CREATOR:
-                withCreator(value);
-                break;
-            default:
-                invalidKeys.add(key);
-                break;
+            case PATH_IDENTITY, PATH_PROJECT -> withPathIdentity(value);
+            case PATH_ORGANISATION -> withPathOrganization(value);
+            case ORGANIZATION -> withOrganization(value);
+            case BIOBANK -> withBiobank(value);
+            case KEYWORD -> withKeyword(value);
+            case LANGUAGE -> logger.info("Ignoring language parameter -> " + value);
+            case PARTICIPANT, PARTICIPANT_FACET -> withParticipant(value);
+            case QUERY -> withQuery(value);
+            case STATUS -> withStatus(value);
+            case CATEGORY, CATEGORY_FACET -> withCategory(value);
+            case FUNDING_SOURCE, FUNDING_SOURCE_FACET -> withFundingSource(value);
+            case PAGE_SORT -> withItemSort(value);
+            case APPROVAL_REFERENCE_ID, APPROVED_BY,
+                     FUNDING,
+                     GRANT_ID, INSTITUTION,
+                     LEVELS, MODIFIED_SINCE,
+                     NAME, PROJECT_MANAGER,
+                     PROJECT_UNIT, TITLE,
+                     USER, PAGE_CURRENT,
+                     PAGE_ITEMS_PER_PAGE,
+                     CRISTIN_ID, MULTIPLE -> query.setValue(qpKey, value);
+            case CREATOR -> withCreator(value);
+            case SECTOR_FACET, COORDINATING_FACET,
+                     RESPONSIBLE_FACET, HEALTH_FACET,
+                     PARTICIPATING_PERSON_ORG_FACET -> query.setFacet(qpKey, value);
+            default -> invalidKeys.add(key);
         }
+    }
+
+    /**
+     * Adds facet keys as valid query parameter keys in error handling messages.
+     */
+    public QueryBuilderProject usingFacetKeys() {
+        allValidKeys = VALID_QUERY_PARAMETER_NVA_KEYS_AND_FACETS;
+        return this;
     }
 
     @Override
     protected Set<String> validKeys() {
-        return VALID_QUERY_PARAMETER_NVA_KEYS;
+        return allValidKeys;
     }
 
     @Override
@@ -165,10 +146,12 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
             if (key == STATUS) {
                 errorMessage =
                     invalidQueryParametersMessageWithRange(key.getKey(), Arrays.toString(ProjectStatus.values()));
-            } else if (nonNull(key.getErrorMessage())) {
-                errorMessage = String.format(key.getErrorMessage(), keyName);
             } else {
-                errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
+                if (nonNull(key.getErrorMessage())) {
+                    errorMessage = String.format(key.getErrorMessage(), keyName);
+                } else {
+                    errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
+                }
             }
             throw new BadRequestException(errorMessage);
         }
@@ -215,7 +198,11 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
      * Setter funding source code.
      */
     public QueryBuilderProject withFundingSource(String fundingSource) {
-        query.setValue(FUNDING_SOURCE, fundingSource);
+        var fundingSources =
+            query.containsKey(FUNDING_SOURCE)
+                ? query.getValue(FUNDING_SOURCE) + "," + fundingSource
+                : fundingSource;
+        query.setValue(FUNDING_SOURCE, fundingSources);
         return this;
     }
 
@@ -255,7 +242,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
      * Setter sorting on 'start_date' and/or 'end_date'.
      */
     public QueryBuilderProject withItemSort(String sort) {
-        query.setValue(PAGE_SORT, sort);
+        query.setValue(PAGE_SORT, UriUtils.escapeWhiteSpace(sort));
         return this;
     }
 
@@ -339,6 +326,18 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
                 ? query.getValue(PARTICIPANT) + "," + participant
                 : participant;
         query.setValue(PARTICIPANT, participants);
+        return this;
+    }
+
+    /**
+     * Setter a category of the project by name. [withDuplicates]
+     */
+    public QueryBuilderProject withCategory(String category) {
+        var categories =
+            query.containsKey(CATEGORY)
+                ? query.getValue(CATEGORY) + "," + category
+                : category;
+        query.setValue(CATEGORY, categories);
         return this;
     }
 

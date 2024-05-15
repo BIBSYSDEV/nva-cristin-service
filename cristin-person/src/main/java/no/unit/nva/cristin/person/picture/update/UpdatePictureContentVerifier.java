@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.picture.update;
 
 import static java.util.Objects.nonNull;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Base64;
@@ -14,9 +15,11 @@ public class UpdatePictureContentVerifier {
 
     private static final Logger logger = LoggerFactory.getLogger(UpdatePictureContentVerifier.class);
 
-    public static final String CANNOT_BE_EMPTY = "Json cannot be empty";
     public static final String NOT_AN_IMAGE = "Binary data is not an image";
     public static final String DECODED_DATA_SIZE_MESSAGE = "Decoded data is an image of size in bytes: {}";
+    public static final String SENT_EMPTY_PAYLOAD =
+        "Client sent an empty payload, attempting to delete profile picture";
+    public static final String COULD_NOT_DECODE_BINARY_DATA = "Could not decode binary data";
 
     private final byte[] decoded;
 
@@ -25,10 +28,17 @@ public class UpdatePictureContentVerifier {
     **/
     public UpdatePictureContentVerifier(Binary input) throws BadRequestException {
         if (!hasContent(input)) {
-            throw new BadRequestException(CANNOT_BE_EMPTY);
+            decoded = decodeInput(emptyPayload());
+            logger.info(SENT_EMPTY_PAYLOAD);
+            return;
         }
 
-        decoded = decodeInput(input);
+        try {
+            decoded = decodeInput(input);
+        } catch (Exception ex) {
+            logger.info(COULD_NOT_DECODE_BINARY_DATA);
+            throw new BadRequestException(NOT_AN_IMAGE);
+        }
 
         if (!isImage(decoded)) {
             throw new BadRequestException(NOT_AN_IMAGE);
@@ -39,6 +49,10 @@ public class UpdatePictureContentVerifier {
 
     private boolean hasContent(Binary input) {
         return nonNull(input.getBase64Data());
+    }
+
+    private static Binary emptyPayload() {
+        return new Binary(EMPTY_STRING);
     }
 
     private byte[] decodeInput(Binary input) {

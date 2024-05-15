@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.funding.sources.client;
 
-import static no.unit.nva.HttpClientProvider.defaultHttpClient;
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;

@@ -7,10 +7,12 @@ import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
+import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
+import no.unit.nva.common.IdCreatedLogger;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.utils.AccessUtils;
@@ -59,6 +61,8 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
 
     @Override
     protected Integer getSuccessStatusCode(Employment input, Employment output) {
+        new IdCreatedLogger().logId(output);
+
         return HttpURLConnection.HTTP_CREATED;
     }
 
@@ -68,7 +72,7 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
     }
 
     private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {
-        if (!AccessUtils.requesterIsUserAdministrator(requestInfo) && !requestInfo.userIsApplicationAdmin()) {
+        if (!AccessUtils.requesterIsUserAdministrator(requestInfo) && !requestInfo.userIsAuthorized(MANAGE_CUSTOMERS)) {
             throw new ForbiddenException();
         }
     }
@@ -76,7 +80,7 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
     private String fullAccessValueOrInstitutionNumber(RequestInfo requestInfo)
         throws BadRequestException, ForbiddenException {
 
-        return requestInfo.userIsApplicationAdmin()
+        return requestInfo.userIsAuthorized(MANAGE_CUSTOMERS)
                    ? CAN_UPDATE_ANY_INSTITUTION : extractCristinInstitutionIdentifier(requestInfo);
     }
 }

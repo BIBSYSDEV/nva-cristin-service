@@ -12,7 +12,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.FULL_TIME_PERCENTAGE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -146,8 +146,9 @@ public class UpdatePersonEmploymentHandlerTest {
     }
 
     private GatewayResponse<Void> sendQuery(String body) throws IOException {
-        InputStream input = createRequest(body);
-        handler.handleRequest(input, output, context);
+        try (var input = createRequest(body)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 
@@ -156,20 +157,20 @@ public class UpdatePersonEmploymentHandlerTest {
 
         return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
                    .withBody(body)
-                   .withCustomerId(customerId)
+                   .withCurrentCustomer(customerId)
                    .withTopLevelCristinOrgId(TOP_ORG_ID)
-                   .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+                   .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
                    .withPathParameters(validPath)
                    .build();
     }
 
     private GatewayResponse<Void> queryWithoutRequiredAccessRights() throws IOException {
-        InputStream input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
-            .withBody(EMPTY_JSON)
-            .withPathParameters(validPath)
-            .build();
-        handler.handleRequest(input, output, context);
-
+        try (var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+                             .withBody(EMPTY_JSON)
+                             .withPathParameters(validPath)
+                             .build()) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, Void.class);
     }
 }

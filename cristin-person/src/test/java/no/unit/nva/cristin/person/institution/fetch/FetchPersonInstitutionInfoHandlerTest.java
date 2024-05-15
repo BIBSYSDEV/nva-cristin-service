@@ -12,7 +12,7 @@ import static no.unit.nva.cristin.model.Constants.PERSON_ID;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.AccessUtils.EDIT_OWN_INSTITUTION_USERS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -43,6 +43,7 @@ import nva.commons.core.Environment;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 
 public class FetchPersonInstitutionInfoHandlerTest {
 
@@ -177,23 +178,25 @@ public class FetchPersonInstitutionInfoHandlerTest {
     }
 
     private GatewayResponse<PersonInstitutionInfo> queryWithoutRequiredAccessRights() throws IOException {
-        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-            .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID))
-            .build();
-        handler.handleRequest(input, output, context);
-
+        try (var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                             .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID))
+                             .build()) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, PersonInstitutionInfo.class);
     }
 
     private GatewayResponse<PersonInstitutionInfo> queryWithUnsupportedQueryParams() throws IOException {
         var customerId = randomUri();
-        InputStream input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-            .withCustomerId(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
-            .withQueryParameters(Map.of(randomString(), randomString()))
-            .withPathParameters(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID))
-            .build();
-        handler.handleRequest(input, output, context);
+        try (var input = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                                     .withCurrentCustomer(customerId)
+                                     .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
+                                     .withQueryParameters(Map.of(randomString(), randomString()))
+                                     .withPathParameters(
+                                         Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID))
+                                     .build()) {
+            handler.handleRequest(input, output, context);
+        }
 
         return GatewayResponse.fromOutputStream(output, PersonInstitutionInfo.class);
     }
@@ -205,8 +208,9 @@ public class FetchPersonInstitutionInfoHandlerTest {
     private GatewayResponse<PersonInstitutionInfo> sendQuery(Map<String, String> pathParam)
         throws IOException {
 
-        InputStream input = requestWithParams(pathParam);
-        handler.handleRequest(input, output, context);
+        try (var input = requestWithParams(pathParam)) {
+            handler.handleRequest(input, output, context);
+        }
         return GatewayResponse.fromOutputStream(output, PersonInstitutionInfo.class);
     }
 
@@ -215,8 +219,8 @@ public class FetchPersonInstitutionInfoHandlerTest {
         var customerId = randomUri();
         return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withCustomerId(customerId)
-            .withAccessRights(customerId, EDIT_OWN_INSTITUTION_USERS)
+            .withCurrentCustomer(customerId)
+            .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
             .withPathParameters(pathParams)
             .build();
     }

@@ -1,0 +1,138 @@
+{
+  "data" : [ {
+    "cristin_project_id" : "323870",
+    "title" : {
+      "no" : "Epigenetic regulation of development and growth in Senegalese sole (Solea senegalensis)- EPISOLE",
+      "en" : "Epigenetic regulation of development and growth in Senegalese sole (Solea senegalensis)- EPISOLE"
+    },
+    "main_language" : "no",
+    "start_date" : "2011-02-01T00:00:00.000Z",
+    "end_date" : "2014-02-01T00:00:00.000Z",
+    "url" : "https://api.cristin-test.uio.no/v2/projects/323870",
+    "status": "ACTIVE",
+    "coordinating_institution" : {
+      "institution" : {
+        "cristin_institution_id" : "1936",
+        "institution_name" : {
+          "en" : "Bergen Hospital Trust - Haukeland University Hospital"
+        },
+        "url" : "https://api.cristin-test.uio.no/v2/institutions/1936"
+      },
+      "unit" : {
+        "cristin_unit_id" : "1936.0.0.0",
+        "unit_name" : {
+          "en" : "Bergen Hospital Trust - Haukeland University Hospital"
+        },
+        "url" : "https://api.cristin-test.uio.no/v2/units/1936.0.0.0"
+      }
+    }
+  } ],
+  "facets" : {
+    "institution_coordinating_idfacet" : [ {
+      "count" : 2339,
+      "cristin_unit_id" : "2012.0.0.0",
+      "unit_name" : {
+        "en" : "Oslo University Hospital"
+      }
+    }, {
+      "count" : 1675,
+      "cristin_unit_id" : "215.0.0.0",
+      "unit_name" : {
+        "en" : "Oslomet - Oslo Metropolitan University"
+      }
+    } ],
+    "category_idfacet" : [ {
+      "count" : 889,
+      "code" : "APPLIEDRESEARCH",
+      "name" : {
+        "en" : "Applied Research"
+      }
+    }, {
+      "count" : 844,
+      "code" : "PHD",
+      "name" : {
+        "en" : "Ph.D. Project"
+      }
+    } ],
+    "health_project_type_idfacet" : [ {
+      "count" : 6577,
+      "code" : "OTHERSTUDY",
+      "name" : {
+        "en" : "Other study"
+      }
+    }, {
+      "count" : 2417,
+      "code" : "OTHERCLIN",
+      "name" : {
+        "en" : "Other clinical trial"
+      }
+    } ],
+    "institution_responsible_idfacet" : [ {
+      "count" : 449,
+      "cristin_unit_id" : "20754.0.0.0",
+      "unit_name" : {
+        "en" : "Sikt - Norwegian Agency for Shared Services in Education and Research"
+      }
+    }, {
+      "count" : 300,
+      "cristin_unit_id" : "2012.0.0.0",
+      "unit_name" : {
+        "en" : "Oslo University Hospital"
+      }
+    } ],
+    "person_institution_idfacet" : [ {
+      "count" : 3060,
+      "cristin_institution_id" : "194",
+      "institution_name" : {
+        "en" : "Norwegian University of Science and Technology"
+      }
+    }, {
+      "count" : 3013,
+      "cristin_institution_id" : "215",
+      "institution_name" : {
+        "en" : "Oslomet - Oslo Metropolitan University"
+      }
+    } ],
+    "funding_source_idfacet" : [ {
+      "count" : 2083,
+      "code" : "NFR",
+      "name" : {
+        "en" : "Research Council of Norway (RCN)"
+      }
+    }, {
+      "count" : 1135,
+      "code" : "EI",
+      "name" : {
+        "en" : "Own institution"
+      }
+    } ],
+    "sector_idfacet" : [ {
+      "count" : 2404,
+      "code" : "UC",
+      "name" : {
+        "en" : "Universities and colleges"
+      }
+    }, {
+      "count" : 796,
+      "code" : "HEALTH",
+      "name" : {
+        "en" : "Health Sector"
+      }
+    }, {
+      "count" : 302,
+      "code" : "INSTITUTE",
+      "name" : {
+        "en" : "Institute Sector"
+      }
+    } ],
+    "person_idfacet" : [ {
+      "count" : 58,
+      "cristin_person_id" : "23413",
+      "name" : "Nils Christian Stenseth"
+    }, {
+      "count" : 22,
+      "cristin_person_id" : "18857",
+      "name" : "Kirsten Bjørklund Holven"
+    } ]
+  }
+}

@@ -28,9 +28,11 @@ import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.common.Utils.readJsonFromInput;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CRISTIN_EMPLOYMENTS;
+import static no.unit.nva.cristin.person.model.cristin.CristinPerson.PERSON_NVI;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> {
 
@@ -58,32 +60,44 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
 
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
-        ObjectNode objectNode = readJsonFromInput(input);
-        String personId = getValidPersonId(requestInfo);
+        var objectNode = readJsonFromInput(input);
+        var personId = getValidPersonId(requestInfo);
 
         if (clientCanUpdateAllFields(requestInfo)) {
             PersonPatchValidator.validate(objectNode);
-            ObjectNode cristinJson = new CristinPersonPatchJsonCreator(objectNode).create().getOutput();
+            objectNode = filterInput(requestInfo, objectNode);
+            var cristinJson = new CristinPersonPatchJsonCreator(objectNode)
+                                  .create()
+                                  .getOutput();
             checkHasFields(cristinJson);
 
-            if (cristinJson.has(CRISTIN_EMPLOYMENTS)) {
+            if (cristinJson.has(CRISTIN_EMPLOYMENTS) || cristinJson.has(PERSON_NVI)) {
                 return apiClient.updatePersonInCristin(personId, cristinJson,
                                                        extractCristinInstitutionIdentifier(requestInfo));
             } else {
                 return apiClient.updatePersonInCristin(personId, cristinJson);
             }
         } else if (clientCanUpdateOwnData(requestInfo)) {
-            String personIdFromCognito = parseLastPartOfPersonCristinIdFromCognito(requestInfo).orElseThrow();
+            var personIdFromCognito = parseLastPartOfPersonCristinIdFromCognito(requestInfo).orElseThrow();
             checkIdentifiersMatch(personId, personIdFromCognito);
-            PersonPatchValidator.validateOrcidIfPresent(objectNode);
-            ObjectNode cristinJson =
-                new CristinPersonPatchJsonCreator(objectNode).createWithAllowedUserModifiableData().getOutput();
+            PersonPatchValidator.validateUserModifiableFields(objectNode);
+            var cristinJson = new CristinPersonPatchJsonCreator(objectNode)
+                                  .createWithAllowedUserModifiableData()
+                                  .getOutput();
             checkHasFields(cristinJson);
 
             return apiClient.updatePersonInCristin(personIdFromCognito, cristinJson);
         } else {
             throw new ForbiddenException();
         }
+    }
+
+    private ObjectNode filterInput(RequestInfo requestInfo, ObjectNode objectNode) {
+        var clientInstNr = attempt(() -> extractCristinInstitutionIdentifier(requestInfo)).orElse(fail -> null);
+
+        return new PersonPatchFieldFilter(objectNode)
+                   .filterOnInstNr(clientInstNr)
+                   .getFiltered();
     }
 
     private void checkHasFields(ObjectNode cristinJson) throws BadRequestException {
