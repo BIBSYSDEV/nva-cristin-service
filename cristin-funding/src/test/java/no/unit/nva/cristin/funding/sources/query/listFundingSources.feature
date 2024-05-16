@@ -49,7 +49,7 @@ Feature: API tests for Cristin Funding Sources list
     And match response.sources[0].type == 'FundingSource'
     And match response.sources[0].id == '#regex ' + fundingSourceIdRegex
     And match response.sources[0].identifier == '#present'
-    And match response.sources[0].name == '#present'
+    And match response.sources[0].labels == '#present'
 
     Examples:
       | CONTENT_TYPE          |

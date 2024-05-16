@@ -60,6 +60,21 @@ Feature: API tests for Cristin Person Update
         {
           'type': 'NO'
         }
+      ],
+      'awards': [
+        {
+          'name': 'My first award',
+          'year': '2014',
+          'type': {
+            'type': 'ResearchDissemination'
+          },
+          'distribution': {
+            'type': 'National'
+          },
+          'affiliation': {
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+          }
+        }
       ]
     }
     """
