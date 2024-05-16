@@ -1,31 +1,42 @@
 [
   {
-    "type": "1197",
-    "label": {
-      "en": "Educational management"
+    "type" : "Keyword",
+    "id" : "https://api.dev.nva.aws.unit.no/cristin/keyword/1197",
+    "identifier" : "1197",
+    "labels" : {
+      "en" : "Educational management",
+      "nb": "Utdanningsledelse"
     }
   },
   {
-    "type": "1198",
-    "label": {
+    "type" : "Keyword",
+    "id" : "https://api.dev.nva.aws.unit.no/cristin/keyword/1198",
+    "identifier" : "1198",
+    "labels" : {
       "en": "Odontologi"
     }
   },
   {
-    "type": "1199",
-    "label": {
+    "type" : "Keyword",
+    "id" : "https://api.dev.nva.aws.unit.no/cristin/keyword/1199",
+    "identifier" : "1199",
+    "labels" : {
       "en": "Technology, Innovation and Culture"
     }
   },
   {
-    "type": "1200",
-    "label": {
+    "type" : "Keyword",
+    "id" : "https://api.dev.nva.aws.unit.no/cristin/keyword/1200",
+    "identifier" : "1200",
+    "labels" : {
       "en": "Astrophysics"
     }
   },
   {
-    "type": "1201",
-    "label": {
+    "type" : "Keyword",
+    "id" : "https://api.dev.nva.aws.unit.no/cristin/keyword/1201",
+    "identifier" : "1201",
+    "labels" : {
       "en": "Biology"
     }
   }

@@ -22,30 +22,35 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Stream;
+import no.unit.nva.cristin.keyword.model.nva.Keyword;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
-import no.unit.nva.model.TypedLabel;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class CreateKeywordHandlerTest {
 
     public static final String EMPTY_JSON = "{}";
-    public static final String KEYWORD_TYPE = "1234";
+    public static final String KEYWORD_TYPE = "1197";
     public static final String EN_KEY = "en";
     public static final String NB_KEY = "nb";
-    public static final String EN_VALUE = "Something about health";
-    public static final String NB_VALUE = "Noe om helse";
+    public static final String EN_VALUE = "Educational management";
+    public static final String NB_VALUE = "Utdanningsledelse";
     public static final URI UPSTREAM_URI = URI.create("https://api.cristin-test.uio.no/v2/keywords");
+    public static final String NVA_CREATE_KEYWORD_RESPONSE_JSON = "nvaFetchKeywordResponse.json";
 
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
@@ -64,17 +69,17 @@ class CreateKeywordHandlerTest {
     }
 
     @Test
-    void shouldCreateAndReturnKeywordWhenClientSendsValidPayload() throws IOException, InterruptedException {
+    void shouldCreateAndReturnKeywordWhenClientSendsValidPayload() throws Exception {
         var responseJson = exampleCristinObjectToJson();
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
         apiClient = new CristinCreateKeywordApiClient(httpClientMock);
         handler = new CreateKeywordHandler(environment, apiClient);
         var gatewayResponse = sendQuery(exampleObject());
-        var actual = gatewayResponse.getBodyObject(TypedLabel.class);
+        var actual = gatewayResponse.getBodyObject(Keyword.class);
+        var expected = readExpectedResponse();
 
         assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
-        assertThat(actual.getType(), equalTo(exampleCristinObject().getCode()));
-        assertThat(actual.getLabel(), equalTo(exampleCristinObject().getName()));
+        JSONAssert.assertEquals(expected, actual.toString(), JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
@@ -108,7 +113,7 @@ class CreateKeywordHandlerTest {
 
     @ParameterizedTest(name = "Payload throws 400 Bad Request: {0}")
     @MethodSource("badRequestProvider")
-    void shouldThrowExceptionWhenInputNotValid(TypedLabel input) throws IOException, InterruptedException {
+    void shouldThrowExceptionWhenInputNotValid(Keyword input) throws IOException, InterruptedException {
         var responseJson = exampleCristinObjectToJson();
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseJson, 201));
         apiClient = new CristinCreateKeywordApiClient(httpClientMock);
@@ -127,8 +132,8 @@ class CreateKeywordHandlerTest {
         return new CristinTypedLabel(KEYWORD_TYPE, exampleLabel());
     }
 
-    private static TypedLabel exampleObject() {
-        return new TypedLabel(null, exampleLabel());
+    private static Keyword exampleObject() {
+        return new Keyword.Builder().withLabels(exampleLabel()).build();
     }
 
     private static Map<String, String> exampleLabel() {
@@ -137,31 +142,35 @@ class CreateKeywordHandlerTest {
     }
 
     private static Stream<Arguments> badRequestProvider() {
-        return Stream.of(Arguments.of(new TypedLabel(null, null)),
-                         Arguments.of(new TypedLabel(null, Map.of(EN_KEY, EN_VALUE))),
-                         Arguments.of(new TypedLabel(null, Map.of(NB_KEY, NB_VALUE))));
+        return Stream.of(Arguments.of(new Keyword.Builder().build()),
+                         Arguments.of(new Keyword.Builder().withLabels(Map.of(EN_KEY, EN_VALUE)).build()),
+                         Arguments.of(new Keyword.Builder().withLabels(Map.of(NB_KEY, NB_VALUE)).build()));
     }
 
-    private GatewayResponse<TypedLabel> sendQueryWithoutAccessRights(TypedLabel body) throws IOException {
-        var input = new HandlerRequestBuilder<TypedLabel>(OBJECT_MAPPER).withBody(body)
+    private GatewayResponse<Keyword> sendQueryWithoutAccessRights(Keyword body) throws IOException {
+        var input = new HandlerRequestBuilder<>(OBJECT_MAPPER).withBody(body)
                         .build();
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output, TypedLabel.class);
+        return GatewayResponse.fromOutputStream(output, Keyword.class);
     }
 
-    private GatewayResponse<TypedLabel> sendQuery(TypedLabel body) throws IOException {
+    private GatewayResponse<Keyword> sendQuery(Keyword body) throws IOException {
         var input = requestWithBody(body);
         handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output, TypedLabel.class);
+        return GatewayResponse.fromOutputStream(output, Keyword.class);
     }
 
-    private InputStream requestWithBody(TypedLabel body) throws JsonProcessingException {
+    private InputStream requestWithBody(Keyword body) throws JsonProcessingException {
         final var customerId = randomUri();
-        return new HandlerRequestBuilder<TypedLabel>(OBJECT_MAPPER)
+        return new HandlerRequestBuilder<Keyword>(OBJECT_MAPPER)
                    .withBody(body)
                    .withCurrentCustomer(customerId)
                    .withAccessRights(customerId, MANAGE_OWN_RESOURCES)
                    .build();
+    }
+
+    private String readExpectedResponse() {
+        return IoUtils.stringFromResources(Path.of(NVA_CREATE_KEYWORD_RESPONSE_JSON));
     }
 
 }

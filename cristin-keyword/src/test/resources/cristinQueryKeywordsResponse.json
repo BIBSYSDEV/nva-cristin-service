@@ -1,7 +1,8 @@
 [ {
   "code" : "1197",
   "name" : {
-    "en" : "Educational management"
+    "en" : "Educational management",
+    "nb" : "Utdanningsledelse"
   }
 }, {
   "code" : "1198",

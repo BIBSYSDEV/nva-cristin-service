@@ -46,12 +46,14 @@ Feature: API tests for keywords query
     When method GET
     Then status 200
     And match response == '#object'
-    And match response['@context'] == '#present'
+    And match response['@context'] == 'https://bibsysdev.github.io/src/keyword-search-context.json'
     And match response.id == '#present'
     And match response.size == '#present'
     And match response.hits == '#present'
-    And match response.hits[0].type == '#present'
-    And match response.hits[0].label == '#present'
+    And match response.hits[0].type == 'Keyword'
+    And match response.hits[0].id == '#present'
+    And match response.hits[0].identifier == '#present'
+    And match response.hits[0].labels == '#present'
 
     Examples:
       | CONTENT_TYPE          |
@@ -80,9 +82,11 @@ Feature: API tests for keywords query
     And method GET
     Then status 200
     And match response == '#object'
-    And match response['@context'] == '#present'
+    And match response['@context'] == 'https://bibsysdev.github.io/src/keyword-search-context.json'
     And match response.id == '#present'
     And match response.size == '#present'
     And match response.hits == '#present'
-    And match response.hits[0].type == '#present'
-    And match response.hits[0].label == '#present'
+    And match response.hits[0].type == 'Keyword'
+    And match response.hits[0].id == '#present'
+    And match response.hits[0].identifier == '#present'
+    And match response.hits[0].labels == '#present'

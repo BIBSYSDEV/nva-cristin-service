@@ -12,19 +12,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.client.CristinQueryApiClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
+import no.unit.nva.cristin.keyword.model.nva.Keyword;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.model.TypedLabel;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 
-public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchResponse<TypedLabel>> {
+public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchResponse<Keyword>> {
 
     public static final String DEFAULT_NUMBER_OF_RESULTS = "100";
     public static final String DEFAULT_PAGE = "1";
 
-    private final transient CristinQueryApiClient<Map<String, String>, TypedLabel> apiClient;
+    private final transient CristinQueryApiClient<Map<String, String>, Keyword> apiClient;
 
     @SuppressWarnings("unused")
     public QueryKeywordsHandler() {
@@ -35,14 +35,14 @@ public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchRespon
         this(new QueryKeywordsApiClient(), environment);
     }
 
-    public QueryKeywordsHandler(CristinQueryApiClient<Map<String, String>, TypedLabel> apiClient,
+    public QueryKeywordsHandler(CristinQueryApiClient<Map<String, String>, Keyword> apiClient,
                                 Environment environment) {
         super(Void.class, environment);
         this.apiClient = apiClient;
     }
 
     @Override
-    protected SearchResponse<TypedLabel> processInput(Void input, RequestInfo requestInfo, Context context)
+    protected SearchResponse<Keyword> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
         var queryParams = parseQueryParams(requestInfo);
@@ -51,7 +51,7 @@ public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchRespon
     }
 
     @Override
-    protected Integer getSuccessStatusCode(Void input, SearchResponse<TypedLabel> output) {
+    protected Integer getSuccessStatusCode(Void input, SearchResponse<Keyword> output) {
         return HTTP_OK;
     }
 
