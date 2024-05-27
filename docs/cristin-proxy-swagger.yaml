@@ -2092,16 +2092,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdentifierWithLabels'
+                $ref: '#/components/schemas/Keyword'
               examples:
                 objectExample:
-                  $ref: '#/components/examples/SingleKeywordExample'
+                  $ref: '#/components/examples/KeywordExample'
             application/ld+json:
               schema:
-                $ref: '#/components/schemas/IdentifierWithLabels'
+                $ref: '#/components/schemas/Keyword'
               examples:
                 objectExample:
-                  $ref: '#/components/examples/SingleKeywordExample'
+                  $ref: '#/components/examples/KeywordExample'
         500:
           $ref: '#/components/responses/500'
         502:
@@ -3554,7 +3554,7 @@ components:
         - type
         - id
         - identifier
-        - name
+        - labels
       properties:
         type:
           type: string
@@ -3565,7 +3565,7 @@ components:
         identifier:
           type: string
           description: the identifier (code) for the funding source
-        name:
+        labels:
           $ref: '#/components/schemas/Languages'
     BioBanks:
       type: object
@@ -3860,16 +3860,22 @@ components:
       type: object
       description: Single keyword
       properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
         type:
           type: string
-          description: The keyword code
-        label:
+          pattern: 'Keyword'
+        id:
+          $ref: '#/components/schemas/Id'
+        identifier:
+          type: integer
+        labels:
           $ref: '#/components/schemas/Languages'
     KeywordPost:
       type: object
-      description: Single keyword. Needs to have label in both Norwegian 'nb' and English 'en'
+      description: Single keyword. Needs to have labels in both Norwegian 'nb' and English 'en'
       properties:
-        label:
+        labels:
           $ref: '#/components/schemas/Languages'
     Categories:
       type: object
@@ -3983,13 +3989,18 @@ components:
       type: object
       description: Single country
       properties:
+        '@context':
+          $ref: '#/components/schemas/Context'
         type:
           type: string
+          pattern: 'Country'
+        identifier:
+          type: string
           description: Two letter country code (ISO 3166-1 alpha-2)
-        typeAlpha3:
+        identifierAlpha3:
           type: string
           description: The 3 letter alpha 3 country code
-        label:
+        labels:
           $ref: '#/components/schemas/Languages'
     IdentifierWithLabels:
       type: object
@@ -4982,7 +4993,7 @@ components:
           - type: "FundingSource"
             id: "https://api.{env.}nva.aws.unit.no/funding-sources/EC%2FH2020"
             identifier: "EC/H2020"
-            name:
+            labels:
               nb: "EC/H2020"
               nn: "EC/H2020"
               en: "EC/H2020"
@@ -4991,7 +5002,7 @@ components:
         type: "FundingSource"
         id: "https://api.{env.}nva.aws.unit.no/funding-sources/EC%2FFP7"
         identifier: "EC/FP7"
-        name:
+        labels:
           nb: "EC/FP7"
           nn: "EC/FP7"
           en: "EC/FP7"
@@ -5245,30 +5256,36 @@ components:
     KeywordsExample:
       value:
         '@context': 'https://example.org/keyword-context.json'
-        id: 'https://api.dev.nva.aws.unit.no/cristin/keywords/?page=1&query=food%results=5'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/keywords/?page=1&query=something%results=5'
         size: 150
         processingTime: 800
         firstRecord: 1
-        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/keywords/?page=2&query=food%results=5'
+        nextResults: 'https://api.dev.nva.aws.unit.no/cristin/keywords/?page=2&query=something%results=5'
         previousResults: ''
         hits:
-          - type: '1971'
-            label:
-              en: 'Food'
-          - type: '1972'
-            label:
-              en: 'Food Classification'
+          - type: 'Keyword'
+            id: 'https://api.dev.nva.aws.unit.no/cristin/keyword/1197'
+            identifier: '1197'
+            labels:
+              en: 'Educational management'
+          - type: 'Keyword'
+            id: 'https://api.dev.nva.aws.unit.no/cristin/keyword/1198'
+            identifier: '1198'
+            labels:
+              en: 'Odontologi'
     KeywordPostExample:
       value:
-        label:
+        labels:
           en: 'Cooking'
           nb: 'Matlaging'
     KeywordExample:
       value:
-        type: '1234'
-        label:
-          en: 'Cooking'
-          nb: 'Matlaging'
+        '@context': 'https://bibsysdev.github.io/src/keyword-context.json'
+        type: 'Keyword'
+        id: 'https://api.dev.nva.aws.unit.no/cristin/keyword/1197'
+        identifier: '1197'
+        labels:
+          en: 'Educational management'
     CategoriesExample:
       value:
         '@context': 'https://example.org/keyword-context.json'
@@ -5292,23 +5309,17 @@ components:
         size: 150
         processingTime: 800
         hits:
-          - type: 'CA'
-            typeAlpha3: 'CAN'
-            label:
+          - type: 'Country'
+            identifier: 'CA'
+            identifierAlpha3: 'CAN'
+            labels:
               en: 'Canada'
-          - type: 'NO'
-            typeAlpha3: 'NOR'
-            label:
+          - type: 'Country'
+            identifier: 'NO'
+            identifierAlpha3: 'NOR'
+            labels:
               nb: 'Norge'
               en: 'Norway'
-    SingleKeywordExample:
-      value:
-        '@context': 'https://bibsysdev.github.io/src/keyword-context.json'
-        type: 'Keyword'
-        id: 'https://api.dev.nva.aws.unit.no/cristin/keyword/1197'
-        identifier: '1197'
-        labels:
-          en: 'Educational management'
     PersonsOrcidExample:
       value:
         '@context': 'https://example.org/persons-orcid-context.json'

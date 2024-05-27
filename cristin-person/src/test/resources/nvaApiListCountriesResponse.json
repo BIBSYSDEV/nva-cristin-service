@@ -1,26 +1,35 @@
-[
-  {
-    "type": "AD",
-    "typeAlpha3": "AND",
-    "label": {
-      "en": "Andorra",
-      "nb": "Andorra"
+{
+  "type": "Countries",
+  "@context": "https://example.org/country-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/country",
+  "size": 3,
+  "hits": [
+    {
+      "type": "Country",
+      "identifier": "AD",
+      "identifierAlpha3": "AND",
+      "labels": {
+        "en": "Andorra",
+        "nb": "Andorra"
+      }
+    },
+    {
+      "type": "Country",
+      "identifier": "AE",
+      "identifierAlpha3": "ARE",
+      "labels": {
+        "en": "United Arab Emirates",
+        "nb": "Arabiske Emirater"
+      }
+    },
+    {
+      "type": "Country",
+      "identifier": "AF",
+      "identifierAlpha3": "AFG",
+      "labels": {
+        "en": "Afghanistan",
+        "nb": "Afghanistan"
+      }
     }
-  },
-  {
-    "type": "AE",
-    "typeAlpha3": "ARE",
-    "label": {
-      "en": "United Arab Emirates",
-      "nb": "Arabiske Emirater"
-    }
-  },
-  {
-    "type": "AF",
-    "typeAlpha3": "AFG",
-    "label": {
-      "en": "Afghanistan",
-      "nb": "Afghanistan"
-    }
-  }
-]
+  ]
+}

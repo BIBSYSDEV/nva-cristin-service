@@ -10,11 +10,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.List;
+import no.unit.nva.commons.json.JsonSerializable;
 
 @JsonInclude(NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public record Countries(@JsonProperty(CONTEXT) URI context,
                         @JsonProperty(ID) URI id,
                         @JsonProperty(SIZE) int size,
-                        @JsonProperty(HITS) List<Country> countries) {
+                        @JsonProperty(HITS) List<Country> countries) implements JsonSerializable {
+
+    @Override
+    public String toString() {
+        return toJsonString();
+    }
+
 }

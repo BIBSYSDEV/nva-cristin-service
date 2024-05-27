@@ -4,6 +4,7 @@
   "id" : "https://api.dev.nva.aws.unit.no/cristin/keyword/1197",
   "identifier" : "1197",
   "labels" : {
-    "en" : "Educational management"
+    "en" : "Educational management",
+    "nb" : "Utdanningsledelse"
   }
 }

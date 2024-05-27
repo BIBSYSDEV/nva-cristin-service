@@ -22,7 +22,11 @@ public class IdentifierWithLabels {
     @JsonProperty(LABELS)
     private final Map<String, String> labels;
 
-    public IdentifierWithLabels(String context, String type, URI id, String identifier, Map<String, String> labels) {
+    public IdentifierWithLabels(@JsonProperty(CONTEXT) String context,
+                                @JsonProperty(TYPE) String type,
+                                @JsonProperty(ID) URI id,
+                                @JsonProperty(IDENTIFIER) String identifier,
+                                @JsonProperty(LABELS) Map<String, String> labels) {
         this.context = context;
         this.type = type;
         this.id = id;
@@ -51,6 +55,7 @@ public class IdentifierWithLabels {
     }
 
     // Builder
+    @SuppressWarnings("unused")
     public static class Builder {
 
         private String context;

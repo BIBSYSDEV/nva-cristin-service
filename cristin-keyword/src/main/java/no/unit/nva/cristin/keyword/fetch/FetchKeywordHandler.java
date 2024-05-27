@@ -9,16 +9,16 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.net.MediaType;
 import java.util.List;
 import no.unit.nva.client.FetchApiClient;
-import no.unit.nva.cristin.keyword.model.nva.KeywordType;
+import no.unit.nva.cristin.keyword.model.nva.Keyword;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 
-public class FetchKeywordHandler extends ApiGatewayHandler<Void, KeywordType> {
+public class FetchKeywordHandler extends ApiGatewayHandler<Void, Keyword> {
 
-    private final FetchApiClient<String, KeywordType> apiClient;
+    private final FetchApiClient<String, Keyword> apiClient;
 
     @SuppressWarnings("unused")
     public FetchKeywordHandler() {
@@ -29,13 +29,13 @@ public class FetchKeywordHandler extends ApiGatewayHandler<Void, KeywordType> {
         this(new FetchCristinKeywordApiClient(), environment);
     }
 
-    public FetchKeywordHandler(FetchApiClient<String, KeywordType> apiClient, Environment environment) {
+    public FetchKeywordHandler(FetchApiClient<String, Keyword> apiClient, Environment environment) {
         super(Void.class, environment);
         this.apiClient = apiClient;
     }
 
     @Override
-    protected KeywordType processInput(Void input, RequestInfo requestInfo, Context context)
+    protected Keyword processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
         validateIdentifier(requestInfo);
@@ -45,7 +45,7 @@ public class FetchKeywordHandler extends ApiGatewayHandler<Void, KeywordType> {
     }
 
     @Override
-    protected Integer getSuccessStatusCode(Void input, KeywordType output) {
+    protected Integer getSuccessStatusCode(Void input, Keyword output) {
         return HTTP_OK;
     }
 
