@@ -1,0 +1,20 @@
+{
+  "type": "PersonsOrcid",
+  "@context": "https://example.org/persons-orcid-context.json",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/person/orcid",
+  "size": 3,
+  "hits": [
+    {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/person/738",
+      "orcid": "https://api.dev.nva.aws.unit.no/cristin/person/1234-1234-1234-1234"
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/person/737",
+      "orcid": "https://api.dev.nva.aws.unit.no/cristin/person/1234-1234-1234-123X"
+    },
+    {
+      "id": "https://api.dev.nva.aws.unit.no/cristin/person/1306958",
+      "orcid": "https://api.dev.nva.aws.unit.no/cristin/person/2222-3333-4444-5555"
+    }
+  ]
+}

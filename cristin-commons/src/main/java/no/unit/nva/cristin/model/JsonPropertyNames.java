@@ -76,4 +76,5 @@ public class JsonPropertyNames {
     public static final String CODE_ALPHA_3 = "code_alpha3";
     public static final String YEAR = "year";
     public static final String DISTRIBUTION = "distribution";
+    public static final String CRISTIN_PERSON_ID = "cristin_person_id";
 }

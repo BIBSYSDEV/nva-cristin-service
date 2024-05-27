@@ -1,4 +1,4 @@
-Feature: API tests for country list
+Feature: API tests for person orcid list
 
   Background:
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
@@ -21,7 +21,7 @@ Feature: API tests for country list
       'Access-Control-Request-Headers': 'Content-Type, Authorization'
     }
   """
-    Given path '/country/'
+    Given path '/person/orcid/'
     When method OPTIONS
     Then status 200
     And match responseHeaders['Access-Control-Allow-Origin'][0] == '*'
@@ -38,7 +38,7 @@ Feature: API tests for country list
 
   Scenario Outline: Query returns valid data and with correct content negotiation <CONTENT_TYPE>
     * configure headers = { 'Accept': <CONTENT_TYPE> }
-    Given path '/country/'
+    Given path '/person/orcid/'
     When method GET
     Then status 200
     And match response == '#object'
@@ -46,11 +46,8 @@ Feature: API tests for country list
     And match response.id == '#present'
     And match response.size == '#present'
     And match response.hits == '#present'
-    And match response.hits[0].identifier == '#present'
-    And match response.hits[0].identifierAlpha3 == '#present'
-    And match response.hits[0].labels == '#present'
-    And match response.hits[0].labels['nb'] == '#present'
-    And match response.hits[0].labels['en'] == '#present'
+    And match response.hits[0].id == '#present'
+    And match response.hits[0].orcid == '#present'
 
     Examples:
       | CONTENT_TYPE          |
