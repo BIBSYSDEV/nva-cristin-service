@@ -29,6 +29,7 @@ import no.unit.nva.model.TypedLabel;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.JacocoGenerated;
+import nva.commons.core.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,6 +172,7 @@ public final class PersonPatchValidator {
                 Optional.of(personNvi)
                     .map(PersonNvi::verifiedBy)
                     .map(PersonSummary::id)
+                    .filter(uri -> StringUtils.isNotBlank(uri.toString()))
                     .map(UriUtils::extractLastPathElement)
                     .filter(Utils::isPositiveInteger)
                     .orElseThrow(() -> invalidIdentifier(MUST_HAVE_A_VALID_PERSON_IDENTIFIER));
