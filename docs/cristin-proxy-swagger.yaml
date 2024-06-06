@@ -63,8 +63,8 @@ paths:
             - CONCLUDED
             - NOTSTARTED
             example: 'active'
-            style: form
-            explode: false
+          style: form
+          explode: false
         - name: page
           in: query
           description: Current page requested
