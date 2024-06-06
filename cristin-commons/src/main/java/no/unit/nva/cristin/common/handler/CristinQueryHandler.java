@@ -39,7 +39,6 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
 
     protected String getValidPage(RequestInfo requestInfo) throws BadRequestException {
         var page = requestInfo.getQueryParameterOpt(PAGE).orElse(FIRST_PAGE);
-        requestInfo.getMultiValueQueryParameter()
         if (Utils.isPositiveInteger(page)) {
             return page;
         }
