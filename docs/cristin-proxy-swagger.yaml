@@ -40,6 +40,8 @@ paths:
             type: string
             pattern: '.+'
           example: 'Helse'
+          style: form
+          explode: false
         - name: organization
           in: query
           description: Search projects by organization id.
@@ -48,6 +50,8 @@ paths:
             type: string
             pattern: '.+'
           example: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+          style: form
+          explode: false
         - name: status
           in: query
           description: Search for project with status
@@ -59,6 +63,8 @@ paths:
             - CONCLUDED
             - NOTSTARTED
             example: 'active'
+            style: form
+            explode: false
         - name: page
           in: query
           description: Current page requested
@@ -67,6 +73,8 @@ paths:
             type: number
             default: '1'
           example: '3'
+          style: form
+          explode: false
         - name: results
           in: query
           description: Results per page
@@ -75,42 +83,56 @@ paths:
             type: number
             default: '5'
           example: '10'
+          style: form
+          explode: false
         - name: institution
           in: query
           description: Cristin id, acronym, name, or part of the name of the coordinating institution
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: project_manager
           in: query
           description: Cristin id, name or part of the name of the project manager.
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: participant
           in: query
           description: Cristin id, name or part of the name of a participant of the project. 'participant' can be used more than once.
           required: false
           schema:
             type: string
+          style: form
+          explode: true
         - name: keyword
           in: query
           description: Keyword search. '?keyword=wind energy' makes a search for projects with keywords equal to or a substring of 'wind energy'. keyword can be used more than once
           required: false
           schema:
             type: string
+          style: form
+          explode: true
         - name: approval_reference_id
           in: query
           description: Reference id of a project approval.
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: funding_source
           in: query
           description: Funding source code.
           required: false
           schema:
             type: string
+          style: form
+          explode: true
         - name: sort
           in: query
           description: Sort results based on parameters.
@@ -124,78 +146,104 @@ paths:
               - end_date
               - end_date asc
               - end_date desc
+          style: form
+          explode: false
         - name: unit
           in: query
           description: Unit id
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: user
           in: query
           description: A person's username in Cristin together with the institution id separated by ':'
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: approved_by
           in: query
           description: Code for the authority that evaluated a project approval.
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: funding
           in: query
           description: Funding source code e.g. NFR, and project_code together separated by ':'
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: levels
           in: query
           description: How many levels down from 'parent_unit_id' will be included in the search.'levels=1' will return projects registered to 'parent_unit_id'. 'levels' can also be used by itself to search for all projects registered to a known cristin unit down to the given level.
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: modified_since
           in: query
           description: Only projects that have been modified since this date will be returned. Format YYYY-MM-DD
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: biobank
           in: query
           description: Biobank id. 'biobank' can be used more than once.
           required: false
           schema:
             type: string
+          style: form
+          explode: true
         - name: creator
           in: query
           description: Creator identifier
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: category
           in: query
           description: Project category
           required: false
           schema:
             type: string
+          style: form
+          explode: true
         - name: grantId
           in: query
           description: Project funding identifier
           required: false
           schema:
             type: number
+          style: form
+          explode: false
         - name: cristinId
           in: query
           description: Project identifier in Cristin
           required: false
           schema:
             type: number
+          style: form
+          explode: false
         - name: multiple
           in: query
           description: Matches multiple fields using only this one param, those being 'cristinId', 'title', 'project_manager', 'participant' and 'grantId'
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: categoryFacet
           in: query
           description: Narrow down on project category. Works only for version 2023-11-03-aggregations
@@ -203,6 +251,8 @@ paths:
           schema:
             type: string
           example: 'APPLIEDRESEARCH'
+          style: form
+          explode: false
         - name: coordinatingFacet
           in: query
           description: Narrow down on coordinating organization. Works only for version 2023-11-03-aggregations
@@ -210,6 +260,8 @@ paths:
           schema:
             type: string
           example: '185.90.0.0'
+          style: form
+          explode: false
         - name: fundingSourceFacet
           in: query
           description: Narrow down on funding source. Works only for version 2023-11-03-aggregations
@@ -217,6 +269,8 @@ paths:
           schema:
             type: string
           example: 'NFR'
+          style: form
+          explode: false
         - name: healthProjectFacet
           in: query
           description: Narrow down on health project. Works only for version 2023-11-03-aggregations
@@ -224,6 +278,8 @@ paths:
           schema:
             type: string
           example: 'DRUGSTUDY'
+          style: form
+          explode: false
         - name: participantFacet
           in: query
           description: Narrow down on participant. Works only for version 2023-11-03-aggregations
@@ -231,6 +287,8 @@ paths:
           schema:
             type: string
           example: '1234'
+          style: form
+          explode: false
         - name: participantOrgFacet
           in: query
           description: Narrow down on participant organization. Works only for version 2023-11-03-aggregations
@@ -238,6 +296,8 @@ paths:
           schema:
             type: string
           example: '185'
+          style: form
+          explode: false
         - name: responsibleFacet
           in: query
           description: Narrow down on responsible organization. Works only for version 2023-11-03-aggregations
@@ -245,6 +305,8 @@ paths:
           schema:
             type: string
           example: '185.90.0.0'
+          style: form
+          explode: false
         - name: sectorFacet
           in: query
           description: Narrow down on sector. Works only for version 2023-11-03-aggregations
@@ -252,6 +314,8 @@ paths:
           schema:
             type: string
           example: 'UC'
+          style: form
+          explode: false
         - name: Accept
           in: header
           description: Requested response format and version of the returned payload
@@ -522,6 +586,8 @@ paths:
             type: string
             pattern: '.+'
           example: 'Universitetet i'
+          style: form
+          explode: false
         - name: depth
           in: query
           description: Depth of sub-organizations included in response
@@ -531,6 +597,8 @@ paths:
             enum:
               - full
               - top
+          style: form
+          explode: false
         - name: page
           in: query
           description: Current page requested
@@ -539,6 +607,8 @@ paths:
             type: number
             default: '1'
           example: '1'
+          style: form
+          explode: false
         - name: results
           in: query
           description: Results per page
@@ -547,6 +617,8 @@ paths:
             type: number
             default: '10'
           example: '10'
+          style: form
+          explode: false
         - name: sort
           in: query
           description: Sort results based on parameters.
@@ -557,6 +629,8 @@ paths:
               - country
               - country asc
               - country desc
+          style: form
+          explode: false
         - name: fullTree
           in: query
           description: Include all parent and sub units for each search result
@@ -564,6 +638,8 @@ paths:
           schema:
             type: boolean
             default: false
+          style: form
+          explode: false
         - name: Accept
           in: header
           description: Requested response format and version of the returned payload
@@ -659,6 +735,8 @@ paths:
             type: string
             enum:
               - none
+          style: form
+          explode: false
         - name: Accept
           in: header
           description: Requested response format and version of the returned payload
@@ -744,6 +822,8 @@ paths:
             type: number
             default: '1'
           example: '3'
+          style: form
+          explode: false
         - name: results
           in: query
           description: Results per page
@@ -752,6 +832,8 @@ paths:
             type: number
             default: '5'
           example: '10'
+          style: form
+          explode: false
         - name: name
           in: query
           description: filter on given name
@@ -759,6 +841,8 @@ paths:
           schema:
             type: string
           example: 'daniel'
+          style: form
+          explode: false
         - name: sort
           in: query
           description: Sort results based on parameters.
@@ -772,6 +856,8 @@ paths:
               - name
               - name asc
               - name desc
+          style: form
+          explode: false
           examples:
             identifierDesc:
               value: 'id desc'
@@ -835,6 +921,8 @@ paths:
             type: number
             default: '1'
           example: '3'
+          style: form
+          explode: false
         - name: results
           in: query
           description: Results per page
@@ -843,42 +931,56 @@ paths:
             type: number
             default: '5'
           example: '10'
+          style: form
+          explode: false
         - name: institution
           in: query
           description: Cristin id, acronym, name, or part of the name of the coordinating institution
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: project_manager
           in: query
           description: Cristin id, name or part of the name of the project manager.
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: participant
           in: query
           description: Cristin id, name or part of the name of a participant of the project. 'participant' can be used more than once.
           required: false
           schema:
             type: string
+          style: form
+          explode: true
         - name: keyword
           in: query
           description: Keyword search. '?keyword=wind energy' makes a search for projects with keywords equal to or a substring of 'wind energy'. keyword can be used more than once
           required: false
           schema:
             type: string
+          style: form
+          explode: true
         - name: approval_reference_id
           in: query
           description: Reference id of a project approval.
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: funding_source
           in: query
           description: Funding source code.
           required: false
           schema:
             type: string
+          style: form
+          explode: true
         - name: sort
           in: query
           description: Sort results based on parameters.
@@ -892,72 +994,96 @@ paths:
               - end_date
               - end_date asc
               - end_date desc
+          style: form
+          explode: false
         - name: unit
           in: query
           description: Unit id
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: user
           in: query
           description: A person's username in Cristin together with the institution id separated by ':'
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: approved_by
           in: query
           description: Code for the authority that evaluated a project approval.
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: funding
           in: query
           description: Funding source code e.g. NFR, and project_code together separated by ':'
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: levels
           in: query
           description: How many levels down from 'parent_unit_id' will be included in the search.'levels=1' will return projects registered to 'parent_unit_id'. 'levels' can also be used by itself to search for all projects registered to a known cristin unit down to the given level.
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: modified_since
           in: query
           description: Only projects that have been modified since this date will be returned. Format YYYY-MM-DD
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: biobank
           in: query
           description: Biobank id. 'biobank' can be used more than once.
           required: false
           schema:
             type: string
+          style: form
+          explode: true
         - name: creator
           in: query
           description: Creator identifier
           required: false
           schema:
             type: string
+          style: form
+          explode: false
         - name: grantId
           in: query
           description: Project funding identifier
           required: false
           schema:
             type: number
+          style: form
+          explode: false
         - name: cristinId
           in: query
           description: Project identifier in Cristin
           required: false
           schema:
             type: number
+          style: form
+          explode: false
         - name: multiple
           in: query
           description: Matches multiple fields using only this one param, those being 'cristinId', 'title', 'project_manager', 'participant' and 'grantId'
           required: false
           schema:
             type: string
+          style: form
+          explode: false
       responses:
         200:
           description: successful operation
@@ -1005,6 +1131,8 @@ paths:
             type: string
             pattern: '.+'
           example: 'Ola Nordmann'
+          style: form
+          explode: false
         - name: organization
           in: query
           description: Search string. Parts of organization name or identifier
@@ -1013,6 +1141,8 @@ paths:
             type: string
             pattern: '.+'
           example: 'Universitetet i Tromsø'
+          style: form
+          explode: false
         - name: page
           in: query
           description: Current page requested
@@ -1021,6 +1151,8 @@ paths:
             type: number
             default: '1'
           example: '3'
+          style: form
+          explode: false
         - name: results
           in: query
           description: Results per page
@@ -1029,12 +1161,16 @@ paths:
             type: number
             default: '5'
           example: '10'
+          style: form
+          explode: false
         - name: verified
           in: query
           description: Verified or not verified persons
           required: false
           schema:
             type: boolean
+          style: form
+          explode: false
         - name: sectorFacet
           in: query
           description: Narrow down to sector. Works only for version 2023-11-03-aggregations
@@ -1042,6 +1178,8 @@ paths:
           schema:
             type: string
           example: 'UC'
+          style: form
+          explode: false
         - name: organizationFacet
           in: query
           description: Narrow down to organization. Works only for version 2023-11-03-aggregations
@@ -1049,6 +1187,8 @@ paths:
           schema:
             type: string
           example: 'uio'
+          style: form
+          explode: false
         - name: sort
           in: query
           description: Sort results based on parameters.
@@ -1062,6 +1202,8 @@ paths:
               - name
               - name asc
               - name desc
+          style: form
+          explode: false
         - name: Accept
           in: header
           description: Requested response format and version of the returned payload
@@ -1792,6 +1934,8 @@ paths:
           required: false
           schema:
             type: boolean
+          style: form
+          explode: false
       responses:
         200:
           description: successful operation
@@ -1971,6 +2115,8 @@ paths:
             type: string
             pattern: '.+'
           example: 'Biology'
+          style: form
+          explode: false
         - name: page
           in: query
           description: Current page requested
@@ -1979,6 +2125,8 @@ paths:
             type: number
             default: '1'
           example: '3'
+          style: form
+          explode: false
         - name: results
           in: query
           description: Results per page
@@ -1987,6 +2135,8 @@ paths:
             type: number
             default: '100'
           example: '5'
+          style: form
+          explode: false
       responses:
         200:
           description: successful operation
