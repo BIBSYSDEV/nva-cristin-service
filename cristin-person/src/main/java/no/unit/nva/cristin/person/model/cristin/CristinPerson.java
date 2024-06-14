@@ -14,6 +14,7 @@ import no.unit.nva.cristin.person.model.nva.ContactDetails;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.PersonNvi;
+import no.unit.nva.cristin.person.model.nva.PersonSummary;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.model.TypedLabel;
 import nva.commons.core.JacocoGenerated;
@@ -278,7 +279,7 @@ public class CristinPerson implements JsonSerializable {
                    .withContactDetails(extractContactDetails())
                    .withImage(extractImage())
                    .withAffiliations(extractAffiliations())
-                   .withVerified(getIdentifiedCristinPerson())
+                   .withVerified(extractVerified())
                    .withKeywords(extractKeywords())
                    .withBackground(extractBackground())
                    .withNvi(extractNvi())
@@ -309,7 +310,7 @@ public class CristinPerson implements JsonSerializable {
                    .withAffiliations(extractAffiliations())
                    .withReserved(getReserved())
                    .withEmployments(extractEmployments())
-                   .withVerified(getIdentifiedCristinPerson())
+                   .withVerified(extractVerified())
                    .withKeywords(extractKeywords())
                    .withBackground(extractBackground())
                    .withNvi(extractNvi())
@@ -386,6 +387,19 @@ public class CristinPerson implements JsonSerializable {
         return getDetailedAffiliations().stream()
                    .map(cristinEmployment -> cristinEmployment.toEmployment(getCristinPersonId()))
                    .collect(Collectors.toSet());
+    }
+
+    private Boolean extractVerified() {
+        var nviVerified = Optional.ofNullable(extractNvi())
+                              .map(PersonNvi::verifiedBy)
+                              .map(PersonSummary::id)
+                              .isPresent();
+
+        if (nviVerified) {
+            return true;
+        } else {
+            return getIdentifiedCristinPerson();
+        }
     }
 
     private Map<String, String> extractBackground() {

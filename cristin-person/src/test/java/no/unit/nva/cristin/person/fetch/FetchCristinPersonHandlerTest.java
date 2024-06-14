@@ -305,6 +305,31 @@ public class FetchCristinPersonHandlerTest {
         JSONAssert.assertEquals(expected, actual, JSONCompareMode.LENIENT);
     }
 
+    @Test
+    void shouldReturnPersonAsVerifiedWhenThatPersonIsNotRegularVerifiedButNviVerified() throws Exception {
+        var json = readFromResources(CRISTIN_PERSON_NVI_VERIFIED_JSON);
+        apiClient = spy(apiClient);
+        doReturn(new HttpResponseFaker(json)).when(apiClient).fetchGetResult(any(URI.class));
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
+
+        assertThat(actual.verified(), equalTo(true));
+    }
+
+    @Test
+    void shouldNotReturnPersonAsVerifiedWhenThatPersonIsNeitherRegularVerifiedOrNviVerified() throws Exception {
+        var cristinPerson = randomCristinPerson();
+        cristinPerson.setNorwegianNationalId(null);
+        cristinPerson.setIdentifiedCristinPerson(false);
+        var json = cristinPerson.toString();
+        apiClient = spy(apiClient);
+        doReturn(new HttpResponseFaker(json)).when(apiClient).fetchGetResult(any(URI.class));
+        handler = new FetchCristinPersonHandler(apiClient, environment);
+        var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
+
+        assertThat(actual.verified(), equalTo(false));
+    }
+
     private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {
         return responseBody.identifiers().stream()
                    .filter(typedValue -> typedValue.getType().equals(NATIONAL_IDENTITY_NUMBER))
