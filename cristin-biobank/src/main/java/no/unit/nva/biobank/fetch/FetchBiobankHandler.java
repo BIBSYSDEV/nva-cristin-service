@@ -10,18 +10,16 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
-
-    private static final Logger logger = LoggerFactory.getLogger(FetchBiobankHandler.class);
 
     private final transient CristinBiobankApiClient cristinClient;
 
     @JacocoGenerated
+    @SuppressWarnings("unused")
     public FetchBiobankHandler() {
         this(CristinBiobankApiClient.defaultClient(), new Environment());
+
     }
 
     public FetchBiobankHandler(CristinBiobankApiClient cristinClient, Environment environment) {
@@ -31,12 +29,11 @@ public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
 
     @Override
     protected Biobank processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        var query = (QueryBiobank)
-                        QueryBiobank.builder()
-                            .fromRequestInfo(requestInfo).build();
-        logger.info("FETCH biobank -> " + query.toURI().toString());
-        return
-            cristinClient.fetchBiobank(query).toBiobank();
+        var query = (QueryBiobank) QueryBiobank.builder()
+                                       .fromRequestInfo(requestInfo)
+                                       .build();
+
+        return cristinClient.fetchBiobank(query);
     }
 
     @Override
