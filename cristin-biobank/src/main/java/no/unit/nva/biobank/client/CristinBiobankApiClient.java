@@ -63,7 +63,7 @@ public class CristinBiobankApiClient extends ApiClient {
         return response;
     }
 
-    private List<Biobank> toNvaFormat(CristinBiobank[] cristinBiobanks) {
+    private List<Biobank> toNvaFormat(CristinBiobank... cristinBiobanks) {
         return Arrays.stream(cristinBiobanks)
                    .map(CristinBiobank::toBiobank)
                    .collect(Collectors.toList());
