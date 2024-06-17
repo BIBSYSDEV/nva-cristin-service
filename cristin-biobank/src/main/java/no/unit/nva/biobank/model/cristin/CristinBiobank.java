@@ -3,6 +3,7 @@ package no.unit.nva.biobank.model.cristin;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import no.unit.nva.biobank.model.cristin.adapter.CristinBiobankToBiobank;
 import no.unit.nva.biobank.model.nva.Biobank;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinExternalSource;
@@ -150,7 +151,7 @@ public class CristinBiobank implements JsonSerializable {
     }
 
     public Biobank toBiobank() {
-        return new Biobank(this);
+        return new CristinBiobankToBiobank().apply(this);
     }
 
     @Override
