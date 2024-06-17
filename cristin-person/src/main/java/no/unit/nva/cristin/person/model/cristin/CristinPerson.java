@@ -392,18 +392,22 @@ public class CristinPerson implements JsonSerializable {
     }
 
     private Boolean extractVerified() {
-        var nviVerified = Optional.ofNullable(extractNvi())
-                              .map(PersonNvi::verifiedBy)
-                              .map(PersonSummary::id)
-                              .map(UriUtils::extractLastPathElement)
-                              .filter(Utils::isPositiveInteger)
-                              .isPresent();
-
-        if (nviVerified) {
+        if (nonNull(getIdentifiedCristinPerson()) && getIdentifiedCristinPerson()) {
+            return true;
+        } else if (isNviVerified()) {
             return true;
         } else {
             return getIdentifiedCristinPerson();
         }
+    }
+
+    private boolean isNviVerified() {
+        return Optional.ofNullable(extractNvi())
+                   .map(PersonNvi::verifiedBy)
+                   .map(PersonSummary::id)
+                   .map(UriUtils::extractLastPathElement)
+                   .filter(Utils::isPositiveInteger)
+                   .isPresent();
     }
 
     private Map<String, String> extractBackground() {
