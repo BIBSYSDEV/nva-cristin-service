@@ -188,10 +188,9 @@ public class Biobank implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Biobank)) {
+        if (!(o instanceof Biobank biobank)) {
             return false;
         }
-        Biobank biobank = (Biobank) o;
         return Objects.equals(context, biobank.context)
                && Objects.equals(getId(), biobank.getId())
                && Objects.equals(getIdentifiers(), biobank.getIdentifiers())
@@ -238,7 +237,7 @@ public class Biobank implements JsonSerializable {
 
         return Stream.of(cristinBiobankIdOrNull,biobankIdOrNull)
                    .filter(Objects::nonNull)
-                   .collect(Collectors.toUnmodifiableList());
+                   .toList();
     }
 
 
@@ -262,14 +261,14 @@ public class Biobank implements JsonSerializable {
         return
             approvals.stream()
                 .map(BiobankApproval::new)
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
     }
 
     private static List<TypedLabel> toBiobankMaterials(List<CristinBiobankMaterial> materials) {
         return
             materials.stream()
                 .map(item -> new TypedLabel(item.getMaterialCode(),item.getMaterialName()))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
     }
 
     private static AssociatedProject toProjectOrNull(CristinBiobank cristinBiobank) {

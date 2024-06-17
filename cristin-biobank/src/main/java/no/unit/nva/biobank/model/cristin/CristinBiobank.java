@@ -159,10 +159,9 @@ public class CristinBiobank implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CristinBiobank)) {
+        if (!(o instanceof CristinBiobank that)) {
             return false;
         }
-        CristinBiobank that = (CristinBiobank) o;
         return Objects.equals(getCristinBiobankId(), that.getCristinBiobankId())
                && Objects.equals(getType(), that.getType())
                && Objects.equals(getName(), that.getName())
