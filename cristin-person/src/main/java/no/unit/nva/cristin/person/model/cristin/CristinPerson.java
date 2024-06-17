@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.person.model.cristin.adapter.CristinAwardToNvaFormat;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
@@ -14,8 +15,10 @@ import no.unit.nva.cristin.person.model.nva.ContactDetails;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.PersonNvi;
+import no.unit.nva.cristin.person.model.nva.PersonSummary;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.model.TypedLabel;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
 
@@ -278,7 +281,7 @@ public class CristinPerson implements JsonSerializable {
                    .withContactDetails(extractContactDetails())
                    .withImage(extractImage())
                    .withAffiliations(extractAffiliations())
-                   .withVerified(getIdentifiedCristinPerson())
+                   .withVerified(extractVerified())
                    .withKeywords(extractKeywords())
                    .withBackground(extractBackground())
                    .withNvi(extractNvi())
@@ -309,7 +312,7 @@ public class CristinPerson implements JsonSerializable {
                    .withAffiliations(extractAffiliations())
                    .withReserved(getReserved())
                    .withEmployments(extractEmployments())
-                   .withVerified(getIdentifiedCristinPerson())
+                   .withVerified(extractVerified())
                    .withKeywords(extractKeywords())
                    .withBackground(extractBackground())
                    .withNvi(extractNvi())
@@ -386,6 +389,25 @@ public class CristinPerson implements JsonSerializable {
         return getDetailedAffiliations().stream()
                    .map(cristinEmployment -> cristinEmployment.toEmployment(getCristinPersonId()))
                    .collect(Collectors.toSet());
+    }
+
+    private Boolean extractVerified() {
+        if (nonNull(getIdentifiedCristinPerson()) && getIdentifiedCristinPerson()) {
+            return true;
+        } else if (isNviVerified()) {
+            return true;
+        } else {
+            return getIdentifiedCristinPerson();
+        }
+    }
+
+    private boolean isNviVerified() {
+        return Optional.ofNullable(extractNvi())
+                   .map(PersonNvi::verifiedBy)
+                   .map(PersonSummary::id)
+                   .map(UriUtils::extractLastPathElement)
+                   .filter(Utils::isPositiveInteger)
+                   .isPresent();
     }
 
     private Map<String, String> extractBackground() {
