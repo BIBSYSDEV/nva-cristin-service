@@ -22,16 +22,12 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.http.HttpRequest.newBuilder;
 import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
-import static nva.commons.core.attempt.Try.attempt;
 
 public class AccessUtils {
 
     public static final String ACCESS_TOKEN_CLAIMS_SCOPE_FIELD = "scope";
     public static final String ACCESS_TOKEN_CLAIMS_FIELD = "claims";
     public static final String AUTHORIZER_FIELD = "authorizer";
-    public static final String USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT =
-            "User:{} does not have required access right:{}";
-
     private static final String COGNITO_CLIENT_APP_ID_KEY = "COGNITO_CLIENT_APP_ID";
     private static final String COGNITO_USER_POOL_ID_KEY = "COGNITO_USER_POOL_ID";
     private static final String BACKEND_CLIENT_ID_KEY = "BACKEND_CLIENT_ID";
@@ -54,10 +50,7 @@ public class AccessUtils {
      * @throws ForbiddenException thrown when user is not authorized to access a user with IdentificationNumber
      */
     public static void validateIdentificationNumberAccess(RequestInfo requestInfo) throws ForbiddenException {
-        if (requesterHasNoAccessRightToUseNationalIdentificationNumber(requestInfo)) {
-            String nvaUsername = attempt(requestInfo::getUserName).orElse(fail -> null);
-            logger.warn(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT,
-                    nvaUsername, MANAGE_OWN_AFFILIATION);
+        if (!requesterIsUserAdministrator(requestInfo)) {
             throw new ForbiddenException();
         }
     }
@@ -75,10 +68,6 @@ public class AccessUtils {
 
     public static boolean clientIsCustomerAdministrator(RequestInfo requestInfo) {
         return requestInfo.userIsAuthorized(MANAGE_CUSTOMERS);
-    }
-
-    private static boolean requesterHasNoAccessRightToUseNationalIdentificationNumber(RequestInfo requestInfo) {
-        return !(requestInfo.userIsAuthorized(MANAGE_OWN_AFFILIATION) || requestInfo.clientIsInternalBackend());
     }
 
     /**
