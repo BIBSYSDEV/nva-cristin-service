@@ -38,13 +38,12 @@ public class CristinProjectApiClient extends ApiClient {
      * them into a list of CristinProject. If individual fetch fails, it uses the query response for that project.
      */
     public List<CristinProject> getEnrichedProjectsUsingQueryResponse(HttpResponse<String> response)
-            throws ApiGatewayException {
+        throws ApiGatewayException {
 
-        List<CristinProject> projectsFromQuery = asList(getDeserializedResponse(response, CristinProject[].class));
-        List<URI> cristinUris = extractCristinUrisFromProjects(projectsFromQuery);
-        List<HttpResponse<String>> individualResponses = fetchQueryResultsOneByOne(cristinUris);
-
-        List<CristinProject> enrichedCristinProjects = mapValidResponsesToCristinProjects(individualResponses);
+        var projectsFromQuery = asList(getDeserializedResponse(response, CristinProject[].class));
+        var cristinUris = extractCristinUrisFromProjects(projectsFromQuery);
+        var individualResponses = fetchQueryResultsOneByOne(cristinUris);
+        var enrichedCristinProjects = mapValidResponsesToCristinProjects(individualResponses);
 
         return allProjectsWereEnriched(projectsFromQuery, enrichedCristinProjects)
                 ? enrichedCristinProjects
@@ -68,7 +67,7 @@ public class CristinProjectApiClient extends ApiClient {
     }
 
     protected boolean allProjectsWereEnriched(List<CristinProject> projectsFromQuery,
-                                            List<CristinProject> enrichedCristinProjects) {
+                                              List<CristinProject> enrichedCristinProjects) {
         return projectsFromQuery.size() == enrichedCristinProjects.size();
     }
 

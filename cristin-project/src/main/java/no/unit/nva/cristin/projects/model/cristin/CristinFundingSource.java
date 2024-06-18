@@ -44,10 +44,9 @@ public class CristinFundingSource implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CristinFundingSource)) {
+        if (!(o instanceof CristinFundingSource that)) {
             return false;
         }
-        CristinFundingSource that = (CristinFundingSource) o;
         return Objects.equals(getFundingSourceCode(), that.getFundingSourceCode()) && Objects.equals(
             getProjectCode(), that.getProjectCode()) && Objects.equals(getFundingSourceName(),
                                                                        that.getFundingSourceName());

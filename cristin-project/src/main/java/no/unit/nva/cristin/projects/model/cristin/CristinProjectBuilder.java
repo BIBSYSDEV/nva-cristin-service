@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.function.Function;
 import no.unit.nva.cristin.model.CristinApproval;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import no.unit.nva.model.adapter.TypedLabelToCristinFormat;
 import no.unit.nva.utils.UriUtils;
 
 import static java.util.Objects.isNull;
@@ -34,21 +36,24 @@ import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizat
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
-public class CristinProjectBuilder {
+public class CristinProjectBuilder implements Function<NvaProject, CristinProject> {
 
     public static final String DEFAULT_TITLE_LANGUAGE_KEY = "nb";
     public static final String PATH_DELIMITER = "/";
 
-    private final transient CristinProject cristinProject;
-    private final transient NvaProject nvaProject;
+    private transient CristinProject cristinProject;
+    private transient NvaProject nvaProject;
 
     public CristinProjectBuilder(NvaProject nvaProject) {
         this.nvaProject = nvaProject;
         this.cristinProject = new CristinProject();
     }
 
-    private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
-        return contributors.stream().map(NvaContributor::toCristinPersonWithRoles).collect(Collectors.toList());
+    @Override
+    public CristinProject apply(NvaProject nvaProject) {
+        this.nvaProject = nvaProject;
+        this.cristinProject = new CristinProject();
+        return build();
     }
 
     /**
@@ -57,7 +62,6 @@ public class CristinProjectBuilder {
      * @return valid CristinProject containing data from source NvaProject
      */
     public CristinProject build() {
-
         cristinProject.setCristinProjectId(extractLastPathElement(nvaProject.getId()));
         cristinProject.setMainLanguage(extractMainLanguage(nvaProject.getLanguage()));
         cristinProject.setTitle(extractTitles(nvaProject));
@@ -89,8 +93,16 @@ public class CristinProjectBuilder {
         return cristinProject;
     }
 
+    private List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
+        return contributors.stream()
+                   .map(NvaContributor::toCristinPersonWithRoles)
+                   .collect(Collectors.toList());
+    }
+
     private String extractExternalUrl(URI webPage) {
-        return Optional.ofNullable(webPage).map(URI::toString).orElse(null);
+        return Optional.ofNullable(webPage)
+                   .map(URI::toString)
+                   .orElse(null);
     }
 
     private CristinPerson extractCreator(NvaContributor creator) {
@@ -116,7 +128,9 @@ public class CristinProjectBuilder {
     }
 
     private List<CristinApproval> extractApprovals(List<Approval> approvals) {
-        return approvals.stream().map(this::toCristinApproval).collect(Collectors.toList());
+        return approvals.stream()
+                   .map(this::toCristinApproval)
+                   .collect(Collectors.toList());
     }
 
     /**
@@ -149,17 +163,15 @@ public class CristinProjectBuilder {
     }
 
     private List<CristinTypedLabel> extractCristinTypedLabels(List<TypedLabel> typedLabels) {
-        return typedLabels.stream().map(this::toCristinTypedLabel).collect(Collectors.toList());
-    }
-
-    private CristinTypedLabel toCristinTypedLabel(TypedLabel typedLabel) {
-        return new CristinTypedLabel(typedLabel.getType(), typedLabel.getLabel());
+        return typedLabels.stream()
+                   .map(new TypedLabelToCristinFormat())
+                   .collect(Collectors.toList());
     }
 
     private List<CristinExternalSource> extractExternalSources(List<ExternalSource> nvaExternalSources) {
         return nonNull(nvaExternalSources)
                    ? nvaExternalSources.stream()
-                         .map(CristinProjectBuilder::toCristinExternalSource)
+                         .map(this::toCristinExternalSource)
                          .collect(Collectors.toList())
                    : null;
     }
@@ -203,7 +215,9 @@ public class CristinProjectBuilder {
     }
 
     private List<CristinFundingSource> extractFundings(List<Funding> fundings) {
-        return fundings.stream().map(this::getCristinFundingSource).collect(Collectors.toList());
+        return fundings.stream()
+                   .map(this::getCristinFundingSource)
+                   .collect(Collectors.toList());
     }
 
     private CristinFundingSource getCristinFundingSource(Funding funding) {
@@ -211,6 +225,7 @@ public class CristinProjectBuilder {
         cristinFundingSource.setFundingSourceCode(extractFundingSourceCode(funding.getSource()));
         cristinFundingSource.setFundingSourceName(funding.getLabels());
         cristinFundingSource.setProjectCode(funding.getIdentifier());
+
         return cristinFundingSource;
     }
 
@@ -220,12 +235,15 @@ public class CristinProjectBuilder {
 
     private Map<String, String> extractTitles(NvaProject nvaProject) {
         Map<String, String> titles = new ConcurrentHashMap<>();
+
         if (nonNull(nvaProject.getLanguage())) {
             titles.put(getLanguageByUri(nvaProject.getLanguage()).getIso6391Code(), nvaProject.getTitle());
         } else {
             titles.put(DEFAULT_TITLE_LANGUAGE_KEY, nvaProject.getTitle());
         }
+
         nvaProject.getAlternativeTitles().forEach(titles::putAll);
+
         return titles;
     }
 
@@ -235,7 +253,7 @@ public class CristinProjectBuilder {
                 : null;
     }
 
-    private static CristinExternalSource toCristinExternalSource(ExternalSource externalSource) {
+    private CristinExternalSource toCristinExternalSource(ExternalSource externalSource) {
         return new CristinExternalSource(externalSource.getName(),
                                          externalSource.getIdentifier());
     }
@@ -250,6 +268,7 @@ public class CristinProjectBuilder {
         var sourceAsText = source.toString();
         var lastElementIndexStart = sourceAsText.lastIndexOf(PATH_DELIMITER) + 1;
         var rawSourceCode = sourceAsText.substring(lastElementIndexStart);
+
         return URLDecoder.decode(rawSourceCode, StandardCharsets.UTF_8);
     }
 }

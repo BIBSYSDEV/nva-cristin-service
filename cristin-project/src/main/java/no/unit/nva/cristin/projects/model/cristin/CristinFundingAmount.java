@@ -37,10 +37,9 @@ public class CristinFundingAmount {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CristinFundingAmount)) {
+        if (!(o instanceof CristinFundingAmount that)) {
             return false;
         }
-        CristinFundingAmount that = (CristinFundingAmount) o;
         return Objects.equals(getCurrencyCode(), that.getCurrencyCode()) && Objects.equals(getAmount(),
                                                                                            that.getAmount());
     }
