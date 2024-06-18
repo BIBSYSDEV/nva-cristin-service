@@ -25,6 +25,7 @@ public class ListFundingSourcesHandler extends CristinQueryHandler<Void, Funding
     private final transient CristinFundingSourcesApiClient cristinClient;
 
     @JacocoGenerated
+    @SuppressWarnings("unused")
     public ListFundingSourcesHandler() {
         this(defaultClient(), new Environment());
     }
@@ -39,13 +40,14 @@ public class ListFundingSourcesHandler extends CristinQueryHandler<Void, Funding
         throws ApiGatewayException {
 
         var domainName = environment.readEnv(ENV_KEY_DOMAIN_NAME);
-        var basePath = environment.readEnvOpt(ENV_KEY_BASE_PATH).orElse("");
+        var basePath = environment.readEnvOpt(ENV_KEY_BASE_PATH).orElse(EMPTY_STRING);
 
         var sources = cristinClient.queryFundingSources()
                           .stream()
                           .map(cfs -> MappingUtils.cristinModelToNvaModel(cfs, domainName, basePath))
                           .collect(Collectors.toList());
         var resultId = DomainUriUtils.getFundingSourcesUri(domainName, basePath);
+
         return new FundingSources(CONTEXT_URI, resultId, sources);
     }
 

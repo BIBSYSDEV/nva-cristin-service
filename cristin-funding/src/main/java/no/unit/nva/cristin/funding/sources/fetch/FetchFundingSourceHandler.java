@@ -22,6 +22,7 @@ public class FetchFundingSourceHandler extends CristinHandler<Void, FundingSourc
     private final transient CristinFundingSourcesApiClient cristinClient;
 
     @JacocoGenerated
+    @SuppressWarnings("unused")
     public FetchFundingSourceHandler() {
         this(defaultClient(), new Environment());
     }
@@ -40,7 +41,7 @@ public class FetchFundingSourceHandler extends CristinHandler<Void, FundingSourc
         var cristinFundingSource = cristinClient.fetchFundingSource(identifier);
 
         var domainName = environment.readEnv(ENV_KEY_DOMAIN_NAME);
-        var basePath = environment.readEnvOpt(ENV_KEY_BASE_PATH).orElse("");
+        var basePath = environment.readEnvOpt(ENV_KEY_BASE_PATH).orElse(EMPTY_STRING);
 
         return MappingUtils.cristinModelToNvaModel(cristinFundingSource, domainName, basePath);
     }
