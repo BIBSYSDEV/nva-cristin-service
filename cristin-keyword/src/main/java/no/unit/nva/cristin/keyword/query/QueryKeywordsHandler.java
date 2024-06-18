@@ -59,12 +59,18 @@ public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchRespon
         validateQueryParameterKeys(requestInfo);
 
         var queryParams = new ConcurrentHashMap<String, String>();
+
         getValidQueryOpt(requestInfo).ifPresent(query -> queryParams.put(QUERY, query));
-        getValidPageOpt(requestInfo)
-            .ifPresentOrElse(page -> queryParams.put(PAGE, page), () -> queryParams.put(PAGE, DEFAULT_PAGE));
-        getValidResultsPerPageOpt(requestInfo)
-            .ifPresentOrElse(results -> queryParams.put(NUMBER_OF_RESULTS, results),
-                             () -> queryParams.put(NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS));
+
+        getValidPageOpt(requestInfo).ifPresentOrElse(
+            page -> queryParams.put(PAGE, page),
+            () -> queryParams.put(PAGE, DEFAULT_PAGE)
+        );
+
+        getValidResultsPerPageOpt(requestInfo).ifPresentOrElse(
+            results -> queryParams.put(NUMBER_OF_RESULTS, results),
+            () -> queryParams.put(NUMBER_OF_RESULTS, DEFAULT_NUMBER_OF_RESULTS)
+        );
 
         return queryParams;
     }
