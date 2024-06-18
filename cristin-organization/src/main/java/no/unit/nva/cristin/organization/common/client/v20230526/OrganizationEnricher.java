@@ -29,6 +29,14 @@ public class OrganizationEnricher {
     private final FetchApiClient<Map<String, String>, Organization> fetchClient;
     private final List<Organization> enrichedOrganizations;
 
+    /**
+     * Takes a list of organizations as an input and enriches that list by doing a http fetch for each entry in the
+     * list.
+     *
+     * @param inputOrganizations The input list of organizations
+     * @param queryParams        The query params used in the original query
+     * @param fetchClient        The client used for fetching the enriched data
+    **/
     public OrganizationEnricher(List<Organization> inputOrganizations,
                                 Map<String, String> queryParams,
                                 FetchApiClient<Map<String, String>, Organization> fetchClient) {
