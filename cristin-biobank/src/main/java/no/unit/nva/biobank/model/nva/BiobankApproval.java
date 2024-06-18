@@ -19,6 +19,7 @@ public class BiobankApproval implements JsonSerializable {
 
     @JacocoGenerated
     @ConstructorProperties({"approvedDate","approvedBy","approvedStatus","applicationCode","approvalReferenceId"})
+    @SuppressWarnings("unused")
     public BiobankApproval(Instant approvedDate, String approvedBy, ApprovalStatus approvedStatus,
                            String applicationCode, String approvalReferenceId) {
         this.approvedDate = approvedDate;
@@ -66,10 +67,9 @@ public class BiobankApproval implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof BiobankApproval)) {
+        if (!(o instanceof BiobankApproval that)) {
             return false;
         }
-        BiobankApproval that = (BiobankApproval) o;
         return Objects.equals(getApprovedDate(), that.getApprovedDate())
             && Objects.equals(getApprovedBy(), that.getApprovedBy())
             && Objects.equals(getApprovedStatus(), that.getApprovedStatus())

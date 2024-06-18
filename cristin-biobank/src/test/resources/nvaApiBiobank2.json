@@ -1,0 +1,68 @@
+{
+  "type": "Biobank",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/biobank/643747",
+  "identifiers": [
+    {
+      "type": "CristinIdentifier",
+      "value": "643747"
+    },
+    {
+      "type": "FHI-BiobankRegistry",
+      "value": "BBR-3295"
+    }
+  ],
+  "biobankType": "GENERALBIOBANK",
+  "labels": {
+    "nb": "GeriDRUG"
+  },
+  "mainLanguage": "nb",
+  "startDate": "2019-03-06T00:00:00Z",
+  "status": "ACTIVE",
+  "created": {
+    "sourceShortName": "REK",
+    "date": "2019-02-22T21:00:07Z"
+  },
+  "lastModified": {
+    "sourceShortName": "REK",
+    "date": "2019-02-22T21:00:07Z"
+  },
+  "coordinator": "https://api.dev.nva.aws.unit.no/cristin/person/115753",
+  "externalSources": [
+    {
+      "type": "ExternalSource",
+      "identifier": "2018/1415",
+      "name": "REK"
+    }
+  ],
+  "approvals": [
+    {
+      "approvedDate": "2019-03-06T00:00:00Z",
+      "approvedBy": "REK",
+      "approvedStatus": "Approved",
+      "applicationCode": "BIOBANK",
+      "approvalReferenceId": "2018/1415"
+    }
+  ],
+  "biobankMaterials": [
+    {
+      "type": "1",
+      "label": {
+        "en": "Whole blood"
+      }
+    },
+    {
+      "type": "2",
+      "label": {
+        "en": "Serum"
+      }
+    },
+    {
+      "type": "3",
+      "label": {
+        "en": "Plasma"
+      }
+    }
+  ],
+  "coordinatingOrganization": "https://api.dev.nva.aws.unit.no/cristin/organization/1936.0.0.0",
+  "@context": "https://bibsysdev.github.io/src/biobank-context.json"
+}

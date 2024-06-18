@@ -36,10 +36,9 @@ public class CristinBiobankMaterial implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CristinBiobankMaterial)) {
+        if (!(o instanceof CristinBiobankMaterial that)) {
             return false;
         }
-        CristinBiobankMaterial that = (CristinBiobankMaterial) o;
         return Objects.equals(getMaterialCode(), that.getMaterialCode())
                && Objects.equals(getMaterialName(), that.getMaterialName());
     }

@@ -45,10 +45,9 @@ public class CristinAssociatedProject implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CristinAssociatedProject)) {
+        if (!(o instanceof CristinAssociatedProject that)) {
             return false;
         }
-        CristinAssociatedProject that = (CristinAssociatedProject) o;
         return Objects.equals(getCristinProjectId(), that.getCristinProjectId())
             && Objects.equals(getTitle(), that.getTitle())
             && Objects.equals(getUrl(), that.getUrl());

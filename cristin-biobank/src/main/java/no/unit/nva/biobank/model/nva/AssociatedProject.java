@@ -21,6 +21,7 @@ public class AssociatedProject implements JsonSerializable {
 
     @JacocoGenerated
     @ConstructorProperties({ "id", "title" })
+    @SuppressWarnings("unused")
     public AssociatedProject(URI id,  Map<String, String> title) {
         this.id = id;
         this.title = nonEmptyOrDefault(title);
@@ -45,10 +46,9 @@ public class AssociatedProject implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof AssociatedProject)) {
+        if (!(o instanceof AssociatedProject that)) {
             return false;
         }
-        AssociatedProject that = (AssociatedProject) o;
         return Objects.equals(getTitle(), that.getTitle())
                && Objects.equals(getId(), that.getId());
     }

@@ -1,0 +1,58 @@
+{
+  "type": "Biobank",
+  "id": "https://api.dev.nva.aws.unit.no/cristin/biobank/2510604",
+  "identifiers": [
+    {
+      "type": "CristinIdentifier",
+      "value": "2510604"
+    }
+  ],
+  "biobankType": "SPECIFICBIOBANK",
+  "labels": {
+    "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
+  },
+  "mainLanguage": "nb",
+  "startDate": "2021-03-15T12:00:00Z",
+  "status": "ACTIVE",
+  "created": {
+    "sourceShortName": "REK",
+    "date": "2021-05-14T21:54:35Z"
+  },
+  "lastModified": {
+    "sourceShortName": "REK",
+    "date": "2022-11-28T21:45:17Z"
+  },
+  "coordinator": "https://api.dev.nva.aws.unit.no/cristin/person/58388",
+  "project": {
+    "id": "https://api.dev.nva.aws.unit.no/cristin/project/2510603",
+    "title": {
+      "nb": "Utvikling av test for å måle stress og smerte hos premature barn"
+    }
+  },
+  "externalSources": [
+    {
+      "type": "ExternalSource",
+      "identifier": "REK mappenr 1",
+      "name": "REK"
+    }
+  ],
+  "approvals": [
+    {
+      "approvedDate": "2021-05-11T21:50:45Z",
+      "approvedBy": "REK",
+      "approvedStatus": "Approved",
+      "applicationCode": "BIOBANK",
+      "approvalReferenceId": "247285"
+    }
+  ],
+  "biobankMaterials": [
+    {
+      "type": "24",
+      "label": {
+        "en": "Other material"
+      }
+    }
+  ],
+  "coordinatingOrganization": "https://api.dev.nva.aws.unit.no/cristin/organization/2012.0.0.0",
+  "@context": "https://bibsysdev.github.io/src/biobank-context.json"
+}

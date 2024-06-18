@@ -12,7 +12,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.Map;
+import java.util.stream.Stream;
 import no.unit.nva.biobank.client.CristinBiobankApiClient;
 import no.unit.nva.biobank.fetch.FetchBiobankHandler;
 import no.unit.nva.biobank.model.nva.Biobank;
@@ -21,9 +23,14 @@ import no.unit.nva.stubs.FakeContext;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 @WireMockTest(httpsEnabled = true)
 public class FetchBiobankHandlerTest {
@@ -43,8 +50,8 @@ public class FetchBiobankHandlerTest {
     }
 
     @ParameterizedTest(name = "Should fetch biobank with Id {0} ")
-    @ValueSource(strings = {"2510604", "643747"})
-    public void shouldReturnBiobankWhenExists(String biobankId) throws IOException {
+    @MethodSource("idAndPayloadProvider")
+    public void shouldReturnBiobankWhenExists(String biobankId, String jsonFileName) throws Exception {
         var input = new HandlerRequestBuilder<Void>(dtoObjectMapper)
                         .withPathParameters(Map.of(IDENTIFIER, biobankId))
                         .withHeaders(Map.of(ACCEPT, APPLICATION_LD_JSON))
@@ -52,14 +59,14 @@ public class FetchBiobankHandlerTest {
 
         handlerUnderTest.handleRequest(input, output, context);
 
-        var response = GatewayResponse.fromOutputStream(output, Biobank.class);
-
-        assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
-
+        final var response = GatewayResponse.fromOutputStream(output, Biobank.class);
         var biobank = response.getBodyObject(Biobank.class);
         var expectedId = URI.create("https://api.dev.nva.aws.unit.no/cristin/biobank/" + biobankId);
+        var expectedPayload = IoUtils.stringFromResources(Path.of(jsonFileName));
 
+        assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_OK)));
         assertThat(biobank.getId(), is(equalTo(expectedId)));
+        JSONAssert.assertEquals(expectedPayload, biobank.toString(), JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @ParameterizedTest(name = "Should fail fetch biobank with Id {0} ")
@@ -75,7 +82,6 @@ public class FetchBiobankHandlerTest {
         var response = GatewayResponse.fromOutputStream(output, Biobank.class);
 
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_NOT_FOUND)));
-
     }
 
     @ParameterizedTest(name = "Should fail fetch biobank with invalid Id {0} ")
@@ -91,7 +97,13 @@ public class FetchBiobankHandlerTest {
         var response = GatewayResponse.fromOutputStream(output, Biobank.class);
 
         assertThat(response.getStatusCode(), is(equalTo(HttpURLConnection.HTTP_BAD_REQUEST)));
+    }
 
+    private static Stream<Arguments> idAndPayloadProvider() {
+        return Stream.of(
+            Arguments.of("2510604", "nvaApiBiobank1.json"),
+            Arguments.of("643747", "nvaApiBiobank2.json")
+        );
     }
 
 }

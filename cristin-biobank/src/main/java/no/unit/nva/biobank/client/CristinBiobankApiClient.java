@@ -5,6 +5,7 @@ import static no.unit.nva.cristin.model.Constants.PROJECT_SEARCH_CONTEXT_URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import no.unit.nva.biobank.model.QueryBiobank;
 import no.unit.nva.biobank.model.cristin.CristinBiobank;
@@ -18,17 +19,17 @@ public class CristinBiobankApiClient extends ApiClient {
 
     @JacocoGenerated
     public static CristinBiobankApiClient defaultClient() {
-        return new CristinBiobankApiClient(
-            defaultHttpClient()
-        );
+        return new CristinBiobankApiClient(defaultHttpClient());
     }
 
     public CristinBiobankApiClient(HttpClient client) {
         super(client);
     }
 
-    public CristinBiobank fetchBiobank(QueryBiobank query) throws ApiGatewayException {
-        return getDeserializedResponse(httpRequestWithStatusCheck(query), CristinBiobank.class);
+    public Biobank fetchBiobank(QueryBiobank query) throws ApiGatewayException {
+        var response = httpRequestWithStatusCheck(query);
+        var cristinBiobank = getDeserializedResponse(response, CristinBiobank.class);
+        return cristinBiobank.toBiobank();
     }
 
     /**
@@ -41,30 +42,31 @@ public class CristinBiobankApiClient extends ApiClient {
      */
     @JacocoGenerated
     public SearchResponse<Biobank> fetchBiobanksWithParameters(QueryBiobank query) throws ApiGatewayException {
-
         final var startRequestTime = System.currentTimeMillis();
         final var response = httpRequestWithStatusCheck(query);
-        final var nvaBiobanks =
-            Arrays.stream(getDeserializedResponse(response, CristinBiobank[].class))
-                .map(CristinBiobank::toBiobank)
-                .collect(Collectors.toList());
-
+        final var cristinBiobanks = getDeserializedResponse(response, CristinBiobank[].class);
+        final var nvaBiobanks = toNvaFormat(cristinBiobanks);
         final var processingTime = calculateProcessingTime(startRequestTime, System.currentTimeMillis());
         final var id = query.toNvaURI();
 
-        return
-            new SearchResponse<Biobank>(id)
-                .withContext(PROJECT_SEARCH_CONTEXT_URL)
-                .withHits(nvaBiobanks)
-                .usingHeadersAndQueryParams(response.headers(), query.toNvaParameters())
-                .withProcessingTime(processingTime);
+        return new SearchResponse<Biobank>(id)
+                   .withContext(PROJECT_SEARCH_CONTEXT_URL)
+                   .withHits(nvaBiobanks)
+                   .usingHeadersAndQueryParams(response.headers(), query.toNvaParameters())
+                   .withProcessingTime(processingTime);
     }
 
     protected HttpResponse<String> httpRequestWithStatusCheck(QueryBiobank query) throws ApiGatewayException {
-
         HttpResponse<String> response = fetchQueryResults(query.toURI());
         checkHttpStatusCode(query.toNvaURI(), response.statusCode(), response.body());
 
         return response;
     }
+
+    private List<Biobank> toNvaFormat(CristinBiobank... cristinBiobanks) {
+        return Arrays.stream(cristinBiobanks)
+                   .map(CristinBiobank::toBiobank)
+                   .collect(Collectors.toList());
+    }
+
 }
