@@ -22,12 +22,15 @@ import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.http.HttpRequest.newBuilder;
 import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
+import static nva.commons.core.attempt.Try.attempt;
 
 public class AccessUtils {
 
     public static final String ACCESS_TOKEN_CLAIMS_SCOPE_FIELD = "scope";
     public static final String ACCESS_TOKEN_CLAIMS_FIELD = "claims";
     public static final String AUTHORIZER_FIELD = "authorizer";
+    public static final String USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT =
+        "User: {} does not have required access right: {}";
     private static final String COGNITO_CLIENT_APP_ID_KEY = "COGNITO_CLIENT_APP_ID";
     private static final String COGNITO_USER_POOL_ID_KEY = "COGNITO_USER_POOL_ID";
     private static final String BACKEND_CLIENT_ID_KEY = "BACKEND_CLIENT_ID";
@@ -42,6 +45,7 @@ public class AccessUtils {
     public static final String COGNITO_TOKEN_ENDPOINT = "oauth2/token";
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String DOING_AUTHORIZED_REQUEST = "Client is doing authorized request";
+    public static final String NO_USERNAME_FOUND = "NO USERNAME FOUND";
 
     /**
      * Validate if Requester is authorized to use IdentificationNumber to access a user.
@@ -51,6 +55,8 @@ public class AccessUtils {
      */
     public static void validateIdentificationNumberAccess(RequestInfo requestInfo) throws ForbiddenException {
         if (!requesterIsUserAdministrator(requestInfo)) {
+            var username = attempt(requestInfo::getUserName).orElse(fail -> NO_USERNAME_FOUND);
+            logger.info(USER_DOES_NOT_HAVE_REQUIRED_ACCESS_RIGHT, username, MANAGE_OWN_AFFILIATION);
             throw new ForbiddenException();
         }
     }
