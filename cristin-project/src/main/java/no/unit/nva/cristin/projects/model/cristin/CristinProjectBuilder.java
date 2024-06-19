@@ -44,6 +44,10 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
     private transient CristinProject cristinProject;
     private transient NvaProject nvaProject;
 
+    @SuppressWarnings("unused")
+    public CristinProjectBuilder() {
+    }
+
     public CristinProjectBuilder(NvaProject nvaProject) {
         this.nvaProject = nvaProject;
         this.cristinProject = new CristinProject();
