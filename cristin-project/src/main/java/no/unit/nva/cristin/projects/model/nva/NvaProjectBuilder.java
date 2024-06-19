@@ -3,20 +3,19 @@ package no.unit.nva.cristin.projects.model.nva;
 import java.net.URI;
 import java.util.function.Function;
 import no.unit.nva.cristin.model.Constants;
-import no.unit.nva.cristin.projects.model.cristin.CristinClinicalTrialPhaseBuilder;
 import no.unit.nva.cristin.model.CristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
 import no.unit.nva.cristin.model.CristinDateInfo;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingAmount;
 import no.unit.nva.cristin.model.CristinOrganization;
-import no.unit.nva.cristin.projects.model.cristin.CristinHealthProjectTypeBuilder;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.cristin.adapter.CristinApprovalToApproval;
 import no.unit.nva.cristin.projects.model.cristin.adapter.CristinFundingSourceToFunding;
 import no.unit.nva.cristin.projects.model.cristin.adapter.CristinPersonsToNvaContributors;
 import no.unit.nva.cristin.projects.model.cristin.adapter.CristinProjectCreatorToNvaContributor;
+import no.unit.nva.cristin.projects.model.cristin.adapter.CristinProjectToHealthProjectData;
 import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.Organization;
 import no.unit.nva.model.DateInfo;
@@ -33,7 +32,6 @@ import nva.commons.core.paths.UriWrapper;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -48,13 +46,8 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
     private transient CristinProject cristinProject;
     private transient String context;
 
-    private final transient EnumBuilder<CristinProject, ClinicalTrialPhase> clinicalTrialPhaseBuilder;
-    private final transient EnumBuilder<CristinProject, HealthProjectType> healthProjectTypeBuilder;
-
     @SuppressWarnings("unused")
     public NvaProjectBuilder() {
-        this.clinicalTrialPhaseBuilder = new CristinClinicalTrialPhaseBuilder();
-        this.healthProjectTypeBuilder = new CristinHealthProjectTypeBuilder();
     }
 
     /**
@@ -62,8 +55,6 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
      */
     public NvaProjectBuilder(CristinProject cristinProject) {
         this.cristinProject = cristinProject;
-        this.clinicalTrialPhaseBuilder = new CristinClinicalTrialPhaseBuilder();
-        this.healthProjectTypeBuilder = new CristinHealthProjectTypeBuilder();
     }
 
     @Override
@@ -109,7 +100,7 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
                    .withInstitutionsResponsibleForResearch(
                        extractInstitutionsResponsibleForResearch(
                            cristinProject.getInstitutionsResponsibleForResearch()))
-                   .withHealthProjectData(extractHealthProjectData(cristinProject))
+                   .withHealthProjectData(new CristinProjectToHealthProjectData().apply(cristinProject))
                    .withApprovals(extractApprovals(cristinProject.getApprovals()))
                    .withExemptFromPublicDisclosure(cristinProject.getExemptFromPublicDisclosure())
                    .withCreator(new CristinProjectCreatorToNvaContributor().apply(cristinProject.getCreator()))
@@ -194,33 +185,6 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
                    : null;
     }
 
-    private URI extractWebPage(String externalUrl) {
-        return attempt(() -> URI.create(externalUrl)).orElse(fail -> null);
-    }
-
-    private List<Approval> extractApprovals(List<CristinApproval> cristinApprovals) {
-        return cristinApprovals.stream()
-                   .map(new CristinApprovalToApproval())
-                   .collect(Collectors.toList());
-    }
-
-    private HealthProjectData extractHealthProjectData(CristinProject cristinProject) {
-        if (isNull(cristinProject.getHealthProjectType()) && isNull(cristinProject.getClinicalTrialPhase())) {
-            return null;
-        }
-
-        return new HealthProjectData(healthProjectTypeBuilder.build(cristinProject),
-                                     cristinProject.getHealthProjectTypeName(),
-                                     clinicalTrialPhaseBuilder.build(cristinProject));
-    }
-
-    private List<Organization> extractInstitutionsResponsibleForResearch(List<CristinOrganization>
-                                                                             institutionsResponsibleForResearch) {
-        return institutionsResponsibleForResearch.stream()
-                   .map(CristinOrganization::extractPreferredTypeOfOrganization)
-                   .collect(Collectors.toList());
-    }
-
     private List<URI> extractRelatedProjects(List<String> cristinRelatedProjects) {
         return nonNull(cristinRelatedProjects)
                    ? cristinRelatedProjects.stream()
@@ -234,6 +198,19 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
         return getNvaApiId(identifier, PROJECT);
     }
 
+    private List<Approval> extractApprovals(List<CristinApproval> cristinApprovals) {
+        return cristinApprovals.stream()
+                   .map(new CristinApprovalToApproval())
+                   .collect(Collectors.toList());
+    }
+
+    private List<Organization> extractInstitutionsResponsibleForResearch(List<CristinOrganization>
+                                                                             institutionsResponsibleForResearch) {
+        return institutionsResponsibleForResearch.stream()
+                   .map(CristinOrganization::extractPreferredTypeOfOrganization)
+                   .collect(Collectors.toList());
+    }
+
     private List<ExternalSource> extractExternalSources(List<CristinExternalSource> cristinExternalSources) {
         return nonNull(cristinExternalSources)
                    ? cristinExternalSources.stream()
@@ -245,6 +222,10 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
     private ExternalSource toExternalSource(CristinExternalSource cristinExternalSource) {
         return new ExternalSource(cristinExternalSource.getSourceReferenceId(),
                                   cristinExternalSource.getSourceShortName());
+    }
+
+    private URI extractWebPage(String externalUrl) {
+        return attempt(() -> URI.create(externalUrl)).orElse(fail -> null);
     }
 
     private String getContext() {
