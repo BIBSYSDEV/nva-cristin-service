@@ -60,10 +60,9 @@ public class Funding implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Funding)) {
+        if (!(o instanceof Funding funding)) {
             return false;
         }
-        Funding funding = (Funding) o;
         return Objects.equals(getType(), funding.getType())
                && Objects.equals(getSource(), funding.getSource())
                && Objects.equals(getIdentifier(), funding.getIdentifier())

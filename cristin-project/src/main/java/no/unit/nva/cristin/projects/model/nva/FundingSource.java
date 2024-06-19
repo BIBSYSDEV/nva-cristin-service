@@ -42,10 +42,9 @@ public class FundingSource implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof FundingSource)) {
+        if (!(o instanceof FundingSource that)) {
             return false;
         }
-        FundingSource that = (FundingSource) o;
         return Objects.equals(getNames(), that.getNames()) && Objects.equals(getCode(), that.getCode());
     }
 

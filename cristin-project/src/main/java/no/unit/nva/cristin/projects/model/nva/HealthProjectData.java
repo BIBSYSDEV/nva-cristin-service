@@ -49,10 +49,9 @@ public class HealthProjectData implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof HealthProjectData)) {
+        if (!(o instanceof HealthProjectData that)) {
             return false;
         }
-        HealthProjectData that = (HealthProjectData) o;
         return Objects.equals(getType(), that.getType())
                && Objects.equals(getLabel(), that.getLabel())
                && Objects.equals(getClinicalTrialPhase(), that.getClinicalTrialPhase());
