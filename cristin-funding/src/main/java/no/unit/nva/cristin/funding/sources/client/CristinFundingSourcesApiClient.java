@@ -18,15 +18,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CristinFundingSourcesApiClient extends ApiClient {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CristinFundingSourcesApiClient.class);
+
+    public static final String MALFORMED_RESPONSE_FROM_CRISTIN = "Malformed response from Cristin!";
+    public static final String UNABLE_TO_DESERIALIZE_JSON = "Unable to deserialize JSON";
+    public static final String FUNDING_SOURCE_NOT_FOUND = "Funding source not found";
+    public static final String FUNDINGS_PATH = "fundings";
+    public static final String SOURCES_PATH = "sources";
 
     private final transient URI cristinBaseUri;
 
     @JacocoGenerated
     public static CristinFundingSourcesApiClient defaultClient() {
         var httpClient = defaultHttpClient();
-        var cristinBaseUri = URI.create(new Environment().readEnv(EnvironmentKeys.ENV_KEY_CRISTIN_API_URL));
+        var cristinBaseUri = getCristinBaseUri();
+
         return new CristinFundingSourcesApiClient(httpClient, cristinBaseUri);
+    }
+
+    private static URI getCristinBaseUri() {
+        return URI.create(new Environment().readEnv(EnvironmentKeys.ENV_KEY_CRISTIN_API_URL));
     }
 
     public CristinFundingSourcesApiClient(HttpClient client, URI cristinBaseUri) {
@@ -35,8 +47,7 @@ public class CristinFundingSourcesApiClient extends ApiClient {
     }
 
     public List<CristinFundingSource> queryFundingSources() throws ApiGatewayException {
-        URI uri = getFundingSourcesUri();
-
+        var uri = getFundingSourcesUri();
         var response = fetchQueryResults(uri);
 
         checkHttpStatusCode(uri, response.statusCode(), response.body());
@@ -44,8 +55,8 @@ public class CristinFundingSourcesApiClient extends ApiClient {
         try {
             return List.of(fromJson(response.body(), CristinFundingSource[].class));
         } catch (IOException e) {
-            LOGGER.error("Unable to deserialize JSON", e);
-            throw new BadGatewayException("Malformed response from Cristin!");
+            LOGGER.error(UNABLE_TO_DESERIALIZE_JSON, e);
+            throw new BadGatewayException(MALFORMED_RESPONSE_FROM_CRISTIN);
         }
     }
 
@@ -55,10 +66,10 @@ public class CristinFundingSourcesApiClient extends ApiClient {
         return fundingSources.stream()
             .filter(fundingSource -> fundingSource.getCode().equals(code))
             .findFirst()
-            .orElseThrow(() -> new NotFoundException("Funding source not found: " + code));
+            .orElseThrow(() -> new NotFoundException(FUNDING_SOURCE_NOT_FOUND));
     }
 
     private URI getFundingSourcesUri() {
-        return UriWrapper.fromUri(this.cristinBaseUri).addChild("fundings", "sources").getUri();
+        return UriWrapper.fromUri(this.cristinBaseUri).addChild(FUNDINGS_PATH, SOURCES_PATH).getUri();
     }
 }

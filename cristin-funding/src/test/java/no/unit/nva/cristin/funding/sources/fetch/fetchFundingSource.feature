@@ -65,7 +65,7 @@ Feature: API tests for Cristin Funding Sources get
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
     And match response.title == 'Not Found'
     And match response.status == 404
-    And match response.detail == 'Funding source not found: ' + unknownIdentifier
+    And match response.detail == 'Funding source not found'
     And match response.requestId == '#notnull'
 
     Examples:
