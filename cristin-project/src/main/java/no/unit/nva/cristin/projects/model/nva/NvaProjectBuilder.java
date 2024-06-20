@@ -12,6 +12,7 @@ import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.cristin.adapter.CristinApprovalToApproval;
+import no.unit.nva.cristin.projects.model.cristin.adapter.CristinExternalSourcesToExternalSources;
 import no.unit.nva.cristin.projects.model.cristin.adapter.CristinFundingSourceToFunding;
 import no.unit.nva.cristin.projects.model.cristin.adapter.CristinPersonsToNvaContributors;
 import no.unit.nva.cristin.projects.model.cristin.adapter.CristinProjectCreatorToNvaContributor;
@@ -50,11 +51,6 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
         return build();
     }
 
-    /**
-     * Build a NVA project datamodel from a Cristin project datamodel.
-     *
-     * @return a NvaProject converted from a CristinProject
-     */
     private NvaProject build() {
         return new NvaProject.Builder()
                    .withId(getNvaApiId(cristinProject.getCristinProjectId(), PROJECT))
@@ -192,17 +188,8 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
                    .collect(Collectors.toList());
     }
 
-    private List<ExternalSource> extractExternalSources(List<CristinExternalSource> cristinExternalSources) {
-        return nonNull(cristinExternalSources)
-                   ? cristinExternalSources.stream()
-                         .map(this::toExternalSource)
-                         .collect(Collectors.toList())
-                   : null;
-    }
-
-    private ExternalSource toExternalSource(CristinExternalSource cristinExternalSource) {
-        return new ExternalSource(cristinExternalSource.getSourceReferenceId(),
-                                  cristinExternalSource.getSourceShortName());
+    private List<ExternalSource> extractExternalSources(List<CristinExternalSource> externalSources) {
+        return new CristinExternalSourcesToExternalSources().apply(externalSources);
     }
 
     private URI extractWebPage(String externalUrl) {
