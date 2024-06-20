@@ -107,11 +107,19 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
 
     private List<Map<String, String>> extractAlternativeTitles() {
         return Optional.ofNullable(cristinProject.getTitle())
-                   .filter(hasTitles -> !hasTitles.isEmpty())
-                   .filter(titles -> titles.keySet().remove(cristinProject.getMainLanguage()))
-                   .filter(remainingTitles -> !remainingTitles.isEmpty())
+                   .map(this::removeMainTitle)
+                   .filter(this::hasData)
                    .map(Collections::singletonList)
                    .orElse(emptyList());
+    }
+
+    private Map<String, String> removeMainTitle(Map<String, String> titles) {
+        titles.remove(cristinProject.getMainLanguage());
+        return titles;
+    }
+
+    private boolean hasData(Map<String, String> titles) {
+        return !titles.isEmpty();
     }
 
     private List<Funding> extractFunding() {

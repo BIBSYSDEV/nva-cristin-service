@@ -1,7 +1,6 @@
 package no.unit.nva.cristin.projects.model.cristin.adapter;
 
 import static java.util.Collections.emptyList;
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import java.util.Optional;
 import java.util.function.Function;
@@ -22,19 +21,21 @@ public class CristinProjectCreatorToNvaContributor extends CristinPersonToNvaCon
     private NvaContributor extractCreator(CristinPerson creator) {
         return Optional.ofNullable(creator)
                    .stream()
-                   .peek(this::addRoleDataIfMissing)
+                   .map(this::addRoleDataIfMissing)
                    .flatMap(this::generateRoleBasedContribution)
                    .findAny()
                    .or(() -> creatorWithoutAffiliation(creator))
                    .orElse(null);
     }
 
-    private void addRoleDataIfMissing(CristinPerson cristinPerson) {
-        if (isNull(cristinPerson.getRoles())) {
-            cristinPerson.setRoles(emptyList());
-        } else {
-            cristinPerson.getRoles().forEach(role -> role.setRoleCode(PRO_CREATOR));
-        }
+    private CristinPerson addRoleDataIfMissing(CristinPerson cristinPerson) {
+        Optional.ofNullable(cristinPerson.getRoles())
+            .ifPresentOrElse(
+                (roles) -> roles.forEach(role -> role.setRoleCode(PRO_CREATOR)),
+                () -> cristinPerson.setRoles(emptyList())
+            );
+
+        return cristinPerson;
     }
 
     private Optional<NvaContributor> creatorWithoutAffiliation(CristinPerson creator) {
