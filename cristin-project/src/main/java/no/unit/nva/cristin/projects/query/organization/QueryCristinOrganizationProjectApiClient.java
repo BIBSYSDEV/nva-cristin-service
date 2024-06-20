@@ -32,13 +32,11 @@ public class QueryCristinOrganizationProjectApiClient extends CristinProjectApiC
 
         var startRequestTime = System.currentTimeMillis();
         var cristinUri = queryProject.toURI();
-
         var response = listProjects(cristinUri);
         var cristinProjects = getEnrichedProjectsUsingQueryResponse(response);
         var nvaProjects = mapValidCristinProjectsToNvaProjects(cristinProjects);
         var endRequestTime = System.currentTimeMillis();
-
-        URI id = queryProject.toNvaURI();
+        var id = queryProject.toNvaURI();
 
         return new SearchResponse<NvaProject>(id)
                    .withContext(PROJECT_SEARCH_CONTEXT_URL)
