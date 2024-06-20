@@ -33,6 +33,7 @@ import nva.commons.core.paths.UriWrapper;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.projects.model.nva.NvaProject.PROJECT_TYPE;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
@@ -40,8 +41,6 @@ import static nva.commons.core.StringUtils.isNotBlank;
 import static nva.commons.core.attempt.Try.attempt;
 
 public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
-
-    public static final String PROJECT_TYPE = "Project";
 
     private transient CristinProject cristinProject;
     private transient String context;

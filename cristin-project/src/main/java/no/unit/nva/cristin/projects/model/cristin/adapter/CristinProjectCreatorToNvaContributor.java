@@ -40,11 +40,13 @@ public class CristinProjectCreatorToNvaContributor extends CristinPersonToNvaCon
     private Optional<NvaContributor> creatorWithoutAffiliation(CristinPerson creator) {
         return Optional.ofNullable(creator)
                    .filter(presentCreator -> nonNull(presentCreator.getCristinPersonId()))
-                   .map(presentCreator -> {
-                       var creatorWithoutAffiliation = new NvaContributor();
-                       creatorWithoutAffiliation.setIdentity(Person.fromCristinPerson(presentCreator));
-                       return creatorWithoutAffiliation;
-                   });
+                   .map(this::extractCreatorIdentity);
+    }
+
+    private NvaContributor extractCreatorIdentity(CristinPerson presentCreator) {
+        var creatorWithoutAffiliation = new NvaContributor();
+        creatorWithoutAffiliation.setIdentity(Person.fromCristinPerson(presentCreator));
+        return creatorWithoutAffiliation;
     }
 
 }

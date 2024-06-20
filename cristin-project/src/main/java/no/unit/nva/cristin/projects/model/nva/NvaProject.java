@@ -28,6 +28,7 @@ import no.unit.nva.model.UriId;
 public class NvaProject implements JsonSerializable, UriId {
 
     public static final String PROJECT_CONTEXT = PROJECT_LOOKUP_CONTEXT_URL;
+    public static final String PROJECT_TYPE = "Project";
 
     @JsonProperty(CONTEXT)
     @JsonInclude(NON_NULL)

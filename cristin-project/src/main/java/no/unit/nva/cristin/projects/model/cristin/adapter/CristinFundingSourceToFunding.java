@@ -15,11 +15,7 @@ public class CristinFundingSourceToFunding implements Function<CristinFundingSou
     public static final String PATH_SEPARATOR = "/";
 
     @Override
-    public Funding apply(CristinFundingSource cristinFundingSource) {
-        return createFunding(cristinFundingSource);
-    }
-
-    private Funding createFunding(CristinFundingSource cristinFunding) {
+    public Funding apply(CristinFundingSource cristinFunding) {
         var source = extractFundingSource(cristinFunding);
         var identifier = cristinFunding.getProjectCode();
         var labels = cristinFunding.getFundingSourceName();

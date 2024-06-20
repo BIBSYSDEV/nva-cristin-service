@@ -22,13 +22,17 @@ public class CristinProjectToHealthProjectData implements Function<CristinProjec
 
     @Override
     public HealthProjectData apply(CristinProject cristinProject) {
-        if (isNull(cristinProject.getHealthProjectType()) && isNull(cristinProject.getClinicalTrialPhase())) {
+        if (hasNoHealthProjectData(cristinProject)) {
             return null;
         }
 
         return new HealthProjectData(healthProjectTypeBuilder.build(cristinProject),
                                      cristinProject.getHealthProjectTypeName(),
                                      clinicalTrialPhaseBuilder.build(cristinProject));
+    }
+
+    private boolean hasNoHealthProjectData(CristinProject cristinProject) {
+        return isNull(cristinProject.getHealthProjectType()) && isNull(cristinProject.getClinicalTrialPhase());
     }
 
 }
