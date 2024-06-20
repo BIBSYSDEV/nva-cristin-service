@@ -2960,9 +2960,7 @@ components:
           pattern: 'Organization'
           description: Always Organization
         labels:
-          type: array
-          items:
-            $ref: '#/components/schemas/Languages'
+          $ref: '#/components/schemas/Languages'
         acronym:
           type: string
           pattern: '.*'
@@ -3671,10 +3669,7 @@ components:
         id:
           type: string
         labels:
-          type: array
-          description: Titles in different languages
-          items:
-            $ref: '#/components/schemas/Languages'
+          $ref: '#/components/schemas/Languages'
         enabled:
           type: boolean
     FundingSources:
@@ -3764,10 +3759,7 @@ components:
                 format: int32
                 description: Cristin ID of project
         labels:
-          type: array
-          description: Names in different languages
-          items:
-            $ref: '#/components/schemas/Languages'
+          $ref: '#/components/schemas/Languages'
         mainLanguage:
           type: string
           description: Main Language
@@ -4111,10 +4103,7 @@ components:
           type: integer
           description: Number of hits on this aggregation
         labels:
-          type: array
-          description: Titles in different languages
-          items:
-            $ref: '#/components/schemas/Languages'
+          $ref: '#/components/schemas/Languages'
     Countries:
       type: object
       properties:
