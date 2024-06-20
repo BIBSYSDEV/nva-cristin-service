@@ -43,18 +43,6 @@ import static nva.commons.core.attempt.Try.attempt;
 public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
 
     private transient CristinProject cristinProject;
-    private transient String context;
-
-    @SuppressWarnings("unused")
-    public NvaProjectBuilder() {
-    }
-
-    /**
-     * Builds a NvaProject from a Cristin Project.
-     */
-    public NvaProjectBuilder(CristinProject cristinProject) {
-        this.cristinProject = cristinProject;
-    }
 
     @Override
     public NvaProject apply(CristinProject cristinProject) {
@@ -67,10 +55,9 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
      *
      * @return a NvaProject converted from a CristinProject
      */
-    public NvaProject build() {
+    private NvaProject build() {
         return new NvaProject.Builder()
                    .withId(getNvaApiId(cristinProject.getCristinProjectId(), PROJECT))
-                   .withContext(getContext())
                    .withType(PROJECT_TYPE)
                    .withIdentifiers(createCristinIdentifier())
                    .withTitle(extractMainTitle())
@@ -105,11 +92,6 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
                    .withCreator(new CristinProjectCreatorToNvaContributor().apply(cristinProject.getCreator()))
                    .withWebPage(extractWebPage(cristinProject.getExternalUrl()))
                    .build();
-    }
-
-    public NvaProjectBuilder withContext(String context) {
-        this.context = context;
-        return this;
     }
 
     private List<Map<String, String>> createCristinIdentifier() {
@@ -225,10 +207,6 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
 
     private URI extractWebPage(String externalUrl) {
         return attempt(() -> URI.create(externalUrl)).orElse(fail -> null);
-    }
-
-    private String getContext() {
-        return context;
     }
 
 }

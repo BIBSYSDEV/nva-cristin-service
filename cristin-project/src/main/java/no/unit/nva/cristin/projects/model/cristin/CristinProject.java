@@ -386,7 +386,7 @@ public class CristinProject implements JsonSerializable {
     }
 
     public NvaProject toNvaProject() {
-        return new NvaProjectBuilder(this).build();
+        return new NvaProjectBuilder().apply(this);
     }
 
     @Override
