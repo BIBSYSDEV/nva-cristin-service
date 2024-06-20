@@ -439,7 +439,7 @@ public class NvaProject implements JsonSerializable, UriId {
     }
 
     public CristinProject toCristinProject() {
-        return new CristinProjectBuilder(this).build();
+        return new CristinProjectBuilder().apply(this);
     }
 
     public static final class Builder {

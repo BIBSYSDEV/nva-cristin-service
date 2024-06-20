@@ -1,7 +1,11 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
+import static java.util.Objects.isNull;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
@@ -10,6 +14,8 @@ import nva.commons.core.JacocoGenerated;
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinFundingSource implements JsonSerializable {
+
+    public static final String PATH_DELIMITER = "/";
 
     private String fundingSourceCode;
     private String projectCode;
@@ -37,6 +43,20 @@ public class CristinFundingSource implements JsonSerializable {
 
     public void setFundingSourceName(Map<String, String> fundingSourceName) {
         this.fundingSourceName = fundingSourceName;
+    }
+
+    /**
+     * Extracts funding source code from URI giving a valid Cristin source code.
+     */
+    public static String extractFundingSourceCode(URI source) {
+        if (isNull(source)) {
+            return null;
+        }
+        var sourceAsText = source.toString();
+        var lastElementIndexStart = sourceAsText.lastIndexOf(PATH_DELIMITER) + 1;
+        var rawSourceCode = sourceAsText.substring(lastElementIndexStart);
+
+        return URLDecoder.decode(rawSourceCode, StandardCharsets.UTF_8);
     }
 
     @Override
