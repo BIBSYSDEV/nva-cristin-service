@@ -8,6 +8,7 @@ import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinTypedLabel;
+import no.unit.nva.cristin.projects.model.cristin.adapter.ExternalSourcesToCristinExternalSources;
 import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
@@ -150,16 +151,8 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
                    .collect(Collectors.toList());
     }
 
-    private List<CristinExternalSource> extractExternalSources(List<ExternalSource> nvaExternalSources) {
-        return nonNull(nvaExternalSources)
-                   ? nvaExternalSources.stream()
-                         .map(this::toCristinExternalSource)
-                         .collect(Collectors.toList())
-                   : null;
-    }
-
-    private CristinExternalSource toCristinExternalSource(ExternalSource externalSource) {
-        return new CristinExternalSource(externalSource.getName(), externalSource.getIdentifier());
+    private List<CristinExternalSource> extractExternalSources(List<ExternalSource> externalSources) {
+        return new ExternalSourcesToCristinExternalSources().apply(externalSources);
     }
 
     private String extractHealthProjectType(HealthProjectData healthProjectData) {
