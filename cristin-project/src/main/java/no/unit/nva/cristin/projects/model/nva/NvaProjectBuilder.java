@@ -22,6 +22,7 @@ import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.model.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.model.CristinTypedLabel;
+import no.unit.nva.cristin.projects.model.cristin.adapter.CristinPersonToPerson;
 import no.unit.nva.model.ApprovalStatus;
 import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.Organization;
@@ -95,7 +96,7 @@ public class NvaProjectBuilder {
         if (getNvaRole(role.getRoleCode()).isPresent()) {
             nvaContributor.setType(getNvaRole(role.getRoleCode()).get());
         }
-        nvaContributor.setIdentity(Person.fromCristinPerson(cristinPerson));
+        nvaContributor.setIdentity(new CristinPersonToPerson().apply(cristinPerson));
         nvaContributor.setAffiliation(extractDepartmentOrFallbackToInstitutionForUserRole(role));
         return nvaContributor;
     }
@@ -172,7 +173,7 @@ public class NvaProjectBuilder {
                    .filter(presentCreator -> nonNull(presentCreator.getCristinPersonId()))
                    .map(presentCreator -> {
                        var creatorWithoutAffiliation = new NvaContributor();
-                       creatorWithoutAffiliation.setIdentity(Person.fromCristinPerson(presentCreator));
+                       creatorWithoutAffiliation.setIdentity(new CristinPersonToPerson().apply(presentCreator));
                        return creatorWithoutAffiliation;
                    });
     }

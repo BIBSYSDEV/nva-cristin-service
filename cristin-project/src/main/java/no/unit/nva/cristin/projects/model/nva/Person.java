@@ -1,22 +1,15 @@
 package no.unit.nva.cristin.projects.model.nva;
 
-import static java.util.Objects.isNull;
-import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
-import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.JsonPropertyNames.EMAIL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.FIRST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.LAST_NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PHONE;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
-import static no.unit.nva.utils.UriUtils.getNvaApiId;
-import static no.unit.nva.utils.UriUtils.nvaIdentifierToCristinIdentifier;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Objects;
-import no.unit.nva.cristin.model.CristinPerson;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Person {
@@ -52,26 +45,6 @@ public class Person {
         this.lastName = builder.lastName;
         this.email = builder.email;
         this.phone = builder.phone;
-    }
-
-    /**
-     * Build a Person datamodel from a CristinPerson datamodel.
-     *
-     * @param cristinPerson the model to convert from
-     * @return a Person converted from a CristinPerson
-     */
-    public static Person fromCristinPerson(CristinPerson cristinPerson) {
-        if (isNull(cristinPerson)) {
-            return null;
-        }
-
-        URI id = getNvaApiId(cristinPerson.getCristinPersonId(), PERSON_PATH_NVA);
-        return new Person(
-            id,
-            cristinPerson.getFirstName(),
-            cristinPerson.getSurname(),
-            cristinPerson.getEmail(),
-            cristinPerson.getPhone());
     }
 
     public URI getId() {
@@ -114,26 +87,6 @@ public class Person {
                && Objects.equals(getLastName(), nvaPerson.getLastName())
                && Objects.equals(getPhone(), nvaPerson.getPhone())
                && Objects.equals(getEmail(), nvaPerson.getEmail());
-    }
-
-    /**
-     * Create a CristinPerson from this object with all fields but roles.
-     *
-     * @return CristinPerson converted from Person
-     */
-    public CristinPerson toCristinPersonWithoutRoles() {
-        CristinPerson cristinPerson = new CristinPerson();
-        cristinPerson.setCristinPersonId(toCristinPersonIdentity());
-        cristinPerson.setUrl(nvaIdentifierToCristinIdentifier(getId(), PERSON_PATH).toString());
-        cristinPerson.setFirstName(getFirstName());
-        cristinPerson.setSurname(getLastName());
-        cristinPerson.setEmail(getEmail());
-        cristinPerson.setPhone(getPhone());
-        return cristinPerson;
-    }
-
-    private String toCristinPersonIdentity() {
-        return extractLastPathElement(getId());
     }
 
     public static final class Builder {

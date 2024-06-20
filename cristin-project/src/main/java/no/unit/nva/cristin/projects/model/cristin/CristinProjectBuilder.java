@@ -9,6 +9,8 @@ import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinTypedLabel;
+import no.unit.nva.cristin.projects.model.cristin.adapter.NvaContributorToCristinPersonWithRoles;
+import no.unit.nva.cristin.projects.model.cristin.adapter.PersonToCristinPersonWithoutRoles;
 import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.model.ExternalSource;
@@ -48,7 +50,9 @@ public class CristinProjectBuilder {
     }
 
     private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
-        return contributors.stream().map(NvaContributor::toCristinPersonWithRoles).collect(Collectors.toList());
+        return contributors.stream()
+                   .map(new NvaContributorToCristinPersonWithRoles())
+                   .collect(Collectors.toList());
     }
 
     /**
@@ -96,9 +100,9 @@ public class CristinProjectBuilder {
     private CristinPerson extractCreator(NvaContributor creator) {
         if (nonNull(creator)) {
             if (nonNull(creator.getAffiliation())) {
-                return creator.toCristinPersonWithRoles();
+                return new NvaContributorToCristinPersonWithRoles().apply(creator);
             } else {
-                return creator.getIdentity().toCristinPersonWithoutRoles();
+                return new PersonToCristinPersonWithoutRoles().apply(creator.getIdentity());
             }
         }
         return null;
