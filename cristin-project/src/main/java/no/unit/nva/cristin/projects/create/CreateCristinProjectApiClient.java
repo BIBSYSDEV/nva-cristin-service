@@ -3,15 +3,17 @@ package no.unit.nva.cristin.projects.create;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
-import static no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder.removeFieldsNotSupportedByPost;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.stream.Collectors;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.common.client.PostApiClient;
+import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -41,6 +43,17 @@ public class CreateCristinProjectApiClient extends PostApiClient {
         var cristinProject = nvaProject.toCristinProject();
         removeFieldsNotSupportedByPost(cristinProject);
         return attempt(() -> OBJECT_MAPPER_NON_EMPTY.writeValueAsString(cristinProject)).orElseThrow();
+    }
+
+    private void removeFieldsNotSupportedByPost(CristinProject cristinProject) {
+        cristinProject.setProjectCategories(removeLabels(cristinProject.getProjectCategories()));
+        cristinProject.setKeywords(removeLabels(cristinProject.getKeywords()));
+    }
+
+    private List<CristinTypedLabel> removeLabels(List<CristinTypedLabel> typedLabels) {
+        return typedLabels.stream()
+                   .map(category -> new CristinTypedLabel(category.getCode(), null))
+                   .collect(Collectors.toList());
     }
 
     private URI getCristinProjectPostUri() {

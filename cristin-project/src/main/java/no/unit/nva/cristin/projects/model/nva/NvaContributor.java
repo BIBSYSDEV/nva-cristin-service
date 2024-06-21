@@ -53,10 +53,9 @@ public class NvaContributor implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof NvaContributor)) {
+        if (!(o instanceof NvaContributor that)) {
             return false;
         }
-        NvaContributor that = (NvaContributor) o;
         return Objects.equals(getType(), that.getType())
                && Objects.equals(getIdentity(), that.getIdentity())
                && Objects.equals(getAffiliation(), that.getAffiliation());

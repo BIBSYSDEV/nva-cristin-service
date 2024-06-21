@@ -7,7 +7,6 @@ import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
@@ -30,8 +29,8 @@ public class UpdateCristinProjectApiClient extends PatchApiClient {
      * @throws ApiGatewayException when operation fails
      */
     public Void updateProjectInCristin(String projectId, ObjectNode cristinJson) throws ApiGatewayException {
-        URI uri = generateCristinUri(projectId);
-        HttpResponse<String> response = patch(uri, cristinJson.toString());
+        var uri = generateCristinUri(projectId);
+        var response = patch(uri, cristinJson.toString());
         checkPatchHttpStatusCode(generateIdUri(projectId), response.statusCode(), response.body());
         return null;
     }

@@ -19,31 +19,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NvaProjectBuilderTest {
 
-    private static final String API_RESPONSE_ONE_NVA_PROJECT_JSON =
-        "nvaApiGetResponseOneNvaProject.json";
+    private static final String API_RESPONSE_ONE_NVA_PROJECT_JSON = "nvaApiGetResponseOneNvaProject.json";
     private static final String cristinGetProject = stringFromResources(Path.of("cristinGetProjectResponse.json"));
-    public static final String URI_ENCODED_FUNDING_SOURCE_URI = "https://api.dev.nva.aws.unit"
-                                                                + ".no/cristin/funding-sources/EC%2FFP7";
+    public static final String URI_ENCODED_FUNDING_SOURCE_URI =
+        "https://api.dev.nva.aws.unit.no/cristin/funding-sources/EC%2FFP7";
     public static final String FUNDING_SOURCE_CODE = "EC/FP7";
 
     @Test
     void shouldReturnNvaProjectWhenCallingNvaProjectBuilderMethodWithValidCristinProject() throws Exception {
-        String expected = stringFromResources(
-                Path.of(API_RESPONSE_ONE_NVA_PROJECT_JSON));
-        CristinProject cristinProject =
-            attempt(() -> OBJECT_MAPPER.readValue(cristinGetProject, CristinProject.class)).get();
-        NvaProject nvaProject = new NvaProjectBuilder(cristinProject).build();
+        var expected = stringFromResources(Path.of(API_RESPONSE_ONE_NVA_PROJECT_JSON));
+        var cristinProject = attempt(() -> OBJECT_MAPPER.readValue(cristinGetProject, CristinProject.class)).get();
+        var nvaProject = new NvaProjectBuilder().apply(cristinProject);
         nvaProject.setContext(PROJECT_LOOKUP_CONTEXT_URL);
-        String actual = attempt(() -> OBJECT_MAPPER.writeValueAsString(nvaProject)).get();
+        var actual = attempt(() -> OBJECT_MAPPER.writeValueAsString(nvaProject)).get();
 
         assertEquals(OBJECT_MAPPER.readTree(expected), OBJECT_MAPPER.readTree(actual));
     }
 
     @Test
     void shouldMapAllSupportedFieldsFoundInCristinJsonToCorrectNvaJson() throws Exception {
-        var cristinProject =
-            attempt(() -> OBJECT_MAPPER.readValue(cristinGetProject, CristinProject.class)).get();
-        var nvaProject = new NvaProjectBuilder(cristinProject).build();
+        var cristinProject = attempt(() -> OBJECT_MAPPER.readValue(cristinGetProject, CristinProject.class)).get();
+        var nvaProject = new NvaProjectBuilder().apply(cristinProject);
         nvaProject.setContext(PROJECT_CONTEXT);
         var expected = stringFromResources(Path.of(API_RESPONSE_ONE_NVA_PROJECT_JSON));
         var actual = OBJECT_MAPPER.valueToTree(nvaProject);
@@ -53,10 +49,8 @@ public class NvaProjectBuilderTest {
 
     @Test
     void shouldSerializeAndDeserializeNvaProjectIntoSameObject() {
-        var nvaJson =
-            stringFromResources(Path.of(API_RESPONSE_ONE_NVA_PROJECT_JSON));
-        var nvaProject =
-            attempt(() -> OBJECT_MAPPER.readValue(nvaJson, NvaProject.class)).get();
+        var nvaJson = stringFromResources(Path.of(API_RESPONSE_ONE_NVA_PROJECT_JSON));
+        var nvaProject = attempt(() -> OBJECT_MAPPER.readValue(nvaJson, NvaProject.class)).get();
         var serialized = attempt(() -> OBJECT_MAPPER.writeValueAsString(nvaProject)).orElseThrow();
         var deserialized = attempt(() -> OBJECT_MAPPER.readValue(serialized, NvaProject.class)).get();
 
@@ -70,7 +64,7 @@ public class NvaProjectBuilderTest {
         var cristinProject = new CristinProject();
         addRequiredFields(cristinProject);
         cristinProject.setProjectFundingSources(List.of(cristinFunding));
-        var nvaProject = new NvaProjectBuilder(cristinProject).build();
+        var nvaProject = new NvaProjectBuilder().apply(cristinProject);
 
         var actual = nvaProject.getFunding().get(0).getSource().toString();
 
@@ -80,4 +74,5 @@ public class NvaProjectBuilderTest {
     private void addRequiredFields(CristinProject cristinProject) {
         cristinProject.setStatus(ProjectStatus.ACTIVE.getCristinStatus());
     }
+
 }

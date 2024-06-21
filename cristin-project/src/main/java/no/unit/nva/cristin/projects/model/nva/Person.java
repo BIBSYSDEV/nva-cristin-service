@@ -105,10 +105,9 @@ public class Person {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Person)) {
+        if (!(o instanceof Person nvaPerson)) {
             return false;
         }
-        Person nvaPerson = (Person) o;
         return getId().equals(nvaPerson.getId())
                && Objects.equals(getFirstName(), nvaPerson.getFirstName())
                && Objects.equals(getLastName(), nvaPerson.getLastName())

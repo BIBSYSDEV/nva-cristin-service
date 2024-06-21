@@ -44,10 +44,14 @@ public class FetchCristinProjectApiClient extends CristinProjectApiClient {
 
         return Optional.of(getProject(id))
                    .filter(CristinProject::hasEnrichedContent)
-                   .map(NvaProjectBuilder::new)
-                   .map(builder -> builder.withContext(PROJECT_LOOKUP_CONTEXT_URL))
-                   .map(NvaProjectBuilder::build)
+                   .map(new NvaProjectBuilder())
+                   .map(this::addContext)
                    .orElseThrow(() -> projectHasNotValidContent(id));
+    }
+
+    private NvaProject addContext(NvaProject nvaProject) {
+        nvaProject.setContext(PROJECT_LOOKUP_CONTEXT_URL);
+        return nvaProject;
     }
 
     protected CristinProject getProject(String id) throws ApiGatewayException {
