@@ -8,6 +8,8 @@ import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinTypedLabel;
+import no.unit.nva.cristin.projects.model.cristin.adapter.ApprovalToCristinApproval;
+import no.unit.nva.cristin.projects.model.cristin.adapter.ContactInfoToCristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.adapter.ExternalSourcesToCristinExternalSources;
 import no.unit.nva.cristin.projects.model.cristin.adapter.NvaContributorToCristinPersonWithRoles;
 import no.unit.nva.cristin.projects.model.cristin.adapter.PersonToCristinPersonWithoutRoles;
@@ -29,12 +31,10 @@ import java.util.stream.Collectors;
 import no.unit.nva.model.adapter.TypedLabelToCristinFormat;
 import no.unit.nva.utils.UriUtils;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
-import static no.unit.nva.cristin.projects.model.cristin.CristinFundingSource.extractFundingSourceCode;
 import static no.unit.nva.cristin.projects.util.LanguageUtil.extractLanguageIso6391;
 import static no.unit.nva.cristin.projects.util.LanguageUtil.extractTitles;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -114,30 +114,12 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
 
     private List<CristinApproval> extractApprovals(List<Approval> approvals) {
         return approvals.stream()
-                   .map(this::toCristinApproval)
+                   .map(new ApprovalToCristinApproval())
                    .collect(Collectors.toList());
     }
 
-    /**
-     * Converts object of type Approval to object of type CristinApproval.
-     */
-    private CristinApproval toCristinApproval(Approval approval) {
-        return new CristinApproval(approval.getDate(),
-                                   CristinApprovalAuthorityBuilder.reverseLookup(approval.getAuthority()),
-                                   CristinApprovalStatusBuilder.reverseLookup(approval.getStatus()),
-                                   CristinApplicationCodeBuilder.reverseLookup(approval.getApplicationCode()),
-                                   approval.getIdentifier(),
-                                   approval.getAuthorityName());
-    }
-
     private CristinContactInfo extractContactInfo(ContactInfo contactInfo) {
-        if (isNull(contactInfo)) {
-            return null;
-        }
-        return new CristinContactInfo(contactInfo.getContactPerson(),
-                                      contactInfo.getOrganization(),
-                                      contactInfo.getEmail(),
-                                      contactInfo.getPhone());
+        return new ContactInfoToCristinContactInfo().apply(contactInfo);
     }
 
     private List<String> extractRelatedProjects(List<URI> relatedProjects) {
@@ -195,17 +177,8 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
 
     private List<CristinFundingSource> extractFundings(List<Funding> fundings) {
         return fundings.stream()
-                   .map(this::getCristinFundingSource)
+                   .map(CristinFundingSource::fromFunding)
                    .collect(Collectors.toList());
-    }
-
-    private CristinFundingSource getCristinFundingSource(Funding funding) {
-        CristinFundingSource cristinFundingSource = new CristinFundingSource();
-        cristinFundingSource.setFundingSourceCode(extractFundingSourceCode(funding.getSource()));
-        cristinFundingSource.setFundingSourceName(funding.getLabels());
-        cristinFundingSource.setProjectCode(funding.getIdentifier());
-
-        return cristinFundingSource;
     }
 
     private Map<String, String> extractSummary(Map<String, String> summary) {
