@@ -8,7 +8,6 @@ import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinRole;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
-import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.model.Organization;
 
 public class CristinPersonToNvaContributorCommon {
@@ -28,7 +27,7 @@ public class CristinPersonToNvaContributorCommon {
         if (getNvaRole(role.getRoleCode()).isPresent()) {
             nvaContributor.setType(getNvaRole(role.getRoleCode()).get());
         }
-        nvaContributor.setIdentity(Person.fromCristinPerson(cristinPerson));
+        nvaContributor.setIdentity(new CristinPersonToPerson().apply(cristinPerson));
         nvaContributor.setAffiliation(extractDepartmentOrFallbackToInstitutionForUserRole(role));
         return nvaContributor;
     }

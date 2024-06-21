@@ -17,8 +17,6 @@ import no.unit.nva.cristin.projects.model.cristin.adapter.CristinFundingSourceTo
 import no.unit.nva.cristin.projects.model.cristin.adapter.CristinPersonsToNvaContributors;
 import no.unit.nva.cristin.projects.model.cristin.adapter.CristinProjectCreatorToNvaContributor;
 import no.unit.nva.cristin.projects.model.cristin.adapter.CristinProjectToHealthProjectData;
-import no.unit.nva.cristin.projects.model.cristin.adapter.CristinPersonToPerson;
-import no.unit.nva.model.ApprovalStatus;
 import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.Organization;
 import no.unit.nva.model.DateInfo;
