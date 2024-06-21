@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
+import no.unit.nva.cristin.projects.model.nva.Funding;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
@@ -43,6 +44,15 @@ public class CristinFundingSource implements JsonSerializable {
 
     public void setFundingSourceName(Map<String, String> fundingSourceName) {
         this.fundingSourceName = fundingSourceName;
+    }
+
+    public static CristinFundingSource fromFunding(Funding funding) {
+        var cristinFundingSource = new CristinFundingSource();
+        cristinFundingSource.setFundingSourceCode(extractFundingSourceCode(funding.getSource()));
+        cristinFundingSource.setFundingSourceName(funding.getLabels());
+        cristinFundingSource.setProjectCode(funding.getIdentifier());
+
+        return cristinFundingSource;
     }
 
     /**

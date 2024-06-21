@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
-import no.unit.nva.cristin.projects.model.nva.Person;
 
 public class CristinProjectCreatorToNvaContributor extends CristinPersonToNvaContributorCommon
     implements Function<CristinPerson, NvaContributor> {
@@ -46,7 +45,7 @@ public class CristinProjectCreatorToNvaContributor extends CristinPersonToNvaCon
 
     private NvaContributor extractCreatorIdentity(CristinPerson presentCreator) {
         var creatorWithoutAffiliation = new NvaContributor();
-        creatorWithoutAffiliation.setIdentity(Person.fromCristinPerson(presentCreator));
+        creatorWithoutAffiliation.setIdentity(new CristinPersonToPerson().apply(presentCreator));
         return creatorWithoutAffiliation;
     }
 
