@@ -85,10 +85,9 @@ public class Approval implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Approval)) {
+        if (!(o instanceof Approval approval)) {
             return false;
         }
-        Approval approval = (Approval) o;
         return Objects.equals(getDate(), approval.getDate())
                && getAuthority() == approval.getAuthority()
                && getStatus() == approval.getStatus()

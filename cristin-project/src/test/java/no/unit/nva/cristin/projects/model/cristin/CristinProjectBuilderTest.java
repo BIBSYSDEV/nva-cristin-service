@@ -61,7 +61,7 @@ class CristinProjectBuilderTest {
         var nvaProject = randomNvaProject();
         var funding = new Funding(UNCONFIRMED_FUNDING, URI.create(input), null, null);
         nvaProject.setFunding(List.of(funding));
-        var cristinProject = new CristinProjectBuilder(nvaProject).build();
+        var cristinProject = new CristinProjectBuilder().apply(nvaProject);
         var cristinFunding = cristinProject.getProjectFundingSources().get(0);
         var actual = cristinFunding.getFundingSourceCode();
 

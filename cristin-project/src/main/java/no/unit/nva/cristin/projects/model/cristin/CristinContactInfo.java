@@ -58,10 +58,9 @@ public class CristinContactInfo {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CristinContactInfo)) {
+        if (!(o instanceof CristinContactInfo that)) {
             return false;
         }
-        CristinContactInfo that = (CristinContactInfo) o;
         return Objects.equals(getContactPerson(), that.getContactPerson())
                && Objects.equals(getInstitution(), that.getInstitution())
                && Objects.equals(getEmail(), that.getEmail())

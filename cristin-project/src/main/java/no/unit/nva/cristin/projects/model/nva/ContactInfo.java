@@ -61,10 +61,9 @@ public class ContactInfo implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ContactInfo)) {
+        if (!(o instanceof ContactInfo that)) {
             return false;
         }
-        ContactInfo that = (ContactInfo) o;
         return Objects.equals(getContactPerson(), that.getContactPerson())
                && Objects.equals(getOrganization(), that.getOrganization())
                && Objects.equals(getEmail(), that.getEmail())

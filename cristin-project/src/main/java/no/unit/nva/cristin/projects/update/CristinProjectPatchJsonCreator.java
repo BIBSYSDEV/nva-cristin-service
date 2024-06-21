@@ -48,6 +48,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
 import static no.unit.nva.cristin.projects.model.cristin.CristinContactInfo.CRISTIN_CONTACT_PERSON;
+import static no.unit.nva.cristin.projects.model.cristin.CristinFundingSource.extractFundingSourceCode;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_ACADEMIC_SUMMARY;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_EXTERNAL_URL;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.CRISTIN_MAIN_LANGUAGE;
@@ -59,7 +60,6 @@ import static no.unit.nva.cristin.projects.model.cristin.CristinProject.INSTITUT
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.KEYWORDS;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.METHOD;
 import static no.unit.nva.cristin.projects.model.cristin.CristinProject.PROJECT_FUNDING_SOURCES;
-import static no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder.extractFundingSourceCode;
 import static no.unit.nva.cristin.projects.model.nva.ContactInfo.CONTACT_PERSON;
 import static no.unit.nva.cristin.projects.model.nva.Funding.SOURCE;
 import static no.unit.nva.cristin.projects.update.ProjectPatchValidator.WEB_PAGE;

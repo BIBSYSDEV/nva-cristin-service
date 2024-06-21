@@ -386,7 +386,7 @@ public class CristinProject implements JsonSerializable {
     }
 
     public NvaProject toNvaProject() {
-        return new NvaProjectBuilder(this).build();
+        return new NvaProjectBuilder().apply(this);
     }
 
     @Override
@@ -394,10 +394,9 @@ public class CristinProject implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof CristinProject)) {
+        if (!(o instanceof CristinProject that)) {
             return false;
         }
-        CristinProject that = (CristinProject) o;
         return Objects.equals(getCristinProjectId(), that.getCristinProjectId())
                && Objects.equals(getPublishable(), that.getPublishable())
                && Objects.equals(getPublished(), that.getPublished())

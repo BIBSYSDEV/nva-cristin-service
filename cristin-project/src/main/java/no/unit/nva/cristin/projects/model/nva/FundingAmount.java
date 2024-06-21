@@ -38,10 +38,9 @@ public class FundingAmount implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof FundingAmount)) {
+        if (!(o instanceof FundingAmount that)) {
             return false;
         }
-        FundingAmount that = (FundingAmount) o;
         return Objects.equals(getCurrency(), that.getCurrency()) && Objects.equals(getValue(), that.getValue());
     }
 

@@ -83,7 +83,8 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
      */
     @Override
     protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
-            throws ApiGatewayException {
+        throws ApiGatewayException {
+
         var cristinQuery = (QueryProject)
             QueryProject.builder()
                 .fromRequestInfo(requestInfo)
