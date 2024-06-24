@@ -9,12 +9,10 @@ import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.cristin.adapter.ApprovalToCristinApproval;
-import no.unit.nva.cristin.projects.model.cristin.adapter.ContactInfoToCristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.adapter.ExternalSourcesToCristinExternalSources;
 import no.unit.nva.cristin.projects.model.cristin.adapter.NvaContributorToCristinPersonWithRoles;
 import no.unit.nva.cristin.projects.model.cristin.adapter.PersonToCristinPersonWithoutRoles;
 import no.unit.nva.cristin.projects.model.nva.Approval;
-import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.model.ExternalSource;
 import no.unit.nva.cristin.projects.model.nva.Funding;
@@ -35,6 +33,7 @@ import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
+import static no.unit.nva.cristin.projects.model.cristin.CristinContactInfo.fromContactInfo;
 import static no.unit.nva.cristin.projects.util.LanguageUtil.extractLanguageIso6391;
 import static no.unit.nva.cristin.projects.util.LanguageUtil.extractTitles;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -81,7 +80,7 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
         cristinProject.setKeywords(extractCristinTypedLabels(nvaProject.getKeywords()));
         cristinProject.setProjectCategories(extractCristinTypedLabels(nvaProject.getProjectCategories()));
         cristinProject.setRelatedProjects(extractRelatedProjects(nvaProject.getRelatedProjects()));
-        cristinProject.setContactInfo(extractContactInfo(nvaProject.getContactInfo()));
+        cristinProject.setContactInfo(fromContactInfo(nvaProject.getContactInfo()));
         cristinProject.setExemptFromPublicDisclosure(nvaProject.getExemptFromPublicDisclosure());
         cristinProject.setCreator(extractCreator(nvaProject.getCreator()));
         cristinProject.setExternalUrl(extractExternalUrl(nvaProject.getWebPage()));
@@ -116,10 +115,6 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
         return approvals.stream()
                    .map(new ApprovalToCristinApproval())
                    .collect(Collectors.toList());
-    }
-
-    private CristinContactInfo extractContactInfo(ContactInfo contactInfo) {
-        return new ContactInfoToCristinContactInfo().apply(contactInfo);
     }
 
     private List<String> extractRelatedProjects(List<URI> relatedProjects) {

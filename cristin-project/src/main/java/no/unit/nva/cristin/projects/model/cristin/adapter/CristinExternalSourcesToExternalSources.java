@@ -1,9 +1,8 @@
 package no.unit.nva.cristin.projects.model.cristin.adapter;
 
-import static java.util.Objects.nonNull;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.model.ExternalSource;
 
@@ -12,20 +11,17 @@ public class CristinExternalSourcesToExternalSources
 
     @Override
     public List<ExternalSource> apply(List<CristinExternalSource> cristinExternalSources) {
-        return extractExternalSources(cristinExternalSources);
+        return Optional.ofNullable(cristinExternalSources)
+                   .map(this::extractExternalSources)
+                   .orElse(null);
     }
 
     private List<ExternalSource> extractExternalSources(List<CristinExternalSource> cristinExternalSources) {
-        return nonNull(cristinExternalSources)
-                   ? cristinExternalSources.stream()
-                         .map(this::toExternalSource)
-                         .collect(Collectors.toList())
-                   : null;
+        return cristinExternalSources.stream()
+                   .map(CristinExternalSource::toExternalSource)
+                   .toList();
     }
 
-    private ExternalSource toExternalSource(CristinExternalSource cristinExternalSource) {
-        return new ExternalSource(cristinExternalSource.getSourceReferenceId(),
-                                  cristinExternalSource.getSourceShortName());
-    }
+
 
 }
