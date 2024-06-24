@@ -3213,7 +3213,7 @@ components:
           properties:
             telephone:
               type: string
-              pattern: '\+?\d+'
+              pattern: '^\+?\d+$'
             email:
               type: string
             webPage:
