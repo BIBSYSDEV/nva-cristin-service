@@ -3213,7 +3213,7 @@ components:
           properties:
             telephone:
               type: string
-              pattern: '\+?\d+'
+              pattern: '^\+?\d+$'
             email:
               type: string
             webPage:
@@ -3676,7 +3676,7 @@ components:
       type: object
       required:
         - type
-        - '@Context'
+        - '@context'
         - id
         - sources
       properties:
@@ -3716,7 +3716,7 @@ components:
       type: object
       required:
         - type
-        - '@Context'
+        - '@context'
         - id
         - sources
       properties:
