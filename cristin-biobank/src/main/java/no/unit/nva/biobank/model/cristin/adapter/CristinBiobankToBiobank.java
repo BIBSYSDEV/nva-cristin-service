@@ -85,10 +85,9 @@ public class CristinBiobankToBiobank implements Function<CristinBiobank, Biobank
     }
 
     private Set<ExternalSource> toExternalSources(Set<CristinExternalSource> externalSources) {
-        return
-            externalSources.stream()
-                .map(es -> new ExternalSource(es.getSourceReferenceId(), es.getSourceShortName()))
-                .collect(Collectors.toUnmodifiableSet());
+        return externalSources.stream()
+                   .map(CristinExternalSource::toExternalSource)
+                   .collect(Collectors.toUnmodifiableSet());
     }
 
     private List<BiobankApproval> toApprovals(List<CristinApproval> approvals) {
