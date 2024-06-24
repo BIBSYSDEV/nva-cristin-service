@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Objects;
+import java.util.Optional;
+import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinContactInfo {
@@ -51,6 +53,26 @@ public class CristinContactInfo {
 
     public String getPhone() {
         return phone;
+    }
+
+    public static CristinContactInfo fromContactInfo(ContactInfo contactInfo) {
+        return Optional.ofNullable(contactInfo)
+                   .map(CristinContactInfo::convert)
+                   .orElse(null);
+    }
+
+    private static CristinContactInfo convert(ContactInfo contactInfo) {
+        return new CristinContactInfo(contactInfo.getContactPerson(),
+                                      contactInfo.getOrganization(),
+                                      contactInfo.getEmail(),
+                                      contactInfo.getPhone());
+    }
+
+    public ContactInfo toContactInfo() {
+        return new ContactInfo(getContactPerson(),
+                               getInstitution(),
+                               getEmail(),
+                               getPhone());
     }
 
     @Override

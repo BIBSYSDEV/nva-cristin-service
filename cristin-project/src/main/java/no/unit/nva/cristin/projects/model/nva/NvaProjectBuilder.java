@@ -151,10 +151,9 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
     }
 
     private ContactInfo extractContactInfo(CristinContactInfo cristinContactInfo) {
-        return nonNull(cristinContactInfo) ? new ContactInfo(cristinContactInfo.getContactPerson(),
-                                                             cristinContactInfo.getInstitution(),
-                                                             cristinContactInfo.getEmail(),
-                                                             cristinContactInfo.getPhone()) : null;
+        return Optional.ofNullable(cristinContactInfo)
+                   .map(CristinContactInfo::toContactInfo)
+                   .orElse(null);
     }
 
     private FundingAmount extractFundingAmount(CristinFundingAmount cristinFundingAmount) {

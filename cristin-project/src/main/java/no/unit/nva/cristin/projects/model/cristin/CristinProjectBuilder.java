@@ -9,7 +9,6 @@ import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.cristin.adapter.ApprovalToCristinApproval;
-import no.unit.nva.cristin.projects.model.cristin.adapter.ContactInfoToCristinContactInfo;
 import no.unit.nva.cristin.projects.model.cristin.adapter.ExternalSourcesToCristinExternalSources;
 import no.unit.nva.cristin.projects.model.cristin.adapter.NvaContributorToCristinPersonWithRoles;
 import no.unit.nva.cristin.projects.model.cristin.adapter.PersonToCristinPersonWithoutRoles;
@@ -119,7 +118,7 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
     }
 
     private CristinContactInfo extractContactInfo(ContactInfo contactInfo) {
-        return new ContactInfoToCristinContactInfo().apply(contactInfo);
+        return CristinContactInfo.fromContactInfo(contactInfo);
     }
 
     private List<String> extractRelatedProjects(List<URI> relatedProjects) {
