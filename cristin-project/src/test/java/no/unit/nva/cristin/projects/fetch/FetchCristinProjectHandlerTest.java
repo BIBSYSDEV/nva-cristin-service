@@ -472,8 +472,9 @@ public class FetchCristinProjectHandlerTest {
     }
 
     private CristinPerson cristinPersonWithDefaultIdentifier() {
-        var creator = new CristinPerson();
-        creator.setCristinPersonId(PERSON_ID);
-        return creator;
+        return new CristinPerson.Builder()
+                   .withCristinPersonId(PERSON_ID)
+                   .build();
     }
+
 }

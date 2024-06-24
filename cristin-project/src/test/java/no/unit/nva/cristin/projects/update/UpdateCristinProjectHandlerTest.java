@@ -489,8 +489,7 @@ class UpdateCristinProjectHandlerTest {
 
     private CristinProject cristinProjectWithCreatorData() {
         var cristinProject = basicCristinProject();
-        var creator = new CristinPerson();
-        creator.setCristinPersonId(USER_IDENTIFIER);
+        var creator = new CristinPerson.Builder().withCristinPersonId(USER_IDENTIFIER).build();
         cristinProject.setCreator(creator);
 
         return cristinProject;
@@ -515,10 +514,9 @@ class UpdateCristinProjectHandlerTest {
     }
 
     private CristinPerson getParticipant(String userIdentifier, String roleCode) {
-        var participant = new CristinPerson();
-        participant.setCristinPersonId(userIdentifier);
-        participant.setRoles(List.of(createRole(roleCode)));
-        return participant;
+        return new CristinPerson.Builder()
+                   .withCristinPersonId(userIdentifier)
+                   .withRoles(List.of(createRole(roleCode))).build();
     }
 
     private CristinRole createRole(String roleCode) {

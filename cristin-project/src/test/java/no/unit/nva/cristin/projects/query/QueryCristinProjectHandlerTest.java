@@ -755,7 +755,10 @@ class QueryCristinProjectHandlerTest {
     void shouldReturnOkWithOnlyCreatorPersonIdWhenProjectCreatorHasMissingOrganizationInRoles() throws Exception {
         var serializedCristinProject = IoUtils.stringFromResources(Path.of(CRISTIN_GET_PROJECT_RESPONSE_JSON));
         var deserialized = OBJECT_MAPPER.readValue(serializedCristinProject, CristinProject.class);
-        deserialized.getCreator().setRoles(null);
+        var creatorWithoutRoles = deserialized.getCreator().copy()
+                                      .withRoles(null)
+                                      .build();
+        deserialized.setCreator(creatorWithoutRoles);
 
         cristinApiClientStub =
             new QueryCristinProjectClientStub(OBJECT_MAPPER.writeValueAsString(deserialized));
