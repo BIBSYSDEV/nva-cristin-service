@@ -3676,7 +3676,7 @@ components:
       type: object
       required:
         - type
-        - '@Context'
+        - '@context'
         - id
         - sources
       properties:
@@ -3716,7 +3716,7 @@ components:
       type: object
       required:
         - type
-        - '@Context'
+        - '@context'
         - id
         - sources
       properties:
