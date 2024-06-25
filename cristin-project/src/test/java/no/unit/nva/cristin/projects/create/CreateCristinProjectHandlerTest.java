@@ -463,8 +463,8 @@ class CreateCristinProjectHandlerTest {
         var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
 
         var creator = capturedCristinProject.getCreator();
-        var actualPerson = creator.getCristinPersonId();
-        var actualOrg = creator.getRoles().get(0).getInstitutionUnit().getCristinUnitId();
+        var actualPerson = creator.cristinPersonId();
+        var actualOrg = creator.roles().get(0).getInstitutionUnit().getCristinUnitId();
 
         assertThat(actualPerson, equalTo(extractLastPathElement(CRISTIN_PERSON_ID)));
         assertThat(actualOrg, equalTo(extractLastPathElement(CRISTIN_ORG_ID)));
@@ -488,8 +488,8 @@ class CreateCristinProjectHandlerTest {
         var capturedCristinProject = OBJECT_MAPPER.readValue(captor.getValue(), CristinProject.class);
 
         var creator = capturedCristinProject.getCreator();
-        var actualPerson = creator.getCristinPersonId();
-        var actualOrg = creator.getRoles();
+        var actualPerson = creator.cristinPersonId();
+        var actualOrg = creator.roles();
 
         assertThat(actualPerson, equalTo(extractLastPathElement(CRISTIN_PERSON_ID)));
         assertThat(actualOrg, equalTo(null));
@@ -609,7 +609,7 @@ class CreateCristinProjectHandlerTest {
     private boolean hasRole(CristinProject capturedCristinProject, String roleCode) {
         return capturedCristinProject.getParticipants()
                    .stream()
-                   .anyMatch(person -> person.getRoles().get(0).getRoleCode().equals(roleCode));
+                   .anyMatch(person -> person.roles().get(0).getRoleCode().equals(roleCode));
     }
 
     private InputStream inputWithClientIdentifiers(NvaProject nvaProject) throws JsonProcessingException {

@@ -19,11 +19,11 @@ public class CristinPersonToPerson implements Function<CristinPerson, Person> {
 
     private Person convert(CristinPerson cristinPerson) {
         return new Person(
-            convertId(cristinPerson.getCristinPersonId()),
-            cristinPerson.getFirstName(),
-            cristinPerson.getSurname(),
-            cristinPerson.getEmail(),
-            cristinPerson.getPhone());
+            convertId(cristinPerson.cristinPersonId()),
+            cristinPerson.firstName(),
+            cristinPerson.surname(),
+            cristinPerson.email(),
+            cristinPerson.phone());
     }
 
     private URI convertId(String cristinPersonId) {

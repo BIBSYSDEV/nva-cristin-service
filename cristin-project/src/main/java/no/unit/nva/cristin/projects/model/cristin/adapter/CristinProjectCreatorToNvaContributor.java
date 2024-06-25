@@ -1,10 +1,12 @@
 package no.unit.nva.cristin.projects.model.cristin.adapter;
 
-import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import no.unit.nva.cristin.model.CristinPerson;
+import no.unit.nva.cristin.model.CristinRole;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 
 public class CristinProjectCreatorToNvaContributor extends CristinPersonToNvaContributorCommon
@@ -28,18 +30,24 @@ public class CristinProjectCreatorToNvaContributor extends CristinPersonToNvaCon
     }
 
     private CristinPerson addRoleDataIfMissing(CristinPerson cristinPerson) {
-        Optional.ofNullable(cristinPerson.getRoles())
-            .ifPresentOrElse(
-                (roles) -> roles.forEach(role -> role.setRoleCode(PRO_CREATOR)),
-                () -> cristinPerson.setRoles(emptyList())
-            );
+        var roles = Optional.ofNullable(cristinPerson.roles())
+                        .map(this::addProjectCreatorRoleCode)
+                        .orElse(Collections.emptyList());
 
-        return cristinPerson;
+        return cristinPerson.copy()
+                   .withRoles(roles)
+                   .build();
+    }
+
+    private List<CristinRole> addProjectCreatorRoleCode(List<CristinRole> cristinRoles) {
+        return cristinRoles.stream()
+                   .peek(role -> role.setRoleCode(PRO_CREATOR))
+                   .toList();
     }
 
     private Optional<NvaContributor> creatorWithoutAffiliation(CristinPerson creator) {
         return Optional.ofNullable(creator)
-                   .filter(presentCreator -> nonNull(presentCreator.getCristinPersonId()))
+                   .filter(presentCreator -> nonNull(presentCreator.cristinPersonId()))
                    .map(this::extractCreatorIdentity);
     }
 

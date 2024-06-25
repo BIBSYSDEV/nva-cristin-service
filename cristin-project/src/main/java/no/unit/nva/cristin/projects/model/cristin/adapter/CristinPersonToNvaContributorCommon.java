@@ -16,7 +16,7 @@ public class CristinPersonToNvaContributorCommon {
     }
 
     protected Stream<NvaContributor> generateRoleBasedContribution(CristinPerson cristinPerson) {
-        return cristinPerson.getRoles()
+        return cristinPerson.roles()
                    .stream()
                    .map(role -> createNvaContributorFromCristinPersonByRole(cristinPerson, role));
     }

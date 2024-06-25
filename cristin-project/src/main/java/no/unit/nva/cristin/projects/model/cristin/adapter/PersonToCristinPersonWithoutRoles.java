@@ -12,16 +12,14 @@ public class PersonToCristinPersonWithoutRoles implements Function<Person, Crist
 
     @Override
     public CristinPerson apply(Person person) {
-        var cristinPerson = new CristinPerson();
-
-        cristinPerson.setCristinPersonId(toCristinPersonIdentity(person.getId()));
-        cristinPerson.setUrl(nvaIdentifierToCristinIdentifier(person.getId(), PERSON_PATH).toString());
-        cristinPerson.setFirstName(person.getFirstName());
-        cristinPerson.setSurname(person.getLastName());
-        cristinPerson.setEmail(person.getEmail());
-        cristinPerson.setPhone(person.getPhone());
-
-        return cristinPerson;
+        return new CristinPerson.Builder()
+                   .withCristinPersonId(toCristinPersonIdentity(person.getId()))
+                   .withFirstName(person.getFirstName())
+                   .withSurname(person.getLastName())
+                   .withUrl(nvaIdentifierToCristinIdentifier(person.getId(), PERSON_PATH).toString())
+                   .withEmail(person.getEmail())
+                   .withPhone(person.getPhone())
+                   .build();
     }
 
     private String toCristinPersonIdentity(URI id) {

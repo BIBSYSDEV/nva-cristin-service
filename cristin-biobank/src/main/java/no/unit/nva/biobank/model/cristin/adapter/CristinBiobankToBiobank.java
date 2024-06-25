@@ -49,7 +49,7 @@ public class CristinBiobankToBiobank implements Function<CristinBiobank, Biobank
             toDateInfoOrNull(cristinBiobank.getCreated()),
             toDateInfoOrNull(cristinBiobank.getLastModified()),
             toCoordinatingUnit(cristinBiobank.getCoordinatingInstitution()),
-            getNvaApiId(cristinBiobank.getCoordinator().getCristinPersonId(), PERSON_PATH_NVA),
+            getNvaApiId(cristinBiobank.getCoordinator().cristinPersonId(), PERSON_PATH_NVA),
             toProjectOrNull(cristinBiobank),
             toExternalSources(cristinBiobank.getExternalSources()),
             toApprovals(cristinBiobank.getApprovals()),

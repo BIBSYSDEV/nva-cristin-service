@@ -33,9 +33,10 @@ public class NvaContributorToCristinPersonWithRoles implements Function<NvaContr
      */
     public CristinPerson toCristinPersonWithRoles() {
         var cristinPerson = new PersonToCristinPersonWithoutRoles().apply(nvaContributor.getIdentity());
-        cristinPerson.setRoles(extractCristinRoles());
 
-        return cristinPerson;
+        return cristinPerson.copy()
+                   .withRoles(extractCristinRoles())
+                   .build();
     }
 
     private List<CristinRole> extractCristinRoles() {
