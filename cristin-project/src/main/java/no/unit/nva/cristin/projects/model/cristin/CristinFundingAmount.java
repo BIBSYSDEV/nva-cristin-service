@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Objects;
+import no.unit.nva.cristin.projects.model.nva.FundingAmount;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinFundingAmount {
@@ -30,6 +31,10 @@ public class CristinFundingAmount {
 
     public Double getAmount() {
         return amount;
+    }
+
+    public FundingAmount toFundingAmount() {
+        return new FundingAmount(getCurrencyCode(), getAmount());
     }
 
     @Override

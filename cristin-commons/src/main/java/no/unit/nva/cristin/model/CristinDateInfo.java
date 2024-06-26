@@ -38,6 +38,10 @@ public class CristinDateInfo {
         return date;
     }
 
+    public DateInfo toDateInfo() {
+        return new DateInfo(getSourceShortName(), getDate());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -54,11 +58,6 @@ public class CristinDateInfo {
     @Override
     public int hashCode() {
         return Objects.hash(getSourceShortName(), getDate());
-    }
-
-
-    public DateInfo toDateInfo() {
-        return new DateInfo(sourceShortName,date);
     }
 
 }

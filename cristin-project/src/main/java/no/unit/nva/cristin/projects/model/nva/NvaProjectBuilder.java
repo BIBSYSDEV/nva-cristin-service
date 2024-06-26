@@ -2,7 +2,6 @@ package no.unit.nva.cristin.projects.model.nva;
 
 import java.net.URI;
 import java.util.function.Function;
-import no.unit.nva.cristin.model.Constants;
 import no.unit.nva.cristin.model.CristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
 import no.unit.nva.cristin.model.CristinDateInfo;
@@ -24,7 +23,6 @@ import no.unit.nva.model.TypedLabel;
 import no.unit.nva.model.adapter.CristinTypedLabelToNvaFormat;
 import nva.commons.core.language.LanguageMapper;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,8 +30,9 @@ import java.util.stream.Collectors;
 import nva.commons.core.paths.UriWrapper;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.model.Constants.CRISTIN_IDENTIFIER_TYPE;
+import static no.unit.nva.cristin.model.Constants.TYPE;
+import static no.unit.nva.cristin.model.Constants.VALUE;
 import static no.unit.nva.cristin.projects.model.nva.NvaProject.PROJECT_TYPE;
 import static no.unit.nva.utils.UriUtils.PROJECT;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
@@ -91,11 +90,16 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
     }
 
     private List<Map<String, String>> createCristinIdentifier() {
-        return nonNull(cristinProject.getCristinProjectId())
-                   ? singletonList(Map.of(
-                       Constants.TYPE, Constants.CRISTIN_IDENTIFIER_TYPE,
-                       Constants.VALUE, cristinProject.getCristinProjectId()))
-                   : emptyList();
+        return Optional.ofNullable(cristinProject.getCristinProjectId())
+                   .map(this::mapOfCristinIdentifier)
+                   .filter(this::hasData)
+                   .stream()
+                   .toList();
+    }
+
+    private Map<String, String> mapOfCristinIdentifier(String cristinIdentifier) {
+        return Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE,
+                      VALUE, cristinIdentifier);
     }
 
     private String extractMainTitle() {
@@ -109,8 +113,8 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
         return Optional.ofNullable(cristinProject.getTitle())
                    .map(this::removeMainTitle)
                    .filter(this::hasData)
-                   .map(Collections::singletonList)
-                   .orElse(emptyList());
+                   .stream()
+                   .toList();
     }
 
     private Map<String, String> removeMainTitle(Map<String, String> titles) {
@@ -146,8 +150,9 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
     }
 
     private DateInfo extractDateInfo(CristinDateInfo cristinDateInfo) {
-        return nonNull(cristinDateInfo) ? new DateInfo(cristinDateInfo.getSourceShortName(),
-                                                       cristinDateInfo.getDate()) : null;
+        return Optional.ofNullable(cristinDateInfo)
+                   .map(CristinDateInfo::toDateInfo)
+                   .orElse(null);
     }
 
     private ContactInfo extractContactInfo(CristinContactInfo cristinContactInfo) {
@@ -157,24 +162,33 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
     }
 
     private FundingAmount extractFundingAmount(CristinFundingAmount cristinFundingAmount) {
-        return nonNull(cristinFundingAmount) ? new FundingAmount(cristinFundingAmount.getCurrencyCode(),
-                                                                 cristinFundingAmount.getAmount()) : null;
+        return Optional.ofNullable(cristinFundingAmount)
+                   .map(CristinFundingAmount::toFundingAmount)
+                   .orElse(null);
     }
 
     private List<TypedLabel> extractTypedLabels(List<CristinTypedLabel> cristinTypedLabels) {
-        return nonNull(cristinTypedLabels)
-                   ? cristinTypedLabels.stream()
-                         .map(new CristinTypedLabelToNvaFormat())
-                         .collect(Collectors.toList())
-                   : null;
+        return Optional.ofNullable(cristinTypedLabels)
+                   .map(this::convertCristinTypedLabels)
+                   .orElse(null);
+    }
+
+    private List<TypedLabel> convertCristinTypedLabels(List<CristinTypedLabel> cristinTypedLabels) {
+        return cristinTypedLabels.stream()
+                   .map(new CristinTypedLabelToNvaFormat())
+                   .toList();
     }
 
     private List<URI> extractRelatedProjects(List<String> cristinRelatedProjects) {
-        return nonNull(cristinRelatedProjects)
-                   ? cristinRelatedProjects.stream()
-                         .map(this::cristinUriStringWithIdentifierToNvaUri)
-                         .collect(Collectors.toList())
-                   : null;
+        return Optional.ofNullable(cristinRelatedProjects)
+                   .map(this::convertRelatedProjects)
+                   .orElse(null);
+    }
+
+    private List<URI> convertRelatedProjects(List<String> cristinRelatedProjects) {
+        return cristinRelatedProjects.stream()
+                   .map(this::cristinUriStringWithIdentifierToNvaUri)
+                   .toList();
     }
 
     private URI cristinUriStringWithIdentifierToNvaUri(String cristinUri) {
@@ -185,14 +199,14 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
     private List<Approval> extractApprovals(List<CristinApproval> cristinApprovals) {
         return cristinApprovals.stream()
                    .map(new CristinApprovalToApproval())
-                   .collect(Collectors.toList());
+                   .toList();
     }
 
     private List<Organization> extractInstitutionsResponsibleForResearch(List<CristinOrganization>
                                                                              institutionsResponsibleForResearch) {
         return institutionsResponsibleForResearch.stream()
                    .map(CristinOrganization::extractPreferredTypeOfOrganization)
-                   .collect(Collectors.toList());
+                   .toList();
     }
 
     private List<ExternalSource> extractExternalSources(List<CristinExternalSource> externalSources) {
