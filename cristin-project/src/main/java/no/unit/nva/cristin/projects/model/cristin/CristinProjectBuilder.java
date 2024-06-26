@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 import no.unit.nva.model.adapter.TypedLabelToCristinFormat;
 import no.unit.nva.utils.UriUtils;
 
-import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
@@ -101,14 +100,15 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
     }
 
     private CristinPerson extractCreator(NvaContributor creator) {
-        if (nonNull(creator)) {
-            if (nonNull(creator.getAffiliation())) {
-                return new NvaContributorToCristinPersonWithRoles().apply(creator);
-            } else {
-                return new PersonToCristinPersonWithoutRoles().apply(creator.getIdentity());
-            }
-        }
-        return null;
+        return Optional.ofNullable(creator)
+                   .map(this::getCreator)
+                   .orElse(null);
+    }
+
+    private CristinPerson getCreator(NvaContributor creator) {
+        return Optional.ofNullable(creator.getAffiliation())
+                   .map(hasAffiliation -> new NvaContributorToCristinPersonWithRoles().apply(creator))
+                   .orElseGet(() -> new PersonToCristinPersonWithoutRoles().apply(creator.getIdentity()));
     }
 
     private List<CristinApproval> extractApprovals(List<Approval> approvals) {
