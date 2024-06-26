@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects.model.nva;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.function.Function;
 import no.unit.nva.cristin.model.CristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.CristinContactInfo;
@@ -167,25 +168,25 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
                    .orElse(null);
     }
 
-    private List<TypedLabel> extractTypedLabels(List<CristinTypedLabel> cristinTypedLabels) {
+    private List<TypedLabel> extractTypedLabels(Collection<CristinTypedLabel> cristinTypedLabels) {
         return Optional.ofNullable(cristinTypedLabels)
                    .map(this::convertCristinTypedLabels)
                    .orElse(null);
     }
 
-    private List<TypedLabel> convertCristinTypedLabels(List<CristinTypedLabel> cristinTypedLabels) {
+    private List<TypedLabel> convertCristinTypedLabels(Collection<CristinTypedLabel> cristinTypedLabels) {
         return cristinTypedLabels.stream()
                    .map(new CristinTypedLabelToNvaFormat())
                    .toList();
     }
 
-    private List<URI> extractRelatedProjects(List<String> cristinRelatedProjects) {
+    private List<URI> extractRelatedProjects(Collection<String> cristinRelatedProjects) {
         return Optional.ofNullable(cristinRelatedProjects)
                    .map(this::convertRelatedProjects)
                    .orElse(null);
     }
 
-    private List<URI> convertRelatedProjects(List<String> cristinRelatedProjects) {
+    private List<URI> convertRelatedProjects(Collection<String> cristinRelatedProjects) {
         return cristinRelatedProjects.stream()
                    .map(this::cristinUriStringWithIdentifierToNvaUri)
                    .toList();
@@ -196,13 +197,13 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
         return getNvaApiId(identifier, PROJECT);
     }
 
-    private List<Approval> extractApprovals(List<CristinApproval> cristinApprovals) {
+    private List<Approval> extractApprovals(Collection<CristinApproval> cristinApprovals) {
         return cristinApprovals.stream()
                    .map(new CristinApprovalToApproval())
                    .toList();
     }
 
-    private List<Organization> extractInstitutionsResponsibleForResearch(List<CristinOrganization>
+    private List<Organization> extractInstitutionsResponsibleForResearch(Collection<CristinOrganization>
                                                                              institutionsResponsibleForResearch) {
         return institutionsResponsibleForResearch.stream()
                    .map(CristinOrganization::extractPreferredTypeOfOrganization)
