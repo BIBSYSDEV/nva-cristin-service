@@ -2463,17 +2463,23 @@ components:
             type: object
             description: One contributor
             properties:
-              type:
-                type: string
-                enum:
-                  - ProjectManager
-                  - ProjectParticipant
-                  - LocalProjectManager
-                description: Type of contributor.
               identity:
                 $ref: '#/components/schemas/PersonSummary'
-              affiliation:
-                $ref: '#/components/schemas/Organization'
+              roles:
+                type: array
+                description: Roles with affiliation of contributor
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - ProjectManager
+                        - ProjectParticipant
+                        - LocalProjectManager
+                      description: Type of contributor.
+                    affiliation:
+                      $ref: '#/components/schemas/Organization'
         status:
           type: string
           enum:
@@ -2665,13 +2671,6 @@ components:
             type: object
             description: One contributor
             properties:
-              type:
-                type: string
-                enum:
-                  - ProjectManager
-                  - ProjectParticipant
-                  - LocalProjectManager
-                description: Type of contributor.
               identity:
                 type: object
                 properties:
@@ -2697,8 +2696,21 @@ components:
                     type: string
                     pattern: '.*'
                     description: Phone number
-              affiliation:
-                $ref: '#/components/schemas/Organization'
+              roles:
+                type: array
+                description: Roles with affiliation of contributor
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - ProjectManager
+                        - ProjectParticipant
+                        - LocalProjectManager
+                      description: Type of contributor.
+                    affiliation:
+                      $ref: '#/components/schemas/Organization'
         academicSummary:
           $ref: '#/components/schemas/Languages'
         popularScientificSummary:
@@ -2807,13 +2819,6 @@ components:
             type: object
             description: One contributor
             properties:
-              type:
-                type: string
-                enum:
-                  - ProjectManager
-                  - ProjectParticipant
-                  - LocalProjectManager
-                description: Type of contributor.
               identity:
                 type: object
                 properties:
@@ -2823,8 +2828,21 @@ components:
                     type: string
                     pattern: 'Person'
                     description: Type of identity. Always Person
-              affiliation:
-                $ref: '#/components/schemas/Organization'
+              roles:
+                type: array
+                description: Roles with affiliation of contributor
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - ProjectManager
+                        - ProjectParticipant
+                        - LocalProjectManager
+                      description: Type of contributor.
+                    affiliation:
+                      $ref: '#/components/schemas/Organization'
         funding:
           type: array
           description: List of fundings for the project
@@ -4219,28 +4237,30 @@ components:
               labels:
                 'nb': 'OsloMet - storbyuniversitetet'
             contributors:
-              - type: 'ProjectManager'
-                identity:
+              - identity:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
                   type: 'Person'
                   firstName: 'Ola'
                   lastName: 'Nordmann'
-                affiliation:
-                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-                  type: 'Organization'
-                  labels:
-                    'nb': 'OsloMet - storbyuniversitetet'
-              - type: 'ProjectParticipant'
-                identity:
+                roles:
+                  - type: 'ProjectManager'
+                    affiliation:
+                      id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                      type: 'Organization'
+                      labels:
+                        'nb': 'OsloMet - storbyuniversitetet'
+              - identity:
                   id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
                   type: 'Person'
                   firstName: 'Kari'
                   lastName: 'Olsen'
-                affiliation:
-                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-                  type: 'Organization'
-                  labels:
-                    'nb': 'OsloMet - storbyuniversitetet'
+                roles:
+                  - type: 'ProjectParticipant'
+                    affiliation:
+                      id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                      type: 'Organization'
+                      labels:
+                        'nb': 'OsloMet - storbyuniversitetet'
             status: CONCLUDED
             academicSummary:
               no: "Jeg arbeider med å skrive en bok, med foreløpig tittel, Digitale bilder. "
@@ -4417,28 +4437,30 @@ components:
           labels:
             'nb': 'OsloMet - storbyuniversitetet'
         contributors:
-          - type: 'ProjectManager'
-            identity:
+          - identity:
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
               type: 'Person'
               firstName: 'Ola'
               lastName: 'Nordmann'
-            affiliation:
-              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-              type: 'Organization'
-              labels:
-                'nb': 'OsloMet - storbyuniversitetet'
-          - type: 'ProjectParticipant'
-            identity:
+            roles:
+              - type: 'ProjectManager'
+                affiliation:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                  type: 'Organization'
+                  labels:
+                    'nb': 'OsloMet - storbyuniversitetet'
+          - identity:
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
               type: 'Person'
               firstName: 'Kari'
               lastName: 'Olsen'
-            affiliation:
-              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-              type: 'Organization'
-              labels:
-                'nb': 'OsloMet - storbyuniversitetet'
+            roles:
+              - type: 'ProjectParticipant'
+                affiliation:
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                  type: 'Organization'
+                  labels:
+                    'nb': 'OsloMet - storbyuniversitetet'
         status: CONCLUDED
         academicSummary:
           en: "Summary in an academic manner"
@@ -4518,10 +4540,11 @@ components:
           type: 'Organization'
           id: 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
         contributors:
-          - type: 'ProjectManager'
-            identity:
+          - identity:
               type: 'Person'
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/538786'
+            roles:
+              - type: 'ProjectManager'
         funding:
           - source: 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/EI'
             identifier: '1234556'
@@ -4564,30 +4587,33 @@ components:
           type: 'Organization'
           id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
         contributors:
-          - type: 'ProjectManager'
-            identity:
+          - identity:
               type: 'Person'
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
-            affiliation:
-              type: 'Organization'
-              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-          - type: 'ProjectParticipant'
-            identity:
+            roles:
+              - type: 'ProjectManager'
+                affiliation:
+                  type: 'Organization'
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+          - identity:
               type: 'Person'
               id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
-            affiliation:
-              type: 'Organization'
-              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-          - type: 'ProjectParticipant'
-            identity:
+            roles:
+              - type: 'ProjectParticipant'
+                affiliation:
+                  type: 'Organization'
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+          - identity:
               type: 'Person'
               FirstName: 'Kjell Ola'
               LastName: 'Nordmann'
               Email: 'ola.nordmann@example.org'
               Phone: '12345678'
-            affiliation:
-              type: 'Organization'
-              id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+            roles:
+              - type: 'ProjectParticipant'
+                affiliation:
+                  type: 'Organization'
+                  id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
         academicSummary:
           en: "Summary in an academic manner"
         popularScientificSummary:
