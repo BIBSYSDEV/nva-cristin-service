@@ -24,15 +24,17 @@ Feature: API tests for Cristin Project retrieve and search
       },
       'contributors': [
         {
-          'type': 'ProjectManager',
           'identity': {
             'type': 'Person',
             'id': 'https://api.cristin-test.uio.no/v2/persons/515114'
           },
-          'affiliation': {
-            'type': 'Organization',
-            'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
-          }
+          'roles': [
+            'type': 'ProjectManager',
+            'affiliation': {
+              'type': 'Organization',
+              'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+            }
+          ]
         }
       ]
     }
@@ -49,15 +51,17 @@ Feature: API tests for Cristin Project retrieve and search
       },
       'contributors': [
         {
-          'type': 'ProjectManager',
           'identity': {
             'type': 'Person',
             'id': 'https://api.cristin-test.uio.no/v2/persons/515114'
           },
-          'affiliation': {
-            'type': 'Organization',
-            'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
-          }
+          'roles': [
+            'type': 'ProjectManager',
+            'affiliation': {
+              'type': 'Organization',
+              'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+            }
+          ]
         }
       ]
     }
@@ -75,15 +79,17 @@ Feature: API tests for Cristin Project retrieve and search
       },
       'contributors': [
         {
-          'type': 'IllegalValue',
           'identity': {
             'type': 'Person',
             'id': 'https://api.cristin-test.uio.no/v2/persons/515114'
           },
-          'affiliation': {
-            'type': 'Organization',
-            'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
-          }
+          'roles': [
+            'type': 'IllegalValue',
+            'affiliation': {
+              'type': 'Organization',
+              'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+            }
+          ]
         }
       ]
     }
