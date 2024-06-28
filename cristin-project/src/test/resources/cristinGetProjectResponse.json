@@ -74,6 +74,21 @@
               "en": "Medical Department"
             }
           }
+        },
+        {
+          "role_code": "PRO_PARTICIPANT",
+          "institution": {
+            "cristin_institution_id": "5678",
+            "institution_name": {
+              "en": "University"
+            }
+          },
+          "unit": {
+            "cristin_unit_id": "5678.0.0.0",
+            "unit_name": {
+              "en": "Legal Department"
+            }
+          }
         }
       ]
     },

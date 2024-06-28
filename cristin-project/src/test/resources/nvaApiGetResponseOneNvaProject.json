@@ -32,7 +32,6 @@
   },
   "contributors": [
     {
-      "type": "ProjectManager",
       "identity": {
         "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
         "type": "Person",
@@ -41,16 +40,30 @@
         "email": "ola.nordmann@example.org",
         "phone": "12345678"
       },
-      "affiliation": {
-        "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-        "type": "Organization",
-        "labels": {
-          "en": "Medical Department"
+      "roles": [
+        {
+          "type": "ProjectManager",
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+            "type": "Organization",
+            "labels": {
+              "en": "Medical Department"
+            }
+          }
+        },
+        {
+          "type": "ProjectParticipant",
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/5678.0.0.0",
+            "type": "Organization",
+            "labels": {
+              "en": "Legal Department"
+            }
+          }
         }
-      }
+      ]
     },
     {
-      "type": "LocalProjectManager",
       "identity": {
         "id": "https://api.dev.nva.aws.unit.no/cristin/person/456789",
         "type": "Person",
@@ -59,13 +72,18 @@
         "email": "kari.nordmann@example.org",
         "phone": "12345678"
       },
-      "affiliation": {
-        "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-        "type": "Organization",
-        "labels": {
-          "en": "Medical Department"
+      "roles": [
+        {
+          "type": "LocalProjectManager",
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+            "type": "Organization",
+            "labels": {
+              "en": "Medical Department"
+            }
+          }
         }
-      }
+      ]
     }
   ],
   "status":"ACTIVE",
@@ -148,17 +166,21 @@
     }
   } ],
   "creator": {
-    "type": "ProjectCreator",
     "identity": {
       "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456",
       "type": "Person",
       "firstName": "Ola",
       "lastName": "Nordmann"
     },
-    "affiliation": {
-      "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
-      "type": "Organization"
-    }
+    "roles": [
+      {
+        "type": "ProjectCreator",
+        "affiliation": {
+          "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+          "type": "Organization"
+        }
+      }
+    ]
   },
   "webPage": "https://www.external.url"
 }

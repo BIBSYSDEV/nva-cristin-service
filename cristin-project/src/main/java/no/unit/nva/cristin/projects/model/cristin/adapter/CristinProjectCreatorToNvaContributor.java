@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects.model.cristin.adapter;
 
-import static java.util.Objects.nonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -9,8 +8,7 @@ import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinRole;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 
-public class CristinProjectCreatorToNvaContributor extends CristinPersonToNvaContributorCommon
-    implements Function<CristinPerson, NvaContributor> {
+public class CristinProjectCreatorToNvaContributor implements Function<CristinPerson, NvaContributor> {
 
     public static final String PRO_CREATOR = "PRO_CREATOR";
 
@@ -23,9 +21,9 @@ public class CristinProjectCreatorToNvaContributor extends CristinPersonToNvaCon
         return Optional.ofNullable(creator)
                    .stream()
                    .map(this::addRoleDataIfMissing)
-                   .flatMap(this::generateRoleBasedContribution)
+                   .map(new CristinPersonToNvaContributor())
                    .findAny()
-                   .or(() -> creatorWithoutAffiliation(creator))
+                   .or(() -> creatorWithoutRoles(creator))
                    .orElse(null);
     }
 
@@ -45,16 +43,10 @@ public class CristinProjectCreatorToNvaContributor extends CristinPersonToNvaCon
                    .toList();
     }
 
-    private Optional<NvaContributor> creatorWithoutAffiliation(CristinPerson creator) {
+    private Optional<NvaContributor> creatorWithoutRoles(CristinPerson creator) {
         return Optional.ofNullable(creator)
-                   .filter(presentCreator -> nonNull(presentCreator.cristinPersonId()))
-                   .map(this::extractCreatorIdentity);
-    }
-
-    private NvaContributor extractCreatorIdentity(CristinPerson presentCreator) {
-        var creatorWithoutAffiliation = new NvaContributor();
-        creatorWithoutAffiliation.setIdentity(new CristinPersonToPerson().apply(presentCreator));
-        return creatorWithoutAffiliation;
+                   .map(new CristinPersonToPerson())
+                   .map(identity -> new NvaContributor(identity, null));
     }
 
 }

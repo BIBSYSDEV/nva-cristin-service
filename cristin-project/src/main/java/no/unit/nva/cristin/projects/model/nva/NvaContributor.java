@@ -1,55 +1,19 @@
 package no.unit.nva.cristin.projects.model.nva;
 
-import java.util.Objects;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import no.unit.nva.commons.json.JsonSerializable;
-import no.unit.nva.model.Organization;
 
-public class NvaContributor implements JsonSerializable {
+public record NvaContributor(@JsonProperty(IDENTITY) Person identity,
+                             @JsonProperty(ROLES) List<Role> roles) implements JsonSerializable {
 
-    private String type;
-    private Person identity;
-    private Organization affiliation;
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Person getIdentity() {
-        return identity;
-    }
-
-    public void setIdentity(Person identity) {
-        this.identity = identity;
-    }
-
-    public Organization getAffiliation() {
-        return affiliation;
-    }
-
-    public void setAffiliation(Organization affiliation) {
-        this.affiliation = affiliation;
-    }
+    public static final String IDENTITY = "identity";
+    public static final String ROLES = "roles";
 
     @Override
-    public int hashCode() {
-        return Objects.hash(getType(), getIdentity(), getAffiliation());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof NvaContributor that)) {
-            return false;
-        }
-        return Objects.equals(getType(), that.getType())
-               && Objects.equals(getIdentity(), that.getIdentity())
-               && Objects.equals(getAffiliation(), that.getAffiliation());
+    public List<Role> roles() {
+        return nonEmptyOrDefault(roles);
     }
 
     @Override

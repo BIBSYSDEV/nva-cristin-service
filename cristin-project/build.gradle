@@ -15,6 +15,7 @@ dependencies {
     testImplementation libs.karate.junit5
     testImplementation libs.nva.logutils
     testImplementation libs.log4j.core
+    testImplementation libs.json.assert
 
     testImplementation project(":cristin-testing")
 }
