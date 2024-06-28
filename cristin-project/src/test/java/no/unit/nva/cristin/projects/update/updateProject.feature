@@ -23,11 +23,19 @@ Feature: API tests for Cristin Project Update
       },
       'contributors': [
         {
-          'type': 'ProjectManager',
           'identity': {
             'type': 'Person',
             'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684652'
-          }
+          },
+          'roles' : [
+            {
+              'type': 'ProjectManager',
+              'affiliation': {
+                'type' : 'Organization',
+                'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+              }
+            ]
+          ]
         }
       ],
       'funding': [
