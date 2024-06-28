@@ -205,11 +205,15 @@ Feature: API tests for creating sample Cristin Projects
       },
       'contributors': [
         {
-          'type': 'ProjectManager',
           'identity': {
             'type': 'Person',
             'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684651'
-          }
+          },
+          'roles': [
+            {
+              'type': 'ProjectManager'
+            }
+          ]
         }
       ]
     }
