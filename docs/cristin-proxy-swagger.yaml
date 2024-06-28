@@ -2670,9 +2670,14 @@ components:
           items:
             type: object
             description: One contributor
+            required:
+              - identity
+              - roles
             properties:
               identity:
                 type: object
+                required:
+                  - id
                 properties:
                   id:
                     $ref: '#/components/schemas/Id'
@@ -2698,9 +2703,12 @@ components:
                     description: Phone number
               roles:
                 type: array
+                minItems: 1
                 description: Roles with affiliation of contributor
                 items:
                   type: object
+                  required:
+                    - type
                   properties:
                     type:
                       type: string
