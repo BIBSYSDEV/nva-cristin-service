@@ -29,10 +29,12 @@ Feature: API tests for Cristin Project retrieve and search
             'id': 'https://api.cristin-test.uio.no/v2/persons/515114'
           },
           'roles': [
-            'type': 'ProjectManager',
-            'affiliation': {
-              'type': 'Organization',
-              'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+            {
+              'type': 'ProjectManager',
+              'affiliation': {
+                'type': 'Organization',
+                'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+              }
             }
           ]
         }
@@ -56,10 +58,12 @@ Feature: API tests for Cristin Project retrieve and search
             'id': 'https://api.cristin-test.uio.no/v2/persons/515114'
           },
           'roles': [
-            'type': 'ProjectManager',
-            'affiliation': {
-              'type': 'Organization',
-              'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+            {
+              'type': 'ProjectManager',
+              'affiliation': {
+                'type': 'Organization',
+                'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+              }
             }
           ]
         }
@@ -84,10 +88,12 @@ Feature: API tests for Cristin Project retrieve and search
             'id': 'https://api.cristin-test.uio.no/v2/persons/515114'
           },
           'roles': [
-            'type': 'IllegalValue',
-            'affiliation': {
-              'type': 'Organization',
-              'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+            {
+              'type': 'IllegalValue',
+              'affiliation': {
+                'type': 'Organization',
+                'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+              }
             }
           ]
         }
