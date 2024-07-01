@@ -71,5 +71,5 @@ jobs:
         run: |
           aws s3 rm s3://$NvaCristinIntermediateStorageBucketName --recursive
         # Delete stack after running tests
-      - name: Delete stack after running tests
-        run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}
+      #- name: Delete stack after running tests
+        #run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}

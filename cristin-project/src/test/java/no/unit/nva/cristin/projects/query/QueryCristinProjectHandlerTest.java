@@ -100,6 +100,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.zalando.problem.Problem;
 
 
@@ -176,13 +178,11 @@ class QueryCristinProjectHandlerTest {
         handler = new QueryCristinProjectHandler(clientProvider, environment);
     }
 
-    @ParameterizedTest
-    @MethodSource("queryResponseWithFundingFileReader")
-    void handlerReturnsExpectedBodyWhenRequestInputIsValid(String expected) throws IOException {
+    @Test
+    void handlerReturnsExpectedBodyWhenRequestInputIsValid() throws Exception {
         var actual = sendDefaultQuery().getBody();
-        final var expectedSearchResponse = OBJECT_MAPPER.readValue(expected, SearchResponse.class);
-        final var actualSearchResponse = OBJECT_MAPPER.readValue(actual, SearchResponse.class);
-        assertEquals(expectedSearchResponse, actualSearchResponse);
+
+        JSONAssert.assertEquals(API_QUERY_RESPONSE_JSON, actual, JSONCompareMode.NON_EXTENSIBLE);
     }
 
     @Test
@@ -770,7 +770,7 @@ class QueryCristinProjectHandlerTest {
             OBJECT_MAPPER.convertValue(gatewayResponse.getBodyObject(SearchResponse.class).getHits(),
                                        new TypeReference<>() {});
 
-        var creatorPersonId = responseHits.get(0).getCreator().getIdentity().getId().toString();
+        var creatorPersonId = responseHits.get(0).getCreator().identity().getId().toString();
 
         assertThat(creatorPersonId, containsString(CREATOR_IDENTIFIER));
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
@@ -1067,10 +1067,6 @@ class QueryCristinProjectHandlerTest {
 
     private String getBodyFromResource(String resource) {
         return IoUtils.stringFromResources(Path.of(resource));
-    }
-
-    private static Stream<? extends Arguments> queryResponseWithFundingFileReader() {
-        return Stream.of(Arguments.of(API_QUERY_RESPONSE_JSON));
     }
 
     private HttpResponse<String> dummyFacetHttpResponse() {

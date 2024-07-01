@@ -55,6 +55,7 @@ import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.projects.model.nva.Role;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.model.DateInfo;
 import no.unit.nva.model.Organization;
@@ -74,7 +75,6 @@ class CreateCristinProjectHandlerTest {
 
     public static final String NO_ACCESS = "NoAccess";
     public static final String ILLEGAL_CONTRIBUTOR_ROLE = "illegalContributorRole";
-    public static final int FIRST_CONTRIBUTOR = 0;
     public static final String INVALIDVALUE = "INVALIDVALUE";
     public static final String API_REQUEST_ONE_NVA_PROJECT_JSON = "nvaApiPostRequestOneProject.json";
     public static final String CLINICAL_TRIAL_PHASE_JSON_FIELD = "\"clinicalTrialPhase\": \"%s\"";
@@ -194,8 +194,7 @@ class CreateCristinProjectHandlerTest {
     @Test
     void shouldReturn400BadRequestWhenIllegalRoleValueInInput() throws Exception {
         var randomNvaProject = randomNvaProject();
-        randomNvaProject.getContributors().get(FIRST_CONTRIBUTOR).setType(ILLEGAL_CONTRIBUTOR_ROLE);
-
+        randomNvaProject.setContributors(List.of(nvaContributorWithRole(ILLEGAL_CONTRIBUTOR_ROLE)));
         var response = executeRequest(randomNvaProject);
 
         assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_BAD_REQUEST));
@@ -250,8 +249,8 @@ class CreateCristinProjectHandlerTest {
         assertThat(actualOrganization, equalTo(expectedOrganization));
         assertThat(actualIdentifierFromOrganization(actualOrganization), equalTo(SOME_UNIT_IDENTIFIER));
 
-        var actualAffiliation = actual.getContributors().get(0).getAffiliation();
-        var expectedAffiliation = request.getContributors().get(0).getAffiliation();
+        var actualAffiliation = actual.getContributors().get(0).roles().get(0).affiliation();
+        var expectedAffiliation = request.getContributors().get(0).roles().get(0).affiliation();
         assertThat(actualAffiliation, equalTo(expectedAffiliation));
         assertThat(actualIdentifierFromOrganization(actualAffiliation), equalTo(SOME_UNIT_IDENTIFIER));
     }
@@ -265,10 +264,9 @@ class CreateCristinProjectHandlerTest {
         assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
 
         var actual = response.getBodyObject(NvaProject.class);
+        var actualAffiliation = actual.getContributors().get(0).roles().get(0).affiliation();
 
-        var actualAffiliation = actual.getContributors().get(0).getAffiliation();
-        var expectedAffiliation = request.getContributors().get(0).getAffiliation();
-        assertThat(actualAffiliation, equalTo(expectedAffiliation));
+        assertThat(actualAffiliation, equalTo(null));
     }
 
     @Test
@@ -441,8 +439,8 @@ class CreateCristinProjectHandlerTest {
         var capturedNvaProject = captor.getValue();
         var creator = capturedNvaProject.getCreator();
 
-        assertThat(creator.getIdentity().getId(), equalTo(CRISTIN_PERSON_ID));
-        assertThat(creator.getAffiliation().getId(), equalTo(CRISTIN_ORG_ID));
+        assertThat(creator.identity().getId(), equalTo(CRISTIN_PERSON_ID));
+        assertThat(creator.roles().get(0).affiliation().getId(), equalTo(CRISTIN_ORG_ID));
     }
 
     @Test
@@ -599,11 +597,10 @@ class CreateCristinProjectHandlerTest {
     }
 
     private NvaContributor nvaContributorWithRole(String roleCode) {
-        var contributorOne = new NvaContributor();
-        contributorOne.setType(roleCode);
-        contributorOne.setIdentity(randomPerson());
-        contributorOne.setAffiliation(randomOrganization());
-        return contributorOne;
+        var identity = randomPerson();
+        var roles = List.of(new Role(roleCode, randomOrganization()));
+
+        return new NvaContributor(identity, roles);
     }
 
     private boolean hasRole(CristinProject capturedCristinProject, String roleCode) {

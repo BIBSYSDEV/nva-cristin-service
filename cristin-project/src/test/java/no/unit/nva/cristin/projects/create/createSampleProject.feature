@@ -30,36 +30,55 @@ Feature: API tests for creating sample Cristin Projects
       },
       'contributors': [
         {
-          'type': 'ProjectManager',
           'identity': {
             'type': 'Person',
             'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684651'
           },
-          'affiliation': {
-            'type': 'Organization',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
-          }
+          'roles': [
+            {
+              'type': 'ProjectManager',
+              'affiliation': {
+                'type': 'Organization',
+                'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
+              }
+            },
+            {
+              'type': 'ProjectParticipant',
+              'affiliation': {
+                'type': 'Organization',
+                'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+              }
+            }
+          ]
         },
         {
-          'type': 'ProjectParticipant',
           'identity': {
             'type': 'Person',
             'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684652'
           },
-          'affiliation': {
-            'type': 'Organization',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
-          }
+          'roles': [
+            {
+              'type': 'ProjectParticipant',
+              'affiliation': {
+                'type': 'Organization',
+                'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
+              }
+            }
+          ]
         },
         {
-          'type': 'ProjectParticipant',
           'identity': {
             'type': 'Person',
             'email': 'nameless@example.org',
             'phone': '12345678',
             'firstName':'name',
             'lastName':'less'
-          }
+          },
+          'roles': [
+            {
+              'type': 'ProjectParticipant'
+            }
+          ]
         }
       ],
       'academicSummary': {
@@ -170,6 +189,7 @@ Feature: API tests for creating sample Cristin Projects
     And match response.keywords == '#[2]'
     And match response.externalSources == '#[1]'
     And match response.funding == '#[1]'
+    And match response.contributors == '#[3]'
     And print response
 
   Scenario: Creating project with only minimum required data returns 201 Created
@@ -185,11 +205,15 @@ Feature: API tests for creating sample Cristin Projects
       },
       'contributors': [
         {
-          'type': 'ProjectManager',
           'identity': {
             'type': 'Person',
             'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684651'
-          }
+          },
+          'roles': [
+            {
+              'type': 'ProjectManager'
+            }
+          ]
         }
       ]
     }

@@ -57,14 +57,16 @@ public class UpdateProjectResourceAccessCheck extends ProjectResourceAccessCheck
                    .flatMap(Collection::stream)
                    .filter(this::isProjectManager)
                    .findAny()
-                   .map(NvaContributor::getIdentity)
+                   .map(NvaContributor::identity)
                    .map(Person::getId)
                    .map(UriUtils::extractLastPathElement)
                    .filter(Utils::isPositiveInteger);
     }
 
     private boolean isProjectManager(NvaContributor nvaContributor) {
-        return PROJECT_MANAGER_ROLE_CODE.equals(nvaContributor.getType());
+        return nvaContributor.roles()
+                   .stream()
+                   .anyMatch(role -> PROJECT_MANAGER_ROLE_CODE.equals(role.type()));
     }
 
 }

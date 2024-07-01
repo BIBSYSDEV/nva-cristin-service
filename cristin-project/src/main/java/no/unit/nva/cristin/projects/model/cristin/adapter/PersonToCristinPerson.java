@@ -8,7 +8,7 @@ import java.util.function.Function;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.projects.model.nva.Person;
 
-public class PersonToCristinPersonWithoutRoles implements Function<Person, CristinPerson> {
+public class PersonToCristinPerson implements Function<Person, CristinPerson> {
 
     @Override
     public CristinPerson apply(Person person) {

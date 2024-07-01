@@ -9,18 +9,40 @@
   },
   "contributors": [
     {
-      "type": "ProjectManager",
       "identity": {
         "type": "Person",
         "id": "https://api.dev.nva.aws.unit.no/cristin/person/538786"
-      }
+      },
+      "roles": [
+        {
+          "type": "ProjectManager",
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/1234.0.0.0",
+            "type": "Organization",
+            "name": {
+              "en": "Medical Department"
+            }
+          }
+        }
+      ]
     },
     {
-      "type": "LocalProjectManager",
       "identity": {
         "type": "Person",
         "id": "https://api.dev.nva.aws.unit.no/cristin/person/123456"
-      }
+      },
+      "roles": [
+        {
+          "type": "LocalProjectManager",
+          "affiliation": {
+            "id": "https://api.dev.nva.aws.unit.no/cristin/organization/5678.0.0.0",
+            "type": "Organization",
+            "name": {
+              "en": "Legal Department"
+            }
+          }
+        }
+      ]
     }
   ],
   "funding": [

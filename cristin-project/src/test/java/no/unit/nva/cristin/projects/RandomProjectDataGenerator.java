@@ -4,6 +4,7 @@ import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
 import no.unit.nva.cristin.projects.model.nva.ApplicationCode;
 import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.ApprovalAuthority;
+import no.unit.nva.cristin.projects.model.nva.Role;
 import no.unit.nva.model.ApprovalStatus;
 import no.unit.nva.cristin.projects.model.nva.ContactInfo;
 import no.unit.nva.model.DateInfo;
@@ -214,11 +215,10 @@ public class RandomProjectDataGenerator {
     }
 
     private static NvaContributor randomContributor() {
-        NvaContributor contributor = new NvaContributor();
-        contributor.setAffiliation(randomOrganization());
-        contributor.setIdentity(randomPerson());
-        contributor.setType(randomContributorType());
-        return contributor;
+        var identity = randomPerson();
+        var roles = List.of(new Role(randomContributorType(), randomOrganization()));
+
+        return new NvaContributor(identity, roles);
     }
 
     private static String randomContributorType() {
@@ -278,21 +278,20 @@ public class RandomProjectDataGenerator {
      * Creates a random contributor with unit affiliation.
      */
     public static NvaContributor randomContributorWithUnitAffiliation() {
-        NvaContributor contributor = new NvaContributor();
-        contributor.setAffiliation(someOrganizationFromUnitIdentifier());
-        contributor.setIdentity(randomPerson());
-        contributor.setType(randomContributorType());
-        return contributor;
+        var identity = randomPerson();
+        var roles = List.of(new Role(randomContributorType(), someOrganizationFromUnitIdentifier()));
+
+        return new NvaContributor(identity, roles);
     }
 
     /**
      * Creates a random contributor without unit affiliation.
      */
     public static NvaContributor randomContributorWithoutUnitAffiliation() {
-        NvaContributor contributor = new NvaContributor();
-        contributor.setIdentity(randomPerson());
-        contributor.setType(randomContributorType());
-        return contributor;
+        var identity = randomPerson();
+        var roles = List.of(new Role(randomContributorType(), null));
+
+        return new NvaContributor(identity, roles);
     }
 
     /**
