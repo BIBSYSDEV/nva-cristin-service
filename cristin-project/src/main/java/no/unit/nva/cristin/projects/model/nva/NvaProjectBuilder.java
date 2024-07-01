@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import nva.commons.core.paths.UriWrapper;
 
 import static java.util.Collections.emptyList;
+import static java.util.function.Predicate.not;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.model.Constants.TYPE;
 import static no.unit.nva.cristin.model.Constants.VALUE;
@@ -93,7 +94,7 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
     private List<Map<String, String>> createCristinIdentifier() {
         return Optional.ofNullable(cristinProject.getCristinProjectId())
                    .map(this::mapOfCristinIdentifier)
-                   .filter(this::hasData)
+                   .filter(not(Map::isEmpty))
                    .stream()
                    .toList();
     }
@@ -113,7 +114,7 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
     private List<Map<String, String>> extractAlternativeTitles() {
         return Optional.ofNullable(cristinProject.getTitle())
                    .map(this::removeMainTitle)
-                   .filter(this::hasData)
+                   .filter(not(Map::isEmpty))
                    .stream()
                    .toList();
     }
@@ -121,10 +122,6 @@ public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
     private Map<String, String> removeMainTitle(Map<String, String> titles) {
         titles.remove(cristinProject.getMainLanguage());
         return titles;
-    }
-
-    private boolean hasData(Map<String, String> titles) {
-        return !titles.isEmpty();
     }
 
     private List<Funding> extractFunding() {
