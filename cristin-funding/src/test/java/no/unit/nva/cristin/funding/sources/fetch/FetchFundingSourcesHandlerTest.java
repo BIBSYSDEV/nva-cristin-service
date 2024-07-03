@@ -11,7 +11,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.hamcrest.collection.IsMapWithSize.aMapWithSize;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
@@ -94,8 +93,8 @@ public class FetchFundingSourcesHandlerTest {
         var expectedId = URI.create("https://api.sandbox.nva.aws.unit.no/cristin/funding-sources/"
                                     + EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED);
         assertThat(fundingSource.getContext(), is(not(nullValue())));
-        assertThat(fundingSource.getId(), is(equalTo(expectedId)));
-        assertThat(fundingSource.getIdentifier(), is(equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
+        assertThat(fundingSource.id(), is(equalTo(expectedId)));
+        assertThat(fundingSource.identifier(), is(equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
 
         assertNamesArePresentForFundingSource(fundingSource);
     }
@@ -171,7 +170,7 @@ public class FetchFundingSourcesHandlerTest {
 
         var expectedId = URI.create("https://api.sandbox.nva.aws.unit.no/alternate-base-path/funding-sources/"
                                     + EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED);
-        assertThat(fundingSource.getId(), is(equalTo(expectedId)));
+        assertThat(fundingSource.id(), is(equalTo(expectedId)));
     }
 
     @Test
@@ -195,17 +194,17 @@ public class FetchFundingSourcesHandlerTest {
 
         var expectedId = URI.create("https://api.sandbox.nva.aws.unit.no/funding-sources/"
                                     + EXISTING_FUNDING_SOURCE_IDENTIFIER_URL_ENCODED);
-        assertThat(fundingSource.getId(), is(equalTo(expectedId)));
+        assertThat(fundingSource.id(), is(equalTo(expectedId)));
     }
 
     private void assertNamesArePresentForFundingSource(FundingSource fundingSource) {
         var expectedNumberOfLanguagesInName = 3;
-        assertThat(fundingSource.getLabels(), aMapWithSize(expectedNumberOfLanguagesInName));
-        assertThat(fundingSource.getLabels(), hasEntry(equalTo("en"),
-                                                     equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
-        assertThat(fundingSource.getLabels(), hasEntry(equalTo("nn"),
-                                                     equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
-        assertThat(fundingSource.getLabels(), hasEntry(equalTo("nb"),
-                                                     equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
+        assertThat(fundingSource.labels(), aMapWithSize(expectedNumberOfLanguagesInName));
+        assertThat(fundingSource.labels(), hasEntry(equalTo("en"),
+                                                    equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
+        assertThat(fundingSource.labels(), hasEntry(equalTo("nn"),
+                                                    equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
+        assertThat(fundingSource.labels(), hasEntry(equalTo("nb"),
+                                                    equalTo(EXISTING_FUNDING_SOURCE_IDENTIFIER)));
     }
 }
