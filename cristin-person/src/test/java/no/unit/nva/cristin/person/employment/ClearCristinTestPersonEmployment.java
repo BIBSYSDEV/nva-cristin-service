@@ -32,7 +32,7 @@ public class ClearCristinTestPersonEmployment {
     }
 
     private static void deleteEmployment(String personId, Employment employment) {
-        String employmentId = extractLastPathElement(employment.getId());
+        var employmentId = extractLastPathElement(employment.getId());
         if (notValidIdentifiers(personId, employmentId)) {
             logger.error(ERROR_NOT_VALID_IDENTIFIERS, personId, employmentId);
             return;
