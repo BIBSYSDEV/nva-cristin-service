@@ -1,6 +1,5 @@
 package no.unit.nva.biobank.model.cristin.adapter;
 
-import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.model.Constants.FHI_BIOBANK_REGISTRY;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
@@ -59,29 +58,35 @@ public class CristinBiobankToBiobank implements Function<CristinBiobank, Biobank
 
     private List<Map<String, String>> toCristinIdentifier(CristinBiobank cristinBiobank) {
 
-        var cristinBiobankIdOrNull = nonNull(cristinBiobank.cristinBiobankId())
-                                         ? Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE,
-                                                  VALUE, cristinBiobank.cristinBiobankId())
-                                         : null;
+        var cristinBiobankIdOrNull = Optional.ofNullable(cristinBiobank.cristinBiobankId())
+                                         .map(this::mapOfCristinBiobankId)
+                                         .orElse(null);
 
-        var biobankIdOrNull = nonNull(cristinBiobank.biobankId())
-                                  ? Map.of(TYPE, FHI_BIOBANK_REGISTRY,
-                                           VALUE, cristinBiobank.biobankId())
-                                  : null;
+        var biobankIdOrNull = Optional.ofNullable(cristinBiobank.biobankId())
+                                  .map(this::mapOfFhiBiobankId)
+                                  .orElse(null);
 
         return Stream.of(cristinBiobankIdOrNull, biobankIdOrNull)
                    .filter(Objects::nonNull)
                    .toList();
     }
 
+    private Map<String, String> mapOfCristinBiobankId(String biobankId) {
+        return Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE,
+                      VALUE, biobankId);
+    }
+
+    private Map<String, String> mapOfFhiBiobankId(String biobankId) {
+        return Map.of(TYPE, FHI_BIOBANK_REGISTRY,
+                      VALUE, biobankId);
+    }
 
     private URI toCoordinatingUnit(CristinOrganization cristinOrganization) {
-        return
-            Optional.ofNullable(cristinOrganization)
-                .map(CristinOrganization::getInstitutionUnit)
-                .map(CristinUnit::getCristinUnitId)
-                .map(unitId -> getNvaApiId(unitId, ORGANIZATION_PATH))
-                .orElse(null);
+        return Optional.ofNullable(cristinOrganization)
+                   .map(CristinOrganization::getInstitutionUnit)
+                   .map(CristinUnit::getCristinUnitId)
+                   .map(unitId -> getNvaApiId(unitId, ORGANIZATION_PATH))
+                   .orElse(null);
     }
 
     private Set<ExternalSource> toExternalSources(Set<CristinExternalSource> externalSources) {
@@ -91,26 +96,27 @@ public class CristinBiobankToBiobank implements Function<CristinBiobank, Biobank
     }
 
     private List<BiobankApproval> toApprovals(List<CristinApproval> approvals) {
-        return
-            approvals.stream()
-                .map(BiobankApproval::new)
-                .toList();
+        return approvals.stream()
+                   .map(BiobankApproval::new)
+                   .toList();
     }
 
     private List<TypedLabel> toBiobankMaterials(List<CristinBiobankMaterial> materials) {
-        return
-            materials.stream()
-                .map(item -> new TypedLabel(item.materialCode(), item.materialName()))
-                .toList();
+        return materials.stream()
+                   .map(item -> new TypedLabel(item.materialCode(), item.materialName()))
+                   .toList();
     }
 
     private AssociatedProject toProjectOrNull(CristinBiobank cristinBiobank) {
-        return nonNull(cristinBiobank.associatedProject())
-                   ? new AssociatedProject(cristinBiobank.associatedProject()) : null;
+        return Optional.ofNullable(cristinBiobank.associatedProject())
+                   .map(AssociatedProject::new)
+                   .orElse(null);
     }
 
-    private DateInfo toDateInfoOrNull(CristinDateInfo cristinBiobank) {
-        return nonNull(cristinBiobank) ? cristinBiobank.toDateInfo() : null;
+    private DateInfo toDateInfoOrNull(CristinDateInfo cristinDateInfo) {
+        return Optional.ofNullable(cristinDateInfo)
+                   .map(CristinDateInfo::toDateInfo)
+                   .orElse(null);
     }
 
 }
