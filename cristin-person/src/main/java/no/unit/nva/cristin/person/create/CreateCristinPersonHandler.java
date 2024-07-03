@@ -124,7 +124,7 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     }
 
     private Set<String> extractIdentifiers(Set<TypedValue> typedValues) {
-        return Optional.ofNullable(typedValues).orElse(Collections.emptySet()).stream().map(TypedValue::getType)
+        return Optional.ofNullable(typedValues).orElse(Collections.emptySet()).stream().map(TypedValue::type)
             .collect(Collectors.toSet());
     }
 
@@ -137,8 +137,8 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
 
     private Optional<String> extractIdentificationNumber(Set<TypedValue> identifiers) {
         return identifiers.stream().filter(TypedValue::hasData)
-            .filter(elm -> NATIONAL_IDENTITY_NUMBER.equals(elm.getType()))
-            .map(TypedValue::getValue).findFirst();
+            .filter(elm -> NATIONAL_IDENTITY_NUMBER.equals(elm.type()))
+            .map(TypedValue::value).findFirst();
     }
 
     private boolean identificationNumberIsValid(String number) {
@@ -146,7 +146,7 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     }
 
     private void validateNoDuplicateNationalIdentifiers(Set<TypedValue> identifiers) throws BadRequestException {
-        if (identifiers.stream().map(TypedValue::getType)
+        if (identifiers.stream().map(TypedValue::type)
                 .filter(NATIONAL_IDENTITY_NUMBER::equals)
                 .toList()
                 .size() > MAX_NATIONAL_IDENTITY_NUMBER_COUNT) {

@@ -60,7 +60,7 @@ public class FetchPictureHandlerTest {
     void shouldReturnPictureFromResponse() throws Exception {
         var response = sendQuery();
         var responseBody = response.getBodyObject(Binary.class);
-        var responseAsBytes = Base64.getDecoder().decode(responseBody.getBase64Data());
+        var responseAsBytes = Base64.getDecoder().decode(responseBody.base64Data());
 
         assertThat(response.getStatusCode(), equalTo(HTTP_OK));
         assertThat(responseAsBytes.length, equalTo(PICTURE_SIZE_IN_BYTES));
