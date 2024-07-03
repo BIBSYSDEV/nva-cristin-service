@@ -64,7 +64,7 @@ public class PositionCodesHandlerTest {
         when(mockHttpClient.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_STRING, 200));
         apiClient = new CristinPositionCodesClient(mockHttpClient);
         handler = new PositionCodesHandler(apiClient, environment);
-        GatewayResponse<PositionCodes> gatewayResponse = sendQuery(null);
+        var gatewayResponse = sendQuery(null);
 
         assertEquals(HttpURLConnection.HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -109,7 +109,7 @@ public class PositionCodesHandlerTest {
 
     private boolean isAllPositionCodesShouldBeInRequestedStatus(boolean expectedPositionStatus,
                                                                 List<PositionCode> actualHits) {
-        return actualHits.stream().allMatch(position -> position.isEnabled() == expectedPositionStatus);
+        return actualHits.stream().allMatch(position -> position.enabled() == expectedPositionStatus);
     }
 
     private GatewayResponse<PositionCodes> sendQuery(Map<String, String> queryParams) throws IOException {
@@ -133,7 +133,7 @@ public class PositionCodesHandlerTest {
     }
 
     private CristinPositionCode getOneCode() {
-        CristinPositionCode oneCode = new CristinPositionCode();
+        var oneCode = new CristinPositionCode();
         oneCode.setCode("123");
         oneCode.setName(Map.of("en", "Consultant"));
         oneCode.setEnabled(true);
@@ -141,7 +141,7 @@ public class PositionCodesHandlerTest {
     }
 
     private CristinPositionCode getAnotherCode() {
-        CristinPositionCode anotherCode = new CristinPositionCode();
+        var anotherCode = new CristinPositionCode();
         anotherCode.setCode("567");
         anotherCode.setName(Map.of("en", "Janitor", "nb", "Vaktmester"));
         anotherCode.setEnabled(false);
