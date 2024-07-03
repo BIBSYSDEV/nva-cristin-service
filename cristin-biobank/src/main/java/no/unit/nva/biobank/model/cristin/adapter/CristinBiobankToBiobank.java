@@ -38,35 +38,35 @@ public class CristinBiobankToBiobank implements Function<CristinBiobank, Biobank
     @Override
     public Biobank apply(CristinBiobank cristinBiobank) {
         return new Biobank(
-            getNvaApiId(cristinBiobank.getCristinBiobankId(), BIOBANK_ID),
+            getNvaApiId(cristinBiobank.cristinBiobankId(), BIOBANK_ID),
             toCristinIdentifier(cristinBiobank),
-            BiobankType.valueOf(cristinBiobank.getType()),
-            cristinBiobank.getName(),
-            cristinBiobank.getMainLanguage(),
-            cristinBiobank.getStoreUntilDate(),
-            cristinBiobank.getStartDate(),
-            cristinBiobank.getStatus(),
-            toDateInfoOrNull(cristinBiobank.getCreated()),
-            toDateInfoOrNull(cristinBiobank.getLastModified()),
-            toCoordinatingUnit(cristinBiobank.getCoordinatingInstitution()),
-            getNvaApiId(cristinBiobank.getCoordinator().cristinPersonId(), PERSON_PATH_NVA),
+            BiobankType.valueOf(cristinBiobank.type()),
+            cristinBiobank.name(),
+            cristinBiobank.mainLanguage(),
+            cristinBiobank.storeUntilDate(),
+            cristinBiobank.startDate(),
+            cristinBiobank.status(),
+            toDateInfoOrNull(cristinBiobank.created()),
+            toDateInfoOrNull(cristinBiobank.lastModified()),
+            toCoordinatingUnit(cristinBiobank.coordinatingInstitution()),
+            getNvaApiId(cristinBiobank.coordinator().cristinPersonId(), PERSON_PATH_NVA),
             toProjectOrNull(cristinBiobank),
-            toExternalSources(cristinBiobank.getExternalSources()),
-            toApprovals(cristinBiobank.getApprovals()),
-            toBiobankMaterials(cristinBiobank.getBiobankMaterials())
+            toExternalSources(cristinBiobank.externalSources()),
+            toApprovals(cristinBiobank.approvals()),
+            toBiobankMaterials(cristinBiobank.biobankMaterials())
         );
     }
 
     private List<Map<String, String>> toCristinIdentifier(CristinBiobank cristinBiobank) {
 
-        var cristinBiobankIdOrNull = nonNull(cristinBiobank.getCristinBiobankId())
+        var cristinBiobankIdOrNull = nonNull(cristinBiobank.cristinBiobankId())
                                          ? Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE,
-                                                  VALUE, cristinBiobank.getCristinBiobankId())
+                                                  VALUE, cristinBiobank.cristinBiobankId())
                                          : null;
 
-        var biobankIdOrNull = nonNull(cristinBiobank.getBiobankId())
+        var biobankIdOrNull = nonNull(cristinBiobank.biobankId())
                                   ? Map.of(TYPE, FHI_BIOBANK_REGISTRY,
-                                           VALUE, cristinBiobank.getBiobankId())
+                                           VALUE, cristinBiobank.biobankId())
                                   : null;
 
         return Stream.of(cristinBiobankIdOrNull, biobankIdOrNull)
@@ -100,13 +100,13 @@ public class CristinBiobankToBiobank implements Function<CristinBiobank, Biobank
     private List<TypedLabel> toBiobankMaterials(List<CristinBiobankMaterial> materials) {
         return
             materials.stream()
-                .map(item -> new TypedLabel(item.getMaterialCode(),item.getMaterialName()))
+                .map(item -> new TypedLabel(item.materialCode(), item.materialName()))
                 .toList();
     }
 
     private AssociatedProject toProjectOrNull(CristinBiobank cristinBiobank) {
-        return nonNull(cristinBiobank.getAssociatedProject())
-                   ? new AssociatedProject(cristinBiobank.getAssociatedProject()) : null;
+        return nonNull(cristinBiobank.associatedProject())
+                   ? new AssociatedProject(cristinBiobank.associatedProject()) : null;
     }
 
     private DateInfo toDateInfoOrNull(CristinDateInfo cristinBiobank) {
