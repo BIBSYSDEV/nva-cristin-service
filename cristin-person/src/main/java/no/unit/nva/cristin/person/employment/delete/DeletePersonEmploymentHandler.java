@@ -52,9 +52,11 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
     protected Void processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         validateHasAccessRights(requestInfo);
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-        String personId = getValidPersonId(requestInfo);
-        String employmentId = getValidEmploymentId(requestInfo);
-        return apiClient.deletePersonEmployment(personId, employmentId,
+        var personId = getValidPersonId(requestInfo);
+        var employmentId = getValidEmploymentId(requestInfo);
+
+        return apiClient.deletePersonEmployment(personId,
+                                                employmentId,
                                                 extractCristinInstitutionIdentifier(requestInfo));
     }
 

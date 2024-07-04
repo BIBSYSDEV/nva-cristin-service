@@ -43,10 +43,9 @@ public class PositionCodes implements JsonSerializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PositionCodes)) {
+        if (!(o instanceof PositionCodes that)) {
             return false;
         }
-        PositionCodes that = (PositionCodes) o;
         return Objects.equals(getContext(), that.getContext())
             && getPositions().equals(that.getPositions());
     }

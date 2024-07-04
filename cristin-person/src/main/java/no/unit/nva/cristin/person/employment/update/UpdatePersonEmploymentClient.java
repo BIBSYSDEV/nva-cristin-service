@@ -11,7 +11,6 @@ import static no.unit.nva.cristin.person.employment.Constants.EMPLOYMENT_PATH_CR
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import no.unit.nva.cristin.common.client.PatchApiClient;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.paths.UriWrapper;
@@ -32,8 +31,8 @@ public class UpdatePersonEmploymentClient extends PatchApiClient {
                                                 String cristinInstitutionNumber)
         throws ApiGatewayException {
 
-        URI uri = generateCristinUri(personId, employmentId);
-        HttpResponse<String> response = patch(uri, request.toString(), cristinInstitutionNumber);
+        var uri = generateCristinUri(personId, employmentId);
+        var response = patch(uri, request.toString(), cristinInstitutionNumber);
         checkPatchHttpStatusCode(generateIdUri(personId, employmentId), response.statusCode(), response.body());
 
         return null;

@@ -5,7 +5,6 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAY
 import static no.unit.nva.cristin.common.ErrorMessages.invalidFieldParameterMessage;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.TYPE;
-import java.util.Optional;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.utils.UriUtils;
@@ -29,14 +28,14 @@ public class CreatePersonEmploymentValidator {
     }
 
     private static void validatePositionCode(Employment input) throws BadRequestException {
-        Optional<String> code = Employment.extractPositionCodeFromTypeUri(input.getType());
+        var code = Employment.extractPositionCodeFromTypeUri(input.getType());
         if (code.isEmpty() || code.get().isBlank()) {
             throw new BadRequestException(invalidFieldParameterMessage(TYPE));
         }
     }
 
     private static void validateAffiliation(Employment input) throws BadRequestException {
-        String orgId = UriUtils.extractLastPathElement(input.getOrganization());
+        var orgId = UriUtils.extractLastPathElement(input.getOrganization());
         if (isNull(CristinOrganization.fromIdentifier(orgId))) {
             throw new BadRequestException(invalidFieldParameterMessage(ORGANIZATION));
         }

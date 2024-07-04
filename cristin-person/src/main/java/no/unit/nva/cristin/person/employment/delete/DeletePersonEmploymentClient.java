@@ -39,8 +39,8 @@ public class DeletePersonEmploymentClient extends ApiClient {
      */
     public Void deletePersonEmployment(String personId, String employmentId, String cristinInstitutionNumber)
         throws ApiGatewayException {
-        URI cristinUri = generateCristinUri(personId, employmentId);
-        HttpResponse<String> response = deleteResults(cristinUri, cristinInstitutionNumber);
+        var cristinUri = generateCristinUri(personId, employmentId);
+        var response = deleteResults(cristinUri, cristinInstitutionNumber);
         checkResponse(response.statusCode());
         return null;
     }
@@ -64,10 +64,10 @@ public class DeletePersonEmploymentClient extends ApiClient {
     }
 
     private HttpResponse<String> deleteResults(URI uri, String cristinInstitutionNumber) throws ApiGatewayException {
-        HttpRequest httpRequest = HttpRequest.newBuilder(uri)
-                                      .header(CRISTIN_INSTITUTION_HEADER, cristinInstitutionNumber)
-                                      .DELETE()
-                                      .build();
+        var httpRequest = HttpRequest.newBuilder(uri)
+                              .header(CRISTIN_INSTITUTION_HEADER, cristinInstitutionNumber)
+                              .DELETE()
+                              .build();
         return getSuccessfulResponseOrThrowException(httpRequest);
     }
 }

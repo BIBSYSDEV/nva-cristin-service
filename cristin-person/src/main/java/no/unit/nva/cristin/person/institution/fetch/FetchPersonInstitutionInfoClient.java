@@ -10,7 +10,6 @@ import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonInstitutionInfo;
 import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
@@ -27,16 +26,16 @@ public class FetchPersonInstitutionInfoClient extends ApiClient {
      * Fetches Cristin data from upstream into response object serialized to client.
      */
     public PersonInstitutionInfo generateGetResponse(String personId, String institutionId) throws ApiGatewayException {
-        URI id = generateIdUri(personId, institutionId);
+        var id = generateIdUri(personId, institutionId);
         return fetchCristinData(personId, institutionId).toPersonInstitutionInfo(id);
     }
 
     private CristinPersonInstitutionInfo fetchCristinData(String personId, String orgId)
         throws ApiGatewayException {
 
-        URI cristinUri = generateCristinUri(personId, orgId);
-        HttpResponse<String> response = fetchGetResult(cristinUri);
-        URI idUri = generateIdUri(personId, orgId);
+        var cristinUri = generateCristinUri(personId, orgId);
+        var response = fetchGetResult(cristinUri);
+        var idUri = generateIdUri(personId, orgId);
         checkHttpStatusCode(idUri, response.statusCode(), response.body());
 
         return getDeserializedResponse(response, CristinPersonInstitutionInfo.class);
