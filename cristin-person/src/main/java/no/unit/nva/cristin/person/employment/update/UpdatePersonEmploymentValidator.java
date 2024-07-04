@@ -12,7 +12,6 @@ import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
 import java.time.Instant;
-import java.util.Optional;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.utils.UriUtils;
@@ -40,8 +39,8 @@ public class UpdatePersonEmploymentValidator {
 
     private static void validatePositionCode(ObjectNode input) throws BadRequestException {
         if (input.has(TYPE)) {
-            URI type = parseUriField(input, TYPE);
-            Optional<String> code = Employment.extractPositionCodeFromTypeUri(type);
+            var type = parseUriField(input, TYPE);
+            var code = Employment.extractPositionCodeFromTypeUri(type);
             if (code.isEmpty() || code.get().isBlank()) {
                 throw new BadRequestException(invalidFieldParameterMessage(TYPE));
             }
@@ -50,8 +49,8 @@ public class UpdatePersonEmploymentValidator {
 
     private static void validateAffiliation(ObjectNode input) throws BadRequestException {
         if (input.has(ORGANIZATION)) {
-            URI organization = parseUriField(input, ORGANIZATION);
-            String orgId = UriUtils.extractLastPathElement(organization);
+            var organization = parseUriField(input, ORGANIZATION);
+            var orgId = UriUtils.extractLastPathElement(organization);
             if (isNull(CristinOrganization.fromIdentifier(orgId))) {
                 throw new BadRequestException(invalidFieldParameterMessage(ORGANIZATION));
             }

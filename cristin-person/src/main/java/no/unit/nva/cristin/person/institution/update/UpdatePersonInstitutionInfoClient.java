@@ -12,7 +12,6 @@ import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import no.unit.nva.cristin.common.client.PatchApiClient;
 import no.unit.nva.cristin.person.model.nva.PersonInstInfoPatch;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -33,9 +32,9 @@ public class UpdatePersonInstitutionInfoClient extends PatchApiClient {
     public String updatePersonInstitutionInfoInCristin(String personId, String orgId, PersonInstInfoPatch request)
         throws ApiGatewayException {
 
-        String payload = generatePayloadFromRequest(request);
-        URI uri = generateCristinUri(personId, orgId);
-        HttpResponse<String> response = patch(uri, payload);
+        var payload = generatePayloadFromRequest(request);
+        var uri = generateCristinUri(personId, orgId);
+        var response = patch(uri, payload);
         checkPatchHttpStatusCode(generateIdUri(personId, orgId), response.statusCode(), response.body());
 
         return EMPTY_JSON;

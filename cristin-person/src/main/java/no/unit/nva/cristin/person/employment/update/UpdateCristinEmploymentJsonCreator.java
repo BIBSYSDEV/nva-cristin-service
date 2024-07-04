@@ -59,8 +59,8 @@ public class UpdateCristinEmploymentJsonCreator {
 
     private void addAffiliation() {
         if (input.has(ORGANIZATION)) {
-            String orgId = getOrgId();
-            ObjectNode institutionOrUnit = OBJECT_MAPPER.createObjectNode();
+            var orgId = getOrgId();
+            var institutionOrUnit = OBJECT_MAPPER.createObjectNode();
 
             if (CristinUnit.isCristinUnitIdentifier(orgId)) {
                 institutionOrUnit.set(UNIT, addUnitAffiliation(orgId));
@@ -73,7 +73,7 @@ public class UpdateCristinEmploymentJsonCreator {
     }
 
     private String getOrgId() {
-        URI organization = parseUriField(ORGANIZATION);
+        var organization = parseUriField(ORGANIZATION);
         return extractLastPathElement(organization);
     }
 
@@ -87,9 +87,9 @@ public class UpdateCristinEmploymentJsonCreator {
 
     private void addPositionCode() {
         if (input.has(TYPE)) {
-            URI type = parseUriField(TYPE);
-            String code = Employment.extractPositionCodeFromTypeUri(type).orElseThrow();
-            ObjectNode positionNode = OBJECT_MAPPER.createObjectNode().put(POSITION_CODE, code);
+            var type = parseUriField(TYPE);
+            var code = Employment.extractPositionCodeFromTypeUri(type).orElseThrow();
+            var positionNode = OBJECT_MAPPER.createObjectNode().put(POSITION_CODE, code);
             output.set(POSITION, positionNode);
         }
     }

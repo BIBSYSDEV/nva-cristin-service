@@ -51,8 +51,8 @@ public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHan
 
         validateNotEmpty(input);
         validateQueryParameters(requestInfo);
-        String personId = getValidPersonId(requestInfo);
-        String orgId = getValidOrgId(requestInfo);
+        var personId = getValidPersonId(requestInfo);
+        var orgId = getValidOrgId(requestInfo);
 
         return apiClient.updatePersonInstitutionInfoInCristin(personId, orgId, input);
     }

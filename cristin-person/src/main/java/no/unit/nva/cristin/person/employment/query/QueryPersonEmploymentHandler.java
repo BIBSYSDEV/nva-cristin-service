@@ -46,7 +46,7 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Search
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-        String identifier = getValidPersonId(requestInfo);
+        var identifier = getValidPersonId(requestInfo);
 
         return apiClient.generateQueryResponse(identifier);
     }
