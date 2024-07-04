@@ -76,20 +76,19 @@ public class FetchPersonInstitutionInfoHandlerTest {
     void shouldReturnPersonInstitutionInfoWhenCallingEndpointWithValidPersonAndInstitutionIdentifiers()
         throws IOException, InterruptedException {
 
-        CristinPersonInstitutionInfo cristinInfo = new CristinPersonInstitutionInfo();
+        var cristinInfo = new CristinPersonInstitutionInfo();
         cristinInfo.setEmail(randomString());
         cristinInfo.setPhone(randomString());
-        String responseBody = OBJECT_MAPPER.writeValueAsString(cristinInfo);
+        var responseBody = OBJECT_MAPPER.writeValueAsString(cristinInfo);
 
         when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(responseBody, 200));
         apiClient = new FetchPersonInstitutionInfoClient(clientMock);
         handler = new FetchPersonInstitutionInfoHandler(apiClient, environment);
 
-        GatewayResponse<PersonInstitutionInfo> gatewayResponse =
-            sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID));
+        var gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, VALID_INSTITUTION_ID));
 
-        PersonInstitutionInfo actual = gatewayResponse.getBodyObject(PersonInstitutionInfo.class);
-        PersonInstitutionInfo expected = cristinInfo.toPersonInstitutionInfo(EXPECTED_ID_URI);
+        var actual = gatewayResponse.getBodyObject(PersonInstitutionInfo.class);
+        var expected = cristinInfo.toPersonInstitutionInfo(EXPECTED_ID_URI);
 
         assertThat(actual, equalTo(expected));
     }
@@ -114,8 +113,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldThrowBadRequestOnInvalidPersonIdPathParam() throws IOException {
-        GatewayResponse<PersonInstitutionInfo> gatewayResponse =
-            sendQuery(Map.of(PERSON_ID, INVALID_PATH_PARAM, ORG_ID, VALID_INSTITUTION_ID));
+        var gatewayResponse = sendQuery(Map.of(PERSON_ID, INVALID_PATH_PARAM, ORG_ID, VALID_INSTITUTION_ID));
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -124,8 +122,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldThrowBadRequestOnInvalidOrganizationPathParam() throws IOException {
-        GatewayResponse<PersonInstitutionInfo> gatewayResponse =
-            sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, INVALID_PATH_PARAM));
+        var gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID, ORG_ID, INVALID_PATH_PARAM));
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -135,8 +132,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldThrowBadRequestOnMissingPersonPathParam() throws IOException {
-        GatewayResponse<PersonInstitutionInfo> gatewayResponse =
-            sendQuery(Map.of(ORG_ID, VALID_INSTITUTION_ID));
+        var gatewayResponse = sendQuery(Map.of(ORG_ID, VALID_INSTITUTION_ID));
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -145,8 +141,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldThrowBadRequestOnMissingOrganizationPathParam() throws IOException {
-        GatewayResponse<PersonInstitutionInfo> gatewayResponse =
-            sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
+        var gatewayResponse = sendQuery(Map.of(PERSON_ID, VALID_PERSON_ID));
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -155,7 +150,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenClientSendsQueryParametersWhichIsNotSupported() throws IOException {
-        GatewayResponse<PersonInstitutionInfo> gatewayResponse = queryWithUnsupportedQueryParams();
+        var gatewayResponse = queryWithUnsupportedQueryParams();
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -164,7 +159,7 @@ public class FetchPersonInstitutionInfoHandlerTest {
 
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
-        GatewayResponse<PersonInstitutionInfo> gatewayResponse = queryWithoutRequiredAccessRights();
+        var gatewayResponse = queryWithoutRequiredAccessRights();
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));

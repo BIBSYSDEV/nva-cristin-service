@@ -247,7 +247,7 @@ public class FetchCristinPersonHandlerTest {
         var ninObject = extractNinObjectFromIdentifiers(responseBody).orElseThrow();
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-        assertThat(ninObject.getValue(), equalTo(NORWEGIAN_NATIONAL_ID));
+        assertThat(ninObject.value(), equalTo(NORWEGIAN_NATIONAL_ID));
     }
 
     @Test
@@ -332,7 +332,7 @@ public class FetchCristinPersonHandlerTest {
 
     private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {
         return responseBody.identifiers().stream()
-                   .filter(typedValue -> typedValue.getType().equals(NATIONAL_IDENTITY_NUMBER))
+                   .filter(typedValue -> typedValue.type().equals(NATIONAL_IDENTITY_NUMBER))
                    .findAny();
     }
 

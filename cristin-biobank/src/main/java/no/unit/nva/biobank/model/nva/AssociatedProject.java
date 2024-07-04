@@ -28,8 +28,8 @@ public class AssociatedProject implements JsonSerializable {
     }
 
     public AssociatedProject(CristinAssociatedProject project) {
-        this.id = createNvaProjectId(project.getCristinProjectId());
-        this.title = nonEmptyOrDefault(project.getTitle());
+        this.id = createNvaProjectId(project.cristinProjectId());
+        this.title = nonEmptyOrDefault(project.title());
     }
 
     public URI getId() {

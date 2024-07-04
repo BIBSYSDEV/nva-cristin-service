@@ -181,7 +181,7 @@ public class CristinPersonPatchJsonCreator {
     }
 
     private List<CristinTypedLabel> keywordsToCristinFormat(List<TypedValue> parsedInput) {
-        return parsedInput.stream().map(elm -> new CristinTypedLabel(elm.getType(), null))
+        return parsedInput.stream().map(elm -> new CristinTypedLabel(elm.type(), null))
                    .collect(Collectors.toList());
     }
 

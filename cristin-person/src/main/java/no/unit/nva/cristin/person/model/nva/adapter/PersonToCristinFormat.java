@@ -89,8 +89,8 @@ public class PersonToCristinFormat implements Function<Person, CristinPerson> {
     private Map<String, String> convertTypedValuesToMap(Set<TypedValue> typedValueSet) {
         return typedValueSet.stream()
                    .filter(TypedValue::hasData)
-                   .filter(distinctByKey(TypedValue::getType))
-                   .collect(Collectors.toMap(TypedValue::getType, TypedValue::getValue));
+                   .filter(distinctByKey(TypedValue::type))
+                   .collect(Collectors.toMap(TypedValue::type, TypedValue::value));
     }
 
     @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")

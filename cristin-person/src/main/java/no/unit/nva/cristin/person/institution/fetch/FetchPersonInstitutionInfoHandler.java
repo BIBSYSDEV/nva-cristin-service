@@ -46,8 +46,8 @@ public class FetchPersonInstitutionInfoHandler extends PersonInstitutionInfoHand
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
         validateQueryParameters(requestInfo);
-        String personId = getValidPersonId(requestInfo);
-        String orgId = getValidOrgId(requestInfo);
+        var personId = getValidPersonId(requestInfo);
+        var orgId = getValidOrgId(requestInfo);
 
         return apiClient.generateGetResponse(personId, orgId);
     }

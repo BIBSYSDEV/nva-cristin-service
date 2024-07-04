@@ -6,6 +6,7 @@ import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.client.CristinPersonQuery;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
@@ -45,12 +46,13 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
      */
     @Override
     public SearchResponse<Person> generateQueryResponse(Map<String, String> requestQueryParams)
-            throws ApiGatewayException {
+        throws ApiGatewayException {
 
         var startRequestTime = System.currentTimeMillis();
         var response = queryOrganizationPersons(new HashMap<>(requestQueryParams));
         var cristinPersons = getEnrichedPersonsUsingQueryResponse(response);
         var persons = mapCristinPersonsToNvaPersons(cristinPersons);
+
         return getPersonSearchResponse(requestQueryParams, startRequestTime, response, persons);
     }
 
@@ -63,12 +65,13 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
      */
     @Override
     public SearchResponse<Person> authorizedGenerateQueryResponse(Map<String, String> requestQueryParams)
-            throws ApiGatewayException {
+        throws ApiGatewayException {
 
         var startRequestTime = System.currentTimeMillis();
         var response = authorizedQueryOrganizationPersons(new HashMap<>(requestQueryParams));
         var cristinPersons = getEnrichedPersonsWithNinUsingQueryResponse(response);
         var personsWithAuthorizedFields = authorizedMappingCristinPersonsToNvaPersons(cristinPersons);
+
         return getPersonSearchResponse(requestQueryParams, startRequestTime, response, personsWithAuthorizedFields);
     }
 
@@ -76,9 +79,11 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
                                                            long startRequestTime,
                                                            HttpResponse<String> response,
                                                            List<Person> persons)
-            throws nva.commons.apigateway.exceptions.BadRequestException {
+        throws BadRequestException {
+
         var endRequestTime = System.currentTimeMillis();
         var id = getServiceUri(requestQueryParams);
+
         return new SearchResponse<Person>(id)
                 .withContext(PERSON_CONTEXT)
                 .withProcessingTime(calculateProcessingTime(startRequestTime, endRequestTime))
@@ -98,14 +103,17 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
         var uri = generateOrganizationPersonsUrl(parameters);
         var response = fetchQueryResults(uri);
         checkHttpStatusCode(getServiceUri(parameters), response.statusCode(), response.body());
+
         return response;
     }
 
     private HttpResponse<String> authorizedQueryOrganizationPersons(Map<String, String> parameters)
-            throws ApiGatewayException {
+        throws ApiGatewayException {
+
         var uri = generateOrganizationPersonsUrl(parameters);
         var response = fetchGetResultWithAuthentication(uri);
         checkHttpStatusCode(getServiceUri(parameters), response.statusCode(), response.body());
+
         return response;
     }
 
@@ -120,11 +128,13 @@ public class CristinOrganizationPersonsClient extends CristinPersonApiClient {
         if (parameters.containsKey(SORT)) {
             query.withSort(parameters.get(SORT));
         }
+
         return query.toURI();
     }
 
     private URI getServiceUri(Map<String, String> queryParameters) {
         var identifier = queryParameters.remove(IDENTIFIER);
+
         return new UriWrapper(HTTPS,
                 DOMAIN_NAME).addChild(BASE_PATH)
                 .addChild(ORGANIZATION_PATH)

@@ -12,7 +12,6 @@ import nva.commons.core.paths.UriWrapper;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -39,16 +38,15 @@ public class QueryPersonEmploymentClient extends ApiClient {
      * Fetches Cristin data from upstream into response object serialized to client.
      */
     public SearchResponse<Employment> generateQueryResponse(String identifier) throws ApiGatewayException {
-        long startRequestTime = System.currentTimeMillis();
-        URI cristinUri = generateCristinUri(identifier);
-        HttpResponse<String> response = fetchQueryResults(cristinUri);
-        URI idUri = generateIdUri(identifier);
+        var startRequestTime = System.currentTimeMillis();
+        var cristinUri = generateCristinUri(identifier);
+        var response = fetchQueryResults(cristinUri);
+        var idUri = generateIdUri(identifier);
         checkResponseForBadRequestIndicatingNotFoundIdentifier(response.statusCode());
         checkHttpStatusCode(idUri, response.statusCode(), response.body());
-        long requestTime = calculateProcessingTime(startRequestTime, System.currentTimeMillis());
-        List<CristinPersonEmployment> cristinEmployments =
-            asList(getDeserializedResponse(response, CristinPersonEmployment[].class));
-        List<Employment> employments = mapEmploymentsToNvaFormat(identifier, cristinEmployments);
+        var requestTime = calculateProcessingTime(startRequestTime, System.currentTimeMillis());
+        var cristinEmployments = asList(getDeserializedResponse(response, CristinPersonEmployment[].class));
+        var employments = mapEmploymentsToNvaFormat(identifier, cristinEmployments);
 
         return new SearchResponse<Employment>(idUri)
             .withContext(EMPLOYMENT_QUERY_CONTEXT)

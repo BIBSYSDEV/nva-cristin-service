@@ -37,11 +37,11 @@ public class CreatePersonEmploymentClient extends PostApiClient {
                                                 String cristinInstitutionNumber)
         throws ApiGatewayException {
 
-        String payload = generatePayloadFromRequest(employment);
-        URI uri = getCristinPostUri(identifier);
-        HttpResponse<String> response = post(uri, payload, cristinInstitutionNumber);
+        var payload = generatePayloadFromRequest(employment);
+        var uri = getCristinPostUri(identifier);
+        var response = post(uri, payload, cristinInstitutionNumber);
         checkPostHttpStatusCode(getNvaPostUri(identifier), response.statusCode(), response.body());
-        CristinPersonEmployment deserializedResponse = deserializeResponse(response);
+        var deserializedResponse = deserializeResponse(response);
 
         return deserializedResponse.toEmployment(identifier);
     }

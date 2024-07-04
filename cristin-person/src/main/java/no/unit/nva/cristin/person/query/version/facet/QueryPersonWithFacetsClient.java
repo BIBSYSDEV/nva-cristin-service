@@ -89,6 +89,7 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
         var response = fetchQueryResults(uri);
         var id = createIdUriFromParams(parameters, PERSON_PATH_NVA);
         checkHttpStatusCode(id, response.statusCode(), response.body());
+
         return response;
     }
 
