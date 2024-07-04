@@ -9,7 +9,6 @@ import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
 import no.unit.nva.cristin.common.client.PatchApiClient;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.paths.UriWrapper;
@@ -27,8 +26,8 @@ public class UpdateCristinPersonApiClient extends PatchApiClient {
      * @throws ApiGatewayException if something went wrong that can be mapped to a client response
      */
     public Void updatePersonInCristin(String personId, ObjectNode request) throws ApiGatewayException {
-        URI uri = generateCristinUri(personId);
-        HttpResponse<String> response = patch(uri, request.toString());
+        var uri = generateCristinUri(personId);
+        var response = patch(uri, request.toString());
         checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode(), response.body());
 
         return null;
@@ -43,8 +42,8 @@ public class UpdateCristinPersonApiClient extends PatchApiClient {
      */
     public Void updatePersonInCristin(String personId, ObjectNode request, String cristinInstitutionNumber)
         throws ApiGatewayException {
-        URI uri = generateCristinUri(personId);
-        HttpResponse<String> response = patch(uri, request.toString(), cristinInstitutionNumber);
+        var uri = generateCristinUri(personId);
+        var response = patch(uri, request.toString(), cristinInstitutionNumber);
         checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode(), response.body());
 
         return null;

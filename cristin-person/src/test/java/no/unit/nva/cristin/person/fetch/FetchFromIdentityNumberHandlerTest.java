@@ -28,7 +28,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -92,9 +91,9 @@ public class FetchFromIdentityNumberHandlerTest {
 
     @Test
     void shouldReturnPersonWhenMockedHttpResponseContainsCristinPerson() throws Exception {
-        Person actual = sendQuery(defaultBody(), EMPTY_MAP).getBodyObject(Person.class);
-        String expectedString = IoUtils.stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
-        Person expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
+        var actual = sendQuery(defaultBody(), EMPTY_MAP).getBodyObject(Person.class);
+        var expectedString = IoUtils.stringFromResources(Path.of(NVA_API_GET_PERSON_RESPONSE_JSON));
+        var expected = OBJECT_MAPPER.readValue(expectedString, Person.class);
         expected = expected.copy().withEmployments(Collections.emptySet()).build();
 
         assertThat(actual, equalTo(expected));
@@ -112,11 +111,11 @@ public class FetchFromIdentityNumberHandlerTest {
 
     @Test
     void shouldReturnServerErrorWhenBackendAuthenticationNotSentToUpstreamOrNotValid() throws Exception {
-        HttpClient clientMock = mock(HttpClient.class);
+        var clientMock = mock(HttpClient.class);
         when(clientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_STRING, 401));
-        CristinPersonApiClient apiClient = new CristinPersonApiClient(clientMock);
+        var apiClient = new CristinPersonApiClient(clientMock);
         handler = new FetchFromIdentityNumberHandler(apiClient, environment);
-        GatewayResponse<Person> gatewayResponse = sendQuery(defaultBody(), EMPTY_MAP);
+        var gatewayResponse = sendQuery(defaultBody(), EMPTY_MAP);
 
         assertEquals(HttpURLConnection.HTTP_UNAUTHORIZED, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -125,7 +124,7 @@ public class FetchFromIdentityNumberHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenPayloadNotMatchingContract() throws Exception {
-        GatewayResponse<Person> gatewayResponse = sendInvalidQuery();
+        var gatewayResponse = sendInvalidQuery();
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -134,7 +133,7 @@ public class FetchFromIdentityNumberHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenSupplyingAnyQueryParam() throws Exception {
-        GatewayResponse<Person> gatewayResponse = sendQuery(defaultBody(), SOME_QUERY_PARAM);
+        var gatewayResponse = sendQuery(defaultBody(), SOME_QUERY_PARAM);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -143,8 +142,8 @@ public class FetchFromIdentityNumberHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenInvalidTypeSpecified() throws Exception {
-        TypedValue invalidType = new TypedValue(WRONG_TYPE, DEFAULT_IDENTITY_NUMBER);
-        GatewayResponse<Person> gatewayResponse = sendQuery(invalidType, EMPTY_MAP);
+        var invalidType = new TypedValue(WRONG_TYPE, DEFAULT_IDENTITY_NUMBER);
+        var gatewayResponse = sendQuery(invalidType, EMPTY_MAP);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -153,8 +152,8 @@ public class FetchFromIdentityNumberHandlerTest {
 
     @Test
     void shouldReturnBadRequestWhenInvalidValueSpecified() throws Exception {
-        TypedValue invalidValue = new TypedValue(NIN_TYPE, WRONG_VALUE);
-        GatewayResponse<Person> gatewayResponse = sendQuery(invalidValue, EMPTY_MAP);
+        var invalidValue = new TypedValue(NIN_TYPE, WRONG_VALUE);
+        var gatewayResponse = sendQuery(invalidValue, EMPTY_MAP);
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -166,7 +165,7 @@ public class FetchFromIdentityNumberHandlerTest {
         apiClient = spy(apiClient);
         doReturn(new HttpResponseFaker(EMPTY_ARRAY, 200)).when(apiClient).fetchQueryResults(any(URI.class));
         handler = new FetchFromIdentityNumberHandler(apiClient, environment);
-        GatewayResponse<Person> gatewayResponse = sendQuery(defaultBody(), EMPTY_MAP);
+        var gatewayResponse = sendQuery(defaultBody(), EMPTY_MAP);
 
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
     }
@@ -176,9 +175,10 @@ public class FetchFromIdentityNumberHandlerTest {
         throws IOException {
         var request = requestWithBackendScope();
         handler.handleRequest(request, output, context);
-        GatewayResponse<Person> response = GatewayResponse.fromOutputStream(output, Person.class);
+        var response = GatewayResponse.fromOutputStream(output, Person.class);
+        var person = response.getBodyObject(Person.class);
+
         assertThat(response.getStatusCode(), is(equalTo(HTTP_OK)));
-        Person person = response.getBodyObject(Person.class);
         assertThat(person, is(not(nullValue())));
     }
 
@@ -198,12 +198,13 @@ public class FetchFromIdentityNumberHandlerTest {
     }
 
     private InputStream requestWithBackendScope() throws JsonProcessingException {
-        ObjectNode requestContext = OBJECT_MAPPER.createObjectNode();
-        ObjectNode authorizerNode = OBJECT_MAPPER.createObjectNode();
-        ObjectNode claimsFromAccessToken = OBJECT_MAPPER.createObjectNode();
+        var requestContext = OBJECT_MAPPER.createObjectNode();
+        var authorizerNode = OBJECT_MAPPER.createObjectNode();
+        var claimsFromAccessToken = OBJECT_MAPPER.createObjectNode();
         claimsFromAccessToken.put(ACCESS_TOKEN_CLAIMS_SCOPE_FIELD, ACCESS_TOKEN_BACKEND_SCOPE);
         authorizerNode.set(ACCESS_TOKEN_CLAIMS_FIELD, claimsFromAccessToken);
         requestContext.set(AUTHORIZER_FIELD, authorizerNode);
+
         return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
             .withBody(defaultBody())
             .withRequestContext(requestContext)
@@ -229,6 +230,7 @@ public class FetchFromIdentityNumberHandlerTest {
     private InputStream requestWithParams(TypedValue body, Map<String, String> queryParams, AccessRight accessRight)
         throws JsonProcessingException {
         var customerId = randomUri();
+
         return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
             .withCurrentCustomer(customerId)
             .withAccessRights(customerId, accessRight)

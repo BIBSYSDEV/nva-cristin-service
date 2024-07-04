@@ -121,12 +121,26 @@ public class UpdatePersonInstitutionInfoHandlerTest {
     }
 
     private PersonInstInfoPatch defaultBody() throws JsonProcessingException {
-        String body = "{\"email\":\"test@example.com\", \"phone\":\"99112233\"}";
+        var body =
+            """
+              {
+                "email": "test@example.com",
+                "phone":"99112233"
+              }
+            """;
+
         return OBJECT_MAPPER.readValue(body, PersonInstInfoPatch.class);
     }
 
     private PersonInstInfoPatch bodyWithUnsupportedFields() throws JsonProcessingException {
-        String body = "{\"hello\":\"world\", \"lorem\":\"ipsum\"}";
+        var body =
+            """
+              {
+                "hello": "world",
+                "lorem": "ipsum"
+              }
+            """;
+
         return OBJECT_MAPPER.readValue(body, PersonInstInfoPatch.class);
     }
 }

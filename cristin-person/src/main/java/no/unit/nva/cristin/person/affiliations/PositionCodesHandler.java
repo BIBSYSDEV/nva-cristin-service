@@ -1,5 +1,7 @@
 package no.unit.nva.cristin.person.affiliations;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static no.unit.nva.cristin.common.ErrorMessages.ONLY_SUPPORT_BOOLEAN_VALUES;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -13,15 +15,13 @@ import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 import nva.commons.core.StringUtils;
 
-@SuppressWarnings("unused")
 public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes> {
 
     public static final String ACTIVE_STATUS_QUERY_PARAM = "active";
-    public static final String TRUE = "true";
-    public static final String FALSE = "false";
     private final transient CristinPositionCodesClient apiClient;
 
     @JacocoGenerated
+    @SuppressWarnings("unused")
     public PositionCodesHandler() {
         this(new Environment());
     }
@@ -40,7 +40,9 @@ public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes>
     protected PositionCodes processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        return apiClient.generateQueryResponse(extractPositionCodeStatusQueryParam(requestInfo));
+        var positionCodeStatus = extractPositionCodeStatusQueryParam(requestInfo);
+
+        return apiClient.generateQueryResponse(positionCodeStatus);
     }
 
     @Override
@@ -50,17 +52,21 @@ public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes>
 
     private Boolean extractPositionCodeStatusQueryParam(RequestInfo requestInfo) throws BadRequestException {
         var activeStatusQueryParam = requestInfo.getQueryParameterOpt(ACTIVE_STATUS_QUERY_PARAM).orElse(null);
+
         return StringUtils.isEmpty(activeStatusQueryParam) ? null
-                   : validateAndGetPositionCodeStatusBooleanQueryParam(activeStatusQueryParam);
+                   : validateAndGetPositionCodeStatus(activeStatusQueryParam);
     }
 
-    private Boolean validateAndGetPositionCodeStatusBooleanQueryParam(String activeStatusQueryParam)
+    private Boolean validateAndGetPositionCodeStatus(String activeStatusQueryParam)
         throws BadRequestException {
-        if (TRUE.equalsIgnoreCase(activeStatusQueryParam) || FALSE.equalsIgnoreCase(activeStatusQueryParam)) {
+        if (TRUE.toString().equalsIgnoreCase(activeStatusQueryParam)
+            || FALSE.toString().equalsIgnoreCase(activeStatusQueryParam)) {
+
             return Boolean.valueOf(activeStatusQueryParam);
         } else {
             throw new BadRequestException(invalidQueryParametersMessage(
                 ACTIVE_STATUS_QUERY_PARAM, ONLY_SUPPORT_BOOLEAN_VALUES));
         }
     }
+
 }

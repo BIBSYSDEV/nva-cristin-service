@@ -48,7 +48,7 @@ public class UpdatePictureContentVerifier {
     }
 
     private boolean hasContent(Binary input) {
-        return nonNull(input.getBase64Data());
+        return nonNull(input.base64Data());
     }
 
     private static Binary emptyPayload() {
@@ -56,7 +56,7 @@ public class UpdatePictureContentVerifier {
     }
 
     private byte[] decodeInput(Binary input) {
-        return Base64.getDecoder().decode(input.getBase64Data());
+        return Base64.getDecoder().decode(input.base64Data());
     }
 
     private boolean isImage(byte[] decoded) {

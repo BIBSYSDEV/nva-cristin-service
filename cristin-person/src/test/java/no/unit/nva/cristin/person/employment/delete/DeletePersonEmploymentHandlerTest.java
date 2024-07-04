@@ -36,7 +36,6 @@ class DeletePersonEmploymentHandlerTest {
     private static final String VALID_EMPLOYMENT_ID = "987654321";
     private final HttpClient httpClientMock = mock(HttpClient.class);
     private final Environment environment = new Environment();
-    private DeletePersonEmploymentClient apiClient;
     private Context context;
     private ByteArrayOutputStream output;
     private DeletePersonEmploymentHandler handler;
@@ -44,7 +43,7 @@ class DeletePersonEmploymentHandlerTest {
     @BeforeEach
     void setUp() throws IOException, InterruptedException {
         when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 200));
-        apiClient = new DeletePersonEmploymentClient(httpClientMock);
+        var apiClient = new DeletePersonEmploymentClient(httpClientMock);
         context = mock(Context.class);
         output = new ByteArrayOutputStream();
         handler = new DeletePersonEmploymentHandler(apiClient, environment);
@@ -53,7 +52,7 @@ class DeletePersonEmploymentHandlerTest {
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
         handler.handleRequest(getInputStreamRequestWithoutAuthentication(), output, context);
-        GatewayResponse<Void> gatewayResponse = GatewayResponse.fromOutputStream(output, Void.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Void.class);
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
@@ -61,7 +60,7 @@ class DeletePersonEmploymentHandlerTest {
     @Test
     void shouldThrowBadRequestExceptionWhenInvalidPersonId() throws IOException {
         handler.handleRequest(getInputStreamRequestWithInvalidPersonId(), output, context);
-        GatewayResponse<Void> gatewayResponse = GatewayResponse.fromOutputStream(output, Void.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Void.class);
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }
@@ -69,7 +68,7 @@ class DeletePersonEmploymentHandlerTest {
     @Test
     void shouldThrowBadRequestExceptionWhenInvalidEmploymentId() throws IOException {
         handler.handleRequest(getInputStreamRequestWithInvalidEmploymentId(), output, context);
-        GatewayResponse<Void> gatewayResponse = GatewayResponse.fromOutputStream(output, Void.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Void.class);
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
     }

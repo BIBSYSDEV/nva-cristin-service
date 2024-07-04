@@ -133,7 +133,7 @@ public class QueryPersonEmploymentHandlerTest {
     }
 
     private List<Employment> extractHitsFromSearchResponse(SearchResponse<?> response) {
-        return OBJECT_MAPPER.convertValue(response.getHits(), new TypeReference<List<Employment>>() { });
+        return OBJECT_MAPPER.convertValue(response.getHits(), new TypeReference<>() { });
     }
 
     private SearchResponse<?> readExpectedResponse() throws JsonProcessingException {
