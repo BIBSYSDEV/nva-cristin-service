@@ -732,9 +732,6 @@ Resources:
         RequestInterval: 30
         FailureThreshold: 2
         EnableSNI: true
-      HealthCheckTags:
-        - Key: Name
-          Value: HealthCheck
 
   CristinHealthAlarm:
     Type: AWS::CloudWatch::Alarm
@@ -745,7 +742,7 @@ Resources:
       MetricName: HealthCheckStatus
       Dimensions:
         - Name: HealthCheckId
-          Value: !GetAtt HealthCheck.Id
+          Value: !GetAtt CristinHealthCheck.Id
       Statistic: Minimum
       Period: 60
       EvaluationPeriods: 1
