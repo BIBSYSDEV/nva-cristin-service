@@ -751,6 +751,7 @@ Resources:
       ComparisonOperator: LessThanThreshold
       AlarmActions:
         - !Ref SlackSnsArn
+      TreatMissingData: notBreaching
 
 Outputs:
   NvaCristinIntermediateStorageBucketName:
