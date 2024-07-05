@@ -81,6 +81,9 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: CristinBotFilterBypassHeaderValue
     Description: Header value of http request header to use to bypass bot filter in requests to Cristin API.
+  SlackSnsArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: '/NVA/Monitoring/SlackSnsArn'
 
 Resources:
 
@@ -715,6 +718,39 @@ Resources:
       Threshold: '1'
       ComparisonOperator: 'LessThanThreshold'
       AlarmName: !Sub 'No successful executions for ${NvaCristinUpdateIntermediateUnitsFunction} last 24h'
+      AlarmActions:
+        - !Ref SlackSnsArn
+
+  CristinHealthCheck:
+    Type: AWS::Route53::HealthCheck
+    Properties:
+      HealthCheckConfig:
+        Port: 443
+        Type: HTTPS
+        ResourcePath: /v2/units
+        FullyQualifiedDomainName: !Select [2, !Split ["/", !Ref CristinApiUrl]]
+        RequestInterval: 30
+        FailureThreshold: 2
+        EnableSNI: true
+
+  CristinHealthAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub Cristin-API-HealthCheck-{NvaCristinProxyApi}
+      AlarmDescription: Check if external Cristin API is healthy
+      Namespace: AWS/Route53
+      MetricName: HealthCheckStatus
+      Dimensions:
+        - Name: HealthCheckId
+          Value: !GetAtt CristinHealthCheck.HealthCheckId
+      Statistic: Minimum
+      Period: 60
+      EvaluationPeriods: 1
+      DatapointsToAlarm: 1
+      Threshold: 1
+      ComparisonOperator: LessThanThreshold
+      AlarmActions:
+        - !Ref SlackSnsArn
 
 Outputs:
   NvaCristinIntermediateStorageBucketName:
