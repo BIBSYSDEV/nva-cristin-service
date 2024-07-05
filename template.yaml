@@ -742,7 +742,7 @@ Resources:
       MetricName: HealthCheckStatus
       Dimensions:
         - Name: HealthCheckId
-          Value: !GetAtt CristinHealthCheck.Id
+          Value: !GetAtt CristinHealthCheck.HealthCheckId
       Statistic: Minimum
       Period: 60
       EvaluationPeriods: 1
