@@ -728,7 +728,7 @@ Resources:
         Port: 443
         Type: HTTPS
         ResourcePath: /v2/units
-        FullyQualifiedDomainName: !Select [2, !Split ["/", !Ref CristinApiUrl]]
+        FullyQualifiedDomainName: !Select [2, !Split ["/", !Ref CristinApiUrl]] # Extracts the domain name from the URL
         RequestInterval: 30
         FailureThreshold: 2
         EnableSNI: true
@@ -736,7 +736,7 @@ Resources:
   CristinHealthAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
-      AlarmName: !Sub Cristin-API-HealthCheck-{NvaCristinProxyApi}
+      AlarmName: !Sub External-Cristin-API-HealthCheck-${NvaCristinProxyApi} # NvaCristinProxyApi is here just to make the name unique
       AlarmDescription: Check if external Cristin API is healthy
       Namespace: AWS/Route53
       MetricName: HealthCheckStatus
