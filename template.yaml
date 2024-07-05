@@ -737,7 +737,7 @@ Resources:
     Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmName: !Sub Cristin-API-HealthCheck-{NvaCristinProxyApi}
-      AlarmDescription: Alarm if health check fails
+      AlarmDescription: Check if external Cristin API is healthy
       Namespace: AWS/Route53
       MetricName: HealthCheckStatus
       Dimensions:
