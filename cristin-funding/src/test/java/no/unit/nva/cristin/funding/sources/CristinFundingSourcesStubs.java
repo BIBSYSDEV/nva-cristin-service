@@ -40,7 +40,7 @@ public final class CristinFundingSourcesStubs {
         if (stubMapping != null) {
             throw new IllegalStateException("reset stubs before creating a new stub!");
         }
-        this.stubMapping = stubFor(get("/fundings/sources?lang=en,nb,nn")
+        this.stubMapping = stubFor(get("/fundings/sources?lang=en%2Cnb%2Cnn") // %2C = Query encoded comma
                                        .willReturn(aResponse()
                                                        .withBody(response)
                                                        .withHeader("Content-Type",

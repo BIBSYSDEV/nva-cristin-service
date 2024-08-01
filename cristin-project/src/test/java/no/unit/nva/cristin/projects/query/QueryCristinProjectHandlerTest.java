@@ -144,6 +144,7 @@ class QueryCristinProjectHandlerTest {
     private static final String API_QUERY_RESPONSE_JSON =
         IoUtils.stringFromResources(Path.of("nvaApiGetQueryResponse.json"));
     public static final String FUNDING_SAMPLE = "NRE:1234";
+    public static final String FUNDING_SAMPLE_ENCODED = "NRE%3A1234";
     public static final String BIOBANK_SAMPLE = String.valueOf(randomInteger());
     public static final String KEYWORD_SAMPLE = randomString();
     public static final String UNIT_ID_SAMPLE = "184.12.60.0";
@@ -670,7 +671,7 @@ class QueryCristinProjectHandlerTest {
         var captor = ArgumentCaptor.forClass(HttpRequest.class);
         verify(mockHttpClient).send(captor.capture(), any());
 
-        var expected = "https://api.cristin-test.uio.no/v2/projects?page=1&per_page=5&title=reindeer&lang=en,nb,nn";
+        var expected = "https://api.cristin-test.uio.no/v2/projects?page=1&per_page=5&title=reindeer&lang=en%2Cnb%2Cnn";
         var actual = captor.getValue().uri().toString();
 
         assertThat(actual, equalTo(expected));
@@ -721,7 +722,7 @@ class QueryCristinProjectHandlerTest {
         var actualURI = captor.getValue().toString();
         assertThat(actualURI, containsString("page=5"));
         assertThat(actualURI, containsString(BIOBANK_ID + EQUAL_OPERATOR + BIOBANK_SAMPLE));
-        assertThat(actualURI, containsString(FUNDING + EQUAL_OPERATOR + FUNDING_SAMPLE));
+        assertThat(actualURI, containsString(FUNDING + EQUAL_OPERATOR + FUNDING_SAMPLE_ENCODED));
         assertThat(actualURI, containsString(TITLE.getKey() + "=hello"));
         assertThat(actualURI, containsString(PROJECT_KEYWORD + EQUAL_OPERATOR + KEYWORD_SAMPLE));
         assertThat(actualURI, containsString(PROJECT_UNIT + EQUAL_OPERATOR + UNIT_ID_SAMPLE));
@@ -730,7 +731,7 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualURI,
                    containsString(PARTICIPANT_PARAM.getKey() + EQUAL_OPERATOR + CREATOR_IDENTIFIER));
         assertThat(actualURI, containsString(CATEGORY_PARAM + EQUAL_OPERATOR + "PHD"));
-        assertThat(actualURI, containsString("sort=start_date+desc"));
+        assertThat(actualURI, containsString("sort=start_date%20desc"));
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
                                                                SearchResponse.class);
@@ -800,7 +801,7 @@ class QueryCristinProjectHandlerTest {
 
         verify(apiClient).fetchQueryResults(captor.capture());
         var actualURI = captor.getValue().toString();
-        assertThat(actualURI, containsString("sort=start_date+desc"));
+        assertThat(actualURI, containsString("sort=start_date%20desc"));
         assertThat(actualURI, containsString(SECTOR_FACET.getKey() + EQUAL_OPERATOR + "INSTITUTE"));
         assertThat(actualURI, containsString(SECTOR_FACET.getKey() + EQUAL_OPERATOR + "UC"));
         assertThat(actualURI, containsString(COORDINATING_FACET.getKey() + EQUAL_OPERATOR + "185.90.0.0"));
@@ -960,15 +961,15 @@ class QueryCristinProjectHandlerTest {
     private static Stream<Arguments> differentQueryParamsProvider() {
         return Stream.of(
             Arguments.of("årsstudium",
-                         "årsstudium"),
+                         "%C3%A5rsstudium"),
             Arguments.of("Et prestisjefylt, stort og viktig prosjekt",
-                         "Et,prestisjefylt,,stort,og,viktig,prosjekt"),
+                         "Et%20prestisjefylt%2C%20stort%20og%20viktig%20prosjekt"),
             Arguments.of("SVIP (styrket veiledning i praksis)",
-                         "SVIP,(styrket,veiledning,i,praksis)"),
+                         "SVIP%20%28styrket%20veiledning%20i%20praksis%29"),
             Arguments.of("Helsefagarbeiderutdanningen – økt gjennomføring",
-                         "Helsefagarbeiderutdanningen,–,økt,gjennomføring"),
+                         "Helsefagarbeiderutdanningen%20%E2%80%93%20%C3%B8kt%20gjennomf%C3%B8ring"),
             Arguments.of("<script>alert(1)</script>",
-                         "%3Cscript%3Ealert(1)%3C/script%3E")
+                         "%3Cscript%3Ealert%281%29%3C%2Fscript%3E")
         );
     }
 
@@ -1109,7 +1110,7 @@ class QueryCristinProjectHandlerTest {
                                                                "creator", CREATOR_IDENTIFIER,
                                                                "participant", CREATOR_IDENTIFIER,
                                                                "category", "PHD"));
-        queryParams.put("sort", "start_date desc");
+        queryParams.put("sort", "start_date desc"); // Map.of() supports only 10 arguments max
         return queryParams;
     }
 

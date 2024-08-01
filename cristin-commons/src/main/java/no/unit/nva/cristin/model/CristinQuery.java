@@ -15,9 +15,13 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -27,6 +31,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.facet.CristinFacetUriParamAppender;
 import nva.commons.core.paths.UriWrapper;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,11 +102,44 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      * @return an URI to NVA (default) Projects with parameters.
      */
     public URI toURI() {
-        return
-            UriWrapper.fromUri(CRISTIN_API_URL)
-                .addChild(getCristinPath())
-                .addQueryParameters(toParameters())
-                .getUri();
+        var parameters = toParameters();
+        var multipleKeyMap = createMultipleKeyMap(parameters);
+
+        var uri = UriWrapper.fromUri(CRISTIN_API_URL)
+                      .addChild(getCristinPath());
+
+        for (NameValuePair pair : multipleKeyMap) {
+            uri = addQueryParameter(uri, pair);
+        }
+
+        return uri.getUri();
+    }
+
+    private List<BasicNameValuePair> createMultipleKeyMap(Map<String, String> parameters) {
+        var multipleKeyMap = new ArrayList<BasicNameValuePair>();
+
+        parameters.forEach((key, values) -> {
+            if (nonNull(values)) {
+                if (multiValuedCristinParams().contains(key)) {
+                    var value = values.split(",");
+                    Arrays.stream(value)
+                        .forEach(currentValue -> multipleKeyMap.add(new BasicNameValuePair(key, currentValue)));
+                } else {
+                    multipleKeyMap.add(new BasicNameValuePair(key, values));
+                }
+            }
+        });
+
+        return multipleKeyMap;
+    }
+
+    private UriWrapper addQueryParameter(UriWrapper uri, NameValuePair pair) {
+        return UriWrapper.fromUri(uri.toString())
+                   .addQueryParameter(pair.getName(), pair.getValue());
+    }
+
+    protected Collection<String> multiValuedCristinParams() {
+        return Collections.emptyList();
     }
 
     /**
@@ -356,6 +395,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
         return decode;
     }
 
+    // TODO: Should this still be used or removed? We now have automatic encoding in UriWrapper
     protected String encodeUTF(String unencoded) {
         return URLEncoder.encode(unencoded, StandardCharsets.UTF_8).replace("%20", "+");
     }

@@ -30,6 +30,7 @@ public class UriUtils {
     private static final String PARAMETER_DELIMITER = "&";
     private static final String EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR = null;
 
+    // TODO: Remove as UriWrapper now does this automatically
     public static String escapeWhiteSpace(String text) {
         return text.replaceAll(WHITESPACE_REGEX, WHITESPACE_REPLACEMENT);
     }

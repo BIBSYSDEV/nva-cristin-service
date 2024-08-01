@@ -280,7 +280,7 @@ public class FetchCristinPersonHandlerTest {
         var captor = ArgumentCaptor.forClass(HttpRequest.class);
         verify(mockHttpClient).send(captor.capture(), any());
 
-        var expected = "https://api.cristin-test.uio.no/v2/persons/12345?lang=en,nb,nn";
+        var expected = "https://api.cristin-test.uio.no/v2/persons/12345?lang=en%2Cnb%2Cnn";
         var actual = captor.getValue().uri().toString();
 
         assertThat(actual, equalTo(expected));

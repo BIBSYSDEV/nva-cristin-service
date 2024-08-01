@@ -55,9 +55,6 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
 
     @Override
     protected Void processInput(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-
-        validateHasAccessRights(requestInfo);
-
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
         var objectNode = readJsonFromInput(input);
@@ -137,6 +134,11 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
     @Override
     protected List<MediaType> listSupportedMediaTypes() {
         return DEFAULT_RESPONSE_MEDIA_TYPES;
+    }
+
+    @Override
+    protected void validateRequest(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        validateHasAccessRights(requestInfo);
     }
 
     private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException, UnauthorizedException {

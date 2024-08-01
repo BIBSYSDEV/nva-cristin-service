@@ -44,4 +44,9 @@ public class ListCategoriesHandler extends ApiGatewayHandler<Void, SearchRespons
         return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
+    @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) {
+        // no-op
+    }
+
 }

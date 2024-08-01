@@ -7,7 +7,6 @@ import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -76,10 +75,14 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        validateQueryParameterKeys(requestInfo);
+    }
+
+    @Override
     protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        validateQueryParameterKeys(requestInfo);
         var requestQueryParameters = extractQueryParameters(requestInfo);
         var apiVersion = getApiVersion(requestInfo);
         var apiClient = clientProvider.getClient(apiVersion);
@@ -126,7 +129,6 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
         }
 
         return name.filter(this::isValidQueryString)
-                   .map(UriUtils::escapeWhiteSpace)
                    .orElseThrow(QueryCristinPersonHandler::invalidNameException);
     }
 
@@ -162,7 +164,6 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
 
     private String getSort(RequestInfo requestInfo) {
         return requestInfo.getQueryParameterOpt(SORT)
-                   .map(UriUtils::escapeWhiteSpace)
                    .orElse(null);
     }
 

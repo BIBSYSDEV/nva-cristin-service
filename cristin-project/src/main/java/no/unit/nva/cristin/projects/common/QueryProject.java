@@ -1,9 +1,6 @@
 package no.unit.nva.cristin.projects.common;
 
-import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.Constants.PATTERN_IS_URL;
-import static no.unit.nva.cristin.model.Constants.STRING_COMMA;
-import static no.unit.nva.cristin.model.Constants.STRING_SPACE;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.BIOBANK;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.CATEGORY;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.FUNDING_SOURCE;
@@ -13,9 +10,9 @@ import static no.unit.nva.cristin.projects.common.ParameterKeyProject.ORGANIZATI
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PARTICIPANT;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PATH_PROJECT;
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.STATUS;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import no.unit.nva.cristin.model.CristinQuery;
 import no.unit.nva.cristin.model.KeyEncoding;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
@@ -31,13 +28,6 @@ public class QueryProject extends CristinQuery<ParameterKeyProject> {
 
     @Override
     protected String toCristinQueryValue(Entry<ParameterKeyProject, String> entry) {
-        if (entry.getKey().equals(BIOBANK) || entry.getKey().equals(KEYWORD) || entry.getKey().equals(PARTICIPANT)
-            || entry.getKey().equals(CATEGORY) || entry.getKey().equals(FUNDING_SOURCE)) {
-
-            final var key = entry.getKey().getKey() + EQUAL_OPERATOR;
-            return Arrays.stream(entry.getValue().split(STRING_COMMA))
-                       .collect(Collectors.joining("&" + key));
-        }
         var value = entry.getKey().encoding() == KeyEncoding.ENCODE_DECODE
                         ? encodeUTF(entry.getValue())
                         : entry.getValue();
@@ -45,9 +35,21 @@ public class QueryProject extends CristinQuery<ParameterKeyProject> {
         if (entry.getKey().equals(STATUS)) {
             return ProjectStatus.valueOf(value).getCristinStatus();
         }
-        return entry.getKey().equals(ORGANIZATION) && entry.getValue().matches(PATTERN_IS_URL)
-                   ? getUnitIdFromOrganization(value)
-                   : value.replace(STRING_SPACE,STRING_COMMA);
+
+        if (entry.getKey().equals(ORGANIZATION) && entry.getValue().matches(PATTERN_IS_URL)) {
+            return getUnitIdFromOrganization(value);
+        }
+
+        return value;
+    }
+
+    @Override
+    protected Collection<String> multiValuedCristinParams() {
+        return List.of(BIOBANK.getKey(),
+                       KEYWORD.getKey(),
+                       PARTICIPANT.getKey(),
+                       CATEGORY.getKey(),
+                       FUNDING_SOURCE.getKey());
     }
 
     @Override

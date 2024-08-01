@@ -27,6 +27,11 @@ public class FetchPictureHandler extends ApiGatewayHandler<Void, Binary> {
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        // no-op
+    }
+
+    @Override
     protected Binary processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         var identifier = getValidPersonId(requestInfo);
 

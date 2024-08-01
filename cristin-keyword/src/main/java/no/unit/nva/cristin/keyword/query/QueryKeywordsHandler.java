@@ -42,6 +42,11 @@ public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchRespon
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) {
+        // no-op
+    }
+
+    @Override
     protected SearchResponse<Keyword> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 

@@ -14,7 +14,6 @@ import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -79,8 +78,8 @@ class ListCristinOrganizationPersonsHandlerTest {
     public static final String INVALID_VALUE = "value";
     public static final int PERSON_COUNT = 5;
     private static final String EMPTY_LIST_STRING = "[]";
-
     public static final String SORT_VALUE = "id desc";
+    public static final String SORT_VALUE_ENCODED = "id%20desc";
 
     private ListCristinOrganizationPersonsHandler handler;
     private ByteArrayOutputStream output;
@@ -175,9 +174,9 @@ class ListCristinOrganizationPersonsHandlerTest {
 
         verify(cristinApiClient).fetchQueryResults(captor.capture());
         assertThat(Optional.ofNullable(captor.getValue()).toString(),
-                   containsString(SORT + EQUAL_OPERATOR + UriUtils.escapeWhiteSpace(SORT_VALUE)));
+                   containsString(SORT + EQUAL_OPERATOR + SORT_VALUE_ENCODED));
         assertThat(Optional.ofNullable(responseBody.getId()).toString(),
-                   containsString(SORT + EQUAL_OPERATOR + UriUtils.escapeWhiteSpace(SORT_VALUE)));
+                   containsString(SORT + EQUAL_OPERATOR + SORT_VALUE_ENCODED));
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 

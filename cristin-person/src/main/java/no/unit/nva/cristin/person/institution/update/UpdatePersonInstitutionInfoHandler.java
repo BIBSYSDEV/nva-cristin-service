@@ -42,19 +42,32 @@ public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHan
     }
 
     @Override
-    protected String processInput(PersonInstInfoPatch input, RequestInfo requestInfo, Context context)
+    protected void validateRequest(PersonInstInfoPatch input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
         AccessUtils.validateIdentificationNumberAccess(requestInfo);
-
-        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-
+        logUser(requestInfo);
         validateNotEmpty(input);
         validateQueryParameters(requestInfo);
+    }
+
+    @Override
+    protected String processInput(PersonInstInfoPatch input, RequestInfo requestInfo, Context context)
+        throws ApiGatewayException {
+
         var personId = getValidPersonId(requestInfo);
         var orgId = getValidOrgId(requestInfo);
 
         return apiClient.updatePersonInstitutionInfoInCristin(personId, orgId, input);
+    }
+
+    @Override
+    protected Integer getSuccessStatusCode(PersonInstInfoPatch input, String output) {
+        return HttpURLConnection.HTTP_NO_CONTENT;
+    }
+
+    private void logUser(RequestInfo requestInfo) {
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
     }
 
     private void validateNotEmpty(PersonInstInfoPatch input) throws BadRequestException {
@@ -65,10 +78,5 @@ public class UpdatePersonInstitutionInfoHandler extends PersonInstitutionInfoHan
 
     private boolean noSupportedValuesPresent(PersonInstInfoPatch input) {
         return isNull(input.getPhone()) && isNull(input.getEmail());
-    }
-
-    @Override
-    protected Integer getSuccessStatusCode(PersonInstInfoPatch input, String output) {
-        return HttpURLConnection.HTTP_NO_CONTENT;
     }
 }

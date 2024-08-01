@@ -52,10 +52,14 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        validateQueryParameterKeys(requestInfo);
+    }
+
+    @Override
     protected SearchResponse<Organization> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        validateQueryParameterKeys(requestInfo);
         var requestQueryParams = extractQueryParameters(requestInfo);
         var apiVersion = getApiVersion(requestInfo);
 

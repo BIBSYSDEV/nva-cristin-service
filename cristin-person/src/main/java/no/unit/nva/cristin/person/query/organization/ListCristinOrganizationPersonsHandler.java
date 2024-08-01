@@ -5,7 +5,6 @@ import no.unit.nva.cognito.TokenValidator;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.RestRequestHandler;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -64,6 +63,12 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
         this.apiClient = apiClient;
     }
 
+    @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        validateHasIdentifierPathParameter(requestInfo);
+        validateQueryParameterKeys(requestInfo);
+    }
+
     /**
      * Implements the main logic of the handler. Any exception thrown by this method will be handled by {@link
      * RestRequestHandler#handleExpectedException} method.
@@ -80,8 +85,6 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
     protected SearchResponse<Person> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        validateHasIdentifierPathParameter(requestInfo);
-        validateQueryParameterKeys(requestInfo);
         var requestQueryParams = extractQueryParams(requestInfo);
         logWhenMissingAccessRights(requestInfo);
 
@@ -138,11 +141,11 @@ public class ListCristinOrganizationPersonsHandler extends CristinQueryHandler<V
     }
 
     private Optional<String> getNameIfPresent(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(NAME).map(UriUtils::escapeWhiteSpace);
+        return requestInfo.getQueryParameterOpt(NAME);
     }
 
     private Optional<String> getSortIfPresent(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(SORT).map(UriUtils::escapeWhiteSpace);
+        return requestInfo.getQueryParameterOpt(SORT);
     }
 
     private Map<String, String> buildParamMap(String identifier, String page, String numberOfResults, String name,

@@ -48,11 +48,6 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
     protected Employment processInput(Employment input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        validateHasAccessRights(requestInfo);
-
-        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-
-        CreatePersonEmploymentValidator.validate(input);
         var identifier = getValidPersonId(requestInfo);
         var institutionIdentifier = fullAccessValueOrInstitutionNumber(requestInfo);
 
@@ -71,10 +66,23 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
         return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
+    @Override
+    protected void validateRequest(Employment input, RequestInfo requestInfo, Context context)
+        throws ApiGatewayException {
+
+        validateHasAccessRights(requestInfo);
+        logUser(requestInfo);
+        CreatePersonEmploymentValidator.validate(input);
+    }
+
     private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {
         if (!AccessUtils.requesterIsUserAdministrator(requestInfo) && !requestInfo.userIsAuthorized(MANAGE_CUSTOMERS)) {
             throw new ForbiddenException();
         }
+    }
+
+    private void logUser(RequestInfo requestInfo) {
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
     }
 
     private String fullAccessValueOrInstitutionNumber(RequestInfo requestInfo)

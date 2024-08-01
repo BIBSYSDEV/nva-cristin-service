@@ -43,4 +43,8 @@ public class ListPersonOrcidHandler extends ApiGatewayHandler<Void, PersonsOrcid
         return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
+    @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        // no-op
+    }
 }

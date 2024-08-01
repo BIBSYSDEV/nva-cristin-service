@@ -45,7 +45,6 @@ import java.util.Set;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.model.QueryBuilder;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.BadRequestException;
 
 @SuppressWarnings({"PMD.GodClass"})
@@ -242,7 +241,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
      * Setter sorting on 'start_date' and/or 'end_date'.
      */
     public QueryBuilderProject withItemSort(String sort) {
-        query.setValue(PAGE_SORT, UriUtils.escapeWhiteSpace(sort));
+        query.setValue(PAGE_SORT, sort);
         return this;
     }
 

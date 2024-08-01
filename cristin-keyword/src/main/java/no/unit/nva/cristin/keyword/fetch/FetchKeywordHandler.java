@@ -38,7 +38,6 @@ public class FetchKeywordHandler extends ApiGatewayHandler<Void, Keyword> {
     protected Keyword processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        validateIdentifier(requestInfo);
         var identifier = extractIdentifier(requestInfo);
 
         return apiClient.executeFetch(identifier);
@@ -52,6 +51,11 @@ public class FetchKeywordHandler extends ApiGatewayHandler<Void, Keyword> {
     @Override
     protected List<MediaType> listSupportedMediaTypes() {
         return DEFAULT_RESPONSE_MEDIA_TYPES;
+    }
+
+    @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        validateIdentifier(requestInfo);
     }
 
     private void validateIdentifier(RequestInfo requestInfo) throws BadRequestException {
