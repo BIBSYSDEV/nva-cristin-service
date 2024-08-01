@@ -12,7 +12,7 @@ import nva.commons.core.paths.UriWrapper;
 
 public class CristinFacetUriParamAppender {
 
-    public static final String PARAM_VALUE_DELIMITER = ",";
+    public static final String PARAM_VALUE_DELIMITER = ",|%2C";
     private UriWrapper appendedCristinUri;
 
     /**
