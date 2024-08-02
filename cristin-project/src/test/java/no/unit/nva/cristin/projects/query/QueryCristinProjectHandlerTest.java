@@ -158,6 +158,7 @@ class QueryCristinProjectHandlerTest {
     public static final String VERSION_DATE_AGGREGATIONS = "application/json; version=2023-11-03";
     public static final String RESPONSE_WITH_FACETS = IoUtils.stringFromResources(
         Path.of("cristinQueryProjectDataAndFacets.json"));
+    public static final String DOUBLE_ENCODED_COMMA_DELIMITER = "%252C";
 
     private final Environment environment = new Environment();
     private QueryCristinProjectApiClient cristinApiClientStub;
@@ -892,20 +893,21 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
-    @Test
-    void shouldConvertRegularParamsToFacetParamsWhenTheyMatchAndAreUsingFacetsVersion() throws Exception {
+    @ParameterizedTest
+    @MethodSource("differentFacetParamsProvider")
+    void shouldConvertRegularParamsToFacetParamsWhenTheyMatchAndAreUsingFacetsVersionWhileAlsoAvoidingDoubleEncoding(
+        Map<String, String> queryParams
+    )
+        throws Exception {
+
         var apiClient = spy(QueryProjectWithFacetsClient.class);
         var queryResponse = dummyFacetHttpResponse();
-        doReturn(queryResponse).when(apiClient).fetchQueryResults(any());
+        var captor = ArgumentCaptor.forClass(URI.class);
+        doReturn(queryResponse).when(apiClient).fetchQueryResults(captor.capture());
         var ignoreEnriched = new HttpResponseFaker(EMPTY_STRING, 404);
         doReturn(List.of(ignoreEnriched)).when(apiClient).fetchQueryResultsOneByOne(any());
         doReturn(apiClient).when(clientProvider).getVersionWithFacets();
         handler = new QueryCristinProjectHandler(clientProvider, new Environment());
-
-        final var queryParams = Map.of("query", "hello",
-                                       "categoryFacet", "RESEARCH,TEST",
-                                       "category", "MORERESEARCH",
-                                       "participant", "1234");
 
         var actual = sendQueryWithFacets(queryParams, VERSION_NAME_AGGREGATIONS).getBodyObject(SearchResponse.class);
 
@@ -920,6 +922,22 @@ class QueryCristinProjectHandlerTest {
         assertThat(actualId.toString(), containsString("1234"));
         assertThat(actualId.toString(), containsString("participantFacet"));
         assertThat(actualId.toString(), not(containsString("participant=")));
+        assertThat(actualId.toString(), not(containsString(DOUBLE_ENCODED_COMMA_DELIMITER)));
+
+        var categoryFacetString = actual.getAggregations().get("categoryFacet").toString();
+        var sectorFacetString = actual.getAggregations().get("sectorFacet").toString();
+
+        assertThat(categoryFacetString, not(containsString(DOUBLE_ENCODED_COMMA_DELIMITER)));
+        assertThat(sectorFacetString, not(containsString(DOUBLE_ENCODED_COMMA_DELIMITER)));
+
+        var cristinUri = captor.getValue().toString();
+
+        assertThat(cristinUri, containsString("category=RESEARCH"));
+        assertThat(cristinUri, containsString("category=TEST"));
+        assertThat(cristinUri, containsString("category=MORERESEARCH"));
+
+        assertThat(cristinUri, containsString("sector=UC"));
+        assertThat(cristinUri, containsString("sector=INSTITUTE"));
     }
 
     @ParameterizedTest(name = "Special character string \"{0}\" should return results")
@@ -1112,6 +1130,21 @@ class QueryCristinProjectHandlerTest {
                                                                "category", "PHD"));
         queryParams.put("sort", "start_date desc"); // Map.of() supports only 10 arguments max
         return queryParams;
+    }
+
+    private static Stream<Arguments> differentFacetParamsProvider() {
+        return Stream.of(
+            Arguments.of(Map.of("query", "hello",
+                                "categoryFacet", "RESEARCH%2CTEST",
+                                "category", "MORERESEARCH",
+                                "sector", "UC%2CINSTITUTE",
+                                "participant", "1234")),
+            Arguments.of(Map.of("query", "hello",
+                                "categoryFacet", "RESEARCH,TEST",
+                                "category", "MORERESEARCH",
+                                "sector", "UC,INSTITUTE",
+                                "participant", "1234"))
+        );
     }
 
 }

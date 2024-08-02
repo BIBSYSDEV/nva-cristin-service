@@ -40,6 +40,9 @@ import org.slf4j.LoggerFactory;
 public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
 
     protected static final Logger logger = LoggerFactory.getLogger(CristinQuery.class);
+
+    public static final String COMMA_DELIMITER_REGEX = ",|%2C";
+
     protected final transient Map<T, String> pathParameters;
     protected final transient Map<T, String> queryParameters;
     protected final transient Map<T, String> facetParameters;
@@ -102,17 +105,23 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      * @return an URI to NVA (default) Projects with parameters.
      */
     public URI toURI() {
-        var parameters = toParameters();
-        var multipleKeyMap = createMultipleKeyMap(parameters);
-
         var uri = UriWrapper.fromUri(CRISTIN_API_URL)
                       .addChild(getCristinPath());
 
-        for (NameValuePair pair : multipleKeyMap) {
-            uri = addQueryParameter(uri, pair);
-        }
+        uri = appendParameters(toParameters(), uri);
 
         return uri.getUri();
+    }
+
+    private UriWrapper appendParameters(Map<String, String> parameters, UriWrapper uri) {
+        var multipleKeyMap = createMultipleKeyMap(parameters);
+        var appendedUri = uri;
+
+        for (NameValuePair pair : multipleKeyMap) {
+            appendedUri = addQueryParameter(appendedUri, pair);
+        }
+
+        return appendedUri;
     }
 
     private List<BasicNameValuePair> createMultipleKeyMap(Map<String, String> parameters) {
@@ -121,7 +130,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
         parameters.forEach((key, values) -> {
             if (nonNull(values)) {
                 if (multiValuedCristinParams().contains(key)) {
-                    var value = values.split(",");
+                    var value = values.split(COMMA_DELIMITER_REGEX);
                     Arrays.stream(value)
                         .forEach(currentValue -> multipleKeyMap.add(new BasicNameValuePair(key, currentValue)));
                 } else {
@@ -148,13 +157,13 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      * @return a URI to NVA (default) Projects with parameters and facets.
      */
     public URI toCristinFacetURI() {
-        var baseUri = UriWrapper.fromUri(CRISTIN_API_URL)
-                          .addChild(getCristinPath())
-                          .addChild(FACETS_PATH)
-                          .addQueryParameters(toParameters())
-                          .getUri();
+        var uri = UriWrapper.fromUri(CRISTIN_API_URL)
+                      .addChild(getCristinPath())
+                      .addChild(FACETS_PATH);
 
-        return appendFacetsToUri(toFacetParameters(), baseUri);
+        uri = appendParameters(toParameters(), uri);
+
+        return appendFacetsToUri(toFacetParameters(), uri.getUri());
     }
 
     private static URI appendFacetsToUri(Map<String, String> parameters, URI cristinUri) {
@@ -337,10 +346,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
     }
 
     protected String toNvaQueryValue(Entry<T, String> entry) {
-        var value = entry.getValue();
-        return entry.getKey().encoding() == KeyEncoding.ENCODE_DECODE
-                   ? encodeUTF(value)
-                   : value;
+        return decodeUTF(entry.getValue()); // Will fix the problem of double encoding
     }
 
     protected String toCristinQueryValue(Entry<T, String> entry) {
