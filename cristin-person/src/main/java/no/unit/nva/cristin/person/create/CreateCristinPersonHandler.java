@@ -111,6 +111,11 @@ public class CreateCristinPersonHandler extends ApiGatewayHandler<Person, Person
     }
 
     @Override
+    protected void validateRequest(Person input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        // TODO: Move validation and access control to here
+    }
+
+    @Override
     protected Integer getSuccessStatusCode(Person input, Person output) {
         new IdCreatedLogger().logId(output);
 

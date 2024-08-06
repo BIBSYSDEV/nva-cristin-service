@@ -58,6 +58,13 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     }
 
     @Override
+    protected void validateRequest(TypedValue input, RequestInfo requestInfo, Context context)
+        throws ApiGatewayException {
+
+        // no-op
+    }
+
+    @Override
     protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 

@@ -83,6 +83,18 @@ class CristinFacetUriParamAppenderTest {
     }
 
     @Test
+    void shouldAppendEncodedCommaSeparatedValuesAsMultipleParamsOfEqualKey() {
+        params.put("organizationFacet", "ntnu%2Cuio");
+        params.put("sectorFacet", "UC");
+
+        var actual = new CristinFacetUriParamAppender(originalUri, params)
+                         .getAppendedUri()
+                         .getUri();
+
+        assertEquals(uriWithMultipleFacetValues, actual);
+    }
+
+    @Test
     void shouldAppendAllSupportedParams() {
         params.put("organizationFacet", "ntnu,uio");
         params.put("sectorFacet", "UC");

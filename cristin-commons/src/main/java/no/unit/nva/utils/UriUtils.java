@@ -24,15 +24,9 @@ public class UriUtils {
     public static final String POSITION = "position";
     public static final String PROJECT = "project";
     public static final String PERSON = "person";
-    public static final String WHITESPACE_REGEX = "\\s+";
-    public static final String WHITESPACE_REPLACEMENT = "+";
     private static final String PARAMETER_KEY_VALUE_PAIR_TEMPLATE = "%s=%s";
     private static final String PARAMETER_DELIMITER = "&";
     private static final String EMPTY_QUERY_PARAMETERS_FOR_URI_CONSTRUCTOR = null;
-
-    public static String escapeWhiteSpace(String text) {
-        return text.replaceAll(WHITESPACE_REGEX, WHITESPACE_REPLACEMENT);
-    }
 
     /**
      * Creates as string from a map containing a formatted query parameters string to be put on end of an url.

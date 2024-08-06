@@ -42,9 +42,6 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
 
     @Override
     protected Void processInput(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-
-        validateHasAccessRights(requestInfo);
-
         var objectNode = readJsonFromInput(input);
         UpdatePersonEmploymentValidator.validate(objectNode);
         var cristinJson = new UpdateCristinEmploymentJsonCreator(objectNode).create().getOutput();
@@ -70,6 +67,11 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
     @Override
     protected List<MediaType> listSupportedMediaTypes() {
         return DEFAULT_RESPONSE_MEDIA_TYPES;
+    }
+
+    @Override
+    protected void validateRequest(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        validateHasAccessRights(requestInfo);
     }
 
     private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {

@@ -65,6 +65,7 @@ class QueryCristinOrganizationProjectHandlerTest {
     public static final String START_DATE = "start_date";
     public static final String DUMMY_UNIT_ID = "184.12.60.0";
     public static final String FUNDING_SAMPLE = "NRE:1234";
+    public static final String FUNDING_SAMPLE_ENCODED = "NRE%3A1234";
     public static final String BIOBANK_SAMPLE = String.valueOf(randomInteger());
     public static final String KEYWORD_SAMPLE = randomString();
     public static final String CRISTIN_QUERY_PROJECTS_RESPONSE_JSON_RESOURCE = "cristinQueryProjectsResponse.json";
@@ -161,7 +162,7 @@ class QueryCristinOrganizationProjectHandlerTest {
         var actualURI = captor.getValue().toString();
         assertThat(actualURI, containsString("page=5"));
         assertThat(actualURI, containsString(BIOBANK_ID + EQUAL_OPERATOR + BIOBANK_SAMPLE));
-        assertThat(actualURI, containsString(FUNDING + EQUAL_OPERATOR + FUNDING_SAMPLE));
+        assertThat(actualURI, containsString(FUNDING + EQUAL_OPERATOR + FUNDING_SAMPLE_ENCODED));
         assertThat(actualURI, containsString(PROJECT_KEYWORD + EQUAL_OPERATOR + KEYWORD_SAMPLE));
         assertThat(actualURI, containsString(PROJECT_UNIT + EQUAL_OPERATOR + DUMMY_UNIT_ID));
         assertThat(actualURI, containsString(PROJECT_SORT + EQUAL_OPERATOR + START_DATE));

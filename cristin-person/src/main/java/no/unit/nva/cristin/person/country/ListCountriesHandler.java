@@ -11,11 +11,11 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 
-@SuppressWarnings("unused")
 public class ListCountriesHandler extends ApiGatewayHandler<Void, Countries> {
 
     private final ListCountriesApiClient apiClient;
 
+    @SuppressWarnings("unused")
     public ListCountriesHandler() {
         this(new Environment(), new ListCountriesApiClient());
     }
@@ -40,6 +40,11 @@ public class ListCountriesHandler extends ApiGatewayHandler<Void, Countries> {
     @Override
     protected List<MediaType> listSupportedMediaTypes() {
         return DEFAULT_RESPONSE_MEDIA_TYPES;
+    }
+
+    @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        // no-op
     }
 
 }

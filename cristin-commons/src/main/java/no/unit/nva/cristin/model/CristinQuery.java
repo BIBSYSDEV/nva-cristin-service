@@ -15,9 +15,13 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -27,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.facet.CristinFacetUriParamAppender;
 import nva.commons.core.paths.UriWrapper;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +39,9 @@ import org.slf4j.LoggerFactory;
 public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
 
     protected static final Logger logger = LoggerFactory.getLogger(CristinQuery.class);
+
+    public static final String COMMA_DELIMITER_REGEX = ",|%2C";
+
     protected final transient Map<T, String> pathParameters;
     protected final transient Map<T, String> queryParameters;
     protected final transient Map<T, String> facetParameters;
@@ -96,11 +104,12 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      * @return an URI to NVA (default) Projects with parameters.
      */
     public URI toURI() {
-        return
-            UriWrapper.fromUri(CRISTIN_API_URL)
-                .addChild(getCristinPath())
-                .addQueryParameters(toParameters())
-                .getUri();
+        var uri = UriWrapper.fromUri(CRISTIN_API_URL)
+                      .addChild(getCristinPath());
+
+        appendParameters(toParameters(), uri);
+
+        return uri.getUri();
     }
 
     /**
@@ -109,13 +118,40 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
      * @return a URI to NVA (default) Projects with parameters and facets.
      */
     public URI toCristinFacetURI() {
-        var baseUri = UriWrapper.fromUri(CRISTIN_API_URL)
-                          .addChild(getCristinPath())
-                          .addChild(FACETS_PATH)
-                          .addQueryParameters(toParameters())
-                          .getUri();
+        var uri = UriWrapper.fromUri(CRISTIN_API_URL)
+                      .addChild(getCristinPath())
+                      .addChild(FACETS_PATH);
 
-        return appendFacetsToUri(toFacetParameters(), baseUri);
+        appendParameters(toParameters(), uri);
+
+        return appendFacetsToUri(toFacetParameters(), uri.getUri());
+    }
+
+    private void appendParameters(Map<String, String> parameters, UriWrapper uri) {
+        var multipleKeyMap = createMultipleKeyMap(parameters);
+        multipleKeyMap.forEach(pair -> uri.addQueryParameter(pair.getName(), pair.getValue()));
+    }
+
+    private List<BasicNameValuePair> createMultipleKeyMap(Map<String, String> parameters) {
+        var multipleKeyMap = new ArrayList<BasicNameValuePair>();
+
+        parameters.forEach((key, values) -> {
+            if (nonNull(values)) {
+                if (multiValuedCristinParams().contains(key)) {
+                    var value = values.split(COMMA_DELIMITER_REGEX);
+                    Arrays.stream(value)
+                        .forEach(currentValue -> multipleKeyMap.add(new BasicNameValuePair(key, currentValue)));
+                } else {
+                    multipleKeyMap.add(new BasicNameValuePair(key, values));
+                }
+            }
+        });
+
+        return multipleKeyMap;
+    }
+
+    protected Collection<String> multiValuedCristinParams() {
+        return Collections.emptyList();
     }
 
     private static URI appendFacetsToUri(Map<String, String> parameters, URI cristinUri) {
@@ -298,10 +334,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
     }
 
     protected String toNvaQueryValue(Entry<T, String> entry) {
-        var value = entry.getValue();
-        return entry.getKey().encoding() == KeyEncoding.ENCODE_DECODE
-                   ? encodeUTF(value)
-                   : value;
+        return decodeUTF(entry.getValue()); // Will fix the problem of double encoding
     }
 
     protected String toCristinQueryValue(Entry<T, String> entry) {
@@ -356,6 +389,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
         return decode;
     }
 
+    // TODO: Should this still be used or removed? We now have automatic encoding in UriWrapper
     protected String encodeUTF(String unencoded) {
         return URLEncoder.encode(unencoded, StandardCharsets.UTF_8).replace("%20", "+");
     }

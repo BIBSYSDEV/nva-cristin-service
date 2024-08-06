@@ -50,6 +50,11 @@ public class QueryCristinProjectHandler extends CristinQueryHandler<Void, Search
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) {
+        // no-op
+    }
+
+    @Override
     protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
             throws ApiGatewayException {
 

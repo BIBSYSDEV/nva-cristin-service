@@ -44,6 +44,11 @@ public class FetchCristinProjectHandler extends CristinHandler<Void, NvaProject>
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) {
+        // no-op
+    }
+
+    @Override
     protected NvaProject processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         validateQueryParameters(requestInfo);
         var id = getValidIdentifier(requestInfo);

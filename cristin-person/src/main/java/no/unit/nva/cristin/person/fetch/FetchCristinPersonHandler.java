@@ -52,7 +52,6 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
 
     @Override
     protected Person processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        validateQueryParameters(requestInfo);
         var identifier = getValidId(requestInfo);
 
         if (clientIsAuthorized(requestInfo)) {
@@ -73,6 +72,11 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
     @Override
     protected List<MediaType> listSupportedMediaTypes() {
         return DEFAULT_RESPONSE_MEDIA_TYPES;
+    }
+
+    @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        validateQueryParameters(requestInfo);
     }
 
     private void validateQueryParameters(RequestInfo requestInfo) throws BadRequestException {

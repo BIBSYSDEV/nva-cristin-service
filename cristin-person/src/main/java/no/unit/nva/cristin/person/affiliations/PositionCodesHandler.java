@@ -37,6 +37,11 @@ public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes>
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        // no-op
+    }
+
+    @Override
     protected PositionCodes processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 

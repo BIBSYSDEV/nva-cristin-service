@@ -68,11 +68,6 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
 
     @Override
     protected Void processInput(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-
-        if (missingHandlerOrResourceAccess(requestInfo)) {
-            throw new ForbiddenException();
-        }
-
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
         var objectNode = readJsonFromInput(input);
@@ -97,6 +92,13 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
     @Override
     protected List<MediaType> listSupportedMediaTypes() {
         return DEFAULT_RESPONSE_MEDIA_TYPES;
+    }
+
+    @Override
+    protected void validateRequest(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        if (missingHandlerOrResourceAccess(requestInfo)) {
+            throw new ForbiddenException();
+        }
     }
 
     private boolean noSupportedValuesPresent(ObjectNode cristinJson) {

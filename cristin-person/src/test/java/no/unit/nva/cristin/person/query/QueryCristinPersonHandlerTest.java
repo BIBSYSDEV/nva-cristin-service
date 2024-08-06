@@ -94,10 +94,10 @@ public class QueryCristinPersonHandlerTest {
     private static final String ALLOW_ALL_ORIGIN = "*";
     private static final String EMPTY_LIST_STRING = "[]";
     private static final String EXPECTED_CRISTIN_URI_WITH_PARAMS =
-        "https://api.cristin-test.uio.no/v2/persons?per_page=5&name=John+Smith&page=1";
+        "https://api.cristin-test.uio.no/v2/persons?per_page=5&name=John%20Smith&page=1";
     private static final String EXPECTED_CRISTIN_URI_WITH_ADDITIONAL_PARAMS =
-        "https://api.cristin-test.uio.no/v2/persons?per_page=5&institution=uio&name=John+Smith&verified=true&page=1"
-        + "&sort=name+desc";
+        "https://api.cristin-test.uio.no/v2/persons?per_page=5&institution=uio&name=John%20Smith&verified=true&page=1"
+        + "&sort=name%20desc";
     private static final String ORGANIZATION_UIO = "uio";
     public static final String SECTOR_FACET_UC = "UC";
     public static final String INSTITUTION_FACET_185 = "185";
