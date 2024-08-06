@@ -14,7 +14,7 @@ Globals:
       - arm64
     Environment:
       Variables:
-        ALLOWED_ORIGIN: '*'
+        ALLOWED_ORIGIN: !Ref AllowedOrigins
         CRISTIN_API_URL: !Ref CristinApiUrl
         DOMAIN_NAME: !Ref ApiDomain
         API_HOST: !Ref ApiDomain # TODO: replace DOMAIN_NAME with API_HOST (New name needed for Cognito test users)
@@ -84,6 +84,10 @@ Parameters:
   SlackSnsArn:
     Type: AWS::SSM::Parameter::Value<String>
     Default: '/NVA/Monitoring/SlackSnsArn'
+  AllowedOrigins:
+    Type: String
+    Description: comma separated list of external clients that are allowed to contact the HTTP APIs, "*" indicates that all origins are allowed
+    Default: '*'
 
 Resources:
 
