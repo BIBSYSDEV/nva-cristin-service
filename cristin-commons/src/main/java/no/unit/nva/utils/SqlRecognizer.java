@@ -14,7 +14,7 @@ public class SqlRecognizer {
      * @return true if there are possible SQL statements in str
      */
     public static boolean containsSqlInjectionFragmentCandidate(String query) {
-        Set intersect = suspicousStatements.stream().filter(query::contains).collect(Collectors.toSet());
+        var intersect = suspicousStatements.stream().filter(query::contains).collect(Collectors.toSet());
         return !intersect.isEmpty();
     }
 }

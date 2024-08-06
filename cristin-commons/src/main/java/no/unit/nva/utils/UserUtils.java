@@ -72,6 +72,7 @@ public class UserUtils {
     }
 
 
+    @SuppressWarnings("unused")
     private static class UserRoles {
 
         private static final String NATIONAL_IDENTITY_NUMBER_FIELD = "nationalIdentityNumber";
@@ -117,6 +118,7 @@ public class UserUtils {
         }
     }
 
+    @SuppressWarnings("unused")
     private static class RoleDto {
 
         @JsonProperty("type")
