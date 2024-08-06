@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.facet;
 
 import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.model.CristinQuery.COMMA_DELIMITER_REGEX;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,7 +13,6 @@ import nva.commons.core.paths.UriWrapper;
 
 public class CristinFacetUriParamAppender {
 
-    public static final String PARAM_VALUE_DELIMITER = ",|%2C";
     private UriWrapper appendedCristinUri;
 
     /**
@@ -36,7 +36,7 @@ public class CristinFacetUriParamAppender {
 
     private List<String> splitOnComma(String value) {
         return Optional.ofNullable(value)
-                   .map(str -> str.split(PARAM_VALUE_DELIMITER))
+                   .map(str -> str.split(COMMA_DELIMITER_REGEX))
                    .map(Arrays::asList)
                    .orElse(Collections.emptyList());
     }

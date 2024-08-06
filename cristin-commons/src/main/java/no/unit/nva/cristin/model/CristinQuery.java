@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.facet.CristinFacetUriParamAppender;
 import nva.commons.core.paths.UriWrapper;
-import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,20 +107,29 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
         var uri = UriWrapper.fromUri(CRISTIN_API_URL)
                       .addChild(getCristinPath());
 
-        uri = appendParameters(toParameters(), uri);
+        appendParameters(toParameters(), uri);
 
         return uri.getUri();
     }
 
-    private UriWrapper appendParameters(Map<String, String> parameters, UriWrapper uri) {
+    /**
+     * Builds URI to search Cristin projects based on facets and parameters supplied to the builder methods.
+     *
+     * @return a URI to NVA (default) Projects with parameters and facets.
+     */
+    public URI toCristinFacetURI() {
+        var uri = UriWrapper.fromUri(CRISTIN_API_URL)
+                      .addChild(getCristinPath())
+                      .addChild(FACETS_PATH);
+
+        appendParameters(toParameters(), uri);
+
+        return appendFacetsToUri(toFacetParameters(), uri.getUri());
+    }
+
+    private void appendParameters(Map<String, String> parameters, UriWrapper uri) {
         var multipleKeyMap = createMultipleKeyMap(parameters);
-        var appendedUri = uri;
-
-        for (NameValuePair pair : multipleKeyMap) {
-            appendedUri = addQueryParameter(appendedUri, pair);
-        }
-
-        return appendedUri;
+        multipleKeyMap.forEach(pair -> uri.addQueryParameter(pair.getName(), pair.getValue()));
     }
 
     private List<BasicNameValuePair> createMultipleKeyMap(Map<String, String> parameters) {
@@ -142,28 +150,8 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
         return multipleKeyMap;
     }
 
-    private UriWrapper addQueryParameter(UriWrapper uri, NameValuePair pair) {
-        return UriWrapper.fromUri(uri.toString())
-                   .addQueryParameter(pair.getName(), pair.getValue());
-    }
-
     protected Collection<String> multiValuedCristinParams() {
         return Collections.emptyList();
-    }
-
-    /**
-     * Builds URI to search Cristin projects based on facets and parameters supplied to the builder methods.
-     *
-     * @return a URI to NVA (default) Projects with parameters and facets.
-     */
-    public URI toCristinFacetURI() {
-        var uri = UriWrapper.fromUri(CRISTIN_API_URL)
-                      .addChild(getCristinPath())
-                      .addChild(FACETS_PATH);
-
-        uri = appendParameters(toParameters(), uri);
-
-        return appendFacetsToUri(toFacetParameters(), uri.getUri());
     }
 
     private static URI appendFacetsToUri(Map<String, String> parameters, URI cristinUri) {
