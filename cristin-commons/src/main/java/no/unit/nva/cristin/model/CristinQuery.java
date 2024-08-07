@@ -8,11 +8,11 @@ import static no.unit.nva.cristin.model.Constants.FACETS_PATH;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.utils.CristinQueryUtils.convertSupportedParamKeysToFacetParamKeys;
+import static no.unit.nva.utils.UriUtils.decodeUri;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static nva.commons.apigateway.RestRequestHandler.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -384,9 +384,7 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
 
 
     protected String decodeUTF(String encoded) {
-        String decode = URLDecoder.decode(encoded, StandardCharsets.UTF_8);
-        logger.info("decoded " + decode);
-        return decode;
+        return decodeUri(encoded);
     }
 
     // TODO: Should this still be used or removed? We now have automatic encoding in UriWrapper
