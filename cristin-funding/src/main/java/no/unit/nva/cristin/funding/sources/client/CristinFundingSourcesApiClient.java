@@ -64,7 +64,7 @@ public class CristinFundingSourcesApiClient extends ApiClient {
         var fundingSources = queryFundingSources();
 
         return fundingSources.stream()
-            .filter(fundingSource -> fundingSource.getCode().equals(code))
+            .filter(fundingSource -> fundingSource.code().equals(code))
             .findFirst()
             .orElseThrow(() -> new NotFoundException(FUNDING_SOURCE_NOT_FOUND));
     }

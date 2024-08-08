@@ -36,6 +36,11 @@ public class ListFundingSourcesHandler extends CristinQueryHandler<Void, Funding
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) {
+        // no-op
+    }
+
+    @Override
     protected FundingSources processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 

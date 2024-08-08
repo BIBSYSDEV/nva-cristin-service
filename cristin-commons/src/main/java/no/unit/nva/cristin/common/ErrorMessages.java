@@ -7,15 +7,10 @@ import java.util.stream.Collectors;
 
 @JacocoGenerated
 public class ErrorMessages {
-
-    public static final String ERROR_MESSAGE_FETCHING_CRISTIN_PROJECT_WITH_ID =
-            "Error fetching cristin project with id: %s . Exception Message: %s";
     public static final String ERROR_MESSAGE_BACKEND_FETCH_FAILED =
             "The request failed because of a problem with the upstream server";
     public static final String ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID =
             "Project matching id %s does not have valid data";
-    public static final String ERROR_MESSAGE_QUERY_WITH_PARAMS_FAILED =
-            "Query failed from params: %s with exception: %s";
     public static final String ERROR_MESSAGE_READING_RESPONSE_FAIL =
             "Error when reading response with body: %s, causing exception: %s";
     public static final String ERROR_MESSAGE_SERVER_ERROR =

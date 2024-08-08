@@ -44,9 +44,8 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Search
     protected SearchResponse<Employment> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        AccessUtils.validateIdentificationNumberAccess(requestInfo);
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-        String identifier = getValidPersonId(requestInfo);
+        var identifier = getValidPersonId(requestInfo);
 
         return apiClient.generateQueryResponse(identifier);
     }
@@ -59,6 +58,11 @@ public class QueryPersonEmploymentHandler extends ApiGatewayHandler<Void, Search
     @Override
     protected List<MediaType> listSupportedMediaTypes() {
         return DEFAULT_RESPONSE_MEDIA_TYPES;
+    }
+
+    @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        AccessUtils.validateIdentificationNumberAccess(requestInfo);
     }
 
 }

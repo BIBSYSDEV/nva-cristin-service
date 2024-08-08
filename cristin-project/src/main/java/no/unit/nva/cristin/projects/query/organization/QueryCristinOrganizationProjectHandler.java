@@ -69,6 +69,10 @@ public class QueryCristinOrganizationProjectHandler extends CristinQueryHandler<
         this.cristinApiClient = cristinApiClient;
     }
 
+    @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) {
+        // no-op
+    }
 
     /**
      * Implements the main logic of the handler. Any exception thrown by this method will be handled by {@link

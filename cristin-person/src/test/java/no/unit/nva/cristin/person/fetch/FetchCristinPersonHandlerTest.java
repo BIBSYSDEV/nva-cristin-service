@@ -247,7 +247,7 @@ public class FetchCristinPersonHandlerTest {
         var ninObject = extractNinObjectFromIdentifiers(responseBody).orElseThrow();
 
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-        assertThat(ninObject.getValue(), equalTo(NORWEGIAN_NATIONAL_ID));
+        assertThat(ninObject.value(), equalTo(NORWEGIAN_NATIONAL_ID));
     }
 
     @Test
@@ -280,7 +280,7 @@ public class FetchCristinPersonHandlerTest {
         var captor = ArgumentCaptor.forClass(HttpRequest.class);
         verify(mockHttpClient).send(captor.capture(), any());
 
-        var expected = "https://api.cristin-test.uio.no/v2/persons/12345?lang=en,nb,nn";
+        var expected = "https://api.cristin-test.uio.no/v2/persons/12345?lang=en%2Cnb%2Cnn";
         var actual = captor.getValue().uri().toString();
 
         assertThat(actual, equalTo(expected));
@@ -332,7 +332,7 @@ public class FetchCristinPersonHandlerTest {
 
     private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {
         return responseBody.identifiers().stream()
-                   .filter(typedValue -> typedValue.getType().equals(NATIONAL_IDENTITY_NUMBER))
+                   .filter(typedValue -> typedValue.type().equals(NATIONAL_IDENTITY_NUMBER))
                    .findAny();
     }
 

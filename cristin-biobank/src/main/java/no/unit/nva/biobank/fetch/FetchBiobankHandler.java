@@ -28,6 +28,11 @@ public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) {
+        // no-op
+    }
+
+    @Override
     protected Biobank processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
         var query = (QueryBiobank) QueryBiobank.builder()
                                        .fromRequestInfo(requestInfo)

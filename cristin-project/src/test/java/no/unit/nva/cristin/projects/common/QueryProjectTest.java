@@ -23,7 +23,7 @@ public class QueryProjectTest {
         "https://api.cristin-test.uio.no/v2/projects?page=2&parent_unit_id=185.90.0.0"
         + "&per_page=10&title=reindeer";
     private static final String QUERY_SAMPLE_WITH_MULTIPLE_PARAMETERS =
-        "https://api.cristin-test.uio.no/v2/projects?approval_reference_id=2017/1593&approved_by=REK&biobank=533895"
+        "https://api.cristin-test.uio.no/v2/projects?approval_reference_id=2017%2F1593&approved_by=REK&biobank=533895"
         + "&biobank=533895&funding_source=NFR&institution=uib&keyword=nature&keyword=nature&levels=7&page=1"
         + "&participant=St&participant=St&per_page=5&project_manager=st&sort=start_date&unit=184.12.60.0";
     private static final String RANDOM_TITLE = "reindeer";
@@ -35,6 +35,14 @@ public class QueryProjectTest {
     private static final String SAMPLE_SORT = "start_date";
     private static final String SAMPLE_UNIT = "184.12.60.0";
     public static final ParameterKeyProject[] QUERY_PARAMETER_KEYS = {PAGE_CURRENT, PAGE_ITEMS_PER_PAGE };
+    public static final String QUERY_WITH_MULTIPLE_OF_SAME_PARAMETERS =
+        "https://api.cristin-test.uio.no/v2/projects"
+        + "?biobank=533895"
+        + "&biobank=533895"
+        + "&keyword=nature"
+        + "&keyword=nature"
+        + "&page=1"
+        + "&per_page=5";
 
     @Test
     void buildReturnsUriWithCustomParameterValuesWhenCustomParameterValuesAreSupplied() throws BadRequestException {
@@ -83,4 +91,19 @@ public class QueryProjectTest {
                 .toURI();
         assertEquals(QUERY_SAMPLE_WITH_MULTIPLE_PARAMETERS, uri.toString());
     }
+
+    @Test
+    void buildReturnsUriCorrectlyAndWithoutDoingDoubleEncodingWhenHavingMoreOfSameParam() throws BadRequestException {
+        var uri = QueryProject.builder()
+                      .withKeyword(KEYWORD)
+                      .withKeyword(KEYWORD)
+                      .withBiobank(BIOBANK)
+                      .withBiobank(BIOBANK)
+                      .withRequiredParameters(QUERY_PARAMETER_KEYS)
+                      .build()
+                      .toURI();
+
+        assertEquals(QUERY_WITH_MULTIPLE_OF_SAME_PARAMETERS, uri.toString());
+    }
+
 }

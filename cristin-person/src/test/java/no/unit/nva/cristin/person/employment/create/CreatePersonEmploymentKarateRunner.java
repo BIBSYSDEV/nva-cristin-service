@@ -21,7 +21,7 @@ public class CreatePersonEmploymentKarateRunner {
     @BeforeAll
     static void clearTestUserEmployments() {
         try {
-            String cristinTestUserId = new Environment().readEnv(TEST_PERSON_IDENTIFIER);
+            var cristinTestUserId = new Environment().readEnv(TEST_PERSON_IDENTIFIER);
             ClearCristinTestPersonEmployment.clearEmployment(cristinTestUserId);
         } catch (ApiGatewayException e) {
             fail(APIGATEWAY_EXCEPTION_DELETING_EMPLOYMENT, e);

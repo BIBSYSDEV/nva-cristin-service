@@ -44,10 +44,14 @@ public class FetchCristinOrganizationHandler extends CristinQueryHandler<Void, O
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        validateThatSuppliedParamsIsSupported(requestInfo);
+    }
+
+    @Override
     protected Organization processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        validateThatSuppliedParamsIsSupported(requestInfo);
         final var identifier = getValidId(requestInfo);
         final var depth = getValidDepth(requestInfo);
         var params = Map.of(DEPTH, depth, IDENTIFIER, identifier);

@@ -13,8 +13,8 @@ public final class MappingUtils {
     public static FundingSource cristinModelToNvaModel(CristinFundingSource cristinFundingSource,
                                                        String domainName,
                                                        String basePath) {
-        var id = getFundingSourceUri(cristinFundingSource.getCode(), domainName, basePath);
-        return new FundingSource(id, cristinFundingSource.getCode(), cristinFundingSource.getName());
+        var id = getFundingSourceUri(cristinFundingSource.code(), domainName, basePath);
+        return new FundingSource(id, cristinFundingSource.code(), cristinFundingSource.name());
     }
 
     private static URI getFundingSourceUri(String code, String domainName, String basePath) {

@@ -14,7 +14,6 @@ import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -79,8 +78,8 @@ class ListCristinOrganizationPersonsHandlerTest {
     public static final String INVALID_VALUE = "value";
     public static final int PERSON_COUNT = 5;
     private static final String EMPTY_LIST_STRING = "[]";
-
     public static final String SORT_VALUE = "id desc";
+    public static final String SORT_VALUE_ENCODED = "id%20desc";
 
     private ListCristinOrganizationPersonsHandler handler;
     private ByteArrayOutputStream output;
@@ -112,8 +111,9 @@ class ListCristinOrganizationPersonsHandlerTest {
         try (var inputStream = generateHandlerRequestWithoutOrganizationIdentifier()) {
             handler.handleRequest(inputStream, output, context);
         }
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
-        String actualDetail = getProblemDetail(gatewayResponse);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
+        var actualDetail = getProblemDetail(gatewayResponse);
+
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS));
     }
@@ -123,8 +123,9 @@ class ListCristinOrganizationPersonsHandlerTest {
         try (var inputStream = generateHandlerDummyRequestWithIllegalQueryParameters()) {
             handler.handleRequest(inputStream, output, context);
         }
-        GatewayResponse<Problem> gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
-        String actualDetail = getProblemDetail(gatewayResponse);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
+        var actualDetail = getProblemDetail(gatewayResponse);
+
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(actualDetail, containsString(validQueryParameterNamesMessage(VALID_QUERY_PARAMETERS)));
     }
@@ -173,9 +174,9 @@ class ListCristinOrganizationPersonsHandlerTest {
 
         verify(cristinApiClient).fetchQueryResults(captor.capture());
         assertThat(Optional.ofNullable(captor.getValue()).toString(),
-                   containsString(SORT + EQUAL_OPERATOR + UriUtils.escapeWhiteSpace(SORT_VALUE)));
+                   containsString(SORT + EQUAL_OPERATOR + SORT_VALUE_ENCODED));
         assertThat(Optional.ofNullable(responseBody.getId()).toString(),
-                   containsString(SORT + EQUAL_OPERATOR + UriUtils.escapeWhiteSpace(SORT_VALUE)));
+                   containsString(SORT + EQUAL_OPERATOR + SORT_VALUE_ENCODED));
         assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
     }
 
@@ -185,29 +186,29 @@ class ListCristinOrganizationPersonsHandlerTest {
     void shouldIncludeNationalIdentificationNumberInResponseForAuthenticatedUser(AccessRight accessRight)
         throws IOException, ApiGatewayException {
 
-        CristinOrganizationPersonsClient apiClient = mock(CristinOrganizationPersonsClient.class);
-        SearchResponse<Person> searchResponse = randomPersonsWithNIN();
+        var apiClient = mock(CristinOrganizationPersonsClient.class);
+        var searchResponse = randomPersonsWithNIN();
         doReturn(searchResponse).when(apiClient).authorizedGenerateQueryResponse(any());
 
         handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
         var input = queryWithAccessRight(accessRight);
         handler.handleRequest(input, output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output,
-                SearchResponse.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
         assertThat(gatewayResponse.getBody(), containsString(NATIONAL_IDENTITY_NUMBER));
     }
 
     @Test
     void shouldNotIncludeNationalIdentificationNumberInResponseForUserWithoutAuthentication()
             throws IOException, ApiGatewayException {
-        CristinOrganizationPersonsClient apiClient = mock(CristinOrganizationPersonsClient.class);
-        SearchResponse<Person> searchResponse = randomPersons();
+        var apiClient = mock(CristinOrganizationPersonsClient.class);
+        var searchResponse = randomPersons();
         doReturn(searchResponse).when(apiClient).generateQueryResponse(any());
         handler = new ListCristinOrganizationPersonsHandler(apiClient, new Environment());
         var input = queryMissingAccessRightToReadNIN();
         handler.handleRequest(input, output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output,
-                SearchResponse.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
         assertThat(gatewayResponse.getBody(), not(containsString(NATIONAL_IDENTITY_NUMBER)));
     }
 

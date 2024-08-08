@@ -12,6 +12,7 @@ public class PersonInstInfoPatchSerializer extends StdSerializer<PersonInstInfoP
     public static final String EMAIL_FIELD = "email";
     public static final String PHONE_FIELD = "phone";
 
+    @SuppressWarnings("unused")
     public PersonInstInfoPatchSerializer() {
         this(null);
     }

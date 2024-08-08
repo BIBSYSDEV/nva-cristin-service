@@ -80,18 +80,18 @@ public class ListFundingSourcesHandlerTest {
         var fundingSources = response.getBodyObject(FundingSources.class);
 
         var expectedContext = URI.create("https://bibsysdev.github.io/src/funding-context.json");
-        assertThat(fundingSources.getContext(), is(equalTo(expectedContext)));
+        assertThat(fundingSources.context(), is(equalTo(expectedContext)));
 
         var expectedId = URI.create("https://api.sandbox.nva.aws.unit.no/cristin/funding-sources");
-        assertThat(fundingSources.getId(), is(equalTo(expectedId)));
+        assertThat(fundingSources.id(), is(equalTo(expectedId)));
 
-        assertThat(fundingSources.getSources(), iterableWithSize(2));
+        assertThat(fundingSources.sources(), iterableWithSize(2));
 
-        var firstEntry = fundingSources.getSources().get(0);
-        assertThat(firstEntry.getIdentifier(), is(equalTo("EC/FP7")));
+        var firstEntry = fundingSources.sources().get(0);
+        assertThat(firstEntry.identifier(), is(equalTo("EC/FP7")));
 
-        var secondEntry = fundingSources.getSources().get(1);
-        assertThat(secondEntry.getIdentifier(), is(equalTo("EC/H2020")));
+        var secondEntry = fundingSources.sources().get(1);
+        assertThat(secondEntry.identifier(), is(equalTo("EC/H2020")));
     }
 
     @Test

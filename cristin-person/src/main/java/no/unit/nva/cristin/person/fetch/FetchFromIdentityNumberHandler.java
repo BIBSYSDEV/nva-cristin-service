@@ -58,6 +58,13 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     }
 
     @Override
+    protected void validateRequest(TypedValue input, RequestInfo requestInfo, Context context)
+        throws ApiGatewayException {
+
+        // no-op
+    }
+
+    @Override
     protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
@@ -71,7 +78,7 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
         validateQueryParameters(requestInfo);
         validateInput(input);
 
-        return apiClient.getPersonFromNationalIdentityNumber(input.getValue());
+        return apiClient.getPersonFromNationalIdentityNumber(input.value());
     }
 
     @Override
@@ -101,9 +108,9 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
 
     private void validateInput(TypedValue input) throws BadRequestException {
         if (Objects.nonNull(input)
-            && NIN_TYPE.equals(input.getType())
-            && Objects.nonNull(input.getValue())
-            && isValidNationalIdentificationNumber(input.getValue())) {
+            && NIN_TYPE.equals(input.type())
+            && Objects.nonNull(input.value())
+            && isValidNationalIdentificationNumber(input.value())) {
 
             return;
         }

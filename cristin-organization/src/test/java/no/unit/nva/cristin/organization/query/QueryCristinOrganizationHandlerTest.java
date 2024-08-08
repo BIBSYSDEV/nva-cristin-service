@@ -244,7 +244,7 @@ class QueryCristinOrganizationHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         verify(cristinApiClientVersionOne).sendRequestMultipleTimes(captor.capture());
-        assertThat(captor.getValue().getQuery(), containsString("sort=country+desc"));
+        assertThat(captor.getValue().getQuery(), containsString("sort=country desc"));
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 
@@ -259,7 +259,7 @@ class QueryCristinOrganizationHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         verify(queryCristinOrgClient20230526).fetchQueryResults(captor.capture());
-        assertThat(captor.getValue().getQuery(), containsString("sort=country+desc"));
+        assertThat(captor.getValue().getQuery(), containsString("sort=country desc"));
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 
@@ -378,6 +378,25 @@ class QueryCristinOrganizationHandlerTest {
         assertThat(actualHits.get(2).getId().toString(), containsString("185.90.3.0"));
         assertThat(actualHits.get(3).getId().toString(), containsString("185.90.4.0"));
         assertThat(actualHits.get(4).getId().toString(), containsString("185.90.5.0"));
+    }
+
+    @Test
+    void shouldHaveCorrectEncodingOfNameParam() throws Exception {
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
+
+        var input = new HandlerRequestBuilder<InputStream>(restApiMapper)
+                        .withHeaders(Map.of(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26))
+                        .withQueryParameters(Map.of(QUERY, "universitetet i oslo"))
+                        .build();
+
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(URI.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        verify(queryCristinOrgClient20230526).fetchQueryResults(captor.capture());
+        assertThat(captor.getValue().getQuery(), containsString("name=universitetet i oslo"));
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 
     private List<Organization> convertHitsToProperFormat(SearchResponse<?> searchResponse) {

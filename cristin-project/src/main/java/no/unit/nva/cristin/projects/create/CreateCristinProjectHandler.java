@@ -103,4 +103,9 @@ public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, N
         return DEFAULT_RESPONSE_MEDIA_TYPES;
     }
 
+    @Override
+    protected void validateRequest(NvaProject input, RequestInfo requestInfo, Context context) {
+        // no-op
+    }
+
 }

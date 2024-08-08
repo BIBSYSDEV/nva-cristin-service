@@ -1,7 +1,6 @@
 package no.unit.nva.cristin.common.handler;
 
 import no.unit.nva.cristin.common.Utils;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
@@ -56,7 +55,6 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     protected String getValidQuery(RequestInfo requestInfo) throws BadRequestException {
         return requestInfo.getQueryParameterOpt(QUERY)
                 .filter(this::isValidQueryString)
-                .map(UriUtils::escapeWhiteSpace)
                 .orElseThrow(() -> new BadRequestException(invalidQueryParametersMessage(
                         QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
@@ -64,15 +62,13 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
     protected String getValidName(RequestInfo requestInfo) throws BadRequestException {
         return requestInfo.getQueryParameterOpt(NAME)
                 .filter(this::isValidQueryString)
-                .map(UriUtils::escapeWhiteSpace)
                 .orElseThrow(() -> new BadRequestException(
                         invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
     }
 
     protected Optional<String> getValidOrganization(RequestInfo requestInfo) {
         return requestInfo.getQueryParameterOpt(ORGANIZATION)
-                .filter(this::isValidQueryString)
-                .map(UriUtils::escapeWhiteSpace);
+                .filter(this::isValidQueryString);
     }
 
     protected boolean isValidQueryString(String str) {

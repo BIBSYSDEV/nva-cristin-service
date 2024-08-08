@@ -27,9 +27,9 @@ public class CreateCristinPersonApiClient extends PostApiClient {
      * Creates a person in Cristin from the supplied Person object.
      */
     public Person createPersonInCristin(Person person) throws ApiGatewayException {
-        String payload = generatePayloadFromRequest(person);
-        URI uri = getCristinPersonPostUri();
-        HttpResponse<String> response = post(uri, payload);
+        var payload = generatePayloadFromRequest(person);
+        var uri = getCristinPersonPostUri();
+        var response = post(uri, payload);
         checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode(), response.body());
 
         return createPersonFromResponse(response);
@@ -39,16 +39,16 @@ public class CreateCristinPersonApiClient extends PostApiClient {
      * Creates a person in Cristin from the supplied Person object and at allowed Cristin institution.
      */
     public Person createPersonInCristin(Person person, String cristinInstitutionNumber) throws ApiGatewayException {
-        String payload = generatePayloadFromRequest(person);
-        URI uri = getCristinPersonPostUri();
-        HttpResponse<String> response = post(uri, payload, cristinInstitutionNumber);
+        var payload = generatePayloadFromRequest(person);
+        var uri = getCristinPersonPostUri();
+        var response = post(uri, payload, cristinInstitutionNumber);
         checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode(), response.body());
 
         return createPersonFromResponse(response);
     }
 
     private Person createPersonFromResponse(HttpResponse<String> response) throws BadGatewayException {
-        CristinPerson responseCristinPerson = getDeserializedResponse(response, CristinPerson.class);
+        var responseCristinPerson = getDeserializedResponse(response, CristinPerson.class);
 
         return responseCristinPerson
                    .toPersonBuilderWithAuthorizedFields()

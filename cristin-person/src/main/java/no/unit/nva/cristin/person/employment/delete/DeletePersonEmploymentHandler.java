@@ -37,6 +37,11 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
         this.apiClient = apiClient;
     }
 
+    @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        validateHasAccessRights(requestInfo);
+    }
+
     /**
      * Implements the main logic of the handler. Any exception thrown by this method will be handled by {@link
      * RestRequestHandler#handleExpectedException} method.
@@ -50,11 +55,12 @@ public class DeletePersonEmploymentHandler extends ApiGatewayHandler<Void, Void>
      */
     @Override
     protected Void processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        validateHasAccessRights(requestInfo);
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-        String personId = getValidPersonId(requestInfo);
-        String employmentId = getValidEmploymentId(requestInfo);
-        return apiClient.deletePersonEmployment(personId, employmentId,
+        var personId = getValidPersonId(requestInfo);
+        var employmentId = getValidEmploymentId(requestInfo);
+
+        return apiClient.deletePersonEmployment(personId,
+                                                employmentId,
                                                 extractCristinInstitutionIdentifier(requestInfo));
     }
 

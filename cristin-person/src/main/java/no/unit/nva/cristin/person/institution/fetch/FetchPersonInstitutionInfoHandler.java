@@ -38,16 +38,18 @@ public class FetchPersonInstitutionInfoHandler extends PersonInstitutionInfoHand
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        AccessUtils.validateIdentificationNumberAccess(requestInfo);
+        logUser(requestInfo);
+        validateQueryParameters(requestInfo);
+    }
+
+    @Override
     protected PersonInstitutionInfo processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        AccessUtils.validateIdentificationNumberAccess(requestInfo);
-
-        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-
-        validateQueryParameters(requestInfo);
-        String personId = getValidPersonId(requestInfo);
-        String orgId = getValidOrgId(requestInfo);
+        var personId = getValidPersonId(requestInfo);
+        var orgId = getValidOrgId(requestInfo);
 
         return apiClient.generateGetResponse(personId, orgId);
     }
@@ -55,6 +57,10 @@ public class FetchPersonInstitutionInfoHandler extends PersonInstitutionInfoHand
     @Override
     protected Integer getSuccessStatusCode(Void input, PersonInstitutionInfo output) {
         return HttpURLConnection.HTTP_OK;
+    }
+
+    private void logUser(RequestInfo requestInfo) {
+        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
     }
 
 }

@@ -19,13 +19,13 @@ import nva.commons.core.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("unused")
 public class CreateKeywordHandler extends ApiGatewayHandler<Keyword, Keyword> {
 
     private static final Logger logger = LoggerFactory.getLogger(CreateKeywordHandler.class);
 
     private final transient CreateKeywordApiClient apiClient;
 
+    @SuppressWarnings("unused")
     public CreateKeywordHandler() {
         this(new Environment(), new CristinCreateKeywordApiClient(CristinAuthenticator.getHttpClient()));
     }
@@ -40,10 +40,6 @@ public class CreateKeywordHandler extends ApiGatewayHandler<Keyword, Keyword> {
     protected Keyword processInput(Keyword input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        authorize(requestInfo);
-        logUserInfo(requestInfo);
-        validateInput(input);
-
         return apiClient.create(input);
     }
 
@@ -55,6 +51,13 @@ public class CreateKeywordHandler extends ApiGatewayHandler<Keyword, Keyword> {
     @Override
     protected List<MediaType> listSupportedMediaTypes() {
         return DEFAULT_RESPONSE_MEDIA_TYPES;
+    }
+
+    @Override
+    protected void validateRequest(Keyword input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        authorize(requestInfo);
+        logUserInfo(requestInfo);
+        validateInput(input);
     }
 
     private void authorize(RequestInfo requestInfo) throws ApiGatewayException {

@@ -22,7 +22,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -68,14 +67,14 @@ public class UpdatePersonEmploymentHandlerTest {
 
     @Test
     void shouldReturnNoContentResponseWhenPayloadIsValid() throws IOException {
-        GatewayResponse<Void> gatewayResponse = sendQuery(validJson);
+        var gatewayResponse = sendQuery(validJson);
 
         assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
     }
 
     @Test
     void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
-        GatewayResponse<Void> gatewayResponse = queryWithoutRequiredAccessRights();
+        var gatewayResponse = queryWithoutRequiredAccessRights();
 
         assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
         assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
@@ -83,9 +82,9 @@ public class UpdatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenInvalidPositionCode() throws IOException {
-        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        var input = OBJECT_MAPPER.createObjectNode();
         input.put(TYPE, INVALID_URI);
-        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
+        var gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(TYPE)));
@@ -93,9 +92,9 @@ public class UpdatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenInvalidAffiliation() throws IOException {
-        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        var input = OBJECT_MAPPER.createObjectNode();
         input.put(ORGANIZATION, INVALID_URI);
-        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
+        var gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(ORGANIZATION)));
@@ -103,9 +102,9 @@ public class UpdatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenInvalidDate() throws IOException {
-        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        var input = OBJECT_MAPPER.createObjectNode();
         input.put(START_DATE, INVALID_VALUE);
-        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
+        var gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(START_DATE)));
@@ -113,9 +112,9 @@ public class UpdatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenNonNullableIsNull() throws IOException {
-        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        var input = OBJECT_MAPPER.createObjectNode();
         input.putNull(START_DATE);
-        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
+        var gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(START_DATE)));
@@ -123,9 +122,9 @@ public class UpdatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenInvalidFullTimePercentage() throws IOException {
-        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        var input = OBJECT_MAPPER.createObjectNode();
         input.put(FULL_TIME_PERCENTAGE, INVALID_VALUE);
-        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
+        var gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(FULL_TIME_PERCENTAGE)));
@@ -133,9 +132,9 @@ public class UpdatePersonEmploymentHandlerTest {
 
     @Test
     void shouldThrowBadRequestWhenNoSupportedValuesPresentInJson() throws IOException {
-        ObjectNode input = OBJECT_MAPPER.createObjectNode();
+        var input = OBJECT_MAPPER.createObjectNode();
         input.put(INVALID_VALUE, INVALID_VALUE);
-        GatewayResponse<Void> gatewayResponse = sendQuery(input.toString());
+        var gatewayResponse = sendQuery(input.toString());
 
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));

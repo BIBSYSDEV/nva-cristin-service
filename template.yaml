@@ -14,7 +14,7 @@ Globals:
       - arm64
     Environment:
       Variables:
-        ALLOWED_ORIGIN: '*'
+        ALLOWED_ORIGIN: !Ref AllowedOrigins
         CRISTIN_API_URL: !Ref CristinApiUrl
         DOMAIN_NAME: !Ref ApiDomain
         API_HOST: !Ref ApiDomain # TODO: replace DOMAIN_NAME with API_HOST (New name needed for Cognito test users)
@@ -81,6 +81,13 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: CristinBotFilterBypassHeaderValue
     Description: Header value of http request header to use to bypass bot filter in requests to Cristin API.
+  SlackSnsArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: '/NVA/Monitoring/SlackSnsArn'
+  AllowedOrigins:
+    Type: String
+    Description: comma separated list of external clients that are allowed to contact the HTTP APIs, "*" indicates that all origins are allowed
+    Default: '*'
 
 Resources:
 
@@ -715,6 +722,40 @@ Resources:
       Threshold: '1'
       ComparisonOperator: 'LessThanThreshold'
       AlarmName: !Sub 'No successful executions for ${NvaCristinUpdateIntermediateUnitsFunction} last 24h'
+      AlarmActions:
+        - !Ref SlackSnsArn
+
+  CristinHealthCheck:
+    Type: AWS::Route53::HealthCheck
+    Properties:
+      HealthCheckConfig:
+        Port: 443
+        Type: HTTPS
+        ResourcePath: /v2/units
+        FullyQualifiedDomainName: !Select [2, !Split ["/", !Ref CristinApiUrl]] # Extracts the domain name from the URL
+        RequestInterval: 30
+        FailureThreshold: 2
+        EnableSNI: true
+
+  CristinHealthAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub External-Cristin-API-HealthCheck-${NvaCristinProxyApi} # NvaCristinProxyApi is here just to make the name unique
+      AlarmDescription: Check if external Cristin API is healthy
+      Namespace: AWS/Route53
+      MetricName: HealthCheckStatus
+      Dimensions:
+        - Name: HealthCheckId
+          Value: !GetAtt CristinHealthCheck.HealthCheckId
+      Statistic: Minimum
+      Period: 60
+      EvaluationPeriods: 1
+      DatapointsToAlarm: 1
+      Threshold: 1
+      ComparisonOperator: LessThanThreshold
+      AlarmActions:
+        - !Ref SlackSnsArn
+      TreatMissingData: notBreaching
 
 Outputs:
   NvaCristinIntermediateStorageBucketName:

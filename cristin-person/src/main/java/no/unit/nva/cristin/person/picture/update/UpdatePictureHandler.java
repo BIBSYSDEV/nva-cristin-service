@@ -33,10 +33,13 @@ public class UpdatePictureHandler extends ApiGatewayHandler<Binary, Void> {
     }
 
     @Override
+    protected void validateRequest(Binary input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        new UpdatePictureAccessCheck().verifyUserHasAccess(requestInfo);
+    }
+
+    @Override
     protected Void processInput(Binary input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
-
-        new UpdatePictureAccessCheck().verifyUserHasAccess(requestInfo);
 
         logger.info(LOG_IDENTIFIERS + IS_ACTING_AS_THEMSELVES, extractCristinIdentifier(requestInfo),
                     extractOrgIdentifier(requestInfo));

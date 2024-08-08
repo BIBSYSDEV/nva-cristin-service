@@ -19,19 +19,19 @@ class FacetUriParamAppenderTest {
         URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?name=tor&sectorFacet=UC");
 
     private static final URI idUriWithMultipleFacet =
-        URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?name=tor&sectorFacet=INSTITUTE,UC");
+        URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?name=tor&sectorFacet=INSTITUTE%2CUC");
 
     private static final URI idUriWithMultipleDifferentFacets =
         URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?name=tor&organizationFacet=uio&sectorFacet=UC");
 
     private static final URI idUriWithMultipleFacetUnSorted =
-        URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?sectorFacet=UC,INSTITUTE&name=tor");
+        URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?sectorFacet=UC%2CINSTITUTE&name=tor");
 
     private static final URI idUriWithMultipleFacetAppendedAndSorted =
         URI.create("https://api.dev.nva.aws.unit.no/cristin/person/"
                    + "?name=tor"
                    + "&organizationFacet=uio"
-                   + "&sectorFacet=INSTITUTE,UC");
+                   + "&sectorFacet=INSTITUTE%2CUC");
 
     private static final URI idUriWithTitleHavingComma = generateUriWithCommaParamValue();
 
@@ -138,15 +138,15 @@ class FacetUriParamAppenderTest {
         var institutionFacet = new CristinInstitutionFacet("uio", null);
 
         var actual = new FacetUriParamAppender(idUriWithTitleHavingComma,
-                                               CristinFacetKey.INSTITUTION.getKey(),
+                                               CristinFacetKey.PARTICIPATING_PERSON_ORG.getKey(),
                                                institutionFacet)
                          .create()
                          .getUriWithFacetKeys()
                          .map(UriWrapper::getUri)
                          .orElse(null);
 
-        var expected = "https://api.dev.nva.aws.unit.no/cristin/project/?organizationFacet=uio"
-                       + "&title=Et%20prestisjefylt,%20stort%20og%20viktig%20prosjekt";
+        var expected = "https://api.dev.nva.aws.unit.no/cristin/project/?participantOrgFacet=uio"
+                       + "&title=Et%20prestisjefylt%2C%20stort%20og%20viktig%20prosjekt";
 
         Objects.requireNonNull(actual);
         assertEquals(expected, actual.toString());

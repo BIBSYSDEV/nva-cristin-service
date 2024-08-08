@@ -10,7 +10,6 @@ import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -43,19 +42,16 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
 
     @Override
     protected Void processInput(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-
-        validateHasAccessRights(requestInfo);
-
-        ObjectNode objectNode = readJsonFromInput(input);
+        var objectNode = readJsonFromInput(input);
         UpdatePersonEmploymentValidator.validate(objectNode);
-        ObjectNode cristinJson = new UpdateCristinEmploymentJsonCreator(objectNode).create().getOutput();
+        var cristinJson = new UpdateCristinEmploymentJsonCreator(objectNode).create().getOutput();
 
         if (cristinJson.isEmpty()) {
             throw new BadRequestException(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD);
         }
 
-        String personId = getValidPersonId(requestInfo);
-        String employmentId = getValidEmploymentId(requestInfo);
+        var personId = getValidPersonId(requestInfo);
+        var employmentId = getValidEmploymentId(requestInfo);
 
         logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
 
@@ -71,6 +67,11 @@ public class UpdatePersonEmploymentHandler extends ApiGatewayHandler<String, Voi
     @Override
     protected List<MediaType> listSupportedMediaTypes() {
         return DEFAULT_RESPONSE_MEDIA_TYPES;
+    }
+
+    @Override
+    protected void validateRequest(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        validateHasAccessRights(requestInfo);
     }
 
     private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {

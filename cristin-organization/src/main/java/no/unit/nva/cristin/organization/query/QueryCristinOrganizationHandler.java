@@ -7,7 +7,6 @@ import no.unit.nva.cristin.common.client.CristinQueryApiClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.model.Organization;
-import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -52,10 +51,14 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     }
 
     @Override
+    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        validateQueryParameterKeys(requestInfo);
+    }
+
+    @Override
     protected SearchResponse<Organization> processInput(Void input, RequestInfo requestInfo, Context context)
         throws ApiGatewayException {
 
-        validateQueryParameterKeys(requestInfo);
         var requestQueryParams = extractQueryParameters(requestInfo);
         var apiVersion = getApiVersion(requestInfo);
 
@@ -90,8 +93,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
     }
 
     private Optional<String> getSort(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(SORT)
-                   .map(UriUtils::escapeWhiteSpace);
+        return requestInfo.getQueryParameterOpt(SORT);
     }
 
     private static String getFullTreeParam(RequestInfo requestInfo) {
