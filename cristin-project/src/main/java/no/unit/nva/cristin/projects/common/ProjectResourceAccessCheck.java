@@ -22,7 +22,7 @@ public class ProjectResourceAccessCheck {
     protected Optional<String> getResourceCreator(NvaProject resource) {
         return Optional.ofNullable(resource)
                    .map(NvaProject::getCreator)
-                   .map(NvaContributor::getIdentity)
+                   .map(NvaContributor::identity)
                    .map(Person::getId)
                    .map(UriUtils::extractLastPathElement)
                    .filter(Utils::isPositiveInteger);

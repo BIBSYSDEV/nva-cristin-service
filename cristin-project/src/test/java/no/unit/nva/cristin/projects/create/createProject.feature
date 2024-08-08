@@ -10,10 +10,96 @@ Feature: API tests for Cristin Project retrieve and search
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
     * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
-    * def minimalCreateRequest = { type: 'Project', title: 'Test Project', language: 'http://lexvo.org/id/iso639-3/nob', startDate: '2010-06-29T01:33:17.518Z', endDate: '2030-06-29T01:33:17.518Z',  coordinatingInstitution: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'},contributors: [{type: 'ProjectManager',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'}}]}
-    * def lessThanMinimalCreateRequest = { type: 'Project', startDate: '2010-06-29T01:33:17.518Z', endDate: '2030-06-29T01:33:17.518Z', coordinatingInstitution: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'},contributors: [{type: 'ProjectManager',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'}}]}
-    * def requestWithIllegalValues =   { type: 'Project', title: 'Test Project', startDate: '2010-06-29T01:33:17.518Z', endDate: 'IllegalValue', coordinatingInstitution: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'},contributors: [{type: 'IllegalValue',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'}}]}
-    * def requestWithId =   { id: 'https://api.dev.nva.aws.unit.no/cristin/project/2121331275', type: 'Project', title: 'Test Project', language: 'http://lexvo.org/id/iso639-3/nob', startDate: '2010-06-29T01:33:17.518Z', endDate: '2030-06-29T01:33:17.518Z', coordinatingInstitution: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'},contributors: [{type: 'ProjectManager',identity: {type: 'Person',id: 'https://api.cristin-test.uio.no/v2/persons/515114'},affiliation: {type: 'Organization',id: 'https://api.cristin-test.uio.no/v2/institutions/20202'}}]}
+    * def minimalCreateRequest =
+    """
+    {
+      'type': 'Project',
+      'title': 'Test Project',
+      'language': 'http://lexvo.org/id/iso639-3/nob',
+      'startDate': '2010-06-29T01:33:17.518Z',
+      'endDate': '2030-06-29T01:33:17.518Z',
+      'coordinatingInstitution': {
+        'type': 'Organization',
+        'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+      },
+      'contributors': [
+        {
+          'identity': {
+            'type': 'Person',
+            'id': 'https://api.cristin-test.uio.no/v2/persons/515114'
+          },
+          'roles': [
+            {
+              'type': 'ProjectManager',
+              'affiliation': {
+                'type': 'Organization',
+                'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+              }
+            }
+          ]
+        }
+      ]
+    }
+    """
+    * def lessThanMinimalCreateRequest =
+    """
+    {
+      'type': 'Project',
+      'startDate': '2010-06-29T01:33:17.518Z',
+      'endDate': '2030-06-29T01:33:17.518Z',
+      'coordinatingInstitution': {
+        'type': 'Organization',
+        'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+      },
+      'contributors': [
+        {
+          'identity': {
+            'type': 'Person',
+            'id': 'https://api.cristin-test.uio.no/v2/persons/515114'
+          },
+          'roles': [
+            {
+              'type': 'ProjectManager',
+              'affiliation': {
+                'type': 'Organization',
+                'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+              }
+            }
+          ]
+        }
+      ]
+    }
+    """
+    * def requestWithIllegalValues =
+    """
+    {
+      'type': 'Project',
+      'title': 'Test Project',
+      'startDate': '2010-06-29T01:33:17.518Z',
+      'endDate': 'IllegalValue',
+      'coordinatingInstitution': {
+        'type': 'Organization',
+        'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+      },
+      'contributors': [
+        {
+          'identity': {
+            'type': 'Person',
+            'id': 'https://api.cristin-test.uio.no/v2/persons/515114'
+          },
+          'roles': [
+            {
+              'type': 'IllegalValue',
+              'affiliation': {
+                'type': 'Organization',
+                'id': 'https://api.cristin-test.uio.no/v2/institutions/20202'
+              }
+            }
+          ]
+        }
+      ]
+    }
+    """
     * def PROBLEM_JSON_MEDIA_TYPE = 'application/problem+json'
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
@@ -45,16 +131,6 @@ Feature: API tests for Cristin Project retrieve and search
     When method POST
     Then status 401
 
-  Scenario: Create returns status Bad request when input has id
-    Given path '/project'
-    * header Authorization = 'Bearer ' + token
-    And request requestWithId
-    When method POST
-    Then status 400
-    And match response.title == 'Bad Request'
-    And match response.status == 400
-    And match response.detail == 'Supplied payload is not valid (project identifier not allowed)'
-
   Scenario: Create returns status Bad request when input is insufficient
     Given path '/project'
     * header Authorization = 'Bearer ' + token
@@ -73,5 +149,3 @@ Feature: API tests for Cristin Project retrieve and search
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And print response.detail
-

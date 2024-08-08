@@ -10,7 +10,7 @@ import java.util.HashMap;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinTypedLabel;
-import no.unit.nva.cristin.projects.model.cristin.adapter.NvaContributorToCristinPersonWithRoles;
+import no.unit.nva.cristin.projects.model.cristin.adapter.NvaContributorToCristinPerson;
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.language.Language;
@@ -183,7 +183,7 @@ public class CristinProjectPatchJsonCreator {
 
     private static List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
         return contributors.stream()
-                   .map(new NvaContributorToCristinPersonWithRoles())
+                   .map(new NvaContributorToCristinPerson())
                    .collect(Collectors.toList());
     }
 

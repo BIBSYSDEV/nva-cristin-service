@@ -1,6 +1,8 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import no.unit.nva.cristin.model.CristinApproval;
@@ -10,8 +12,8 @@ import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinTypedLabel;
 import no.unit.nva.cristin.projects.model.cristin.adapter.ApprovalToCristinApproval;
 import no.unit.nva.cristin.projects.model.cristin.adapter.ExternalSourcesToCristinExternalSources;
-import no.unit.nva.cristin.projects.model.cristin.adapter.NvaContributorToCristinPersonWithRoles;
-import no.unit.nva.cristin.projects.model.cristin.adapter.PersonToCristinPersonWithoutRoles;
+import no.unit.nva.cristin.projects.model.cristin.adapter.NvaContributorToCristinPerson;
+import no.unit.nva.cristin.projects.model.cristin.adapter.PersonToCristinPerson;
 import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
 import no.unit.nva.model.ExternalSource;
@@ -29,7 +31,6 @@ import java.util.stream.Collectors;
 import no.unit.nva.model.adapter.TypedLabelToCristinFormat;
 import no.unit.nva.utils.UriUtils;
 
-import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingInstitution;
 import static no.unit.nva.cristin.model.CristinOrganizationBuilder.fromOrganizationContainingUnitIfPresent;
@@ -90,7 +91,7 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
 
     private List<CristinPerson> extractContributors(List<NvaContributor> contributors) {
         return contributors.stream()
-                   .map(new NvaContributorToCristinPersonWithRoles())
+                   .map(new NvaContributorToCristinPerson())
                    .collect(Collectors.toList());
     }
 
@@ -101,14 +102,19 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
     }
 
     private CristinPerson extractCreator(NvaContributor creator) {
-        if (nonNull(creator)) {
-            if (nonNull(creator.getAffiliation())) {
-                return new NvaContributorToCristinPersonWithRoles().apply(creator);
-            } else {
-                return new PersonToCristinPersonWithoutRoles().apply(creator.getIdentity());
-            }
-        }
-        return null;
+        return Optional.ofNullable(creator)
+                   .map(this::getCreator)
+                   .orElse(null);
+    }
+
+    private CristinPerson getCreator(NvaContributor creator) {
+        return Optional.of(creator.roles())
+                   .stream()
+                   .flatMap(Collection::stream) // For removal of List.of(null)
+                   .filter(Objects::nonNull)
+                   .findAny()
+                   .map(hasAffiliation -> new NvaContributorToCristinPerson().apply(creator))
+                   .orElseGet(() -> new PersonToCristinPerson().apply(creator.identity()));
     }
 
     private List<CristinApproval> extractApprovals(List<Approval> approvals) {
