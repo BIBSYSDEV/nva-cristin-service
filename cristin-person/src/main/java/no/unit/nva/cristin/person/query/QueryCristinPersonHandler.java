@@ -7,6 +7,7 @@ import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
 import no.unit.nva.cristin.common.handler.CristinQueryHandler;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
@@ -128,7 +129,8 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
             return null;
         }
 
-        return name.filter(this::isValidQueryString)
+        return name.map(UriUtils::decodeUri)
+                   .filter(this::isValidQueryString)
                    .orElseThrow(QueryCristinPersonHandler::invalidNameException);
     }
 
@@ -138,7 +140,10 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     }
 
     private String extractOrganization(RequestInfo requestInfo) {
-        return getValidOrganization(requestInfo).orElse(null);
+        return requestInfo.getQueryParameterOpt(ORGANIZATION)
+                   .map(UriUtils::decodeUri)
+                   .filter(this::isValidQueryString)
+                   .orElse(null);
     }
 
     private String extractVerified(RequestInfo requestInfo) {

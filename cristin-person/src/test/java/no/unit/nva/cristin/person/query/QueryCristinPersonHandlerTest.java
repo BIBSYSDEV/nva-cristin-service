@@ -109,6 +109,8 @@ public class QueryCristinPersonHandlerTest {
     public static final String DELIMITER = ",";
     public static final String EQUALS = "=";
     public static final String NAME_DESC = "name desc";
+    public static final String ENCODED_NAME = "t%C3%B8rresen";
+    public static final String ENCODED_ORGANIZATION = "H%C3%B8gskole";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -421,6 +423,25 @@ public class QueryCristinPersonHandlerTest {
         var actual = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
         assertThat(actual.getStatusCode(), equalTo(HttpURLConnection.HTTP_OK));
+    }
+
+    @Test
+    void shouldAvoidDoubleEncodingWhenInputFromClientIsAlreadyEncoded() throws IOException, ApiGatewayException {
+        apiClient = spy(apiClient);
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, environment);
+        try (var input = requestWithQueryParameters(Map.of(NAME, ENCODED_NAME,
+                                                           ORGANIZATION, ENCODED_ORGANIZATION))) {
+            handler.handleRequest(input, output, context);
+        }
+
+        GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        var captor = ArgumentCaptor.forClass(URI.class);
+        verify(apiClient).fetchQueryResults(captor.capture());
+
+        assertThat(captor.getValue().toString(), containsString(ENCODED_NAME));
+        assertThat(captor.getValue().toString(), containsString(ENCODED_ORGANIZATION));
     }
 
     private SearchResponse<Person> randomPersons() {
