@@ -4,7 +4,6 @@ import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PERSON_QUERY_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
-import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
@@ -23,7 +22,6 @@ import no.unit.nva.cristin.person.model.cristin.CristinPersonSearchResponse;
 import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
-import org.apache.hc.core5.net.URIBuilder;
 
 public class QueryPersonWithFacetsClient extends CristinPersonApiClient
     implements ClientVersion, CristinAuthorizedQueryClient<Map<String, String>, Person> {
@@ -101,14 +99,10 @@ public class QueryPersonWithFacetsClient extends CristinPersonApiClient
     }
 
     private static URI appendFacetsToUri(Map<String, String> parameters, URI cristinUri) {
-        var uri = new CristinFacetUriParamAppender(cristinUri, parameters)
-                      .getAppendedUri()
-                      //.addChild(FACETS_PATH)
-                      .getUri();
-
-        //return uri;
-
-        return attempt(() -> new URIBuilder(uri).appendPath(FACETS_PATH).build()).orElseThrow();
+        return new CristinFacetUriParamAppender(cristinUri, parameters)
+                   .getAppendedUri()
+                   .addChild(FACETS_PATH)
+                   .getUri();
     }
 
     private CristinPersonSearchResponse deserializeResponse(HttpResponse<String> response) throws BadGatewayException {
