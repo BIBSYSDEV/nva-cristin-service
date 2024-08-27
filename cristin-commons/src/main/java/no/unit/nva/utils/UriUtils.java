@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import nva.commons.core.paths.UriWrapper;
 
-
 public class UriUtils {
 
     public static final String POSITION = "position";
@@ -55,8 +54,8 @@ public class UriUtils {
      */
     public static URI addLanguage(URI uri) {
         return UriWrapper.fromUri(uri)
-            .addQueryParameter(QUERY_PARAMETER_LANGUAGE, ALL_QUERY_PARAMETER_LANGUAGES)
-            .getUri();
+                   .addQueryParameter(QUERY_PARAMETER_LANGUAGE, ALL_QUERY_PARAMETER_LANGUAGES)
+                   .getUri();
     }
 
     public static URI createIdUriFromParams(Map<String, String> requestQueryParams, String type) {

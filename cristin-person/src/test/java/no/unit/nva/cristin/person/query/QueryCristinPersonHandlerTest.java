@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.net.HttpHeaders;
 import java.net.URI;
+import java.net.http.HttpRequest;
 import java.util.ArrayList;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -15,6 +16,7 @@ import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.query.version.facet.QueryPersonWithFacetsClient;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.exception.FailedHttpRequestException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
@@ -109,6 +111,9 @@ public class QueryCristinPersonHandlerTest {
     public static final String DELIMITER = ",";
     public static final String EQUALS = "=";
     public static final String NAME_DESC = "name desc";
+    public static final String ENCODED_NAME = "t%C3%B8rresen";
+    public static final String ENCODED_ORGANIZATION = "H%C3%B8gskole";
+    public static final String INVALID_ENCODING = "%EF%BF%BD";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -423,6 +428,45 @@ public class QueryCristinPersonHandlerTest {
         assertThat(actual.getStatusCode(), equalTo(HttpURLConnection.HTTP_OK));
     }
 
+    @Test
+    void shouldAvoidDoubleEncodingWhenInputFromClientIsAlreadyEncoded() throws IOException, ApiGatewayException {
+        apiClient = spy(apiClient);
+        doReturn(apiClient).when(clientProvider).getVersionOne();
+        handler = new QueryCristinPersonHandler(clientProvider, environment);
+        try (var input = requestWithQueryParameters(Map.of(NAME, ENCODED_NAME,
+                                                           ORGANIZATION, ENCODED_ORGANIZATION))) {
+            handler.handleRequest(input, output, context);
+        }
+
+        GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        var captor = ArgumentCaptor.forClass(URI.class);
+        verify(apiClient).fetchQueryResults(captor.capture());
+
+        assertThat(captor.getValue().toString(), containsString(ENCODED_NAME));
+        assertThat(captor.getValue().toString(), containsString(ENCODED_ORGANIZATION));
+    }
+
+    @Test
+    void shouldAvoidDoubleEncodingInVersionWithFacetsUsingFacetsWhenInputFromClientIsAlreadyEncoded()
+        throws Exception {
+
+        var apiClient = spy(ApiClientFacetsStub.class);
+        doReturn(apiClient).when(clientProvider).getVersionWithFacets();
+        handler = new QueryCristinPersonHandler(clientProvider, environment);
+        var request = new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+                          .withBody(null)
+                          .withQueryParameters(Map.of(NAME, ENCODED_NAME,
+                                                      ORGANIZATION, ENCODED_ORGANIZATION,
+                                                      SECTOR_PARAM.getNvaKey(), multiValuedFacetParam()))
+                          .withHeaders(Map.of(ACCEPT, VERSION_2023_11_03_AGGREGATIONS))
+                          .build();
+
+        handler.handleRequest(request, output, context);
+
+        assertThat(apiClient.getHttpRequest().uri().toString(), not(containsString(INVALID_ENCODING)));
+    }
+
     private SearchResponse<Person> randomPersons() {
         var persons = new ArrayList<Person>();
         IntStream.range(0, 5).mapToObj(i -> randomPerson()).forEach(persons::add);
@@ -556,6 +600,22 @@ public class QueryCristinPersonHandlerTest {
     private static Stream<Arguments> accessRightProvider() {
         return Stream.of(Arguments.of(MANAGE_OWN_AFFILIATION),
                          Arguments.of(MANAGE_CUSTOMERS));
+    }
+
+    static class ApiClientFacetsStub extends QueryPersonWithFacetsClient {
+        private HttpRequest httpRequest;
+
+        @Override
+        protected HttpResponse<String> getSuccessfulResponseOrThrowException(HttpRequest httpRequest)
+            throws FailedHttpRequestException {
+            this.httpRequest = httpRequest;
+
+            return super.getSuccessfulResponseOrThrowException(httpRequest);
+        }
+
+        public HttpRequest getHttpRequest() {
+            return httpRequest;
+        }
     }
 
 }
