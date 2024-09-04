@@ -93,6 +93,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         return requestQueryParams;
     }
 
+    @Override
     protected String getValidQuery(RequestInfo requestInfo) throws BadRequestException {
         return requestInfo.getQueryParameterOpt(QUERY)
                    .orElseThrow(() -> new BadRequestException(
