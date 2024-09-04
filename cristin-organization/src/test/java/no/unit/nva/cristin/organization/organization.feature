@@ -128,3 +128,13 @@ Feature: API tests for Cristin Organization retrieve and search
     When method GET
     Then status 200
     And match response.hits[0].country == 'NO'
+
+  Scenario: GET organization with special character query returns 200 OK
+    Given path '/organization'
+    And param query = 'Wyższa Szkoła Informatyki i Zarządzania'
+    And param results = '1'
+    And param page = '1'
+    When method GET
+    Then status 200
+    And match response.hits == '#array'
+    And match response.hits == '#[1]'
