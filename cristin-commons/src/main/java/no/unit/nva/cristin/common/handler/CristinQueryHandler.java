@@ -6,7 +6,6 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
@@ -17,7 +16,6 @@ import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.ORGANIZATION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 
@@ -64,11 +62,6 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
                 .filter(this::isValidQueryString)
                 .orElseThrow(() -> new BadRequestException(
                         invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
-    }
-
-    protected Optional<String> getValidOrganization(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(ORGANIZATION)
-                .filter(this::isValidQueryString);
     }
 
     protected boolean isValidQueryString(String str) {
