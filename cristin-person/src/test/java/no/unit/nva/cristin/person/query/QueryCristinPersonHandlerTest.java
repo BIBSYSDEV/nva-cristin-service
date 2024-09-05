@@ -117,6 +117,7 @@ public class QueryCristinPersonHandlerTest {
     public static final String ENCODED_ORGANIZATION = "H%C3%B8gskole";
     public static final String INVALID_ENCODING = "%EF%BF%BD";
     private static final String NAME_WITH_SPECIAL_CHARACTERS = "Jéan De'La #Luc";
+    private static final String ORGANIZATION_WITH_SPECIAL_CHARACTERS = "Unévers De'La #Spec";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -472,11 +473,15 @@ public class QueryCristinPersonHandlerTest {
 
     @Test
     void shouldAllowSpecialCharactersForQueryString() throws Exception {
-        var input = requestWithQueryParameters(Map.of(NAME, NAME_WITH_SPECIAL_CHARACTERS));
+        var input = requestWithQueryParameters(Map.of(NAME, NAME_WITH_SPECIAL_CHARACTERS,
+                                                      ORGANIZATION, ORGANIZATION_WITH_SPECIAL_CHARACTERS));
         handler.handleRequest(input, output, context);
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        var searchString = gatewayResponse.getBodyObject(SearchResponse.class).getSearchString();
 
+        assertThat(searchString, containsString(NAME_WITH_SPECIAL_CHARACTERS));
+        assertThat(searchString, containsString(ORGANIZATION_WITH_SPECIAL_CHARACTERS));
         assertThat(gatewayResponse.getStatusCode(), CoreMatchers.equalTo(HTTP_OK));
     }
 

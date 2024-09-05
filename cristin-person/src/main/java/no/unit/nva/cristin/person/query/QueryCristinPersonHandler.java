@@ -129,7 +129,6 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
     private String extractOrganization(RequestInfo requestInfo) {
         return requestInfo.getQueryParameterOpt(ORGANIZATION)
                    .map(UriUtils::decodeUri)
-                   .filter(this::isValidQueryString)
                    .orElse(null);
     }
 

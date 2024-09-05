@@ -62,11 +62,14 @@ Feature: API tests for Cristin persons query
   Scenario: Query accepts special characters and whitespace
     Given path '/person/'
     And param name = 'Jéan De'La #Luc'
+    And param organization = 'Unévers De'La #Spec'
     When method GET
     Then status 200
     And match response == '#object'
     And match response['@context'] == '#present'
     And match response.id == '#present'
+    And match response.searchString contains 'Jéan De'La #Luc'
+    And match response.searchString contains 'Unévers De'La #Spec'
     And match response.size == '#present'
     And match response.hits == '#present'
 
