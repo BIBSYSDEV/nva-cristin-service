@@ -119,7 +119,6 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
                                   getSort(requestInfo));
     }
 
-    @Override
     protected String getValidName(RequestInfo requestInfo) {
         return requestInfo.getQueryParameterOpt(NAME)
                    .map(UriUtils::decodeUri)

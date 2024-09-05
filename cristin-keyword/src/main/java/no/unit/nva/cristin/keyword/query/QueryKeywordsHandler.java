@@ -4,7 +4,6 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
-import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Map;
 import java.util.Optional;
@@ -65,7 +64,7 @@ public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchRespon
 
         var queryParams = new ConcurrentHashMap<String, String>();
 
-        getValidQueryOpt(requestInfo).ifPresent(query -> queryParams.put(QUERY, query));
+        requestInfo.getQueryParameterOpt(QUERY).ifPresent(query -> queryParams.put(QUERY, query));
 
         getValidPageOpt(requestInfo).ifPresentOrElse(
             page -> queryParams.put(PAGE, page),
@@ -80,16 +79,14 @@ public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchRespon
         return queryParams;
     }
 
-    private Optional<String> getValidQueryOpt(RequestInfo requestInfo) {
-        return attempt(() -> super.getValidQuery(requestInfo)).toOptional();
-    }
-
     private Optional<String> getValidPageOpt(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(PAGE).filter(Utils::isPositiveInteger);
+        return requestInfo.getQueryParameterOpt(PAGE)
+                   .filter(Utils::isPositiveInteger);
     }
 
     private Optional<String> getValidResultsPerPageOpt(RequestInfo requestInfo) {
-        return requestInfo.getQueryParameterOpt(NUMBER_OF_RESULTS).filter(Utils::isPositiveInteger);
+        return requestInfo.getQueryParameterOpt(NUMBER_OF_RESULTS)
+                   .filter(Utils::isPositiveInteger);
     }
 
 }

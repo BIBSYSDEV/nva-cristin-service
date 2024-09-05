@@ -5,16 +5,12 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.core.Environment;
 
-import java.util.List;
 import java.util.Set;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
-import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.Constants.FIRST_PAGE;
-import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
@@ -22,7 +18,6 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.QUERY;
 public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
 
     private static final Set<String> VALID_QUERY_PARAMETERS = Set.of(QUERY, PAGE, NUMBER_OF_RESULTS);
-    private static final List<Character> VALID_SPECIAL_CHARS = List.of('-', ',', '.');
 
     public CristinQueryHandler(Class<I> iclass, Environment environment) {
         super(iclass, environment);
@@ -50,30 +45,4 @@ public abstract class CristinQueryHandler<I, O> extends CristinHandler<I, O> {
         throw new BadRequestException(String.format(ERROR_MESSAGE_INVALID_VALUE, NUMBER_OF_RESULTS));
     }
 
-    protected String getValidQuery(RequestInfo requestInfo) throws BadRequestException {
-        return requestInfo.getQueryParameterOpt(QUERY)
-                .filter(this::isValidQueryString)
-                .orElseThrow(() -> new BadRequestException(invalidQueryParametersMessage(
-                        QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
-    }
-
-    protected String getValidName(RequestInfo requestInfo) throws BadRequestException {
-        return requestInfo.getQueryParameterOpt(NAME)
-                .filter(this::isValidQueryString)
-                .orElseThrow(() -> new BadRequestException(
-                        invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
-    }
-
-    protected boolean isValidQueryString(String str) {
-        for (Character c : str.toCharArray()) {
-            if (isUnsupportedCharacter(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isUnsupportedCharacter(Character c) {
-        return !Character.isLetterOrDigit(c) && !Character.isWhitespace(c) && !VALID_SPECIAL_CHARS.contains(c);
-    }
 }
