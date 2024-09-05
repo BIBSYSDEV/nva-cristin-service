@@ -24,6 +24,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,6 +50,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import static com.google.common.net.HttpHeaders.ACCEPT;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -114,6 +116,7 @@ public class QueryCristinPersonHandlerTest {
     public static final String ENCODED_NAME = "t%C3%B8rresen";
     public static final String ENCODED_ORGANIZATION = "H%C3%B8gskole";
     public static final String INVALID_ENCODING = "%EF%BF%BD";
+    private static final String NAME_WITH_SPECIAL_CHARACTERS = "Jéan De'La #Luc";
 
     private CristinPersonApiClient apiClient;
     private final Environment environment = new Environment();
@@ -465,6 +468,16 @@ public class QueryCristinPersonHandlerTest {
         handler.handleRequest(request, output, context);
 
         assertThat(apiClient.getHttpRequest().uri().toString(), not(containsString(INVALID_ENCODING)));
+    }
+
+    @Test
+    void shouldAllowSpecialCharactersForQueryString() throws Exception {
+        var input = requestWithQueryParameters(Map.of(NAME, NAME_WITH_SPECIAL_CHARACTERS));
+        handler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        assertThat(gatewayResponse.getStatusCode(), CoreMatchers.equalTo(HTTP_OK));
     }
 
     private SearchResponse<Person> randomPersons() {

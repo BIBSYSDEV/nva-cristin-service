@@ -61,7 +61,7 @@ Feature: API tests for Cristin persons query
 
   Scenario: Query accepts special characters and whitespace
     Given path '/person/'
-    And param name = 'John Smith'
+    And param name = 'Jéan De'La #Luc'
     When method GET
     Then status 200
     And match response == '#object'
