@@ -4,9 +4,8 @@ import static com.google.common.net.HttpHeaders.ACCEPT;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
+import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_VALUE;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_RETURNED_BAD_REQUEST;
-import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.model.Constants.CATEGORY_PARAM;
 import static no.unit.nva.cristin.model.Constants.EQUAL_OPERATOR;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
@@ -270,7 +269,7 @@ class QueryCristinProjectHandlerTest {
 
     @Test
     void handlerReturnsBadRequestWhenTitleQueryParamIsEmpty() throws Exception {
-        try (var input = requestWithQueryParameters(Map.of(JsonPropertyNames.QUERY, EMPTY_STRING))) {
+        try (var input = requestWithQueryParameters(Map.of(QUERY.getNvaKey(), EMPTY_STRING))) {
             handler.handleRequest(input, output, context);
         }
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
@@ -278,11 +277,7 @@ class QueryCristinProjectHandlerTest {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
         assertEquals(PROBLEM_JSON, gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
         assertThat(gatewayResponse.getBody(),
-                   containsString(
-                       invalidQueryParametersMessage(
-                           JsonPropertyNames.QUERY,
-                           ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE))
-        );
+                   containsString(String.format(ERROR_MESSAGE_INVALID_VALUE, QUERY.getNvaKey())));
     }
 
     @Test
