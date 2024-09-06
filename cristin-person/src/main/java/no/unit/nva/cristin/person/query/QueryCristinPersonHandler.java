@@ -22,8 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
-import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
@@ -121,28 +119,15 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
                                   getSort(requestInfo));
     }
 
-    @Override
-    protected String getValidName(RequestInfo requestInfo) throws BadRequestException {
-        var name = requestInfo.getQueryParameterOpt(NAME);
-
-        if (name.isEmpty()) {
-            return null;
-        }
-
-        return name.map(UriUtils::decodeUri)
-                   .filter(this::isValidQueryString)
-                   .orElseThrow(QueryCristinPersonHandler::invalidNameException);
-    }
-
-    private static BadRequestException invalidNameException() {
-        return new BadRequestException(
-            invalidQueryParametersMessage(NAME, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE));
+    protected String getValidName(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(NAME)
+                   .map(UriUtils::decodeUri)
+                   .orElse(null);
     }
 
     private String extractOrganization(RequestInfo requestInfo) {
         return requestInfo.getQueryParameterOpt(ORGANIZATION)
                    .map(UriUtils::decodeUri)
-                   .filter(this::isValidQueryString)
                    .orElse(null);
     }
 

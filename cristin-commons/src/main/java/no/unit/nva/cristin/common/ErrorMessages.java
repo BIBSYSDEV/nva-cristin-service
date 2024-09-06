@@ -59,6 +59,8 @@ public class ErrorMessages {
         "Upstream returned 400 (Bad Request). That might indicate bad query parameters";
     public static final String ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION =
         "Remote service responded with error when client called uri: %s. Exception from upstream returned: %s";
+    public static final String ERROR_MESSAGE_REQUIRED_PARAM_MISSING =
+        "Required param '%s' is missing";
 
     /**
      * Formats and emits a message with required parameter names.

@@ -11,7 +11,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class UriUtilsTest {
 
-    public static final String URI_WITH_INVALID_ENCODING = "https://api.nva.no/?name=t%EF%BF%BDrresen&lang=en%2Cnb%2Cnn";
+    public static final String URI_WITH_INVALID_ENCODING =
+        "https://api.nva.no/?name=t%EF%BF%BDrresen&lang=en%2Cnb%2Cnn";
     public static final String INVALID_ENCODING = "%EF%BF%BD";
 
     @ParameterizedTest()

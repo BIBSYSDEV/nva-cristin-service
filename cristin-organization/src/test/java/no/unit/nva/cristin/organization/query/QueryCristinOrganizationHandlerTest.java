@@ -48,9 +48,7 @@ import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.unit.nva.cristin.common.ErrorMessages.ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_DEPTH_INVALID;
-import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 import static no.unit.nva.client.ClientProvider.VERSION_2023_05_26;
 import static no.unit.nva.client.ClientProvider.VERSION_ONE;
 import static no.unit.nva.cristin.model.Constants.FULL;
@@ -88,6 +86,7 @@ class QueryCristinOrganizationHandlerTest {
     public static final String MEDICAL_BIOCHEMISTRY = "Department of Medical Biochemistry";
     public static final String EMPTY_OBJECT = "{}";
     public static final String NOT_FOUND_LOG_MESSAGE = "Organization from search result could not be found in upstream";
+    public static final String PARAM_QUERY_IS_MISSING = "Required param 'query' is missing";
 
     private QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private DefaultOrgQueryClientProvider clientProvider;
@@ -126,8 +125,7 @@ class QueryCristinOrganizationHandlerTest {
         var gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
         var actualDetail = getProblemDetail(gatewayResponse);
         assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(invalidQueryParametersMessage(
-            QUERY, ALPHANUMERIC_CHARACTERS_DASH_COMMA_PERIOD_AND_WHITESPACE)));
+        assertThat(actualDetail, containsString(PARAM_QUERY_IS_MISSING));
     }
 
     @Test
@@ -399,6 +397,17 @@ class QueryCristinOrganizationHandlerTest {
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 
+    @ParameterizedTest
+    @MethodSource("specialCharacterQueryParamProvider")
+    void shouldAllowSpecialCharactersForQueryString(String query) throws Exception {
+        var input = generateHandlerRequestWithQuery(query);
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
     private List<Organization> convertHitsToProperFormat(SearchResponse<?> searchResponse) {
         return OBJECT_MAPPER.convertValue(searchResponse.getHits(), new TypeReference<>() {});
     }
@@ -515,6 +524,22 @@ class QueryCristinOrganizationHandlerTest {
             .when(fetchClient).fetchGetResult(any());
 
         return fetchClient;
+    }
+
+    private InputStream generateHandlerRequestWithQuery(String query) throws JsonProcessingException {
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withQueryParameters(Map.of(QUERY, query))
+                   .build();
+    }
+
+    private static Stream<Arguments> specialCharacterQueryParamProvider() {
+        return Stream.of(
+            Arguments.of("Wyższa Szkoła Informatyki i Zarządzania \"COPERNICUS\" we Wrocławiu"),
+            Arguments.of("Yale School of Medicine - Yale Cancer Center (YCC)"),
+            Arguments.of("Hogeschool IPABO Amsterdam/Alkmaar"),
+            Arguments.of("University of Technology, Sydney - Branch: St. Leonards Campus)")
+        );
     }
 
 }

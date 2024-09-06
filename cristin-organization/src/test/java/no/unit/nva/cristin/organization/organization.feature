@@ -41,7 +41,7 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 400
     And match response.title == 'Bad Request'
     And match response.status == 400
-    And match response.detail == 'Parameter \'query\' has invalid value. May only contain alphanumeric characters, dash, comma, period, colon, semicolon and whitespace'
+    And match response.detail == 'Required param \'query\' is missing'
 
   Scenario: GET returns 404 status Not found when requesting unknown organization identifier
     Given path '/organization/' + nonExistingOrganizationId
@@ -128,3 +128,13 @@ Feature: API tests for Cristin Organization retrieve and search
     When method GET
     Then status 200
     And match response.hits[0].country == 'NO'
+
+  Scenario: GET organization with special character query returns 200 OK
+    Given path '/organization'
+    And param query = 'Wyższa Szkoła Informatyki i Zarządzania'
+    And param results = '1'
+    And param page = '1'
+    When method GET
+    Then status 200
+    And match response.hits == '#array'
+    And match response.hits == '#[1]'
