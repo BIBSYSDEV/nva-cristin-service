@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.fetch;
 
+import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
@@ -52,6 +53,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
+import nva.commons.logutils.LogUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -195,6 +197,19 @@ public class FetchFromIdentityNumberHandlerTest {
         var actual = sendQueryWithAccessRight(defaultBody(), accessRight);
 
         assertThat(actual.getStatusCode(), equalTo(HTTP_OK));
+    }
+
+    @Test
+    void shouldStripPersonalDataFromLoggedUris() throws Exception {
+        final var logger = LogUtils.getTestingAppenderForRootLogger();
+        var clientMock = mock(HttpClient.class);
+        when(clientMock.<String>send(any(), any())).thenThrow(RuntimeException.class);
+        var apiClient = new CristinPersonApiClient(clientMock);
+        handler = new FetchFromIdentityNumberHandler(apiClient, environment);
+        var gatewayResponse = sendQuery(defaultBody(), EMPTY_MAP);
+
+        assertEquals(HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
+        assertThat(logger.getMessages(), not(containsString(DEFAULT_IDENTITY_NUMBER)));
     }
 
     private InputStream requestWithBackendScope() throws JsonProcessingException {
