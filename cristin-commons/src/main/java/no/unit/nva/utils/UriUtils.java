@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.regex.Pattern;
 import nva.commons.core.paths.UriWrapper;
 
 public class UriUtils {
@@ -19,6 +20,7 @@ public class UriUtils {
     public static final String POSITION = "position";
     public static final String PROJECT = "project";
     public static final String PERSON = "person";
+    private static final String NATIONAL_IDENTITY_PATTERN = "national_id=(\\d+)(\\d{2})";
 
     /**
      * Create URI identifying NVA resource from path and identifier.
@@ -111,6 +113,20 @@ public class UriUtils {
      */
     public static String decodeUri(String uri) {
         return URLDecoder.decode(uri, StandardCharsets.UTF_8);
+    }
+
+    public static String maskSensitiveData(URI uri) {
+        var pattern = Pattern.compile(NATIONAL_IDENTITY_PATTERN);
+        var matcher = pattern.matcher(uri.toString());
+        String maskedUri;
+        if (matcher.find()) {
+            var toMask = matcher.group(1);
+            maskedUri = uri.toString().replaceAll(toMask, "XXXXXXXXX");
+        } else {
+            maskedUri = uri.toString();
+        }
+
+        return maskedUri;
     }
 
 }

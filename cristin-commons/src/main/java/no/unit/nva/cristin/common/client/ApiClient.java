@@ -43,6 +43,7 @@ import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEAD
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.utils.UriUtils.addLanguage;
+import static no.unit.nva.utils.UriUtils.maskSensitiveData;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -157,7 +158,8 @@ public class ApiClient {
         try {
             return fetchResponseWithRetry(httpRequest);
         } catch (Exception ex) {
-            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, httpRequest.uri().toString(), ex);
+            var uri = maskSensitiveData(httpRequest.uri());
+            logError(ERROR_MESSAGE_BACKEND_FAILED_WITH_EXCEPTION, uri, ex);
             throw new FailedHttpRequestException(ERROR_MESSAGE_BACKEND_FETCH_FAILED);
         }
     }

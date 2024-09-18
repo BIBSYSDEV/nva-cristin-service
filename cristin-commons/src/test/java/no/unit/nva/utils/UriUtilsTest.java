@@ -1,11 +1,13 @@
 package no.unit.nva.utils;
 
 import static no.unit.nva.utils.UriUtils.addLanguage;
+import static no.unit.nva.utils.UriUtils.maskSensitiveData;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import java.net.URI;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -23,6 +25,15 @@ class UriUtilsTest {
 
         assertThat(uriWithLanguage.toString(), not(equalTo(URI_WITH_INVALID_ENCODING)));
         assertThat(uriWithLanguage.toString(), not(containsString(INVALID_ENCODING)));
+    }
+
+    @Test
+    void shouldMaskPersonalDataFromUris() {
+        var uri = URI.create("https://example.org/?national_id=12345612345");
+        var expected = "https://example.org/?national_id=XXXXXXXXX45";
+        var actual = maskSensitiveData(uri);
+
+        assertThat(actual, containsString(expected));
     }
 
 }
