@@ -14,6 +14,7 @@ import no.unit.nva.cristin.projects.model.cristin.adapter.NvaContributorToCristi
 import no.unit.nva.cristin.projects.model.nva.Funding;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.language.Language;
+import no.unit.nva.language.LanguageDescription;
 import no.unit.nva.model.Organization;
 
 import java.net.URI;
@@ -138,7 +139,7 @@ public class CristinProjectPatchJsonCreator {
         }
     }
 
-    private boolean isSupportedLanguage(Language language) {
+    private boolean isSupportedLanguage(LanguageDescription language) {
         return !UNDEFINED_LANGUAGE.equals(language);
     }
 
