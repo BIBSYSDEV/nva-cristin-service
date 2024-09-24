@@ -4,7 +4,7 @@ phases:
 
   install:
     runtime-versions:
-      java: corretto17
+      java: corretto21
     commands:
       pip3 install aws-sam-cli -U
   build:
