@@ -62,7 +62,6 @@ public class CristinOrganizationApiClient
     public static final String NULL_HTTP_RESPONSE_ERROR_MESSAGE = "No HttpResponse found";
     public static final int SINGLE_HIT = 1;
     public static final String UNIQUELY_IDENTIFY_ORGANIZATION = "Identifier does not uniquely identify organization";
-    public static final int FIRST_AND_ONLY_UNIT = 0;
     private static final int NO_HITS = 0;
 
     /**
@@ -120,12 +119,11 @@ public class CristinOrganizationApiClient
 
     private Organization extractOrganization(String identifier, HttpResponse<String> response)
             throws ApiGatewayException {
-        List<SubUnitDto> units = attempt(() ->
-                OBJECT_MAPPER.readValue(response.body(), new TypeReference<List<SubUnitDto>>() {
-                }))
+        var type = new TypeReference<List<SubUnitDto>>() {};
+        List<SubUnitDto> units = attempt(() -> OBJECT_MAPPER.readValue(response.body(), type))
                 .orElseThrow(fail -> new FailedHttpRequestException(fail.getException()));
         if (SINGLE_HIT == units.size()) {
-            return toOrganization(identifier, units.get(FIRST_AND_ONLY_UNIT));
+            return toOrganization(identifier, units.getFirst());
         } else {
             throw new BadRequestException(UNIQUELY_IDENTIFY_ORGANIZATION);
         }

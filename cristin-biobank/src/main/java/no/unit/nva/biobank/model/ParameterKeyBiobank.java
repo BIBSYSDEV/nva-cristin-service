@@ -34,7 +34,7 @@ public enum ParameterKeyBiobank implements IParameterKey {
     public static final int IGNORE_PATH_PARAMETER_INDEX = 2;
 
     public static final Set<ParameterKeyBiobank> VALID_QUERY_PARAMETERS =
-        Arrays.stream(ParameterKeyBiobank.values())
+        Arrays.stream(values())
             .filter(ParameterKeyBiobank::ignorePathKeys)
             .collect(Collectors.toSet());
 
@@ -103,16 +103,12 @@ public enum ParameterKeyBiobank implements IParameterKey {
     }
 
     public static ParameterKeyBiobank keyFromString(String paramName, String value) {
-        var result = Arrays.stream(ParameterKeyBiobank.values())
-                         .filter(ParameterKeyBiobank::ignorePathKeys)
-                         .filter(IParameterKey.equalTo(paramName))
-                         .collect(Collectors.toSet());
-        return result.size() == 1
-                   ? result.stream().findFirst().get()
-                   : result.stream()
-                         .filter(IParameterKey.hasValidValue(value))
-                         .findFirst()
-                         .orElse(INVALID);
+        return Arrays.stream(values())
+                .filter(ParameterKeyBiobank::ignorePathKeys)
+                .filter(IParameterKey.equalTo(paramName))
+                .distinct()
+                .reduce((first, second) -> IParameterKey.hasValidValue(value).test(second) ? second : first)
+                .orElse(INVALID);
     }
 
 

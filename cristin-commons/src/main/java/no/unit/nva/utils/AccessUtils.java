@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
@@ -20,6 +19,7 @@ import java.util.Base64;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.http.HttpRequest.newBuilder;
+import static java.net.http.HttpResponse.*;
 import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.core.attempt.Try.attempt;
@@ -80,23 +80,27 @@ public class AccessUtils {
      * Fetches an internal backend token from Cognito.
      */
     public static String getBackendAccessToken() throws IOException, InterruptedException {
-        var cognitoTokenUrl = getCognitoTokenUrl();
-        var payload = GRANT_TYPE_PAYLOAD;
 
-        var request = newBuilder(cognitoTokenUrl)
-                .POST(HttpRequest.BodyPublishers.ofString(payload))
-                .header(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
-                .header(AUTHORIZATION, basicAuthHeader())
-                .build();
-        HttpClient client = HttpClient.newBuilder()
+        try (var client = createHttpClient()) {
+            var response = client.send(createTokenRequest(), BodyHandlers.ofString(StandardCharsets.UTF_8));
+            var jsonTree = JsonUtils.dtoObjectMapper.readTree(response.body());
+            return jsonTree.get(ACCESS_TOKEN).textValue();
+        }
+    }
+
+    private static HttpClient createHttpClient() {
+        return HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
                 .connectTimeout(Duration.ofSeconds(30))
                 .build();
+    }
 
-        HttpResponse<String> response = client.send(request,
-                                                    HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        var jsonTree = JsonUtils.dtoObjectMapper.readTree(response.body());
-        return jsonTree.get(ACCESS_TOKEN).textValue();
+    private static HttpRequest createTokenRequest() {
+        return newBuilder(getCognitoTokenUrl())
+                .POST(HttpRequest.BodyPublishers.ofString(GRANT_TYPE_PAYLOAD))
+                .header(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
+                .header(AUTHORIZATION, basicAuthHeader())
+                .build();
     }
 
     private static URI getCognitoTokenUrl() {

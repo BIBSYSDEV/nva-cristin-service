@@ -59,7 +59,7 @@ public class QueryKeywordsHandler extends CristinQueryHandler<Void, SearchRespon
         return HTTP_OK;
     }
 
-    private ConcurrentHashMap<String, String> parseQueryParams(RequestInfo requestInfo) throws BadRequestException {
+    private Map<String, String> parseQueryParams(RequestInfo requestInfo) throws BadRequestException {
         validateQueryParameterKeys(requestInfo);
 
         var queryParams = new ConcurrentHashMap<String, String>();

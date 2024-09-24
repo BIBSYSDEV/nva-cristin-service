@@ -42,6 +42,7 @@ import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.StringUtils.isNotBlank;
 import static nva.commons.core.attempt.Try.attempt;
 
+@SuppressWarnings("PMD.CouplingBetweenObjects")
 public class NvaProjectBuilder implements Function<CristinProject, NvaProject> {
 
     private transient CristinProject cristinProject;
