@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpRequest.newBuilder;
-import static java.net.http.HttpResponse.*;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.utils.AccessUtils.BASIC;
@@ -55,7 +55,7 @@ public final class UserUtils {
         throws IOException, InterruptedException {
         try (var client = createHttpClient()) {
             final var response = client.send(createHttpRequest(nationalIdentityNumber, customerId, roles),
-                    BodyHandlers.ofString(StandardCharsets.UTF_8));
+                    ofString(StandardCharsets.UTF_8));
             logger.info(RESPONSE_FROM_USER_CREATE, response);
         }
     }

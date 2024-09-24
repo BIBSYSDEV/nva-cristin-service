@@ -19,7 +19,7 @@ import java.util.Base64;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.http.HttpRequest.newBuilder;
-import static java.net.http.HttpResponse.*;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.core.attempt.Try.attempt;
@@ -82,7 +82,7 @@ public class AccessUtils {
     public static String getBackendAccessToken() throws IOException, InterruptedException {
 
         try (var client = createHttpClient()) {
-            var response = client.send(createTokenRequest(), BodyHandlers.ofString(StandardCharsets.UTF_8));
+            var response = client.send(createTokenRequest(), ofString(StandardCharsets.UTF_8));
             var jsonTree = JsonUtils.dtoObjectMapper.readTree(response.body());
             return jsonTree.get(ACCESS_TOKEN).textValue();
         }
