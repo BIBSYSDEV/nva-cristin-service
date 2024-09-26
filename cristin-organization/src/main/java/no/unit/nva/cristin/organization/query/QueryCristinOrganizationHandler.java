@@ -78,7 +78,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         return HttpURLConnection.HTTP_OK;
     }
 
-    private ConcurrentHashMap<String, String> extractQueryParameters(RequestInfo requestInfo)
+    private Map<String, String> extractQueryParameters(RequestInfo requestInfo)
         throws BadRequestException {
 
         var requestQueryParams = new ConcurrentHashMap<String, String>();

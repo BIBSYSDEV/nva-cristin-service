@@ -29,7 +29,7 @@ import nva.commons.apigateway.exceptions.ForbiddenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Utils {
+public final class Utils {
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
@@ -40,6 +40,9 @@ public class Utils {
     public static final String USER_IS_INTERNAL_BACKEND = "User is internal backend";
     public static final String USER_TOP_LEVEL_CRISTIN_ORGANIZATION = "User has top level cristin organization {}";
 
+    private Utils() {
+        // NO-OP
+    }
 
     /**
      * Check if a string supplied is a positive integer.
@@ -130,7 +133,7 @@ public class Utils {
 
 
     private static boolean isValidIdentifier(String identifier) {
-        return Utils.isPositiveInteger(identifier);
+        return isPositiveInteger(identifier);
     }
 
     /**
@@ -169,7 +172,7 @@ public class Utils {
 
     private static String extractInstitution(URI organization) {
         var organizationIdentifier = UriUtils.extractLastPathElement(organization);
-        return Utils.removeUnitPartFromIdentifierIfPresent(organizationIdentifier);
+        return removeUnitPartFromIdentifierIfPresent(organizationIdentifier);
     }
 
     private static BadRequestException failedToRetrieveTopLevelOrgCristinId() {

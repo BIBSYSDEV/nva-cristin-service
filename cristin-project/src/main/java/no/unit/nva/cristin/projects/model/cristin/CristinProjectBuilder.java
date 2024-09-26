@@ -39,6 +39,7 @@ import static no.unit.nva.cristin.projects.util.LanguageUtil.extractLanguageIso6
 import static no.unit.nva.cristin.projects.util.LanguageUtil.extractTitles;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 
+@SuppressWarnings("PMD.CouplingBetweenObjects")
 public class CristinProjectBuilder implements Function<NvaProject, CristinProject> {
 
     private transient CristinProject cristinProject;
@@ -191,5 +192,4 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
                    .map(ProjectStatus::getCristinStatus)
                    .orElse(null);
     }
-
 }
