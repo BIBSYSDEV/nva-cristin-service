@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.projects.model.cristin.adapter;
 
+import static java.util.Objects.isNull;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import java.net.URI;
@@ -19,15 +20,20 @@ public class CristinPersonToPerson implements Function<CristinPerson, Person> {
 
     private Person convert(CristinPerson cristinPerson) {
         return new Person(
-            convertId(cristinPerson.cristinPersonId()),
+            convertId(cristinPerson.identifiedCristinPerson(), cristinPerson.cristinPersonId()),
             cristinPerson.firstName(),
             cristinPerson.surname(),
             cristinPerson.email(),
             cristinPerson.phone());
     }
 
-    private URI convertId(String cristinPersonId) {
-        return getNvaApiId(cristinPersonId, PERSON_PATH_NVA);
+    private URI convertId(Boolean identified, String cristinPersonId) {
+        return identifiedFieldNotPresent(identified) || identified
+                   ? getNvaApiId(cristinPersonId, PERSON_PATH_NVA) : null;
+    }
+
+    private boolean identifiedFieldNotPresent(Boolean identified) {
+        return isNull(identified);
     }
 
 }

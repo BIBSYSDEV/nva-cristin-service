@@ -90,7 +90,8 @@
             }
           }
         }
-      ]
+      ],
+      "identified_cristin_person": true
     },
     {
       "cristin_person_id": "456789",
@@ -116,6 +117,30 @@
           }
         }
       ]
+    },
+    {
+      "cristin_person_id": "444555",
+      "first_name": "John",
+      "surname": "Doe",
+      "url": "https://api.cristin.no/v2/persons/444555",
+      "roles": [
+        {
+          "role_code": "PRO_PARTICIPANT",
+          "institution": {
+            "cristin_institution_id": "1234",
+            "institution_name": {
+              "en": "University"
+            }
+          },
+          "unit": {
+            "cristin_unit_id": "1234.0.0.0",
+            "unit_name": {
+              "en": "Medical Department"
+            }
+          }
+        }
+      ],
+      "identified_cristin_person": false
     }
   ],
   "popular_scientific_summary": {

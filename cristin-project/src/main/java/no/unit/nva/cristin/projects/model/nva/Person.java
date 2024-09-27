@@ -81,13 +81,14 @@ public class Person {
         if (!(o instanceof Person nvaPerson)) {
             return false;
         }
-        return getId().equals(nvaPerson.getId())
+        return Objects.equals(getId(), nvaPerson.getId())
                && Objects.equals(getFirstName(), nvaPerson.getFirstName())
                && Objects.equals(getLastName(), nvaPerson.getLastName())
                && Objects.equals(getPhone(), nvaPerson.getPhone())
                && Objects.equals(getEmail(), nvaPerson.getEmail());
     }
 
+    @SuppressWarnings("unused")
     public static final class Builder {
 
         private transient URI id;
