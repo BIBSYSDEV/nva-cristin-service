@@ -20,16 +20,18 @@ public class CristinPersonToPerson implements Function<CristinPerson, Person> {
 
     private Person convert(CristinPerson cristinPerson) {
         return new Person(
-            convertId(cristinPerson.identifiedCristinPerson(), cristinPerson.cristinPersonId()),
+            extractIdIfIdentified(cristinPerson.identifiedCristinPerson(), cristinPerson.cristinPersonId()),
             cristinPerson.firstName(),
             cristinPerson.surname(),
             cristinPerson.email(),
             cristinPerson.phone());
     }
 
-    private URI convertId(Boolean identified, String cristinPersonId) {
-        return identifiedFieldNotPresent(identified) || identified
-                   ? getNvaApiId(cristinPersonId, PERSON_PATH_NVA) : null;
+    private URI extractIdIfIdentified(Boolean identified, String cristinPersonId) {
+        if (identifiedFieldNotPresent(identified) || identified) {
+            return getNvaApiId(cristinPersonId, PERSON_PATH_NVA);
+        }
+        return null;
     }
 
     private boolean identifiedFieldNotPresent(Boolean identified) {
