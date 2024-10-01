@@ -37,6 +37,7 @@ import no.unit.nva.cristin.model.JsonPropertyNames;
 import no.unit.nva.cristin.model.KeyEncoding;
 import no.unit.nva.cristin.model.query.CristinFacetParamKey;
 
+@SuppressWarnings("PMD.ExcessivePublicCount")
 public enum ParameterKeyProject implements IParameterKey {
     INVALID(null),
     PATH_IDENTITY(JsonPropertyNames.IDENTIFIER, null, PATTERN_IS_NON_EMPTY),
@@ -111,7 +112,7 @@ public enum ParameterKeyProject implements IParameterKey {
     public static final int IGNORE_FACET_PARAMETER_INDEX = 31;
 
     public static final Set<ParameterKeyProject> VALID_QUERY_PARAMETERS =
-        Arrays.stream(ParameterKeyProject.values())
+        Arrays.stream(values())
             .filter(ParameterKeyProject::ignorePathKeys)
             .collect(Collectors.toSet());
 
@@ -196,16 +197,12 @@ public enum ParameterKeyProject implements IParameterKey {
     }
 
     public static ParameterKeyProject keyFromString(String paramName, String value) {
-        var result = Arrays.stream(ParameterKeyProject.values())
-                         .filter(ParameterKeyProject::ignorePathKeys)
-                         .filter(IParameterKey.equalTo(paramName))
-                         .collect(Collectors.toSet());
-        return result.size() == 1
-                   ? result.stream().findFirst().get()
-                   : result.stream()
-                         .filter(IParameterKey.hasValidValue(value))
-                         .findFirst()
-                         .orElse(INVALID);
+        return Arrays.stream(values())
+                .filter(ParameterKeyProject::ignorePathKeys)
+                .filter(IParameterKey.equalTo(paramName))
+                .distinct()
+                .reduce((first, second) -> IParameterKey.hasValidValue(value).test(second) ? second : first)
+                .orElse(INVALID);
     }
 
 

@@ -15,12 +15,16 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import nva.commons.core.paths.UriWrapper;
 
-public class UriUtils {
+public final class UriUtils {
 
     public static final String POSITION = "position";
     public static final String PROJECT = "project";
     public static final String PERSON = "person";
     private static final String NATIONAL_IDENTITY_PATTERN = "national_id=(\\d+)(\\d{2})";
+
+    private UriUtils() {
+        // NO-OP
+    }
 
     /**
      * Create URI identifying NVA resource from path and identifier.
@@ -85,7 +89,7 @@ public class UriUtils {
 
     public static URI createNvaProjectId(String identifier) {
         return new UriWrapper(HTTPS, DOMAIN_NAME)
-            .addChild(BASE_PATH).addChild(UriUtils.PROJECT).addChild(identifier).getUri();
+            .addChild(BASE_PATH).addChild(PROJECT).addChild(identifier).getUri();
     }
 
     public static String extractLastPathElement(URI uri) {

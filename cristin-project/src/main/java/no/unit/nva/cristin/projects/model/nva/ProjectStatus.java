@@ -59,7 +59,7 @@ public enum ProjectStatus {
     @JacocoGenerated
     private static RuntimeException returnException(String name) {
         return new IllegalArgumentException(
-                format(ERROR_MESSAGE_TEMPLATE, name, stream(ProjectStatus.values())
+                format(ERROR_MESSAGE_TEMPLATE, name, stream(values())
                         .map(ProjectStatus::toString).collect(joining(DELIMITER))));
     }
 

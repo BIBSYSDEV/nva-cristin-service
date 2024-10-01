@@ -4,7 +4,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import java.time.Instant;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -55,7 +55,7 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
     }
 
     private Set<ValidatedResult> validateProjectInput(NvaProject project) {
-        var results = new HashSet<ValidatedResult>();
+        var results = EnumSet.noneOf(ValidatedResult.class);
         if (isNull(project)) {
             results.add(ValidatedResult.Empty);
             return results;

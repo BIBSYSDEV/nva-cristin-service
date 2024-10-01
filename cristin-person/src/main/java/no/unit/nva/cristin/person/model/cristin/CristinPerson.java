@@ -39,7 +39,8 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 
-@SuppressWarnings({"unused", "PMD.GodClass", "PMD.TooManyFields", "PMD.ExcessivePublicCount"})
+@SuppressWarnings({"unused", "PMD.GodClass", "PMD.TooManyFields", "PMD.ExcessivePublicCount",
+        "PMD.CouplingBetweenObjects"})
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPerson implements JsonSerializable {
@@ -394,11 +395,8 @@ public class CristinPerson implements JsonSerializable {
     private Boolean extractVerified() {
         if (nonNull(getIdentifiedCristinPerson()) && getIdentifiedCristinPerson()) {
             return true;
-        } else if (isNviVerified()) {
-            return true;
-        } else {
-            return getIdentifiedCristinPerson();
         }
+        return isNviVerified() || Boolean.TRUE.equals(getIdentifiedCristinPerson());
     }
 
     private boolean isNviVerified() {
