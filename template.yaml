@@ -102,7 +102,7 @@ Resources:
       MethodSettings:
         - HttpMethod: 'GET'
           ResourcePath: '/~1organization~1{identifier}'
-          CacheTtlInSeconds: 300
+          CacheTtlInSeconds: 3600
           CachingEnabled: true
         - HttpMethod: 'GET'
           ResourcePath: '/~1organization'
