@@ -41,6 +41,7 @@ import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.attempt.Try.attempt;
 
+@SuppressWarnings("PMD.CouplingBetweenObjects")
 public class CristinPersonApiClient extends ApiClient
     implements ClientVersion,
                CristinAuthorizedQueryClient<Map<String, String>, Person> {

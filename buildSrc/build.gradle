@@ -15,13 +15,16 @@ dependencies {
 }
 
 group 'no.unit.nva'
-version '1.0-JDK17'
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+version '1.0-JDK21'
+
+java {
+    java.sourceCompatibility = JavaVersion.VERSION_21
+    java.targetCompatibility = JavaVersion.VERSION_21
+}
 
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
-    gradleVersion = "8.2.1"
+    gradleVersion = "8.10.1"
 }
 
 

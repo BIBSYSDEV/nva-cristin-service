@@ -240,9 +240,11 @@ public class ApiClient {
                    .filter(Try::isSuccess)
                    .map(Try::get)
                    .filter(this::isSuccessfulRequest)
-                   .collect(Collectors.toList());
+                   .toList();
     }
 
+    // This is reported as unused, but it is…
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private boolean isSuccessfulRequest(HttpResponse<String> response) {
         try {
             checkHttpStatusCode(response.uri(), response.statusCode(), response.body());

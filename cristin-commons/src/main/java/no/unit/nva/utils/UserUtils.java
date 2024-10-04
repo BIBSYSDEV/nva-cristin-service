@@ -1,7 +1,6 @@
 package no.unit.nva.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.net.http.HttpResponse;
 import no.unit.nva.cognito.CognitoUtil;
 import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.core.paths.UriWrapper;
@@ -19,16 +18,20 @@ import java.util.stream.Collectors;
 
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpRequest.newBuilder;
+import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.utils.AccessUtils.BASIC;
 
-public class UserUtils {
+public final class UserUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(UserUtils.class);
     public static final String RESPONSE_FROM_USER_CREATE = "Response from user create={}";
     public static final String USER_CREATED_WITH_ROLES = "User {} created with role(s) '{}'";
 
+    private UserUtils() {
+        // NO-OP
+    }
 
     /**
      * Creates user in Cognito used for Karate tests.
@@ -50,20 +53,29 @@ public class UserUtils {
 
     private static void createNvaUserWithRoles(String nationalIdentityNumber, URI customerId, Set<String> roles)
         throws IOException, InterruptedException {
-        final var userRoles = new UserRoles(nationalIdentityNumber, customerId, roles);
-        final var body = JsonUtils.dtoObjectMapper.writeValueAsString(userRoles);
-        final var request = newBuilder(createUserServiceUri())
-                .header(AUTHORIZATION, BASIC + AccessUtils.getBackendAccessToken())
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
-        final var client = HttpClient.newBuilder()
+        try (var client = createHttpClient()) {
+            final var response = client.send(createHttpRequest(nationalIdentityNumber, customerId, roles),
+                    ofString(StandardCharsets.UTF_8));
+            logger.info(RESPONSE_FROM_USER_CREATE, response);
+        }
+    }
+
+    private static HttpClient createHttpClient() {
+        return HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
                 .connectTimeout(Duration.ofSeconds(30))
                 .build();
+    }
 
-        final var response =
-            client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-        logger.info(RESPONSE_FROM_USER_CREATE, response);
+    private static HttpRequest createHttpRequest(String nationalIdentityNumber,
+                                                 URI customerId,
+                                                 Set<String> roles) throws IOException, InterruptedException {
+        final var userRoles = new UserRoles(nationalIdentityNumber, customerId, roles);
+        final var body = JsonUtils.dtoObjectMapper.writeValueAsString(userRoles);
+        return newBuilder(createUserServiceUri())
+                .header(AUTHORIZATION, BASIC + AccessUtils.getBackendAccessToken())
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
     }
 
 
