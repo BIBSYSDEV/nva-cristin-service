@@ -11,7 +11,8 @@ public record CristinPerson(String cristinPersonId,
                             String url,
                             String email,
                             String phone,
-                            List<CristinRole> roles) {
+                            List<CristinRole> roles,
+                            Boolean identifiedCristinPerson) {
 
     // Builder
     public static class Builder {
@@ -22,6 +23,7 @@ public record CristinPerson(String cristinPersonId,
         private String email;
         private String phone;
         private List<CristinRole> roles;
+        private Boolean identifiedCristinPerson;
 
         public Builder withCristinPersonId(String cristinPersonId) {
             this.cristinPersonId = cristinPersonId;
@@ -58,21 +60,28 @@ public record CristinPerson(String cristinPersonId,
             return this;
         }
 
+        public Builder withIdentifiedCristinPerson(Boolean identifiedCristinPerson) {
+            this.identifiedCristinPerson = identifiedCristinPerson;
+            return this;
+        }
+
         public CristinPerson build() {
-            return new CristinPerson(cristinPersonId, firstName, surname, url, email, phone, roles);
+            return new CristinPerson(cristinPersonId, firstName, surname, url, email, phone, roles,
+                                     identifiedCristinPerson);
         }
     }
 
     // Copy using Builder
     public Builder copy() {
         return new CristinPerson.Builder()
-            .withCristinPersonId(cristinPersonId)
-            .withFirstName(firstName)
-            .withSurname(surname)
-            .withUrl(url)
-            .withEmail(email)
-            .withPhone(phone)
-            .withRoles(roles);
+                   .withCristinPersonId(cristinPersonId)
+                   .withFirstName(firstName)
+                   .withSurname(surname)
+                   .withUrl(url)
+                   .withEmail(email)
+                   .withPhone(phone)
+                   .withRoles(roles)
+                   .withIdentifiedCristinPerson(identifiedCristinPerson);
     }
 
 }
