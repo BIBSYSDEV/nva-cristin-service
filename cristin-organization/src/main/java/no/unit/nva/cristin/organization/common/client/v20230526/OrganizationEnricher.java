@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.organization.common.client.v20230526;
 
-import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static nva.commons.core.attempt.Try.attempt;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ public class OrganizationEnricher {
         "Organization from search result could not be found in upstream: {}";
 
     private final List<Organization> inputOrganizations;
-    private final Map<String, String> queryParams;
     private final FetchApiClient<Map<String, String>, Organization> fetchClient;
     private final List<Organization> enrichedOrganizations;
 
@@ -34,14 +32,11 @@ public class OrganizationEnricher {
      * list.
      *
      * @param inputOrganizations The input list of organizations
-     * @param queryParams        The query params used in the original query
      * @param fetchClient        The client used for fetching the enriched data
     **/
     public OrganizationEnricher(List<Organization> inputOrganizations,
-                                Map<String, String> queryParams,
                                 FetchApiClient<Map<String, String>, Organization> fetchClient) {
         this.inputOrganizations = inputOrganizations;
-        this.queryParams = queryParams;
         this.fetchClient = fetchClient;
         enrichedOrganizations = new ArrayList<>();
     }
@@ -71,7 +66,6 @@ public class OrganizationEnricher {
 
     private Map<String, String> extractParams(String identifier) {
         var enrichParams = new ConcurrentHashMap<String, String>();
-        enrichParams.put(DEPTH, queryParams.get(DEPTH));
         enrichParams.put(IDENTIFIER, identifier);
 
         return enrichParams;

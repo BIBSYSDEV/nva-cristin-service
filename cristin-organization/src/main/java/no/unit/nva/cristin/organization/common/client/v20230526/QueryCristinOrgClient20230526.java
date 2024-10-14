@@ -60,7 +60,7 @@ public class QueryCristinOrgClient20230526 extends ApiClient
         var response = queryUpstream(queryUri);
         var organizations = getOrganizations(response);
         if (wantsFullTree(params)) {
-            var organizationEnricher = new OrganizationEnricher(organizations, params, fetchClient);
+            var organizationEnricher = new OrganizationEnricher(organizations, fetchClient);
             organizations = organizationEnricher.enrich().getResult();
         }
         var totalProcessingTime = calculateProcessingTime(start, System.currentTimeMillis());
