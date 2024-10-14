@@ -588,17 +588,6 @@ paths:
           example: 'Universitetet i'
           style: form
           explode: false
-        - name: depth
-          in: query
-          description: Depth of sub-organizations included in response
-          required: false
-          schema:
-            type: string
-            enum:
-              - full
-              - top
-          style: form
-          explode: false
         - name: page
           in: query
           description: Current page requested
