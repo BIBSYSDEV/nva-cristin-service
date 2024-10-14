@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.client;
 
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.SORT;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
@@ -15,7 +16,6 @@ import nva.commons.core.paths.UriWrapper;
 public class CristinPersonQuery {
 
     public static final String NIN_PARAM_KEY = "national_id";
-    public static final String PARENT_UNIT_ID = "parent_unit_id";
     private static final String CRISTIN_QUERY_PARAMETER_NAME_KEY = "name";
     private static final String CRISTIN_QUERY_PARAMETER_ORGANIZATION_KEY = "institution";
     private static final String CRISTIN_QUERY_PARAMETER_PAGE_KEY = "page";
