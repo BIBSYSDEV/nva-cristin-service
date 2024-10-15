@@ -3,6 +3,7 @@ package no.unit.nva.cristin.organization.fetch;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.http.HttpHeaders;
 import java.util.stream.Stream;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.organization.common.client.CristinOrganizationApiClient;
@@ -49,6 +50,7 @@ import static no.unit.nva.cristin.model.Constants.NOT_FOUND_MESSAGE_TEMPLATE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
+import static no.unit.nva.cristin.testing.HttpResponseFaker.LINK_EXAMPLE_VALUE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
@@ -80,6 +82,8 @@ class FetchCristinOrganizationHandlerTest {
     public static final String CRISTIN_GET_RESPONSE_JSON = "cristinGetResponse.json";
     public static final String CRISTIN_GET_RESPONSE_SUB_UNITS_JSON = "cristinGetResponseSubUnits.json";
     public static final String CRISTIN_GET_RESPONSE_SUB_UNITS_SORTED_JSON = "cristinGetResponseSubUnitsSorted.json";
+    public static final String CRISTIN_GET_RESPONSE_ADDITIONAL_SUB_UNITS_JSON =
+        "cristinGetResponseAdditionalSubUnits.json";
     public static final Map<String, String> QUERY_PARAM_NO_DEPTH = Map.of(DEPTH, NONE);
     public static final String NVA_GET_RESPONSE_20230526_JSON = "nvaGetResponse20230526.json";
     public static final String NVA_GET_RESPONSE_WITH_SUB_UNITS_20230526_JSON =
@@ -89,6 +93,7 @@ class FetchCristinOrganizationHandlerTest {
     public static final String ACRONYM_KLM_MBK = "KLM-MBK";
     public static final String ERROR_MESSAGE_NOT_FOUND =
         "The requested resource 'https://api.dev.nva.aws.unit.no/cristin/organization/1.0.0.0' was not found";
+    public static final String X_TOTAL_COUNT_OVER_PAGE_LIMIT = "1500";
 
     private FetchCristinOrganizationHandler fetchCristinOrganizationHandler;
     private CristinOrganizationApiClient cristinApiClient;
@@ -362,6 +367,50 @@ class FetchCristinOrganizationHandlerTest {
         assertThat(hasParts.get(8).getId().toString(), containsString("185.15.0.31"));
         assertThat(hasParts.get(9).getId().toString(), containsString("185.15.0.32"));
         assertThat(hasParts.get(10).getId().toString(), containsString("185.15.0.36"));
+    }
+
+    @Test
+    void shouldDoAnExtraRequestWhenUpstreamHasHeaderIndicatingMoreHitsThanFirstPage() throws IOException,
+                                                                                             ApiGatewayException {
+        var resource = stringFromResources(CRISTIN_GET_RESPONSE_JSON);
+        var fakeHttpResponse = new HttpResponseFaker(resource, HTTP_OK);
+
+        var headersIndicatingMoreResults = headerMapWithMoreResultsThanFirstPageHas();
+        var cristinSubsPayload = getFromResources(CRISTIN_GET_RESPONSE_SUB_UNITS_JSON);
+        var fakeSubUnitResponse = new HttpResponseFaker(cristinSubsPayload, HTTP_OK, headersIndicatingMoreResults);
+
+        var cristinAdditionalSubsPayload = getFromResources(CRISTIN_GET_RESPONSE_ADDITIONAL_SUB_UNITS_JSON);
+        var fakeAdditionalSubUnitResponse = new HttpResponseFaker(cristinAdditionalSubsPayload, HTTP_OK);
+
+        doReturn(fakeHttpResponse).doReturn(fakeSubUnitResponse).doReturn(fakeAdditionalSubUnitResponse)
+            .when(fetchOrgClient20230526).fetchGetResult(any());
+
+        fetchCristinOrganizationHandler = new FetchCristinOrganizationHandler(clientProvider, new Environment());
+        fetchCristinOrganizationHandler.handleRequest(generateHandlerRequest(SOME_IDENTIFIER), output, context);
+
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, Organization.class);
+
+        verify(fetchOrgClient20230526, times(3)).fetchGetResult(any());
+        verify(cristinApiClient, times(0)).fetchGetResult(any());
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+
+        var actualOrg = gatewayResponse.getBodyObject(Organization.class);
+        assertThat(actualOrg.getHasPart().size(), equalTo(10));
+        assertThat(containsIdentifier(actualOrg, "185.15.0.111"), equalTo(true));
+        assertThat(containsIdentifier(actualOrg, "185.15.0.222"), equalTo(true));
+    }
+
+    private boolean containsIdentifier(Organization actualOrg, String identifier) {
+        return actualOrg.getHasPart()
+                   .stream()
+                   .anyMatch(organization -> organization.getId().toString().contains(identifier));
+    }
+
+    private HttpHeaders headerMapWithMoreResultsThanFirstPageHas() {
+        return HttpHeaders.of(
+            HttpResponseFaker.headerMap(X_TOTAL_COUNT_OVER_PAGE_LIMIT, LINK_EXAMPLE_VALUE),
+            HttpResponseFaker.filter()
+        );
     }
 
     private Object getSubSubUnit(String subUnitFile) {
