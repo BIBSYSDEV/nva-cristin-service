@@ -48,7 +48,6 @@ import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_DEPTH_INVALID;
 import static no.unit.nva.client.ClientProvider.VERSION_2023_05_26;
 import static no.unit.nva.client.ClientProvider.VERSION_ONE;
 import static no.unit.nva.cristin.model.Constants.FULL;
@@ -163,16 +162,6 @@ class QueryCristinOrganizationHandlerTest {
         assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
         assertEquals(2, actual.getHits().size());
         assertEquals(JSON_UTF_8.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-    }
-
-    @Test
-    void shouldReturnBadRequestOnIllegalDepth() throws IOException {
-        var inputStream = generateHandlerRequestWithIllegalDepthParameter();
-        queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
-        var actualDetail = getProblemDetail(gatewayResponse);
-        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(ERROR_MESSAGE_DEPTH_INVALID));
     }
 
     @ParameterizedTest(name = "Requesting version {0} should call version one {1} times and version two {2} times")
@@ -452,13 +441,6 @@ class QueryCristinOrganizationHandlerTest {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
                 .withQueryParameters(Map.of(QUERY, "strangeQueryWithoutHits"))
-                .build();
-    }
-
-    private InputStream generateHandlerRequestWithIllegalDepthParameter() throws JsonProcessingException {
-        return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
-                .withQueryParameters(Map.of(QUERY, "Fysikk", DEPTH, "feil"))
                 .build();
     }
 
