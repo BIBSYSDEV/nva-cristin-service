@@ -71,7 +71,10 @@ public class FetchCristinOrgClient20230526 extends ApiClient
                 subUnitsDto.addAll(deserializeSubUnits(responseWithSubsPageTwo));
             }
 
-            return getMultiLevelOrganization(response, subUnitsDto);
+            var organization = getMultiLevelOrganization(response, subUnitsDto);
+            organization.setContext(ORGANIZATION_CONTEXT);
+
+            return organization;
         } else {
             var organization = getSingleLevelOrganization(response);
             organization.setContext(ORGANIZATION_CONTEXT);
@@ -107,11 +110,8 @@ public class FetchCristinOrgClient20230526 extends ApiClient
 
         var unit = getDeserializedResponse(response, UnitDto.class);
         unit.setSubUnits(subUnitsDto);
-        var organization = new OrganizationFromUnitMapper().apply(unit);
 
-        organization.setContext(ORGANIZATION_CONTEXT);
-
-        return organization;
+        return new OrganizationFromUnitMapper().apply(unit);
     }
 
     private Organization getSingleLevelOrganization(HttpResponse<String> response) throws BadGatewayException {
