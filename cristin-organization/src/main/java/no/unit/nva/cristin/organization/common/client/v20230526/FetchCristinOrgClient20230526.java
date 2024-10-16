@@ -10,12 +10,15 @@ import static no.unit.nva.cristin.model.Constants.PARENT_UNIT_ID;
 import static no.unit.nva.cristin.model.Constants.UNITS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
+import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.client.FetchApiClient;
@@ -29,7 +32,9 @@ import nva.commons.core.paths.UriWrapper;
 public class FetchCristinOrgClient20230526 extends ApiClient
     implements FetchApiClient<Map<String, String>, Organization> {
 
-    public static final String ALL_RESULTS = "2000";
+    public static final String ALL_RESULTS = "1000"; // Max in upstream for first page
+    public static final String FIRST_PAGE = "1";
+    public static final String SECOND_PAGE = "2";  // Edge case where search result has up to size 2000
 
     public FetchCristinOrgClient20230526() {
         this(defaultHttpClient());
@@ -51,10 +56,22 @@ public class FetchCristinOrgClient20230526 extends ApiClient
         var fetchUri = getCristinUri(identifier);
         var response = fetchGetResult(fetchUri);
         checkHttpStatusCode(getNvaApiId(identifier, ORGANIZATION_PATH), response.statusCode(), response.body());
+
         if (wantsDepth(params)) {
-            var fetchSubsUri = createCristinQueryUri(translateParamsForSubUnits(identifier), UNITS_PATH);
+            var fetchSubsUri = createCristinQueryUri(translateParamsForSubUnits(identifier, FIRST_PAGE), UNITS_PATH);
             var responseWithSubs = fetchGetResult(fetchSubsUri);
-            var organization = getOrganization(response, responseWithSubs);
+            var subUnitsDto = new ArrayList<>(deserializeSubUnits(responseWithSubs));
+
+            var multiPageProcessor = new MultiPageProcessor(responseWithSubs);
+            if (multiPageProcessor.hasAdditionalPages()) {
+                var fetchSubsUriPageTwo =
+                    createCristinQueryUri(translateParamsForSubUnits(identifier, SECOND_PAGE), UNITS_PATH);
+                var responseWithSubsPageTwo = fetchGetResult(fetchSubsUriPageTwo);
+
+                subUnitsDto.addAll(deserializeSubUnits(responseWithSubsPageTwo));
+            }
+
+            var organization = getMultiLevelOrganization(response, subUnitsDto);
             organization.setContext(ORGANIZATION_CONTEXT);
 
             return organization;
@@ -65,6 +82,7 @@ public class FetchCristinOrgClient20230526 extends ApiClient
 
             return organization;
         }
+
     }
 
     private boolean wantsDepth(Map<String, String> params) {
@@ -79,8 +97,21 @@ public class FetchCristinOrgClient20230526 extends ApiClient
                    .getUri();
     }
 
-    private Map<String, String> translateParamsForSubUnits(String identifier) {
-        return Map.of(PARENT_UNIT_ID, identifier, CRISTIN_PER_PAGE_PARAM, ALL_RESULTS);
+    private Map<String, String> translateParamsForSubUnits(String identifier, String page) {
+        return Map.of(PARENT_UNIT_ID, identifier, PAGE, page, CRISTIN_PER_PAGE_PARAM, ALL_RESULTS);
+    }
+
+    private List<UnitDto> deserializeSubUnits(HttpResponse<String> responseWithSubs) throws BadGatewayException {
+        return asList(getDeserializedResponse(responseWithSubs, UnitDto[].class));
+    }
+
+    private Organization getMultiLevelOrganization(HttpResponse<String> response, List<UnitDto> subUnitsDto)
+        throws BadGatewayException {
+
+        var unit = getDeserializedResponse(response, UnitDto.class);
+        unit.setSubUnits(subUnitsDto);
+
+        return new OrganizationFromUnitMapper().apply(unit);
     }
 
     private Organization getSingleLevelOrganization(HttpResponse<String> response) throws BadGatewayException {
@@ -89,12 +120,4 @@ public class FetchCristinOrgClient20230526 extends ApiClient
         return new OrganizationFromUnitMapper().apply(unit);
     }
 
-    private Organization getOrganization(HttpResponse<String> response, HttpResponse<String> responseWithSubs)
-        throws BadGatewayException {
-        var unit = getDeserializedResponse(response, UnitDto.class);
-        var subUnits = asList(getDeserializedResponse(responseWithSubs, UnitDto[].class));
-        unit.setSubUnits(subUnits);
-
-        return new OrganizationFromUnitMapper().apply(unit);
-    }
 }
