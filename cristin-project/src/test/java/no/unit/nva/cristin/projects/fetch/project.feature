@@ -124,8 +124,14 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.funding[0].source == '#present'
     And match response.funding[0].identifier == '#present'
     And match response.funding[0].labels == '#present'
-    And match response.contributors[0].identity.id == '#present'
     And match response.contributors[0].roles[0].type == '#present'
+
+  Scenario: Fetch returns id on identified persons
+    Given path '/project/2676613'
+    When method GET
+    Then status 200
+    And match response == '#object'
+    And match response.contributors[0].identity.id == '#present'
 
   Scenario: Fetch returns method and equipment
     Given path '/project/284612'
