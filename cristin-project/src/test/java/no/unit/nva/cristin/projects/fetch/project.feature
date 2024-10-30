@@ -125,6 +125,7 @@ Feature: API tests for Cristin Project retrieve and search
     And match response.funding[0].identifier == '#present'
     And match response.funding[0].labels == '#present'
     And match response.contributors[0].roles[0].type == '#present'
+    And match response.creator.identity.id == '#present'
 
   Scenario: Fetch returns id on identified persons
     Given path '/project/2676613'
