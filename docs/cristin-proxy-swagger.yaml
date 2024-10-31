@@ -146,6 +146,12 @@ paths:
               - end_date
               - end_date asc
               - end_date desc
+              - name
+              - name asc
+              - name desc
+              - score
+              - score asc
+              - score desc
           style: form
           explode: false
         - name: unit
@@ -581,7 +587,7 @@ paths:
         - name: query
           in: query
           description: Search for organization by name
-          required: false
+          required: true
           schema:
             type: string
             pattern: '.+'
@@ -629,6 +635,15 @@ paths:
               - country
               - country asc
               - country desc
+              - name_en
+              - name_en asc
+              - name_en desc
+              - name_nb
+              - name_nb asc
+              - name_nb desc
+              - name_nn
+              - name_nn asc
+              - name_nn desc
           style: form
           explode: false
         - name: fullTree
@@ -994,6 +1009,12 @@ paths:
               - end_date
               - end_date asc
               - end_date desc
+              - name
+              - name asc
+              - name desc
+              - score
+              - score asc
+              - score desc
           style: form
           explode: false
         - name: unit
@@ -2619,13 +2640,21 @@ components:
           type: object
           description: Project Creator
           properties:
-            type:
-              type: string
-              description: Type. Always ProjectCreator
             identity:
               $ref: '#/components/schemas/PersonSummary'
-            affiliation:
-              $ref: '#/components/schemas/Organization'
+            roles:
+              type: array
+              description: Single element array having role with affiliation
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - ProjectCreator
+                    description: Role of project creator
+                  affiliation:
+                    $ref: '#/components/schemas/Organization'
         webPage:
           type: string
           format: uri
@@ -4327,6 +4356,17 @@ components:
                 authorityName:
                   en: 'Regional committees for medical and health research ethics'
             webPage: 'https://www.example.org'
+            creator:
+              identity:
+                id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
+                type: 'Person'
+                firstName: 'Kari'
+                lastName: 'Olsen'
+              roles:
+                - type: 'ProjectCreator'
+                  affiliation:
+                    id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                    type: 'Organization'
     ProjectsWithFacetsExample:
       value:
         '@context': 'https://bibsysdev.github.io/src/project-search-context.json'
@@ -4369,6 +4409,17 @@ components:
             created:
               sourceShortName: "REK"
               date: "2019-12-31T09:45:17Z"
+            creator:
+              identity:
+                id: 'https://api.dev.nva.aws.unit.no/cristin/person/326035'
+                type: 'Person'
+                firstName: 'Kari'
+                lastName: 'Olsen'
+              roles:
+                - type: 'ProjectCreator'
+                  affiliation:
+                    id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                    type: 'Organization'
         aggregations:
           sectorFacet:
             - id: 'https://api.dev.nva.aws.unit.no/cristin/person?name=john&sectorFacet=UC&page=1&results=5'
@@ -4527,15 +4578,16 @@ components:
             authorityName:
               en: 'Regional committees for medical and health research ethics'
         creator:
-          type: 'ProjectCreator'
           identity:
             id: 'https://api.dev.nva.aws.unit.no/cristin/person/325953'
             type: 'Person'
             firstName: 'Ola'
             lastName: 'Nordmann'
-          affiliation:
-            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
-            type: 'Organization'
+          roles:
+            - type: 'ProjectCreator'
+              affiliation:
+                id: 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                type: 'Organization'
         webPage: 'https://www.example.org'
     ProjectPatchExample:
       value:
