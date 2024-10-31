@@ -4,16 +4,19 @@ Service for fetching data from the [Cristin API](https://api.cristin.no/v2/doc/i
 
 ## Building locally
 
-We need to add some test tag exclusions since the tagged tests are only used for integration 
-testing on deployed instances.
-
 ### Windows
 
-```gradlew build -x karateTest -x createTestUsers -x deleteTestUsers```
+```gradlew build```
 
-### Linux
+### Linux/Mac
 
-```./gradlew build -x karateTest -x createTestUsers -x deleteTestUsers```
+```./gradlew build```
+
+### If build fails, add these params
+
+```-x karateTest -x createTestUsers -x deleteTestUsers```
+
+These params exclude integration tests and might be necessary
 
 ## Running karate tests
 
@@ -42,8 +45,6 @@ or deploy a stack manually.
 
 ## OpenApi
 
-[NVA Developer Portal](https://portal.dev.nva.aws.unit.no/)
-
-Or most recent in ```docs/cristin-proxy-swagger.yaml```
+Most recent in ```docs/cristin-proxy-swagger.yaml```
 
 [Swagger Editor](https://editor.swagger.io/)
