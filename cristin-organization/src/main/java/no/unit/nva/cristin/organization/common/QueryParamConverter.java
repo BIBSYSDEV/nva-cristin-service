@@ -29,7 +29,9 @@ public class QueryParamConverter {
             CRISTIN_PER_PAGE_PARAM, requestQueryParams.get(NUMBER_OF_RESULTS)));
 
         if (requestQueryParams.containsKey(SORT)) {
-            translatedParams.put(SORT, requestQueryParams.get(SORT));
+            var sort = requestQueryParams.get(SORT);
+            var sortConverted = convertSortValues(sort);
+            translatedParams.put(SORT, sortConverted);
         }
 
         return translatedParams;
@@ -37,6 +39,12 @@ public class QueryParamConverter {
 
     private static String toCristinLevel(String depth) {
         return TOP.equals(depth) || isNull(depth) ? FIRST_LEVEL : ALL_SUB_LEVELS;
+    }
+
+    private static String convertSortValues(String input) {
+        return input.replace("nameNb", "name_nb")
+                   .replace("nameEn", "name_en")
+                   .replace("nameNn", "name_nn");
     }
 
 }

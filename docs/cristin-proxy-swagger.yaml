@@ -635,15 +635,15 @@ paths:
               - country
               - country asc
               - country desc
-              - name_en
-              - name_en asc
-              - name_en desc
-              - name_nb
-              - name_nb asc
-              - name_nb desc
-              - name_nn
-              - name_nn asc
-              - name_nn desc
+              - nameEn
+              - nameEn asc
+              - nameEn desc
+              - nameNb
+              - nameNb asc
+              - nameNb desc
+              - nameNn
+              - nameNn asc
+              - nameNn desc
           style: form
           explode: false
         - name: fullTree
