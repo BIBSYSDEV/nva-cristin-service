@@ -587,7 +587,7 @@ paths:
         - name: query
           in: query
           description: Search for organization by name
-          required: true
+          required: false
           schema:
             type: string
             pattern: '.+'

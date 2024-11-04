@@ -88,7 +88,7 @@ class QueryCristinOrganizationHandlerTest {
     public static final String MEDICAL_BIOCHEMISTRY = "Department of Medical Biochemistry";
     public static final String EMPTY_OBJECT = "{}";
     public static final String NOT_FOUND_LOG_MESSAGE = "Organization from search result could not be found in upstream";
-    public static final String PARAM_QUERY_IS_MISSING = "Required param 'query' is missing";
+    private static final int TWO_HITS = 2;
 
     private QueryCristinOrganizationHandler queryCristinOrganizationHandler;
     private DefaultOrgQueryClientProvider clientProvider;
@@ -121,13 +121,18 @@ class QueryCristinOrganizationHandlerTest {
     }
 
     @Test
-    void shouldReturnBadRequestResponseOnMissingQueryParam() throws IOException {
-        var inputStream = generateHandlerRequestWithMissingQueryParameter();
+    void shouldReturnAllResultsWhenNoParamsAreSpecified() throws Exception {
+        var fakeQueryResponseResource = IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_V_2_JSON));
+        doReturn(new HttpResponseFaker(fakeQueryResponseResource))
+            .when(queryCristinOrgClient20230526).fetchQueryResults(any());
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
+        var inputStream = generateHandlerRequestWithNoQueryParameters();
         queryCristinOrganizationHandler.handleRequest(inputStream, output, context);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output,Problem.class);
-        var actualDetail = getProblemDetail(gatewayResponse);
-        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(actualDetail, containsString(PARAM_QUERY_IS_MISSING));
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        var responseBody = gatewayResponse.getBodyObject(SearchResponse.class);
+
+        assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+        assertThat(responseBody.getHits().size(), equalTo(TWO_HITS));
     }
 
     @Test
@@ -466,7 +471,7 @@ class QueryCristinOrganizationHandlerTest {
         return OBJECT_MAPPER.readValue(IoUtils.stringFromResources(Path.of(subUnitFile)), Organization.class);
     }
 
-    private InputStream generateHandlerRequestWithMissingQueryParameter() throws JsonProcessingException {
+    private InputStream generateHandlerRequestWithNoQueryParameters() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                 .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
                 .build();

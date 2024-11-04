@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_REQUIRED_PARAM_MISSING;
 import static no.unit.nva.cristin.common.ErrorMessages.validQueryParameterNamesMessage;
 import static no.unit.nva.client.ClientProvider.VERSION;
 import static no.unit.nva.cristin.model.Constants.FULL_TREE;
@@ -83,7 +82,7 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
 
         var requestQueryParams = new ConcurrentHashMap<String, String>();
 
-        requestQueryParams.put(QUERY, getValidQuery(requestInfo));
+        getQuery(requestInfo).ifPresent(query -> requestQueryParams.put(QUERY, query));
         requestQueryParams.put(DEPTH, getValidDepth(requestInfo));
         requestQueryParams.put(PAGE, getValidPage(requestInfo));
         requestQueryParams.put(NUMBER_OF_RESULTS, getValidNumberOfResults(requestInfo));
@@ -93,10 +92,8 @@ public class QueryCristinOrganizationHandler extends CristinQueryHandler<Void, S
         return requestQueryParams;
     }
 
-    protected String getValidQuery(RequestInfo requestInfo) throws BadRequestException {
-        return requestInfo.getQueryParameterOpt(QUERY)
-                   .orElseThrow(() -> new BadRequestException(
-                       String.format(ERROR_MESSAGE_REQUIRED_PARAM_MISSING, QUERY)));
+    private Optional<String> getQuery(RequestInfo requestInfo) {
+        return requestInfo.getQueryParameterOpt(QUERY);
     }
 
     private Optional<String> getSort(RequestInfo requestInfo) {

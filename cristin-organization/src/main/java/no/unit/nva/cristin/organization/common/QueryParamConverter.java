@@ -22,11 +22,15 @@ public class QueryParamConverter {
      * Transforms request query params to cristin format for query params.
      */
     public static Map<String, String> translateToCristinApi(Map<String, String> requestQueryParams) {
-        var translatedParams = new ConcurrentHashMap<>(Map.of(
-            CRISTIN_LEVELS_PARAM, toCristinLevel(requestQueryParams.get(DEPTH)),
-            CRISTIN_QUERY_NAME_PARAM, requestQueryParams.get(QUERY),
-            PAGE, requestQueryParams.get(PAGE),
-            CRISTIN_PER_PAGE_PARAM, requestQueryParams.get(NUMBER_OF_RESULTS)));
+        var translatedParams = new ConcurrentHashMap<String, String>();
+
+        if (requestQueryParams.containsKey(QUERY)) {
+            translatedParams.put(CRISTIN_QUERY_NAME_PARAM, requestQueryParams.get(QUERY));
+        }
+
+        translatedParams.put(CRISTIN_LEVELS_PARAM, toCristinLevel(requestQueryParams.get(DEPTH)));
+        translatedParams.put(PAGE, requestQueryParams.get(PAGE));
+        translatedParams.put(CRISTIN_PER_PAGE_PARAM, requestQueryParams.get(NUMBER_OF_RESULTS));
 
         if (requestQueryParams.containsKey(SORT)) {
             var sort = requestQueryParams.get(SORT);
