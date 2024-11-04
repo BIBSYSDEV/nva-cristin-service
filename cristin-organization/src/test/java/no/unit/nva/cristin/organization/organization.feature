@@ -35,13 +35,13 @@ Feature: API tests for Cristin Organization retrieve and search
     And match response.status == 400
     And match response.detail == 'Invalid path parameter for identifier, needs to be organization identifier matching pattern /(?:\\d+.){3}\\d+/, e.g. (100.0.0.0)'
 
-  Scenario: GET returns 400 status Bad request when requesting without any query parameter
+  Scenario: GET returns 200 OK when requesting without any query parameter
     Given path '/organization/'
     When method GET
-    Then status 400
-    And match response.title == 'Bad Request'
-    And match response.status == 400
-    And match response.detail == 'Required param \'query\' is missing'
+    Then status 200
+    And match response.hits == '#present'
+    And match response.hits == '#array'
+    And match response.hits == '#[5]'
 
   Scenario: GET returns 404 status Not found when requesting unknown organization identifier
     Given path '/organization/' + nonExistingOrganizationId
