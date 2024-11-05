@@ -138,3 +138,15 @@ Feature: API tests for Cristin Organization retrieve and search
     Then status 200
     And match response.hits == '#array'
     And match response.hits == '#[1]'
+
+  Scenario: GET organization sorting on name in english returns results
+    Given path '/organization'
+    And param query = testOrganizationNameSearchTerm
+    And param results = '2'
+    And param page = '4'
+    And param sort = 'nameEn'
+    When method GET
+    Then status 200
+    And match response.hits == '#array'
+    And match response.size == '#number'
+    And match response.hits == '#[2]' // hits array length == 0

@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.zalando.problem.Problem;
 
@@ -44,6 +45,7 @@ import java.util.Map;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static com.google.common.net.MediaType.JSON_UTF_8;
+import static java.lang.String.format;
 import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
@@ -218,7 +220,7 @@ class QueryCristinOrganizationHandlerTest {
 
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
         var input =
-            generateValidHandlerRequestWithVersionParam(String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26));
+            generateValidHandlerRequestWithVersionParam(format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26));
         queryCristinOrganizationHandler.handleRequest(input, output, context);
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output,
@@ -236,32 +238,25 @@ class QueryCristinOrganizationHandlerTest {
         assertThat(readHitsAsTree(actualHits), equalTo(readHitsAsTree(expectedHits)));
     }
 
-    @Test
-    void shouldHaveCorrectCristinUriWithParamsOnVersionOne() throws Exception {
+    @ParameterizedTest(name = "Version {0} has correct upstream uri")
+    @ValueSource(strings = {VERSION_ONE, VERSION_2023_05_26})
+    void shouldHaveCorrectCristinUriWithParamsDifferentVersions(String apiVersion) throws Exception {
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
-        var input = generateHandlerRequestWithAdditionalQueryParameters(String.format(ACCEPT_HEADER_EXAMPLE,
-                                                                                      VERSION_ONE));
+        var input = generateHandlerRequestWithAdditionalQueryParameters(format(ACCEPT_HEADER_EXAMPLE,
+                                                                               apiVersion));
         queryCristinOrganizationHandler.handleRequest(input, output, context);
 
         var captor = ArgumentCaptor.forClass(URI.class);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+        final var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
 
-        verify(cristinApiClientVersionOne).sendRequestMultipleTimes(captor.capture());
-        assertThat(captor.getValue().getQuery(), containsString("sort=country desc"));
-        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
-    }
+        if (VERSION_2023_05_26.equals(apiVersion)) {
+            verify(queryCristinOrgClient20230526).fetchQueryResults(captor.capture());
+        } else {
+            verify(cristinApiClientVersionOne).sendRequestMultipleTimes(captor.capture());
+        }
 
-    @Test
-    void shouldHaveCorrectCristinUriWithParamsOnVersionTwo() throws Exception {
-        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
-        var input = generateHandlerRequestWithAdditionalQueryParameters(String.format(ACCEPT_HEADER_EXAMPLE,
-                                                                                      VERSION_2023_05_26));
-        queryCristinOrganizationHandler.handleRequest(input, output, context);
-
-        var captor = ArgumentCaptor.forClass(URI.class);
-        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
-
-        verify(queryCristinOrgClient20230526).fetchQueryResults(captor.capture());
+        assertThat(captor.getValue().toString(), containsString("https://api.cristin-test.uio.no/v2/units?"));
+        assertThat(captor.getValue().getQuery(), containsString("name=strangeQueryWithoutHits"));
         assertThat(captor.getValue().getQuery(), containsString("sort=country desc"));
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
@@ -367,8 +362,8 @@ class QueryCristinOrganizationHandlerTest {
             .when(queryCristinOrgClient20230526).fetchQueryResults(any());
 
         queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
-        var input = generateValidHandlerRequestWithVersionParam(String.format(ACCEPT_HEADER_EXAMPLE,
-                                                                              VERSION_2023_05_26));
+        var input = generateValidHandlerRequestWithVersionParam(format(ACCEPT_HEADER_EXAMPLE,
+                                                                       VERSION_2023_05_26));
         queryCristinOrganizationHandler.handleRequest(input, output, context);
 
         var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
@@ -413,6 +408,35 @@ class QueryCristinOrganizationHandlerTest {
         assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
     }
 
+    @ParameterizedTest(name = "Sort param {1} gets converted to {2} on api version {0}")
+    @MethodSource("sortAndVersionArgumentProvider")
+    void shouldConvertSortParamBetweenNvaFormatAndCristinFormat(String apiVersion,
+                                                                String nvaSort,
+                                                                String cristinSort)
+        throws Exception {
+
+        queryCristinOrganizationHandler = new QueryCristinOrganizationHandler(clientProvider, new Environment());
+        var input = generateHandlerRequestWithSortParameters(
+            format(ACCEPT_HEADER_EXAMPLE, apiVersion),
+            nvaSort
+        );
+        queryCristinOrganizationHandler.handleRequest(input, output, context);
+
+        var captor = ArgumentCaptor.forClass(URI.class);
+        var gatewayResponse = GatewayResponse.fromOutputStream(output, SearchResponse.class);
+
+        if (VERSION_2023_05_26.equals(apiVersion)) {
+            verify(queryCristinOrgClient20230526).fetchQueryResults(captor.capture());
+        } else {
+            verify(cristinApiClientVersionOne).sendRequestMultipleTimes(captor.capture());
+        }
+
+        var sortTemplate = "sort=%s";
+
+        assertThat(captor.getValue().getQuery(), containsString(format(sortTemplate, cristinSort)));
+        assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
+    }
+
     private List<Organization> convertHitsToProperFormat(SearchResponse<?> searchResponse) {
         return OBJECT_MAPPER.convertValue(searchResponse.getHits(), new TypeReference<>() {});
     }
@@ -434,8 +458,8 @@ class QueryCristinOrganizationHandlerTest {
 
     private static Stream<Arguments> versionArgumentProvider() {
         return Stream.of(
-            Arguments.of(String.format(ACCEPT_HEADER_EXAMPLE, VERSION_ONE), 1, 0),
-            Arguments.of(String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26), 0, 1)
+            Arguments.of(format(ACCEPT_HEADER_EXAMPLE, VERSION_ONE), 1, 0),
+            Arguments.of(format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26), 0, 1)
         );
     }
 
@@ -508,7 +532,7 @@ class QueryCristinOrganizationHandlerTest {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
                    .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type(),
                                        ACCEPT_HEADER_KEY_NAME,
-                                       String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26)))
+                                       format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26)))
                    .withQueryParameters(Map.of(QUERY, MEDICAL_BIOCHEMISTRY,
                                                DEPTH, FULL,
                                                FULL_TREE, Boolean.TRUE.toString()))
@@ -545,6 +569,58 @@ class QueryCristinOrganizationHandlerTest {
             Arguments.of("Hogeschool IPABO Amsterdam/Alkmaar"),
             Arguments.of("University of Technology, Sydney - Branch: St. Leonards Campus)")
         );
+    }
+
+    private static Stream<Arguments> sortAndVersionArgumentProvider() {
+        return Stream.of(
+            Arguments.of(VERSION_ONE,
+                         "nameEn",
+                         "name_en"),
+            Arguments.of(VERSION_ONE,
+                         "nameEn asc",
+                         "name_en asc"),
+            Arguments.of(VERSION_ONE,
+                         "nameEn desc",
+                         "name_en desc"),
+            Arguments.of(VERSION_2023_05_26,
+                         "nameEn",
+                         "name_en"),
+            Arguments.of(VERSION_2023_05_26,
+                         "nameEn asc",
+                         "name_en asc"),
+            Arguments.of(VERSION_2023_05_26,
+                         "nameEn desc",
+                         "name_en desc"),
+            Arguments.of(VERSION_ONE,
+                         "nameNb",
+                         "name_nb"),
+            Arguments.of(VERSION_ONE,
+                         "nameNb asc",
+                         "name_nb asc"),
+            Arguments.of(VERSION_ONE,
+                         "nameNb desc",
+                         "name_nb desc"),
+            Arguments.of(VERSION_2023_05_26,
+                         "nameNb",
+                         "name_nb"),
+            Arguments.of(VERSION_2023_05_26,
+                         "nameNb asc",
+                         "name_nb asc"),
+            Arguments.of(VERSION_2023_05_26,
+                         "nameNb desc",
+                         "name_nb desc")
+        );
+    }
+
+    private InputStream generateHandlerRequestWithSortParameters(String versionParam, String nvaSortParam)
+        throws JsonProcessingException {
+
+        return new HandlerRequestBuilder<InputStream>(restApiMapper)
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type(),
+                                       ACCEPT_HEADER_KEY_NAME, versionParam))
+                   .withQueryParameters(Map.of(QUERY, "strangeQueryWithoutHits",
+                                               SORT, nvaSortParam))
+                   .build();
     }
 
 }
