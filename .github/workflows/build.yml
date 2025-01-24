@@ -8,7 +8,9 @@ on:
 
 jobs:
   build:
-    uses: BIBSYSDEV/nva-github-workflows/.github/workflows/java.yml@v1
+    uses: BIBSYSDEV/nva-github-workflows/.github/workflows/java.yml@larsv/parameterize-openapi-reference
+    with:
+      openapi_definition: "docs/cristin-proxy-swagger.yaml"
     secrets:
       codacy_token: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
