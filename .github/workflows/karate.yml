@@ -2,7 +2,7 @@ name: Karate API tests
 
 on: [ push ]
 env:
-  BASE_PATH: cristin-$GITHUB_REF_NAME
+  BASE_NAME: cristin-$GITHUB_REF_NAME
   PR_NUMBER: ${{ github.event.number }}
   DOMAIN_NAME:  "api.dev.nva.aws.unit.no"
   CRISTIN_API_URL: "https://api.cristin-test.uio.no/v2"
@@ -45,7 +45,9 @@ jobs:
           aws-region: eu-west-1
       # Stack name cannot contain slashes, but are based on the branch name which can contain slashes
       - name: Set stack name
-        run: echo "STACK_NAME=$(echo ${{env.BASE_PATH}} | tr '/' '-')" >> $GITHUB_ENV
+        run: |
+          echo "BASE_PATH=$(echo ${{env.BASE_NAME}} | tr '/' '-')" >> $GITHUB_ENV
+          echo "STACK_NAME=$(echo ${{env.BASE_NAME}} | tr '/' '-')" >> $GITHUB_ENV
       - name: Build
         run: sam build
       # Prevent prompts and failure when the stack is unchanged
