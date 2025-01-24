@@ -43,6 +43,8 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::884807050265:role/nva-dev-github-actions-role
           aws-region: eu-west-1
+      - name: Sanitize branch name
+        run: echo "STACK_NAME=$(echo '${GITHUB_REF_NAME}' | tr '/' '-')" >> $GITHUB_ENV
       - name: Build
         run: sam build
       # Prevent prompts and failure when the stack is unchanged
