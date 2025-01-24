@@ -2,7 +2,6 @@ name: Karate API tests
 
 on: [ push ]
 env:
-  STACK_NAME: cristin-$GITHUB_REF_NAME
   BASE_PATH: cristin-$GITHUB_REF_NAME
   PR_NUMBER: ${{ github.event.number }}
   DOMAIN_NAME:  "api.dev.nva.aws.unit.no"
@@ -44,19 +43,9 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::884807050265:role/nva-dev-github-actions-role
           aws-region: eu-west-1
-      #### Temp debugging
-      - name: Test env variable
-        id: vars
-        run: |
-          echo "GITHUB_REF_NAME (original) = ${{env.STACK_NAME}}"
-          echo "SANITIZED_STACK_NAME=$(echo $GITHUB_REF_NAME | tr '/' '-')" >> $GITHUB_ENV
-          echo "SANITIZED_STACK_NAME2=$(echo ${{env.STACK_NAME}} | tr '/' '-')" >> $GITHUB_ENV
-      - name: Test env variable 2
-        run: |
-          echo "GITHUB_REF_NAME (original) = ${{env.STACK_NAME}}"
-          echo "SANITIZED_STACK_NAME = ${{env.SANITIZED_STACK_NAME}}"
-          echo "SANITIZED_STACK_NAME2 = ${{env.SANITIZED_STACK_NAME2}}"
-        #### End temp debugging
+      # Stack name cannot contain slashes, but are based on the branch name which can contain slashes
+      - name: Set stack name
+        run: echo "STACK_NAME=$(echo ${{env.BASE_PATH}} | tr '/' '-')" >> $GITHUB_ENV
       - name: Build
         run: sam build
       # Prevent prompts and failure when the stack is unchanged
