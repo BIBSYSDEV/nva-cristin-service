@@ -3,7 +3,6 @@ name: Karate API tests
 on: [ push ]
 env:
   BASE_NAME: cristin-$GITHUB_REF_NAME
-  PR_NUMBER: ${{ github.event.number }}
   DOMAIN_NAME:  "api.dev.nva.aws.unit.no"
   CRISTIN_API_URL: "https://api.cristin-test.uio.no/v2"
   COGNITO_USER_POOL_ID:  "eu-west-1_nLV9i5X5D"
