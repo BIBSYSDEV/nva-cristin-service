@@ -45,13 +45,15 @@ jobs:
           aws-region: eu-west-1
       #### Temp debugging
       - name: Test env variable
+        id: vars
         run: |
           echo "STACK_NAME (original) = $STACK_NAME"
-          SANITIZED_STACK_NAME=$(echo '${GITHUB_REF_NAME}' | tr '/' '-')
+          SANITIZED_STACK_NAME=$(echo '${GITHUB_REF_NAME}' | tr '/' '-') >> $GITHUB_OUTPUT
           echo "SANITIZED_STACK_NAME = $SANITIZED_STACK_NAME"
-          echo "::set-env name=STACK_NAME::$SANITIZED_STACK_NAME"
-          echo "STACK_NAME (new) = $STACK_NAME"
-
+      - name: Test env variable 2
+        run: |
+          echo "STACK_NAME (original) = $STACK_NAME"
+          echo "STACK_NAME (sanitized) = ${{ steps.vars.outputs.SANITIZED_STACK_NAME }}"
         #### End temp debugging
       - name: Build
         run: sam build
