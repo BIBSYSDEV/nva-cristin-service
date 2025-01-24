@@ -50,7 +50,7 @@ jobs:
         run: |
           echo "GITHUB_REF_NAME (original) = ${{env.STACK_NAME}}"
           echo "SANITIZED_STACK_NAME=$(echo $GITHUB_REF_NAME | tr '/' '-')" >> $GITHUB_ENV
-          echo "SANITIZED_STACK_NAME2=$(echo 'cristin-$GITHUB_REF_NAME' | tr '/' '-')" >> $GITHUB_ENV
+          echo "SANITIZED_STACK_NAME2=$(echo ${{env.STACK_NAME}} | tr '/' '-')" >> $GITHUB_ENV
       - name: Test env variable 2
         run: |
           echo "GITHUB_REF_NAME (original) = ${{env.STACK_NAME}}"
