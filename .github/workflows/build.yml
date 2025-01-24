@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    uses: BIBSYSDEV/nva-github-workflows/.github/workflows/java.yml@larsv/parameterize-openapi-reference
+    uses: BIBSYSDEV/nva-github-workflows/.github/workflows/java.yml@v1
     with:
       openapi_definition: "docs/cristin-proxy-swagger.yaml"
     secrets:
