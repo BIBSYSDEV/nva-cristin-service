@@ -48,11 +48,14 @@ jobs:
         id: vars
         run: |
           echo "GITHUB_REF_NAME (original) = ${{env.STACK_NAME}}"
+          echo '${{env.STACK_NAME}}' | tr '/' '-')
           SANITIZED_STACK_NAME=$(echo '${{env.STACK_NAME}}' | tr '/' '-') >> $GITHUB_OUTPUT
+          SANITIZED_STACK_NAME=$(echo '${{env.STACK_NAME}}' | tr '/' '-') >> $GITHUB_ENV
       - name: Test env variable 2
         run: |
           echo "GITHUB_REF_NAME (original) = ${{env.STACK_NAME}}"
           echo "STACK_NAME (sanitized) = ${{ steps.vars.outputs.SANITIZED_STACK_NAME }}"
+          echo "STACK_NAME (sanitized) = ${{ env.SANITIZED_STACK_NAME }}"
         #### End temp debugging
       - name: Build
         run: sam build
