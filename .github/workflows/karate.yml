@@ -48,7 +48,7 @@ jobs:
         id: vars
         run: |
           echo "GITHUB_REF_NAME (original) = ${{env.STACK_NAME}}"
-          echo '${{env.STACK_NAME}}' | tr '/' '-')
+          echo '${{env.STACK_NAME}}' | tr '/' '-'
           SANITIZED_STACK_NAME=$(echo '${{env.STACK_NAME}}' | tr '/' '-') >> $GITHUB_OUTPUT
           SANITIZED_STACK_NAME=$(echo '${{env.STACK_NAME}}' | tr '/' '-') >> $GITHUB_ENV
       - name: Test env variable 2
