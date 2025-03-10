@@ -48,3 +48,4 @@ or deploy a stack manually.
 Most recent in ```docs/cristin-proxy-swagger.yaml```
 
 [Swagger Editor](https://editor.swagger.io/)
+
