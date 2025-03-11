@@ -82,13 +82,13 @@ Feature: API tests for Cristin Project Update
       'webPage': 'https://www.change.org'
     }
     """
-    * def modifiedProject = karate.json(swaggerSampleProject)
+    * def modifiedProject = karate.toJson(swaggerSampleProject)
     * modifiedProject.title = modifiedProject.title + " " + randomString()
     Given url CRISTIN_BASE
 
   Scenario: Update returns status 204 No Content on successful update of project
     Given path '/project/2675095'
     * header Authorization = 'Bearer ' + token
-    And request swaggerSampleProject
+    And request modifiedProject
     When method PATCH
     Then status 204
