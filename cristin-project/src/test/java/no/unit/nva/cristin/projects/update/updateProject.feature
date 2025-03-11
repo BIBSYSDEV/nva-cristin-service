@@ -10,6 +10,7 @@ Feature: API tests for Cristin Project Update
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
     * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
     * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
+    * def randomString = function() { return java.util.UUID.randomUUID().toString() }
     * def swaggerSampleProject =
     """
     {
@@ -21,23 +22,6 @@ Feature: API tests for Cristin Project Update
         'type': 'Organization',
         'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
       },
-      'contributors': [
-        {
-          'identity': {
-            'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684652'
-          },
-          'roles' : [
-            {
-              'type': 'ProjectManager',
-              'affiliation': {
-                'type' : 'Organization',
-                'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
-              }
-            }
-          ]
-        }
-      ],
       'funding': [
         {
           'source': 'https://api.dev.nva.aws.unit.no/cristin/funding-sources/NFR',
@@ -98,6 +82,8 @@ Feature: API tests for Cristin Project Update
       'webPage': 'https://www.change.org'
     }
     """
+    * def modifiedProject = karate.json(swaggerSampleProject)
+    * modifiedProject.title = modifiedProject.title + " " + randomString()
     Given url CRISTIN_BASE
 
   Scenario: Update returns status 204 No Content on successful update of project
