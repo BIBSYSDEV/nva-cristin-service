@@ -7,6 +7,8 @@ import nva.commons.core.paths.UriWrapper;
 
 import java.net.URI;
 import java.net.http.HttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
@@ -16,6 +18,9 @@ import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 
 public class UpdateCristinProjectApiClient extends PatchApiClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(UpdateCristinProjectApiClient.class);
+
 
     public UpdateCristinProjectApiClient(HttpClient client) {
         super(client);
@@ -30,6 +35,10 @@ public class UpdateCristinProjectApiClient extends PatchApiClient {
      */
     public Void updateProjectInCristin(String projectId, ObjectNode cristinJson) throws ApiGatewayException {
         var uri = generateCristinUri(projectId);
+
+        logger.info("Updating project in Cristin with uri: {}", uri);
+        logger.info(cristinJson.toPrettyString());
+
         var response = patch(uri, cristinJson.toString());
         checkPatchHttpStatusCode(generateIdUri(projectId), response.statusCode(), response.body());
         return null;
