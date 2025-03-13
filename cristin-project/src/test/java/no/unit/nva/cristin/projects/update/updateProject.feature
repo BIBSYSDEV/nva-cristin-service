@@ -32,7 +32,7 @@ Feature: API tests for Cristin Project Update
               'type': 'ProjectManager',
               'affiliation': {
                 'type' : 'Organization',
-                'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
+                'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
               }
             }
           ]
