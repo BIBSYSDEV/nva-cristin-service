@@ -165,7 +165,7 @@ public class ApiClient {
     }
 
     private HttpResponse<String> fetchResponseWithRetry(HttpRequest httpRequest) {
-        logger.info("Fetching data with retry from uri: {}", maskSensitiveData(httpRequest.uri()));
+        logger.info("Fetching data with retry from uri: {}", httpRequest.uri());
         var retryRegistry = defaultRetryRegistry();
         var retryWithDefaultConfig = retryRegistry.retry("executeRequest");
         Supplier<HttpResponse<String>> supplier = () -> executeRequest(httpRequest);
