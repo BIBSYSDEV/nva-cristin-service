@@ -661,7 +661,6 @@ Resources:
 
   NvaCristinIntermediateStorageUnitsParameter:
     Type: 'AWS::SSM::Parameter'
-    DependsOn: NvaCristinIntermediateStorageBucket
     Condition: IsCustomDomainBasePathCristin
     Properties:
       Description: 'S3 URI of the file in S3 bucket'
@@ -671,7 +670,6 @@ Resources:
 
   NvaCristinIntermediateStorageBucketWritePolicy:
     Type: 'AWS::IAM::ManagedPolicy'
-    DependsOn: NvaCristinIntermediateStorageBucket
     Properties:
       Description: 'Managed policy for writing objects to S3 from Lambda'
       PolicyDocument:
