@@ -2,8 +2,7 @@ name: Karate API tests
 
 on: [ push ]
 env:
-  STACK_NAME: cristin-$GITHUB_REF_NAME
-  BASE_PATH: cristin-$GITHUB_REF_NAME
+  BASE_NAME: cristin-$GITHUB_REF_NAME
   DOMAIN_NAME:  "api.dev.nva.aws.unit.no"
   CRISTIN_API_URL: "https://api.cristin-test.uio.no/v2"
   COGNITO_USER_POOL_ID:  "eu-west-1_nLV9i5X5D"
@@ -43,6 +42,11 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::884807050265:role/nva-dev-github-actions-role
           aws-region: eu-west-1
+      # Stack name cannot contain slashes, but are based on the branch name which can contain slashes
+      - name: Set stack name
+        run: |
+          echo "BASE_PATH=$(echo ${{env.BASE_NAME}} | tr '/' '-')" >> $GITHUB_ENV
+          echo "STACK_NAME=$(echo ${{env.BASE_NAME}} | tr '/' '-')" >> $GITHUB_ENV
       - name: Build
         run: sam build
       # Prevent prompts and failure when the stack is unchanged
