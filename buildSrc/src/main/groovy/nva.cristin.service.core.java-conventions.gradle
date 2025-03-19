@@ -3,6 +3,7 @@ plugins {
     id 'pmd'
     id 'checkstyle'
     id 'jacoco-report-aggregation'
+    id 'com.diffplug.spotless'
 }
 
 repositories {
@@ -126,3 +127,29 @@ tasks.withType(Checkstyle).configureEach{
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'utf-8'
 }
+
+
+spotless {
+    java {
+        toggleOffOn() // Ignores sections between `spotless:off` / `spotless:on`
+        googleJavaFormat().reflowLongStrings().formatJavadoc(true).reorderImports(true)
+    }
+
+    format 'misc', {
+        target '.gitignore', '.gitattributes', '.editorconfig', '**/*.gradle'
+        leadingTabsToSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+
+    enforceCheck false // Disabled so that we can reformat in a separate PR
+}
+
+// Reformat project before build and test if needed
+//tasks.named('build').configure {
+//    dependsOn 'spotlessApply'
+//}
+//
+//tasks.named('test').configure {
+//    dependsOn 'spotlessApply'
+//}
