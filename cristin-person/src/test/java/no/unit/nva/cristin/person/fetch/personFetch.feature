@@ -199,8 +199,8 @@ Feature: API tests for Cristin Person fetch
     And match response.awards == '#present'
     And match response.awards[0].name == 'My first award'
     And match response.awards[0].year == 2014
-    And match response.awards[0].type.type == 'ResearchDissemination'
-    And match response.awards[0].type.label == '#present'
+    And match response.awards[0].awardFor.type == 'ResearchDissemination'
+    And match response.awards[0].awardFor.label == '#present'
     And match response.awards[0].distribution.type == 'National'
     And match response.awards[0].distribution.label == '#present'
     And match response.awards[0].affiliation == '#present'
