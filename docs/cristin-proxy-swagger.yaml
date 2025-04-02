@@ -3337,7 +3337,7 @@ components:
               year:
                 type: integer
                 description: Year of the award
-              type:
+              awardFor:
                 type: object
                 properties:
                   type:
@@ -3625,7 +3625,7 @@ components:
               year:
                 type: integer
                 description: Year of the award
-              type:
+              awardFor:
                 type: object
                 required:
                   - type
@@ -4837,7 +4837,7 @@ components:
             awards:
               - name: 'My first award'
                 year: '2014'
-                type:
+                awardFor:
                   type: 'ResearchDissemination'
                   label:
                     'en': 'Dissemination of research results'
@@ -5014,7 +5014,7 @@ components:
         awards:
           - name: 'My first award'
             year: '2014'
-            type:
+            awardFor:
               type: 'ResearchDissemination'
               label:
                 'en': 'Dissemination of research results'
@@ -5065,7 +5065,7 @@ components:
         awards:
           - name: 'My first award'
             year: '2014'
-            type:
+            awardFor:
               type: 'ResearchDissemination'
             distribution:
               type: 'National'

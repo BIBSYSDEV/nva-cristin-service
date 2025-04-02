@@ -325,5 +325,4 @@ public class CristinPersonPatchJsonCreator {
             output.set(AWARDS, cristinAwardsNode);
         }
     }
-
 }
