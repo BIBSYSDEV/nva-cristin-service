@@ -23,7 +23,7 @@ public class AwardToCristinFormat implements Function<Award, CristinAward> {
 
         var title = award.name();
         var year = award.year();
-        var type = generateCristinAwardTypeWithoutLabel(award.type());
+        var type = generateCristinAwardTypeWithoutLabel(award.awardFor());
         var distribution = generateCristinAwardDistributionWithoutLabel(award.distribution());
         var affiliation = generateCristinAffiliation(award.affiliation());
 

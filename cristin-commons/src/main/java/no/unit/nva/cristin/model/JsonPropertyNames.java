@@ -3,13 +3,13 @@ package no.unit.nva.cristin.model;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
-public class JsonPropertyNames {
-
+public final class JsonPropertyNames {
 
     public static final String ACADEMIC_SUMMARY = "academicSummary";
     public static final String ACRONYM = "acronym";
     public static final String AFFILIATION = "affiliation";
     public static final String ALTERNATIVE_TITLES = "alternativeTitles";
+    public static final String AWARD_FOR = "awardFor";
     public static final String BIOBANK_ID = "biobank";
     public static final String CONTACT_INFO = "contactInfo";
     public static final String CONTEXT = "@context";
@@ -77,4 +77,8 @@ public class JsonPropertyNames {
     public static final String YEAR = "year";
     public static final String DISTRIBUTION = "distribution";
     public static final String CRISTIN_PERSON_ID = "cristin_person_id";
+
+    private JsonPropertyNames() {
+        // NO-OP
+    }
 }

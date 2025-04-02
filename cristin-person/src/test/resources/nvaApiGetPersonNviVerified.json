@@ -1,5 +1,5 @@
 {
-  "@context": "https://example.org/person-context.json",
+  "@context": "https://bibsysdev.github.io/src/person-context.json",
   "id": "https://api.dev.nva.aws.unit.no/cristin/person/359084",
   "type": "Person",
   "identifiers": [
