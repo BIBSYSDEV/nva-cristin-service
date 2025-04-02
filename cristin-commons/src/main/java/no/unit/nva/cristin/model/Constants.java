@@ -53,7 +53,7 @@ public class Constants {
     public static final String PATTERN_IS_URL =
         "(http(s):\\/\\/.)[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)";
     public static final String PERSONS_PATH = "persons";
-    public static final String PERSON_CONTEXT = "https://example.org/person-context.json";
+    public static final String PERSON_CONTEXT = "https://bibsysdev.github.io/src/person-context.json";
     public static final String PERSON_ID = "id";
     public static final String PERSON_PATH = "persons";
     public static final String PERSON_PATH_NVA = "person";

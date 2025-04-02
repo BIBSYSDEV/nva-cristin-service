@@ -1,5 +1,5 @@
 {
-  "@context": "https://example.org/person-context.json",
+  "@context": "https://bibsysdev.github.io/src/person-context.json",
   "id": "https://api.dev.nva.aws.unit.no/cristin/person/359084",
   "type": "Person",
   "identifiers": [
@@ -110,7 +110,7 @@
     {
       "name": "My first award",
       "year": 2019,
-      "type": {
+      "awardFor": {
         "type": "Research",
         "label": {
           "en": "Research activity",
@@ -132,7 +132,7 @@
     {
       "name": "My second award",
       "year": 2016,
-      "type": {
+      "awardFor": {
         "type": "Research",
         "label": {
           "en": "Research activity",
@@ -154,7 +154,7 @@
     {
       "name": "My third award",
       "year": 2014,
-      "type": {
+      "awardFor": {
         "type": "ResearchDissemination",
         "label": {
           "en": "Dissemination of research results",

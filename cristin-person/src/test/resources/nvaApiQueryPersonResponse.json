@@ -119,7 +119,7 @@
         {
           "name": "My first award",
           "year": 2019,
-          "type": {
+          "awardFor": {
             "type": "Research",
             "label": {
               "en": "Research activity",
@@ -141,7 +141,7 @@
         {
           "name": "My second award",
           "year": 2016,
-          "type": {
+          "awardFor": {
             "type": "Research",
             "label": {
               "en": "Research activity",
@@ -163,7 +163,7 @@
         {
           "name": "My third award",
           "year": 2014,
-          "type": {
+          "awardFor": {
             "type": "ResearchDissemination",
             "label": {
               "en": "Dissemination of research results",
@@ -295,7 +295,7 @@
         {
           "name": "My first award",
           "year": 2019,
-          "type": {
+          "awardFor": {
             "type": "Research",
             "label": {
               "en": "Research activity",
@@ -317,7 +317,7 @@
         {
           "name": "My second award",
           "year": 2016,
-          "type": {
+          "awardFor": {
             "type": "Research",
             "label": {
               "en": "Research activity",
@@ -339,7 +339,7 @@
         {
           "name": "My third award",
           "year": 2014,
-          "type": {
+          "awardFor": {
             "type": "ResearchDissemination",
             "label": {
               "en": "Dissemination of research results",
