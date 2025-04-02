@@ -65,7 +65,7 @@ Feature: API tests for Cristin Person Update
         {
           'name': 'My first award',
           'year': '2014',
-          'type': {
+          'awardFor': {
             'type': 'ResearchDissemination'
           },
           'distribution': {
