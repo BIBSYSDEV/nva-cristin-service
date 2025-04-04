@@ -20,11 +20,11 @@ public class CristinAwardToNvaFormat implements Function<CristinAward, Award> {
 
         var name = cristinAward.title();
         var year = cristinAward.year();
-        var type = generateAwardTypeWithLabel(cristinAward.type());
+        var awardFor = generateAwardTypeWithLabel(cristinAward.type());
         var distribution = generateAwardDistributionWithLabel(cristinAward.distribution());
         var affiliation = extractAffiliation(cristinAward.affiliation());
 
-        return new Award(name, year, type, distribution, affiliation);
+        return new Award(name, year, awardFor, distribution, affiliation);
     }
 
     private TypedLabel generateAwardTypeWithLabel(CristinTypedLabel cristinAwardType) {
