@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.net.URI;
 import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
-import nva.commons.core.JacocoGenerated;
 
-@SuppressWarnings("unused")
-@JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPersonInstitutionInfo {
 

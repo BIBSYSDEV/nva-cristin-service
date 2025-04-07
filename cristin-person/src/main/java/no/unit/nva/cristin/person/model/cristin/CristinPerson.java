@@ -39,7 +39,7 @@ import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 
-@SuppressWarnings({"unused", "PMD.GodClass", "PMD.TooManyFields", "PMD.ExcessivePublicCount",
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyFields", "PMD.ExcessivePublicCount",
                    "PMD.CouplingBetweenObjects"})
 @JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
