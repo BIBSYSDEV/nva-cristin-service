@@ -58,6 +58,7 @@ public class CristinPersonEmployment implements JsonSerializable {
         this.affiliation = affiliation;
     }
 
+    @SuppressWarnings({"PMD.BooleanGetMethodName"})
     public Boolean getActive() {
         return active;
     }

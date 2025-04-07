@@ -164,6 +164,7 @@ public class CristinPerson implements JsonSerializable {
         this.norwegianNationalId = norwegianNationalId;
     }
 
+    @SuppressWarnings({"PMD.BooleanGetMethodName"})
     public Boolean getReserved() {
         return reserved;
     }
@@ -180,6 +181,7 @@ public class CristinPerson implements JsonSerializable {
         this.detailedAffiliations = detailedAffiliations;
     }
 
+    @SuppressWarnings({"PMD.BooleanGetMethodName"})
     public Boolean getIdentifiedCristinPerson() {
         return identifiedCristinPerson;
     }

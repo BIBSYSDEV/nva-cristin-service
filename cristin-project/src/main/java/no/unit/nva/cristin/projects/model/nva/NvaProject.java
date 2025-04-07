@@ -234,6 +234,7 @@ public class NvaProject implements JsonSerializable, UriId {
         this.popularScientificSummary = popularScientificSummary;
     }
 
+    @SuppressWarnings({"PMD.BooleanGetMethodName"})
     public Boolean getPublished() {
         return published;
     }
@@ -242,6 +243,7 @@ public class NvaProject implements JsonSerializable, UriId {
         this.published = published;
     }
 
+    @SuppressWarnings({"PMD.BooleanGetMethodName"})
     public Boolean getPublishable() {
         return publishable;
     }
@@ -354,6 +356,7 @@ public class NvaProject implements JsonSerializable, UriId {
         this.approvals = approvals;
     }
 
+    @SuppressWarnings({"PMD.BooleanGetMethodName"})
     public Boolean getExemptFromPublicDisclosure() {
         return exemptFromPublicDisclosure;
     }
