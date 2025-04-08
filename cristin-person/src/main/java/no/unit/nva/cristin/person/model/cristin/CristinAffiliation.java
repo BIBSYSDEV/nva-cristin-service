@@ -13,10 +13,7 @@ import java.util.Optional;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.person.model.nva.Affiliation;
 import no.unit.nva.cristin.person.model.nva.Role;
-import nva.commons.core.JacocoGenerated;
 
-@SuppressWarnings("unused")
-@JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinAffiliation {
 

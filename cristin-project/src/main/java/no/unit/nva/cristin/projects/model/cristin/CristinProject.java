@@ -133,6 +133,7 @@ public class CristinProject implements JsonSerializable {
         this.cristinProjectId = cristinProjectId;
     }
 
+    @SuppressWarnings({"PMD.BooleanGetMethodName"})
     public Boolean getPublishable() {
         return publishable;
     }
@@ -141,6 +142,7 @@ public class CristinProject implements JsonSerializable {
         this.publishable = publishable;
     }
 
+    @SuppressWarnings({"PMD.BooleanGetMethodName"})
     public Boolean getPublished() {
         return published;
     }
@@ -349,6 +351,7 @@ public class CristinProject implements JsonSerializable {
         this.approvals = approvals;
     }
 
+    @SuppressWarnings({"PMD.BooleanGetMethodName"})
     public Boolean getExemptFromPublicDisclosure() {
         return exemptFromPublicDisclosure;
     }

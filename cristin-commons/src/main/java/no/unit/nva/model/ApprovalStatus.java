@@ -32,7 +32,6 @@ public enum ApprovalStatus {
      * Lookup ApprovalStatus by json. If value not supported, throws exception.
      */
     @JsonCreator
-    @SuppressWarnings("unused")
     public static ApprovalStatus fromJson(String value) {
         return stream(values())
                    .filter(nameType -> nameType.getStatusValue().equalsIgnoreCase(value))

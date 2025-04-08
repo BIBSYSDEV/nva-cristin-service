@@ -23,11 +23,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
 import no.unit.nva.utils.CustomInstantSerializer;
-import nva.commons.core.JacocoGenerated;
 import nva.commons.core.paths.UriWrapper;
 
-@SuppressWarnings("unused")
-@JacocoGenerated
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPersonEmployment implements JsonSerializable {
 
@@ -58,6 +55,7 @@ public class CristinPersonEmployment implements JsonSerializable {
         this.affiliation = affiliation;
     }
 
+    @SuppressWarnings({"PMD.BooleanGetMethodName"})
     public Boolean getActive() {
         return active;
     }

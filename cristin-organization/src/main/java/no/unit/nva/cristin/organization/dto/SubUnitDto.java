@@ -7,7 +7,6 @@ import nva.commons.core.JacocoGenerated;
 import java.net.URI;
 import java.util.Map;
 
-@SuppressWarnings("unused")
 public class SubUnitDto {
     /*
     {
