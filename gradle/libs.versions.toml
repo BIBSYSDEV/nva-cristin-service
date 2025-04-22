@@ -21,7 +21,7 @@ nva-commons = { strictly = '2.2.1' }
 nva-language = { strictly = '1.2.1' }
 resilience4j = '2.2.0'
 slf4j = { require = '2.0.16' }
-vavrVersion = '0.10.4'
+vavrVersion = '0.10.6'
 wiremock = { strictly = '3.9.1' }
 zalando = { strictly = '0.27.1' }
 
