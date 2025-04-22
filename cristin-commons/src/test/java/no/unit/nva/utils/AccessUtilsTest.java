@@ -1,8 +1,11 @@
 package no.unit.nva.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import no.unit.nva.cognito.CognitoUtil;
 import no.unit.nva.exception.UnauthorizedException;
+import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.exceptions.ApiIoException;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -11,6 +14,7 @@ import java.util.Map;
 
 import static no.unit.nva.cognito.CognitoUtil.ADMIN_TESTUSER_ID_KEY;
 import static no.unit.nva.cognito.CognitoUtil.ADMIN_TESTUSER_PASSWORD_KEY;
+import static no.unit.nva.commons.json.JsonUtils.dtoObjectMapper;
 import static no.unit.nva.cristin.common.client.ApiClient.AUTHORIZATION;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -48,18 +52,24 @@ class AccessUtilsTest {
         + "fQYnkVmCEEn2q_lDuL9z6GK2eu_xom2jt2H-AZTNwywuc1GAdYi1S4A";
 
     @Test
-    void validateIdentificationNumberAccess() {
-        RequestInfo requestInfo = new RequestInfo();
-        requestInfo.setHeaders(Map.of(AUTHORIZATION, getBearerToken(OLD_EXPIRED_TOKEN)));
+    void validateIdentificationNumberAccess() throws JsonProcessingException, ApiIoException {
+        var request = new HandlerRequestBuilder<Void>(dtoObjectMapper)
+                          .withHeaders(Map.of(AUTHORIZATION, getBearerToken(OLD_EXPIRED_TOKEN)))
+                          .build();
+        RequestInfo requestInfo = RequestInfo.fromRequest(request);
         assertThrows(UnauthorizedException.class, () -> AccessUtils.requesterIsUserAdministrator(requestInfo));
     }
 
     @Test
-    void validateIdentificationNumberAccessForAdminUser() {
-        RequestInfo requestInfo = new RequestInfo();
+    void validateIdentificationNumberAccessForAdminUser() throws JsonProcessingException, ApiIoException {
         final String token = loginAdminTestUser();
         assertNotNull(token);
-        requestInfo.setHeaders(Map.of(AUTHORIZATION, getBearerToken(token)));
+
+        var request = new HandlerRequestBuilder<Void>(dtoObjectMapper)
+                          .withHeaders(Map.of(AUTHORIZATION, getBearerToken(token)))
+                          .build();
+        RequestInfo requestInfo = RequestInfo.fromRequest(request);
+
         assertTrue(AccessUtils.requesterIsUserAdministrator(requestInfo));
     }
 
