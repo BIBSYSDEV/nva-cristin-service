@@ -56,7 +56,7 @@ class AccessUtilsTest {
         var request = new HandlerRequestBuilder<Void>(dtoObjectMapper)
                           .withHeaders(Map.of(AUTHORIZATION, getBearerToken(OLD_EXPIRED_TOKEN)))
                           .build();
-        RequestInfo requestInfo = RequestInfo.fromRequest(request);
+        var requestInfo = RequestInfo.fromRequest(request);
         assertThrows(UnauthorizedException.class, () -> AccessUtils.requesterIsUserAdministrator(requestInfo));
     }
 
@@ -68,8 +68,7 @@ class AccessUtilsTest {
         var request = new HandlerRequestBuilder<Void>(dtoObjectMapper)
                           .withHeaders(Map.of(AUTHORIZATION, getBearerToken(token)))
                           .build();
-        RequestInfo requestInfo = RequestInfo.fromRequest(request);
-
+        var requestInfo = RequestInfo.fromRequest(request);
         assertTrue(AccessUtils.requesterIsUserAdministrator(requestInfo));
     }
 
