@@ -1,3 +1,7 @@
+plugins {
+    id 'java-library'
+    id 'java-test-fixtures'
+}
 
 dependencies {
     implementation libs.nva.json
@@ -12,7 +16,6 @@ dependencies {
     implementation libs.nva.language
 
 
-    implementation libs.aws.sdk2.cognitoidp
     implementation libs.com.auth0.jwt
     implementation libs.com.auth0.jwks
 
@@ -22,11 +25,17 @@ dependencies {
     testImplementation libs.log4j.core
     testImplementation libs.mockito.core
 
+    testFixturesImplementation libs.aws.sdk2.cognitoidp
+    testFixturesImplementation libs.aws.sdk2.regions
+    testFixturesImplementation libs.aws.sdk2.urlconnection
+    testFixturesImplementation libs.aws.sdk2.auth
+    testFixturesImplementation libs.nva.json
+    testFixturesImplementation libs.nva.core
+    testFixturesImplementation libs.nva.commons.apigateway
+    testFixturesImplementation libs.jackson.databind
+
     implementation libs.nva.testutils
-    implementation libs.aws.sdk2.auth
     implementation libs.aws.sdk2.awscore
-    implementation libs.aws.sdk2.regions
-    implementation libs.aws.sdk2.urlconnection
     implementation libs.aws.sdk2.spi
     implementation libs.apache.http.core5
 

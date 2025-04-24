@@ -13,9 +13,11 @@ import java.util.Map;
 import no.unit.nva.commons.json.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.http.HttpStatusCode;
 
 public class OAuthLogin {
 
+    private static final int ONE = 1;
     private final HttpClient httpClient;
     private final URI cognitoUrl;
     private final String clientId;
@@ -48,7 +50,7 @@ public class OAuthLogin {
 
         var response = attempt(() -> httpClient.send(request, HttpResponse.BodyHandlers.ofString())).orElseThrow();
 
-        if (response.statusCode() == 302) {
+        if (response.statusCode() == HttpStatusCode.MOVED_TEMPORARILY) {
             var location = response.headers().firstValue("Location").orElse(null);
             if (location != null) {
                 logger.info("Redirect location: {}", location);
@@ -89,7 +91,7 @@ public class OAuthLogin {
         var queryParams = new HashMap<String, String>();
         for (var param : query.split("&")) {
             var pair = param.split("=");
-            if (pair.length > 1) {
+            if (pair.length > ONE) {
                 queryParams.put(pair[0], pair[1]);
             }
         }
@@ -110,7 +112,7 @@ public class OAuthLogin {
 
         var response = attempt(() -> httpClient.send(request, HttpResponse.BodyHandlers.ofString())).orElseThrow();
 
-        if (response.statusCode() == 200) {
+        if (response.statusCode() == HttpStatusCode.OK) {
             logger.info("Successfully exchanged authorization code for access token.");
             var responseBody = response.body();
 

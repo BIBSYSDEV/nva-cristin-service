@@ -10,7 +10,7 @@ dependencies {
 
     implementation libs.aws.sdk2.cognitoidp
 
-    testImplementation project(":cristin-commons")
+    testImplementation(testFixtures(project(":cristin-commons")))
     testImplementation project(":cristin-testing")
 
     testImplementation libs.karate.core
