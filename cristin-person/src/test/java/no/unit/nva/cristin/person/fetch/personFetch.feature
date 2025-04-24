@@ -17,7 +17,7 @@ Feature: API tests for Cristin Person fetch
     * def simple_password = java.lang.System.getenv('SIMPLE_TESTUSER_PASSWORD')
     * def cognitoClientAppId = java.lang.System.getenv('COGNITO_CLIENT_APP_ID')
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
-    * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
+    * def tokenGenerator = Java.type('no.unit.nva.utils.CognitoUtil')
     * def admin_token = tokenGenerator.loginUser(admin_username, admin_password, cognitoClientAppId)
     * def simple_user_token = tokenGenerator.loginUser(simple_username, simple_password, cognitoClientAppId)
     * def samplePersonIdentifier = '515114'

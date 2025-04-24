@@ -9,7 +9,7 @@ Feature: API tests for Cristin Person creation
     * def password = java.lang.System.getenv('ADMIN_TESTUSER_PASSWORD')
     * def cognitoClientAppId = java.lang.System.getenv('COGNITO_CLIENT_APP_ID')
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
-    * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
+    * def tokenGenerator = Java.type('no.unit.nva.utils.CognitoUtil')
     * def administratorToken = tokenGenerator.loginUser(username, password, cognitoClientAppId)
     * def sampleSimplePerson =
      """
