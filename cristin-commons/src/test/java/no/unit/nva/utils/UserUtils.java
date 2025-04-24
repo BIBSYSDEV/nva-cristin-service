@@ -1,7 +1,6 @@
 package no.unit.nva.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import no.unit.nva.cognito.CognitoUtil;
 import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
