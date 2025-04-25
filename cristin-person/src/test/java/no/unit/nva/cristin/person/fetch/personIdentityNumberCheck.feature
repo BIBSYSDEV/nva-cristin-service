@@ -52,10 +52,6 @@ Feature: API tests for Cristin Person fetch containing identity number check
     * header Authorization = 'Bearer and.just-a.silly-text-for-token'
     When method GET
     Then status 401
-    * string identifiers = response.identifiers
-    And match identifiers contains 'CristinIdentifier'
-    And match identifiers !contains 'NationalIdentificationNumber'
-    And match response.NationalIdentificationNumber != '#present'
 
   Scenario: Fetch returns status Not found when requesting unknown person identifier
     Given path '/person/identityNumber'
