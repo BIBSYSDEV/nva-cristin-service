@@ -12,6 +12,7 @@ dependencies {
     testImplementation libs.json.assert
     testImplementation libs.nva.logutils
     testImplementation libs.log4j.core
+    testImplementation(testFixtures(project(":cristin-commons")))
 }
 
 tasks.named('test', Test) {

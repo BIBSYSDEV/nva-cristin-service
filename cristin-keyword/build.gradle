@@ -10,6 +10,7 @@ dependencies {
     testImplementation libs.json.assert
 
     testImplementation project(":cristin-testing")
+    testImplementation(testFixtures(project(":cristin-commons")))
 }
 
 tasks.named('test', Test) {

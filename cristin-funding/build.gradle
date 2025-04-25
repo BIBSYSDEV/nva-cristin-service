@@ -11,6 +11,7 @@ dependencies {
     testImplementation libs.karate.junit5
     testImplementation libs.wiremock
     testImplementation project(":cristin-testing")
+    testImplementation(testFixtures(project(":cristin-commons")))
 }
 
 
