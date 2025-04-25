@@ -10,7 +10,7 @@ dependencies {
 
     implementation libs.aws.sdk2.cognitoidp
 
-    testImplementation project(":cristin-commons")
+    testImplementation(testFixtures(project(":cristin-commons")))
     testImplementation project(":cristin-testing")
 
     testImplementation libs.karate.core
@@ -25,4 +25,8 @@ tasks.named('test', Test) {
     useJUnitPlatform {
         excludeTags 'karateTest','integrationTest'
     }
+}
+
+test {
+    environment "COGNITO_AUTHORIZER_URLS", "http://localhost:3000"
 }

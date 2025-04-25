@@ -1,14 +1,13 @@
 package no.unit.nva.utils;
 
-import no.unit.nva.cognito.CognitoUtil;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static no.unit.nva.cognito.CognitoUtil.ADMIN_TESTUSER_ID_KEY;
-import static no.unit.nva.cognito.CognitoUtil.SIMPLE_TESTUSER_ID_KEY;
+import static no.unit.nva.utils.CognitoUtil.ADMIN_TESTUSER_ID_KEY;
+import static no.unit.nva.utils.CognitoUtil.SIMPLE_TESTUSER_ID_KEY;
 
 @Tag("integrationTest")
 @Tag("deleteTestUsers")

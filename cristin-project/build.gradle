@@ -16,6 +16,7 @@ dependencies {
     testImplementation libs.nva.logutils
     testImplementation libs.log4j.core
     testImplementation libs.json.assert
+    testImplementation(testFixtures(project(":cristin-commons")))
 
     testImplementation project(":cristin-testing")
 }
@@ -24,4 +25,8 @@ tasks.named('test', Test) {
     useJUnitPlatform {
         excludeTags 'karateTest'
     }
+}
+
+test {
+    environment "COGNITO_AUTHORIZER_URLS", "http://localhost:3000"
 }

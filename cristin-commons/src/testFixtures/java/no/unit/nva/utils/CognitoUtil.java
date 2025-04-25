@@ -1,6 +1,9 @@
-package no.unit.nva.cognito;
+package no.unit.nva.utils;
 
+import java.net.http.HttpClient;
 import nva.commons.apigateway.AccessRight;
+import nva.commons.core.Environment;
+import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
@@ -12,9 +15,6 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminDelete
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminDeleteUserResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminSetUserPasswordRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthRequest;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUsersRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.MessageActionType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserType;
@@ -22,7 +22,6 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.UserType;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,7 +36,7 @@ public class CognitoUtil {
 
     public static final String CURRENT_CUSTOMER_CLAIM_NAME = "custom:customerId";
     public static final URI CURRENT_CUSTOMER_CLAIM_VALUE =
-            URI.create("https://api.dev.nva.aws.unit.no/customer/f50dff3a-e244-48c7-891d-cc4d75597321");
+        URI.create("https://api.dev.nva.aws.unit.no/customer/f50dff3a-e244-48c7-891d-cc4d75597321");
 
     public static final String ACCESS_RIGHTS_CLAIM_NAME = "custom:accessRights";
     public static final String MULTI_VALUE_DELIMITER = ",";
@@ -47,7 +46,6 @@ public class CognitoUtil {
     public static final String ADMIN_TESTUSER_ID_KEY = "ADMIN_TESTUSER_ID";
     public static final String ADMIN_TESTUSER_PASSWORD_KEY = "ADMIN_TESTUSER_PASSWORD";
     public static final String ADMIN_TESTUSER_NIN_KEY = "ADMIN_TESTUSER_NIN";
-
 
     public static final String SIMPLE_TESTUSER_ID_KEY = "SIMPLE_TESTUSER_ID";
     public static final String SIMPLE_TESTUSER_PASSWORD_KEY = "SIMPLE_TESTUSER_PASSWORD";
@@ -59,8 +57,8 @@ public class CognitoUtil {
      * Create user in the user to the user pool.
      *
      * @param username Username for the sign-up
-     * @param password    Password for the sign-up
-     * @param poolId      Identifier for Cognito user pool
+     * @param password Password for the sign-up
+     * @param poolId   Identifier for Cognito user pool
      * @return username in cognito for user created from parameters.
      */
     public static String adminCreateUser(String username,
@@ -75,21 +73,21 @@ public class CognitoUtil {
         list.add(newAttribute(NVA_NIN_ATTRIBUTE, nvaUserNin));
 
         var createUserRequest = AdminCreateUserRequest
-            .builder()
-            .userPoolId(poolId)
-                .username(username)
-            .userAttributes(list)
-            .messageAction(MessageActionType.SUPPRESS)
-            .build();
+                                    .builder()
+                                    .userPoolId(poolId)
+                                    .username(username)
+                                    .userAttributes(list)
+                                    .messageAction(MessageActionType.SUPPRESS)
+                                    .build();
 
         try {
             var result = getCognitoIdentityProvider().adminCreateUser(createUserRequest);
             var adminSetUserPasswordRequest = AdminSetUserPasswordRequest.builder()
-                .userPoolId(poolId)
-                    .username(username)
-                .password(password)
-                .permanent(true)
-                .build();
+                                                  .userPoolId(poolId)
+                                                  .username(username)
+                                                  .password(password)
+                                                  .permanent(true)
+                                                  .build();
             getCognitoIdentityProvider().adminSetUserPassword(adminSetUserPasswordRequest);
             logger.debug("user created username={}", result.user().username());
             if (isNull(loginUser(username, password, clientId))) {
@@ -107,26 +105,19 @@ public class CognitoUtil {
      * Login existing user and return token.
      *
      * @param cognitoUserName Username in cognito to use for login
-     * @param password    users password
-     * @param clientId    Cognito AppClientId
+     * @param password        users password
+     * @param clientId        Cognito AppClientId
      * @return access_token from loginUser()
      */
     public static String loginUser(String cognitoUserName, String password, String clientId) {
-        try {
-            final var loginResult = loginUserCognito(cognitoUserName, password, clientId);
-            logger.debug("LoginResult.getAuthenticationResult={}", loginResult.authenticationResult());
-            return loginResult.authenticationResult().accessToken();
-        } catch (Exception e) {
-            logger.warn("Error loginUserAndReturnToken cognitoUsername:{}, {}", cognitoUserName, e.getMessage());
-            return null;
-        }
+        return loginUserCognito(cognitoUserName, password, clientId);
     }
 
     /**
      * Delete the user with nvaUsername from Cognito Userpool.
      *
      * @param userName Username to use for login
-     * @param poolId      Cognito userpool id
+     * @param poolId   Cognito userpool id
      */
     public static void deleteUser(String userName, String poolId) {
         getUsername(userName, poolId).ifPresent(username -> {
@@ -140,8 +131,8 @@ public class CognitoUtil {
 
     private static String constructAccessRights() {
         return Stream.of(MANAGE_OWN_AFFILIATION, MANAGE_OWN_RESOURCES)
-            .map(AccessRight::toPersistedString)
-            .collect(Collectors.joining(MULTI_VALUE_DELIMITER));
+                   .map(AccessRight::toPersistedString)
+                   .collect(Collectors.joining(MULTI_VALUE_DELIMITER));
     }
 
     private static AttributeType newAttribute(String atributeName, String attributeValue) {
@@ -152,27 +143,27 @@ public class CognitoUtil {
      * Delete a user in Cognito userpool.
      *
      * @param username string identifying user in userpool
-     * @param poolId      Cognito Userpool Id
+     * @param poolId   Cognito Userpool Id
      * @return If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body If not
      *     successful a runtime exception is thrown
      */
     private static AdminDeleteUserResponse deleteUserCognito(String username, String poolId) {
         var deleteUserRequest = AdminDeleteUserRequest.builder()
-            .userPoolId(poolId)
-                .username(username)
-            .build();
+                                    .userPoolId(poolId)
+                                    .username(username)
+                                    .build();
         return getCognitoIdentityProvider().adminDeleteUser(deleteUserRequest);
     }
 
     private static Optional<String> getUsername(String nvaUsername, String poolId) {
         try {
             var listUsersRequest = ListUsersRequest.builder()
-                .userPoolId(poolId)
-                    .filter(String.format("username = \"%s\"", nvaUsername))
-                .build();
+                                       .userPoolId(poolId)
+                                       .filter(String.format("username = \"%s\"", nvaUsername))
+                                       .build();
             return getCognitoIdentityProvider().listUsers(listUsersRequest).users().stream()
-                .findFirst()
-                .map(UserType::username);
+                       .findFirst()
+                       .map(UserType::username);
         } catch (Exception e) {
             logger.warn("Error getting username:{}, {}", nvaUsername, e.getMessage());
             return Optional.empty();
@@ -187,28 +178,33 @@ public class CognitoUtil {
      * @param clientId Cognito AppClientId
      * @return result of operation containing credentials and tokens
      */
-    private static InitiateAuthResponse loginUserCognito(String username,
-                                                              String password,
-                                                         String clientId
+    private static String loginUserCognito(String username,
+                                           String password,
+                                           String clientId
     ) {
+        var redirectUri = getLoginRedirectUrl();
+        var cognitoUrl = getCognitoAuthenticationUrl();
 
-        final Map<String, String> authParams = Map.of("USERNAME", username, "PASSWORD", password);
+        var oauth = new OAuthLogin(HttpClient.newHttpClient(), clientId, redirectUri, cognitoUrl);
+        var authorizationCode = oauth.getCode(username, password);
+        return oauth.getAccessToken(authorizationCode);
+    }
 
-        final InitiateAuthRequest initiateAuthRequest = InitiateAuthRequest.builder()
-            .clientId(clientId)
-                .authFlow(AuthFlowType.USER_PASSWORD_AUTH)
-            .authParameters(authParams)
-            .build();
-        return getCognitoIdentityProvider().initiateAuth(initiateAuthRequest);
+    private static URI getLoginRedirectUrl() {
+        return URI.create(new Environment().readEnv("LOGIN_REDIRECT_URL"));
+    }
+
+    private static URI getCognitoAuthenticationUrl() {
+        return UriWrapper.fromHost(new Environment().readEnv("COGNITO_AUTHENTICATION_DOMAIN")).getUri();
     }
 
     private static CognitoIdentityProviderClient getCognitoIdentityProvider() {
 
         return CognitoIdentityProviderClient
-            .builder()
-                .httpClient(UrlConnectionHttpClient.create())
-            .credentialsProvider(DefaultCredentialsProvider.create())
-            .region(Region.of(REGION))
-            .build();
+                   .builder()
+                   .httpClient(UrlConnectionHttpClient.create())
+                   .credentialsProvider(DefaultCredentialsProvider.create())
+                   .region(Region.of(REGION))
+                   .build();
     }
 }

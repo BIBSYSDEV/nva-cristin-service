@@ -1,6 +1,5 @@
 package no.unit.nva.utils;
 
-import no.unit.nva.cognito.CognitoUtil;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -11,12 +10,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
-import static no.unit.nva.cognito.CognitoUtil.ADMIN_TESTUSER_ID_KEY;
-import static no.unit.nva.cognito.CognitoUtil.ADMIN_TESTUSER_NIN_KEY;
-import static no.unit.nva.cognito.CognitoUtil.ADMIN_TESTUSER_PASSWORD_KEY;
-import static no.unit.nva.cognito.CognitoUtil.SIMPLE_TESTUSER_ID_KEY;
-import static no.unit.nva.cognito.CognitoUtil.SIMPLE_TESTUSER_NIN_KEY;
-import static no.unit.nva.cognito.CognitoUtil.SIMPLE_TESTUSER_PASSWORD_KEY;
+import static no.unit.nva.utils.CognitoUtil.ADMIN_TESTUSER_ID_KEY;
+import static no.unit.nva.utils.CognitoUtil.ADMIN_TESTUSER_NIN_KEY;
+import static no.unit.nva.utils.CognitoUtil.ADMIN_TESTUSER_PASSWORD_KEY;
+import static no.unit.nva.utils.CognitoUtil.SIMPLE_TESTUSER_ID_KEY;
+import static no.unit.nva.utils.CognitoUtil.SIMPLE_TESTUSER_NIN_KEY;
+import static no.unit.nva.utils.CognitoUtil.SIMPLE_TESTUSER_PASSWORD_KEY;
 import static no.unit.nva.utils.AccessUtils.getTestClientAppId;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

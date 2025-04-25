@@ -10,7 +10,7 @@ Feature: API tests for Creation of Cristin Person Employments
     * def simple_user_password = java.lang.System.getenv('SIMPLE_TESTUSER_PASSWORD')
     * def cognitoClientAppId = java.lang.System.getenv('COGNITO_CLIENT_APP_ID')
     * def cognitoUserpoolId = java.lang.System.getenv('COGNITO_USER_POOL_ID')
-    * def tokenGenerator = Java.type('no.unit.nva.cognito.CognitoUtil')
+    * def tokenGenerator = Java.type('no.unit.nva.utils.CognitoUtil')
     * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
     * def simpleUserToken = tokenGenerator.loginUser(simple_user_name, simple_user_password, cognitoClientAppId)
     * def invalidToken = 'just-a-invalid-token-for-now'

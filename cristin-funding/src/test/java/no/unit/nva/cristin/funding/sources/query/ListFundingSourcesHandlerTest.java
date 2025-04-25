@@ -36,6 +36,7 @@ import org.zalando.problem.Problem;
 
 @WireMockTest(httpsEnabled = true)
 public class ListFundingSourcesHandlerTest {
+    private static final String COGNITO_AUTHORIZER_URLS = "COGNITO_AUTHORIZER_URLS";
 
     private final Context context = new FakeContext();
     private ListFundingSourcesHandler handlerUnderTest;
@@ -49,6 +50,7 @@ public class ListFundingSourcesHandlerTest {
 
         when(environment.readEnv(ENV_KEY_ALLOWED_ORIGIN)).thenReturn("*");
         when(environment.readEnv(ENV_KEY_DOMAIN_NAME)).thenReturn("https://api.sandbox.nva.aws.unit.no");
+        when(environment.readEnv(COGNITO_AUTHORIZER_URLS)).thenReturn("http://localhost:3000");
         when(environment.readEnvOpt(ENV_KEY_BASE_PATH)).thenReturn(Optional.of("cristin"));
 
         var cristinClient = new CristinFundingSourcesApiClient(WiremockHttpClient.create(),
