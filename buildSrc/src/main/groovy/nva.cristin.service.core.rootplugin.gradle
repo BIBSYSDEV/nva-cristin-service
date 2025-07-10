@@ -24,10 +24,6 @@ reporting {
     }
 }
 
-
-
-check {
+tasks.named('check') {
     dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
-//    dependsOn jacocoTestCoverageVerification
 }
-

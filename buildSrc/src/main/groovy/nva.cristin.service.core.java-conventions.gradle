@@ -35,16 +35,18 @@ sourceSets {
 tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
     violationRules {
         rule {
+            // FIXME: Add relevant tests and remove this exclusion
             excludes = [
                     'cristin-commons:*'
             ]
             limit {
                 counter = 'METHOD'
                 value = 'COVEREDRATIO'
-                minimum = 0.800
+                minimum = 1.000
             }
         }
         rule {
+            // FIXME: Add relevant tests and remove this exclusion
             excludes = [
                     'cristin-commons:*'
             ]
@@ -56,6 +58,10 @@ tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
         }
     }
     dependsOn jacocoTestReport
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification)
 }
 
 tasks.named('test', Test) {
