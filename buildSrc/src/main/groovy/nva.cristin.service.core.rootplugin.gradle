@@ -19,10 +19,7 @@ dependencies {
 reporting {
     reports {
         testCodeCoverageReport(JacocoCoverageReport) {
-            testType = TestSuiteType.UNIT_TEST
-        }
-        integrationTestCodeCoverageReport(JacocoCoverageReport) {
-            testType = TestSuiteType.INTEGRATION_TEST
+            testSuiteName = "test"
         }
     }
 }
@@ -30,8 +27,7 @@ reporting {
 
 
 check {
-    dependsOn testCodeCoverageReport
-    dependsOn integrationTestCodeCoverageReport
+    dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
 //    dependsOn jacocoTestCoverageVerification
 }
 

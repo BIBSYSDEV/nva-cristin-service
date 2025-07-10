@@ -1,37 +1,36 @@
 [versions]
 apache-http-core5 = { strictly = '5.3.4' }
-awsSdk2 = { strictly = '2.31.28' }
-awsSdk = { strictly = '1.12.772' }
-aws-lambda-java-core = { strictly = '1.2.3' }
+awsLambdaCore = { strictly = '1.3.0' }
+awsSdk = { strictly = '1.12.787' }
+awsSdk2 = { strictly = '2.31.77' }
 bekkopen-nocommons = { strictly = '0.16.0' }
+com-auth0-jwks = { strictly = '0.22.2' }
 com-auth0-jwt = { strictly = '4.5.0' }
-com-auth0-jwks = { strictly = '0.22.1' }
-google-guava = { strictly = '33.4.8-jre' }
+guava = { strictly = '33.4.8-jre' }
 hamcrest = { strictly = '3.0' }
-jackson = { require = '2.17.2' }
+jackson = { strictly = '2.19.1' }
 json-assert = { strictly = '1.5.3' }
-junit = { strictly = '5.12.2' }
+jupiter = { strictly = '5.13.3' }
 karate-apache = { strictly = '0.9.6' }
 karate-core = { strictly = '1.3.1' }
 karate-junit5 = { strictly = '1.3.1' }
-log4j = { strictly = '2.24.0' }
-log4jApi = { strictly = '2.24.0' }
-mockito = { strictly = '5.13.0' }
-nva-commons = { strictly = '2.2.4' }
+log4j = { strictly = '2.25.0' }
+mockito = { strictly = '5.18.0' }
+nva-commons = { strictly = '2.2.9' }
 nva-language = { strictly = '1.2.1' }
 resilience4j = '2.2.0'
-slf4j = { require = '2.0.16' }
+slf4j = { strictly = '2.0.17' }
 vavrVersion = '0.10.6'
-wiremock = { strictly = '3.13.0' }
-zalando = { strictly = '0.27.1' }
+wiremock = { strictly = '3.13.1' }
+zalandoProblem = { strictly = '0.27.1' }
 
 [libraries]
 
 #Test
 
-junit-jupiter-api = { group = 'org.junit.jupiter', name = 'junit-jupiter-api', version.ref = 'junit' }
-junit-jupiter-params = { group = 'org.junit.jupiter', name = 'junit-jupiter-params', version.ref = 'junit' }
-junit-jupiter-engine = { group = 'org.junit.jupiter', name = 'junit-jupiter-engine', version.ref = 'junit' }
+junit-jupiter-api = { group = 'org.junit.jupiter', name = 'junit-jupiter-api', version.ref = 'jupiter' }
+junit-jupiter-params = { group = 'org.junit.jupiter', name = 'junit-jupiter-params', version.ref = 'jupiter' }
+junit-jupiter-engine = { group = 'org.junit.jupiter', name = 'junit-jupiter-engine', version.ref = 'jupiter' }
 
 mockito-core = { group = 'org.mockito', name = 'mockito-core', version.ref = 'mockito' }
 hamcrest = { group = 'org.hamcrest', name = 'hamcrest', version.ref = 'hamcrest' }
@@ -40,7 +39,7 @@ nva-logutils = { group = 'com.github.bibsysdev', name = 'logutils', version.ref 
 nva-json = { group = 'com.github.bibsysdev', name = 'json', version.ref = 'nva-commons' }
 nva-core = { group = 'com.github.bibsysdev', name = 'core', version.ref = 'nva-commons' }
 
-zalando = { group = 'org.zalando', name = 'problem', version.ref = 'zalando' }
+zalando = { group = 'org.zalando', name = 'problem', version.ref = 'zalandoProblem' }
 karate-core = { group = 'com.intuit.karate', name = 'karate-core', version.ref = 'karate-core'}
 karate-apache = { group = 'com.intuit.karate', name = 'karate-apache', version.ref = 'karate-apache'}
 karate-junit5 = { group = 'com.intuit.karate', name = 'karate-junit5', version.ref = 'karate-junit5'}
@@ -63,8 +62,8 @@ jackson-annotations = { group = 'com.fasterxml.jackson.core', name = 'jackson-an
 jackson-datatype-jdk8 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jdk8', version.ref = 'jackson' }
 jackson-datatype-jsr310 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jsr310', version.ref = 'jackson' }
 
-aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version.ref = 'aws-lambda-java-core' }
-google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'google-guava' }
+aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version.ref = 'awsLambdaCore' }
+google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'guava' }
 
 aws-sdk-core = { group = 'com.amazonaws', name = 'aws-java-sdk-core', version.ref = 'awsSdk' }
 aws-sdk2-core = { group = 'software.amazon.awssdk', name = 'sdk-core', version.ref = 'awsSdk2' }
@@ -77,7 +76,7 @@ aws-sdk2-awscore = {group = 'software.amazon.awssdk', name = 'aws-core', version
 aws-sdk2-regions = {group = 'software.amazon.awssdk', name = 'regions', version.ref = 'awsSdk2' }
 aws-sdk2-spi = {group =  'software.amazon.awssdk', name='http-client-spi', version.ref='awsSdk2' }
 
-log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4jApi' }
+log4j-api = { group = 'org.apache.logging.log4j', name = 'log4j-api', version.ref = 'log4j' }
 log4j-core = { group = 'org.apache.logging.log4j', name = 'log4j-core', version.ref = 'log4j' }
 slf4j-api = { group = 'org.slf4j', name = 'slf4j-api', version.ref = 'slf4j' }
 
