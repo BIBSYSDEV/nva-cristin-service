@@ -35,7 +35,7 @@ sourceSets {
 tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
     violationRules {
         rule {
-            // FIXME: Add relevant tests and remove this exclusion
+            // FIXME: Add relevant tests and remove this exclusion (see NP-49448)
             excludes = [
                     'cristin-commons:*'
             ]
@@ -46,7 +46,7 @@ tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
             }
         }
         rule {
-            // FIXME: Add relevant tests and remove this exclusion
+            // FIXME: Add relevant tests and remove this exclusion (see NP-49448)
             excludes = [
                     'cristin-commons:*'
             ]
