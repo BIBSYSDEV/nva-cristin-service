@@ -32,7 +32,7 @@ stack in AWS. That means we are running the tests locally against an already dep
 
 ### Example environment variables override in IntelliJ
 
-In Edit Configuration -> Environment Variables :
+In Edit Configuration -> Environment Variables:
 
 ```DOMAIN_NAME=api.dev.nva.aws.unit.no;BASE_PATH=cristin```
 
