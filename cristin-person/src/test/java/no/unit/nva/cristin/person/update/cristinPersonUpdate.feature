@@ -14,8 +14,8 @@ Feature: API tests for Cristin Person Update
     * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
     * def simpleUserToken = tokenGenerator.loginUser(simple_user_name, simple_user_password, cognitoClientAppId)
     * def invalidToken = 'just-a-invalid-token-for-now'
-    * def personIdentifier = '1862292' # 27034425812
-    * def nviPersonIdentifier = '1504353' # 16125214405
+    * def personIdentifier = '1862292'
+    * def nviPersonIdentifier = '1504353'
 
     * def updateFieldsRequest =
     """
