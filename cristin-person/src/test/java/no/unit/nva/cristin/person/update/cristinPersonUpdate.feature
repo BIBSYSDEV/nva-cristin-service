@@ -231,7 +231,7 @@ Feature: API tests for Cristin Person Update
     {
       'nvi': {
           'verifiedBy': {
-              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862292'
+              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1504353'
           },
           'verifiedAt': {
               'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
