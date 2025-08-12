@@ -3020,14 +3020,14 @@ components:
             partOf: [ ]
             hasPart: [ ]
             labels:
-              en: Some Parent Org
+              en: Some Parent Organization
         hasPart:
           - id: https://api.nva.unit.no/cristin/organization/194.63.15.0
             type: Organization
             partOf: [ ]
             hasPart: [ ]
             labels:
-              en: Some Child Dept
+              en: Some Child Organization
       properties:
         id:
           $ref: '#/components/schemas/Id'
