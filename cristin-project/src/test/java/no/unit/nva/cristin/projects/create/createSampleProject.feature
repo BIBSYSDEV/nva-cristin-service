@@ -150,7 +150,7 @@ Feature: API tests for creating sample Cristin Projects
         }
       ],
       'relatedProjects': [
-        'https://api.dev.nva.aws.unit.no/cristin/project/2057063'
+        'https://api.dev.nva.aws.unit.no/cristin/project/2745378'
       ],
       'contactInfo': {
         'type': 'ContactInfo',
