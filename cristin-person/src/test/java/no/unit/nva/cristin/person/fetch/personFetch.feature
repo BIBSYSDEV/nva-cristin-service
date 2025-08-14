@@ -155,7 +155,7 @@ Feature: API tests for Cristin Person fetch
     And match identifiers !contains 'NationalIdentificationNumber'
 
   Scenario: Get returns supported fields in payload
-    * def samplePersonIdentifier = '1862292'
+    * def samplePersonIdentifier = '854279'
     Given path '/person/' + samplePersonIdentifier
     When method GET
     Then status 200
@@ -178,7 +178,7 @@ Feature: API tests for Cristin Person fetch
     And match response.employments[0].organization == '#present'
 
   Scenario: Get returns more supported fields in payload for another user
-    * def sampleAnotherPersonIdentifier = '1862292'
+    * def sampleAnotherPersonIdentifier = '1684653'
     Given path '/person/' + sampleAnotherPersonIdentifier
     When method GET
     Then status 200

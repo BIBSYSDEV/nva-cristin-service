@@ -58,7 +58,7 @@ Feature: API tests for Cristin Project Update
         }
       ],
       'relatedProjects': [
-        'https://api.dev.nva.aws.unit.no/cristin/project/2745378'
+        'https://api.dev.nva.aws.unit.no/cristin/project/2057063'
       ],
       'academicSummary': {
         'en': 'Some academic summary',
