@@ -4,7 +4,7 @@ Feature: API tests for Cristin Person Picture Fetch
     * def domainName = java.lang.System.getenv('DOMAIN_NAME')
     * def basePath = java.lang.System.getenv('BASE_PATH')
     * def CRISTIN_BASE =  'https://' + domainName +'/' + basePath
-    * def personIdentifier = '854279'
+    * def personIdentifier = '1862305'
     * def nonExistingPerson = '111222333'
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE

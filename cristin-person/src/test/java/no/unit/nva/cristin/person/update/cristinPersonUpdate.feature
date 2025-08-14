@@ -14,8 +14,8 @@ Feature: API tests for Cristin Person Update
     * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
     * def simpleUserToken = tokenGenerator.loginUser(simple_user_name, simple_user_password, cognitoClientAppId)
     * def invalidToken = 'just-a-invalid-token-for-now'
-    * def personIdentifier = '1684653'
-    * def nviPersonIdentifier = '1684654'
+    * def personIdentifier = '1862301'
+    * def nviPersonIdentifier = '1862302'
 
     * def updateFieldsRequest =
     """
@@ -231,7 +231,7 @@ Feature: API tests for Cristin Person Update
     {
       'nvi': {
           'verifiedBy': {
-              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/854279'
+              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862305'
           },
           'verifiedAt': {
               'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
@@ -264,7 +264,7 @@ Feature: API tests for Cristin Person Update
     {
       'nvi': {
           'verifiedBy': {
-              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/854279'
+              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862305'
           },
           'verifiedAt': {
               'hello': 'world'
@@ -284,7 +284,7 @@ Feature: API tests for Cristin Person Update
     {
       'nvi': {
           'verifiedBy': {
-              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/854279'
+              'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862305'
           },
           'verifiedAt': {
              'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
