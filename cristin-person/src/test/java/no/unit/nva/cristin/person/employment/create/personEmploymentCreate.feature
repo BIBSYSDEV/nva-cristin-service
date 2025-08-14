@@ -21,7 +21,7 @@ Feature: API tests for Creation of Cristin Person Employments
     """
     {
       'type': 'https://api.dev.nva.aws.unit.no/position#1087',
-      'organization': 'https://api.dev.nva.aws.unit.no/organization/185.90.0.0',
+      'organization': 'https://api.dev.nva.aws.unit.no/organization/20754.0.0.0',
       'startDate': '2020-01-01T00:00:00.000Z',
       'endDate': '2022-01-01T00:00:00.000Z',
       'fullTimeEquivalentPercentage': 80.0
@@ -31,7 +31,7 @@ Feature: API tests for Creation of Cristin Person Employments
     """
     {
       'type': 'https://api.dev.nva.aws.unit.no/hello',
-      'organization': 'https://api.dev.nva.aws.unit.no/organization/185.90.0.0',
+      'organization': 'https://api.dev.nva.aws.unit.no/organization/20754.0.0.0',
       'startDate': '2020-01-01T00:00:00.000Z',
     }
     """

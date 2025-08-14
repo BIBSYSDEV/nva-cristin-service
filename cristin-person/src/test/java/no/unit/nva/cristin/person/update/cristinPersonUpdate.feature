@@ -287,7 +287,7 @@ Feature: API tests for Cristin Person Update
               'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862305'
           },
           'verifiedAt': {
-             'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0'
+             'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
           }
       }
     }
