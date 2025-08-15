@@ -142,7 +142,7 @@ Feature: API tests for Cristin persons query
     Given path '/person'
     And param name = queryString
     And param organization = organizationQuery
-    And param results = '3'
+    And param results = '2'
     And param page = '2'
     When method GET
     Then status 200

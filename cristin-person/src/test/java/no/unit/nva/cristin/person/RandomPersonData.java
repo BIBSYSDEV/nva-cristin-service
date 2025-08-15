@@ -13,7 +13,7 @@ import no.unit.nva.cristin.person.model.nva.Employment;
 
 public class RandomPersonData {
 
-    public static final String SOME_UNIT_IDENTIFIER = "20754.0.0.0";
+    public static final String SOME_UNIT_IDENTIFIER = "185.90.0.0";
     public static final String HEAD_ENGINEER_CODE = HASHTAG + "1087";
 
     /**
