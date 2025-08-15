@@ -58,7 +58,7 @@ Feature: API tests for Cristin Project Update
         }
       ],
       'relatedProjects': [
-        'https://api.dev.nva.aws.unit.no/cristin/project/2057063'
+        'https://api.dev.nva.aws.unit.no/cristin/project/2745442'
       ],
       'academicSummary': {
         'en': 'Some academic summary',
@@ -101,7 +101,7 @@ Feature: API tests for Cristin Project Update
     Given url CRISTIN_BASE
 
   Scenario: Update returns status 204 No Content on successful update of project
-    Given path '/project/2675095'
+    Given path '/project/2745449'
     * header Authorization = 'Bearer ' + token
     And request swaggerSampleProject
     When method PATCH
