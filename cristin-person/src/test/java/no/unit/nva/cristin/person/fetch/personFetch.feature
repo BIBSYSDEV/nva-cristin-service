@@ -178,7 +178,7 @@ Feature: API tests for Cristin Person fetch
     And match response.employments[0].organization == '#present'
 
   Scenario: Get returns more supported fields in payload for another user
-    * def sampleAnotherPersonIdentifier = '1862292'
+    * def sampleAnotherPersonIdentifier = '1862301'
     Given path '/person/' + sampleAnotherPersonIdentifier
     When method GET
     Then status 200
