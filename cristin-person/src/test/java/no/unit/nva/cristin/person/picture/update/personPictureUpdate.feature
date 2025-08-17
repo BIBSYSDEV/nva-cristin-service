@@ -11,7 +11,7 @@ Feature: API tests for Cristin Person Picture Update
     * def tokenGenerator = Java.type('no.unit.nva.utils.CognitoUtil')
     * def token = tokenGenerator.loginUser(username, password, cognitoClientAppId)
     * def personIdentifier = '1862303'
-    * def anotherPersonIdentifier = '1100259'
+    * def anotherPersonIdentifier = '1862302'
     Given url CRISTIN_BASE
     * print 'Current base url: ' + CRISTIN_BASE
 
