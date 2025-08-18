@@ -19,20 +19,20 @@ Feature: API tests for Cristin Project Update
       'endDate': '2030-12-31T00:00:00.001Z',
       'coordinatingInstitution': {
         'type': 'Organization',
-        'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+        'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
       },
       'contributors': [
         {
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862300'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862292'
           },
           'roles' : [
             {
               'type': 'ProjectManager',
               'affiliation': {
                 'type' : 'Organization',
-                'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
               }
             }
           ]
