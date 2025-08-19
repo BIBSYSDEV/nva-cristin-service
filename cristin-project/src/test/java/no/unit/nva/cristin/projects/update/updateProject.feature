@@ -25,7 +25,7 @@ Feature: API tests for Cristin Project Update
         {
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862292'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862300'
           },
           'roles' : [
             {
