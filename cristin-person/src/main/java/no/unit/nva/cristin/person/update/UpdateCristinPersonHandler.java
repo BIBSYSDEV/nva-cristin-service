@@ -40,6 +40,7 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
 
     public static final String ERROR_MESSAGE_IDENTIFIERS_DO_NOT_MATCH = "Identifier from path does not match "
                                                                         + "identifier from user info";
+    private static final String PERSON_ID_NOT_FOUND = "PERSON_ID_NOT_FOUND_IN_QUERY_PARAMETERS";
     private final transient UpdateCristinPersonApiClient apiClient;
 
     @SuppressWarnings("unused")
@@ -85,8 +86,14 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
 
             return apiClient.updatePersonInCristin(personIdFromCognito, cristinJson);
         } else {
+            logFailedAuthorization(requestInfo, personId);
             throw new ForbiddenException();
         }
+    }
+
+    private static void logFailedAuthorization(RequestInfo requestInfo, String subject) throws UnauthorizedException {
+        logger.error("Unauthorized attempt to update person with id: {} by logged in user id {}", subject,
+                     requestInfo.getPersonCristinId());
     }
 
     private ObjectNode filterInput(RequestInfo requestInfo, ObjectNode objectNode) {
@@ -143,8 +150,9 @@ public class UpdateCristinPersonHandler extends ApiGatewayHandler<String, Void> 
 
     private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException, UnauthorizedException {
         if (!AccessUtils.requesterIsUserAdministrator(requestInfo) && !clientCanUpdateOwnData(requestInfo)) {
+            var personIdFromQuery = attempt(() -> getValidPersonId(requestInfo)).orElse(e -> PERSON_ID_NOT_FOUND);
+            logFailedAuthorization(requestInfo, personIdFromQuery);
             throw new ForbiddenException();
         }
     }
-
 }
