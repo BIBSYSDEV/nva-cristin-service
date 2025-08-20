@@ -101,7 +101,7 @@ Feature: API tests for Cristin Project Update
     Given url CRISTIN_BASE
 
   Scenario: Update returns status 204 No Content on successful update of project
-    Given path '/project/2745449'
+    Given path '/project/2745469'
     * header Authorization = 'Bearer ' + token
     And request swaggerSampleProject
     When method PATCH
