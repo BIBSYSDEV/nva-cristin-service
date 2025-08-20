@@ -13,7 +13,7 @@ Feature: API tests for Cristin Project Update
     * def swaggerSampleProject =
     """
     {
-      'title': 'Updated Title',
+      'title': 'karate cristin service test 5',
       'language': 'http://lexvo.org/id/iso639-3/eng',
       'startDate': '2022-10-09T00:00:00.001Z',
       'endDate': '2030-12-31T00:00:00.001Z',
