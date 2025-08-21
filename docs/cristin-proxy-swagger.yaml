@@ -3007,6 +3007,27 @@ components:
     Organization:
       type: object
       description: Affiliated organization
+      example:
+        id: https://api.nva.unit.no/cristin/organization/194.63.0.0
+        type: Organization
+        labels:
+          en: Faculty of Information Technology and Electrical Engineering
+        acronym: NTNU
+        country: NO
+        partOf:
+          - id: https://api.nva.unit.no/cristin/organization/194.0.0.0
+            type: Organization
+            partOf: [ ]
+            hasPart: [ ]
+            labels:
+              en: Some Parent Organization
+        hasPart:
+          - id: https://api.nva.unit.no/cristin/organization/194.63.15.0
+            type: Organization
+            partOf: [ ]
+            hasPart: [ ]
+            labels:
+              en: Some Child Organization
       properties:
         id:
           $ref: '#/components/schemas/Id'
@@ -3027,18 +3048,12 @@ components:
           description: List of Organizations this organization is part of
           type: array
           items:
-            type: object
-            properties:
-              organization:
-                $ref: '#/components/schemas/Organization'
+            $ref: '#/components/schemas/Organization'
         hasPart:
           description: List of Organizations that is part of this organization
           type: array
           items:
-            type: object
-            properties:
-              organization:
-                $ref: '#/components/schemas/Organization'
+            $ref: '#/components/schemas/Organization'
     Funding:
       type: object
       description: Funding

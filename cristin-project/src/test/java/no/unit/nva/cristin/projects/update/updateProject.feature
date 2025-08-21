@@ -13,26 +13,26 @@ Feature: API tests for Cristin Project Update
     * def swaggerSampleProject =
     """
     {
-      'title': 'Updated Title',
+      'title': 'karate cristin service test 5',
       'language': 'http://lexvo.org/id/iso639-3/eng',
       'startDate': '2022-10-09T00:00:00.001Z',
       'endDate': '2030-12-31T00:00:00.001Z',
       'coordinatingInstitution': {
         'type': 'Organization',
-        'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20202.0.0.0'
+        'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
       },
       'contributors': [
         {
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684652'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862292'
           },
           'roles' : [
             {
               'type': 'ProjectManager',
               'affiliation': {
                 'type' : 'Organization',
-                'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/215.0.0.0'
+                'id': 'https://api.dev.nva.aws.unit.no/cristin/organization/20754.0.0.0'
               }
             }
           ]
@@ -58,7 +58,7 @@ Feature: API tests for Cristin Project Update
         }
       ],
       'relatedProjects': [
-        'https://api.dev.nva.aws.unit.no/cristin/project/2057063'
+        'https://api.dev.nva.aws.unit.no/cristin/project/2745442'
       ],
       'academicSummary': {
         'en': 'Some academic summary',
@@ -101,7 +101,7 @@ Feature: API tests for Cristin Project Update
     Given url CRISTIN_BASE
 
   Scenario: Update returns status 204 No Content on successful update of project
-    Given path '/project/2675095'
+    Given path '/project/2745469'
     * header Authorization = 'Bearer ' + token
     And request swaggerSampleProject
     When method PATCH

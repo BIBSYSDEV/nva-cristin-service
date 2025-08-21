@@ -32,7 +32,7 @@ Feature: API tests for creating sample Cristin Projects
         {
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684651'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862299'
           },
           'roles': [
             {
@@ -54,7 +54,7 @@ Feature: API tests for creating sample Cristin Projects
         {
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684652'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862300'
           },
           'roles': [
             {
@@ -150,7 +150,7 @@ Feature: API tests for creating sample Cristin Projects
         }
       ],
       'relatedProjects': [
-        'https://api.dev.nva.aws.unit.no/cristin/project/2057063'
+        'https://api.dev.nva.aws.unit.no/cristin/project/2745442'
       ],
       'contactInfo': {
         'type': 'ContactInfo',
@@ -207,7 +207,7 @@ Feature: API tests for creating sample Cristin Projects
         {
           'identity': {
             'type': 'Person',
-            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1684651'
+            'id': 'https://api.dev.nva.aws.unit.no/cristin/person/1862299'
           },
           'roles': [
             {
