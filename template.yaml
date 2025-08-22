@@ -672,6 +672,15 @@ Resources:
       Type: 'String'
       Value: !Sub 's3://${NvaCristinIntermediateStorageBucket}/units-norway.json'
 
+  NvaCristinIntermediateStorageBucketNameParameter:
+    Type: 'AWS::SSM::Parameter'
+    Condition: IsCustomDomainBasePathCristin
+    Properties:
+      Description: 'S3 bucket name for storing intermediate storage data'
+      Name: '/NVA/S3/CristinIntermediateStorage/BucketName'
+      Type: 'String'
+      Value: !Ref NvaCristinIntermediateStorageBucket
+
   NvaCristinIntermediateStorageBucketWritePolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
