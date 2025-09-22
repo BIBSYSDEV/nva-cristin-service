@@ -1943,6 +1943,8 @@ paths:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaCristinFetchPositionFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
+        cacheKeyParameters:
+          - 'method.request.querystring.active'
       tags:
         - Position
       summary: Fetch position codes
