@@ -43,7 +43,9 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.validation.PatchValidator.COULD_NOT_PARSE_LANGUAGE_FIELD;
 import static no.unit.nva.validation.PatchValidator.ILLEGAL_VALUE_FOR_PROPERTY;
+import static nva.commons.apigateway.AccessRight.MANAGE_ALL_PROJECTS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_RESOURCES;
+import static nva.commons.apigateway.AccessRight.MANAGE_RESOURCES_ALL;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -245,6 +247,18 @@ class UpdateCristinProjectHandlerTest {
         mockFetchResponse(fetchedProjectJson);
 
         var input = generateInputWithPayloadAndRequesterPersonCristinId(MANAGE_OWN_RESOURCES);
+        handler.handleRequest(input, output, context);
+        var response =  GatewayResponse.fromOutputStream(output, Void.class);
+
+        assertThat(response.getStatusCode(), equalTo(HTTP_NO_CONTENT));
+    }
+
+    @Test
+    void shouldAllowUserToUpdateAnyProjectWhenHavingAccessRightManageAllProjects() throws Exception {
+        var fetchedProjectJson = basicCristinProject().toString();
+        mockFetchResponse(fetchedProjectJson);
+
+        var input = generateInputWithPayloadAndRequesterPersonCristinId(MANAGE_ALL_PROJECTS);
         handler.handleRequest(input, output, context);
         var response =  GatewayResponse.fromOutputStream(output, Void.class);
 

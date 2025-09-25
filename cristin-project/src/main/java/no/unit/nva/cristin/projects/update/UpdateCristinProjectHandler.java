@@ -31,6 +31,8 @@ import static no.unit.nva.cristin.projects.update.UpdateProjectResourceAccessChe
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
+import static nva.commons.apigateway.AccessRight.MANAGE_ALL_PROJECTS;
+import static nva.commons.apigateway.AccessRight.MANAGE_OWN_RESOURCES;
 
 public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void> {
 
@@ -96,9 +98,17 @@ public class UpdateCristinProjectHandler extends ApiGatewayHandler<String, Void>
 
     @Override
     protected void validateRequest(String input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+        if (canEditAllProjects(requestInfo)) {
+            return;
+        }
+
         if (missingHandlerOrResourceAccess(requestInfo)) {
             throw new ForbiddenException();
         }
+    }
+
+    private boolean canEditAllProjects(RequestInfo requestInfo) {
+        return requestInfo.userIsAuthorized(MANAGE_ALL_PROJECTS);
     }
 
     private boolean noSupportedValuesPresent(ObjectNode cristinJson) {
