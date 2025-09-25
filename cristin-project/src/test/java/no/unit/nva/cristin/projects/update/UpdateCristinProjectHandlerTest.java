@@ -45,7 +45,6 @@ import static no.unit.nva.validation.PatchValidator.COULD_NOT_PARSE_LANGUAGE_FIE
 import static no.unit.nva.validation.PatchValidator.ILLEGAL_VALUE_FOR_PROPERTY;
 import static nva.commons.apigateway.AccessRight.MANAGE_ALL_PROJECTS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_RESOURCES;
-import static nva.commons.apigateway.AccessRight.MANAGE_RESOURCES_ALL;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static org.hamcrest.CoreMatchers.containsString;
