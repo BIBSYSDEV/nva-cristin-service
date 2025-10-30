@@ -45,7 +45,7 @@ public record Person(@JsonProperty(CONTEXT) String context,
                      @JsonProperty(AFFILIATIONS) List<Affiliation> affiliations,
                      @JsonProperty(RESERVED) Boolean reserved,
                      @JsonProperty(EMPLOYMENTS) Set<Employment> employments,
-                     @JsonProperty(VERIFIED) Boolean verified,
+                     @JsonProperty(VERIFIED) boolean verified,
                      @JsonProperty(KEYWORDS) Set<TypedLabel> keywords,
                      @JsonProperty(BACKGROUND) Map<String, String> background,
                      @JsonProperty(NVI) PersonNvi nvi,
@@ -137,7 +137,7 @@ public record Person(@JsonProperty(CONTEXT) String context,
         private List<Affiliation> affiliations;
         private Boolean reserved;
         private Set<Employment> employments;
-        private Boolean verified;
+        private boolean verified;
         private Set<TypedLabel> keywords;
         private Map<String, String> background;
         private PersonNvi nvi;
@@ -196,7 +196,7 @@ public record Person(@JsonProperty(CONTEXT) String context,
         }
 
         public Builder withVerified(Boolean verified) {
-            this.verified = verified;
+            this.verified = Boolean.TRUE.equals(verified);
             return this;
         }
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
+import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinUnit;
 import no.unit.nva.cristin.person.affiliations.model.CristinPositionCode;
@@ -73,6 +74,17 @@ public class PersonTest {
         assertThat(json.has(EMPLOYMENTS), equalTo(false));
         assertThat(json.toString().contains(EMPLOYMENTS), equalTo(false));
         assertThat(jsonString.contains(EMPLOYMENTS), equalTo(false));
+    }
+
+    @Test
+    void personWithoutVerifiedFieldShouldHaveVerifiedSetToFalse() throws JsonProcessingException {
+        var person = new Person.Builder().build();
+
+        var json = person.toJsonString();
+
+        var verified = JsonUtils.dtoObjectMapper.readTree(json).get("verified").asText();
+
+        assertEquals(Boolean.FALSE.toString(), verified);
     }
 
     private List<CristinPersonEmployment> generateExpectedEmploymentsMatchingJson() {
