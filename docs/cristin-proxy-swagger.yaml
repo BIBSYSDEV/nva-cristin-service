@@ -3305,6 +3305,7 @@ components:
             $ref: '#/components/schemas/PersonEmployment'
         verified:
           type: boolean
+          nullable: false
           description: Whether we can document the existence of the person
         keywords:
           type: array
@@ -3567,6 +3568,7 @@ components:
           description: Can be modified by the user themselves, otherwise user administrator can do the update
         reserved:
           type: boolean
+          nullable: true
           description: If person should be hidden from public view
         employments:
           type: array
