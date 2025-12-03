@@ -2,6 +2,7 @@ package no.unit.nva.cristin.facet;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static nva.commons.core.StringUtils.EMPTY_STRING;
 import static nva.commons.core.attempt.Try.attempt;
 import java.net.URI;
 import java.util.ArrayList;
@@ -77,14 +78,37 @@ public class FacetUriParamAppender {
     }
 
     private Map<String, List<String>> getQueryMap(String query) {
-        Map<String, List<String>> map = new HashMap<>();
-        Arrays.stream(query.split(QUERY_PARAMETER_DELIMITER))
-            .forEach(pair -> {
-                var keyValue = splitQueryParamString(pair);
-                var values = shouldSplitOnComma(keyValue[0]) ? splitOnComma(keyValue[1]) : keepValueAsIs(keyValue[1]);
-                map.put(keyValue[0], new ArrayList<>(values));
-            });
+        var map = new HashMap<String, List<String>>();
+        var parts = query.split(QUERY_PARAMETER_DELIMITER);
+
+        String currentKey = null;
+        var currentValue = new StringBuilder();
+
+        for (String part : parts) {
+            if (part.contains(QUERY_PARAMETER_ASSIGNER)) {
+                if (nonNull(currentKey)) {
+                    addParameterToMap(map, currentKey, currentValue.toString());
+                }
+                var keyValue = splitQueryParamString(part);
+                currentKey = keyValue[0];
+                currentValue = new StringBuilder(keyValue.length > 1 ? keyValue[1] : EMPTY_STRING);
+            } else {
+                if (!currentValue.isEmpty()) {
+                    currentValue.append(QUERY_PARAMETER_DELIMITER);
+                }
+                currentValue.append(part);
+            }
+        }
+        if (nonNull(currentKey)) {
+            addParameterToMap(map, currentKey, currentValue.toString());
+        }
+
         return map;
+    }
+
+    private void addParameterToMap(Map<String, List<String>> map, String key, String value) {
+        var values = shouldSplitOnComma(key) ? splitOnComma(value) : keepValueAsIs(value);
+        map.put(key, new ArrayList<>(values));
     }
 
     private String[] splitQueryParamString(String pair) {
