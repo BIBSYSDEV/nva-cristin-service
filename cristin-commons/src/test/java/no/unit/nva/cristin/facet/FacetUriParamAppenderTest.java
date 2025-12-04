@@ -2,11 +2,13 @@ package no.unit.nva.cristin.facet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.net.URI;
+import java.util.List;
 import java.util.Objects;
+import no.unit.nva.cristin.model.query.CristinCodeFacet;
 import no.unit.nva.cristin.model.query.CristinFacetKey;
 import no.unit.nva.cristin.model.query.CristinInstitutionFacet;
-import no.unit.nva.cristin.model.query.CristinCodeFacet;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.Test;
 
@@ -150,6 +152,43 @@ class FacetUriParamAppenderTest {
 
         Objects.requireNonNull(actual);
         assertEquals(expected, actual.toString());
+    }
+
+    @Test
+    void shouldHandleQueryParameterValueWithAmpersandUnencodedWhenGeneratingFacetId() {
+        var uri = URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?type=project&name=Feed&Feeding");
+
+        var cristinFacet = new CristinCodeFacet("UC", null);
+
+        var actual = createFacetId(uri, cristinFacet);
+
+        assertHasQueryParams(actual, List.of("type=project",  "name=Feed%26Feeding", "sectorFacet=UC"));
+    }
+
+    @Test
+    void shouldHandleQueryParameterValueWithAmpersandEncodedWhenGeneratingFacetId() {
+        var uri = URI.create("https://api.dev.nva.aws.unit.no/cristin/person/?type=project&name=Feed%26Feeding");
+
+        var cristinFacet = new CristinCodeFacet("UC", null);
+
+        var actual = createFacetId(uri, cristinFacet);
+
+        assertHasQueryParams(actual, List.of("type=project",  "name=Feed%26Feeding", "sectorFacet=UC"));
+    }
+
+    private static URI createFacetId(URI idUriWithEncodedAmpersand, CristinCodeFacet cristinFacet) {
+        return new FacetUriParamAppender(idUriWithEncodedAmpersand,
+                                         CristinFacetKey.SECTOR.getKey(),
+                                         cristinFacet)
+                   .create()
+                   .getUriWithFacetKeys()
+                   .map(UriWrapper::getUri)
+                   .orElseThrow();
+    }
+
+    private static void assertHasQueryParams(URI actual, List<String> queryParams) {
+        var query = actual.getRawQuery();
+        queryParams.forEach(param -> assertTrue(query.contains(param)));
     }
 
     private static URI generateUriWithCommaParamValue() {
