@@ -1,20 +1,14 @@
 package no.unit.nva.cristin.facet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import no.unit.nva.cristin.model.query.CristinCodeFacet;
 import no.unit.nva.cristin.model.query.CristinFacetKey;
 import no.unit.nva.cristin.model.query.CristinInstitutionFacet;
-import no.unit.nva.cristin.model.query.CristinCodeFacet;
 import nva.commons.core.paths.UriWrapper;
 import org.junit.jupiter.api.Test;
 
