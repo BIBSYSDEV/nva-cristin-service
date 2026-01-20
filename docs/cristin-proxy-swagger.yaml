@@ -62,7 +62,7 @@ paths:
             - ACTIVE
             - CONCLUDED
             - NOTSTARTED
-            example: 'active'
+            example: ACTIVE
           style: form
           explode: false
         - name: page
@@ -71,8 +71,8 @@ paths:
           required: false
           schema:
             type: number
-            default: '1'
-          example: '3'
+            default: 1
+          example: 3
           style: form
           explode: false
         - name: results
@@ -81,8 +81,8 @@ paths:
           required: false
           schema:
             type: number
-            default: '5'
-          example: '10'
+            default: 5
+          example: 10
           style: form
           explode: false
         - name: institution
@@ -342,7 +342,7 @@ paths:
               value: application/ld+json; version=2023-11-03-aggregations
               description: Version with search facets. Header value also accepts version=[2023-11-03, aggregations]
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -369,11 +369,11 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/ProjectsWithFacetsExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
     post:
       x-amazon-apigateway-integration:
@@ -406,7 +406,7 @@ paths:
                 $ref: '#/components/examples/ProjectPostExample'
 
       responses:
-        201:
+        "201":
           description: Successful creation of project
           content:
             application/json:
@@ -421,15 +421,15 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/ProjectsExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /project/{identifier}:
     get:
@@ -454,7 +454,7 @@ paths:
             pattern: '^[0-9]+$'
           example: '495216'
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -469,13 +469,13 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/ProjectExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
     patch:
       x-amazon-apigateway-integration:
@@ -516,7 +516,7 @@ paths:
               objectExample:
                 $ref: '#/components/examples/ProjectPatchExample'
       responses:
-        204:
+        "204":
           description: Successful update of resource
           content:
             application/json:
@@ -525,15 +525,15 @@ paths:
             application/ld+json:
               schema:
                 type: string
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /category/project:
     get:
@@ -549,7 +549,7 @@ paths:
       description: Returns list of categories
       operationId: ListCategories
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -564,11 +564,11 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/CategoriesExample'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
-        400:
+        "400":
           $ref: '#/components/responses/400'
   /organization:
     get:
@@ -611,8 +611,8 @@ paths:
           required: false
           schema:
             type: number
-            default: '1'
-          example: '1'
+            default: 1
+          example: 1
           style: form
           explode: false
         - name: results
@@ -621,8 +621,8 @@ paths:
           required: false
           schema:
             type: number
-            default: '10'
-          example: '10'
+            default: 10
+          example: 10
           style: form
           explode: false
         - name: sort
@@ -674,7 +674,7 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -701,13 +701,13 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/OrganizationsExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /organization/{identifier}:
     get:
@@ -771,7 +771,7 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -798,13 +798,13 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/OrganizationExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
 
   /organization/{identifier}/persons:
@@ -835,8 +835,8 @@ paths:
           required: false
           schema:
             type: number
-            default: '1'
-          example: '3'
+            default: 1
+          example: 3
           style: form
           explode: false
         - name: results
@@ -845,8 +845,8 @@ paths:
           required: false
           schema:
             type: number
-            default: '5'
-          example: '10'
+            default: 5
+          example: 10
           style: form
           explode: false
         - name: name
@@ -883,7 +883,7 @@ paths:
             nameAsc:
               value: 'name asc'
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -898,13 +898,13 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/OrganizationPersonsExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /organization/{identifier}/projects:
     get:
@@ -934,8 +934,8 @@ paths:
           required: false
           schema:
             type: number
-            default: '1'
-          example: '3'
+            default: 1
+          example: 3
           style: form
           explode: false
         - name: results
@@ -944,8 +944,8 @@ paths:
           required: false
           schema:
             type: number
-            default: '5'
-          example: '10'
+            default: 5
+          example: 10
           style: form
           explode: false
         - name: institution
@@ -1106,7 +1106,7 @@ paths:
           style: form
           explode: false
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -1121,13 +1121,13 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/OrganizationProjectsExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
 
   /person:
@@ -1170,8 +1170,8 @@ paths:
           required: false
           schema:
             type: number
-            default: '1'
-          example: '3'
+            default: 1
+          example: 3
           style: form
           explode: false
         - name: results
@@ -1180,8 +1180,8 @@ paths:
           required: false
           schema:
             type: number
-            default: '5'
-          example: '10'
+            default: 5
+          example: 10
           style: form
           explode: false
         - name: verified
@@ -1245,7 +1245,7 @@ paths:
               value: application/ld+json; version=2023-11-03-aggregations
               description: Version with search aggregations. Header value also accepts version=[2023-11-03, aggregations]
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -1272,11 +1272,11 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonsWithFacetsExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
     post:
       x-amazon-apigateway-integration:
@@ -1308,7 +1308,7 @@ paths:
               objectExample:
                 $ref: '#/components/examples/PersonPostExample'
       responses:
-        201:
+        "201":
           description: Successful creation of resource
           content:
             application/json:
@@ -1323,15 +1323,15 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonPostResponseExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /person/{id}:
     parameters:
@@ -1374,7 +1374,7 @@ paths:
       description: Returns a single person matching id parameter without NIN
       operationId: GetPersonById
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -1389,15 +1389,15 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
     patch:
       x-amazon-apigateway-integration:
@@ -1429,7 +1429,7 @@ paths:
               objectExample:
                 $ref: '#/components/examples/PersonPatchExample'
       responses:
-        204:
+        "204":
           description: Successful update of resource
           content:
             application/json:
@@ -1440,15 +1440,15 @@ paths:
               schema:
                 type: string
                 example: '{}'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /person/identityNumber:
     post:
@@ -1474,7 +1474,7 @@ paths:
               objectExample:
                 $ref: '#/components/examples/PersonNinExample'
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -1489,17 +1489,17 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /person/{id}/organization/{orgId}:
     parameters:
@@ -1533,7 +1533,7 @@ paths:
       security:
         - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend','aws.cognito.signin.user.admin']
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -1548,17 +1548,17 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonOrganizationInfoExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
     patch:
       x-amazon-apigateway-integration:
@@ -1590,7 +1590,7 @@ paths:
               objectExample:
                 $ref: '#/components/examples/PersonInstInfoPatchExample'
       responses:
-        204:
+        "204":
           description: Successful update of resource
           content:
             application/json:
@@ -1601,15 +1601,15 @@ paths:
               schema:
                 type: string
                 example: '{}'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /person/{id}/employment:
     parameters:
@@ -1635,7 +1635,7 @@ paths:
       security:
         - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend','aws.cognito.signin.user.admin']
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -1650,17 +1650,17 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonEmploymentQueryExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
     post:
       x-amazon-apigateway-integration:
@@ -1692,7 +1692,7 @@ paths:
               objectExample:
                 $ref: '#/components/examples/PersonEmploymentExample'
       responses:
-        201:
+        "201":
           description: Successful creation of resource
           content:
             application/json:
@@ -1707,15 +1707,15 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonEmploymentExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /person/{id}/employment/{employmentId}:
     parameters:
@@ -1749,19 +1749,19 @@ paths:
       security:
         - CognitoUserPool: ['https://api.nva.unit.no/scopes/backend', 'https://api.nva.unit.no/scopes/frontend','aws.cognito.signin.user.admin']
       responses:
-        204:
+        "204":
           description: successful operation
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
     patch:
       x-amazon-apigateway-integration:
@@ -1793,17 +1793,17 @@ paths:
               objectExample:
                 $ref: '#/components/examples/PersonEmploymentExample'
       responses:
-        204:
+        "204":
           description: Successful update of resource
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /person/{id}/picture:
     parameters:
@@ -1844,7 +1844,7 @@ paths:
               objectExample:
                 $ref: '#/components/examples/BinaryExample'
       responses:
-        204:
+        "204":
           description: Successful update of resource
           content:
             application/json:
@@ -1853,17 +1853,17 @@ paths:
             application/ld+json:
               schema:
                 type: string
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
     get:
       x-amazon-apigateway-integration:
@@ -1877,7 +1877,7 @@ paths:
       description: Retrieves person profile picture in base64 format which contains mimetype image/jpeg
       operationId: FetchPersonPicture
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -1892,15 +1892,15 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/BinaryExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
 
   /person/orcid:
@@ -1916,7 +1916,7 @@ paths:
       description: Retrieves person id's and orcid's for persons having orcid
       operationId: FetchPersonsOrcid
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -1931,9 +1931,9 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PersonsOrcidExample'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
 
   /position:
@@ -1960,7 +1960,7 @@ paths:
           style: form
           explode: false
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -1975,17 +1975,17 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/PositionCodesSample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /funding-sources:
     get:
@@ -2001,7 +2001,7 @@ paths:
       description: Returns all support funding sources
       operationId: ListFundingSources
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -2016,9 +2016,9 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/FundingSourcesSample'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /funding-sources/{identifier}:
     parameters:
@@ -2047,7 +2047,7 @@ paths:
       description: Returns the funding source with the given identifier
       operationId: FetchFundingSource
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -2062,11 +2062,11 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/FundingSourceNewSample'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
 
   /biobank/{identifier}:
@@ -2095,7 +2095,7 @@ paths:
       description: Returns the biobank with the given identifier
       operationId: FetchBiobank
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -2110,11 +2110,11 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/BiobankExample'
-        404:
+        "404":
           $ref: '#/components/responses/404'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /keyword:
     get:
@@ -2146,8 +2146,8 @@ paths:
           required: false
           schema:
             type: number
-            default: '1'
-          example: '3'
+            default: 1
+          example: 3
           style: form
           explode: false
         - name: results
@@ -2156,12 +2156,12 @@ paths:
           required: false
           schema:
             type: number
-            default: '100'
-          example: '5'
+            default: 100
+          example: 5
           style: form
           explode: false
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -2176,11 +2176,11 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/KeywordsExample'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
-        400:
+        "400":
           $ref: '#/components/responses/400'
     post:
       x-amazon-apigateway-integration:
@@ -2212,7 +2212,7 @@ paths:
               objectExample:
                 $ref: '#/components/examples/KeywordPostExample'
       responses:
-        201:
+        "201":
           description: Successful creation of resource
           content:
             application/json:
@@ -2227,15 +2227,15 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/KeywordExample'
-        400:
+        "400":
           $ref: '#/components/responses/400'
-        401:
+        "401":
           $ref: '#/components/responses/401'
-        403:
+        "403":
           $ref: '#/components/responses/403'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
   /keyword/{id}:
     parameters:
@@ -2260,7 +2260,7 @@ paths:
       description: Returns single keyword
       operationId: FetchKeyword
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -2275,11 +2275,11 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/KeywordExample'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
-        400:
+        "400":
           $ref: '#/components/responses/400'
   /country:
     get:
@@ -2295,7 +2295,7 @@ paths:
       description: Returns list of supported countries
       operationId: ListCountries
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -2310,44 +2310,44 @@ paths:
               examples:
                 objectExample:
                   $ref: '#/components/examples/CountriesExample'
-        500:
+        "500":
           $ref: '#/components/responses/500'
-        502:
+        "502":
           $ref: '#/components/responses/502'
 
 components:
   responses:
-    400:
+    "400":
       description: Bad Request
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
-    401:
+    "401":
       description: Unauthorized
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
-    403:
+    "403":
       description: Forbidden
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
-    404:
+    "404":
       description: Not found
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
-    500:
+    "500":
       description: Internal Server Error
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
-    502:
+    "502":
       description: Bad Gateway from upstream
       content:
         application/problem+json:
@@ -4963,7 +4963,7 @@ components:
         contactDetails:
           telephone: '+4799885566'
           email: 'example@email.org'
-          webPage: 'www.example.org'
+          webPage: 'https://www.example.org'
         image: 'https://api.cristin.no/v2/persons/359084/picture'
         affiliations:
           - type: 'Affiliation'
@@ -5064,14 +5064,12 @@ components:
           no: 'Min bakgrunn som forsker'
           en: 'null'
         nvi:
-          verifiedBy:
-            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
-          verifiedAt:
-            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+          verifiedBy: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+          verifiedAt: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
         contactDetails:
           telephone: '+4799885566'
           email: 'example@email.org'
-          webPage: 'www.example.org'
+          webPage: 'https://www.example.org'
         place:
           nb: 'Mitt arbeidssted'
           en: 'null'
@@ -5117,14 +5115,12 @@ components:
           no: 'Min bakgrunn som forsker'
           en: 'My history as a researcher'
         nvi:
-          verifiedBy:
-            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
-          verifiedAt:
-            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+          verifiedBy: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+          verifiedAt: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
         contactDetails:
           telephone: '+4799885566'
           email: 'example@email.org'
-          webPage: 'www.example.org'
+          webPage: 'https://www.example.org'
         place:
           nb: 'Mitt arbeidssted'
           en: 'My workplace'
@@ -5194,7 +5190,7 @@ components:
         contactDetails:
           telephone: '+4799885566'
           email: 'example@email.org'
-          webPage: 'www.example.org'
+          webPage: 'https://www.example.org'
     PersonOrganizationInfoExample:
       value:
         '@context': 'https://ontology.org'
@@ -5230,7 +5226,7 @@ components:
           - type: "FundingSource"
             id: "https://api.{env.}nva.aws.unit.no/funding-sources/EC%2FFP7"
             identifier: "EC/FP7"
-            name:
+            labels:
               nb: "EC/FP7"
               nn: "EC/FP7"
               en: "EC/FP7"
@@ -5256,9 +5252,7 @@ components:
         id: 'https://api.dev.nva.aws.unit.no/cristin/person/123456/employment'
         size: 2
         processingTime: 800
-        firstRecord: 'null'
-        nextResults: 'null'
-        previousResults: 'null'
+        firstRecord: 1
         hits:
           - id: 'https://api.dev.nva.aws.unit.no/cristin/person/123456/employment/1016'
             type: 'https://api.dev.nva.aws.unit.no/cristin/position#1087'
@@ -5505,16 +5499,15 @@ components:
         processingTime: 800
         firstRecord: 1
         nextResults: 'https://api.dev.nva.aws.unit.no/cristin/keywords/?page=2&query=something%results=5'
-        previousResults: ''
         hits:
           - type: 'Keyword'
             id: 'https://api.dev.nva.aws.unit.no/cristin/keyword/1197'
-            identifier: '1197'
+            identifier: 1197
             labels:
               en: 'Educational management'
           - type: 'Keyword'
             id: 'https://api.dev.nva.aws.unit.no/cristin/keyword/1198'
-            identifier: '1198'
+            identifier: 1198
             labels:
               en: 'Odontologi'
     KeywordPostExample:
@@ -5527,7 +5520,7 @@ components:
         '@context': 'https://bibsysdev.github.io/src/keyword-context.json'
         type: 'Keyword'
         id: 'https://api.dev.nva.aws.unit.no/cristin/keyword/1197'
-        identifier: '1197'
+        identifier: 1197
         labels:
           en: 'Educational management'
     CategoriesExample:
@@ -5537,8 +5530,6 @@ components:
         size: 150
         processingTime: 800
         firstRecord: 1
-        nextResults: ''
-        previousResults: ''
         hits:
           - type: 'BASICRESEARCH'
             label:
