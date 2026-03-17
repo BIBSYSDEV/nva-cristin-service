@@ -8,6 +8,11 @@ env:
 cache:
   paths:
     - "/root/.gradle/caches/**/*"
+reports:
+  unit-tests:
+    files:
+      - '*/build/test-results/test/TEST-*.xml'
+    file-format: JUNITXML
 phases:
   install:
     runtime-versions:
@@ -24,6 +29,8 @@ phases:
         fi
   build:
     commands:
+      # Run test task via Gradle so that reports end up in the expected folders (sam build doesn't re-run the task)
+      - ./gradlew test
       - sam build
   post_build:
     commands:
