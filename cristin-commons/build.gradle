@@ -35,7 +35,7 @@ dependencies {
     testFixturesImplementation libs.nva.apigateway
     testFixturesImplementation libs.jackson.databind
 
-    implementation libs.nva.testutils
+    testImplementation libs.nva.testutils
     implementation libs.aws.sdk2.awscore
     implementation libs.aws.sdk2.spi
     implementation libs.apache.http.core5
