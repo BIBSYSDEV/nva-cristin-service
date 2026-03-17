@@ -20,6 +20,7 @@ env:
   COGNITO_AUTHENTICATION_DOMAIN: "nva-dev.auth.eu-west-1.amazoncognito.com"
   CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME: "Hello"
   CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE: "World"
+  GRADLE_OPTS: "-Dorg.gradle.configuration-cache=false"
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -37,7 +38,9 @@ jobs:
           java-version: 21
           distribution: corretto
       - name: Setup AWS SAM CLI
-        uses: aws-actions/setup-sam@v1
+        uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@master
         with:
