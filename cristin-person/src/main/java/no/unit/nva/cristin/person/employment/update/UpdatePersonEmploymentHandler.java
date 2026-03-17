@@ -10,7 +10,7 @@ import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;

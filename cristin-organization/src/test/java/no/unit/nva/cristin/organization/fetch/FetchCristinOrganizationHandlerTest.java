@@ -422,7 +422,7 @@ class FetchCristinOrganizationHandlerTest {
     }
 
     private InputStream generateHandlerRequest(String organizationIdentifier) throws JsonProcessingException {
-        var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type());
+        var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.toString());
         var pathParameters = Map.of(IDENTIFIER, organizationIdentifier);
         return new HandlerRequestBuilder<>(restApiMapper)
                 .withHeaders(headers)
@@ -433,7 +433,7 @@ class FetchCristinOrganizationHandlerTest {
     @SuppressWarnings("SameParameterValue")
     private InputStream generateHandlerRequestWithAdditionalQueryParameters(String organizationIdentifier, String depth)
             throws JsonProcessingException {
-        var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type());
+        var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.toString());
         var pathParameters = Map.of(IDENTIFIER, organizationIdentifier);
         var queryParameters = Map.of(DEPTH, depth);
         return new HandlerRequestBuilder<>(restApiMapper)
@@ -446,7 +446,7 @@ class FetchCristinOrganizationHandlerTest {
 
     private InputStream generateHandlerRequestWithMissingPathParameter() throws JsonProcessingException {
         return new HandlerRequestBuilder<>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.toString()))
                 .build();
     }
 
@@ -461,7 +461,7 @@ class FetchCristinOrganizationHandlerTest {
     }
 
     private InputStream requestUsingV20230526(Map<String, String> queryParameters) throws JsonProcessingException {
-        var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type(),
+        var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.toString(),
                              ACCEPT_HEADER_KEY_NAME, String.format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26));
         var pathParameters = Map.of(IDENTIFIER, SOME_IDENTIFIER);
         return new HandlerRequestBuilder<>(restApiMapper)
@@ -495,7 +495,7 @@ class FetchCristinOrganizationHandlerTest {
     private InputStream generateHandlerRequestWithoutDepth()
         throws JsonProcessingException {
 
-        var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.type());
+        var headers = Map.of(CONTENT_TYPE, MediaTypes.APPLICATION_JSON_LD.toString());
         var pathParameters = Map.of(IDENTIFIER, SOME_IDENTIFIER);
         var queryParams = Map.of(DEPTH, NONE);
 

@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import no.unit.nva.commons.json.JsonUtils;
 import nva.commons.apigateway.MediaTypes;
 import nva.commons.core.Environment;

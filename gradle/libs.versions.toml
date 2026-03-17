@@ -1,27 +1,28 @@
 [versions]
-apache-http-core5 = { strictly = '5.3.4' }
-awsLambdaCore = { strictly = '1.3.0' }
-awsSdk = { strictly = '1.12.787' }
-awsSdk2 = { strictly = '2.31.77' }
+apache-http-core5 = { strictly = '5.4.1' }
+awsLambdaCore = { strictly = '1.4.0' }
+awsSdk = { strictly = '1.12.797' }
+awsSdk2 = { strictly = '2.42.5' }
 bekkopen-nocommons = { strictly = '0.16.0' }
-com-auth0-jwks = { strictly = '0.22.2' }
-com-auth0-jwt = { strictly = '4.5.0' }
-guava = { strictly = '33.4.8-jre' }
+com-auth0-jwks = { strictly = '0.23.0' }
+com-auth0-jwt = { strictly = '4.5.1' }
+guava = { strictly = '33.5.0-jre' }
 hamcrest = { strictly = '3.0' }
-jackson = { strictly = '2.19.1' }
+jackson = { strictly = '2.21.1' }
+jackson-annotations = { strictly = '2.21' }
 json-assert = { strictly = '1.5.3' }
-jupiter = { strictly = '5.13.3' }
+jupiter = { strictly = '5.14.2' }
 karate-apache = { strictly = '0.9.6' }
 karate-core = { strictly = '1.3.1' }
 karate-junit5 = { strictly = '1.3.1' }
-log4j = { strictly = '2.25.0' }
-mockito = { strictly = '5.18.0' }
-nva-commons = { strictly = '2.2.9' }
+log4j = { strictly = '2.25.3' }
+mockito = { strictly = '5.22.0' }
+nva-commons = { strictly = '2.5.9' }
 nva-language = { strictly = '1.2.1' }
 resilience4j = '2.2.0'
 slf4j = { strictly = '2.0.17' }
 vavrVersion = '0.10.6'
-wiremock = { strictly = '3.13.1' }
+wiremock = { strictly = '4.0.0-beta.29' }
 zalandoProblem = { strictly = '0.27.1' }
 
 [libraries]
@@ -58,7 +59,7 @@ nva-lambdaauthorizer = { group = 'com.github.bibsysdev', name = 'lambdaauthorize
 
 jackson-core = { group = 'com.fasterxml.jackson.core', name = 'jackson-core', version.ref = 'jackson' }
 jackson-databind = { group = 'com.fasterxml.jackson.core', name = 'jackson-databind', version.ref = 'jackson' }
-jackson-annotations = { group = 'com.fasterxml.jackson.core', name = 'jackson-annotations', version.ref = 'jackson' }
+jackson-annotations = { group = 'com.fasterxml.jackson.core', name = 'jackson-annotations', version.ref = 'jackson-annotations' }
 jackson-datatype-jdk8 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jdk8', version.ref = 'jackson' }
 jackson-datatype-jsr310 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jsr310', version.ref = 'jackson' }
 
@@ -87,7 +88,8 @@ com-auth0-jwks = { group = 'com.auth0', name =  'jwks-rsa', version.ref= 'com-au
 
 aws-sdk2-urlconnection = { group = 'software.amazon.awssdk', name = 'url-connection-client', version.ref = 'awsSdk2' }
 
-wiremock = { group = 'org.wiremock', name = 'wiremock-jetty12', version.ref = 'wiremock' }
+wiremock = { group = 'org.wiremock', name = 'wiremock', version.ref = 'wiremock' }
+wiremock-junit5 = { group = 'org.wiremock', name = 'wiremock-junit5', version.ref = 'wiremock' }
 
 apache-http-core5 = { group = 'org.apache.httpcomponents.core5', name = 'httpcore5', version.ref = 'apache-http-core5' }
 

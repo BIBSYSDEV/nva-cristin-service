@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.fetch;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import java.util.List;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;

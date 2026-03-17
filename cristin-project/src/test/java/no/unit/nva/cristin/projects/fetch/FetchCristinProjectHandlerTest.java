@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.net.HttpHeaders;
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import java.net.http.HttpClient;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;

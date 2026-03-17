@@ -2,7 +2,7 @@ package no.unit.nva.cristin.person.update;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import java.util.Objects;
 import java.util.Optional;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;

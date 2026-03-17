@@ -178,7 +178,7 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     private InputStream generateHandlerDummyRequestWithIllegalQueryParameters() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                 .withQueryParameters(Map.of(INVALID_KEY, INVALID_VALUE))
                 .build();
@@ -186,7 +186,7 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     private InputStream generateHandlerDummyRequest() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                 .withQueryParameters(Map.of(PAGE, SAMPLE_PAGE))
                 .withQueryParameters(Map.of(NUMBER_OF_RESULTS, SAMPLE_RESULTS_SIZE))
@@ -196,7 +196,7 @@ class QueryCristinOrganizationProjectHandlerTest {
     private InputStream generateHandlerProRealisticRequest(Map<String, String> queryParametersMap)
             throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                 .withQueryParameters(queryParametersMap)
                 .build();
@@ -204,7 +204,7 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     private InputStream generateHandlerRequestWithoutOrganizationIdentifier() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .build();
     }
 

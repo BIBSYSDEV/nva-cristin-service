@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.person.create;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
 import no.unit.nva.common.IdCreatedLogger;
 import no.unit.nva.cristin.common.client.CristinAuthenticator;

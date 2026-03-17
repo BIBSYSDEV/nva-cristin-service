@@ -9,7 +9,7 @@ import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
 import no.unit.nva.common.IdCreatedLogger;
