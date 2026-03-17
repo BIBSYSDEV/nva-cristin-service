@@ -21,6 +21,7 @@ env:
   CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME: "Hello"
   CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE: "World"
   GRADLE_OPTS: "-Dorg.gradle.configuration-cache=false"
+  SAM_CLI_TELEMETRY: "0"
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -28,21 +29,19 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
-          python-version: "3.8"
+          python-version: "3.12"
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 21
           distribution: corretto
-      - name: Setup AWS SAM CLI
-        uses: aws-actions/setup-sam@v2
-        with:
-          use-installer: true
+      - name: Install AWS SAM CLI
+        run: pip install aws-sam-cli
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@master
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
           role-to-assume: arn:aws:iam::884807050265:role/nva-dev-github-actions-role
           aws-region: eu-west-1
