@@ -9,6 +9,7 @@ dependencies {
 
     implementation libs.google.guava
     implementation libs.aws.lambda.java.core
+    implementation libs.nva.apigateway
     implementation libs.nva.secrets
     implementation libs.nva.lambdaauthorizer
     implementation libs.aws.sdk2.core
@@ -31,7 +32,7 @@ dependencies {
     testFixturesImplementation libs.aws.sdk2.auth
     testFixturesImplementation libs.nva.json
     testFixturesImplementation libs.nva.core
-    testFixturesImplementation libs.nva.commons.apigateway
+    testFixturesImplementation libs.nva.apigateway
     testFixturesImplementation libs.jackson.databind
 
     implementation libs.nva.testutils

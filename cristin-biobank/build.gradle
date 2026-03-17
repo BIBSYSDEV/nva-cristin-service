@@ -2,6 +2,7 @@
 dependencies {
     implementation project(":cristin-commons")
     implementation libs.nva.json
+    implementation libs.nva.apigateway
     implementation libs.nva.core
     implementation libs.nva.language
     implementation libs.aws.lambda.java.core

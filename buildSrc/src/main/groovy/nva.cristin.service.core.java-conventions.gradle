@@ -12,7 +12,6 @@ repositories {
 }
 
 dependencies {
-    implementation libs.bundles.nvaCommons
     implementation libs.bundles.jackson
     implementation libs.slf4j.api
     testImplementation libs.bundles.testing
