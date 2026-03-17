@@ -15,7 +15,7 @@ import java.time.Duration;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.net.HttpHeaders.AUTHORIZATION;
+import static org.apache.hc.core5.http.HttpHeaders.AUTHORIZATION;
 import static java.net.http.HttpRequest.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;

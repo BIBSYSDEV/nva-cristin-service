@@ -5,7 +5,6 @@ awsSdk2 = { strictly = '2.42.5' }
 bekkopen-nocommons = { strictly = '0.16.0' }
 com-auth0-jwks = { strictly = '0.23.0' }
 com-auth0-jwt = { strictly = '4.5.1' }
-guava = { strictly = '33.5.0-jre' }
 hamcrest = { strictly = '3.0' }
 jackson = { strictly = '2.21.1' }
 jackson-annotations = { strictly = '2.21' }
@@ -60,7 +59,6 @@ jackson-datatype-jdk8 = { group = 'com.fasterxml.jackson.datatype', name = 'jack
 jackson-datatype-jsr310 = { group = 'com.fasterxml.jackson.datatype', name = 'jackson-datatype-jsr310', version.ref = 'jackson' }
 
 aws-lambda-java-core = { group = 'com.amazonaws', name = 'aws-lambda-java-core', version.ref = 'awsLambdaCore' }
-google-guava = { group = 'com.google.guava', name = 'guava', version.ref = 'guava' }
 
 aws-sdk2-core = { group = 'software.amazon.awssdk', name = 'sdk-core', version.ref = 'awsSdk2' }
 aws-sdk2-secrets = { group = 'software.amazon.awssdk', name = 'secretsmanager', version.ref = 'awsSdk2' }

@@ -4,10 +4,10 @@ plugins {
 }
 
 dependencies {
+    implementation libs.apache.http.core5
     implementation libs.nva.json
     implementation libs.nva.core
 
-    implementation libs.google.guava
     implementation libs.aws.lambda.java.core
     implementation libs.nva.apigateway
     implementation libs.nva.secrets

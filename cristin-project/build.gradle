@@ -1,6 +1,7 @@
 
 dependencies {
     implementation project(":cristin-commons")
+    implementation libs.apache.http.core5
     implementation libs.nva.json
     implementation libs.nva.apigateway
     implementation libs.nva.core
@@ -9,7 +10,6 @@ dependencies {
     implementation libs.nva.language
     implementation libs.aws.sdk2.core
     implementation libs.aws.sdk2.cognitoidp
-    implementation libs.google.guava
     implementation libs.aws.lambda.java.core
 
     testImplementation libs.karate.core

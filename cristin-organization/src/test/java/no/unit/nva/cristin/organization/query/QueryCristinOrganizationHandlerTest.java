@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.net.HttpHeaders;
+import org.apache.hc.core5.http.HttpHeaders;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Stream;
@@ -43,7 +43,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.Map;
 
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static org.apache.hc.core5.http.HttpHeaders.CONTENT_TYPE;
 import static nva.commons.apigateway.MediaType.JSON_UTF_8;
 import static java.lang.String.format;
 import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
