@@ -1,9 +1,9 @@
 dependencies {
     implementation project(":cristin-commons")
+    implementation libs.aws.lambda.java.core
     implementation libs.aws.sdk2.s3
     implementation libs.vavr
     implementation libs.resilience4j.all
-    implementation libs.nva.apigateway
     implementation libs.nva.core
     implementation libs.nva.json
 

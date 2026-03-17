@@ -8,20 +8,11 @@ dependencies {
     implementation libs.nva.json
     implementation libs.nva.core
 
-    implementation libs.aws.lambda.java.core
     implementation libs.nva.apigateway
     implementation libs.nva.secrets
-    implementation libs.nva.lambdaauthorizer
     implementation libs.aws.sdk2.core
-    implementation libs.aws.sdk2.secrets
     implementation libs.nva.language
 
-
-    implementation libs.com.auth0.jwt
-    implementation libs.com.auth0.jwks
-
-    testImplementation libs.karate.core
-    testImplementation libs.karate.junit5
     testImplementation libs.nva.logutils
     testImplementation libs.log4j.core
     testImplementation libs.mockito.core

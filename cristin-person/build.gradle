@@ -4,12 +4,9 @@ dependencies {
     implementation libs.apache.http.core5
     implementation libs.nva.json
     implementation libs.aws.lambda.java.core
-    implementation libs.nva.logutils
     implementation libs.nva.core
     implementation libs.nva.apigateway
     implementation libs.bekkopen.nocommons
-
-    implementation libs.aws.sdk2.cognitoidp
 
     testImplementation(testFixtures(project(":cristin-commons")))
     testImplementation project(":cristin-testing")
