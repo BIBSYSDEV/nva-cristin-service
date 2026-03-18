@@ -11,12 +11,6 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-dependencies {
-    implementation libs.bundles.jackson
-    implementation libs.slf4j.api
-    testImplementation libs.bundles.testing
-}
-
 sourceSets {
     test {
         resources {

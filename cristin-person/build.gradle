@@ -1,21 +1,28 @@
 
 dependencies {
-    implementation project(":cristin-commons")
-    implementation libs.apache.http.core5
-    implementation libs.nva.json
-    implementation libs.aws.lambda.java.core
-    implementation libs.nva.core
-    implementation libs.nva.apigateway
     implementation libs.bekkopen.nocommons
-
-    testImplementation(testFixtures(project(":cristin-commons")))
-    testImplementation project(":cristin-testing")
-
+    implementation nvaCatalog.aws.lambda.core
+    implementation nvaCatalog.httpclient5
+    implementation nvaCatalog.jackson.annotations
+    implementation nvaCatalog.jackson.databind
+    implementation nvaLibs.apigateway
+    implementation nvaLibs.core
+    implementation nvaLibs.json
+    implementation project(":cristin-commons")
+    testImplementation libs.json.assert
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
-    testImplementation libs.json.assert
-    testImplementation libs.nva.logutils
-    testImplementation libs.log4j.core
+    testImplementation nvaCatalog.hamcrest
+    testImplementation nvaCatalog.junit.jupiter.api
+    testImplementation nvaCatalog.junit.jupiter.engine
+    testImplementation nvaCatalog.junit.jupiter.params
+    testImplementation nvaCatalog.log4j.core
+    testImplementation nvaCatalog.mockito.core
+    testImplementation nvaCatalog.zalando
+    testImplementation nvaLibs.logutils
+    testImplementation nvaLibs.testutils
+    testImplementation project(":cristin-testing")
+    testImplementation(testFixtures(project(":cristin-commons")))
 }
 
 tasks.named('test', Test) {

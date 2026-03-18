@@ -4,36 +4,36 @@ plugins {
 }
 
 dependencies {
-    implementation libs.apache.http.core5
-    implementation libs.nva.json
-    implementation libs.nva.core
-
-    implementation libs.nva.apigateway
-    implementation libs.nva.secrets
-    implementation libs.aws.sdk2.core
+    implementation libs.aws.sdk2.spi
     implementation libs.nva.language
-
-    testImplementation libs.nva.logutils
-    testImplementation libs.log4j.core
-    testImplementation libs.mockito.core
-
+    implementation libs.resilience4j.all
+    implementation libs.vavr
+    implementation nvaCatalog.aws.sdk2.core
+    implementation nvaCatalog.httpclient5
+    implementation nvaCatalog.jackson.core
+    implementation nvaCatalog.jackson.databind
+    implementation nvaCatalog.slf4j.api
+    implementation nvaLibs.apigateway
+    implementation nvaLibs.core
+    implementation nvaLibs.json
+    implementation nvaLibs.secrets
+    testFixturesImplementation libs.aws.sdk2.auth
     testFixturesImplementation libs.aws.sdk2.cognitoidp
     testFixturesImplementation libs.aws.sdk2.regions
     testFixturesImplementation libs.aws.sdk2.urlconnection
-    testFixturesImplementation libs.aws.sdk2.auth
-    testFixturesImplementation libs.nva.json
-    testFixturesImplementation libs.nva.core
-    testFixturesImplementation libs.nva.apigateway
-    testFixturesImplementation libs.jackson.databind
-
-    testImplementation libs.nva.testutils
-    implementation libs.aws.sdk2.awscore
-    implementation libs.aws.sdk2.spi
-    implementation libs.apache.http.core5
-
-    implementation libs.vavr
-    implementation libs.resilience4j.all
-
+    testFixturesImplementation nvaCatalog.jackson.databind
+    testFixturesImplementation nvaLibs.apigateway
+    testFixturesImplementation nvaLibs.core
+    testFixturesImplementation nvaLibs.json
+    testImplementation nvaCatalog.hamcrest
+    testImplementation nvaCatalog.junit.jupiter.api
+    testImplementation nvaCatalog.junit.jupiter.engine
+    testImplementation nvaCatalog.junit.jupiter.params
+    testImplementation nvaCatalog.log4j.core
+    testImplementation nvaCatalog.mockito.core
+    testImplementation nvaCatalog.zalando
+    testImplementation nvaLibs.logutils
+    testImplementation nvaLibs.testutils
 }
 tasks.named('test', Test) {
     useJUnitPlatform {

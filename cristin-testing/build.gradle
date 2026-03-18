@@ -1,5 +1,4 @@
 dependencies {
+    implementation nvaLibs.core
     implementation project(":cristin-commons")
-
-    implementation libs.nva.core
 }
