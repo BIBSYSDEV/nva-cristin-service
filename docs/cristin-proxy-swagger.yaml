@@ -3430,9 +3430,9 @@ components:
           description: Person NVI data
           properties:
             verifiedBy:
-              $ref: '#/components/schemas/Id'
+              $ref: '#/components/schemas/PersonSummary'
             verifiedAt:
-              $ref: '#/components/schemas/Id'
+              $ref: '#/components/schemas/Organization'
         contactDetails:
           type: object
           description: Contact information
@@ -3593,9 +3593,9 @@ components:
           description: Person NVI data
           properties:
             verifiedBy:
-              $ref: '#/components/schemas/Id'
+              $ref: '#/components/schemas/PersonSummary'
             verifiedAt:
-              $ref: '#/components/schemas/Id'
+              $ref: '#/components/schemas/Organization'
         contactDetails:
           type: object
           description: Contact information
