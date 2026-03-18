@@ -22,7 +22,6 @@ dependencies {
     testImplementation nvaCatalog.wiremock
     testImplementation nvaCatalog.wiremock.junit5
     testImplementation nvaCatalog.zalando
-    testImplementation nvaLibs.logutils
     testImplementation nvaLibs.testutils
     testImplementation project(":cristin-testing")
     testImplementation(testFixtures(project(":cristin-commons")))

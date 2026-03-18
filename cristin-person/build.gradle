@@ -5,9 +5,11 @@ plugins {
 dependencies {
     implementation libs.bekkopen.nocommons
     implementation nvaCatalog.aws.lambda.core
-    implementation nvaCatalog.httpclient5
+    implementation nvaCatalog.httpcore5
     implementation nvaCatalog.jackson.annotations
+    implementation nvaCatalog.jackson.core
     implementation nvaCatalog.jackson.databind
+    implementation nvaCatalog.slf4j.api
     implementation nvaLibs.apigateway
     implementation nvaLibs.core
     implementation nvaLibs.json
@@ -16,11 +18,14 @@ dependencies {
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
     testImplementation nvaCatalog.hamcrest
+    testImplementation nvaCatalog.httpcore5
+    testImplementation nvaCatalog.jackson.core
     testImplementation nvaCatalog.junit.jupiter.api
     testImplementation nvaCatalog.junit.jupiter.engine
     testImplementation nvaCatalog.junit.jupiter.params
     testImplementation nvaCatalog.log4j.core
     testImplementation nvaCatalog.mockito.core
+    testImplementation nvaCatalog.slf4j.api
     testImplementation nvaCatalog.zalando
     testImplementation nvaLibs.logutils
     testImplementation nvaLibs.testutils

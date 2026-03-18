@@ -5,10 +5,11 @@ plugins {
 dependencies {
     implementation libs.aws.sdk2.spi
     implementation libs.nva.language
-    implementation libs.resilience4j.all
+    implementation libs.resilience4j.retry
     implementation libs.vavr
     implementation nvaCatalog.aws.sdk2.core
-    implementation nvaCatalog.httpclient5
+    implementation nvaCatalog.httpcore5
+    implementation nvaCatalog.jackson.annotations
     implementation nvaCatalog.jackson.core
     implementation nvaCatalog.jackson.databind
     implementation nvaCatalog.slf4j.api
@@ -18,6 +19,7 @@ dependencies {
     implementation nvaLibs.secrets
     testFixturesImplementation libs.aws.sdk2.auth
     testFixturesImplementation libs.aws.sdk2.cognitoidp
+    testFixturesImplementation libs.aws.sdk2.core
     testFixturesImplementation libs.aws.sdk2.regions
     testFixturesImplementation libs.aws.sdk2.urlconnection
     testFixturesImplementation nvaCatalog.jackson.databind
@@ -30,7 +32,6 @@ dependencies {
     testImplementation nvaCatalog.junit.jupiter.params
     testImplementation nvaCatalog.log4j.core
     testImplementation nvaCatalog.mockito.core
-    testImplementation nvaCatalog.zalando
     testImplementation nvaLibs.logutils
     testImplementation nvaLibs.testutils
 }
