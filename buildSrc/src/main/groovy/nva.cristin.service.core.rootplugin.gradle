@@ -3,6 +3,7 @@ plugins{
     id 'jacoco-report-aggregation'
     id 'com.github.ben-manes.versions'
     id 'com.autonomousapps.dependency-analysis'
+    id 'io.github.michael-nestler.spectral'
 }
 
 repositories {
@@ -45,4 +46,9 @@ tasks.named('dependencyUpdates') {
         // Don't suggest upgrading from a stable version to a non-stable version
         isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
     }
+}
+
+spectral {
+    documents.from("docs/*.yaml")
+    ruleset.set(file('.spectral.yaml'))
 }

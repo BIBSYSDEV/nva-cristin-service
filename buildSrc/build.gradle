@@ -12,6 +12,7 @@ dependencies {
     implementation group: 'org.jacoco', name: 'org.jacoco.report', version: '0.8.14'
     implementation group: 'com.diffplug.spotless', name: 'spotless-plugin-gradle', version: '8.3.0'
     implementation group: 'com.autonomousapps', name: 'dependency-analysis-gradle-plugin', version: '3.6.1'
+    implementation group: 'io.github.michael-nestler', name: 'gradle-spectral', version: '0.2.0-0'
 }
 
 group 'no.unit.nva'
