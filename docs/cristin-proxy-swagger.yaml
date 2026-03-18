@@ -5064,8 +5064,10 @@ components:
           no: 'Min bakgrunn som forsker'
           en: 'null'
         nvi:
-          verifiedBy: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
-          verifiedAt: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+          verifiedBy:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+          verifiedAt:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
         contactDetails:
           telephone: '+4799885566'
           email: 'example@email.org'
@@ -5115,8 +5117,10 @@ components:
           no: 'Min bakgrunn som forsker'
           en: 'My history as a researcher'
         nvi:
-          verifiedBy: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
-          verifiedAt: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
+          verifiedBy:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/person/12345'
+          verifiedAt:
+            id: 'https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0'
         contactDetails:
           telephone: '+4799885566'
           email: 'example@email.org'
