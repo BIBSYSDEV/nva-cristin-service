@@ -1,5 +1,8 @@
-dependencies {
-    implementation project(":cristin-commons")
+plugins {
+    id 'nva.cristin.service.core.java-conventions'
+}
 
-    implementation libs.nva.core
+dependencies {
+    implementation nvaLibs.core
+    implementation project(":cristin-commons")
 }
