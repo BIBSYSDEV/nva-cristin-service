@@ -8,6 +8,7 @@ import static no.unit.nva.cristin.model.Constants.INSTITUTION_PATH;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import no.unit.nva.cristin.common.client.ApiClient;
@@ -18,40 +19,44 @@ import nva.commons.core.paths.UriWrapper;
 
 public class FetchPersonInstitutionInfoClient extends ApiClient {
 
-    public FetchPersonInstitutionInfoClient(HttpClient client) {
-        super(client);
-    }
+  public FetchPersonInstitutionInfoClient(HttpClient client) {
+    super(client);
+  }
 
-    /**
-     * Fetches Cristin data from upstream into response object serialized to client.
-     */
-    public PersonInstitutionInfo generateGetResponse(String personId, String institutionId) throws ApiGatewayException {
-        var id = generateIdUri(personId, institutionId);
-        return fetchCristinData(personId, institutionId).toPersonInstitutionInfo(id);
-    }
+  /** Fetches Cristin data from upstream into response object serialized to client. */
+  public PersonInstitutionInfo generateGetResponse(String personId, String institutionId)
+      throws ApiGatewayException {
+    var id = generateIdUri(personId, institutionId);
+    return fetchCristinData(personId, institutionId).toPersonInstitutionInfo(id);
+  }
 
-    private CristinPersonInstitutionInfo fetchCristinData(String personId, String orgId)
-        throws ApiGatewayException {
+  private CristinPersonInstitutionInfo fetchCristinData(String personId, String orgId)
+      throws ApiGatewayException {
 
-        var cristinUri = generateCristinUri(personId, orgId);
-        var response = fetchGetResult(cristinUri);
-        var idUri = generateIdUri(personId, orgId);
-        checkHttpStatusCode(idUri, response.statusCode(), response.body());
+    var cristinUri = generateCristinUri(personId, orgId);
+    var response = fetchGetResult(cristinUri);
+    var idUri = generateIdUri(personId, orgId);
+    checkHttpStatusCode(idUri, response.statusCode(), response.body());
 
-        return getDeserializedResponse(response, CristinPersonInstitutionInfo.class);
-    }
+    return getDeserializedResponse(response, CristinPersonInstitutionInfo.class);
+  }
 
-    private URI generateCristinUri(String personId, String orgId) {
-        return UriWrapper.fromUri(CRISTIN_API_URL)
-            .addChild(PERSON_PATH).addChild(personId)
-            .addChild(INSTITUTION_PATH).addChild(orgId)
-            .getUri();
-    }
+  private URI generateCristinUri(String personId, String orgId) {
+    return UriWrapper.fromUri(CRISTIN_API_URL)
+        .addChild(PERSON_PATH)
+        .addChild(personId)
+        .addChild(INSTITUTION_PATH)
+        .addChild(orgId)
+        .getUri();
+  }
 
-    private URI generateIdUri(String personId, String orgId) {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH)
-            .addChild(PERSON_PATH_NVA).addChild(personId)
-            .addChild(ORGANIZATION_PATH).addChild(orgId)
-            .getUri();
-    }
+  private URI generateIdUri(String personId, String orgId) {
+    return new UriWrapper(HTTPS, DOMAIN_NAME)
+        .addChild(BASE_PATH)
+        .addChild(PERSON_PATH_NVA)
+        .addChild(personId)
+        .addChild(ORGANIZATION_PATH)
+        .addChild(orgId)
+        .getUri();
+  }
 }

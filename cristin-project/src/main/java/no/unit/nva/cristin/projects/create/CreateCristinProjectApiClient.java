@@ -5,6 +5,7 @@ import static no.unit.nva.cristin.model.Constants.PROJECTS_PATH;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,48 +23,47 @@ import nva.commons.core.paths.UriWrapper;
 
 public class CreateCristinProjectApiClient extends PostApiClient {
 
-    public static final ObjectMapper OBJECT_MAPPER_NON_EMPTY = JsonUtils.dynamoObjectMapper;
+  public static final ObjectMapper OBJECT_MAPPER_NON_EMPTY = JsonUtils.dynamoObjectMapper;
 
-    public CreateCristinProjectApiClient(HttpClient client) {
-        super(client);
-    }
+  public CreateCristinProjectApiClient(HttpClient client) {
+    super(client);
+  }
 
-    /**
-     * Used for creating a person in Cristin from the supplied Person object.
-     */
-    public NvaProject createProjectInCristin(NvaProject nvaProject) throws ApiGatewayException {
-        var payload = generatePayloadFromRequest(nvaProject);
-        var uri = getCristinProjectPostUri();
-        var response = post(uri, payload);
-        checkPostHttpStatusCode(getNvaApiUri(PROJECT_PATH_NVA), response.statusCode(), response.body());
-        return createProjectFromResponse(response);
-    }
+  /** Used for creating a person in Cristin from the supplied Person object. */
+  public NvaProject createProjectInCristin(NvaProject nvaProject) throws ApiGatewayException {
+    var payload = generatePayloadFromRequest(nvaProject);
+    var uri = getCristinProjectPostUri();
+    var response = post(uri, payload);
+    checkPostHttpStatusCode(getNvaApiUri(PROJECT_PATH_NVA), response.statusCode(), response.body());
+    return createProjectFromResponse(response);
+  }
 
-    private String generatePayloadFromRequest(NvaProject nvaProject) {
-        var cristinProject = nvaProject.toCristinProject();
-        removeFieldsNotSupportedByPost(cristinProject);
-        return attempt(() -> OBJECT_MAPPER_NON_EMPTY.writeValueAsString(cristinProject)).orElseThrow();
-    }
+  private String generatePayloadFromRequest(NvaProject nvaProject) {
+    var cristinProject = nvaProject.toCristinProject();
+    removeFieldsNotSupportedByPost(cristinProject);
+    return attempt(() -> OBJECT_MAPPER_NON_EMPTY.writeValueAsString(cristinProject)).orElseThrow();
+  }
 
-    private void removeFieldsNotSupportedByPost(CristinProject cristinProject) {
-        cristinProject.setProjectCategories(removeLabels(cristinProject.getProjectCategories()));
-        cristinProject.setKeywords(removeLabels(cristinProject.getKeywords()));
-    }
+  private void removeFieldsNotSupportedByPost(CristinProject cristinProject) {
+    cristinProject.setProjectCategories(removeLabels(cristinProject.getProjectCategories()));
+    cristinProject.setKeywords(removeLabels(cristinProject.getKeywords()));
+  }
 
-    private List<CristinTypedLabel> removeLabels(List<CristinTypedLabel> typedLabels) {
-        return typedLabels.stream()
-                   .map(category -> new CristinTypedLabel(category.getCode(), null))
-                   .collect(Collectors.toList());
-    }
+  private List<CristinTypedLabel> removeLabels(List<CristinTypedLabel> typedLabels) {
+    return typedLabels.stream()
+        .map(category -> new CristinTypedLabel(category.getCode(), null))
+        .collect(Collectors.toList());
+  }
 
-    private URI getCristinProjectPostUri() {
-        return UriWrapper.fromUri(CRISTIN_API_URL).addChild(PROJECTS_PATH).getUri();
-    }
+  private URI getCristinProjectPostUri() {
+    return UriWrapper.fromUri(CRISTIN_API_URL).addChild(PROJECTS_PATH).getUri();
+  }
 
-    private NvaProject createProjectFromResponse(HttpResponse<String> response) throws BadGatewayException {
-        var cristinProject = getDeserializedResponse(response, CristinProject.class);
-        var nvaProject = cristinProject.toNvaProject();
-        nvaProject.setContext(NvaProject.PROJECT_CONTEXT);
-        return nvaProject;
-    }
+  private NvaProject createProjectFromResponse(HttpResponse<String> response)
+      throws BadGatewayException {
+    var cristinProject = getDeserializedResponse(response, CristinProject.class);
+    var nvaProject = cristinProject.toNvaProject();
+    nvaProject.setContext(NvaProject.PROJECT_CONTEXT);
+    return nvaProject;
+  }
 }

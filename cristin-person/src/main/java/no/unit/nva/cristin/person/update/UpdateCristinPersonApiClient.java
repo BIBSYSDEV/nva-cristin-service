@@ -6,6 +6,7 @@ import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -15,46 +16,51 @@ import nva.commons.core.paths.UriWrapper;
 
 public class UpdateCristinPersonApiClient extends PatchApiClient {
 
-    public UpdateCristinPersonApiClient(HttpClient client) {
-        super(client);
-    }
+  public UpdateCristinPersonApiClient(HttpClient client) {
+    super(client);
+  }
 
-    /**
-     * Updates a person in Cristin.
-     *
-     * @return An empty json if update was successful
-     * @throws ApiGatewayException if something went wrong that can be mapped to a client response
-     */
-    public Void updatePersonInCristin(String personId, ObjectNode request) throws ApiGatewayException {
-        var uri = generateCristinUri(personId);
-        var response = patch(uri, request.toString());
-        checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode(), response.body());
+  /**
+   * Updates a person in Cristin.
+   *
+   * @return An empty json if update was successful
+   * @throws ApiGatewayException if something went wrong that can be mapped to a client response
+   */
+  public Void updatePersonInCristin(String personId, ObjectNode request)
+      throws ApiGatewayException {
+    var uri = generateCristinUri(personId);
+    var response = patch(uri, request.toString());
+    checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode(), response.body());
 
-        return null;
-    }
+    return null;
+  }
 
-    /**
-     * Updates a person in Cristin. Specifies client's Cristin organization consisting of first number sequence as
-     * param.
-     *
-     * @return An empty json if update was successful
-     * @throws ApiGatewayException if something went wrong that can be mapped to a client response
-     */
-    public Void updatePersonInCristin(String personId, ObjectNode request, String cristinInstitutionNumber)
-        throws ApiGatewayException {
-        var uri = generateCristinUri(personId);
-        var response = patch(uri, request.toString(), cristinInstitutionNumber);
-        checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode(), response.body());
+  /**
+   * Updates a person in Cristin. Specifies client's Cristin organization consisting of first number
+   * sequence as param.
+   *
+   * @return An empty json if update was successful
+   * @throws ApiGatewayException if something went wrong that can be mapped to a client response
+   */
+  public Void updatePersonInCristin(
+      String personId, ObjectNode request, String cristinInstitutionNumber)
+      throws ApiGatewayException {
+    var uri = generateCristinUri(personId);
+    var response = patch(uri, request.toString(), cristinInstitutionNumber);
+    checkPatchHttpStatusCode(generateIdUri(personId), response.statusCode(), response.body());
 
-        return null;
-    }
+    return null;
+  }
 
-    private URI generateCristinUri(String personId) {
-        return  UriWrapper.fromUri(CRISTIN_API_URL).addChild(PERSON_PATH).addChild(personId).getUri();
-    }
+  private URI generateCristinUri(String personId) {
+    return UriWrapper.fromUri(CRISTIN_API_URL).addChild(PERSON_PATH).addChild(personId).getUri();
+  }
 
-    private URI generateIdUri(String personId) {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH).addChild(PERSON_PATH_NVA).addChild(personId)
-            .getUri();
-    }
+  private URI generateIdUri(String personId) {
+    return new UriWrapper(HTTPS, DOMAIN_NAME)
+        .addChild(BASE_PATH)
+        .addChild(PERSON_PATH_NVA)
+        .addChild(personId)
+        .getUri();
+  }
 }

@@ -4,6 +4,5 @@ import java.net.URI;
 
 public interface UriId {
 
-    URI getId();
-
+  URI getId();
 }

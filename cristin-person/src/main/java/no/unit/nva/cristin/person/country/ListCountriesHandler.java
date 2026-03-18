@@ -1,50 +1,51 @@
 package no.unit.nva.cristin.person.country;
 
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
+
 import com.amazonaws.services.lambda.runtime.Context;
-import nva.commons.apigateway.MediaType;
 import java.net.HttpURLConnection;
 import java.util.List;
 import no.unit.nva.cristin.person.model.nva.Countries;
 import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.apigateway.MediaType;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 
 public class ListCountriesHandler extends ApiGatewayHandler<Void, Countries> {
 
-    private final ListCountriesApiClient apiClient;
+  private final ListCountriesApiClient apiClient;
 
-    @SuppressWarnings("unused")
-    public ListCountriesHandler() {
-        this(new Environment(), new ListCountriesApiClient());
-    }
+  @SuppressWarnings("unused")
+  public ListCountriesHandler() {
+    this(new Environment(), new ListCountriesApiClient());
+  }
 
-    public ListCountriesHandler(Environment environment, ListCountriesApiClient apiClient) {
-        super(Void.class, environment);
-        this.apiClient = apiClient;
-    }
+  public ListCountriesHandler(Environment environment, ListCountriesApiClient apiClient) {
+    super(Void.class, environment);
+    this.apiClient = apiClient;
+  }
 
-    @Override
-    protected Countries processInput(Void input, RequestInfo requestInfo, Context context)
-        throws ApiGatewayException {
+  @Override
+  protected Countries processInput(Void input, RequestInfo requestInfo, Context context)
+      throws ApiGatewayException {
 
-        return apiClient.executeRequest();
-    }
+    return apiClient.executeRequest();
+  }
 
-    @Override
-    protected Integer getSuccessStatusCode(Void input, Countries output) {
-        return HttpURLConnection.HTTP_OK;
-    }
+  @Override
+  protected Integer getSuccessStatusCode(Void input, Countries output) {
+    return HttpURLConnection.HTTP_OK;
+  }
 
-    @Override
-    protected List<MediaType> listSupportedMediaTypes() {
-        return DEFAULT_RESPONSE_MEDIA_TYPES;
-    }
+  @Override
+  protected List<MediaType> listSupportedMediaTypes() {
+    return DEFAULT_RESPONSE_MEDIA_TYPES;
+  }
 
-    @Override
-    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        // no-op
-    }
-
+  @Override
+  protected void validateRequest(Void input, RequestInfo requestInfo, Context context)
+      throws ApiGatewayException {
+    // no-op
+  }
 }

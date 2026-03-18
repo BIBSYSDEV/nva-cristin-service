@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.net.URI;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,27 +14,27 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class UriUtilsTest {
 
-    public static final String URI_WITH_INVALID_ENCODING =
-        "https://api.nva.no/?name=t%EF%BF%BDrresen&lang=en%2Cnb%2Cnn";
-    public static final String INVALID_ENCODING = "%EF%BF%BD";
+  public static final String URI_WITH_INVALID_ENCODING =
+      "https://api.nva.no/?name=t%EF%BF%BDrresen&lang=en%2Cnb%2Cnn";
+  public static final String INVALID_ENCODING = "%EF%BF%BD";
 
-    @ParameterizedTest()
-    @ValueSource(strings = {"https://api.nva.no/?name=tørresen", "https://api.nva.no/?name=t%C3%B8rresen"})
-    void shouldNotBreakEncodingWhenAddingLanguagesToUri(String value) {
-        var uri = URI.create(value);
-        var uriWithLanguage = addLanguage(uri);
+  @ParameterizedTest()
+  @ValueSource(
+      strings = {"https://api.nva.no/?name=tørresen", "https://api.nva.no/?name=t%C3%B8rresen"})
+  void shouldNotBreakEncodingWhenAddingLanguagesToUri(String value) {
+    var uri = URI.create(value);
+    var uriWithLanguage = addLanguage(uri);
 
-        assertThat(uriWithLanguage.toString(), not(equalTo(URI_WITH_INVALID_ENCODING)));
-        assertThat(uriWithLanguage.toString(), not(containsString(INVALID_ENCODING)));
-    }
+    assertThat(uriWithLanguage.toString(), not(equalTo(URI_WITH_INVALID_ENCODING)));
+    assertThat(uriWithLanguage.toString(), not(containsString(INVALID_ENCODING)));
+  }
 
-    @Test
-    void shouldMaskPersonalDataFromUris() {
-        var uri = URI.create("https://example.org/?national_id=12345612345");
-        var expected = "https://example.org/?national_id=XXXXXXXXX45";
-        var actual = maskSensitiveData(uri);
+  @Test
+  void shouldMaskPersonalDataFromUris() {
+    var uri = URI.create("https://example.org/?national_id=12345612345");
+    var expected = "https://example.org/?national_id=XXXXXXXXX45";
+    var actual = maskSensitiveData(uri);
 
-        assertThat(actual, containsString(expected));
-    }
-
+    assertThat(actual, containsString(expected));
+  }
 }

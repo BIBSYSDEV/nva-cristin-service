@@ -6,10 +6,9 @@ import org.junit.jupiter.api.Tag;
 @Tag("karateTest")
 public class PersonQueryKarateRunnerIT {
 
-    // Also runs tests in subdirectories
-    @Karate.Test
-    Karate runKarateFeatures() {
-        return Karate.run().relativeTo(getClass());
-    }
-
+  // Also runs tests in subdirectories
+  @Karate.Test
+  Karate runKarateFeatures() {
+    return Karate.run().relativeTo(getClass());
+  }
 }

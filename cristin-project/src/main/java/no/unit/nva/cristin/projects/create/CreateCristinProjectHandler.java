@@ -1,111 +1,110 @@
 package no.unit.nva.cristin.projects.create;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import nva.commons.apigateway.MediaType;
-import no.unit.nva.common.IdCreatedLogger;
-import no.unit.nva.validation.Validator;
-import no.unit.nva.cristin.common.client.CristinAuthenticator;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.access.HandlerAccessCheck;
-import nva.commons.apigateway.ApiGatewayHandler;
-import nva.commons.apigateway.RequestInfo;
-import nva.commons.apigateway.RestRequestHandler;
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-import nva.commons.apigateway.exceptions.ForbiddenException;
-import nva.commons.core.Environment;
-
-import java.net.HttpURLConnection;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 
+import com.amazonaws.services.lambda.runtime.Context;
+import java.net.HttpURLConnection;
+import java.util.List;
+import no.unit.nva.access.HandlerAccessCheck;
+import no.unit.nva.common.IdCreatedLogger;
+import no.unit.nva.cristin.common.client.CristinAuthenticator;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.validation.Validator;
+import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.apigateway.MediaType;
+import nva.commons.apigateway.RequestInfo;
+import nva.commons.apigateway.RestRequestHandler;
+import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.ForbiddenException;
+import nva.commons.core.Environment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CreateCristinProjectHandler extends ApiGatewayHandler<NvaProject, NvaProject> {
 
-    private static final Logger logger = LoggerFactory.getLogger(CreateCristinProjectHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(CreateCristinProjectHandler.class);
 
-    private final transient CreateCristinProjectApiClient apiClient;
+  private final transient CreateCristinProjectApiClient apiClient;
 
-    /**
-     * Create CreateCristinProjectHandler with default authenticated HttpClient.
-     */
-    @SuppressWarnings("unused")
-    public CreateCristinProjectHandler() {
-        this(new CreateCristinProjectApiClient(CristinAuthenticator.getHttpClient()), new Environment());
+  /** Create CreateCristinProjectHandler with default authenticated HttpClient. */
+  @SuppressWarnings("unused")
+  public CreateCristinProjectHandler() {
+    this(
+        new CreateCristinProjectApiClient(CristinAuthenticator.getHttpClient()), new Environment());
+  }
+
+  /**
+   * Create CreateCristinProjectHandler with supplied HttpClient.
+   *
+   * @param apiClient HttpClient to use for access external services
+   * @param environment configuration for service
+   */
+  public CreateCristinProjectHandler(
+      CreateCristinProjectApiClient apiClient, Environment environment) {
+    super(NvaProject.class, environment);
+    this.apiClient = apiClient;
+  }
+
+  /**
+   * Implements the main logic of the handler. Any exception thrown by this method will be handled
+   * by {@link RestRequestHandler#handleExpectedException} method.
+   *
+   * @param input The input object to the method. Usually a deserialized json.
+   * @param requestInfo Request headers and path.
+   * @param context the ApiGateway context.
+   * @return the Response body that is going to be serialized in json
+   * @throws ApiGatewayException all exceptions are caught by writeFailure and mapped to error codes
+   *     through the method {@link RestRequestHandler#getFailureStatusCode}
+   */
+  @Override
+  protected NvaProject processInput(NvaProject input, RequestInfo requestInfo, Context context)
+      throws ApiGatewayException {
+
+    HandlerAccessCheck handlerAccessCheck = new CreateProjectHandlerAccessCheck();
+    handlerAccessCheck.verifyAccess(requestInfo);
+
+    if (!handlerAccessCheck.isVerified()) {
+      throw new ForbiddenException();
     }
 
-    /**
-     * Create CreateCristinProjectHandler with supplied HttpClient.
-     *
-     * @param apiClient   HttpClient to use for access external services
-     * @param environment configuration for service
-     */
-    public CreateCristinProjectHandler(CreateCristinProjectApiClient apiClient, Environment environment) {
-        super(NvaProject.class, environment);
-        this.apiClient = apiClient;
-    }
+    logger.info(
+        LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
+    Validator<NvaProject> validator = new CreateCristinProjectValidator();
+    validator.validate(input);
+    addCreatorDataToInput(input, requestInfo);
 
-    /**
-     * Implements the main logic of the handler. Any exception thrown by this method will be handled by {@link
-     * RestRequestHandler#handleExpectedException} method.
-     *
-     * @param input       The input object to the method. Usually a deserialized json.
-     * @param requestInfo Request headers and path.
-     * @param context     the ApiGateway context.
-     * @return the Response body that is going to be serialized in json
-     * @throws ApiGatewayException all exceptions are caught by writeFailure and mapped to error codes through the
-     *                             method {@link RestRequestHandler#getFailureStatusCode}
-     */
-    @Override
-    protected NvaProject processInput(NvaProject input, RequestInfo requestInfo, Context context)
-            throws ApiGatewayException {
+    return apiClient.createProjectInCristin(input);
+  }
 
-        HandlerAccessCheck handlerAccessCheck = new CreateProjectHandlerAccessCheck();
-        handlerAccessCheck.verifyAccess(requestInfo);
+  private void addCreatorDataToInput(NvaProject input, RequestInfo requestInfo) {
+    var creator = new ProjectCreatorAppender(requestInfo).getCreator();
+    input.setCreator(creator);
+  }
 
-        if (!handlerAccessCheck.isVerified()) {
-            throw new ForbiddenException();
-        }
+  /**
+   * Define the success status code.
+   *
+   * @param input The request input.
+   * @param output The response output
+   * @return the success status code.
+   */
+  @Override
+  protected Integer getSuccessStatusCode(NvaProject input, NvaProject output) {
+    new IdCreatedLogger().logId(output);
 
-        logger.info(LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
-        Validator<NvaProject> validator = new CreateCristinProjectValidator();
-        validator.validate(input);
-        addCreatorDataToInput(input, requestInfo);
+    return HttpURLConnection.HTTP_CREATED;
+  }
 
-        return apiClient.createProjectInCristin(input);
-    }
+  @Override
+  protected List<MediaType> listSupportedMediaTypes() {
+    return DEFAULT_RESPONSE_MEDIA_TYPES;
+  }
 
-    private void addCreatorDataToInput(NvaProject input, RequestInfo requestInfo) {
-        var creator = new ProjectCreatorAppender(requestInfo).getCreator();
-        input.setCreator(creator);
-    }
-
-    /**
-     * Define the success status code.
-     *
-     * @param input  The request input.
-     * @param output The response output
-     * @return the success status code.
-     */
-    @Override
-    protected Integer getSuccessStatusCode(NvaProject input, NvaProject output) {
-        new IdCreatedLogger().logId(output);
-
-        return HttpURLConnection.HTTP_CREATED;
-    }
-
-    @Override
-    protected List<MediaType> listSupportedMediaTypes() {
-        return DEFAULT_RESPONSE_MEDIA_TYPES;
-    }
-
-    @Override
-    protected void validateRequest(NvaProject input, RequestInfo requestInfo, Context context) {
-        // no-op
-    }
-
+  @Override
+  protected void validateRequest(NvaProject input, RequestInfo requestInfo, Context context) {
+    // no-op
+  }
 }

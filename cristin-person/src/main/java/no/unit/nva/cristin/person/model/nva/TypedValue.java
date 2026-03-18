@@ -6,16 +6,15 @@ import no.unit.nva.commons.json.JsonSerializable;
 import nva.commons.core.JacocoGenerated;
 
 @JacocoGenerated
-public record TypedValue(@JsonProperty("type") String type,
-                         @JsonProperty("value") String value) implements JsonSerializable {
+public record TypedValue(@JsonProperty("type") String type, @JsonProperty("value") String value)
+    implements JsonSerializable {
 
-    public boolean hasData() {
-        return Objects.nonNull(type()) && Objects.nonNull(value());
-    }
+  public boolean hasData() {
+    return Objects.nonNull(type()) && Objects.nonNull(value());
+  }
 
-    @Override
-    public String toString() {
-        return toJsonString();
-    }
-
+  @Override
+  public String toString() {
+    return toJsonString();
+  }
 }

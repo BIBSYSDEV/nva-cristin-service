@@ -11,6 +11,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -39,91 +40,97 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class QueryKeywordsHandlerTest {
 
-    public static final String INVALID_PARAM = "invalid";
-    public static final int FIVE_HITS = 5;
-    public static final String CRISTIN_KEYWORDS_RESPONSE_JSON = "cristinQueryKeywordsResponse.json";
-    public static final String EXPECTED_CRISTIN_URI_WITH_DEFAULT_PARAMS =
-        "https://api.cristin-test.uio.no/v2/keywords?per_page=100&page=1";
-    public static final String EXPECTED_CRISTIN_URI_WITH_QUERY_PARAM =
-        "https://api.cristin-test.uio.no/v2/keywords?per_page=100&name=biology&page=1";
-    public static final String QUERY_VALUE = "biology";
-    public static final String NVA_QUERY_KEYWORDS_RESPONSE_JSON = "nvaQueryKeywordsResponse.json";
-    public static final String EXPECTED_CONTEXT = "https://bibsysdev.github.io/src/keyword-search-context.json";
-    public static final String EXPECTED_ID = "https://api.dev.nva.aws.unit.no/cristin/keyword?page=1&results=100";
+  public static final String INVALID_PARAM = "invalid";
+  public static final int FIVE_HITS = 5;
+  public static final String CRISTIN_KEYWORDS_RESPONSE_JSON = "cristinQueryKeywordsResponse.json";
+  public static final String EXPECTED_CRISTIN_URI_WITH_DEFAULT_PARAMS =
+      "https://api.cristin-test.uio.no/v2/keywords?per_page=100&page=1";
+  public static final String EXPECTED_CRISTIN_URI_WITH_QUERY_PARAM =
+      "https://api.cristin-test.uio.no/v2/keywords?per_page=100&name=biology&page=1";
+  public static final String QUERY_VALUE = "biology";
+  public static final String NVA_QUERY_KEYWORDS_RESPONSE_JSON = "nvaQueryKeywordsResponse.json";
+  public static final String EXPECTED_CONTEXT =
+      "https://bibsysdev.github.io/src/keyword-search-context.json";
+  public static final String EXPECTED_ID =
+      "https://api.dev.nva.aws.unit.no/cristin/keyword?page=1&results=100";
 
-    private QueryKeywordsApiClient apiClient;
-    private final Environment environment = new Environment();
-    private Context context;
-    private ByteArrayOutputStream output;
-    private QueryKeywordsHandler handler;
+  private QueryKeywordsApiClient apiClient;
+  private final Environment environment = new Environment();
+  private Context context;
+  private ByteArrayOutputStream output;
+  private QueryKeywordsHandler handler;
 
-    @BeforeEach
-    void setUp() throws ApiGatewayException {
-        var httpClient = mock(HttpClient.class);
-        apiClient = new QueryKeywordsApiClient(httpClient);
-        apiClient = spy(apiClient);
-        var fakeQueryResponse = IoUtils.stringFromResources(Path.of(CRISTIN_KEYWORDS_RESPONSE_JSON));
-        doReturn(new HttpResponseFaker(fakeQueryResponse)).when(apiClient).fetchQueryResults(any());
-        context = mock(Context.class);
-        output = new ByteArrayOutputStream();
-        handler = new QueryKeywordsHandler(apiClient, environment);
-    }
+  @BeforeEach
+  void setUp() throws ApiGatewayException {
+    var httpClient = mock(HttpClient.class);
+    apiClient = new QueryKeywordsApiClient(httpClient);
+    apiClient = spy(apiClient);
+    var fakeQueryResponse = IoUtils.stringFromResources(Path.of(CRISTIN_KEYWORDS_RESPONSE_JSON));
+    doReturn(new HttpResponseFaker(fakeQueryResponse)).when(apiClient).fetchQueryResults(any());
+    context = mock(Context.class);
+    output = new ByteArrayOutputStream();
+    handler = new QueryKeywordsHandler(apiClient, environment);
+  }
 
-    @Test
-    void shouldReturnListOfKeywordsAsDefaultWithoutSpecifyingAnyQueryParams() throws Exception {
-        Map<String, String> queryParams = Collections.emptyMap();
-        var response = sendQuery(queryParams);
-        var responseBody = response.getBodyObject(SearchResponse.class);
+  @Test
+  void shouldReturnListOfKeywordsAsDefaultWithoutSpecifyingAnyQueryParams() throws Exception {
+    Map<String, String> queryParams = Collections.emptyMap();
+    var response = sendQuery(queryParams);
+    var responseBody = response.getBodyObject(SearchResponse.class);
 
-        assertThat(response.getStatusCode(), equalTo(HTTP_OK));
-        assertThat(responseBody.getHits().size(), equalTo(FIVE_HITS));
+    assertThat(response.getStatusCode(), equalTo(HTTP_OK));
+    assertThat(responseBody.getHits().size(), equalTo(FIVE_HITS));
 
-        var expected = IoUtils.stringFromResources(Path.of(NVA_QUERY_KEYWORDS_RESPONSE_JSON));
-        var actual = extractHitsFromSearchResponse(responseBody).toString();
+    var expected = IoUtils.stringFromResources(Path.of(NVA_QUERY_KEYWORDS_RESPONSE_JSON));
+    var actual = extractHitsFromSearchResponse(responseBody).toString();
 
-        assertThat(responseBody.getContext(), equalTo(EXPECTED_CONTEXT));
-        assertThat(responseBody.getId(), equalTo(URI.create(EXPECTED_ID)));
-        JSONAssert.assertEquals(expected, actual, JSONCompareMode.NON_EXTENSIBLE);
-    }
+    assertThat(responseBody.getContext(), equalTo(EXPECTED_CONTEXT));
+    assertThat(responseBody.getId(), equalTo(URI.create(EXPECTED_ID)));
+    JSONAssert.assertEquals(expected, actual, JSONCompareMode.NON_EXTENSIBLE);
+  }
 
-    @Test
-    void shouldAllowQueryWithDefaultParametersAndAddThemToUpstreamUri() throws Exception {
-        sendQuery(Collections.emptyMap());
+  @Test
+  void shouldAllowQueryWithDefaultParametersAndAddThemToUpstreamUri() throws Exception {
+    sendQuery(Collections.emptyMap());
 
-        verify(apiClient).fetchQueryResults(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_DEFAULT_PARAMS).getUri());
-    }
+    verify(apiClient)
+        .fetchQueryResults(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_DEFAULT_PARAMS).getUri());
+  }
 
-    @Test
-    void shouldAllowQueryWithQueryParameterAddedToUpstreamUri() throws Exception {
-        sendQuery(Map.of(QUERY, QUERY_VALUE));
+  @Test
+  void shouldAllowQueryWithQueryParameterAddedToUpstreamUri() throws Exception {
+    sendQuery(Map.of(QUERY, QUERY_VALUE));
 
-        verify(apiClient).fetchQueryResults(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_QUERY_PARAM).getUri());
-    }
+    verify(apiClient)
+        .fetchQueryResults(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_QUERY_PARAM).getUri());
+  }
 
-    @Test
-    void shouldThrowBadRequestOnInvalidQueryParams() throws IOException {
-        var queryParams = Map.of(INVALID_PARAM, INVALID_PARAM);
-        var response = sendQuery(queryParams);
+  @Test
+  void shouldThrowBadRequestOnInvalidQueryParams() throws IOException {
+    var queryParams = Map.of(INVALID_PARAM, INVALID_PARAM);
+    var response = sendQuery(queryParams);
 
-        assertThat(response.getStatusCode(), equalTo(HTTP_BAD_REQUEST));
-    }
+    assertThat(response.getStatusCode(), equalTo(HTTP_BAD_REQUEST));
+  }
 
-    @SuppressWarnings("rawtypes")
-    private GatewayResponse<SearchResponse> sendQuery(Map<String, String> queryParams) throws IOException {
-        var input = requestWithQueryParameters(queryParams);
-        handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output, SearchResponse.class);
-    }
+  @SuppressWarnings("rawtypes")
+  private GatewayResponse<SearchResponse> sendQuery(Map<String, String> queryParams)
+      throws IOException {
+    var input = requestWithQueryParameters(queryParams);
+    handler.handleRequest(input, output, context);
+    return GatewayResponse.fromOutputStream(output, SearchResponse.class);
+  }
 
-    private InputStream requestWithQueryParameters(Map<String, String> map) throws JsonProcessingException {
-        return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-                   .withBody(null)
-                   .withQueryParameters(map)
-                   .build();
-    }
+  private InputStream requestWithQueryParameters(Map<String, String> map)
+      throws JsonProcessingException {
+    return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
+        .withBody(null)
+        .withQueryParameters(map)
+        .build();
+  }
 
-    @SuppressWarnings("rawtypes")
-    private List<Keyword> extractHitsFromSearchResponse(SearchResponse response) {
-        return OBJECT_MAPPER.convertValue(response.getHits(), new TypeReference<>() {});
-    }
+  @SuppressWarnings("rawtypes")
+  private List<Keyword> extractHitsFromSearchResponse(SearchResponse response) {
+    return OBJECT_MAPPER.convertValue(response.getHits(), new TypeReference<>() {});
+  }
 }

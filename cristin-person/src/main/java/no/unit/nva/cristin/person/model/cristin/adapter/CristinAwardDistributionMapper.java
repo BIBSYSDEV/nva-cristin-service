@@ -5,39 +5,39 @@ import java.util.Optional;
 import nva.commons.core.SingletonCollector;
 
 public enum CristinAwardDistributionMapper {
+  INTERNATIONAL("INTERNATIONAL", "International"),
+  NATIONAL("NATIONAL", "National"),
+  INTERNAL("INTERNAL", "Internal");
 
-    INTERNATIONAL("INTERNATIONAL", "International"),
-    NATIONAL("NATIONAL", "National"),
-    INTERNAL("INTERNAL", "Internal");
+  private final String cristinKey;
+  private final String nvaKey;
 
-    private final String cristinKey;
-    private final String nvaKey;
+  CristinAwardDistributionMapper(String cristinKey, String nvaKey) {
+    this.cristinKey = cristinKey;
+    this.nvaKey = nvaKey;
+  }
 
-    CristinAwardDistributionMapper(String cristinKey, String nvaKey) {
-        this.cristinKey = cristinKey;
-        this.nvaKey = nvaKey;
-    }
+  public String getKey() {
+    return cristinKey;
+  }
 
-    public String getKey() {
-        return cristinKey;
-    }
+  public String getNvaKey() {
+    return nvaKey;
+  }
 
-    public String getNvaKey() {
-        return nvaKey;
-    }
+  public static Optional<String> getNvaKey(String key) {
+    return Optional.ofNullable(
+        Arrays.stream(values())
+            .filter(typeKey -> typeKey.getKey().equals(key))
+            .map(CristinAwardDistributionMapper::getNvaKey)
+            .collect(SingletonCollector.collectOrElse(null)));
+  }
 
-    public static Optional<String> getNvaKey(String key) {
-        return Optional.ofNullable(Arrays.stream(values())
-                                       .filter(typeKey -> typeKey.getKey().equals(key))
-                                       .map(CristinAwardDistributionMapper::getNvaKey)
-                                       .collect(SingletonCollector.collectOrElse(null)));
-    }
-
-    public static Optional<String> getCristinKey(String key) {
-        return Optional.ofNullable(Arrays.stream(values())
-                                       .filter(typeKey -> typeKey.getNvaKey().equals(key))
-                                       .map(CristinAwardDistributionMapper::getKey)
-                                       .collect(SingletonCollector.collectOrElse(null)));
-    }
-
+  public static Optional<String> getCristinKey(String key) {
+    return Optional.ofNullable(
+        Arrays.stream(values())
+            .filter(typeKey -> typeKey.getNvaKey().equals(key))
+            .map(CristinAwardDistributionMapper::getKey)
+            .collect(SingletonCollector.collectOrElse(null)));
+  }
 }

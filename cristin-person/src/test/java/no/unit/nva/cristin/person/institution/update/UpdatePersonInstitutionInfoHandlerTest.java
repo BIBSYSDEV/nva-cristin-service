@@ -14,9 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.hc.core5.http.HttpHeaders;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,119 +28,128 @@ import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class UpdatePersonInstitutionInfoHandlerTest {
 
-    private static final String PERSON_ID = "id";
-    private static final String ORG_ID = "orgId";
-    private static final Map<String, String> validPath =
-        Map.of(PERSON_ID, randomIntegerAsString(), ORG_ID, randomIntegerAsString());
+  private static final String PERSON_ID = "id";
+  private static final String ORG_ID = "orgId";
+  private static final Map<String, String> validPath =
+      Map.of(PERSON_ID, randomIntegerAsString(), ORG_ID, randomIntegerAsString());
 
-    private final HttpClient httpClientMock = mock(HttpClient.class);
-    private final Environment environment = new Environment();
-    private Context context;
-    private ByteArrayOutputStream output;
-    private UpdatePersonInstitutionInfoHandler handler;
+  private final HttpClient httpClientMock = mock(HttpClient.class);
+  private final Environment environment = new Environment();
+  private Context context;
+  private ByteArrayOutputStream output;
+  private UpdatePersonInstitutionInfoHandler handler;
 
-    @BeforeEach
-    void setUp() throws IOException, InterruptedException {
-        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
-        var apiClient = new UpdatePersonInstitutionInfoClient(httpClientMock);
-        context = mock(Context.class);
-        output = new ByteArrayOutputStream();
-        handler = new UpdatePersonInstitutionInfoHandler(apiClient, environment);
+  @BeforeEach
+  void setUp() throws IOException, InterruptedException {
+    when(httpClientMock.<String>send(any(), any()))
+        .thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
+    var apiClient = new UpdatePersonInstitutionInfoClient(httpClientMock);
+    context = mock(Context.class);
+    output = new ByteArrayOutputStream();
+    handler = new UpdatePersonInstitutionInfoHandler(apiClient, environment);
+  }
+
+  @Test
+  void shouldReturnNoContentResponseWhenCallingHandlerWithValidData() throws IOException {
+    var gatewayResponse = sendQuery(validPath, defaultBody());
+
+    assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    assertEquals(EMPTY_JSON, gatewayResponse.getBody());
+  }
+
+  @Test
+  void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
+    var gatewayResponse = queryWithoutRequiredAccessRights(defaultBody());
+
+    assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+    assertEquals(
+        APPLICATION_PROBLEM_JSON.toString(),
+        gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+  }
+
+  @Test
+  void shouldThrowBadRequestIfNoSupportedFieldsIsPresentInRequest() throws IOException {
+    var gatewayResponse = sendQuery(validPath, bodyWithUnsupportedFields());
+
+    assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    assertEquals(
+        APPLICATION_PROBLEM_JSON.toString(),
+        gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+    assertThat(
+        gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));
+  }
+
+  @Test
+  void shouldReturnBadRequestWhenSendingNullBody() throws IOException {
+    var gatewayResponse = sendQuery(validPath, null);
+
+    assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+  }
+
+  private static String randomIntegerAsString() {
+    return String.valueOf(randomInteger());
+  }
+
+  private GatewayResponse<Object> sendQuery(Map<String, String> pathParam, PersonInstInfoPatch body)
+      throws IOException {
+
+    try (var input = createRequest(pathParam, body)) {
+      handler.handleRequest(input, output, context);
     }
+    return GatewayResponse.fromOutputStream(output, Object.class);
+  }
 
-    @Test
-    void shouldReturnNoContentResponseWhenCallingHandlerWithValidData() throws IOException {
-        var gatewayResponse = sendQuery(validPath, defaultBody());
+  private InputStream createRequest(Map<String, String> pathParam, PersonInstInfoPatch body)
+      throws JsonProcessingException {
+    var customerId = randomUri();
+    return new HandlerRequestBuilder<PersonInstInfoPatch>(OBJECT_MAPPER)
+        .withBody(body)
+        .withCurrentCustomer(customerId)
+        .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
+        .withPathParameters(pathParam)
+        .build();
+  }
 
-        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
-        assertEquals(EMPTY_JSON, gatewayResponse.getBody());
-    }
-
-    @Test
-    void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
-        var gatewayResponse = queryWithoutRequiredAccessRights(defaultBody());
-
-        assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-    }
-
-    @Test
-    void shouldThrowBadRequestIfNoSupportedFieldsIsPresentInRequest() throws IOException {
-        var gatewayResponse = sendQuery(validPath, bodyWithUnsupportedFields());
-
-        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));
-    }
-
-    @Test
-    void shouldReturnBadRequestWhenSendingNullBody() throws IOException {
-        var gatewayResponse = sendQuery(validPath, null);
-
-        assertEquals(HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-    }
-
-    private static String randomIntegerAsString() {
-        return String.valueOf(randomInteger());
-    }
-
-    private GatewayResponse<Object> sendQuery(Map<String, String> pathParam, PersonInstInfoPatch body)
-        throws IOException {
-
-        try (var input = createRequest(pathParam, body)) {
-            handler.handleRequest(input, output, context);
-        }
-        return GatewayResponse.fromOutputStream(output, Object.class);
-    }
-
-    private InputStream createRequest(Map<String, String> pathParam, PersonInstInfoPatch body)
-        throws JsonProcessingException {
-        var customerId = randomUri();
-        return new HandlerRequestBuilder<PersonInstInfoPatch>(OBJECT_MAPPER)
+  private GatewayResponse<String> queryWithoutRequiredAccessRights(PersonInstInfoPatch body)
+      throws IOException {
+    try (var input =
+        new HandlerRequestBuilder<PersonInstInfoPatch>(OBJECT_MAPPER)
             .withBody(body)
-            .withCurrentCustomer(customerId)
-            .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
-            .withPathParameters(pathParam)
-            .build();
+            .withPathParameters(validPath)
+            .build()) {
+      handler.handleRequest(input, output, context);
     }
 
-    private GatewayResponse<String> queryWithoutRequiredAccessRights(PersonInstInfoPatch body) throws IOException {
-        try (var input = new HandlerRequestBuilder<PersonInstInfoPatch>(OBJECT_MAPPER)
-                                     .withBody(body)
-                                     .withPathParameters(validPath)
-                                     .build()) {
-            handler.handleRequest(input, output, context);
-        }
+    return GatewayResponse.fromOutputStream(output, String.class);
+  }
 
-        return GatewayResponse.fromOutputStream(output, String.class);
-    }
+  private PersonInstInfoPatch defaultBody() throws JsonProcessingException {
+    var body =
+        """
+          {
+            "email": "test@example.com",
+            "phone":"99112233"
+          }
+        """;
 
-    private PersonInstInfoPatch defaultBody() throws JsonProcessingException {
-        var body =
-            """
-              {
-                "email": "test@example.com",
-                "phone":"99112233"
-              }
-            """;
+    return OBJECT_MAPPER.readValue(body, PersonInstInfoPatch.class);
+  }
 
-        return OBJECT_MAPPER.readValue(body, PersonInstInfoPatch.class);
-    }
+  private PersonInstInfoPatch bodyWithUnsupportedFields() throws JsonProcessingException {
+    var body =
+        """
+          {
+            "hello": "world",
+            "lorem": "ipsum"
+          }
+        """;
 
-    private PersonInstInfoPatch bodyWithUnsupportedFields() throws JsonProcessingException {
-        var body =
-            """
-              {
-                "hello": "world",
-                "lorem": "ipsum"
-              }
-            """;
-
-        return OBJECT_MAPPER.readValue(body, PersonInstInfoPatch.class);
-    }
+    return OBJECT_MAPPER.readValue(body, PersonInstInfoPatch.class);
+  }
 }

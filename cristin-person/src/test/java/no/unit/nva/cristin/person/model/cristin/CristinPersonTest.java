@@ -10,6 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -26,121 +27,124 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class CristinPersonTest {
 
-    private static final String CRISTIN_GET_PERSON_JSON =
-        "cristinGetPersonResponse.json";
-    private static final String NVA_API_GET_PERSON_JSON =
-        "nvaApiGetPersonResponse.json";
-    private static final String SOME_NIN = "12345612345";
+  private static final String CRISTIN_GET_PERSON_JSON = "cristinGetPersonResponse.json";
+  private static final String NVA_API_GET_PERSON_JSON = "nvaApiGetPersonResponse.json";
+  private static final String SOME_NIN = "12345612345";
 
-    @Test
-    void shouldBuildCristinModelCorrectlyWhenParsingFromCristinJson() throws IOException {
-        String body = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
-        CristinPerson cristinPerson = fromJson(body, CristinPerson.class);
+  @Test
+  void shouldBuildCristinModelCorrectlyWhenParsingFromCristinJson() throws IOException {
+    String body = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
+    CristinPerson cristinPerson = fromJson(body, CristinPerson.class);
 
-        ObjectNode bodyNode = removeIgnoredFields(body);
-        String cristinPersonAsString = OBJECT_MAPPER.writeValueAsString(cristinPerson);
-        ObjectNode cristinPersonAsNode = (ObjectNode) OBJECT_MAPPER.readTree(cristinPersonAsString);
-        removeFieldNotPresentInRawJsonTestData(cristinPersonAsNode);
+    ObjectNode bodyNode = removeIgnoredFields(body);
+    String cristinPersonAsString = OBJECT_MAPPER.writeValueAsString(cristinPerson);
+    ObjectNode cristinPersonAsNode = (ObjectNode) OBJECT_MAPPER.readTree(cristinPersonAsString);
+    removeFieldNotPresentInRawJsonTestData(cristinPersonAsNode);
 
-        assertEquals(bodyNode, cristinPersonAsNode);
-    }
+    assertEquals(bodyNode, cristinPersonAsNode);
+  }
 
-    @Test
-    void shouldBuildNvaModelCorrectlyWhenConvertingCristinPersonToNvaPerson() throws IOException {
-        String cristinBody = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
-        CristinPerson cristinPerson = fromJson(cristinBody, CristinPerson.class);
+  @Test
+  void shouldBuildNvaModelCorrectlyWhenConvertingCristinPersonToNvaPerson() throws IOException {
+    String cristinBody = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
+    CristinPerson cristinPerson = fromJson(cristinBody, CristinPerson.class);
 
-        String nvaBody = getBodyFromResource(NVA_API_GET_PERSON_JSON);
-        Person expectedNvaPerson = fromJson(nvaBody, Person.class);
-        expectedNvaPerson = expectedNvaPerson.copy().withContext(null).build();
+    String nvaBody = getBodyFromResource(NVA_API_GET_PERSON_JSON);
+    Person expectedNvaPerson = fromJson(nvaBody, Person.class);
+    expectedNvaPerson = expectedNvaPerson.copy().withContext(null).build();
 
-        Person actualNvaPerson = cristinPerson.toPerson();
+    Person actualNvaPerson = cristinPerson.toPerson();
 
-        assertThat(actualNvaPerson, equalTo(expectedNvaPerson));
-    }
+    assertThat(actualNvaPerson, equalTo(expectedNvaPerson));
+  }
 
-    @Test
-    void shouldBuildNvaModelCorrectlyWhenConvertingCristinPersonToNvaPersonWithAuthorizedFields() throws IOException {
-        var cristinBody = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
-        var cristinPerson = fromJson(cristinBody, CristinPerson.class);
-        var nin = SOME_NIN;
-        cristinPerson.setNorwegianNationalId(nin);
-        cristinPerson.setReserved(true);
-        cristinPerson.setDetailedAffiliations(Collections.emptyList());
+  @Test
+  void shouldBuildNvaModelCorrectlyWhenConvertingCristinPersonToNvaPersonWithAuthorizedFields()
+      throws IOException {
+    var cristinBody = getBodyFromResource(CRISTIN_GET_PERSON_JSON);
+    var cristinPerson = fromJson(cristinBody, CristinPerson.class);
+    var nin = SOME_NIN;
+    cristinPerson.setNorwegianNationalId(nin);
+    cristinPerson.setReserved(true);
+    cristinPerson.setDetailedAffiliations(Collections.emptyList());
 
-        var nvaBody = getBodyFromResource(NVA_API_GET_PERSON_JSON);
-        var expectedNvaPerson = fromJson(nvaBody, Person.class);
-        var identifiers = expectedNvaPerson.identifiers();
-        identifiers.add(new TypedValue(NATIONAL_IDENTITY_NUMBER, nin));
-        expectedNvaPerson = expectedNvaPerson.copy()
-                                .withIdentifiers(identifiers)
-                                .withReserved(true)
-                                .withEmployments(Collections.emptySet())
-                                .withContext(null)
-                                .build();
+    var nvaBody = getBodyFromResource(NVA_API_GET_PERSON_JSON);
+    var expectedNvaPerson = fromJson(nvaBody, Person.class);
+    var identifiers = expectedNvaPerson.identifiers();
+    identifiers.add(new TypedValue(NATIONAL_IDENTITY_NUMBER, nin));
+    expectedNvaPerson =
+        expectedNvaPerson
+            .copy()
+            .withIdentifiers(identifiers)
+            .withReserved(true)
+            .withEmployments(Collections.emptySet())
+            .withContext(null)
+            .build();
 
-        var actualNvaPerson = cristinPerson.toPersonWithAuthorizedFields();
+    var actualNvaPerson = cristinPerson.toPersonWithAuthorizedFields();
 
-        assertThat(actualNvaPerson, equalTo(expectedNvaPerson));
-    }
+    assertThat(actualNvaPerson, equalTo(expectedNvaPerson));
+  }
 
-    @Test
-    void shouldOnlyShowIdentifierAndNotNameWhenDoingOpenQueryAndSomehowAReservedPersonGetsReturned() {
-        var cristinPerson = new CristinPerson();
-        var identifier = randomInteger(99999).toString();
-        cristinPerson.setCristinPersonId(identifier);
-        cristinPerson.setFirstName(randomString());
-        cristinPerson.setReserved(true);
-        var person = cristinPerson.toPerson();
+  @Test
+  void shouldOnlyShowIdentifierAndNotNameWhenDoingOpenQueryAndSomehowAReservedPersonGetsReturned() {
+    var cristinPerson = new CristinPerson();
+    var identifier = randomInteger(99999).toString();
+    cristinPerson.setCristinPersonId(identifier);
+    cristinPerson.setFirstName(randomString());
+    cristinPerson.setReserved(true);
+    var person = cristinPerson.toPerson();
 
-        assertThat(person.id().toString(), containsString(identifier));
-        assertThat(person.names().size(), equalTo(0));
-    }
+    assertThat(person.id().toString(), containsString(identifier));
+    assertThat(person.names().size(), equalTo(0));
+  }
 
-    @Test
-    void shouldMapAllSupportedFieldsFoundInCristinJsonToCorrectNvaJson() throws Exception {
-        var cristinPerson =
-            attempt(() -> OBJECT_MAPPER.readValue(fromResources(CRISTIN_GET_PERSON_JSON), CristinPerson.class)).get();
-        var nvaPerson = cristinPerson.toPersonBuilder()
-                            .withContext(PERSON_CONTEXT)
-                            .build();
+  @Test
+  void shouldMapAllSupportedFieldsFoundInCristinJsonToCorrectNvaJson() throws Exception {
+    var cristinPerson =
+        attempt(
+                () ->
+                    OBJECT_MAPPER.readValue(
+                        fromResources(CRISTIN_GET_PERSON_JSON), CristinPerson.class))
+            .get();
+    var nvaPerson = cristinPerson.toPersonBuilder().withContext(PERSON_CONTEXT).build();
 
-        var expected = fromResources(NVA_API_GET_PERSON_JSON);
-        var actual = nvaPerson.toString();
+    var expected = fromResources(NVA_API_GET_PERSON_JSON);
+    var actual = nvaPerson.toString();
 
-        JSONAssert.assertEquals(expected, actual, JSONCompareMode.NON_EXTENSIBLE);
-    }
+    JSONAssert.assertEquals(expected, actual, JSONCompareMode.NON_EXTENSIBLE);
+  }
 
-    private String fromResources(String resource) {
-        return IoUtils.stringFromResources(Path.of(resource));
-    }
+  private String fromResources(String resource) {
+    return IoUtils.stringFromResources(Path.of(resource));
+  }
 
-    private static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
-        return OBJECT_MAPPER.readValue(body, classOfT);
-    }
+  private static <T> T fromJson(String body, Class<T> classOfT) throws IOException {
+    return OBJECT_MAPPER.readValue(body, classOfT);
+  }
 
-    private String getBodyFromResource(String resource) {
-        return IoUtils.stringFromResources(Path.of(resource));
-    }
+  private String getBodyFromResource(String resource) {
+    return IoUtils.stringFromResources(Path.of(resource));
+  }
 
-    private ObjectNode removeIgnoredFields(String body) throws JsonProcessingException {
-        ObjectNode nodeTree = (ObjectNode) OBJECT_MAPPER.readTree(body);
-        nodeTree.remove("cristin_profile_url");
-        removeInstitutionFieldFromAffiliations(nodeTree);
-        return nodeTree;
-    }
+  private ObjectNode removeIgnoredFields(String body) throws JsonProcessingException {
+    ObjectNode nodeTree = (ObjectNode) OBJECT_MAPPER.readTree(body);
+    nodeTree.remove("cristin_profile_url");
+    removeInstitutionFieldFromAffiliations(nodeTree);
+    return nodeTree;
+  }
 
-    private void removeInstitutionFieldFromAffiliations(ObjectNode nodeTree) {
-        ArrayNode affiliations = (ArrayNode) nodeTree.get("affiliations");
-        affiliations.forEach(this::removeInstitution);
-    }
+  private void removeInstitutionFieldFromAffiliations(ObjectNode nodeTree) {
+    ArrayNode affiliations = (ArrayNode) nodeTree.get("affiliations");
+    affiliations.forEach(this::removeInstitution);
+  }
 
-    private void removeInstitution(JsonNode node) {
-        ObjectNode objectNode = (ObjectNode) node;
-        objectNode.remove("institution");
-    }
+  private void removeInstitution(JsonNode node) {
+    ObjectNode objectNode = (ObjectNode) node;
+    objectNode.remove("institution");
+  }
 
-    private void removeFieldNotPresentInRawJsonTestData(ObjectNode node) {
-        node.remove("detailed_affiliations");
-    }
+  private void removeFieldNotPresentInRawJsonTestData(ObjectNode node) {
+    node.remove("detailed_affiliations");
+  }
 }

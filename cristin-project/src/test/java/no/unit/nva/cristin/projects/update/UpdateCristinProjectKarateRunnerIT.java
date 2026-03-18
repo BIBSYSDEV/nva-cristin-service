@@ -6,9 +6,8 @@ import org.junit.jupiter.api.Tag;
 @Tag("karateTest")
 public class UpdateCristinProjectKarateRunnerIT {
 
-    @Karate.Test
-    Karate runUpdateCristinProjectKarateTests() {
-        return Karate.run().relativeTo(getClass());
-    }
-
+  @Karate.Test
+  Karate runUpdateCristinProjectKarateTests() {
+    return Karate.run().relativeTo(getClass());
+  }
 }

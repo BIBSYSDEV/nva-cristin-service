@@ -5,6 +5,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.HITS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.model.JsonPropertyNames.SIZE;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -14,14 +15,15 @@ import no.unit.nva.commons.json.JsonSerializable;
 
 @JsonInclude(NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-public record Countries(@JsonProperty(CONTEXT) URI context,
-                        @JsonProperty(ID) URI id,
-                        @JsonProperty(SIZE) int size,
-                        @JsonProperty(HITS) List<Country> countries) implements JsonSerializable {
+public record Countries(
+    @JsonProperty(CONTEXT) URI context,
+    @JsonProperty(ID) URI id,
+    @JsonProperty(SIZE) int size,
+    @JsonProperty(HITS) List<Country> countries)
+    implements JsonSerializable {
 
-    @Override
-    public String toString() {
-        return toJsonString();
-    }
-
+  @Override
+  public String toString() {
+    return toJsonString();
+  }
 }

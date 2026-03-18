@@ -13,39 +13,34 @@ import nva.commons.core.JacocoGenerated;
 
 public class FetchBiobankHandler extends CristinHandler<Void, Biobank> {
 
-    private final transient CristinBiobankApiClient cristinClient;
+  private final transient CristinBiobankApiClient cristinClient;
 
-    @JacocoGenerated
-    @SuppressWarnings("unused")
-    public FetchBiobankHandler() {
-        this(CristinBiobankApiClient.defaultClient(), new Environment());
+  @JacocoGenerated
+  @SuppressWarnings("unused")
+  public FetchBiobankHandler() {
+    this(CristinBiobankApiClient.defaultClient(), new Environment());
+  }
 
-    }
+  public FetchBiobankHandler(CristinBiobankApiClient cristinClient, Environment environment) {
+    super(Void.class, environment);
+    this.cristinClient = cristinClient;
+  }
 
-    public FetchBiobankHandler(CristinBiobankApiClient cristinClient, Environment environment) {
-        super(Void.class, environment);
-        this.cristinClient = cristinClient;
-    }
+  @Override
+  protected void validateRequest(Void input, RequestInfo requestInfo, Context context) {
+    // no-op
+  }
 
-    @Override
-    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) {
-        // no-op
-    }
+  @Override
+  protected Biobank processInput(Void input, RequestInfo requestInfo, Context context)
+      throws ApiGatewayException {
+    var query = (QueryBiobank) QueryBiobank.builder().fromRequestInfo(requestInfo).build();
 
-    @Override
-    protected Biobank processInput(Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
-        var query = (QueryBiobank) QueryBiobank.builder()
-                                       .fromRequestInfo(requestInfo)
-                                       .build();
+    return cristinClient.fetchBiobank(query);
+  }
 
-        return cristinClient.fetchBiobank(query);
-    }
-
-    @Override
-    protected Integer getSuccessStatusCode(Void input, Biobank output) {
-        return HttpURLConnection.HTTP_OK;
-    }
-
-
-
+  @Override
+  protected Integer getSuccessStatusCode(Void input, Biobank output) {
+    return HttpURLConnection.HTTP_OK;
+  }
 }
