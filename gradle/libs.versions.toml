@@ -1,12 +1,12 @@
 [versions]
 awsSdk2 = { strictly = '2.42.5' }
-bekkopen-nocommons = { strictly = '0.16.0' }
-json-assert = { strictly = '1.5.3' }
-karate-core = { strictly = '1.3.1' }
-karate-junit5 = { strictly = '1.3.1' }
+bekkopen-nocommons = { strictly = '0.17.0' }
+json-assert = { strictly = '2.0-rc1' }
+karate-core = { strictly = '1.4.1' }
+karate-junit5 = { strictly = '1.4.1' }
 nva-language = { strictly = '1.2.1' }
-resilience4j = '2.2.0'
-vavrVersion = '0.10.6'
+resilience4j = '2.4.0'
+vavrVersion = '1.0.1'
 
 [libraries]
 aws-sdk2-auth = {group = 'software.amazon.awssdk', name = 'auth', version.ref = 'awsSdk2' }
