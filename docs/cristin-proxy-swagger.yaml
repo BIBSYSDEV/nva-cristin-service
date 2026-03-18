@@ -17,6 +17,18 @@ servers:
   - url: https://api.dev.nva.aws.unit.no/cristin
   - url: https://api.sandbox.nva.aws.unit.no/cristin
   - url: https://api.test.nva.aws.unit.no/cristin
+tags:
+  - name: Biobank
+  - name: Categories
+  - name: Countries
+  - name: FundingSource
+  - name: FundingSources
+  - name: Keywords
+  - name: Organization
+  - name: Person
+  - name: Position
+  - name: Project
+  - name: external
 paths:
   /project:
     get:
