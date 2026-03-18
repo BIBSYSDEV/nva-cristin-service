@@ -2,7 +2,6 @@ plugins {
     id 'java-library'
     id 'java-test-fixtures'
     id 'pmd'
-    id 'checkstyle'
     id 'jacoco-report-aggregation'
     id 'com.diffplug.spotless'
     id 'com.autonomousapps.dependency-analysis'
@@ -108,20 +107,6 @@ pmd {
     ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
     ruleSets = []
     ignoreFailures = false
-}
-
-checkstyle {
-    configFile = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml').asFile()
-
-    showViolations = true
-}
-
-tasks.withType(Checkstyle).configureEach{
-    reports {
-        xml.required
-        html.required
-        html.stylesheet rootProject.resources.text.fromFile('config/checkstyle/checkstyle-simple.xsl')
-    }
 }
 
 tasks.withType(JavaCompile).configureEach {
