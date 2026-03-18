@@ -2100,13 +2100,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BiobankNew'
+                $ref: '#/components/schemas/BioBank'
               examples:
                 objectExample:
                   $ref: '#/components/examples/BiobankExample'
             application/ld+json:
               schema:
-                $ref: '#/components/schemas/BiobankNew'
+                $ref: '#/components/schemas/BioBank'
               examples:
                 objectExample:
                   $ref: '#/components/examples/BiobankExample'
@@ -3786,28 +3786,7 @@ components:
           description: the identifier (code) for the funding source
         labels:
           $ref: '#/components/schemas/Languages'
-    BioBanks:
-      type: object
-      required:
-        - type
-        - '@context'
-        - id
-        - sources
-      properties:
-        type:
-          type: string
-          description: Always BioBanks
-        '@context':
-          $ref: '#/components/schemas/Context'
-        id:
-          type: string
-          description: URI to the query
-        sources:
-          type: array
-          description: The list of BioBanks
-          items:
-            $ref: '#/components/schemas/BiobankNew'
-    BiobankNew:
+    BioBank:
       type: object
       properties:
         '@context':
@@ -4213,21 +4192,6 @@ components:
         identifierAlpha3:
           type: string
           description: The 3 letter alpha 3 country code
-        labels:
-          $ref: '#/components/schemas/Languages'
-    IdentifierWithLabels:
-      type: object
-      description: Single element with id and labels
-      properties:
-        '@context':
-          $ref: '#/components/schemas/Context'
-        type:
-          type: string
-          description: Type of element
-        id:
-          $ref: '#/components/schemas/Id'
-        identifier:
-          type: string
         labels:
           $ref: '#/components/schemas/Languages'
     PersonsOrcid:
