@@ -4,13 +4,16 @@ Service for fetching data from the [Cristin API](https://api.cristin.no/v2/doc/i
 
 ## Building locally
 
-### Windows
+```
+# Build the project
+./gradlew build
 
-```gradlew build```
+# Check for new versions of dependencies
+./gradlew dependencyUpdates --no-parallel
 
-### Linux/Mac
-
-```./gradlew build```
+# Check for misconfigured dependencies
+./gradlew buildHealth
+```
 
 ### If build fails, add these params
 

@@ -1,7 +1,7 @@
 package no.unit.nva.cristin.common.handler;
 
-import com.google.common.net.MediaType;
 import nva.commons.apigateway.ApiGatewayHandler;
+import nva.commons.apigateway.MediaType;
 import nva.commons.core.Environment;
 
 import java.util.List;

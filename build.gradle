@@ -1,7 +1,4 @@
 plugins {
     id 'nva.cristin.service.core.rootplugin'
-}
-
-allprojects{
-    apply plugin: 'nva.cristin.service.core.java-conventions'
+    alias(nvaCatalog.plugins.gradle.versions)
 }

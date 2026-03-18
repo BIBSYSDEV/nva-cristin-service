@@ -6,7 +6,7 @@ import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static nva.commons.core.attempt.Try.attempt;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import java.util.List;
 import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.cristin.keyword.model.nva.Keyword;

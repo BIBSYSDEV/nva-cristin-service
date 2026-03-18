@@ -3,7 +3,7 @@ package no.unit.nva.cristin.person.orcid;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import java.util.List;
 import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.cristin.person.orcid.model.PersonsOrcid;

@@ -1,12 +1,12 @@
 plugins{
     id 'java-library'
     id 'jacoco-report-aggregation'
+    id 'com.github.ben-manes.versions'
+    id 'com.autonomousapps.dependency-analysis'
 }
-
 
 repositories {
     mavenCentral()
-    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -26,4 +26,23 @@ reporting {
 
 tasks.named('check') {
     dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
+}
+
+def isNonStable(String version) {
+    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { version.toUpperCase().contains(it) }
+
+    // Stable version patterns: digits/dots/v/hyphens optionally ending with -r/-jre
+    def stableVersionPattern = /^[0-9,.v-]+(-r|-jre)?$/
+    return !stableKeyword && !(version ==~ stableVersionPattern)
+}
+
+tasks.named('dependencyUpdates') {
+    checkForGradleUpdate = true
+    outputDir = 'build/dependencyUpdates'
+    reportfileName = 'report'
+    gradleReleaseChannel = 'current'
+    rejectVersionIf {
+        // Don't suggest upgrading from a stable version to a non-stable version
+        isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
+    }
 }

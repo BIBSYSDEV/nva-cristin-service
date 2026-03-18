@@ -1,12 +1,12 @@
 package no.unit.nva.cristin.common.client;
 
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static org.apache.hc.core5.http.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static no.unit.nva.cristin.common.ErrorMessages.UPSTREAM_BAD_REQUEST_RESPONSE;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_INSTITUTION_HEADER;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE;
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;

@@ -2,7 +2,7 @@ package no.unit.nva.cristin.projects.update;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import java.net.http.HttpClient;
 import java.util.Map;
 import no.unit.nva.validation.Validator;

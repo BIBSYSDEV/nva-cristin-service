@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.projects.query.organization;
 
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_TEMPLATE_REQUIRED_MISSING;
@@ -18,6 +17,7 @@ import static no.unit.nva.cristin.projects.common.ParameterKeyProject.VALID_QUER
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_JSON_LD;
+import static org.apache.hc.core5.http.HttpHeaders.CONTENT_TYPE;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -178,7 +178,7 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     private InputStream generateHandlerDummyRequestWithIllegalQueryParameters() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                 .withQueryParameters(Map.of(INVALID_KEY, INVALID_VALUE))
                 .build();
@@ -186,7 +186,7 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     private InputStream generateHandlerDummyRequest() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                 .withQueryParameters(Map.of(PAGE, SAMPLE_PAGE))
                 .withQueryParameters(Map.of(NUMBER_OF_RESULTS, SAMPLE_RESULTS_SIZE))
@@ -196,7 +196,7 @@ class QueryCristinOrganizationProjectHandlerTest {
     private InputStream generateHandlerProRealisticRequest(Map<String, String> queryParametersMap)
             throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                 .withQueryParameters(queryParametersMap)
                 .build();
@@ -204,7 +204,7 @@ class QueryCristinOrganizationProjectHandlerTest {
 
     private InputStream generateHandlerRequestWithoutOrganizationIdentifier() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .build();
     }
 
