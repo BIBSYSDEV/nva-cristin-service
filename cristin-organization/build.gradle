@@ -1,3 +1,7 @@
+plugins {
+    id 'nva.cristin.service.core.java-conventions'
+}
+
 dependencies {
     implementation nvaCatalog.aws.lambda.core
     implementation nvaCatalog.httpclient5

@@ -1,3 +1,6 @@
+plugins {
+    id 'nva.cristin.service.core.java-conventions'
+}
 
 dependencies {
     implementation libs.nva.language
