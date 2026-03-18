@@ -4,22 +4,23 @@ plugins {
 
 dependencies {
     implementation libs.resilience4j.all
+    implementation libs.resilience4j.core
+    implementation libs.resilience4j.ratelimiter
+    implementation libs.resilience4j.retry
     implementation libs.vavr
     implementation nvaCatalog.aws.lambda.core
+    implementation nvaCatalog.aws.sdk2.core
     implementation nvaCatalog.aws.sdk2.s3
-    implementation nvaCatalog.jackson.annotations
     implementation nvaCatalog.jackson.core
     implementation nvaCatalog.jackson.databind
+    implementation nvaCatalog.slf4j.api
     implementation nvaLibs.core
     implementation nvaLibs.json
     implementation project(":cristin-commons")
-    testImplementation nvaCatalog.hamcrest
+    testImplementation nvaCatalog.aws.sdk2.http.client
     testImplementation nvaCatalog.junit.jupiter.api
     testImplementation nvaCatalog.junit.jupiter.engine
-    testImplementation nvaCatalog.junit.jupiter.params
     testImplementation nvaCatalog.mockito.core
-    testImplementation nvaCatalog.zalando
-    testImplementation nvaLibs.logutils
     testImplementation nvaLibs.testutils
 }
 

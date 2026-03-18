@@ -3,7 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation libs.nva.language
     implementation nvaCatalog.aws.lambda.core
     implementation nvaCatalog.jackson.annotations
     implementation nvaCatalog.jackson.core
@@ -20,11 +19,8 @@ dependencies {
     testImplementation nvaCatalog.junit.jupiter.api
     testImplementation nvaCatalog.junit.jupiter.engine
     testImplementation nvaCatalog.junit.jupiter.params
-    testImplementation nvaCatalog.mockito.core
     testImplementation nvaCatalog.wiremock
     testImplementation nvaCatalog.wiremock.junit5
-    testImplementation nvaCatalog.zalando
-    testImplementation nvaLibs.logutils
     testImplementation nvaLibs.testutils
     testImplementation project(":cristin-testing")
     testImplementation(testFixtures(project(":cristin-commons")))
