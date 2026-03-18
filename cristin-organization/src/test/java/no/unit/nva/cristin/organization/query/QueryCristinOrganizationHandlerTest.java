@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.net.HttpHeaders;
+import org.apache.hc.core5.http.HttpHeaders;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Stream;
@@ -43,8 +43,8 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.Map;
 
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
-import static com.google.common.net.MediaType.JSON_UTF_8;
+import static org.apache.hc.core5.http.HttpHeaders.CONTENT_TYPE;
+import static nva.commons.apigateway.MediaType.JSON_UTF_8;
 import static java.lang.String.format;
 import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
@@ -449,7 +449,7 @@ class QueryCristinOrganizationHandlerTest {
         throws JsonProcessingException {
 
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type(),
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString(),
                                        ACCEPT_HEADER_KEY_NAME, versionParam))
                    .withQueryParameters(Map.of(QUERY, "Department of Medical Biochemistry",
                                                "depth", "full"))
@@ -473,20 +473,20 @@ class QueryCristinOrganizationHandlerTest {
 
     private InputStream generateHandlerRequestWithNoQueryParameters() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .build();
     }
 
     private InputStream generateHandlerRequestWithRandomQueryParameter() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .withQueryParameters(Map.of(QUERY, "strangeQueryWithoutHits"))
                 .build();
     }
 
     private InputStream generateHandlerRequestWithIllegalDepthParameter() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .withQueryParameters(Map.of(QUERY, "Fysikk", DEPTH, "feil"))
                 .build();
     }
@@ -495,7 +495,7 @@ class QueryCristinOrganizationHandlerTest {
         throws JsonProcessingException {
 
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type(),
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString(),
                                        ACCEPT_HEADER_KEY_NAME, versionParam))
                    .withQueryParameters(Map.of(QUERY, "strangeQueryWithoutHits",
                                                SORT, "country desc"))
@@ -508,7 +508,7 @@ class QueryCristinOrganizationHandlerTest {
 
     private InputStream generateValidHandlerRequest() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                    .withQueryParameters(Map.of(QUERY, "Department of Medical Biochemistry", "depth", "full"))
                    .build();
     }
@@ -530,7 +530,7 @@ class QueryCristinOrganizationHandlerTest {
 
     private InputStream handlerRequestWantingFullTree() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type(),
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString(),
                                        ACCEPT_HEADER_KEY_NAME,
                                        format(ACCEPT_HEADER_EXAMPLE, VERSION_2023_05_26)))
                    .withQueryParameters(Map.of(QUERY, MEDICAL_BIOCHEMISTRY,
@@ -557,7 +557,7 @@ class QueryCristinOrganizationHandlerTest {
 
     private InputStream generateHandlerRequestWithQuery(String query) throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                    .withQueryParameters(Map.of(QUERY, query))
                    .build();
     }
@@ -616,7 +616,7 @@ class QueryCristinOrganizationHandlerTest {
         throws JsonProcessingException {
 
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type(),
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString(),
                                        ACCEPT_HEADER_KEY_NAME, versionParam))
                    .withQueryParameters(Map.of(QUERY, "strangeQueryWithoutHits",
                                                SORT, nvaSortParam))

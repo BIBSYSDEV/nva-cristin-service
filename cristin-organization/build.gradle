@@ -1,8 +1,9 @@
 dependencies {
     implementation project(":cristin-commons")
+    implementation libs.apache.http.core5
     implementation libs.nva.json
-    implementation libs.nva.commons.apigateway
-    implementation libs.google.guava
+    implementation libs.nva.apigateway
+    implementation libs.nva.core
     implementation libs.aws.lambda.java.core
 
     testImplementation libs.karate.core

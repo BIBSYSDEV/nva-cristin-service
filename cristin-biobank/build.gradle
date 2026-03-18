@@ -2,6 +2,7 @@
 dependencies {
     implementation project(":cristin-commons")
     implementation libs.nva.json
+    implementation libs.nva.apigateway
     implementation libs.nva.core
     implementation libs.nva.language
     implementation libs.aws.lambda.java.core
@@ -11,6 +12,7 @@ dependencies {
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
     testImplementation libs.wiremock
+    testImplementation libs.wiremock.junit5
     testImplementation libs.json.assert
     testImplementation project(":cristin-testing")
     testImplementation(testFixtures(project(":cristin-commons")))

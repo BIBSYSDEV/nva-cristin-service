@@ -1,6 +1,6 @@
 package no.unit.nva.cristin.person.institution.common;
 
-import com.google.common.net.MediaType;
+import nva.commons.apigateway.MediaType;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.BadRequestException;

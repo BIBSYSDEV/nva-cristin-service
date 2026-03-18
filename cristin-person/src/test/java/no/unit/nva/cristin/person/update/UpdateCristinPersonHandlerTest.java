@@ -2,7 +2,7 @@ package no.unit.nva.cristin.person.update;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.HttpHeaders;
+import org.apache.hc.core5.http.HttpHeaders;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;

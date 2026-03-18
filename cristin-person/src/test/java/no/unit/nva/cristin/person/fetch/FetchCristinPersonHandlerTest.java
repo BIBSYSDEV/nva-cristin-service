@@ -2,7 +2,7 @@ package no.unit.nva.cristin.person.fetch;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.HttpHeaders;
+import org.apache.hc.core5.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.util.Optional;
 import java.util.stream.Stream;

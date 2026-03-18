@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+import static org.apache.hc.core5.http.HttpHeaders.CONTENT_TYPE;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_ID_FOUR_NUMBERS;
@@ -300,7 +300,7 @@ class ListCristinOrganizationPersonsHandlerTest {
 
     private InputStream generateHandlerDummyRequestWithIllegalQueryParameters() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                   .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                    .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                    .withQueryParameters(Map.of(INVALID_KEY, INVALID_VALUE))
                    .build();
@@ -308,7 +308,7 @@ class ListCristinOrganizationPersonsHandlerTest {
 
     private InputStream generateHandlerDummyRequest() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .withPathParameters(Map.of(IDENTIFIER, DUMMY_ORGANIZATION_IDENTIFIER))
                 .withQueryParameters(Map.of(PAGE, SAMPLE_PAGE))
                 .withQueryParameters(Map.of(NUMBER_OF_RESULTS, SAMPLE_RESULTS_SIZE))
@@ -317,7 +317,7 @@ class ListCristinOrganizationPersonsHandlerTest {
 
     private InputStream generateHandlerRequestWithoutOrganizationIdentifier() throws JsonProcessingException {
         return new HandlerRequestBuilder<InputStream>(restApiMapper)
-                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.type()))
+                .withHeaders(Map.of(CONTENT_TYPE, APPLICATION_JSON_LD.toString()))
                 .build();
     }
 

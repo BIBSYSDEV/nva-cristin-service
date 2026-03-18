@@ -19,13 +19,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static com.google.common.net.HttpHeaders.LINK;
 import static no.unit.nva.cristin.model.Constants.REL_NEXT;
 import static no.unit.nva.cristin.model.Constants.REL_PREV;
 import static no.unit.nva.cristin.model.Constants.X_TOTAL_COUNT;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NUMBER_OF_RESULTS;
 import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static nva.commons.core.StringUtils.EMPTY_STRING;
+import static org.apache.hc.core5.http.HttpHeaders.LINK;
 
 @SuppressWarnings({"unused", "PMD.GodClass"})
 @JacocoGenerated

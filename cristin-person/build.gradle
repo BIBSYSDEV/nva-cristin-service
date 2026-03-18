@@ -1,21 +1,18 @@
 
 dependencies {
     implementation project(":cristin-commons")
+    implementation libs.apache.http.core5
     implementation libs.nva.json
-    implementation libs.google.guava
     implementation libs.aws.lambda.java.core
-    implementation libs.nva.logutils
-    implementation libs.nva.commons.apigateway
+    implementation libs.nva.core
+    implementation libs.nva.apigateway
     implementation libs.bekkopen.nocommons
-
-    implementation libs.aws.sdk2.cognitoidp
 
     testImplementation(testFixtures(project(":cristin-commons")))
     testImplementation project(":cristin-testing")
 
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
-    testImplementation libs.bundles.testing
     testImplementation libs.json.assert
     testImplementation libs.nva.logutils
     testImplementation libs.log4j.core
