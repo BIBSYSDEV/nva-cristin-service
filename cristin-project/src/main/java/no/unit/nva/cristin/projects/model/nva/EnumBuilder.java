@@ -5,10 +5,10 @@ import java.util.stream.Collectors;
 
 public interface EnumBuilder<T, R extends Enum<R>> {
 
-    R build(T classOfT);
+  R build(T classOfT);
 
-    static Map<String, String> mapValuesReversed(Map<String, String> map) {
-        return map.entrySet().stream().collect(Collectors.toUnmodifiableMap(Map.Entry::getValue, Map.Entry::getKey));
-    }
-
+  static Map<String, String> mapValuesReversed(Map<String, String> map) {
+    return map.entrySet().stream()
+        .collect(Collectors.toUnmodifiableMap(Map.Entry::getValue, Map.Entry::getKey));
+  }
 }

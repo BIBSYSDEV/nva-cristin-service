@@ -3,6 +3,7 @@ package no.unit.nva.cristin.organization.common.client.v20230526;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DEPTH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
 import static nva.commons.core.attempt.Try.attempt;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,69 +20,69 @@ import org.slf4j.LoggerFactory;
 
 public class OrganizationEnricher {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrganizationEnricher.class);
+  private static final Logger logger = LoggerFactory.getLogger(OrganizationEnricher.class);
 
-    public static final String COULD_NOT_BE_FOUND_IN_UPSTREAM =
-        "Organization from search result could not be found in upstream: {}";
+  public static final String COULD_NOT_BE_FOUND_IN_UPSTREAM =
+      "Organization from search result could not be found in upstream: {}";
 
-    private final List<Organization> inputOrganizations;
-    private final Map<String, String> queryParams;
-    private final FetchApiClient<Map<String, String>, Organization> fetchClient;
-    private final List<Organization> enrichedOrganizations;
+  private final List<Organization> inputOrganizations;
+  private final Map<String, String> queryParams;
+  private final FetchApiClient<Map<String, String>, Organization> fetchClient;
+  private final List<Organization> enrichedOrganizations;
 
-    /**
-     * Takes a list of organizations as an input and enriches that list by doing a http fetch for each entry in the
-     * list.
-     *
-     * @param inputOrganizations The input list of organizations
-     * @param queryParams        The query params used in the original query
-     * @param fetchClient        The client used for fetching the enriched data
-    **/
-    public OrganizationEnricher(List<Organization> inputOrganizations,
-                                Map<String, String> queryParams,
-                                FetchApiClient<Map<String, String>, Organization> fetchClient) {
-        this.inputOrganizations = inputOrganizations;
-        this.queryParams = queryParams;
-        this.fetchClient = fetchClient;
-        enrichedOrganizations = new ArrayList<>();
+  /**
+   * Takes a list of organizations as an input and enriches that list by doing a http fetch for each
+   * entry in the list.
+   *
+   * @param inputOrganizations The input list of organizations
+   * @param queryParams The query params used in the original query
+   * @param fetchClient The client used for fetching the enriched data
+   */
+  public OrganizationEnricher(
+      List<Organization> inputOrganizations,
+      Map<String, String> queryParams,
+      FetchApiClient<Map<String, String>, Organization> fetchClient) {
+    this.inputOrganizations = inputOrganizations;
+    this.queryParams = queryParams;
+    this.fetchClient = fetchClient;
+    enrichedOrganizations = new ArrayList<>();
+  }
+
+  public OrganizationEnricher enrich() throws ApiGatewayException {
+    for (Organization organization : inputOrganizations) {
+      var identifier = extractIdentifier(organization);
+      var enrichParams = extractParams(identifier);
+      try {
+        var enriched = fetchClient.executeFetch(enrichParams);
+        enrichedOrganizations.add(enriched);
+      } catch (NotFoundException notFoundException) {
+        logger.warn(COULD_NOT_BE_FOUND_IN_UPSTREAM, extractOrgId(organization));
+      }
     }
 
-    public OrganizationEnricher enrich() throws ApiGatewayException {
-        for (Organization organization : inputOrganizations) {
-            var identifier = extractIdentifier(organization);
-            var enrichParams = extractParams(identifier);
-            try {
-                var enriched = fetchClient.executeFetch(enrichParams);
-                enrichedOrganizations.add(enriched);
-            } catch (NotFoundException notFoundException) {
-                logger.warn(COULD_NOT_BE_FOUND_IN_UPSTREAM, extractOrgId(organization));
-            }
-        }
+    return this;
+  }
 
-        return this;
-    }
+  public List<Organization> getResult() {
+    return enrichedOrganizations;
+  }
 
-    public List<Organization> getResult() {
-        return enrichedOrganizations;
-    }
+  private static String extractIdentifier(Organization organization) {
+    return attempt(() -> UriUtils.extractLastPathElement(organization.getId())).orElseThrow();
+  }
 
-    private static String extractIdentifier(Organization organization) {
-        return attempt(() -> UriUtils.extractLastPathElement(organization.getId())).orElseThrow();
-    }
+  private Map<String, String> extractParams(String identifier) {
+    var enrichParams = new ConcurrentHashMap<String, String>();
+    enrichParams.put(DEPTH, queryParams.get(DEPTH));
+    enrichParams.put(IDENTIFIER, identifier);
 
-    private Map<String, String> extractParams(String identifier) {
-        var enrichParams = new ConcurrentHashMap<String, String>();
-        enrichParams.put(DEPTH, queryParams.get(DEPTH));
-        enrichParams.put(IDENTIFIER, identifier);
+    return enrichParams;
+  }
 
-        return enrichParams;
-    }
-
-    private static String extractOrgId(Organization organization) {
-        return Optional.ofNullable(organization)
-                   .map(Organization::getId)
-                   .map(Objects::toString)
-                   .orElse(null);
-    }
-
+  private static String extractOrgId(Organization organization) {
+    return Optional.ofNullable(organization)
+        .map(Organization::getId)
+        .map(Objects::toString)
+        .orElse(null);
+  }
 }

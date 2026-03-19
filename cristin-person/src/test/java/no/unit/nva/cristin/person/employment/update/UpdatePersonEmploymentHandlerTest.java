@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.hc.core5.http.HttpHeaders;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,139 +37,149 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class UpdatePersonEmploymentHandlerTest {
 
-    private static final Map<String, String> validPath =
-        Map.of(PERSON_ID, randomIntegerAsString(), EMPLOYMENT_ID, randomIntegerAsString());
-    private static final String validJson =
-        IoUtils.stringFromResources(Path.of("nvaApiCreateEmploymentRequest.json"));
-    private static final String INVALID_URI = "https://example.org/hello";
-    private static final String INVALID_VALUE = "hello";
-    private static final URI TOP_ORG_ID = UriWrapper.fromUri(randomUri()).addChild("185.90.0.0").getUri();
+  private static final Map<String, String> validPath =
+      Map.of(PERSON_ID, randomIntegerAsString(), EMPLOYMENT_ID, randomIntegerAsString());
+  private static final String validJson =
+      IoUtils.stringFromResources(Path.of("nvaApiCreateEmploymentRequest.json"));
+  private static final String INVALID_URI = "https://example.org/hello";
+  private static final String INVALID_VALUE = "hello";
+  private static final URI TOP_ORG_ID =
+      UriWrapper.fromUri(randomUri()).addChild("185.90.0.0").getUri();
 
-    private final HttpClient httpClientMock = mock(HttpClient.class);
-    private final Environment environment = new Environment();
-    private Context context;
-    private ByteArrayOutputStream output;
-    private UpdatePersonEmploymentHandler handler;
+  private final HttpClient httpClientMock = mock(HttpClient.class);
+  private final Environment environment = new Environment();
+  private Context context;
+  private ByteArrayOutputStream output;
+  private UpdatePersonEmploymentHandler handler;
 
-    @BeforeEach
-    void setUp() throws IOException, InterruptedException {
-        when(httpClientMock.<String>send(any(), any())).thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
-        UpdatePersonEmploymentClient apiClient = new UpdatePersonEmploymentClient(httpClientMock);
-        context = mock(Context.class);
-        output = new ByteArrayOutputStream();
-        handler = new UpdatePersonEmploymentHandler(apiClient, environment);
+  @BeforeEach
+  void setUp() throws IOException, InterruptedException {
+    when(httpClientMock.<String>send(any(), any()))
+        .thenReturn(new HttpResponseFaker(EMPTY_JSON, 204));
+    UpdatePersonEmploymentClient apiClient = new UpdatePersonEmploymentClient(httpClientMock);
+    context = mock(Context.class);
+    output = new ByteArrayOutputStream();
+    handler = new UpdatePersonEmploymentHandler(apiClient, environment);
+  }
+
+  @Test
+  void shouldReturnNoContentResponseWhenPayloadIsValid() throws IOException {
+    var gatewayResponse = sendQuery(validJson);
+
+    assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+  }
+
+  @Test
+  void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
+    var gatewayResponse = queryWithoutRequiredAccessRights();
+
+    assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+    assertEquals(
+        APPLICATION_PROBLEM_JSON.toString(),
+        gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
+  }
+
+  @Test
+  void shouldThrowBadRequestWhenInvalidPositionCode() throws IOException {
+    var input = OBJECT_MAPPER.createObjectNode();
+    input.put(TYPE, INVALID_URI);
+    var gatewayResponse = sendQuery(input.toString());
+
+    assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(TYPE)));
+  }
+
+  @Test
+  void shouldThrowBadRequestWhenInvalidAffiliation() throws IOException {
+    var input = OBJECT_MAPPER.createObjectNode();
+    input.put(ORGANIZATION, INVALID_URI);
+    var gatewayResponse = sendQuery(input.toString());
+
+    assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    assertThat(
+        gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(ORGANIZATION)));
+  }
+
+  @Test
+  void shouldThrowBadRequestWhenInvalidDate() throws IOException {
+    var input = OBJECT_MAPPER.createObjectNode();
+    input.put(START_DATE, INVALID_VALUE);
+    var gatewayResponse = sendQuery(input.toString());
+
+    assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(START_DATE)));
+  }
+
+  @Test
+  void shouldThrowBadRequestWhenNonNullableIsNull() throws IOException {
+    var input = OBJECT_MAPPER.createObjectNode();
+    input.putNull(START_DATE);
+    var gatewayResponse = sendQuery(input.toString());
+
+    assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(START_DATE)));
+  }
+
+  @Test
+  void shouldThrowBadRequestWhenInvalidFullTimePercentage() throws IOException {
+    var input = OBJECT_MAPPER.createObjectNode();
+    input.put(FULL_TIME_PERCENTAGE, INVALID_VALUE);
+    var gatewayResponse = sendQuery(input.toString());
+
+    assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    assertThat(
+        gatewayResponse.getBody(),
+        containsString(invalidFieldParameterMessage(FULL_TIME_PERCENTAGE)));
+  }
+
+  @Test
+  void shouldThrowBadRequestWhenNoSupportedValuesPresentInJson() throws IOException {
+    var input = OBJECT_MAPPER.createObjectNode();
+    input.put(INVALID_VALUE, INVALID_VALUE);
+    var gatewayResponse = sendQuery(input.toString());
+
+    assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    assertThat(
+        gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));
+  }
+
+  private static String randomIntegerAsString() {
+    return String.valueOf(randomInteger());
+  }
+
+  private GatewayResponse<Void> sendQuery(String body) throws IOException {
+    try (var input = createRequest(body)) {
+      handler.handleRequest(input, output, context);
     }
+    return GatewayResponse.fromOutputStream(output, Void.class);
+  }
 
-    @Test
-    void shouldReturnNoContentResponseWhenPayloadIsValid() throws IOException {
-        var gatewayResponse = sendQuery(validJson);
+  private InputStream createRequest(String body) throws JsonProcessingException {
+    var customerId = randomUri();
 
-        assertEquals(HttpURLConnection.HTTP_NO_CONTENT, gatewayResponse.getStatusCode());
+    return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+        .withBody(body)
+        .withCurrentCustomer(customerId)
+        .withTopLevelCristinOrgId(TOP_ORG_ID)
+        .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
+        .withPathParameters(validPath)
+        .build();
+  }
+
+  private GatewayResponse<Void> queryWithoutRequiredAccessRights() throws IOException {
+    try (var input =
+        new HandlerRequestBuilder<String>(OBJECT_MAPPER)
+            .withBody(EMPTY_JSON)
+            .withPathParameters(validPath)
+            .build()) {
+      handler.handleRequest(input, output, context);
     }
-
-    @Test
-    void shouldThrowForbiddenExceptionWhenClientIsNotAuthenticated() throws IOException {
-        var gatewayResponse = queryWithoutRequiredAccessRights();
-
-        assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
-        assertEquals(APPLICATION_PROBLEM_JSON.toString(), gatewayResponse.getHeaders().get(HttpHeaders.CONTENT_TYPE));
-    }
-
-    @Test
-    void shouldThrowBadRequestWhenInvalidPositionCode() throws IOException {
-        var input = OBJECT_MAPPER.createObjectNode();
-        input.put(TYPE, INVALID_URI);
-        var gatewayResponse = sendQuery(input.toString());
-
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(TYPE)));
-    }
-
-    @Test
-    void shouldThrowBadRequestWhenInvalidAffiliation() throws IOException {
-        var input = OBJECT_MAPPER.createObjectNode();
-        input.put(ORGANIZATION, INVALID_URI);
-        var gatewayResponse = sendQuery(input.toString());
-
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(ORGANIZATION)));
-    }
-
-    @Test
-    void shouldThrowBadRequestWhenInvalidDate() throws IOException {
-        var input = OBJECT_MAPPER.createObjectNode();
-        input.put(START_DATE, INVALID_VALUE);
-        var gatewayResponse = sendQuery(input.toString());
-
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(START_DATE)));
-    }
-
-    @Test
-    void shouldThrowBadRequestWhenNonNullableIsNull() throws IOException {
-        var input = OBJECT_MAPPER.createObjectNode();
-        input.putNull(START_DATE);
-        var gatewayResponse = sendQuery(input.toString());
-
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(START_DATE)));
-    }
-
-    @Test
-    void shouldThrowBadRequestWhenInvalidFullTimePercentage() throws IOException {
-        var input = OBJECT_MAPPER.createObjectNode();
-        input.put(FULL_TIME_PERCENTAGE, INVALID_VALUE);
-        var gatewayResponse = sendQuery(input.toString());
-
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(invalidFieldParameterMessage(FULL_TIME_PERCENTAGE)));
-    }
-
-    @Test
-    void shouldThrowBadRequestWhenNoSupportedValuesPresentInJson() throws IOException {
-        var input = OBJECT_MAPPER.createObjectNode();
-        input.put(INVALID_VALUE, INVALID_VALUE);
-        var gatewayResponse = sendQuery(input.toString());
-
-        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-        assertThat(gatewayResponse.getBody(), containsString(ERROR_MESSAGE_NO_SUPPORTED_FIELDS_IN_PAYLOAD));
-    }
-
-    private static String randomIntegerAsString() {
-        return String.valueOf(randomInteger());
-    }
-
-    private GatewayResponse<Void> sendQuery(String body) throws IOException {
-        try (var input = createRequest(body)) {
-            handler.handleRequest(input, output, context);
-        }
-        return GatewayResponse.fromOutputStream(output, Void.class);
-    }
-
-    private InputStream createRequest(String body) throws JsonProcessingException {
-        var customerId = randomUri();
-
-        return new HandlerRequestBuilder<String>(OBJECT_MAPPER)
-                   .withBody(body)
-                   .withCurrentCustomer(customerId)
-                   .withTopLevelCristinOrgId(TOP_ORG_ID)
-                   .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
-                   .withPathParameters(validPath)
-                   .build();
-    }
-
-    private GatewayResponse<Void> queryWithoutRequiredAccessRights() throws IOException {
-        try (var input = new HandlerRequestBuilder<String>(OBJECT_MAPPER)
-                             .withBody(EMPTY_JSON)
-                             .withPathParameters(validPath)
-                             .build()) {
-            handler.handleRequest(input, output, context);
-        }
-        return GatewayResponse.fromOutputStream(output, Void.class);
-    }
+    return GatewayResponse.fromOutputStream(output, Void.class);
+  }
 }

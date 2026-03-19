@@ -8,6 +8,7 @@ import static no.unit.nva.model.Organization.ORGANIZATION_IDENTIFIER_PATTERN;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -20,52 +21,53 @@ import nva.commons.apigateway.RequestInfo;
 
 public class ProjectCreatorAppender {
 
-    public static final Pattern ORGANIZATION_PATTERN = Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
+  public static final Pattern ORGANIZATION_PATTERN =
+      Pattern.compile(ORGANIZATION_IDENTIFIER_PATTERN);
 
-    public static final String PROJECT_CREATOR = "ProjectCreator";
+  public static final String PROJECT_CREATOR = "ProjectCreator";
 
-    private final NvaContributor creator;
+  private final NvaContributor creator;
 
-    public ProjectCreatorAppender(RequestInfo requestInfo) {
-        creator = extractProjectCreator(requestInfo);
+  public ProjectCreatorAppender(RequestInfo requestInfo) {
+    creator = extractProjectCreator(requestInfo);
+  }
+
+  private NvaContributor extractProjectCreator(RequestInfo requestInfo) {
+    var clientIdentifier = extractCristinIdentifier(requestInfo);
+
+    if (isNull(clientIdentifier) || !isPositiveInteger(clientIdentifier)) {
+      return null;
     }
 
-    private NvaContributor extractProjectCreator(RequestInfo requestInfo) {
-        var clientIdentifier = extractCristinIdentifier(requestInfo);
+    var identity = createIdentity(clientIdentifier);
+    var role = extractAffiliation(requestInfo);
 
-        if (isNull(clientIdentifier) || !isPositiveInteger(clientIdentifier)) {
-            return null;
-        }
+    return new NvaContributor(identity, singleRoleList(role));
+  }
 
-        var identity = createIdentity(clientIdentifier);
-        var role = extractAffiliation(requestInfo);
+  private Person createIdentity(String identifier) {
+    var identity = getNvaApiId(identifier, PERSON_PATH_NVA);
+    return new Person.Builder().withId(identity).build();
+  }
 
-        return new NvaContributor(identity, singleRoleList(role));
-    }
+  private Role extractAffiliation(RequestInfo requestInfo) {
+    return Optional.of(extractOrgIdentifier(requestInfo))
+        .filter(organization -> ORGANIZATION_PATTERN.matcher(organization).matches())
+        .map(this::createAffiliation)
+        .map(organization -> new Role(PROJECT_CREATOR, organization))
+        .orElse(null);
+  }
 
-    private Person createIdentity(String identifier) {
-        var identity = getNvaApiId(identifier, PERSON_PATH_NVA);
-        return new Person.Builder().withId(identity).build();
-    }
+  private Organization createAffiliation(String identifier) {
+    var affiliation = getNvaApiId(identifier, ORGANIZATION_PATH);
+    return new Organization.Builder().withId(affiliation).build();
+  }
 
-    private Role extractAffiliation(RequestInfo requestInfo) {
-        return Optional.of(extractOrgIdentifier(requestInfo))
-                   .filter(organization -> ORGANIZATION_PATTERN.matcher(organization).matches())
-                   .map(this::createAffiliation)
-                   .map(organization -> new Role(PROJECT_CREATOR, organization))
-                   .orElse(null);
-    }
+  private List<Role> singleRoleList(Role role) {
+    return Collections.singletonList(role);
+  }
 
-    private Organization createAffiliation(String identifier) {
-        var affiliation = getNvaApiId(identifier, ORGANIZATION_PATH);
-        return new Organization.Builder().withId(affiliation).build();
-    }
-
-    private List<Role> singleRoleList(Role role) {
-        return Collections.singletonList(role);
-    }
-
-    public NvaContributor getCreator() {
-        return creator;
-    }
+  public NvaContributor getCreator() {
+    return creator;
+  }
 }

@@ -6,23 +6,22 @@ import no.unit.nva.cristin.model.CristinTypedLabel;
 
 public class KeywordFromCristin implements Function<CristinTypedLabel, Keyword> {
 
-    private final String context;
+  private final String context;
 
-    public KeywordFromCristin() {
-        context = Keyword.DEFAULT_CONTEXT;
-    }
+  public KeywordFromCristin() {
+    context = Keyword.DEFAULT_CONTEXT;
+  }
 
-    public KeywordFromCristin(String context) {
-        this.context = context;
-    }
+  public KeywordFromCristin(String context) {
+    this.context = context;
+  }
 
-    @Override
-    public Keyword apply(CristinTypedLabel cristinTypedLabel) {
-        return new Keyword.Builder()
-                   .withContext(context)
-                   .withIdentifier(cristinTypedLabel.getCode())
-                   .withLabels(cristinTypedLabel.getName())
-                   .build();
-    }
-
+  @Override
+  public Keyword apply(CristinTypedLabel cristinTypedLabel) {
+    return new Keyword.Builder()
+        .withContext(context)
+        .withIdentifier(cristinTypedLabel.getCode())
+        .withLabels(cristinTypedLabel.getName())
+        .build();
+  }
 }

@@ -1,5 +1,3 @@
 package no.unit.nva.client;
 
-public interface GenericApiClient {
-
-}
+public interface GenericApiClient {}

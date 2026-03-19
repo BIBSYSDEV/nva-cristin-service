@@ -1,29 +1,29 @@
 package no.unit.nva.exception;
 
-import nva.commons.apigateway.exceptions.ApiGatewayException;
-
 import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
+
+import nva.commons.apigateway.exceptions.ApiGatewayException;
 
 public class FailedHttpRequestException extends ApiGatewayException {
 
-    public FailedHttpRequestException(String message) {
-        super(message);
-    }
+  public FailedHttpRequestException(String message) {
+    super(message);
+  }
 
-    public FailedHttpRequestException(Exception e, String message) {
-        super(e, message);
-    }
+  public FailedHttpRequestException(Exception e, String message) {
+    super(e, message);
+  }
 
-    public FailedHttpRequestException(Exception e) {
-        super(e);
-    }
+  public FailedHttpRequestException(Exception e) {
+    super(e);
+  }
 
-    public FailedHttpRequestException(Exception e, Integer statusCode) {
-        super(e, statusCode);
-    }
+  public FailedHttpRequestException(Exception e, Integer statusCode) {
+    super(e, statusCode);
+  }
 
-    @Override
-    protected Integer statusCode() {
-        return HTTP_BAD_GATEWAY;
-    }
+  @Override
+  protected Integer statusCode() {
+    return HTTP_BAD_GATEWAY;
+  }
 }

@@ -5,24 +5,23 @@ import java.util.Map;
 
 public class CristinCodeFacet extends CristinFacet {
 
-    private final String code;
-    private final Map<String, String> name;
+  private final String code;
+  private final Map<String, String> name;
 
-    public CristinCodeFacet(@JsonProperty("code") String code,
-                            @JsonProperty("name") Map<String, String> name) {
-        super();
-        this.code = code;
-        this.name = name;
-    }
+  public CristinCodeFacet(
+      @JsonProperty("code") String code, @JsonProperty("name") Map<String, String> name) {
+    super();
+    this.code = code;
+    this.name = name;
+  }
 
-    @Override
-    public String getKey() {
-        return code;
-    }
+  @Override
+  public String getKey() {
+    return code;
+  }
 
-    @Override
-    public Map<String, String> getLabels() {
-        return name;
-    }
-
+  @Override
+  public Map<String, String> getLabels() {
+    return name;
+  }
 }

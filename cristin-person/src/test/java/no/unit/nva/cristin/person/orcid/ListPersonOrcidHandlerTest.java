@@ -9,6 +9,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.ByteArrayOutputStream;
@@ -31,56 +32,58 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class ListPersonOrcidHandlerTest {
 
-    public static final String CRISTIN_PERSONS_ORCID_RESPONSE_JSON = "cristinGetPersonsOrcidResponse.json";
-    public static final String EXPECTED_CRISTIN_URI_WITH_DEFAULT_PARAMS =
-        "https://api.cristin-test.uio.no/v2/persons/orcid";
-    public static final String NVA_PERSONS_ORCID_RESPONSE_JSON = "nvaGetPersonsOrcidResponse.json";
+  public static final String CRISTIN_PERSONS_ORCID_RESPONSE_JSON =
+      "cristinGetPersonsOrcidResponse.json";
+  public static final String EXPECTED_CRISTIN_URI_WITH_DEFAULT_PARAMS =
+      "https://api.cristin-test.uio.no/v2/persons/orcid";
+  public static final String NVA_PERSONS_ORCID_RESPONSE_JSON = "nvaGetPersonsOrcidResponse.json";
 
-    private ListPersonOrcidApiClient apiClient;
-    private final Environment environment = new Environment();
-    private Context context;
-    private ByteArrayOutputStream output;
-    private ListPersonOrcidHandler handler;
+  private ListPersonOrcidApiClient apiClient;
+  private final Environment environment = new Environment();
+  private Context context;
+  private ByteArrayOutputStream output;
+  private ListPersonOrcidHandler handler;
 
-    @BeforeEach
-    void setUp() throws ApiGatewayException {
-        var httpClient = mock(HttpClient.class);
-        apiClient = new ListPersonOrcidApiClient(httpClient);
-        apiClient = spy(apiClient);
-        var fakeCristinResponse = IoUtils.stringFromResources(Path.of(CRISTIN_PERSONS_ORCID_RESPONSE_JSON));
-        doReturn(new HttpResponseFaker(fakeCristinResponse)).when(apiClient).fetchGetResultWithAuthentication(any());
-        context = mock(Context.class);
-        output = new ByteArrayOutputStream();
-        handler = new ListPersonOrcidHandler(environment, apiClient);
-    }
+  @BeforeEach
+  void setUp() throws ApiGatewayException {
+    var httpClient = mock(HttpClient.class);
+    apiClient = new ListPersonOrcidApiClient(httpClient);
+    apiClient = spy(apiClient);
+    var fakeCristinResponse =
+        IoUtils.stringFromResources(Path.of(CRISTIN_PERSONS_ORCID_RESPONSE_JSON));
+    doReturn(new HttpResponseFaker(fakeCristinResponse))
+        .when(apiClient)
+        .fetchGetResultWithAuthentication(any());
+    context = mock(Context.class);
+    output = new ByteArrayOutputStream();
+    handler = new ListPersonOrcidHandler(environment, apiClient);
+  }
 
-    @Test
-    void shouldReturnListOfPersonsOrcidWhenCallingUpstream() throws Exception {
-        final var actual = sendQuery();
-        final var expected = IoUtils.stringFromResources(Path.of(NVA_PERSONS_ORCID_RESPONSE_JSON));
+  @Test
+  void shouldReturnListOfPersonsOrcidWhenCallingUpstream() throws Exception {
+    final var actual = sendQuery();
+    final var expected = IoUtils.stringFromResources(Path.of(NVA_PERSONS_ORCID_RESPONSE_JSON));
 
-        assertThat(actual.getStatusCode(), equalTo(HTTP_OK));
-        JSONAssert.assertEquals(expected, actual.getBody(), JSONCompareMode.NON_EXTENSIBLE);
-    }
+    assertThat(actual.getStatusCode(), equalTo(HTTP_OK));
+    JSONAssert.assertEquals(expected, actual.getBody(), JSONCompareMode.NON_EXTENSIBLE);
+  }
 
-    @Test
-    void shouldCallCorrectUpstreamUri() throws Exception {
-        sendQuery();
+  @Test
+  void shouldCallCorrectUpstreamUri() throws Exception {
+    sendQuery();
 
-        verify(apiClient)
-            .fetchGetResultWithAuthentication(UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_DEFAULT_PARAMS).getUri());
-    }
+    verify(apiClient)
+        .fetchGetResultWithAuthentication(
+            UriWrapper.fromUri(EXPECTED_CRISTIN_URI_WITH_DEFAULT_PARAMS).getUri());
+  }
 
-    private GatewayResponse<PersonsOrcid> sendQuery() throws IOException {
-        var input = generateRequest();
-        handler.handleRequest(input, output, context);
-        return GatewayResponse.fromOutputStream(output, PersonsOrcid.class);
-    }
+  private GatewayResponse<PersonsOrcid> sendQuery() throws IOException {
+    var input = generateRequest();
+    handler.handleRequest(input, output, context);
+    return GatewayResponse.fromOutputStream(output, PersonsOrcid.class);
+  }
 
-    private InputStream generateRequest() throws JsonProcessingException {
-        return new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
-                   .withBody(null)
-                   .build();
-    }
-
+  private InputStream generateRequest() throws JsonProcessingException {
+    return new HandlerRequestBuilder<Void>(OBJECT_MAPPER).withBody(null).build();
+  }
 }

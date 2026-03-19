@@ -9,17 +9,12 @@ import no.unit.nva.model.ExternalSource;
 public class ExternalSourcesToCristinExternalSources
     implements Function<List<ExternalSource>, List<CristinExternalSource>> {
 
-    @Override
-    public List<CristinExternalSource> apply(List<ExternalSource> externalSources) {
-        return Optional.ofNullable(externalSources)
-                   .map(this::extractExternalSources)
-                   .orElse(null);
-    }
+  @Override
+  public List<CristinExternalSource> apply(List<ExternalSource> externalSources) {
+    return Optional.ofNullable(externalSources).map(this::extractExternalSources).orElse(null);
+  }
 
-    private List<CristinExternalSource> extractExternalSources(List<ExternalSource> externalSources) {
-        return externalSources.stream()
-                   .map(CristinExternalSource::fromExternalSource)
-                   .toList();
-    }
-
+  private List<CristinExternalSource> extractExternalSources(List<ExternalSource> externalSources) {
+    return externalSources.stream().map(CristinExternalSource::fromExternalSource).toList();
+  }
 }

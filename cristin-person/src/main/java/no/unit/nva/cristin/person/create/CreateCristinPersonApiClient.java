@@ -7,6 +7,7 @@ import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -19,49 +20,48 @@ import nva.commons.core.paths.UriWrapper;
 
 public class CreateCristinPersonApiClient extends PostApiClient {
 
-    public CreateCristinPersonApiClient(HttpClient client) {
-        super(client);
-    }
+  public CreateCristinPersonApiClient(HttpClient client) {
+    super(client);
+  }
 
-    /**
-     * Creates a person in Cristin from the supplied Person object.
-     */
-    public Person createPersonInCristin(Person person) throws ApiGatewayException {
-        var payload = generatePayloadFromRequest(person);
-        var uri = getCristinPersonPostUri();
-        var response = post(uri, payload);
-        checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode(), response.body());
+  /** Creates a person in Cristin from the supplied Person object. */
+  public Person createPersonInCristin(Person person) throws ApiGatewayException {
+    var payload = generatePayloadFromRequest(person);
+    var uri = getCristinPersonPostUri();
+    var response = post(uri, payload);
+    checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode(), response.body());
 
-        return createPersonFromResponse(response);
-    }
+    return createPersonFromResponse(response);
+  }
 
-    /**
-     * Creates a person in Cristin from the supplied Person object and at allowed Cristin institution.
-     */
-    public Person createPersonInCristin(Person person, String cristinInstitutionNumber) throws ApiGatewayException {
-        var payload = generatePayloadFromRequest(person);
-        var uri = getCristinPersonPostUri();
-        var response = post(uri, payload, cristinInstitutionNumber);
-        checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode(), response.body());
+  /**
+   * Creates a person in Cristin from the supplied Person object and at allowed Cristin institution.
+   */
+  public Person createPersonInCristin(Person person, String cristinInstitutionNumber)
+      throws ApiGatewayException {
+    var payload = generatePayloadFromRequest(person);
+    var uri = getCristinPersonPostUri();
+    var response = post(uri, payload, cristinInstitutionNumber);
+    checkPostHttpStatusCode(getNvaApiUri(PERSON_PATH_NVA), response.statusCode(), response.body());
 
-        return createPersonFromResponse(response);
-    }
+    return createPersonFromResponse(response);
+  }
 
-    private Person createPersonFromResponse(HttpResponse<String> response) throws BadGatewayException {
-        var responseCristinPerson = getDeserializedResponse(response, CristinPerson.class);
+  private Person createPersonFromResponse(HttpResponse<String> response)
+      throws BadGatewayException {
+    var responseCristinPerson = getDeserializedResponse(response, CristinPerson.class);
 
-        return responseCristinPerson
-                   .toPersonBuilderWithAuthorizedFields()
-                   .withContext(PERSON_CONTEXT)
-                   .build();
-    }
+    return responseCristinPerson
+        .toPersonBuilderWithAuthorizedFields()
+        .withContext(PERSON_CONTEXT)
+        .build();
+  }
 
-    private String generatePayloadFromRequest(Person person) {
-        return attempt(() -> OBJECT_MAPPER.writeValueAsString(person.toCristinPerson()))
-                   .orElseThrow();
-    }
+  private String generatePayloadFromRequest(Person person) {
+    return attempt(() -> OBJECT_MAPPER.writeValueAsString(person.toCristinPerson())).orElseThrow();
+  }
 
-    private URI getCristinPersonPostUri() {
-        return  UriWrapper.fromUri(CRISTIN_API_URL).addChild(PERSON_PATH).getUri();
-    }
+  private URI getCristinPersonPostUri() {
+    return UriWrapper.fromUri(CRISTIN_API_URL).addChild(PERSON_PATH).getUri();
+  }
 }

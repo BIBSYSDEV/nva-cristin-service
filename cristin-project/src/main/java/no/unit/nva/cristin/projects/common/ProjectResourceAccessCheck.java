@@ -9,23 +9,20 @@ import no.unit.nva.utils.UriUtils;
 
 public class ProjectResourceAccessCheck {
 
-    public static final String USER_IDENTIFIER = "userIdentifier";
+  public static final String USER_IDENTIFIER = "userIdentifier";
 
-    protected ProjectResourceAccessCheck() {
+  protected ProjectResourceAccessCheck() {}
 
-    }
+  protected boolean hasMatch(String identifierFromResource, String userIdentifier) {
+    return identifierFromResource.equals(userIdentifier);
+  }
 
-    protected boolean hasMatch(String identifierFromResource, String userIdentifier) {
-        return identifierFromResource.equals(userIdentifier);
-    }
-
-    protected Optional<String> getResourceCreator(NvaProject resource) {
-        return Optional.ofNullable(resource)
-                   .map(NvaProject::getCreator)
-                   .map(NvaContributor::identity)
-                   .map(Person::getId)
-                   .map(UriUtils::extractLastPathElement)
-                   .filter(Utils::isPositiveInteger);
-    }
-
+  protected Optional<String> getResourceCreator(NvaProject resource) {
+    return Optional.ofNullable(resource)
+        .map(NvaProject::getCreator)
+        .map(NvaContributor::identity)
+        .map(Person::getId)
+        .map(UriUtils::extractLastPathElement)
+        .filter(Utils::isPositiveInteger);
+  }
 }

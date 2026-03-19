@@ -6,12 +6,11 @@ import java.util.Map;
 
 public interface CristinSearchResponse<T> {
 
-    @JsonProperty("data")
-    @JsonGetter
-    T data();
+  @JsonProperty("data")
+  @JsonGetter
+  T data();
 
-    @JsonProperty("facets")
-    @JsonGetter
-    Map<String, CristinFacet[]> facets();
-
+  @JsonProperty("facets")
+  @JsonGetter
+  Map<String, CristinFacet[]> facets();
 }

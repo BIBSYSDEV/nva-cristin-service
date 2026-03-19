@@ -10,6 +10,7 @@ import static no.unit.nva.model.Organization.ORGANIZATION_CONTEXT;
 import static no.unit.nva.utils.UriUtils.createCristinQueryUri;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
@@ -20,8 +21,8 @@ import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.common.client.CristinQueryApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
-import no.unit.nva.cristin.organization.dto.v20230526.mapper.OrganizationFromUnitMapper;
 import no.unit.nva.cristin.organization.dto.v20230526.UnitDto;
+import no.unit.nva.cristin.organization.dto.v20230526.mapper.OrganizationFromUnitMapper;
 import no.unit.nva.model.Organization;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
@@ -29,71 +30,71 @@ import nva.commons.apigateway.exceptions.BadGatewayException;
 public class QueryCristinOrgClient20230526 extends ApiClient
     implements CristinQueryApiClient<Map<String, String>, Organization> {
 
-    public static final URI ORGANIZATION_ID_URI = getNvaApiUri(ORGANIZATION_PATH);
+  public static final URI ORGANIZATION_ID_URI = getNvaApiUri(ORGANIZATION_PATH);
 
-    private final FetchApiClient<Map<String, String>, Organization> fetchClient;
+  private final FetchApiClient<Map<String, String>, Organization> fetchClient;
 
-    public QueryCristinOrgClient20230526() {
-        this(defaultHttpClient());
+  public QueryCristinOrgClient20230526() {
+    this(defaultHttpClient());
+  }
+
+  public QueryCristinOrgClient20230526(HttpClient client) {
+    this(client, new FetchCristinOrgClient20230526(client));
+  }
+
+  public QueryCristinOrgClient20230526(
+      HttpClient client, FetchApiClient<Map<String, String>, Organization> fetchClient) {
+    super(client);
+    this.fetchClient = fetchClient;
+  }
+
+  /**
+   * Query organizations matching given query criteria. By specifying query param depth one can
+   * choose how deep in the organization tree the search should go.
+   *
+   * @param params Map containing verified query parameters
+   */
+  @Override
+  public SearchResponse<Organization> executeQuery(Map<String, String> params)
+      throws ApiGatewayException {
+    var queryUri = createCristinQueryUri(translateToCristinApi(params), UNITS_PATH);
+    var start = System.currentTimeMillis();
+    var response = queryUpstream(queryUri);
+    var organizations = getOrganizations(response);
+    if (wantsFullTree(params)) {
+      var organizationEnricher = new OrganizationEnricher(organizations, params, fetchClient);
+      organizations = organizationEnricher.enrich().getResult();
     }
+    var totalProcessingTime = calculateProcessingTime(start, System.currentTimeMillis());
 
-    public QueryCristinOrgClient20230526(HttpClient client) {
-        this(client, new FetchCristinOrgClient20230526(client));
-    }
+    var searchResponse =
+        new SearchResponse<Organization>(ORGANIZATION_ID_URI)
+            .withContext(ORGANIZATION_CONTEXT)
+            .withHits(organizations)
+            .usingHeadersAndQueryParams(response.headers(), params)
+            .withProcessingTime(totalProcessingTime);
 
-    public QueryCristinOrgClient20230526(HttpClient client,
-                                         FetchApiClient<Map<String, String>, Organization> fetchClient) {
-        super(client);
-        this.fetchClient = fetchClient;
-    }
+    searchResponse.setId(createIdUriFromParams(params, ORGANIZATION_PATH));
 
-    /**
-     * Query organizations matching given query criteria. By specifying query param depth one can choose how deep in
-     * the organization tree the search should go.
-     *
-     * @param params Map containing verified query parameters
-     */
-    @Override
-    public SearchResponse<Organization> executeQuery(Map<String, String> params) throws ApiGatewayException {
-        var queryUri = createCristinQueryUri(translateToCristinApi(params), UNITS_PATH);
-        var start = System.currentTimeMillis();
-        var response = queryUpstream(queryUri);
-        var organizations = getOrganizations(response);
-        if (wantsFullTree(params)) {
-            var organizationEnricher = new OrganizationEnricher(organizations, params, fetchClient);
-            organizations = organizationEnricher.enrich().getResult();
-        }
-        var totalProcessingTime = calculateProcessingTime(start, System.currentTimeMillis());
+    return searchResponse;
+  }
 
-        var searchResponse = new SearchResponse<Organization>(ORGANIZATION_ID_URI)
-                   .withContext(ORGANIZATION_CONTEXT)
-                   .withHits(organizations)
-                   .usingHeadersAndQueryParams(response.headers(), params)
-                   .withProcessingTime(totalProcessingTime);
+  private HttpResponse<String> queryUpstream(URI uri) throws ApiGatewayException {
+    var response = fetchQueryResults(uri);
+    checkHttpStatusCode(ORGANIZATION_ID_URI, response.statusCode(), response.body());
 
-        searchResponse.setId(createIdUriFromParams(params, ORGANIZATION_PATH));
+    return response;
+  }
 
-        return searchResponse;
-    }
+  private List<Organization> getOrganizations(HttpResponse<String> response)
+      throws BadGatewayException {
+    var units = asList(getDeserializedResponse(response, UnitDto[].class));
 
-    private HttpResponse<String> queryUpstream(URI uri) throws ApiGatewayException {
-        var response = fetchQueryResults(uri);
-        checkHttpStatusCode(ORGANIZATION_ID_URI, response.statusCode(), response.body());
+    return units.stream().map(new OrganizationFromUnitMapper()).collect(Collectors.toList());
+  }
 
-        return response;
-    }
-
-    private List<Organization> getOrganizations(HttpResponse<String> response) throws BadGatewayException {
-        var units = asList(getDeserializedResponse(response, UnitDto[].class));
-
-        return units.stream()
-                   .map(new OrganizationFromUnitMapper())
-                   .collect(Collectors.toList());
-    }
-
-    private boolean wantsFullTree(Map<String, String> params) {
-        var includeFullTree = params.get(FULL_TREE);
-        return Boolean.TRUE.toString().equalsIgnoreCase(includeFullTree);
-    }
-
+  private boolean wantsFullTree(Map<String, String> params) {
+    var includeFullTree = params.get(FULL_TREE);
+    return Boolean.TRUE.toString().equalsIgnoreCase(includeFullTree);
+  }
 }

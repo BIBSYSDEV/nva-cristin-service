@@ -1,9 +1,17 @@
 package no.unit.nva.cristin.projects.model.cristin;
 
+import static java.util.Objects.nonNull;
+import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
+import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
+import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.model.CristinApproval;
@@ -12,444 +20,489 @@ import no.unit.nva.cristin.model.CristinExternalSource;
 import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
 import no.unit.nva.cristin.model.CristinTypedLabel;
-import no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.projects.model.nva.NvaProjectBuilder;
 import no.unit.nva.utils.CustomInstantSerializer;
 import nva.commons.core.StringUtils;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.Objects.nonNull;
-import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
-import static no.unit.nva.cristin.model.JsonPropertyNames.STATUS;
-import static no.unit.nva.cristin.model.JsonPropertyNames.TITLE;
 
 @SuppressWarnings({"PMD.TooManyFields", "unused", "PMD.ExcessivePublicCount", "PMD.GodClass"})
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinProject implements JsonSerializable {
 
-    public static final String CRISTIN_PROJECT_ID = "cristin_project_id";
-    public static final String PUBLISHABLE = "publishable";
-    public static final String PUBLISHED = "published";
-    public static final String CRISTIN_START_DATE = "start_date";
-    public static final String CRISTIN_END_DATE = "end_date";
-    public static final String CREATED = "created";
-    public static final String CRISTIN_LAST_MODIFIED = "last_modified";
-    public static final String COORDINATING_INSTITUTION = "coordinating_institution";
-    public static final String CRISTIN_CONTACT_INFO = "contact_info";
-    public static final String CRISTIN_TOTAL_FUNDING_AMOUNT = "total_funding_amount";
-    public static final String PARTICIPANTS = "participants";
-    public static final String METHOD = "method";
-    public static final String EQUIPMENT = "equipment";
-    public static final String CRISTIN_PROJECT_CATEGORIES = "project_categories";
-    public static final String KEYWORDS = "keywords";
-    public static final String CRISTIN_EXTERNAL_SOURCES = "external_sources";
-    public static final String CRISTIN_RELATED_PROJECTS = "related_projects";
-    public static final String INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH = "institutions_responsible_for_research";
-    public static final String HEALTH_PROJECT_TYPE = "health_project_type";
-    public static final String HEALTH_PROJECT_TYPE_NAME = "health_project_type_name";
-    public static final String CLINICAL_TRIAL_PHASE = "clinical_trial_phase";
-    public static final String APPROVALS = "approvals";
-    public static final String EXEMPT_FROM_PUBLIC_DISCLOSURE = "exempt_from_public_disclosure";
-    public static final String PROJECT_FUNDING_SOURCES = "project_funding_sources";
-    public static final String CRISTIN_ACADEMIC_SUMMARY = "academic_summary";
-    public static final String CRISTIN_POPULAR_SCIENTIFIC_SUMMARY = "popular_scientific_summary";
-    public static final String CRISTIN_MAIN_LANGUAGE = "main_language";
-    public static final String CREATOR = "creator";
-    public static final String CRISTIN_EXTERNAL_URL = "external_url";
-
-    @JsonProperty(CRISTIN_PROJECT_ID)
-    private String cristinProjectId;
-    @JsonProperty(PUBLISHABLE)
-    private Boolean publishable;
-    @JsonProperty(PUBLISHED)
-    private Boolean published;
-    @JsonProperty(TITLE)
-    private Map<String, String> title;
-    @JsonProperty(CRISTIN_MAIN_LANGUAGE)
-    private String mainLanguage;
-    @JsonProperty(CRISTIN_START_DATE)
-    @JsonSerialize(using = CustomInstantSerializer.class)
-    private Instant startDate;
-    @JsonProperty(CRISTIN_END_DATE)
-    @JsonSerialize(using = CustomInstantSerializer.class)
-    private Instant endDate;
-    @JsonProperty(STATUS)
-    private String status;
-    @JsonProperty(CREATED)
-    private CristinDateInfo created;
-    @JsonProperty(CRISTIN_LAST_MODIFIED)
-    private CristinDateInfo lastModified;
-    @JsonProperty(COORDINATING_INSTITUTION)
-    private CristinOrganization coordinatingInstitution;
-    @JsonProperty(PROJECT_FUNDING_SOURCES)
-    private List<CristinFundingSource> projectFundingSources;
-    @JsonProperty(CRISTIN_CONTACT_INFO)
-    private CristinContactInfo contactInfo;
-    @JsonProperty(CRISTIN_TOTAL_FUNDING_AMOUNT)
-    private CristinFundingAmount totalFundingAmount;
-    @JsonProperty(PARTICIPANTS)
-    private List<CristinPerson> participants;
-    @JsonProperty(CRISTIN_ACADEMIC_SUMMARY)
-    private Map<String, String> academicSummary;
-    @JsonProperty(CRISTIN_POPULAR_SCIENTIFIC_SUMMARY)
-    private Map<String, String> popularScientificSummary;
-    @JsonProperty(METHOD)
-    private Map<String, String> method;
-    @JsonProperty(EQUIPMENT)
-    private Map<String, String> equipment;
-    @JsonProperty(CRISTIN_PROJECT_CATEGORIES)
-    private List<CristinTypedLabel> projectCategories;
-    @JsonProperty(KEYWORDS)
-    private List<CristinTypedLabel> keywords;
-    @JsonProperty(CRISTIN_EXTERNAL_SOURCES)
-    private List<CristinExternalSource> externalSources;
-    @JsonProperty(CRISTIN_RELATED_PROJECTS)
-    private List<String> relatedProjects;
-    @JsonProperty(INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)
-    private List<CristinOrganization> institutionsResponsibleForResearch;
-    @JsonProperty(HEALTH_PROJECT_TYPE)
-    private String healthProjectType;
-    @JsonProperty(HEALTH_PROJECT_TYPE_NAME)
-    private Map<String, String> healthProjectTypeName;
-    @JsonProperty(CLINICAL_TRIAL_PHASE)
-    private String clinicalTrialPhase;
-    @JsonProperty(APPROVALS)
-    private List<CristinApproval> approvals;
-    @JsonProperty(EXEMPT_FROM_PUBLIC_DISCLOSURE)
-    private Boolean exemptFromPublicDisclosure;
-    @JsonProperty(CREATOR)
-    private CristinPerson creator;
-    @JsonProperty(CRISTIN_EXTERNAL_URL)
-    private String externalUrl;
-
-    public String getCristinProjectId() {
-        return cristinProjectId;
-    }
-
-    public void setCristinProjectId(String cristinProjectId) {
-        this.cristinProjectId = cristinProjectId;
-    }
-
-    @SuppressWarnings({"PMD.BooleanGetMethodName"})
-    public Boolean getPublishable() {
-        return publishable;
-    }
-
-    public void setPublishable(Boolean publishable) {
-        this.publishable = publishable;
-    }
-
-    @SuppressWarnings({"PMD.BooleanGetMethodName"})
-    public Boolean getPublished() {
-        return published;
-    }
-
-    public void setPublished(Boolean published) {
-        this.published = published;
-    }
-
-    public Map<String, String> getTitle() {
-        return nonEmptyOrDefault(title);
-    }
-
-    public void setTitle(Map<String, String> title) {
-        this.title = title;
-    }
-
-    public String getMainLanguage() {
-        return mainLanguage;
-    }
-
-    public void setMainLanguage(String mainLanguage) {
-        this.mainLanguage = mainLanguage;
-    }
+  public static final String CRISTIN_PROJECT_ID = "cristin_project_id";
+  public static final String PUBLISHABLE = "publishable";
+  public static final String PUBLISHED = "published";
+  public static final String CRISTIN_START_DATE = "start_date";
+  public static final String CRISTIN_END_DATE = "end_date";
+  public static final String CREATED = "created";
+  public static final String CRISTIN_LAST_MODIFIED = "last_modified";
+  public static final String COORDINATING_INSTITUTION = "coordinating_institution";
+  public static final String CRISTIN_CONTACT_INFO = "contact_info";
+  public static final String CRISTIN_TOTAL_FUNDING_AMOUNT = "total_funding_amount";
+  public static final String PARTICIPANTS = "participants";
+  public static final String METHOD = "method";
+  public static final String EQUIPMENT = "equipment";
+  public static final String CRISTIN_PROJECT_CATEGORIES = "project_categories";
+  public static final String KEYWORDS = "keywords";
+  public static final String CRISTIN_EXTERNAL_SOURCES = "external_sources";
+  public static final String CRISTIN_RELATED_PROJECTS = "related_projects";
+  public static final String INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH =
+      "institutions_responsible_for_research";
+  public static final String HEALTH_PROJECT_TYPE = "health_project_type";
+  public static final String HEALTH_PROJECT_TYPE_NAME = "health_project_type_name";
+  public static final String CLINICAL_TRIAL_PHASE = "clinical_trial_phase";
+  public static final String APPROVALS = "approvals";
+  public static final String EXEMPT_FROM_PUBLIC_DISCLOSURE = "exempt_from_public_disclosure";
+  public static final String PROJECT_FUNDING_SOURCES = "project_funding_sources";
+  public static final String CRISTIN_ACADEMIC_SUMMARY = "academic_summary";
+  public static final String CRISTIN_POPULAR_SCIENTIFIC_SUMMARY = "popular_scientific_summary";
+  public static final String CRISTIN_MAIN_LANGUAGE = "main_language";
+  public static final String CREATOR = "creator";
+  public static final String CRISTIN_EXTERNAL_URL = "external_url";
 
-    public Instant getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Instant startDate) {
-        this.startDate = startDate;
-    }
-
-    public Instant getEndDate() {
-        return endDate;
-    }
+  @JsonProperty(CRISTIN_PROJECT_ID)
+  private String cristinProjectId;
+
+  @JsonProperty(PUBLISHABLE)
+  private Boolean publishable;
 
-    public void setEndDate(Instant endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
+  @JsonProperty(PUBLISHED)
+  private Boolean published;
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+  @JsonProperty(TITLE)
+  private Map<String, String> title;
+
+  @JsonProperty(CRISTIN_MAIN_LANGUAGE)
+  private String mainLanguage;
+
+  @JsonProperty(CRISTIN_START_DATE)
+  @JsonSerialize(using = CustomInstantSerializer.class)
+  private Instant startDate;
+
+  @JsonProperty(CRISTIN_END_DATE)
+  @JsonSerialize(using = CustomInstantSerializer.class)
+  private Instant endDate;
+
+  @JsonProperty(STATUS)
+  private String status;
 
-    public CristinDateInfo getCreated() {
-        return created;
-    }
+  @JsonProperty(CREATED)
+  private CristinDateInfo created;
+
+  @JsonProperty(CRISTIN_LAST_MODIFIED)
+  private CristinDateInfo lastModified;
+
+  @JsonProperty(COORDINATING_INSTITUTION)
+  private CristinOrganization coordinatingInstitution;
+
+  @JsonProperty(PROJECT_FUNDING_SOURCES)
+  private List<CristinFundingSource> projectFundingSources;
 
-    public void setCreated(CristinDateInfo created) {
-        this.created = created;
-    }
+  @JsonProperty(CRISTIN_CONTACT_INFO)
+  private CristinContactInfo contactInfo;
+
+  @JsonProperty(CRISTIN_TOTAL_FUNDING_AMOUNT)
+  private CristinFundingAmount totalFundingAmount;
+
+  @JsonProperty(PARTICIPANTS)
+  private List<CristinPerson> participants;
+
+  @JsonProperty(CRISTIN_ACADEMIC_SUMMARY)
+  private Map<String, String> academicSummary;
 
-    public CristinDateInfo getLastModified() {
-        return lastModified;
-    }
+  @JsonProperty(CRISTIN_POPULAR_SCIENTIFIC_SUMMARY)
+  private Map<String, String> popularScientificSummary;
+
+  @JsonProperty(METHOD)
+  private Map<String, String> method;
+
+  @JsonProperty(EQUIPMENT)
+  private Map<String, String> equipment;
+
+  @JsonProperty(CRISTIN_PROJECT_CATEGORIES)
+  private List<CristinTypedLabel> projectCategories;
 
-    public void setLastModified(CristinDateInfo lastModified) {
-        this.lastModified = lastModified;
-    }
+  @JsonProperty(KEYWORDS)
+  private List<CristinTypedLabel> keywords;
+
+  @JsonProperty(CRISTIN_EXTERNAL_SOURCES)
+  private List<CristinExternalSource> externalSources;
+
+  @JsonProperty(CRISTIN_RELATED_PROJECTS)
+  private List<String> relatedProjects;
 
-    public CristinOrganization getCoordinatingInstitution() {
-        return coordinatingInstitution;
-    }
+  @JsonProperty(INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)
+  private List<CristinOrganization> institutionsResponsibleForResearch;
 
-    public void setCoordinatingInstitution(CristinOrganization coordinatingInstitution) {
-        this.coordinatingInstitution = coordinatingInstitution;
-    }
+  @JsonProperty(HEALTH_PROJECT_TYPE)
+  private String healthProjectType;
 
-    public List<CristinFundingSource> getProjectFundingSources() {
-        return nonEmptyOrDefault(projectFundingSources);
-    }
+  @JsonProperty(HEALTH_PROJECT_TYPE_NAME)
+  private Map<String, String> healthProjectTypeName;
 
-    public void setProjectFundingSources(List<CristinFundingSource> projectFundingSources) {
-        this.projectFundingSources = projectFundingSources;
-    }
+  @JsonProperty(CLINICAL_TRIAL_PHASE)
+  private String clinicalTrialPhase;
 
-    public CristinContactInfo getContactInfo() {
-        return contactInfo;
-    }
+  @JsonProperty(APPROVALS)
+  private List<CristinApproval> approvals;
 
-    public void setContactInfo(CristinContactInfo contactInfo) {
-        this.contactInfo = contactInfo;
-    }
+  @JsonProperty(EXEMPT_FROM_PUBLIC_DISCLOSURE)
+  private Boolean exemptFromPublicDisclosure;
 
-    public CristinFundingAmount getTotalFundingAmount() {
-        return totalFundingAmount;
-    }
+  @JsonProperty(CREATOR)
+  private CristinPerson creator;
 
-    public void setTotalFundingAmount(CristinFundingAmount totalFundingAmount) {
-        this.totalFundingAmount = totalFundingAmount;
-    }
+  @JsonProperty(CRISTIN_EXTERNAL_URL)
+  private String externalUrl;
 
-    public List<CristinPerson> getParticipants() {
-        return nonEmptyOrDefault(participants);
-    }
+  public String getCristinProjectId() {
+    return cristinProjectId;
+  }
 
-    public void setParticipants(List<CristinPerson> participants) {
-        this.participants = participants;
-    }
+  public void setCristinProjectId(String cristinProjectId) {
+    this.cristinProjectId = cristinProjectId;
+  }
 
-    public Map<String, String> getAcademicSummary() {
-        return nonEmptyOrDefault(academicSummary);
-    }
+  @SuppressWarnings({"PMD.BooleanGetMethodName"})
+  public Boolean getPublishable() {
+    return publishable;
+  }
 
-    public void setAcademicSummary(Map<String, String> academicSummary) {
-        this.academicSummary = academicSummary;
-    }
+  public void setPublishable(Boolean publishable) {
+    this.publishable = publishable;
+  }
 
-    public Map<String, String> getPopularScientificSummary() {
-        return nonEmptyOrDefault(popularScientificSummary);
-    }
+  @SuppressWarnings({"PMD.BooleanGetMethodName"})
+  public Boolean getPublished() {
+    return published;
+  }
 
-    public void setPopularScientificSummary(Map<String, String> popularScientificSummary) {
-        this.popularScientificSummary = popularScientificSummary;
-    }
+  public void setPublished(Boolean published) {
+    this.published = published;
+  }
 
-    public Map<String, String> getMethod() {
-        return nonEmptyOrDefault(method);
-    }
+  public Map<String, String> getTitle() {
+    return nonEmptyOrDefault(title);
+  }
 
-    public void setMethod(Map<String, String> method) {
-        this.method = method;
-    }
+  public void setTitle(Map<String, String> title) {
+    this.title = title;
+  }
 
-    public Map<String, String> getEquipment() {
-        return nonEmptyOrDefault(equipment);
-    }
+  public String getMainLanguage() {
+    return mainLanguage;
+  }
 
-    public void setEquipment(Map<String, String> equipment) {
-        this.equipment = equipment;
-    }
+  public void setMainLanguage(String mainLanguage) {
+    this.mainLanguage = mainLanguage;
+  }
 
-    public List<CristinTypedLabel> getProjectCategories() {
-        return nonEmptyOrDefault(projectCategories);
-    }
+  public Instant getStartDate() {
+    return startDate;
+  }
 
-    public void setProjectCategories(List<CristinTypedLabel> projectCategories) {
-        this.projectCategories = projectCategories;
-    }
+  public void setStartDate(Instant startDate) {
+    this.startDate = startDate;
+  }
 
-    public List<CristinTypedLabel> getKeywords() {
-        return nonEmptyOrDefault(keywords);
-    }
+  public Instant getEndDate() {
+    return endDate;
+  }
 
-    public void setKeywords(List<CristinTypedLabel> keywords) {
-        this.keywords = keywords;
-    }
+  public void setEndDate(Instant endDate) {
+    this.endDate = endDate;
+  }
 
-    public List<CristinExternalSource> getExternalSources() {
-        return nonEmptyOrDefault(externalSources);
-    }
+  public String getStatus() {
+    return status;
+  }
 
-    public void setExternalSources(List<CristinExternalSource> externalSources) {
-        this.externalSources = externalSources;
-    }
+  public void setStatus(String status) {
+    this.status = status;
+  }
 
-    public List<String> getRelatedProjects() {
-        return nonEmptyOrDefault(relatedProjects);
-    }
+  public CristinDateInfo getCreated() {
+    return created;
+  }
 
-    public void setRelatedProjects(List<String> relatedProjects) {
-        this.relatedProjects = relatedProjects;
-    }
+  public void setCreated(CristinDateInfo created) {
+    this.created = created;
+  }
 
-    public List<CristinOrganization> getInstitutionsResponsibleForResearch() {
-        return nonEmptyOrDefault(institutionsResponsibleForResearch);
-    }
+  public CristinDateInfo getLastModified() {
+    return lastModified;
+  }
 
-    public void setInstitutionsResponsibleForResearch(List<CristinOrganization> institutionsResponsibleForResearch) {
-        this.institutionsResponsibleForResearch = institutionsResponsibleForResearch;
-    }
+  public void setLastModified(CristinDateInfo lastModified) {
+    this.lastModified = lastModified;
+  }
 
-    public String getHealthProjectType() {
-        return healthProjectType;
-    }
+  public CristinOrganization getCoordinatingInstitution() {
+    return coordinatingInstitution;
+  }
 
-    public void setHealthProjectType(String healthProjectType) {
-        this.healthProjectType = healthProjectType;
-    }
+  public void setCoordinatingInstitution(CristinOrganization coordinatingInstitution) {
+    this.coordinatingInstitution = coordinatingInstitution;
+  }
 
-    public Map<String, String> getHealthProjectTypeName() {
-        return nonEmptyOrDefault(healthProjectTypeName);
-    }
+  public List<CristinFundingSource> getProjectFundingSources() {
+    return nonEmptyOrDefault(projectFundingSources);
+  }
 
-    public void setHealthProjectTypeName(Map<String, String> healthProjectTypeName) {
-        this.healthProjectTypeName = healthProjectTypeName;
-    }
+  public void setProjectFundingSources(List<CristinFundingSource> projectFundingSources) {
+    this.projectFundingSources = projectFundingSources;
+  }
 
-    public String getClinicalTrialPhase() {
-        return clinicalTrialPhase;
-    }
+  public CristinContactInfo getContactInfo() {
+    return contactInfo;
+  }
 
-    public void setClinicalTrialPhase(String clinicalTrialPhase) {
-        this.clinicalTrialPhase = clinicalTrialPhase;
-    }
+  public void setContactInfo(CristinContactInfo contactInfo) {
+    this.contactInfo = contactInfo;
+  }
 
-    public List<CristinApproval> getApprovals() {
-        return nonEmptyOrDefault(approvals);
-    }
+  public CristinFundingAmount getTotalFundingAmount() {
+    return totalFundingAmount;
+  }
 
-    public void setApprovals(List<CristinApproval> approvals) {
-        this.approvals = approvals;
-    }
+  public void setTotalFundingAmount(CristinFundingAmount totalFundingAmount) {
+    this.totalFundingAmount = totalFundingAmount;
+  }
 
-    @SuppressWarnings({"PMD.BooleanGetMethodName"})
-    public Boolean getExemptFromPublicDisclosure() {
-        return exemptFromPublicDisclosure;
-    }
+  public List<CristinPerson> getParticipants() {
+    return nonEmptyOrDefault(participants);
+  }
 
-    public void setExemptFromPublicDisclosure(Boolean exemptFromPublicDisclosure) {
-        this.exemptFromPublicDisclosure = exemptFromPublicDisclosure;
-    }
+  public void setParticipants(List<CristinPerson> participants) {
+    this.participants = participants;
+  }
 
-    public CristinPerson getCreator() {
-        return creator;
-    }
+  public Map<String, String> getAcademicSummary() {
+    return nonEmptyOrDefault(academicSummary);
+  }
 
-    public void setCreator(CristinPerson creator) {
-        this.creator = creator;
-    }
+  public void setAcademicSummary(Map<String, String> academicSummary) {
+    this.academicSummary = academicSummary;
+  }
 
-    public String getExternalUrl() {
-        return externalUrl;
-    }
+  public Map<String, String> getPopularScientificSummary() {
+    return nonEmptyOrDefault(popularScientificSummary);
+  }
 
-    public void setExternalUrl(String externalUrl) {
-        this.externalUrl = externalUrl;
-    }
+  public void setPopularScientificSummary(Map<String, String> popularScientificSummary) {
+    this.popularScientificSummary = popularScientificSummary;
+  }
 
-    /**
-     * Verifies CristinProject has enough data to be considered as valid.
-     *
-     * @return project has enough data to be considered valid
-     */
-    public boolean hasEnrichedContent() {
-        return StringUtils.isNotBlank(cristinProjectId)
-               && !getTitle().isEmpty()
-               && nonNull(getStartDate())
-               && nonNull(getCoordinatingInstitution());
-    }
+  public Map<String, String> getMethod() {
+    return nonEmptyOrDefault(method);
+  }
 
-    public NvaProject toNvaProject() {
-        return new NvaProjectBuilder().apply(this);
-    }
+  public void setMethod(Map<String, String> method) {
+    this.method = method;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof CristinProject that)) {
-            return false;
-        }
-        return Objects.equals(getCristinProjectId(), that.getCristinProjectId())
-               && Objects.equals(getPublishable(), that.getPublishable())
-               && Objects.equals(getPublished(), that.getPublished())
-               && Objects.equals(getTitle(), that.getTitle())
-               && Objects.equals(getMainLanguage(), that.getMainLanguage())
-               && Objects.equals(getStartDate(), that.getStartDate())
-               && Objects.equals(getEndDate(), that.getEndDate())
-               && Objects.equals(getStatus(), that.getStatus())
-               && Objects.equals(getCreated(), that.getCreated())
-               && Objects.equals(getLastModified(), that.getLastModified())
-               && Objects.equals(getCoordinatingInstitution(), that.getCoordinatingInstitution())
-               && Objects.equals(getProjectFundingSources(), that.getProjectFundingSources())
-               && Objects.equals(getContactInfo(), that.getContactInfo())
-               && Objects.equals(getTotalFundingAmount(), that.getTotalFundingAmount())
-               && Objects.equals(getParticipants(), that.getParticipants())
-               && Objects.equals(getAcademicSummary(), that.getAcademicSummary())
-               && Objects.equals(getPopularScientificSummary(), that.getPopularScientificSummary())
-               && Objects.equals(getMethod(), that.getMethod())
-               && Objects.equals(getEquipment(), that.getEquipment())
-               && Objects.equals(getProjectCategories(), that.getProjectCategories())
-               && Objects.equals(getKeywords(), that.getKeywords())
-               && Objects.equals(getExternalSources(), that.getExternalSources())
-               && Objects.equals(getRelatedProjects(), that.getRelatedProjects())
-               && Objects.equals(getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch())
-               && Objects.equals(getHealthProjectType(), that.getHealthProjectType())
-               && Objects.equals(getHealthProjectTypeName(), that.getHealthProjectTypeName())
-               && Objects.equals(getClinicalTrialPhase(), that.getClinicalTrialPhase())
-               && Objects.equals(getApprovals(), that.getApprovals())
-               && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure())
-               && Objects.equals(getCreator(), that.getCreator())
-               && Objects.equals(getExternalUrl(), that.getExternalUrl());
-    }
+  public Map<String, String> getEquipment() {
+    return nonEmptyOrDefault(equipment);
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getCristinProjectId(), getPublishable(), getPublished(), getTitle(), getMainLanguage(),
-                            getStartDate(), getEndDate(), getStatus(), getCreated(), getLastModified(),
-                            getCoordinatingInstitution(), getProjectFundingSources(), getContactInfo(),
-                            getTotalFundingAmount(), getParticipants(), getAcademicSummary(),
-                            getPopularScientificSummary(),
-                            getMethod(), getEquipment(), getProjectCategories(), getKeywords(), getExternalSources(),
-                            getRelatedProjects(), getInstitutionsResponsibleForResearch(), getHealthProjectType(),
-                            getHealthProjectTypeName(), getClinicalTrialPhase(), getApprovals(),
-                            getExemptFromPublicDisclosure(), getCreator(), getExternalUrl());
-    }
+  public void setEquipment(Map<String, String> equipment) {
+    this.equipment = equipment;
+  }
 
-    @Override
-    public String toString() {
-        return toJsonString();
-    }
+  public List<CristinTypedLabel> getProjectCategories() {
+    return nonEmptyOrDefault(projectCategories);
+  }
 
+  public void setProjectCategories(List<CristinTypedLabel> projectCategories) {
+    this.projectCategories = projectCategories;
+  }
+
+  public List<CristinTypedLabel> getKeywords() {
+    return nonEmptyOrDefault(keywords);
+  }
+
+  public void setKeywords(List<CristinTypedLabel> keywords) {
+    this.keywords = keywords;
+  }
+
+  public List<CristinExternalSource> getExternalSources() {
+    return nonEmptyOrDefault(externalSources);
+  }
+
+  public void setExternalSources(List<CristinExternalSource> externalSources) {
+    this.externalSources = externalSources;
+  }
+
+  public List<String> getRelatedProjects() {
+    return nonEmptyOrDefault(relatedProjects);
+  }
+
+  public void setRelatedProjects(List<String> relatedProjects) {
+    this.relatedProjects = relatedProjects;
+  }
+
+  public List<CristinOrganization> getInstitutionsResponsibleForResearch() {
+    return nonEmptyOrDefault(institutionsResponsibleForResearch);
+  }
+
+  public void setInstitutionsResponsibleForResearch(
+      List<CristinOrganization> institutionsResponsibleForResearch) {
+    this.institutionsResponsibleForResearch = institutionsResponsibleForResearch;
+  }
+
+  public String getHealthProjectType() {
+    return healthProjectType;
+  }
+
+  public void setHealthProjectType(String healthProjectType) {
+    this.healthProjectType = healthProjectType;
+  }
+
+  public Map<String, String> getHealthProjectTypeName() {
+    return nonEmptyOrDefault(healthProjectTypeName);
+  }
+
+  public void setHealthProjectTypeName(Map<String, String> healthProjectTypeName) {
+    this.healthProjectTypeName = healthProjectTypeName;
+  }
+
+  public String getClinicalTrialPhase() {
+    return clinicalTrialPhase;
+  }
+
+  public void setClinicalTrialPhase(String clinicalTrialPhase) {
+    this.clinicalTrialPhase = clinicalTrialPhase;
+  }
+
+  public List<CristinApproval> getApprovals() {
+    return nonEmptyOrDefault(approvals);
+  }
+
+  public void setApprovals(List<CristinApproval> approvals) {
+    this.approvals = approvals;
+  }
+
+  @SuppressWarnings({"PMD.BooleanGetMethodName"})
+  public Boolean getExemptFromPublicDisclosure() {
+    return exemptFromPublicDisclosure;
+  }
+
+  public void setExemptFromPublicDisclosure(Boolean exemptFromPublicDisclosure) {
+    this.exemptFromPublicDisclosure = exemptFromPublicDisclosure;
+  }
+
+  public CristinPerson getCreator() {
+    return creator;
+  }
+
+  public void setCreator(CristinPerson creator) {
+    this.creator = creator;
+  }
+
+  public String getExternalUrl() {
+    return externalUrl;
+  }
+
+  public void setExternalUrl(String externalUrl) {
+    this.externalUrl = externalUrl;
+  }
+
+  /**
+   * Verifies CristinProject has enough data to be considered as valid.
+   *
+   * @return project has enough data to be considered valid
+   */
+  public boolean hasEnrichedContent() {
+    return StringUtils.isNotBlank(cristinProjectId)
+        && !getTitle().isEmpty()
+        && nonNull(getStartDate())
+        && nonNull(getCoordinatingInstitution());
+  }
+
+  public NvaProject toNvaProject() {
+    return new NvaProjectBuilder().apply(this);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof CristinProject that)) {
+      return false;
+    }
+    return Objects.equals(getCristinProjectId(), that.getCristinProjectId())
+        && Objects.equals(getPublishable(), that.getPublishable())
+        && Objects.equals(getPublished(), that.getPublished())
+        && Objects.equals(getTitle(), that.getTitle())
+        && Objects.equals(getMainLanguage(), that.getMainLanguage())
+        && Objects.equals(getStartDate(), that.getStartDate())
+        && Objects.equals(getEndDate(), that.getEndDate())
+        && Objects.equals(getStatus(), that.getStatus())
+        && Objects.equals(getCreated(), that.getCreated())
+        && Objects.equals(getLastModified(), that.getLastModified())
+        && Objects.equals(getCoordinatingInstitution(), that.getCoordinatingInstitution())
+        && Objects.equals(getProjectFundingSources(), that.getProjectFundingSources())
+        && Objects.equals(getContactInfo(), that.getContactInfo())
+        && Objects.equals(getTotalFundingAmount(), that.getTotalFundingAmount())
+        && Objects.equals(getParticipants(), that.getParticipants())
+        && Objects.equals(getAcademicSummary(), that.getAcademicSummary())
+        && Objects.equals(getPopularScientificSummary(), that.getPopularScientificSummary())
+        && Objects.equals(getMethod(), that.getMethod())
+        && Objects.equals(getEquipment(), that.getEquipment())
+        && Objects.equals(getProjectCategories(), that.getProjectCategories())
+        && Objects.equals(getKeywords(), that.getKeywords())
+        && Objects.equals(getExternalSources(), that.getExternalSources())
+        && Objects.equals(getRelatedProjects(), that.getRelatedProjects())
+        && Objects.equals(
+            getInstitutionsResponsibleForResearch(), that.getInstitutionsResponsibleForResearch())
+        && Objects.equals(getHealthProjectType(), that.getHealthProjectType())
+        && Objects.equals(getHealthProjectTypeName(), that.getHealthProjectTypeName())
+        && Objects.equals(getClinicalTrialPhase(), that.getClinicalTrialPhase())
+        && Objects.equals(getApprovals(), that.getApprovals())
+        && Objects.equals(getExemptFromPublicDisclosure(), that.getExemptFromPublicDisclosure())
+        && Objects.equals(getCreator(), that.getCreator())
+        && Objects.equals(getExternalUrl(), that.getExternalUrl());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        getCristinProjectId(),
+        getPublishable(),
+        getPublished(),
+        getTitle(),
+        getMainLanguage(),
+        getStartDate(),
+        getEndDate(),
+        getStatus(),
+        getCreated(),
+        getLastModified(),
+        getCoordinatingInstitution(),
+        getProjectFundingSources(),
+        getContactInfo(),
+        getTotalFundingAmount(),
+        getParticipants(),
+        getAcademicSummary(),
+        getPopularScientificSummary(),
+        getMethod(),
+        getEquipment(),
+        getProjectCategories(),
+        getKeywords(),
+        getExternalSources(),
+        getRelatedProjects(),
+        getInstitutionsResponsibleForResearch(),
+        getHealthProjectType(),
+        getHealthProjectTypeName(),
+        getClinicalTrialPhase(),
+        getApprovals(),
+        getExemptFromPublicDisclosure(),
+        getCreator(),
+        getExternalUrl());
+  }
+
+  @Override
+  public String toString() {
+    return toJsonString();
+  }
 }
-

@@ -5,6 +5,7 @@ import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PAGE_ITEMS
 import static no.unit.nva.cristin.projects.common.ParameterKeyProject.PATH_PROJECT;
 import static no.unit.nva.utils.VersioningUtils.ACCEPT_HEADER_KEY_NAME;
 import static no.unit.nva.utils.VersioningUtils.extractVersionFromRequestInfo;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import java.net.HttpURLConnection;
 import no.unit.nva.client.ClientProvider;
@@ -20,67 +21,68 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 
-/**
- * Handler for requests to Lambda function.
- */
-public class QueryCristinProjectHandler extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
+/** Handler for requests to Lambda function. */
+public class QueryCristinProjectHandler
+    extends CristinQueryHandler<Void, SearchResponse<NvaProject>> {
 
-    public static final ParameterKeyProject[] REQUIRED_QUERY_PARAMETER =
-        {PATH_PROJECT, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE };
+  public static final ParameterKeyProject[] REQUIRED_QUERY_PARAMETER = {
+    PATH_PROJECT, PAGE_CURRENT, PAGE_ITEMS_PER_PAGE
+  };
 
-    private final transient ClientProvider<CristinQueryApiClient<QueryProject, NvaProject>> clientProvider;
+  private final transient ClientProvider<CristinQueryApiClient<QueryProject, NvaProject>>
+      clientProvider;
 
-    @SuppressWarnings("unused")
-    @JacocoGenerated
-    public QueryCristinProjectHandler() {
-        this(new Environment());
+  @SuppressWarnings("unused")
+  @JacocoGenerated
+  public QueryCristinProjectHandler() {
+    this(new Environment());
+  }
+
+  @JacocoGenerated
+  public QueryCristinProjectHandler(Environment environment) {
+    this(new DefaultProjectQueryClientProvider(), environment);
+  }
+
+  protected QueryCristinProjectHandler(
+      ClientProvider<CristinQueryApiClient<QueryProject, NvaProject>> clientProvider,
+      Environment environment) {
+    super(Void.class, environment);
+    this.clientProvider = clientProvider;
+  }
+
+  @Override
+  protected void validateRequest(Void input, RequestInfo requestInfo, Context context) {
+    // no-op
+  }
+
+  @Override
+  protected SearchResponse<NvaProject> processInput(
+      Void input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
+
+    var apiVersion = getApiVersion(requestInfo);
+    var client = clientProvider.getClient(apiVersion);
+    var queryBuilder = QueryProject.builder();
+
+    if (client instanceof QueryProjectWithFacetsClient) {
+      queryBuilder.usingFacetKeys();
     }
 
-    @JacocoGenerated
-    public QueryCristinProjectHandler(Environment environment) {
-        this(new DefaultProjectQueryClientProvider(), environment);
-    }
+    var cristinQuery =
+        (QueryProject)
+            queryBuilder
+                .fromRequestInfo(requestInfo)
+                .withRequiredParameters(REQUIRED_QUERY_PARAMETER)
+                .build();
 
-    protected QueryCristinProjectHandler(
-        ClientProvider<CristinQueryApiClient<QueryProject, NvaProject>> clientProvider,
-        Environment environment
-    ) {
-        super(Void.class, environment);
-        this.clientProvider = clientProvider;
-    }
+    return client.executeQuery(cristinQuery);
+  }
 
-    @Override
-    protected void validateRequest(Void input, RequestInfo requestInfo, Context context) {
-        // no-op
-    }
+  @Override
+  protected Integer getSuccessStatusCode(Void input, SearchResponse output) {
+    return HttpURLConnection.HTTP_OK;
+  }
 
-    @Override
-    protected SearchResponse<NvaProject> processInput(Void input, RequestInfo requestInfo, Context context)
-            throws ApiGatewayException {
-
-        var apiVersion = getApiVersion(requestInfo);
-        var client = clientProvider.getClient(apiVersion);
-        var queryBuilder = QueryProject.builder();
-
-        if (client instanceof QueryProjectWithFacetsClient) {
-            queryBuilder.usingFacetKeys();
-        }
-
-        var cristinQuery = (QueryProject) queryBuilder
-                                              .fromRequestInfo(requestInfo)
-                                              .withRequiredParameters(REQUIRED_QUERY_PARAMETER)
-                                              .build();
-
-        return client.executeQuery(cristinQuery);
-    }
-
-    @Override
-    protected Integer getSuccessStatusCode(Void input, SearchResponse output) {
-        return HttpURLConnection.HTTP_OK;
-    }
-
-    private String getApiVersion(RequestInfo requestInfo) {
-        return extractVersionFromRequestInfo(requestInfo, ACCEPT_HEADER_KEY_NAME);
-    }
-
+  private String getApiVersion(RequestInfo requestInfo) {
+    return extractVersionFromRequestInfo(requestInfo, ACCEPT_HEADER_KEY_NAME);
+  }
 }

@@ -6,9 +6,8 @@ import no.unit.nva.cristin.model.CristinTypedLabel;
 
 public class KeywordToCristin implements Function<Keyword, CristinTypedLabel> {
 
-    @Override
-    public CristinTypedLabel apply(Keyword keyword) {
-        return new CristinTypedLabel(null, keyword.getLabels());
-    }
-
+  @Override
+  public CristinTypedLabel apply(Keyword keyword) {
+    return new CristinTypedLabel(null, keyword.getLabels());
+  }
 }

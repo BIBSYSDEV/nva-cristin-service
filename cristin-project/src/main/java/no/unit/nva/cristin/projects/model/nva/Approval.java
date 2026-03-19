@@ -2,6 +2,7 @@ package no.unit.nva.cristin.projects.model.nva;
 
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.JsonPropertyNames.IDENTIFIER;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -14,91 +15,100 @@ import no.unit.nva.model.ApprovalStatus;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Approval implements JsonSerializable {
 
-    public static final String APPROVAL_DATE = "date";
-    public static final String APPROVAL_AUTHORITY = "authority";
-    public static final String APPROVAL_STATUS = "status";
-    public static final String APPLICATION_CODE = "applicationCode";
-    public static final String AUTHORITY_NAME = "authorityName";
+  public static final String APPROVAL_DATE = "date";
+  public static final String APPROVAL_AUTHORITY = "authority";
+  public static final String APPROVAL_STATUS = "status";
+  public static final String APPLICATION_CODE = "applicationCode";
+  public static final String AUTHORITY_NAME = "authorityName";
 
-    @JsonProperty(APPROVAL_DATE)
-    private final Instant date;
-    @JsonProperty(APPROVAL_AUTHORITY)
-    private final ApprovalAuthority authority;
-    @JsonProperty(APPROVAL_STATUS)
-    private final ApprovalStatus status;
-    @JsonProperty(APPLICATION_CODE)
-    private final ApplicationCode applicationCode;
-    @JsonProperty(IDENTIFIER)
-    private final String identifier;
-    @JsonProperty(AUTHORITY_NAME)
-    private final Map<String, String> authorityName;
+  @JsonProperty(APPROVAL_DATE)
+  private final Instant date;
 
-    /**
-     * Constructor for object of type Approval.
-     */
-    @JsonCreator
-    public Approval(@JsonProperty(APPROVAL_DATE) Instant date,
-                    @JsonProperty(APPROVAL_AUTHORITY) ApprovalAuthority authority,
-                    @JsonProperty(APPROVAL_STATUS) ApprovalStatus status,
-                    @JsonProperty(APPLICATION_CODE) ApplicationCode applicationCode,
-                    @JsonProperty(IDENTIFIER) String identifier,
-                    @JsonProperty(AUTHORITY_NAME) Map<String, String> authorityName) {
-        this.date = date;
-        this.authority = authority;
-        this.status = status;
-        this.applicationCode = applicationCode;
-        this.identifier = identifier;
-        this.authorityName = authorityName;
+  @JsonProperty(APPROVAL_AUTHORITY)
+  private final ApprovalAuthority authority;
+
+  @JsonProperty(APPROVAL_STATUS)
+  private final ApprovalStatus status;
+
+  @JsonProperty(APPLICATION_CODE)
+  private final ApplicationCode applicationCode;
+
+  @JsonProperty(IDENTIFIER)
+  private final String identifier;
+
+  @JsonProperty(AUTHORITY_NAME)
+  private final Map<String, String> authorityName;
+
+  /** Constructor for object of type Approval. */
+  @JsonCreator
+  public Approval(
+      @JsonProperty(APPROVAL_DATE) Instant date,
+      @JsonProperty(APPROVAL_AUTHORITY) ApprovalAuthority authority,
+      @JsonProperty(APPROVAL_STATUS) ApprovalStatus status,
+      @JsonProperty(APPLICATION_CODE) ApplicationCode applicationCode,
+      @JsonProperty(IDENTIFIER) String identifier,
+      @JsonProperty(AUTHORITY_NAME) Map<String, String> authorityName) {
+    this.date = date;
+    this.authority = authority;
+    this.status = status;
+    this.applicationCode = applicationCode;
+    this.identifier = identifier;
+    this.authorityName = authorityName;
+  }
+
+  public Instant getDate() {
+    return date;
+  }
+
+  public ApprovalAuthority getAuthority() {
+    return authority;
+  }
+
+  public ApprovalStatus getStatus() {
+    return status;
+  }
+
+  public ApplicationCode getApplicationCode() {
+    return applicationCode;
+  }
+
+  public String getIdentifier() {
+    return identifier;
+  }
+
+  public Map<String, String> getAuthorityName() {
+    return nonEmptyOrDefault(authorityName);
+  }
+
+  @Override
+  public String toString() {
+    return toJsonString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    public Instant getDate() {
-        return date;
+    if (!(o instanceof Approval approval)) {
+      return false;
     }
+    return Objects.equals(getDate(), approval.getDate())
+        && getAuthority() == approval.getAuthority()
+        && getStatus() == approval.getStatus()
+        && getApplicationCode() == approval.getApplicationCode()
+        && Objects.equals(getIdentifier(), approval.getIdentifier())
+        && Objects.equals(getAuthorityName(), approval.getAuthorityName());
+  }
 
-    public ApprovalAuthority getAuthority() {
-        return authority;
-    }
-
-    public ApprovalStatus getStatus() {
-        return status;
-    }
-
-    public ApplicationCode getApplicationCode() {
-        return applicationCode;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public Map<String, String> getAuthorityName() {
-        return nonEmptyOrDefault(authorityName);
-    }
-
-    @Override
-    public String toString() {
-        return toJsonString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Approval approval)) {
-            return false;
-        }
-        return Objects.equals(getDate(), approval.getDate())
-               && getAuthority() == approval.getAuthority()
-               && getStatus() == approval.getStatus()
-               && getApplicationCode() == approval.getApplicationCode()
-               && Objects.equals(getIdentifier(), approval.getIdentifier())
-               && Objects.equals(getAuthorityName(), approval.getAuthorityName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getDate(), getAuthority(), getStatus(), getApplicationCode(), getIdentifier(),
-                            getAuthorityName());
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        getDate(),
+        getAuthority(),
+        getStatus(),
+        getApplicationCode(),
+        getIdentifier(),
+        getAuthorityName());
+  }
 }
