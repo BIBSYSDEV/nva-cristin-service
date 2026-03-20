@@ -7,15 +7,15 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'nebula.lint', name: 'nebula.lint.gradle.plugin', version: '21.1.3'
-    implementation group: 'org.jacoco', name: 'org.jacoco.core', version: '0.8.14'
-    implementation group: 'org.jacoco', name: 'org.jacoco.report', version: '0.8.14'
-    implementation group: 'com.diffplug.spotless', name: 'spotless-plugin-gradle', version: '8.3.0'
-    implementation group: 'com.autonomousapps', name: 'dependency-analysis-gradle-plugin', version: '3.6.1'
+    implementation 'nebula.lint:nebula.lint.gradle.plugin:21.1.3'
+    implementation 'org.jacoco:org.jacoco.core:0.8.14'
+    implementation 'org.jacoco:org.jacoco.report:0.8.14'
+    implementation 'com.diffplug.spotless:spotless-plugin-gradle:8.3.0'
+    implementation 'com.autonomousapps:dependency-analysis-gradle-plugin:3.6.1'
 }
 
-group 'no.unit.nva'
-version '1.0-JDK21'
+group = 'no.unit.nva'
+version = '1.0-JDK21'
 
 java {
     java.sourceCompatibility = JavaVersion.VERSION_21
