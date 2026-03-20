@@ -27,6 +27,7 @@ reporting {
 
 tasks.named('check') {
     dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
+    dependsOn tasks.named('spectral')
 }
 
 def isNonStable(String version) {
