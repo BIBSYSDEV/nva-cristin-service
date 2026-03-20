@@ -2,13 +2,12 @@ package no.unit.nva.cristin.organization.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import nva.commons.core.JacocoGenerated;
-
 import java.net.URI;
 import java.util.Map;
+import nva.commons.core.JacocoGenerated;
 
 public class SubUnitDto {
-    /*
+  /*
     {
     "cristin_unit_id" : "185.11.0.0",
     "unit_name" : {
@@ -18,105 +17,105 @@ public class SubUnitDto {
   }
      */
 
-    private String id;
-    private Map<String, String> name;
-    private Map<String, String> institution;
-    private URI uri;
-    private String acronym;
-    private String country;
+  private String id;
+  private Map<String, String> name;
+  private Map<String, String> institution;
+  private URI uri;
+  private String acronym;
+  private String country;
 
-    @JsonIgnore
-    private URI sourceUri;
+  @JsonIgnore private URI sourceUri;
 
-    /**
-     * Default and JSON constructor.
-     *
-     * @param id          the Cristin ID.
-     * @param name        the unit name.
-     * @param institution the institution properties.
-     * @param uri         the institution URI.
-     * @param acronym     the institution Acronym.
-     * @param country     the country code of the unit.
-     */
-    public SubUnitDto(@JsonProperty("cristin_unit_id") String id,
-                      @JsonProperty("unit_name") Map<String, String> name,
-                      @JsonProperty("institution") Map<String, String> institution,
-                      @JsonProperty("url") String uri,
-                      @JsonProperty("acronym") String acronym,
-                      @JsonProperty("country") String country) {
-        this.id = id;
-        this.name = name;
-        this.institution = institution;
-        this.uri = URI.create(uri);
-        this.acronym = acronym;
-        this.country = country;
-    }
+  /**
+   * Default and JSON constructor.
+   *
+   * @param id the Cristin ID.
+   * @param name the unit name.
+   * @param institution the institution properties.
+   * @param uri the institution URI.
+   * @param acronym the institution Acronym.
+   * @param country the country code of the unit.
+   */
+  public SubUnitDto(
+      @JsonProperty("cristin_unit_id") String id,
+      @JsonProperty("unit_name") Map<String, String> name,
+      @JsonProperty("institution") Map<String, String> institution,
+      @JsonProperty("url") String uri,
+      @JsonProperty("acronym") String acronym,
+      @JsonProperty("country") String country) {
+    this.id = id;
+    this.name = name;
+    this.institution = institution;
+    this.uri = URI.create(uri);
+    this.acronym = acronym;
+    this.country = country;
+  }
 
-    @JacocoGenerated
-    public String getId() {
-        return id;
-    }
+  @JacocoGenerated
+  public String getId() {
+    return id;
+  }
 
-    @JacocoGenerated
-    public void setId(String id) {
-        this.id = id;
-    }
+  @JacocoGenerated
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    @JacocoGenerated
-    public Map<String, String> getName() {
-        return name;
-    }
+  @JacocoGenerated
+  public Map<String, String> getName() {
+    return name;
+  }
 
-    @JacocoGenerated
-    public void setName(Map<String, String> name) {
-        this.name = name;
-    }
+  @JacocoGenerated
+  public void setName(Map<String, String> name) {
+    this.name = name;
+  }
 
-    @JacocoGenerated
-    public URI getUri() {
-        return uri;
-    }
+  @JacocoGenerated
+  public URI getUri() {
+    return uri;
+  }
 
-    @JacocoGenerated
-    public void setUri(URI uri) {
-        this.uri = uri;
-    }
+  @JacocoGenerated
+  public void setUri(URI uri) {
+    this.uri = uri;
+  }
 
-    @JacocoGenerated
-    public Map<String, String> getInstitution() {
-        return institution;
-    }
+  @JacocoGenerated
+  public Map<String, String> getInstitution() {
+    return institution;
+  }
 
-    @JacocoGenerated
-    public void setInstitution(Map<String, String> institution) {
-        this.institution = institution;
-    }
+  @JacocoGenerated
+  public void setInstitution(Map<String, String> institution) {
+    this.institution = institution;
+  }
 
-    @JacocoGenerated
-    public String getAcronym() {
-        return acronym;
-    }
+  @JacocoGenerated
+  public String getAcronym() {
+    return acronym;
+  }
 
-    @JacocoGenerated
-    public void setAcronym(String acronym) {
-        this.acronym = acronym;
-    }
+  @JacocoGenerated
+  public void setAcronym(String acronym) {
+    this.acronym = acronym;
+  }
 
-    @JacocoGenerated
-    public URI getSourceUri() {
-        return sourceUri;
-    }
+  @JacocoGenerated
+  public URI getSourceUri() {
+    return sourceUri;
+  }
 
-    @JacocoGenerated
-    public void setSourceUri(URI sourceUri) {
-        this.sourceUri = sourceUri;
-    }
+  @JacocoGenerated
+  public void setSourceUri(URI sourceUri) {
+    this.sourceUri = sourceUri;
+  }
 
-    public String getCountry() {
-        return country;
-    }
+  public String getCountry() {
+    return country;
+  }
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
+  public void setCountry(String country) {
+    this.country = country;
+  }
 }

@@ -7,13 +7,13 @@ import java.util.Optional;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinOrcid {
 
-    private String id;
+  private String id;
 
-    public Optional<String> getId() {
-        return Optional.ofNullable(id);
-    }
+  public Optional<String> getId() {
+    return Optional.ofNullable(id);
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 }

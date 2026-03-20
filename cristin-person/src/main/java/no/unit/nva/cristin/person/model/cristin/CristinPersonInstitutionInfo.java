@@ -8,26 +8,26 @@ import no.unit.nva.cristin.person.model.nva.PersonInstitutionInfo;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CristinPersonInstitutionInfo {
 
-    private String email;
-    private String phone;
+  private String email;
+  private String phone;
 
-    public String getEmail() {
-        return email;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public String getPhone() {
-        return phone;
-    }
+  public String getPhone() {
+    return phone;
+  }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
 
-    public PersonInstitutionInfo toPersonInstitutionInfo(URI id) {
-        return new PersonInstitutionInfo(id, getEmail(), getPhone());
-    }
+  public PersonInstitutionInfo toPersonInstitutionInfo(URI id) {
+    return new PersonInstitutionInfo(id, getEmail(), getPhone());
+  }
 }

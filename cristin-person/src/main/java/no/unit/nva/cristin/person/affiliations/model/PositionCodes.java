@@ -2,6 +2,7 @@ package no.unit.nva.cristin.person.affiliations.model;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,48 +16,48 @@ import nva.commons.core.JacocoGenerated;
 @JacocoGenerated
 public class PositionCodes implements JsonSerializable {
 
-    @JsonProperty(CONTEXT)
-    @JsonInclude(NON_NULL)
-    private final URI context;
-    private final Set<PositionCode> positions;
+  @JsonProperty(CONTEXT)
+  @JsonInclude(NON_NULL)
+  private final URI context;
 
-    /**
-     * Creates a Position Code wrapper for serialization to client.
-     */
-    @JsonCreator
-    public PositionCodes(@JsonProperty("@context") URI context, @JsonProperty("codes") Set<PositionCode> codes) {
-        this.context = context;
-        this.positions = codes;
-    }
+  private final Set<PositionCode> positions;
 
-    public URI getContext() {
-        return context;
-    }
+  /** Creates a Position Code wrapper for serialization to client. */
+  @JsonCreator
+  public PositionCodes(
+      @JsonProperty("@context") URI context, @JsonProperty("codes") Set<PositionCode> codes) {
+    this.context = context;
+    this.positions = codes;
+  }
 
-    public Set<PositionCode> getPositions() {
-        return Utils.nonEmptyOrDefault(positions);
-    }
+  public URI getContext() {
+    return context;
+  }
 
-    @JacocoGenerated
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof PositionCodes that)) {
-            return false;
-        }
-        return Objects.equals(getContext(), that.getContext())
-            && getPositions().equals(that.getPositions());
-    }
+  public Set<PositionCode> getPositions() {
+    return Utils.nonEmptyOrDefault(positions);
+  }
 
-    @Override
-    public String toString() {
-        return toJsonString();
+  @JacocoGenerated
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
+    if (!(o instanceof PositionCodes that)) {
+      return false;
+    }
+    return Objects.equals(getContext(), that.getContext())
+        && getPositions().equals(that.getPositions());
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getContext(), getPositions());
-    }
+  @Override
+  public String toString() {
+    return toJsonString();
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getContext(), getPositions());
+  }
 }

@@ -1,44 +1,13 @@
 package no.unit.nva.cristin.projects;
 
-import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
-import no.unit.nva.cristin.projects.model.nva.ApplicationCode;
-import no.unit.nva.cristin.projects.model.nva.Approval;
-import no.unit.nva.cristin.projects.model.nva.ApprovalAuthority;
-import no.unit.nva.cristin.projects.model.nva.Role;
-import no.unit.nva.model.ApprovalStatus;
-import no.unit.nva.cristin.projects.model.nva.ContactInfo;
-import no.unit.nva.model.DateInfo;
-import no.unit.nva.model.ExternalSource;
-import no.unit.nva.cristin.projects.model.nva.Funding;
-import no.unit.nva.cristin.projects.model.nva.FundingAmount;
-import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
-import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
-import no.unit.nva.cristin.projects.model.nva.NvaContributor;
-import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.cristin.projects.model.nva.Person;
-import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
-import no.unit.nva.model.TypedLabel;
-import no.unit.nva.model.Organization;
-import no.unit.nva.utils.UriUtils;
-import nva.commons.core.language.LanguageMapper;
-
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+import static no.unit.nva.cristin.model.Constants.CRISTIN_IDENTIFIER_TYPE;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
-import static no.unit.nva.cristin.model.Constants.CRISTIN_IDENTIFIER_TYPE;
-import static no.unit.nva.cristin.projects.model.cristin.adapter.CristinFundingSourceToFunding.FUNDING_SOURCES;
-import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
 import static no.unit.nva.cristin.model.Constants.TYPE;
 import static no.unit.nva.cristin.model.Constants.VALUE;
+import static no.unit.nva.cristin.projects.model.cristin.adapter.CristinFundingSourceToFunding.FUNDING_SOURCES;
+import static no.unit.nva.cristin.projects.model.nva.Funding.UNCONFIRMED_FUNDING;
 import static no.unit.nva.cristin.projects.model.nva.NvaProject.PROJECT_TYPE;
 import static no.unit.nva.hamcrest.DoesNotHaveEmptyValues.doesNotHaveEmptyValuesIgnoringFields;
 import static no.unit.nva.language.LanguageMapper.getLanguageByUri;
@@ -52,256 +21,295 @@ import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import no.unit.nva.cristin.projects.model.nva.ApplicationCode;
+import no.unit.nva.cristin.projects.model.nva.Approval;
+import no.unit.nva.cristin.projects.model.nva.ApprovalAuthority;
+import no.unit.nva.cristin.projects.model.nva.ClinicalTrialPhase;
+import no.unit.nva.cristin.projects.model.nva.ContactInfo;
+import no.unit.nva.cristin.projects.model.nva.Funding;
+import no.unit.nva.cristin.projects.model.nva.FundingAmount;
+import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
+import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
+import no.unit.nva.cristin.projects.model.nva.NvaContributor;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.projects.model.nva.Person;
+import no.unit.nva.cristin.projects.model.nva.ProjectStatus;
+import no.unit.nva.cristin.projects.model.nva.Role;
+import no.unit.nva.model.ApprovalStatus;
+import no.unit.nva.model.DateInfo;
+import no.unit.nva.model.ExternalSource;
+import no.unit.nva.model.Organization;
+import no.unit.nva.model.TypedLabel;
+import no.unit.nva.utils.UriUtils;
+import nva.commons.core.language.LanguageMapper;
+
 public class RandomProjectDataGenerator {
 
+  public static final String[] LANGUAGES = {"en", "nb", "nn"};
+  public static final Set<String> IGNORE_LIST =
+      Set.of(
+          ".context", // Context is not used in searchResponse
+          ".coordinatingInstitution.partOf", // Ignoring Organization parts as we only need Id here
+          ".coordinatingInstitution.hasPart",
+          ".coordinatingInstitution.context",
+          ".coordinatingInstitution.acronym",
+          ".coordinatingInstitution.country",
+          "contributors.affiliation.partOf",
+          "contributors.affiliation.hasPart",
+          ".contributors.affiliation.context",
+          ".contributors.affiliation.acronym",
+          ".contributors.affiliation.country",
+          "published",
+          "publishable",
+          ".institutionsResponsibleForResearch.hasPart",
+          ".institutionsResponsibleForResearch.partOf",
+          ".institutionsResponsibleForResearch.acronym",
+          ".institutionsResponsibleForResearch.context",
+          ".institutionsResponsibleForResearch.country",
+          ".funding",
+          ".creator");
+  private static final String NORWEGIAN = "nb";
+  private static final String[] CONTRIBUTOR_TYPES = {
+    "ProjectManager", "ProjectParticipant", "LocalProjectManager"
+  };
+  public static final String SOME_UNIT_IDENTIFIER = "185.90.0.0";
+  public static final String EMAIL_DOMAIN = "@email.no";
+  public static final String PATH_DELIMITER = "/";
 
-    public static final String[] LANGUAGES = {"en", "nb", "nn"};
-    public static final Set<String> IGNORE_LIST = Set.of(
-            ".context",                             // Context is not used in searchResponse
-            ".coordinatingInstitution.partOf",      // Ignoring Organization parts as we only need Id here
-            ".coordinatingInstitution.hasPart",
-            ".coordinatingInstitution.context",
-            ".coordinatingInstitution.acronym",
-            ".coordinatingInstitution.country",
-            "contributors.affiliation.partOf",
-            "contributors.affiliation.hasPart",
-            ".contributors.affiliation.context",
-            ".contributors.affiliation.acronym",
-            ".contributors.affiliation.country",
-            "published",
-            "publishable",
-            ".institutionsResponsibleForResearch.hasPart",
-            ".institutionsResponsibleForResearch.partOf",
-            ".institutionsResponsibleForResearch.acronym",
-            ".institutionsResponsibleForResearch.context",
-            ".institutionsResponsibleForResearch.country",
-            ".funding",
-            ".creator"
-    );
-    private static final String NORWEGIAN = "nb";
-    private static final String[] CONTRIBUTOR_TYPES = {"ProjectManager", "ProjectParticipant", "LocalProjectManager"};
-    public static final String SOME_UNIT_IDENTIFIER = "185.90.0.0";
-    public static final String EMAIL_DOMAIN = "@email.no";
-    public static final String PATH_DELIMITER = "/";
+  /**
+   * Create a NvaProject containing random data.
+   *
+   * @return valid NvaProject with random data
+   */
+  public static NvaProject randomNvaProject() {
+    final String identifier = randomInteger().toString();
+    final URI language = LanguageMapper.toUri(NORWEGIAN);
+    final var fundings = randomFundings();
+    final NvaProject nvaProject =
+        new NvaProject.Builder()
+            // .withContext(PROJECT_CONTEXT)
+            .withType(PROJECT_TYPE)
+            .withId(UriUtils.createNvaProjectId(identifier))
+            .withIdentifiers(
+                Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
+            .withTitle(randomString())
+            .withLanguage(language)
+            .withStatus(randomStatus())
+            .withAlternativeTitles(randomListOfTitles(language))
+            .withStartDate(randomInstant())
+            .withEndDate(randomInstant())
+            .withAcademicSummary(randomSummary())
+            .withPopularScientificSummary(randomSummary())
+            .withFunding(fundings)
+            .withContributors(randomContributors())
+            .withCoordinatingInstitution(randomOrganization())
+            .withCreated(randomDateInfo())
+            .withLastModified(randomDateInfo())
+            .withContactInfo(randomContactInfo())
+            .withFundingAmount(randomFundingAmount())
+            .withMethod(randomSummary())
+            .withEquipment(randomSummary())
+            .withProjectCategories(List.of(randomTypedLabel()))
+            .withKeywords(List.of(randomTypedLabel()))
+            .withExternalSources(List.of(randomExternalSource()))
+            .withRelatedProjects(List.of(randomRelatedProjects()))
+            .withInstitutionsResponsibleForResearch(List.of(randomOrganization()))
+            .withHealthProjectData(randomHealthProjectData())
+            .withApprovals(randomApprovals())
+            .withExemptFromPublicDisclosure(randomBoolean())
+            .withWebPage(randomUri())
+            .build();
+    assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
+    return nvaProject;
+  }
 
-    /**
-     * Create a NvaProject containing random data.
-     *
-     * @return valid NvaProject with random data
-     */
-    public static NvaProject randomNvaProject() {
-        final String identifier = randomInteger().toString();
-        final URI language = LanguageMapper.toUri(NORWEGIAN);
-        final var fundings = randomFundings();
-        final NvaProject nvaProject = new NvaProject.Builder()
-                                          // .withContext(PROJECT_CONTEXT)
-                                          .withType(PROJECT_TYPE)
-                                          .withId(UriUtils.createNvaProjectId(identifier))
-                                          .withIdentifiers(Collections.singletonList(
-                                              Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
-                                          .withTitle(randomString())
-                                          .withLanguage(language)
-                                          .withStatus(randomStatus())
-                                          .withAlternativeTitles(randomListOfTitles(language))
-                                          .withStartDate(randomInstant())
-                                          .withEndDate(randomInstant())
-                                          .withAcademicSummary(randomSummary())
-                                          .withPopularScientificSummary(randomSummary())
-                                          .withFunding(fundings)
-                                          .withContributors(randomContributors())
-                                          .withCoordinatingInstitution(randomOrganization())
-                                          .withCreated(randomDateInfo())
-                                          .withLastModified(randomDateInfo())
-                                          .withContactInfo(randomContactInfo())
-                                          .withFundingAmount(randomFundingAmount())
-                                          .withMethod(randomSummary())
-                                          .withEquipment(randomSummary())
-                                          .withProjectCategories(List.of(randomTypedLabel()))
-                                          .withKeywords(List.of(randomTypedLabel()))
-                                          .withExternalSources(List.of(randomExternalSource()))
-                                          .withRelatedProjects(List.of(randomRelatedProjects()))
-                                          .withInstitutionsResponsibleForResearch(List.of(randomOrganization()))
-                                          .withHealthProjectData(randomHealthProjectData())
-                                          .withApprovals(randomApprovals())
-                                          .withExemptFromPublicDisclosure(randomBoolean())
-                                          .withWebPage(randomUri())
-                                          .build();
-        assertThat(nvaProject, doesNotHaveEmptyValuesIgnoringFields(IGNORE_LIST));
-        return nvaProject;
+  /** List of approvals with random data. */
+  public static List<Approval> randomApprovals() {
+    return List.of(
+        new Approval(
+            randomInstant(),
+            randomElement(ApprovalAuthority.values()),
+            randomElement(ApprovalStatus.values()),
+            randomElement(ApplicationCode.values()),
+            randomString(),
+            randomNamesMap()));
+  }
+
+  private static HealthProjectData randomHealthProjectData() {
+    return new HealthProjectData(
+        randomElement(HealthProjectType.values()),
+        randomNamesMap(),
+        randomElement(ClinicalTrialPhase.values()));
+  }
+
+  private static URI randomRelatedProjects() {
+    return semiRandomProjectId(randomInteger(99999).toString());
+  }
+
+  private static ExternalSource randomExternalSource() {
+    return new ExternalSource(randomString(), randomString());
+  }
+
+  private static TypedLabel randomTypedLabel() {
+    return new TypedLabel(randomString(), randomNamesMap());
+  }
+
+  private static ContactInfo randomContactInfo() {
+    return new ContactInfo(
+        randomString(), randomString(), randomString() + EMAIL_DOMAIN, randomString());
+  }
+
+  private static FundingAmount randomFundingAmount() {
+    return new FundingAmount(randomString(), randomInteger().doubleValue());
+  }
+
+  /**
+   * Create a valid NvaProject containing so less as possible random data.
+   *
+   * @return valid NvaProject with random data
+   */
+  public static NvaProject randomMinimalNvaProject() {
+    final String identifier = randomString();
+    return new NvaProject.Builder()
+        .withId(UriUtils.createNvaProjectId(identifier))
+        .withIdentifiers(
+            Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
+        .withType(PROJECT_TYPE)
+        .withTitle(randomString())
+        .withLanguage(LanguageMapper.toUri(randomElement(LANGUAGES)))
+        .withStatus(randomStatus())
+        .withCoordinatingInstitution(randomOrganization())
+        .withContributors(randomContributors())
+        .withStartDate(randomInstant())
+        .withEndDate(randomInstant())
+        .build();
+  }
+
+  public static Map<String, String> randomNamesMap() {
+    return Map.of(randomLanguage(), randomString());
+  }
+
+  public static ProjectStatus randomStatus() {
+    return randomElement(ProjectStatus.values());
+  }
+
+  private static URI semiRandomPersonId(String identifier) {
+    return getNvaApiId(identifier, PERSON_PATH_NVA);
+  }
+
+  private static URI semiRandomOrganizationId(String identifier) {
+    return getNvaApiId(identifier, ORGANIZATION_PATH);
+  }
+
+  private static URI semiRandomProjectId(String identifier) {
+    return getNvaApiId(identifier, PROJECT_PATH_NVA);
+  }
+
+  public static List<NvaContributor> randomContributors() {
+    return IntStream.rangeClosed(0, randomInteger(5))
+        .mapToObj(i -> randomContributor())
+        .collect(Collectors.toList());
+  }
+
+  private static NvaContributor randomContributor() {
+    var identity = randomPerson();
+    var roles = List.of(new Role(randomContributorType(), randomOrganization()));
+
+    return new NvaContributor(identity, roles);
+  }
+
+  private static String randomContributorType() {
+    return randomElement(CONTRIBUTOR_TYPES);
+  }
+
+  public static Person randomPerson() {
+    return new Person(
+        semiRandomPersonId(randomString()),
+        randomString(),
+        randomString(),
+        randomString() + EMAIL_DOMAIN,
+        randomString());
+  }
+
+  public static List<Funding> randomFundings() {
+    return IntStream.rangeClosed(0, randomInteger(7))
+        .mapToObj(i -> randomFunding())
+        .collect(Collectors.toList());
+  }
+
+  private static Funding randomFunding() {
+    return new Funding(
+        UNCONFIRMED_FUNDING,
+        getNvaApiUri(FUNDING_SOURCES + PATH_DELIMITER + randomString()),
+        randomString(),
+        randomNamesMap());
+  }
+
+  private static Map<String, String> randomSummary() {
+    return Collections.unmodifiableMap(
+        Arrays.stream(LANGUAGES)
+            .collect(
+                Collectors.toMap(languageCode -> languageCode, languageCode -> randomString())));
+  }
+
+  /** Creates a random organization. */
+  public static Organization randomOrganization() {
+    var labels = randomNamesMap();
+    return new Organization.Builder()
+        .withId(semiRandomOrganizationId(randomString()))
+        .withLabels(labels)
+        .build();
+  }
+
+  public static List<Map<String, String>> randomListOfTitles(URI usedLanguage) {
+    return List.of(Map.of(randomLanguageCodeExcept(usedLanguage), randomString()));
+  }
+
+  public static String randomLanguage() {
+    return randomElement(LANGUAGES);
+  }
+
+  private static String randomLanguageCodeExcept(URI usedLanguage) {
+    String usedLanguageCode = getLanguageByUri(usedLanguage).getIso6391Code();
+    String lang = randomElement(LANGUAGES);
+    while (lang.equals(usedLanguageCode)) {
+      lang = randomElement(LANGUAGES);
     }
+    return lang;
+  }
 
-    /**
-     * List of approvals with random data.
-     */
-    public static List<Approval> randomApprovals() {
-        return List.of(new Approval(randomInstant(),
-                                    randomElement(ApprovalAuthority.values()),
-                                    randomElement(ApprovalStatus.values()),
-                                    randomElement(ApplicationCode.values()),
-                                    randomString(),
-                                    randomNamesMap()));
-    }
+  /** Creates a random contributor with unit affiliation. */
+  public static NvaContributor randomContributorWithUnitAffiliation() {
+    var identity = randomPerson();
+    var roles = List.of(new Role(randomContributorType(), someOrganizationFromUnitIdentifier()));
 
-    private static HealthProjectData randomHealthProjectData() {
-        return new HealthProjectData(randomElement(HealthProjectType.values()),
-                                     randomNamesMap(),
-                                     randomElement(ClinicalTrialPhase.values()));
-    }
+    return new NvaContributor(identity, roles);
+  }
 
-    private static URI randomRelatedProjects() {
-        return semiRandomProjectId(randomInteger(99999).toString());
-    }
+  /** Creates a random contributor without unit affiliation. */
+  public static NvaContributor randomContributorWithoutUnitAffiliation() {
+    var identity = randomPerson();
+    var roles = List.of(new Role(randomContributorType(), null));
 
-    private static ExternalSource randomExternalSource() {
-        return new ExternalSource(randomString(), randomString());
-    }
+    return new NvaContributor(identity, roles);
+  }
 
-    private static TypedLabel randomTypedLabel() {
-        return new TypedLabel(randomString(), randomNamesMap());
-    }
+  /** Creates a dummy organization with unit identifier. */
+  public static Organization someOrganizationFromUnitIdentifier() {
+    return new Organization.Builder()
+        .withId(getNvaApiId(SOME_UNIT_IDENTIFIER, ORGANIZATION_PATH))
+        .build();
+  }
 
-    private static ContactInfo randomContactInfo() {
-        return new ContactInfo(randomString(), randomString(), randomString() + EMAIL_DOMAIN, randomString());
-    }
-
-    private static FundingAmount randomFundingAmount() {
-        return new FundingAmount(randomString(), randomInteger().doubleValue());
-    }
-
-    /**
-     * Create a valid NvaProject containing so less as possible random data.
-     *
-     * @return valid NvaProject with random data
-     */
-    public static NvaProject randomMinimalNvaProject() {
-        final String identifier = randomString();
-        return new NvaProject.Builder()
-                   .withId(UriUtils.createNvaProjectId(identifier))
-                   .withIdentifiers(Collections.singletonList(Map.of(TYPE, CRISTIN_IDENTIFIER_TYPE, VALUE, identifier)))
-                   .withType(PROJECT_TYPE)
-                   .withTitle(randomString())
-                   .withLanguage(LanguageMapper.toUri(randomElement(LANGUAGES)))
-                   .withStatus(randomStatus())
-                   .withCoordinatingInstitution(randomOrganization())
-                   .withContributors(randomContributors())
-                   .withStartDate(randomInstant())
-                   .withEndDate(randomInstant())
-                   .build();
-    }
-
-    public static Map<String, String> randomNamesMap() {
-        return Map.of(randomLanguage(), randomString());
-    }
-
-    public static ProjectStatus randomStatus() {
-        return randomElement(ProjectStatus.values());
-    }
-
-    private static URI semiRandomPersonId(String identifier) {
-        return getNvaApiId(identifier, PERSON_PATH_NVA);
-    }
-
-    private static URI semiRandomOrganizationId(String identifier) {
-        return getNvaApiId(identifier, ORGANIZATION_PATH);
-    }
-
-    private static URI semiRandomProjectId(String identifier) {
-        return getNvaApiId(identifier, PROJECT_PATH_NVA);
-    }
-
-    public static List<NvaContributor> randomContributors() {
-        return IntStream.rangeClosed(0, randomInteger(5))
-                .mapToObj(i -> randomContributor()).collect(Collectors.toList());
-    }
-
-    private static NvaContributor randomContributor() {
-        var identity = randomPerson();
-        var roles = List.of(new Role(randomContributorType(), randomOrganization()));
-
-        return new NvaContributor(identity, roles);
-    }
-
-    private static String randomContributorType() {
-        return randomElement(CONTRIBUTOR_TYPES);
-    }
-
-    public static Person randomPerson() {
-        return new Person(semiRandomPersonId(randomString()), randomString(), randomString(),
-                          randomString() + EMAIL_DOMAIN, randomString());
-    }
-
-    public static List<Funding> randomFundings() {
-        return IntStream.rangeClosed(0, randomInteger(7))
-                .mapToObj(i -> randomFunding()).collect(Collectors.toList());
-    }
-
-    private static Funding randomFunding() {
-        return new Funding(UNCONFIRMED_FUNDING, getNvaApiUri(FUNDING_SOURCES + PATH_DELIMITER + randomString()),
-                           randomString(),
-                           randomNamesMap());
-    }
-
-    private static Map<String, String> randomSummary() {
-        return Collections.unmodifiableMap(Arrays.stream(LANGUAGES)
-                .collect(Collectors.toMap(languageCode -> languageCode, languageCode -> randomString())));
-    }
-
-    /**
-     * Creates a random organization.
-     */
-    public static Organization randomOrganization() {
-        var labels = randomNamesMap();
-        return new Organization.Builder()
-                   .withId(semiRandomOrganizationId(randomString()))
-                   .withLabels(labels)
-                   .build();
-    }
-
-    public static List<Map<String, String>> randomListOfTitles(URI usedLanguage) {
-        return List.of(Map.of(randomLanguageCodeExcept(usedLanguage), randomString()));
-    }
-
-    public static String randomLanguage() {
-        return randomElement(LANGUAGES);
-    }
-
-    private static String randomLanguageCodeExcept(URI usedLanguage) {
-        String usedLanguageCode = getLanguageByUri(usedLanguage).getIso6391Code();
-        String lang = randomElement(LANGUAGES);
-        while (lang.equals(usedLanguageCode)) {
-            lang = randomElement(LANGUAGES);
-        }
-        return lang;
-    }
-
-    /**
-     * Creates a random contributor with unit affiliation.
-     */
-    public static NvaContributor randomContributorWithUnitAffiliation() {
-        var identity = randomPerson();
-        var roles = List.of(new Role(randomContributorType(), someOrganizationFromUnitIdentifier()));
-
-        return new NvaContributor(identity, roles);
-    }
-
-    /**
-     * Creates a random contributor without unit affiliation.
-     */
-    public static NvaContributor randomContributorWithoutUnitAffiliation() {
-        var identity = randomPerson();
-        var roles = List.of(new Role(randomContributorType(), null));
-
-        return new NvaContributor(identity, roles);
-    }
-
-    /**
-     * Creates a dummy organization with unit identifier.
-     */
-    public static Organization someOrganizationFromUnitIdentifier() {
-        return new Organization.Builder().withId(getNvaApiId(SOME_UNIT_IDENTIFIER, ORGANIZATION_PATH)).build();
-    }
-
-    private static DateInfo randomDateInfo() {
-        return new DateInfo(randomString(), randomInstant());
-    }
+  private static DateInfo randomDateInfo() {
+    return new DateInfo(randomString(), randomInstant());
+  }
 }

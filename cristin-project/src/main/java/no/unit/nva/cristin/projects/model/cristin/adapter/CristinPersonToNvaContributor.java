@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.projects.model.cristin.adapter;
 
 import static java.util.Objects.isNull;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -12,28 +13,23 @@ import no.unit.nva.cristin.projects.model.nva.Role;
 
 public class CristinPersonToNvaContributor implements Function<CristinPerson, NvaContributor> {
 
-    @Override
-    public NvaContributor apply(CristinPerson cristinPerson) {
-        if (isNull(cristinPerson)) {
-            return null;
-        }
-
-        var identity = new CristinPersonToPerson().apply(cristinPerson);
-        var roles = extractRoles(cristinPerson);
-
-        return new NvaContributor(identity, roles);
+  @Override
+  public NvaContributor apply(CristinPerson cristinPerson) {
+    if (isNull(cristinPerson)) {
+      return null;
     }
 
-    private List<Role> extractRoles(CristinPerson cristinPerson) {
-        return Optional.ofNullable(cristinPerson.roles())
-                   .map(this::cristinRolesToRoles)
-                   .orElse(null);
-    }
+    var identity = new CristinPersonToPerson().apply(cristinPerson);
+    var roles = extractRoles(cristinPerson);
 
-    private List<Role> cristinRolesToRoles(Collection<CristinRole> cristinRoles) {
-        return cristinRoles.stream()
-                   .map(new CristinRoleToRole())
-                   .toList();
-    }
+    return new NvaContributor(identity, roles);
+  }
 
+  private List<Role> extractRoles(CristinPerson cristinPerson) {
+    return Optional.ofNullable(cristinPerson.roles()).map(this::cristinRolesToRoles).orElse(null);
+  }
+
+  private List<Role> cristinRolesToRoles(Collection<CristinRole> cristinRoles) {
+    return cristinRoles.stream().map(new CristinRoleToRole()).toList();
+  }
 }

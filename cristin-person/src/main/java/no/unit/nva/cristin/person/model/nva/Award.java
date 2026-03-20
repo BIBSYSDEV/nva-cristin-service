@@ -5,20 +5,22 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.AWARD_FOR;
 import static no.unit.nva.cristin.model.JsonPropertyNames.DISTRIBUTION;
 import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import static no.unit.nva.cristin.model.JsonPropertyNames.YEAR;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.model.Organization;
 import no.unit.nva.model.TypedLabel;
 
-public record Award(@JsonProperty(NAME) String name,
-                    @JsonProperty(YEAR) int year,
-                    @JsonProperty(AWARD_FOR) TypedLabel awardFor,
-                    @JsonProperty(DISTRIBUTION) TypedLabel distribution,
-                    @JsonProperty(AFFILIATION) Organization affiliation) implements JsonSerializable {
+public record Award(
+    @JsonProperty(NAME) String name,
+    @JsonProperty(YEAR) int year,
+    @JsonProperty(AWARD_FOR) TypedLabel awardFor,
+    @JsonProperty(DISTRIBUTION) TypedLabel distribution,
+    @JsonProperty(AFFILIATION) Organization affiliation)
+    implements JsonSerializable {
 
-    @Override
-    public String toString() {
-        return toJsonString();
-    }
-
+  @Override
+  public String toString() {
+    return toJsonString();
+  }
 }

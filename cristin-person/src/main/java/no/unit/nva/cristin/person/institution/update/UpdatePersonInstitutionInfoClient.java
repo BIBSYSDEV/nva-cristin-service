@@ -10,6 +10,7 @@ import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static nva.commons.core.attempt.Try.attempt;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import no.unit.nva.cristin.common.client.PatchApiClient;
@@ -19,42 +20,48 @@ import nva.commons.core.paths.UriWrapper;
 
 public class UpdatePersonInstitutionInfoClient extends PatchApiClient {
 
-    public UpdatePersonInstitutionInfoClient(HttpClient client) {
-        super(client);
-    }
+  public UpdatePersonInstitutionInfoClient(HttpClient client) {
+    super(client);
+  }
 
-    /**
-     * Updates a persons information related to supplied institution.
-     *
-     * @return An empty json if update was successful
-     * @throws ApiGatewayException if something went wrong that can be mapped to a client response
-     */
-    public String updatePersonInstitutionInfoInCristin(String personId, String orgId, PersonInstInfoPatch request)
-        throws ApiGatewayException {
+  /**
+   * Updates a persons information related to supplied institution.
+   *
+   * @return An empty json if update was successful
+   * @throws ApiGatewayException if something went wrong that can be mapped to a client response
+   */
+  public String updatePersonInstitutionInfoInCristin(
+      String personId, String orgId, PersonInstInfoPatch request) throws ApiGatewayException {
 
-        var payload = generatePayloadFromRequest(request);
-        var uri = generateCristinUri(personId, orgId);
-        var response = patch(uri, payload);
-        checkPatchHttpStatusCode(generateIdUri(personId, orgId), response.statusCode(), response.body());
+    var payload = generatePayloadFromRequest(request);
+    var uri = generateCristinUri(personId, orgId);
+    var response = patch(uri, payload);
+    checkPatchHttpStatusCode(
+        generateIdUri(personId, orgId), response.statusCode(), response.body());
 
-        return EMPTY_JSON;
-    }
+    return EMPTY_JSON;
+  }
 
-    private String generatePayloadFromRequest(PersonInstInfoPatch request) {
-        return attempt(() -> OBJECT_MAPPER.writeValueAsString(request)).orElseThrow();
-    }
+  private String generatePayloadFromRequest(PersonInstInfoPatch request) {
+    return attempt(() -> OBJECT_MAPPER.writeValueAsString(request)).orElseThrow();
+  }
 
-    private URI generateCristinUri(String personId, String orgId) {
-        return UriWrapper.fromUri(CRISTIN_API_URL)
-            .addChild(PERSON_PATH).addChild(personId)
-            .addChild(INSTITUTION_PATH).addChild(orgId)
-            .getUri();
-    }
+  private URI generateCristinUri(String personId, String orgId) {
+    return UriWrapper.fromUri(CRISTIN_API_URL)
+        .addChild(PERSON_PATH)
+        .addChild(personId)
+        .addChild(INSTITUTION_PATH)
+        .addChild(orgId)
+        .getUri();
+  }
 
-    private URI generateIdUri(String personId, String orgId) {
-        return new UriWrapper(HTTPS, DOMAIN_NAME).addChild(BASE_PATH)
-            .addChild(PERSON_PATH_NVA).addChild(personId)
-            .addChild(ORGANIZATION_PATH).addChild(orgId)
-            .getUri();
-    }
+  private URI generateIdUri(String personId, String orgId) {
+    return new UriWrapper(HTTPS, DOMAIN_NAME)
+        .addChild(BASE_PATH)
+        .addChild(PERSON_PATH_NVA)
+        .addChild(personId)
+        .addChild(ORGANIZATION_PATH)
+        .addChild(orgId)
+        .getUri();
+  }
 }

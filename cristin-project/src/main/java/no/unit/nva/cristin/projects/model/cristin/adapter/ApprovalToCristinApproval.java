@@ -9,14 +9,14 @@ import no.unit.nva.cristin.projects.model.nva.Approval;
 
 public class ApprovalToCristinApproval implements Function<Approval, CristinApproval> {
 
-    @Override
-    public CristinApproval apply(Approval approval) {
-        return new CristinApproval(approval.getDate(),
-                                   CristinApprovalAuthorityBuilder.reverseLookup(approval.getAuthority()),
-                                   CristinApprovalStatusBuilder.reverseLookup(approval.getStatus()),
-                                   CristinApplicationCodeBuilder.reverseLookup(approval.getApplicationCode()),
-                                   approval.getIdentifier(),
-                                   approval.getAuthorityName());
-    }
-
+  @Override
+  public CristinApproval apply(Approval approval) {
+    return new CristinApproval(
+        approval.getDate(),
+        CristinApprovalAuthorityBuilder.reverseLookup(approval.getAuthority()),
+        CristinApprovalStatusBuilder.reverseLookup(approval.getStatus()),
+        CristinApplicationCodeBuilder.reverseLookup(approval.getApplicationCode()),
+        approval.getIdentifier(),
+        approval.getAuthorityName());
+  }
 }

@@ -2,8 +2,7 @@ package no.unit.nva.facet;
 
 public interface FacetKey {
 
-    String getKey();
+  String getKey();
 
-    String getNvaKey();
-
+  String getNvaKey();
 }

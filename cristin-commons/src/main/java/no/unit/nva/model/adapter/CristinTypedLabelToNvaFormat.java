@@ -6,9 +6,8 @@ import no.unit.nva.model.TypedLabel;
 
 public class CristinTypedLabelToNvaFormat implements Function<CristinTypedLabel, TypedLabel> {
 
-    @Override
-    public TypedLabel apply(CristinTypedLabel cristinTypedLabel) {
-        return new TypedLabel(cristinTypedLabel.getCode(), cristinTypedLabel.getName());
-    }
-
+  @Override
+  public TypedLabel apply(CristinTypedLabel cristinTypedLabel) {
+    return new TypedLabel(cristinTypedLabel.getCode(), cristinTypedLabel.getName());
+  }
 }

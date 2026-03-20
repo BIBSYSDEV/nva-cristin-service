@@ -13,24 +13,28 @@ import no.unit.nva.model.ApprovalStatus;
 
 public class CristinApprovalToApproval implements Function<CristinApproval, Approval> {
 
-    private final transient EnumBuilder<CristinApproval, ApprovalAuthority> approvalAuthorityBuilder;
-    private final transient EnumBuilder<CristinApproval, ApplicationCode> applicationCodeBuilder;
-    private final transient EnumBuilder<CristinApproval, ApprovalStatus> approvalStatusBuilder;
+  private final transient EnumBuilder<CristinApproval, ApprovalAuthority> approvalAuthorityBuilder;
+  private final transient EnumBuilder<CristinApproval, ApplicationCode> applicationCodeBuilder;
+  private final transient EnumBuilder<CristinApproval, ApprovalStatus> approvalStatusBuilder;
 
-    public CristinApprovalToApproval() {
-        this.approvalAuthorityBuilder = new CristinApprovalAuthorityBuilder();
-        this.applicationCodeBuilder = new CristinApplicationCodeBuilder();
-        this.approvalStatusBuilder = new CristinApprovalStatusBuilder();
-    }
+  public CristinApprovalToApproval() {
+    this.approvalAuthorityBuilder = new CristinApprovalAuthorityBuilder();
+    this.applicationCodeBuilder = new CristinApplicationCodeBuilder();
+    this.approvalStatusBuilder = new CristinApprovalStatusBuilder();
+  }
 
-    @Override
-    public Approval apply(CristinApproval cristinApproval) {
-        var authority = approvalAuthorityBuilder.build(cristinApproval);
-        var applicationCode = applicationCodeBuilder.build(cristinApproval);
-        var status = approvalStatusBuilder.build(cristinApproval);
+  @Override
+  public Approval apply(CristinApproval cristinApproval) {
+    var authority = approvalAuthorityBuilder.build(cristinApproval);
+    var applicationCode = applicationCodeBuilder.build(cristinApproval);
+    var status = approvalStatusBuilder.build(cristinApproval);
 
-        return new Approval(cristinApproval.getApprovedDate(), authority, status, applicationCode,
-                            cristinApproval.getApprovalReferenceId(), cristinApproval.getApprovedByName());
-    }
-
+    return new Approval(
+        cristinApproval.getApprovedDate(),
+        authority,
+        status,
+        applicationCode,
+        cristinApproval.getApprovalReferenceId(),
+        cristinApproval.getApprovedByName());
+  }
 }

@@ -10,24 +10,23 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
 @JsonSubTypes({
-    @Type(CristinCodeFacet.class),
-    @Type(CristinInstitutionFacet.class),
-    @Type(CristinUnitFacet.class),
-    @Type(CristinPersonFacet.class)
+  @Type(CristinCodeFacet.class),
+  @Type(CristinInstitutionFacet.class),
+  @Type(CristinUnitFacet.class),
+  @Type(CristinPersonFacet.class)
 })
 public abstract class CristinFacet {
 
-    @JsonProperty("count")
-    private Integer count;
+  @JsonProperty("count")
+  private Integer count;
 
-    public Integer getCount() {
-        return count;
-    }
+  public Integer getCount() {
+    return count;
+  }
 
-    @JsonProperty("key")
-    public abstract String getKey();
+  @JsonProperty("key")
+  public abstract String getKey();
 
-    @JsonProperty("labels")
-    public abstract Map<String, String> getLabels();
-
+  @JsonProperty("labels")
+  public abstract Map<String, String> getLabels();
 }

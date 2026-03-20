@@ -6,6 +6,5 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 
 public interface CreateKeywordApiClient extends GenericApiClient {
 
-    Keyword create(Keyword input) throws ApiGatewayException;
-
+  Keyword create(Keyword input) throws ApiGatewayException;
 }
