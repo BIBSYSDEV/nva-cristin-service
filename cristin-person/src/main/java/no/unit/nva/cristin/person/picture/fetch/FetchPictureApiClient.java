@@ -22,6 +22,7 @@ import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.person.model.nva.Binary;
 import no.unit.nva.exception.FailedHttpRequestException;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.paths.UriWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,11 @@ public class FetchPictureApiClient extends ApiClient {
   public Binary fetchPicture(String personId) throws ApiGatewayException {
     var uri = generateCristinUri(personId);
     var response = fetchBinary(uri);
-    checkHttpStatusCode(generateIdUri(personId), response.statusCode());
+    try {
+      checkHttpStatusCode(generateIdUri(personId), response.statusCode());
+    } catch (NotFoundException exception) {
+      return Binary.empty();
+    }
 
     return createResponseJson(response);
   }
