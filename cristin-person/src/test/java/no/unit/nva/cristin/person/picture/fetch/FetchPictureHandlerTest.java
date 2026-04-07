@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.picture.fetch;
 
 import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PERSON_ID;
@@ -19,12 +20,14 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 import no.unit.nva.cristin.person.model.nva.Binary;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
+import nva.commons.core.StringUtils;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,9 +48,7 @@ public class FetchPictureHandlerTest {
 
   @BeforeEach
   void setUp() throws IOException, InterruptedException {
-    HttpResponse<byte[]> httpResponseMock = mock(HttpResponse.class);
-    when(httpResponseMock.body()).thenReturn(pictureToByteArray());
-    when(httpResponseMock.statusCode()).thenReturn(200);
+    HttpResponse<byte[]> httpResponseMock = mockResponse(200, pictureToByteArray());
     when(httpClientMock.<byte[]>send(any(), any())).thenReturn(httpResponseMock);
     apiClient = new FetchPictureApiClient(httpClientMock);
     apiClient = spy(apiClient);
@@ -68,6 +69,20 @@ public class FetchPictureHandlerTest {
   }
 
   @Test
+  void shouldReturnNoContentWhenPictureDoesNotExist() throws IOException, InterruptedException {
+    var response = mockResponse(404, StringUtils.EMPTY_STRING.getBytes(StandardCharsets.UTF_8));
+    when(httpClientMock.<byte[]>send(any(), any())).thenReturn(response);
+    apiClient = new FetchPictureApiClient(httpClientMock);
+    apiClient = spy(apiClient);
+    doReturn(randomString()).when(apiClient).readBasicAuthHeader();
+    handler = new FetchPictureHandler(apiClient, environment);
+
+    var gatewayResponse = sendQuery();
+
+    assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_NO_CONTENT));
+  }
+
+  @Test
   void shouldReturnBadGatewayWhenRequestFails() throws Exception {
     when(httpClientMock.<byte[]>send(any(), any())).thenThrow(HttpTimeoutException.class);
     apiClient = new FetchPictureApiClient(httpClientMock);
@@ -78,6 +93,13 @@ public class FetchPictureHandlerTest {
     var response = sendQuery();
 
     assertThat(response.getStatusCode(), equalTo(HTTP_BAD_GATEWAY));
+  }
+
+  private HttpResponse<byte[]> mockResponse(int statusCode, byte[] body) {
+    HttpResponse<byte[]> httpResponseMock = mock(HttpResponse.class);
+    when(httpResponseMock.body()).thenReturn(body);
+    when(httpResponseMock.statusCode()).thenReturn(statusCode);
+    return httpResponseMock;
   }
 
   private byte[] pictureToByteArray() throws IOException {
