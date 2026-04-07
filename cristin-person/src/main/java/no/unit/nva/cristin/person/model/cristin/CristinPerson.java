@@ -8,6 +8,7 @@ import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.PICTURE;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -268,16 +269,17 @@ public class CristinPerson implements JsonSerializable {
   }
 
   public Person.Builder toPersonBuilder() {
+    var id = extractIdUri();
     if (Boolean.TRUE.equals(getReserved())) {
       // Also preserving size of hits from upstream
-      return new Person.Builder().withId(extractIdUri());
+      return new Person.Builder().withId(id);
     }
     return new Person.Builder()
-        .withId(extractIdUri())
+        .withId(id)
         .withIdentifiers(extractNonAuthorizedIdentifiers())
         .withNames(extractNames())
         .withContactDetails(extractContactDetails())
-        .withImage(extractImage())
+        .withImage(extractImage(id))
         .withAffiliations(extractAffiliations())
         .withVerified(extractVerified())
         .withKeywords(extractKeywords())
@@ -300,12 +302,13 @@ public class CristinPerson implements JsonSerializable {
   }
 
   public Person.Builder toPersonBuilderWithAuthorizedFields() {
+    var id = extractIdUri();
     return new Person.Builder()
-        .withId(extractIdUri())
+        .withId(id)
         .withIdentifiers(extractAuthorizedIdentifiers())
         .withNames(extractNames())
         .withContactDetails(extractContactDetails())
-        .withImage(extractImage())
+        .withImage(extractImage(id))
         .withAffiliations(extractAffiliations())
         .withReserved(getReserved())
         .withEmployments(extractEmployments())
@@ -377,8 +380,10 @@ public class CristinPerson implements JsonSerializable {
     return names;
   }
 
-  private URI extractImage() {
-    return getPictureUrl().map(UriWrapper::fromUri).map(UriWrapper::getUri).orElse(null);
+  private URI extractImage(URI id) {
+    return getPictureUrl()
+        .map(value -> UriWrapper.fromUri(id).addChild(PICTURE).getUri())
+        .orElse(null);
   }
 
   private List<Affiliation> extractAffiliations() {

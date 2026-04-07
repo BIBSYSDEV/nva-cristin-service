@@ -27,4 +27,5 @@ public class JsonPropertyNames {
   public static final String COLLABORATION = "collaboration";
   public static final String COUNTRIES = "countries";
   public static final String AWARDS = "awards";
+  public static final String PICTURE = "picture";
 }
