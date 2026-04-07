@@ -44,7 +44,7 @@
         "email": "kjell@ola.no",
         "webPage": "https://www.kjell.no"
       },
-      "image": "https://api.cristin.no/v2/persons/359084/picture",
+      "image": "https://api.dev.nva.aws.unit.no/cristin/person/359084/picture",
       "affiliations": [
         {
           "type": "Affiliation",
@@ -220,7 +220,7 @@
         "email": "kjell@ola.no",
         "webPage": "https://www.kjell.no"
       },
-      "image": "https://api.cristin.no/v2/persons/359084/picture",
+      "image": "https://api.dev.nva.aws.unit.no/cristin/person/359084/picture",
       "affiliations": [
         {
           "type": "Affiliation",
