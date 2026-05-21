@@ -44,7 +44,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
@@ -73,7 +72,6 @@ import nva.commons.core.paths.UriWrapper;
 import nva.commons.logutils.LogUtils;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -376,17 +374,10 @@ public class CreateCristinPersonHandlerTest {
 
   @Test
   void shouldLogClientSpecificIdentifiersWhenDoingAuthorizedRequests() throws IOException {
-    try (var outputStreamCaptor = new ByteArrayOutputStream()) {
-      var currentPrintSteam = System.out;
-      try (var newPrintStream = new PrintStream(outputStreamCaptor)) {
-        System.setOut(newPrintStream);
-        var response = sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
-        assertEquals(HTTP_CREATED, response.getStatusCode());
-      }
-      System.setOut(currentPrintSteam);
-      assertThat(
-          outputStreamCaptor.toString(), Matchers.containsString(LOG_MESSAGE_FOR_IDENTIFIERS));
-    }
+    var testAppender = LogUtils.getTestingAppender(CreateCristinPersonHandler.class);
+    var response = sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
+    assertEquals(HTTP_CREATED, response.getStatusCode());
+    assertThat(testAppender.getMessages(), containsString(LOG_MESSAGE_FOR_IDENTIFIERS));
   }
 
   @Test
