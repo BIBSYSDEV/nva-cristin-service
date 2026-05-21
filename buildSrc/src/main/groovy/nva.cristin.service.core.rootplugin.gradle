@@ -1,55 +1,18 @@
-plugins{
-    id 'java-library'
-    id 'jacoco-report-aggregation'
-    id 'com.github.ben-manes.versions'
-    id 'com.autonomousapps.dependency-analysis'
-    id 'io.github.michael-nestler.spectral'
+plugins {
+    id 'nva.root-module-conventions'
 }
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    subprojects.forEach {
-        jacocoAggregation it
+nva {
+    dependencyAnalysis {
+        enforced = false
     }
-}
-
-
-reporting {
-    reports {
-        testCodeCoverageReport(JacocoCoverageReport) {
-            testSuiteName = "test"
-        }
+    jacoco {
+        // FIXME: Remove dead code and add tests for remaining gaps (see NP-49448)
+        minMethodCoverage = new BigDecimal('0.888')
+        minClassCoverage = new BigDecimal('0.963')
     }
-}
-
-tasks.named('check') {
-    dependsOn tasks.named('testCodeCoverageReport', JacocoReport)
-    dependsOn tasks.named('spectral')
-}
-
-def isNonStable(String version) {
-    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { version.toUpperCase().contains(it) }
-
-    // Stable version patterns: digits/dots/v/hyphens optionally ending with -r/-jre
-    def stableVersionPattern = /^[0-9,.v-]+(-r|-jre)?$/
-    return !stableKeyword && !(version ==~ stableVersionPattern)
-}
-
-tasks.named('dependencyUpdates') {
-    checkForGradleUpdate = true
-    outputDir = 'build/dependencyUpdates'
-    reportfileName = 'report'
-    gradleReleaseChannel = 'current'
-    rejectVersionIf {
-        // Don't suggest upgrading from a stable version to a non-stable version
-        isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
+    spectral {
+        documents = ['docs/*.yaml']
+        rulesetFile = file('.spectral.yaml')
     }
-}
-
-spectral {
-    documents.from("docs/*.yaml")
-    ruleset.set(file('.spectral.yaml'))
 }
