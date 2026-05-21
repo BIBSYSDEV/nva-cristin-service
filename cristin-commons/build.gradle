@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation libs.aws.sdk2.spi
+    implementation 'software.amazon.awssdk:http-client-spi'
     implementation libs.nva.language
     implementation libs.resilience4j.retry
     implementation libs.vavr
@@ -17,11 +17,11 @@ dependencies {
     implementation nvaLibs.core
     implementation nvaLibs.json
     implementation nvaLibs.secrets
-    testFixturesImplementation libs.aws.sdk2.auth
-    testFixturesImplementation libs.aws.sdk2.cognitoidp
-    testFixturesImplementation libs.aws.sdk2.core
-    testFixturesImplementation libs.aws.sdk2.regions
-    testFixturesImplementation libs.aws.sdk2.urlconnection
+    testFixturesImplementation 'software.amazon.awssdk:auth'
+    testFixturesImplementation 'software.amazon.awssdk:aws-core'
+    testFixturesImplementation 'software.amazon.awssdk:cognitoidentityprovider'
+    testFixturesImplementation 'software.amazon.awssdk:regions'
+    testFixturesImplementation 'software.amazon.awssdk:url-connection-client'
     testFixturesImplementation nvaCatalog.jackson.databind
     testFixturesImplementation nvaLibs.apigateway
     testFixturesImplementation nvaLibs.core
