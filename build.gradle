@@ -1,4 +1,3 @@
 plugins {
     id 'nva.cristin.service.core.rootplugin'
-    alias(nvaCatalog.plugins.gradle.versions)
 }

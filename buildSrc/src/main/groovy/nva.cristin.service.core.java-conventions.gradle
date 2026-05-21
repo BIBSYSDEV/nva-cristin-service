@@ -1,14 +1,12 @@
 plugins {
-    id 'java-library'
+    id 'nva.java-conventions'
     id 'java-test-fixtures'
-    id 'pmd'
-    id 'jacoco-report-aggregation'
-    id 'com.diffplug.spotless'
-    id 'com.autonomousapps.dependency-analysis'
 }
 
-repositories {
-    mavenCentral()
+nva {
+    pmd {
+        rulesetFile = rootProject.file('config/pmd/ruleset.xml')
+    }
 }
 
 dependencies {
@@ -16,57 +14,7 @@ dependencies {
     testFixturesImplementation(platform("software.amazon.awssdk:bom:${nvaCatalog.versions.aws.sdk2.asProvider().get()}"))
 }
 
-sourceSets {
-    test {
-        resources {
-            srcDir file('src/test/java')
-            exclude '**/*.java' , '*/*.xml'
-        }
-    }
-    check {
-        resources {
-            exclude '**/*.java' , '*/*.xml'
-        }
-    }
-}
-
-tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification) {
-    violationRules {
-        rule {
-            // FIXME: Add relevant tests and remove this exclusion (see NP-49448)
-            excludes = [
-                    'cristin-commons:*'
-            ]
-            limit {
-                counter = 'METHOD'
-                value = 'COVEREDRATIO'
-                minimum = 1.000
-            }
-        }
-        rule {
-            // FIXME: Add relevant tests and remove this exclusion (see NP-49448)
-            excludes = [
-                    'cristin-commons:*'
-            ]
-            limit {
-                counter = 'CLASS'
-                value = 'COVEREDRATIO'
-                minimum = 1.000
-            }
-        }
-    }
-    dependsOn jacocoTestReport
-}
-
-tasks.named('check') {
-    dependsOn tasks.named('jacocoTestCoverageVerification', JacocoCoverageVerification)
-}
-
 tasks.named('test', Test) {
-    useJUnitPlatform()
-    testLogging {
-        events 'skipped', 'passed', 'failed'
-    }
     environment "ALLOWED_ORIGIN", "*"
     environment "CRISTIN_API_URL", "https://api.cristin-test.uio.no/v2"
     environment "BASE_PATH", "cristin"
@@ -74,7 +22,6 @@ tasks.named('test', Test) {
     environment "COGNITO_URI", "https://example.cognito.org"
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_NAME", "Hello"
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
-    finalizedBy jacocoTestReport
 }
 
 tasks.register('createTestUsers', Test) {
@@ -105,59 +52,4 @@ tasks.register('karateTest', Test) {
     systemProperty "karate.options", System.properties.getProperty("karate.options")
     systemProperty "karate.env", System.properties.getProperty("karate.env")
     outputs.upToDateWhen { false }
-}
-
-pmd {
-    toolVersion = '7.23.0'
-    ruleSetConfig = rootProject.resources.text.fromFile('config/pmd/ruleset.xml')
-    ruleSets = []
-    ignoreFailures = false
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'utf-8'
-}
-
-
-spotless {
-    java {
-        toggleOffOn() // Ignores sections between `spotless:off` / `spotless:on`
-        googleJavaFormat().reflowLongStrings().formatJavadoc(true).reorderImports(true)
-    }
-
-    groovyGradle {
-        target('**/*.gradle')
-        greclipse()
-        leadingTabsToSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-
-    format 'misc', {
-        target('.gitignore', '.gitattributes', '.editorconfig')
-        leadingTabsToSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-
-    format 'markdown', {
-        target('**/*.md')
-        prettier().config(['proseWrap': 'preserve'])
-        endWithNewline()
-    }
-
-    format 'yaml', {
-        target('**/*.yaml', '**/*.yml')
-        prettier().config(['printWidth': 120])
-        endWithNewline()
-    }
-}
-
-// Reformat project before build and test if needed
-tasks.named('build').configure {
-    dependsOn 'spotlessApply'
-}
-
-tasks.named('test').configure {
-    dependsOn 'spotlessApply'
 }
