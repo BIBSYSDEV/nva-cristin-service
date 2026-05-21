@@ -5,8 +5,6 @@ import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 
-// The private fields in the record are viewed as unused, this is a bug
-@SuppressWarnings("PMD.UnusedPrivateField")
 public record CristinFundingSource(
     @JsonProperty(CODE_FIELD) String code, @JsonProperty(NAME_FIELD) Map<String, String> name) {
 

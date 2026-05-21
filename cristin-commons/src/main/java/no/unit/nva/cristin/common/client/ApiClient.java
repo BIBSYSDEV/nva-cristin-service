@@ -162,6 +162,7 @@ public class ApiClient {
     return getSuccessfulResponseOrThrowException(httpRequest);
   }
 
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   protected HttpResponse<String> getSuccessfulResponseOrThrowException(HttpRequest httpRequest)
       throws FailedHttpRequestException {
 
@@ -258,8 +259,7 @@ public class ApiClient {
         .toList();
   }
 
-  // This is reported as unused, but it is…
-  @SuppressWarnings("PMD.UnusedPrivateMethod")
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private boolean isSuccessfulRequest(HttpResponse<String> response) {
     try {
       checkHttpStatusCode(response.uri(), response.statusCode(), response.body());
@@ -345,7 +345,6 @@ public class ApiClient {
     return effortCount < MAX_EFFORTS;
   }
 
-  @SuppressWarnings("PMD.UselessParentheses") // keep the parenthesis for clarity
   private boolean shouldKeepTrying(int effortCount, Try<HttpResponse<String>> lastEffort) {
     return lastEffort == null || (lastEffort.isFailure() && shouldTryMoreTimes(effortCount));
   }

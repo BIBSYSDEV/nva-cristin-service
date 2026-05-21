@@ -9,6 +9,7 @@ public class LogUtils {
   public static final String NOT_PRESENT = "not present";
 
   /** Extracts organization identifier from requestInfo or else default value. */
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static String extractOrgIdentifier(RequestInfo requestInfo) {
     try {
       return requestInfo
@@ -21,6 +22,7 @@ public class LogUtils {
   }
 
   /** Extracts cristin identifier from requestInfo or else default value. */
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static String extractCristinIdentifier(RequestInfo requestInfo) {
     try {
       return UriUtils.extractLastPathElement(requestInfo.getPersonCristinId());

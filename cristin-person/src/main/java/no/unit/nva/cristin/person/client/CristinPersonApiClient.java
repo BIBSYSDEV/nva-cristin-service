@@ -40,7 +40,6 @@ import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.paths.UriWrapper;
 
-@SuppressWarnings("PMD.CouplingBetweenObjects")
 public class CristinPersonApiClient extends ApiClient
     implements ClientVersion, CristinAuthorizedQueryClient<Map<String, String>, Person> {
 

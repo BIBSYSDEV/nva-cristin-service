@@ -180,7 +180,6 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     }
   }
 
-  @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
   private void validateRelatedProjects(ObjectNode input) throws BadRequestException {
     if (input.has(RELATED_PROJECTS) && !input.get(RELATED_PROJECTS).isNull()) {
       var relatedProjects = input.get(RELATED_PROJECTS);
@@ -192,6 +191,7 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     }
   }
 
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private void validateResearchResponsibleOrganizationsIfPresent(ObjectNode input)
       throws BadRequestException {
     if (input.has(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)

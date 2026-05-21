@@ -20,7 +20,6 @@ import no.unit.nva.cristin.model.CristinOrganization;
 import no.unit.nva.cristin.model.CristinPerson;
 import nva.commons.core.JacocoGenerated;
 
-@SuppressWarnings({"PMD.ExcessiveParameterList", "PMD.TooManyFields"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record CristinBiobank(

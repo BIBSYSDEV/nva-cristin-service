@@ -2,6 +2,7 @@ package no.unit.nva.client;
 
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 
+@FunctionalInterface
 public interface FetchApiClient<T, R> extends GenericApiClient {
 
   /**

@@ -45,9 +45,9 @@ public class QueryBuilderBiobank extends QueryBuilder<ParameterKeyBiobank> {
   @Override
   protected void setValue(String key, String value) {
     final var parameterKey = keyFromString(key, value);
-    if (parameterKey.equals(INVALID)) {
+    if (parameterKey == INVALID) {
       invalidKeys.add(key);
-    } else if (parameterKey.equals(LANGUAGE)) {
+    } else if (parameterKey == LANGUAGE) {
       logger.info("Ignoring language parameter -> " + value);
     } else {
       query.setValue(parameterKey, value);

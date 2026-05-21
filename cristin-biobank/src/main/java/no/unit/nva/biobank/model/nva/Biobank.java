@@ -21,7 +21,7 @@ import no.unit.nva.model.ExternalSource;
 import no.unit.nva.model.TypedLabel;
 import nva.commons.core.JacocoGenerated;
 
-@SuppressWarnings({"PMD.ExcessiveParameterList", "PMD.TooManyFields"})
+@SuppressWarnings("PMD.ExcessiveParameterList")
 @JsonInclude(NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public class Biobank implements JsonSerializable {
