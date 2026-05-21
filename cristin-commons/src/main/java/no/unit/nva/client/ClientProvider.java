@@ -1,5 +1,6 @@
 package no.unit.nva.client;
 
+@FunctionalInterface
 public interface ClientProvider<T extends GenericApiClient> {
 
   String VERSION = "version";

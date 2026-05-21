@@ -35,11 +35,11 @@ public class QueryProject extends CristinQuery<ParameterKeyProject> {
             ? encodeUTF(entry.getValue())
             : entry.getValue();
 
-    if (entry.getKey().equals(STATUS)) {
+    if (entry.getKey() == STATUS) {
       return ProjectStatus.valueOf(value).getCristinStatus();
     }
 
-    if (entry.getKey().equals(ORGANIZATION) && entry.getValue().matches(PATTERN_IS_URL)) {
+    if (entry.getKey() == ORGANIZATION && entry.getValue().matches(PATTERN_IS_URL)) {
       return getUnitIdFromOrganization(value);
     }
 
@@ -58,7 +58,7 @@ public class QueryProject extends CristinQuery<ParameterKeyProject> {
 
   @Override
   protected String getNvaPathItem(int pathSize, Entry<ParameterKeyProject, String> entry) {
-    var isProjects = entry.getKey().equals(PATH_PROJECT) && pathSize > 1;
+    var isProjects = entry.getKey() == PATH_PROJECT && pathSize > 1;
     return isProjects ? entry.getKey().getKey() : entry.getKey().getNvaKey();
   }
 

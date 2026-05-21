@@ -12,8 +12,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import no.unit.nva.client.ClientVersion;
-import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
 import no.unit.nva.cristin.facet.CristinFacetConverter;
 import no.unit.nva.cristin.facet.CristinFacetUriParamAppender;
 import no.unit.nva.cristin.model.SearchResponse;
@@ -24,8 +22,7 @@ import no.unit.nva.cristin.person.model.nva.Person;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadGatewayException;
 
-public class QueryPersonWithFacetsClient extends CristinPersonApiClient
-    implements ClientVersion, CristinAuthorizedQueryClient<Map<String, String>, Person> {
+public class QueryPersonWithFacetsClient extends CristinPersonApiClient {
 
   public static final String FACETS_PATH = "facets";
   public static final String VERSION_WITH_AGGREGATIONS = "2023-11-03-aggregations";

@@ -114,7 +114,8 @@ public class AccessUtils {
     var clientAppId = getBackendClientAppId();
     var clientAppSecret = getBackendClientAppSecret();
     return BASIC
-        + Base64.getEncoder().encodeToString((clientAppId + ":" + clientAppSecret).getBytes());
+        + Base64.getEncoder()
+            .encodeToString((clientAppId + ":" + clientAppSecret).getBytes(StandardCharsets.UTF_8));
   }
 
   private static String getBackendClientAppSecret() {

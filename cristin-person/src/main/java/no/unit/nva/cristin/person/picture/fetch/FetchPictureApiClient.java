@@ -97,6 +97,7 @@ public class FetchPictureApiClient extends ApiClient {
         .getUri();
   }
 
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private HttpResponse<byte[]> getSuccessfulBinaryResponseOrThrowException(HttpRequest httpRequest)
       throws FailedHttpRequestException {
 

@@ -52,6 +52,7 @@ public class RetryConfigProvider {
         .build();
   }
 
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private static Predicate<CompletableFuture<HttpResponse>> resultStatusIsServerErrorAsync() {
     return httpResponse -> {
       try {

@@ -26,6 +26,7 @@ public class UpdatePictureContentVerifier {
   private final byte[] decoded;
 
   /** Verifies that content from input is a valid image and decodes it. */
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public UpdatePictureContentVerifier(Binary input) throws BadRequestException {
     if (!hasContent(input)) {
       decoded = decodeInput(emptyPayload());
@@ -59,6 +60,7 @@ public class UpdatePictureContentVerifier {
     return Base64.getDecoder().decode(input.base64Data());
   }
 
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private boolean isImage(byte[] decoded) {
     try (InputStream is = new ByteArrayInputStream(decoded)) {
       return ImageIO.read(is) != null;

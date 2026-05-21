@@ -6,6 +6,7 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import nva.commons.secrets.SecretsReader;
@@ -68,7 +69,8 @@ public class CristinAuthenticator {
     logger.info(USING_A_BASIC_AUTH_HEADER);
 
     return "Basic "
-        + Base64.getEncoder().encodeToString((getUserName() + ":" + getPassWord()).getBytes());
+        + Base64.getEncoder()
+            .encodeToString((getUserName() + ":" + getPassWord()).getBytes(StandardCharsets.UTF_8));
   }
 
   private static String getPassWord() {

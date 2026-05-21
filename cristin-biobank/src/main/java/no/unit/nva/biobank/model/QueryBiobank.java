@@ -15,9 +15,7 @@ public class QueryBiobank extends CristinQuery<ParameterKeyBiobank> {
 
   @Override
   protected String getNvaPathItem(int pathSize, Entry<ParameterKeyBiobank, String> entry) {
-    return entry.getKey().equals(PATH_IDENTITY)
-        ? PATH_BIOBANK.getNvaKey()
-        : entry.getKey().getNvaKey();
+    return entry.getKey() == PATH_IDENTITY ? PATH_BIOBANK.getNvaKey() : entry.getKey().getNvaKey();
   }
 
   @Override

@@ -86,6 +86,7 @@ public class OAuthLogin {
     return URI.create(baseUrl + "?" + params);
   }
 
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private static String extractCodeFromLocation(String location) {
     try {
       var uri = URI.create(location);

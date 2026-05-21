@@ -4,6 +4,7 @@ import no.unit.nva.client.GenericApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 
+@FunctionalInterface
 public interface CristinQueryApiClient<T, R> extends GenericApiClient {
 
   /**

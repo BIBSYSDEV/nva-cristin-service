@@ -54,9 +54,9 @@ public final class Utils {
    */
   public static boolean isPositiveInteger(String str) {
     try {
-      int value = Integer.parseInt(str);
+      var value = Integer.parseInt(str);
       return value > 0;
-    } catch (Exception e) {
+    } catch (NumberFormatException e) {
       return false;
     }
   }
