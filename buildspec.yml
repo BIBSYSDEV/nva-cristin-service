@@ -11,7 +11,7 @@ cache:
 reports:
   unit-tests:
     files:
-      - '*/build/test-results/test/TEST-*.xml'
+      - "*/build/test-results/test/TEST-*.xml"
     file-format: JUNITXML
 phases:
   install:
