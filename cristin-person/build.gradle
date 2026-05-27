@@ -17,6 +17,7 @@ dependencies {
     testImplementation libs.json.assert
     testImplementation libs.karate.core
     testImplementation libs.karate.junit5
+    testImplementation nvaCatalog.assertj.core
     testImplementation nvaCatalog.hamcrest
     testImplementation nvaCatalog.httpcore5
     testImplementation nvaCatalog.jackson.core

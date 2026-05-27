@@ -41,8 +41,9 @@ import nva.commons.apigateway.RequestInfoConstants;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
-import nva.commons.logutils.LogUtils;
+import nva.commons.logutils.LogRecorder;
 import org.apache.hc.core5.http.HttpHeaders;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -154,7 +155,7 @@ public class CreatePersonEmploymentHandlerTest {
 
   @Test
   void shouldLogIdentifierOfTheNewlyCreatedResource() throws Exception {
-    final var testAppender = LogUtils.getTestingAppender(IdCreatedLogger.class);
+    final var logRecorder = LogRecorder.forClass(IdCreatedLogger.class);
 
     var employment = sampleEmployment();
     var employmentId = "1234";
@@ -170,9 +171,8 @@ public class CreatePersonEmploymentHandlerTest {
     var idUri = "https://api.dev.nva.aws.unit.no/cristin/person/112233/employment/1234";
 
     assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_CREATED));
-    assertThat(
-        testAppender.getMessages(),
-        containsString(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, idUri)));
+    Assertions.assertThat(logRecorder.messages())
+        .contains(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, idUri));
   }
 
   private static String randomIntegerAsString() {

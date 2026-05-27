@@ -64,7 +64,8 @@ import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
-import nva.commons.logutils.LogUtils;
+import nva.commons.logutils.LogRecorder;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -603,7 +604,7 @@ class CreateCristinProjectHandlerTest {
 
   @Test
   void shouldLogIdentifierOfTheNewlyCreatedResource() throws Exception {
-    final var testAppender = LogUtils.getTestingAppender(IdCreatedLogger.class);
+    final var logRecorder = LogRecorder.forClass(IdCreatedLogger.class);
 
     var expected = randomMinimalNvaProject();
     expected.setContext(NvaProject.PROJECT_CONTEXT);
@@ -616,9 +617,8 @@ class CreateCristinProjectHandlerTest {
     var response = executeRequest(requestProject);
 
     assertThat(response.getStatusCode(), equalTo(HTTP_CREATED));
-    assertThat(
-        testAppender.getMessages(),
-        containsString(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, identifier)));
+    Assertions.assertThat(logRecorder.messages())
+        .contains(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, identifier));
   }
 
   private NvaContributor nvaContributorWithRole(String roleCode) {

@@ -26,6 +26,7 @@ dependencies {
     testFixturesImplementation nvaLibs.apigateway
     testFixturesImplementation nvaLibs.core
     testFixturesImplementation nvaLibs.json
+    testImplementation nvaCatalog.assertj.core
     testImplementation nvaCatalog.hamcrest
     testImplementation nvaCatalog.junit.jupiter.api
     testImplementation nvaCatalog.junit.jupiter.engine

@@ -61,8 +61,9 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.ioutils.IoUtils;
-import nva.commons.logutils.LogUtils;
+import nva.commons.logutils.LogRecorder;
 import org.apache.hc.core5.http.HttpHeaders;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -340,7 +341,7 @@ class QueryCristinOrganizationHandlerTest {
 
   @Test
   void shouldShowCorrectNotFoundLogMessageWhenIdentifierNotFoundInUpstream() throws Exception {
-    final var testAppender = LogUtils.getTestingAppender(OrganizationEnricher.class);
+    final var logRecorder = LogRecorder.forClass(OrganizationEnricher.class);
 
     var fetchClient = mockFetchClientWithOneHitMissingInUpstream();
     queryCristinOrgClient20230526 = new QueryCristinOrgClient20230526(httpClient, fetchClient);
@@ -359,7 +360,8 @@ class QueryCristinOrganizationHandlerTest {
     var input = handlerRequestWantingFullTree();
     queryCristinOrganizationHandler.handleRequest(input, output, context);
 
-    assertThat(testAppender.getMessages(), containsString(NOT_FOUND_LOG_MESSAGE));
+    Assertions.assertThat(logRecorder.messages())
+        .anyMatch(message -> message.startsWith(NOT_FOUND_LOG_MESSAGE));
   }
 
   @Test
