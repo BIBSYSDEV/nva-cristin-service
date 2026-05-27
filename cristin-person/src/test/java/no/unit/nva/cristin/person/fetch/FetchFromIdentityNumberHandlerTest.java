@@ -53,8 +53,9 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
-import nva.commons.logutils.LogUtils;
+import nva.commons.logutils.LogRecorder;
 import org.apache.hc.core5.http.HttpHeaders;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -218,7 +219,7 @@ public class FetchFromIdentityNumberHandlerTest {
 
   @Test
   void shouldStripPersonalDataFromLoggedUris() throws Exception {
-    final var logger = LogUtils.getTestingAppenderForRootLogger();
+    final var logRecorder = LogRecorder.forRoot(FetchFromIdentityNumberHandler.class);
     var clientMock = mock(HttpClient.class);
     when(clientMock.<String>send(any(), any())).thenThrow(RuntimeException.class);
     var apiClient = new CristinPersonApiClient(clientMock);
@@ -226,7 +227,8 @@ public class FetchFromIdentityNumberHandlerTest {
     var gatewayResponse = sendQuery(defaultBody(), EMPTY_MAP);
 
     assertEquals(HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
-    assertThat(logger.getMessages(), not(containsString(DEFAULT_IDENTITY_NUMBER)));
+    Assertions.assertThat(logRecorder.messages())
+        .noneMatch(message -> message.contains(DEFAULT_IDENTITY_NUMBER));
   }
 
   private InputStream requestWithBackendScope() throws JsonProcessingException {

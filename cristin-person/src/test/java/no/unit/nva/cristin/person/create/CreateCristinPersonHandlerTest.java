@@ -69,8 +69,9 @@ import nva.commons.apigateway.GatewayResponse;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
 import nva.commons.core.paths.UriWrapper;
-import nva.commons.logutils.LogUtils;
+import nva.commons.logutils.LogRecorder;
 import org.apache.hc.core5.http.HttpHeaders;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -374,10 +375,10 @@ public class CreateCristinPersonHandlerTest {
 
   @Test
   void shouldLogClientSpecificIdentifiersWhenDoingAuthorizedRequests() throws IOException {
-    var testAppender = LogUtils.getTestingAppender(CreateCristinPersonHandler.class);
+    var logRecorder = LogRecorder.forClass(CreateCristinPersonHandler.class);
     var response = sendQueryWhileMockingIdentifiersUsedForLogging(dummyPerson());
     assertEquals(HTTP_CREATED, response.getStatusCode());
-    assertThat(testAppender.getMessages(), containsString(LOG_MESSAGE_FOR_IDENTIFIERS));
+    Assertions.assertThat(logRecorder.messages()).contains(LOG_MESSAGE_FOR_IDENTIFIERS);
   }
 
   @Test
@@ -464,7 +465,7 @@ public class CreateCristinPersonHandlerTest {
 
   @Test
   void shouldLogIdentifierOfTheNewlyCreatedResource() throws IOException, InterruptedException {
-    final var testAppender = LogUtils.getTestingAppender(IdCreatedLogger.class);
+    final var logRecorder = LogRecorder.forClass(IdCreatedLogger.class);
 
     var responseJson = OBJECT_MAPPER.writeValueAsString(dummyCristinPerson());
     when(httpClientMock.<String>send(any(), any()))
@@ -475,9 +476,8 @@ public class CreateCristinPersonHandlerTest {
     var actual = gatewayResponse.getBodyObject(Person.class);
 
     assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_CREATED));
-    assertThat(
-        testAppender.getMessages(),
-        containsString(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, actual.getId().toString())));
+    Assertions.assertThat(logRecorder.messages())
+        .contains(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, actual.getId().toString()));
   }
 
   private static String readFile(String file) {
