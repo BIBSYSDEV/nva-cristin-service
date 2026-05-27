@@ -3,30 +3,28 @@ plugins {
 }
 
 dependencies {
-    implementation nvaCatalog.aws.lambda.core
-    implementation nvaCatalog.jackson.annotations
-    implementation nvaCatalog.jackson.core
-    implementation nvaCatalog.jackson.databind
-    implementation nvaCatalog.slf4j.api
-    implementation nvaLibs.apigateway
-    implementation nvaLibs.core
-    implementation nvaLibs.json
-    implementation project(":cristin-commons")
-    testImplementation libs.karate.core
-    testImplementation libs.karate.junit5
-    testImplementation nvaCatalog.hamcrest
-    testImplementation nvaCatalog.junit.jupiter.api
-    testImplementation nvaCatalog.junit.jupiter.engine
-    testImplementation nvaCatalog.junit.jupiter.params
-    testImplementation nvaCatalog.mockito.core
-    testImplementation nvaCatalog.wiremock
-    testImplementation nvaCatalog.wiremock.junit5
-    testImplementation nvaCatalog.zalando
-    testImplementation nvaLibs.testutils
-    testImplementation project(":cristin-testing")
-    testImplementation(testFixtures(project(":cristin-commons")))
+    api(nvaCatalog.aws.lambda.core)
+    api(nvaCatalog.jackson.annotations)
+    api(nvaLibs.apigateway)
+    api(nvaLibs.core)
+    api(project(":cristin-commons"))
+    implementation(nvaCatalog.jackson.core)
+    implementation(nvaCatalog.jackson.databind)
+    implementation(nvaCatalog.slf4j.api)
+    implementation(nvaLibs.json)
+    testImplementation(libs.karate.core)
+    testImplementation(libs.karate.junit5)
+    testImplementation(nvaCatalog.hamcrest)
+    testImplementation(nvaCatalog.junit.jupiter.api)
+    testImplementation(nvaCatalog.junit.jupiter.params)
+    testImplementation(nvaCatalog.mockito.core)
+    testImplementation(nvaCatalog.wiremock.core)
+    testImplementation(nvaCatalog.wiremock.junit5)
+    testImplementation(nvaCatalog.zalando)
+    testImplementation(nvaLibs.testutils)
+    testRuntimeOnly(nvaCatalog.junit.jupiter.engine)
+    testRuntimeOnly(nvaCatalog.wiremock)
 }
-
 
 tasks.named('test', Test) {
     useJUnitPlatform {

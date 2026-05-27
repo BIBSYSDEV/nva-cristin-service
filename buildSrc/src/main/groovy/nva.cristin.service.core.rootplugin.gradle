@@ -4,7 +4,7 @@ plugins {
 
 nva {
     dependencyAnalysis {
-        enforced = false
+        enforced = true
     }
     jacoco {
         // FIXME: Remove dead code and add tests for remaining gaps (see NP-49448)
