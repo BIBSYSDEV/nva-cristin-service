@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation libs.nva.language
+    implementation nvaCatalog.nva.language
     implementation nvaCatalog.aws.lambda.core
     implementation nvaCatalog.jackson.annotations
     implementation nvaCatalog.jackson.core

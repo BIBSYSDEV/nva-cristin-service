@@ -3,11 +3,11 @@ plugins {
 }
 
 dependencies {
-    implementation libs.resilience4j.all
-    implementation libs.resilience4j.core
-    implementation libs.resilience4j.ratelimiter
-    implementation libs.resilience4j.retry
-    implementation libs.vavr
+    implementation nvaCatalog.resilience4j.all
+    implementation nvaCatalog.resilience4j.core
+    implementation nvaCatalog.resilience4j.ratelimiter
+    implementation nvaCatalog.resilience4j.retry
+    implementation nvaCatalog.vavr
     implementation nvaCatalog.aws.lambda.core
     implementation nvaCatalog.aws.sdk2.core
     implementation nvaCatalog.aws.sdk2.s3
