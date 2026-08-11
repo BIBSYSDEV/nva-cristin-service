@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.client;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.nonNull;
 import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.common.Utils.isOrcid;
 import static no.unit.nva.cristin.common.Utils.isPositiveInteger;
@@ -20,6 +21,7 @@ import static no.unit.nva.utils.UriUtils.PERSON;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import static nva.commons.core.StringUtils.isNotBlank;
 import static nva.commons.core.attempt.Try.attempt;
 
 import java.net.HttpURLConnection;
@@ -311,7 +313,7 @@ public class CristinPersonApiClient extends ApiClient
   private void throwRedirectWhenPersonIsMergedIntoAnother(
       String requestedIdentifier, HttpResponse<String> response) throws TemporaryRedirectException {
 
-    var redirectedToIdentifier = extractLastPathElement(response.uri());
+    var redirectedToIdentifier = extractPersonIdentifier(response.uri());
     if (upstreamRedirectedToAnotherCristinPerson(requestedIdentifier, redirectedToIdentifier)) {
       logger.info(LOG_PERSON_MERGED_INTO_ANOTHER, requestedIdentifier, redirectedToIdentifier);
       throw new TemporaryRedirectException(getNvaApiId(redirectedToIdentifier, PERSON));
@@ -323,6 +325,10 @@ public class CristinPersonApiClient extends ApiClient
     return isPositiveInteger(requestedIdentifier)
         && isPositiveInteger(redirectedToIdentifier)
         && !requestedIdentifier.equals(redirectedToIdentifier);
+  }
+
+  private String extractPersonIdentifier(URI uri) {
+    return nonNull(uri) && isNotBlank(uri.getPath()) ? extractLastPathElement(uri) : null;
   }
 
   /**

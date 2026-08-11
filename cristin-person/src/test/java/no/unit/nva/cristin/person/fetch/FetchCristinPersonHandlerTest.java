@@ -94,6 +94,7 @@ public class FetchCristinPersonHandlerTest {
   private static final String EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON =
       "https://api.dev.nva.aws.unit.no/cristin/person/5647";
   private static final String PERSONS_PATH = "persons";
+  private static final String CRISTIN_URI_WITHOUT_PATH = "https://www.cristin.no";
 
   private CristinPersonApiClient apiClient;
   private final Environment environment = new Environment();
@@ -419,6 +420,21 @@ public class FetchCristinPersonHandlerTest {
     var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
 
     assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
+  }
+
+  @Test
+  void shouldReturnPersonWhenUpstreamRespondsFromUriWithoutAnyPath() throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(
+            HttpResponseFaker.respondedFromUri(
+                readFromResources(CRISTIN_GET_PERSON_RESPONSE_JSON),
+                URI.create(CRISTIN_URI_WITHOUT_PATH)))
+        .when(apiClient)
+        .fetchGetResult(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
+
+    assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
   }
 
   private HttpResponseFaker responseRedirectedToPerson(String identifier) {
