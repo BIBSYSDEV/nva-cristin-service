@@ -297,38 +297,10 @@ public class CristinPersonApiClient extends ApiClient
     return toCristinPerson(identifier, fetchGetResult(uri));
   }
 
-  private CristinPerson toCristinPerson(String identifier, HttpResponse<String> response)
-      throws ApiGatewayException {
-    checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
-    throwRedirectWhenPersonIsMergedIntoAnother(identifier, response);
-    return getDeserializedResponse(response, CristinPerson.class);
-  }
-
   private URI getCorrectUriForIdentifier(String identifier) {
     return isOrcid(identifier)
         ? CristinPersonQuery.fromOrcid(identifier)
         : CristinPersonQuery.fromId(identifier);
-  }
-
-  private void throwRedirectWhenPersonIsMergedIntoAnother(
-      String requestedIdentifier, HttpResponse<String> response) throws TemporaryRedirectException {
-
-    var redirectedToIdentifier = extractPersonIdentifier(response.uri());
-    if (upstreamRedirectedToAnotherCristinPerson(requestedIdentifier, redirectedToIdentifier)) {
-      logger.info(LOG_PERSON_MERGED_INTO_ANOTHER, requestedIdentifier, redirectedToIdentifier);
-      throw new TemporaryRedirectException(getNvaApiId(redirectedToIdentifier, PERSON));
-    }
-  }
-
-  private boolean upstreamRedirectedToAnotherCristinPerson(
-      String requestedIdentifier, String redirectedToIdentifier) {
-    return isPositiveInteger(requestedIdentifier)
-        && isPositiveInteger(redirectedToIdentifier)
-        && Integer.parseInt(requestedIdentifier) != Integer.parseInt(redirectedToIdentifier);
-  }
-
-  private String extractPersonIdentifier(URI uri) {
-    return nonNull(uri) && isNotBlank(uri.getPath()) ? extractLastPathElement(uri) : null;
   }
 
   /**
@@ -380,6 +352,34 @@ public class CristinPersonApiClient extends ApiClient
         .map(CristinPerson::getCristinPersonId)
         .map(CristinPersonQuery::fromId)
         .orElseThrow();
+  }
+
+  private CristinPerson toCristinPerson(String identifier, HttpResponse<String> response)
+      throws ApiGatewayException {
+    checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
+    throwRedirectWhenPersonIsMergedIntoAnother(identifier, response);
+    return getDeserializedResponse(response, CristinPerson.class);
+  }
+
+  private void throwRedirectWhenPersonIsMergedIntoAnother(
+      String requestedIdentifier, HttpResponse<String> response) throws TemporaryRedirectException {
+
+    var redirectedToIdentifier = extractPersonIdentifier(response.uri());
+    if (upstreamRedirectedToAnotherCristinPerson(requestedIdentifier, redirectedToIdentifier)) {
+      logger.info(LOG_PERSON_MERGED_INTO_ANOTHER, requestedIdentifier, redirectedToIdentifier);
+      throw new TemporaryRedirectException(getNvaApiId(redirectedToIdentifier, PERSON));
+    }
+  }
+
+  private boolean upstreamRedirectedToAnotherCristinPerson(
+      String requestedIdentifier, String redirectedToIdentifier) {
+    return isPositiveInteger(requestedIdentifier)
+        && isPositiveInteger(redirectedToIdentifier)
+        && Integer.parseInt(requestedIdentifier) != Integer.parseInt(redirectedToIdentifier);
+  }
+
+  private String extractPersonIdentifier(URI uri) {
+    return nonNull(uri) && isNotBlank(uri.getPath()) ? extractLastPathElement(uri) : null;
   }
 
   private URI idUriForIdentityNumber() {
