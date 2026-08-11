@@ -324,7 +324,7 @@ public class CristinPersonApiClient extends ApiClient
       String requestedIdentifier, String redirectedToIdentifier) {
     return isPositiveInteger(requestedIdentifier)
         && isPositiveInteger(redirectedToIdentifier)
-        && !requestedIdentifier.equals(redirectedToIdentifier);
+        && Integer.parseInt(requestedIdentifier) != Integer.parseInt(redirectedToIdentifier);
   }
 
   private String extractPersonIdentifier(URI uri) {

@@ -95,6 +95,7 @@ public class FetchCristinPersonHandlerTest {
       "https://api.dev.nva.aws.unit.no/cristin/person/5647";
   private static final String PERSONS_PATH = "persons";
   private static final String CRISTIN_URI_WITHOUT_PATH = "https://www.cristin.no";
+  private static final Map<String, String> PATH_PARAM_WITH_LEADING_ZEROS = Map.of(ID, "0012345");
 
   private CristinPersonApiClient apiClient;
   private final Environment environment = new Environment();
@@ -420,6 +421,19 @@ public class FetchCristinPersonHandlerTest {
     var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
 
     assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
+  }
+
+  @Test
+  void shouldNotRedirectWhenUpstreamIdentifierIsNumericallyEqualButWrittenDifferently()
+      throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(responseRedirectedToPerson(VALID_PATH_PARAM.get(ID)))
+        .when(apiClient)
+        .fetchGetResult(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, PATH_PARAM_WITH_LEADING_ZEROS);
+
+    assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
   }
 
   @Test
