@@ -287,15 +287,16 @@ public class CristinPersonApiClient extends ApiClient
   protected CristinPerson getCristinPersonWithAuthentication(String identifier)
       throws ApiGatewayException {
     var uri = getCorrectUriForIdentifier(identifier);
-    var response = fetchGetResultWithAuthentication(uri);
-    throwRedirectWhenPersonIsMergedIntoAnother(identifier, response);
-    checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
-    return getDeserializedResponse(response, CristinPerson.class);
+    return toCristinPerson(identifier, fetchGetResultWithAuthentication(uri));
   }
 
   protected CristinPerson getCristinPerson(String identifier) throws ApiGatewayException {
     var uri = getCorrectUriForIdentifier(identifier);
-    var response = fetchGetResult(uri);
+    return toCristinPerson(identifier, fetchGetResult(uri));
+  }
+
+  private CristinPerson toCristinPerson(String identifier, HttpResponse<String> response)
+      throws ApiGatewayException {
     throwRedirectWhenPersonIsMergedIntoAnother(identifier, response);
     checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
     return getDeserializedResponse(response, CristinPerson.class);
