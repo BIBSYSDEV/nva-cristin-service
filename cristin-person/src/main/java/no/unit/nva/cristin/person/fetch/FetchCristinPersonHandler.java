@@ -75,8 +75,8 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
   }
 
   @Override
-  protected void handleExpectedException(
-      Context context, Void input, ApiGatewayException exception) throws IOException {
+  protected void handleExpectedException(Context context, Void input, ApiGatewayException exception)
+      throws IOException {
 
     if (exception instanceof TemporaryRedirectException) {
       writeExpectedFailure(input, exception, context.getAwsRequestId());

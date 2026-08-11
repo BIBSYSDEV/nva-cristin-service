@@ -6,13 +6,17 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FET
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.model.Constants.PERSONS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.exception.TemporaryRedirectException.TEMPORARY_REDIRECT;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
+import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -95,8 +99,7 @@ public class FetchCristinPersonHandlerTest {
       "nvaApiGetPersonNviVerified.json";
   private static final String MERGED_INTO_IDENTIFIER = "5647";
   private static final String EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON =
-      "https://api.dev.nva.aws.unit.no/cristin/person/5647";
-  private static final String PERSONS_PATH = "persons";
+      "https://%s/%s/person/%s".formatted(DOMAIN_NAME, BASE_PATH, MERGED_INTO_IDENTIFIER);
   private static final String CRISTIN_URI_WITHOUT_PATH = "https://www.cristin.no";
   private static final Map<String, String> PATH_PARAM_WITH_LEADING_ZEROS = Map.of(ID, "0012345");
 
@@ -475,7 +478,7 @@ public class FetchCristinPersonHandlerTest {
   }
 
   private URI cristinUriForPerson(String identifier) {
-    return fromUri(CRISTIN_API_URL).addChild(PERSONS_PATH).addChild(identifier).getUri();
+    return getCristinUri(identifier, PERSONS_PATH);
   }
 
   private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {
