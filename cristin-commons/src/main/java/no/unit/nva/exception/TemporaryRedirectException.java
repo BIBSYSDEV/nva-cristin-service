@@ -6,7 +6,8 @@ import nva.commons.apigateway.exceptions.RedirectException;
 public class TemporaryRedirectException extends RedirectException {
 
   public static final int TEMPORARY_REDIRECT = 307;
-  public static final String ERROR_MESSAGE_TEMPORARY_REDIRECT =
+
+  private static final String ERROR_MESSAGE_TEMPORARY_REDIRECT =
       "The requested resource is temporarily available at '%s'";
 
   private final URI location;
