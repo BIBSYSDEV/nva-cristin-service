@@ -405,11 +405,29 @@ public class FetchCristinPersonHandlerTest {
     assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
   }
 
+  @Test
+  void shouldReturnNotFoundWhenUpstreamRedirectsToPersonThatDoesNotExist() throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(
+            HttpResponseFaker.respondedFromUri(
+                EMPTY_STRING,
+                HttpURLConnection.HTTP_NOT_FOUND,
+                cristinUriForPerson(MERGED_INTO_IDENTIFIER)))
+        .when(apiClient)
+        .fetchGetResult(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
+
+    assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
+  }
+
   private HttpResponseFaker responseRedirectedToPerson(String identifier) {
-    var cristinUriAfterRedirect =
-        fromUri(CRISTIN_API_URL).addChild(PERSONS_PATH).addChild(identifier).getUri();
     return HttpResponseFaker.respondedFromUri(
-        readFromResources(CRISTIN_GET_PERSON_RESPONSE_JSON), cristinUriAfterRedirect);
+        readFromResources(CRISTIN_GET_PERSON_RESPONSE_JSON), cristinUriForPerson(identifier));
+  }
+
+  private URI cristinUriForPerson(String identifier) {
+    return fromUri(CRISTIN_API_URL).addChild(PERSONS_PATH).addChild(identifier).getUri();
   }
 
   private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {

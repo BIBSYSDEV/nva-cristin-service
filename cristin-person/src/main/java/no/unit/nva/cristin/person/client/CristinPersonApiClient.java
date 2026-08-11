@@ -297,8 +297,8 @@ public class CristinPersonApiClient extends ApiClient
 
   private CristinPerson toCristinPerson(String identifier, HttpResponse<String> response)
       throws ApiGatewayException {
-    throwRedirectWhenPersonIsMergedIntoAnother(identifier, response);
     checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
+    throwRedirectWhenPersonIsMergedIntoAnother(identifier, response);
     return getDeserializedResponse(response, CristinPerson.class);
   }
 
