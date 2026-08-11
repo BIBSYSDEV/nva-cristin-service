@@ -10,6 +10,7 @@ import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.exception.TemporaryRedirectException.TEMPORARY_REDIRECT;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
@@ -89,6 +90,10 @@ public class FetchCristinPersonHandlerTest {
   public static final String CRISTIN_PERSON_NVI_VERIFIED_JSON = "cristinPersonNviVerified.json";
   public static final String NVA_API_GET_PERSON_NVI_VERIFIED_JSON =
       "nvaApiGetPersonNviVerified.json";
+  private static final String MERGED_INTO_IDENTIFIER = "5647";
+  private static final String EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON =
+      "https://api.dev.nva.aws.unit.no/cristin/person/5647";
+  private static final String PERSONS_PATH = "persons";
 
   private CristinPersonApiClient apiClient;
   private final Environment environment = new Environment();
@@ -353,6 +358,58 @@ public class FetchCristinPersonHandlerTest {
     var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
 
     assertThat(actual.verified(), equalTo(false));
+  }
+
+  @Test
+  void shouldReturnTemporaryRedirectToNewPersonWhenUpstreamRedirectsToPersonMergedInto()
+      throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(responseRedirectedToPerson(MERGED_INTO_IDENTIFIER))
+        .when(apiClient)
+        .fetchGetResult(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
+
+    assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
+    assertThat(
+        gatewayResponse.getHeaders().get(HttpHeaders.LOCATION),
+        equalTo(EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON));
+  }
+
+  @Test
+  void shouldReturnTemporaryRedirectToNewPersonWhenUpstreamRedirectsAndClientIsAuthorized()
+      throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(responseRedirectedToPerson(MERGED_INTO_IDENTIFIER))
+        .when(apiClient)
+        .fetchGetResultWithAuthentication(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendAuthorizedQuery(MANAGE_OWN_AFFILIATION);
+
+    assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
+    assertThat(
+        gatewayResponse.getHeaders().get(HttpHeaders.LOCATION),
+        equalTo(EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON));
+  }
+
+  @Test
+  void shouldReturnPersonDataWhenLookingUpByOrcidEvenThoughUpstreamRedirectsToCristinIdentifier()
+      throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(responseRedirectedToPerson(MERGED_INTO_IDENTIFIER))
+        .when(apiClient)
+        .fetchGetResult(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_ORCID_PATH_PARAM);
+
+    assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+  }
+
+  private HttpResponseFaker responseRedirectedToPerson(String identifier) {
+    var cristinUriAfterRedirect =
+        fromUri(CRISTIN_API_URL).addChild(PERSONS_PATH).addChild(identifier).getUri();
+    return HttpResponseFaker.respondedFromUri(
+        readFromResources(CRISTIN_GET_PERSON_RESPONSE_JSON), cristinUriAfterRedirect);
   }
 
   private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {

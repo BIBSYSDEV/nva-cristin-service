@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person.client;
 import static java.util.Arrays.asList;
 import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.common.Utils.isOrcid;
+import static no.unit.nva.cristin.common.Utils.isPositiveInteger;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -17,6 +18,7 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 import static no.unit.nva.utils.UriUtils.PERSON;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
+import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -35,10 +37,13 @@ import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.exception.TemporaryRedirectException;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.paths.UriWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CristinPersonApiClient extends ApiClient
     implements ClientVersion, CristinAuthorizedQueryClient<Map<String, String>, Person> {
@@ -47,6 +52,10 @@ public class CristinPersonApiClient extends ApiClient
   public static final String ERROR_MESSAGE_NO_MATCH_FOUND_FOR_SUPPLIED_PAYLOAD =
       "No match found for supplied " + "payload";
   public static final String VERSION_ONE = "1";
+
+  private static final Logger logger = LoggerFactory.getLogger(CristinPersonApiClient.class);
+  private static final String LOG_PERSON_MERGED_INTO_ANOTHER =
+      "Upstream redirected person {} to person {}";
 
   /** Create CristinPersonApiClient with default HTTP client. */
   public CristinPersonApiClient() {
@@ -279,6 +288,7 @@ public class CristinPersonApiClient extends ApiClient
       throws ApiGatewayException {
     var uri = getCorrectUriForIdentifier(identifier);
     var response = fetchGetResultWithAuthentication(uri);
+    throwRedirectWhenPersonIsMergedIntoAnother(identifier, response);
     checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
     return getDeserializedResponse(response, CristinPerson.class);
   }
@@ -286,6 +296,7 @@ public class CristinPersonApiClient extends ApiClient
   protected CristinPerson getCristinPerson(String identifier) throws ApiGatewayException {
     var uri = getCorrectUriForIdentifier(identifier);
     var response = fetchGetResult(uri);
+    throwRedirectWhenPersonIsMergedIntoAnother(identifier, response);
     checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
     return getDeserializedResponse(response, CristinPerson.class);
   }
@@ -294,6 +305,23 @@ public class CristinPersonApiClient extends ApiClient
     return isOrcid(identifier)
         ? CristinPersonQuery.fromOrcid(identifier)
         : CristinPersonQuery.fromId(identifier);
+  }
+
+  private void throwRedirectWhenPersonIsMergedIntoAnother(
+      String requestedIdentifier, HttpResponse<String> response) throws TemporaryRedirectException {
+
+    var redirectedToIdentifier = extractLastPathElement(response.uri());
+    if (upstreamRedirectedToAnotherCristinPerson(requestedIdentifier, redirectedToIdentifier)) {
+      logger.info(LOG_PERSON_MERGED_INTO_ANOTHER, requestedIdentifier, redirectedToIdentifier);
+      throw new TemporaryRedirectException(getNvaApiId(redirectedToIdentifier, PERSON));
+    }
+  }
+
+  private boolean upstreamRedirectedToAnotherCristinPerson(
+      String requestedIdentifier, String redirectedToIdentifier) {
+    return isPositiveInteger(requestedIdentifier)
+        && isPositiveInteger(redirectedToIdentifier)
+        && !requestedIdentifier.equals(redirectedToIdentifier);
   }
 
   /**
