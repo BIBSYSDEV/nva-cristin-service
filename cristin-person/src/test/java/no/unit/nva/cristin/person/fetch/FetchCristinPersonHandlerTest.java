@@ -52,13 +52,16 @@ import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.exception.TemporaryRedirectException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
+import nva.commons.logutils.LogRecorder;
 import org.apache.hc.core5.http.HttpHeaders;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -421,6 +424,21 @@ public class FetchCristinPersonHandlerTest {
     var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
 
     assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
+  }
+
+  @Test
+  void shouldNotLogStackTraceWhenPersonIsMergedIntoAnother() throws Exception {
+    final var logRecorder = LogRecorder.forRoot(FetchCristinPersonHandler.class);
+    apiClient = spy(apiClient);
+    doReturn(responseRedirectedToPerson(MERGED_INTO_IDENTIFIER))
+        .when(apiClient)
+        .fetchGetResult(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
+
+    assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
+    Assertions.assertThat(logRecorder.messages())
+        .noneMatch(message -> message.contains(TemporaryRedirectException.class.getName()));
   }
 
   @Test
