@@ -18,12 +18,12 @@ import java.util.List;
 import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.Person;
-import no.unit.nva.exception.TemporaryRedirectException;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.MediaType;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.apigateway.exceptions.RedirectException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 import org.slf4j.Logger;
@@ -78,7 +78,7 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
   protected void handleExpectedException(Context context, Void input, ApiGatewayException exception)
       throws IOException {
 
-    if (exception instanceof TemporaryRedirectException) {
+    if (exception instanceof RedirectException) {
       writeExpectedFailure(input, exception, context.getAwsRequestId());
     } else {
       super.handleExpectedException(context, input, exception);
