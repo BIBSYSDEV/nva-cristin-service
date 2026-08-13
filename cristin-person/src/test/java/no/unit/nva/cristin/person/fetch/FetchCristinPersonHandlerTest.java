@@ -102,6 +102,8 @@ public class FetchCristinPersonHandlerTest {
       "https://%s/%s/person/%s".formatted(DOMAIN_NAME, BASE_PATH, MERGED_INTO_IDENTIFIER);
   private static final String CRISTIN_URI_WITHOUT_PATH = "https://www.cristin.no";
   private static final String INSTITUTIONS_PATH = "institutions";
+  private static final String PERSONS_PATH_CAPITALIZED = "Persons";
+  private static final String SLASH = "/";
   private static final Map<String, String> PATH_PARAM_WITH_LEADING_ZEROS = Map.of(ID, "0012345");
 
   private CristinPersonApiClient apiClient;
@@ -456,6 +458,42 @@ public class FetchCristinPersonHandlerTest {
     var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, PATH_PARAM_WITH_LEADING_ZEROS);
 
     assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+  }
+
+  @Test
+  void shouldRedirectWhenUpstreamPersonUriHasTrailingSlash() throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(
+            HttpResponseFaker.respondedFromUri(
+                readFromResources(CRISTIN_GET_PERSON_RESPONSE_JSON),
+                URI.create(cristinUriForPerson(MERGED_INTO_IDENTIFIER) + SLASH)))
+        .when(apiClient)
+        .fetchGetResult(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
+
+    assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
+    assertThat(
+        gatewayResponse.getHeaders().get(HttpHeaders.LOCATION),
+        equalTo(EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON));
+  }
+
+  @Test
+  void shouldRedirectWhenUpstreamPersonPathIsSpelledWithDifferentCasing() throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(
+            HttpResponseFaker.respondedFromUri(
+                readFromResources(CRISTIN_GET_PERSON_RESPONSE_JSON),
+                getCristinUri(MERGED_INTO_IDENTIFIER, PERSONS_PATH_CAPITALIZED)))
+        .when(apiClient)
+        .fetchGetResult(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
+
+    assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
+    assertThat(
+        gatewayResponse.getHeaders().get(HttpHeaders.LOCATION),
+        equalTo(EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON));
   }
 
   @Test

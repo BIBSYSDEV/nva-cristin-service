@@ -60,7 +60,7 @@ public class CristinPersonApiClient extends ApiClient
   private static final String LOG_PERSON_MERGED_INTO_ANOTHER =
       "Upstream redirected person {} to person {}";
   private static final Pattern CRISTIN_PERSON_PATH =
-      Pattern.compile(".*/%s/[^/]+".formatted(PERSONS_PATH));
+      Pattern.compile(".*/%s/[^/]+/*".formatted(PERSONS_PATH), Pattern.CASE_INSENSITIVE);
 
   /** Create CristinPersonApiClient with default HTTP client. */
   public CristinPersonApiClient() {
