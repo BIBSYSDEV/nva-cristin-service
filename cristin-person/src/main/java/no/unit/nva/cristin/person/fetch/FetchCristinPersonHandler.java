@@ -79,6 +79,7 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
       throws IOException {
 
     if (exception instanceof RedirectException) {
+      logger.info(exception.getMessage());
       writeExpectedFailure(input, exception, context.getAwsRequestId());
     } else {
       super.handleExpectedException(context, input, exception);

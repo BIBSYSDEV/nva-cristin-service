@@ -445,6 +445,8 @@ public class FetchCristinPersonHandlerTest {
     assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
     Assertions.assertThat(logRecorder.messages())
         .noneMatch(message -> message.contains(TemporaryRedirectException.class.getName()));
+    Assertions.assertThat(logRecorder.messages())
+        .anyMatch(message -> message.contains(EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON));
   }
 
   @Test
