@@ -1,14 +1,12 @@
 package no.unit.nva.cristin.person.client;
 
 import static java.util.Arrays.asList;
-import static java.util.Objects.nonNull;
 import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.common.Utils.isOrcid;
 import static no.unit.nva.cristin.common.Utils.isPositiveInteger;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
-import static no.unit.nva.cristin.model.Constants.PERSONS_PATH;
 import static no.unit.nva.cristin.model.Constants.PERSON_CONTEXT;
 import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.cristin.model.Constants.PERSON_QUERY_CONTEXT;
@@ -20,8 +18,8 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.PAGE;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 import static no.unit.nva.utils.UriUtils.PERSON;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
-import static no.unit.nva.utils.UriUtils.extractLastPathElement;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import static nva.commons.core.StringUtils.isNotBlank;
 import static nva.commons.core.attempt.Try.attempt;
 
 import java.net.HttpURLConnection;
@@ -31,7 +29,6 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.unit.nva.client.ClientVersion;
@@ -57,10 +54,8 @@ public class CristinPersonApiClient extends ApiClient
   public static final String VERSION_ONE = "1";
 
   private static final Logger logger = LoggerFactory.getLogger(CristinPersonApiClient.class);
-  private static final String LOG_PERSON_MERGED_INTO_ANOTHER =
-      "Upstream redirected person {} to person {}";
-  private static final Pattern CRISTIN_PERSON_PATH =
-      Pattern.compile(".*/%s/[^/]+/*".formatted(PERSONS_PATH), Pattern.CASE_INSENSITIVE);
+  private static final String LOG_REDIRECTING_TO_CANONICAL_PERSON =
+      "Redirecting requested person {} to canonical person {}";
 
   /** Create CristinPersonApiClient with default HTTP client. */
   public CristinPersonApiClient() {
@@ -360,35 +355,25 @@ public class CristinPersonApiClient extends ApiClient
   private CristinPerson toCristinPerson(String identifier, HttpResponse<String> response)
       throws ApiGatewayException {
     checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
-    throwRedirectWhenPersonIsMergedIntoAnother(identifier, response);
-    return getDeserializedResponse(response, CristinPerson.class);
+    var cristinPerson = getDeserializedResponse(response, CristinPerson.class);
+    throwRedirectWhenIdentifierIsNotCanonical(identifier, cristinPerson);
+    return cristinPerson;
   }
 
-  private void throwRedirectWhenPersonIsMergedIntoAnother(
-      String requestedIdentifier, HttpResponse<String> response) throws TemporaryRedirectException {
+  private void throwRedirectWhenIdentifierIsNotCanonical(
+      String requestedIdentifier, CristinPerson cristinPerson) throws TemporaryRedirectException {
 
-    var redirectedToIdentifier = extractPersonIdentifier(response.uri());
-    if (upstreamRedirectedToAnotherCristinPerson(requestedIdentifier, redirectedToIdentifier)) {
-      logger.info(LOG_PERSON_MERGED_INTO_ANOTHER, requestedIdentifier, redirectedToIdentifier);
-      throw new TemporaryRedirectException(getNvaApiId(redirectedToIdentifier, PERSON));
+    var canonicalIdentifier = cristinPerson.getCristinPersonId();
+    if (identifierIsNotCanonical(requestedIdentifier, canonicalIdentifier)) {
+      logger.info(LOG_REDIRECTING_TO_CANONICAL_PERSON, requestedIdentifier, canonicalIdentifier);
+      throw new TemporaryRedirectException(getNvaApiId(canonicalIdentifier, PERSON));
     }
   }
 
-  private boolean upstreamRedirectedToAnotherCristinPerson(
-      String requestedIdentifier, String redirectedToIdentifier) {
+  private boolean identifierIsNotCanonical(String requestedIdentifier, String canonicalIdentifier) {
     return isPositiveInteger(requestedIdentifier)
-        && isPositiveInteger(redirectedToIdentifier)
-        && Integer.parseInt(requestedIdentifier) != Integer.parseInt(redirectedToIdentifier);
-  }
-
-  private String extractPersonIdentifier(URI uri) {
-    return isCristinPersonResource(uri) ? extractLastPathElement(uri) : null;
-  }
-
-  private boolean isCristinPersonResource(URI uri) {
-    return nonNull(uri)
-        && nonNull(uri.getPath())
-        && CRISTIN_PERSON_PATH.matcher(uri.getPath()).matches();
+        && isNotBlank(canonicalIdentifier)
+        && !requestedIdentifier.equals(canonicalIdentifier);
   }
 
   private URI idUriForIdentityNumber() {

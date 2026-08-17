@@ -10,13 +10,11 @@ import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.model.Constants.PERSONS_PATH;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static no.unit.nva.exception.TemporaryRedirectException.TEMPORARY_REDIRECT;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
-import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
 import static nva.commons.apigateway.MediaTypes.APPLICATION_PROBLEM_JSON;
@@ -80,11 +78,11 @@ public class FetchCristinPersonHandlerTest {
   private static final String NVA_API_GET_PERSON_RESPONSE_JSON = "nvaApiGetPersonResponse.json";
   private static final Map<String, String> ILLEGAL_PATH_PARAM = Map.of(ID, "string");
   private static final Map<String, String> ILLEGAL_QUERY_PARAMS = Map.of("somekey", "somevalue");
-  private static final Map<String, String> VALID_PATH_PARAM = Map.of(ID, "12345");
+  private static final Map<String, String> VALID_PATH_PARAM = Map.of(ID, "359084");
   private static final Map<String, String> ZERO_QUERY_PARAMS = Collections.emptyMap();
   private static final String EMPTY_STRING = "";
   private static final String EXPECTED_CRISTIN_URI_WITH_IDENTIFIER =
-      "https://api.cristin-test.uio.no/v2/persons/12345";
+      "https://api.cristin-test.uio.no/v2/persons/359084";
   private static final Map<String, String> VALID_ORCID_PATH_PARAM =
       Map.of(ID, "1234-1234-1234-1234");
   private static final String EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER =
@@ -100,11 +98,9 @@ public class FetchCristinPersonHandlerTest {
   private static final String MERGED_INTO_IDENTIFIER = "5647";
   private static final String EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON =
       "https://%s/%s/person/%s".formatted(DOMAIN_NAME, BASE_PATH, MERGED_INTO_IDENTIFIER);
-  private static final String CRISTIN_URI_WITHOUT_PATH = "https://www.cristin.no";
-  private static final String INSTITUTIONS_PATH = "institutions";
-  private static final String PERSONS_PATH_CAPITALIZED = "Persons";
-  private static final String SLASH = "/";
-  private static final Map<String, String> PATH_PARAM_WITH_LEADING_ZEROS = Map.of(ID, "0012345");
+  private static final Map<String, String> PATH_PARAM_WITH_LEADING_ZEROS = Map.of(ID, "0359084");
+  private static final String EXPECTED_NVA_LOCATION_FOR_CANONICAL_PERSON =
+      "https://%s/%s/person/%s".formatted(DOMAIN_NAME, BASE_PATH, VALID_PATH_PARAM.get(ID));
 
   private CristinPersonApiClient apiClient;
   private final Environment environment = new Environment();
@@ -319,7 +315,7 @@ public class FetchCristinPersonHandlerTest {
     var captor = ArgumentCaptor.forClass(HttpRequest.class);
     verify(mockHttpClient).send(captor.capture(), any());
 
-    var expected = "https://api.cristin-test.uio.no/v2/persons/12345?lang=en%2Cnb%2Cnn";
+    var expected = "https://api.cristin-test.uio.no/v2/persons/359084?lang=en%2Cnb%2Cnn";
     var actual = captor.getValue().uri().toString();
 
     assertThat(actual, equalTo(expected));
@@ -375,7 +371,7 @@ public class FetchCristinPersonHandlerTest {
   void shouldReturnTemporaryRedirectToNewPersonWhenUpstreamRedirectsToPersonMergedInto()
       throws Exception {
     apiClient = spy(apiClient);
-    doReturn(responseRedirectedToPerson(MERGED_INTO_IDENTIFIER))
+    doReturn(new HttpResponseFaker(cristinPersonWithIdentifier(MERGED_INTO_IDENTIFIER)))
         .when(apiClient)
         .fetchGetResult(any(URI.class));
     handler = new FetchCristinPersonHandler(apiClient, environment);
@@ -391,7 +387,7 @@ public class FetchCristinPersonHandlerTest {
   void shouldReturnTemporaryRedirectToNewPersonWhenUpstreamRedirectsAndClientIsAuthorized()
       throws Exception {
     apiClient = spy(apiClient);
-    doReturn(responseRedirectedToPerson(MERGED_INTO_IDENTIFIER))
+    doReturn(new HttpResponseFaker(cristinPersonWithIdentifier(MERGED_INTO_IDENTIFIER)))
         .when(apiClient)
         .fetchGetResultWithAuthentication(any(URI.class));
     handler = new FetchCristinPersonHandler(apiClient, environment);
@@ -407,7 +403,7 @@ public class FetchCristinPersonHandlerTest {
   void shouldReturnPersonDataWhenLookingUpByOrcidEvenThoughUpstreamRedirectsToCristinIdentifier()
       throws Exception {
     apiClient = spy(apiClient);
-    doReturn(responseRedirectedToPerson(MERGED_INTO_IDENTIFIER))
+    doReturn(new HttpResponseFaker(cristinPersonWithIdentifier(MERGED_INTO_IDENTIFIER)))
         .when(apiClient)
         .fetchGetResult(any(URI.class));
     handler = new FetchCristinPersonHandler(apiClient, environment);
@@ -417,26 +413,10 @@ public class FetchCristinPersonHandlerTest {
   }
 
   @Test
-  void shouldReturnNotFoundWhenUpstreamRedirectsToPersonThatDoesNotExist() throws Exception {
-    apiClient = spy(apiClient);
-    doReturn(
-            HttpResponseFaker.respondedFromUri(
-                EMPTY_STRING,
-                HttpURLConnection.HTTP_NOT_FOUND,
-                cristinUriForPerson(MERGED_INTO_IDENTIFIER)))
-        .when(apiClient)
-        .fetchGetResult(any(URI.class));
-    handler = new FetchCristinPersonHandler(apiClient, environment);
-    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
-
-    assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
-  }
-
-  @Test
   void shouldNotLogStackTraceWhenPersonIsMergedIntoAnother() throws Exception {
     final var logRecorder = LogRecorder.forRoot(FetchCristinPersonHandler.class);
     apiClient = spy(apiClient);
-    doReturn(responseRedirectedToPerson(MERGED_INTO_IDENTIFIER))
+    doReturn(new HttpResponseFaker(cristinPersonWithIdentifier(MERGED_INTO_IDENTIFIER)))
         .when(apiClient)
         .fetchGetResult(any(URI.class));
     handler = new FetchCristinPersonHandler(apiClient, environment);
@@ -450,91 +430,26 @@ public class FetchCristinPersonHandlerTest {
   }
 
   @Test
-  void shouldNotRedirectWhenUpstreamIdentifierIsNumericallyEqualButWrittenDifferently()
-      throws Exception {
-    apiClient = spy(apiClient);
-    doReturn(responseRedirectedToPerson(VALID_PATH_PARAM.get(ID)))
-        .when(apiClient)
-        .fetchGetResult(any(URI.class));
-    handler = new FetchCristinPersonHandler(apiClient, environment);
+  void shouldRedirectToCanonicalPersonWhenRequestedIdentifierIsZeroPadded() throws Exception {
     var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, PATH_PARAM_WITH_LEADING_ZEROS);
 
-    assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-  }
-
-  @Test
-  void shouldRedirectWhenUpstreamPersonUriHasTrailingSlash() throws Exception {
-    apiClient = spy(apiClient);
-    doReturn(
-            HttpResponseFaker.respondedFromUri(
-                readFromResources(CRISTIN_GET_PERSON_RESPONSE_JSON),
-                URI.create(cristinUriForPerson(MERGED_INTO_IDENTIFIER) + SLASH)))
-        .when(apiClient)
-        .fetchGetResult(any(URI.class));
-    handler = new FetchCristinPersonHandler(apiClient, environment);
-    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
-
     assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
     assertThat(
         gatewayResponse.getHeaders().get(HttpHeaders.LOCATION),
-        equalTo(EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON));
+        equalTo(EXPECTED_NVA_LOCATION_FOR_CANONICAL_PERSON));
   }
 
   @Test
-  void shouldRedirectWhenUpstreamPersonPathIsSpelledWithDifferentCasing() throws Exception {
-    apiClient = spy(apiClient);
-    doReturn(
-            HttpResponseFaker.respondedFromUri(
-                readFromResources(CRISTIN_GET_PERSON_RESPONSE_JSON),
-                getCristinUri(MERGED_INTO_IDENTIFIER, PERSONS_PATH_CAPITALIZED)))
-        .when(apiClient)
-        .fetchGetResult(any(URI.class));
-    handler = new FetchCristinPersonHandler(apiClient, environment);
-    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
-
-    assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
-    assertThat(
-        gatewayResponse.getHeaders().get(HttpHeaders.LOCATION),
-        equalTo(EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON));
-  }
-
-  @Test
-  void shouldNotRedirectWhenUpstreamRespondsFromResourceThatIsNotAPerson() throws Exception {
-    apiClient = spy(apiClient);
-    doReturn(
-            HttpResponseFaker.respondedFromUri(
-                readFromResources(CRISTIN_GET_PERSON_RESPONSE_JSON),
-                getCristinUri(MERGED_INTO_IDENTIFIER, INSTITUTIONS_PATH)))
-        .when(apiClient)
-        .fetchGetResult(any(URI.class));
-    handler = new FetchCristinPersonHandler(apiClient, environment);
+  void shouldNotRedirectWhenRequestedIdentifierIsAlreadyCanonical() throws Exception {
     var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
 
     assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
   }
 
-  @Test
-  void shouldReturnPersonWhenUpstreamRespondsFromUriWithoutAnyPath() throws Exception {
-    apiClient = spy(apiClient);
-    doReturn(
-            HttpResponseFaker.respondedFromUri(
-                readFromResources(CRISTIN_GET_PERSON_RESPONSE_JSON),
-                URI.create(CRISTIN_URI_WITHOUT_PATH)))
-        .when(apiClient)
-        .fetchGetResult(any(URI.class));
-    handler = new FetchCristinPersonHandler(apiClient, environment);
-    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
-
-    assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
-  }
-
-  private HttpResponseFaker responseRedirectedToPerson(String identifier) {
-    return HttpResponseFaker.respondedFromUri(
-        readFromResources(CRISTIN_GET_PERSON_RESPONSE_JSON), cristinUriForPerson(identifier));
-  }
-
-  private URI cristinUriForPerson(String identifier) {
-    return getCristinUri(identifier, PERSONS_PATH);
+  private String cristinPersonWithIdentifier(String identifier) {
+    var cristinPerson = randomCristinPerson();
+    cristinPerson.setCristinPersonId(identifier);
+    return cristinPerson.toString();
   }
 
   private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {

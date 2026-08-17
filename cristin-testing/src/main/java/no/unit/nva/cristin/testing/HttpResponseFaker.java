@@ -27,7 +27,6 @@ public class HttpResponseFaker implements HttpResponse<String> {
   private final transient String bodyString;
   private final transient int status;
   private final transient HttpHeaders httpHeaders;
-  private final transient URI effectiveUri;
 
   public HttpResponseFaker(String bodyString) {
     this(bodyString, HTTP_OK);
@@ -37,34 +36,17 @@ public class HttpResponseFaker implements HttpResponse<String> {
     this(bodyString, status, defaultHeaders());
   }
 
-  public HttpResponseFaker(String bodyString, int status, HttpHeaders httpHeaders) {
-    this(bodyString, status, httpHeaders, null);
-  }
-
   /**
    * Main constructor for a stub of HttpResponse.
    *
    * @param bodyString Body content of HttpResponse
    * @param status Http status code of HttpResponse
    * @param httpHeaders HttpHeaders used in the HttpResponse
-   * @param effectiveUri the URI of the final request, which differs from the requested URI when
-   *     redirects have been followed
    */
-  public HttpResponseFaker(
-      String bodyString, int status, HttpHeaders httpHeaders, URI effectiveUri) {
+  public HttpResponseFaker(String bodyString, int status, HttpHeaders httpHeaders) {
     this.bodyString = bodyString;
     this.status = status;
     this.httpHeaders = httpHeaders;
-    this.effectiveUri = effectiveUri;
-  }
-
-  public static HttpResponseFaker respondedFromUri(String bodyString, URI effectiveUri) {
-    return respondedFromUri(bodyString, HTTP_OK, effectiveUri);
-  }
-
-  public static HttpResponseFaker respondedFromUri(
-      String bodyString, int status, URI effectiveUri) {
-    return new HttpResponseFaker(bodyString, status, defaultHeaders(), effectiveUri);
   }
 
   /**
@@ -120,7 +102,7 @@ public class HttpResponseFaker implements HttpResponse<String> {
 
   @Override
   public URI uri() {
-    return effectiveUri;
+    return null;
   }
 
   @Override
