@@ -1,6 +1,7 @@
 package no.unit.nva.cristin.person.model.nva;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
+import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.COLLABORATION;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.EMPLOYMENTS;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import no.unit.nva.commons.json.JsonUtils;
 import no.unit.nva.cristin.model.CristinOrganization;
@@ -21,6 +23,8 @@ import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import nva.commons.core.ioutils.IoUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class PersonTest {
 
@@ -90,6 +94,22 @@ public class PersonTest {
     var verified = JsonUtils.dtoObjectMapper.readTree(json).get("verified").asText();
 
     assertEquals(Boolean.FALSE.toString(), verified);
+  }
+
+  @ParameterizedTest(name = "Should strip whitespace from language map collaboration values")
+  @ValueSource(strings = {"\r\n %s \n", "\t %s \t"})
+  void shouldTrimWhitespaceFromCollaborationValues(String candidate) {
+    var person =
+        new Person.Builder()
+            .withCollaboration(Map.of("en", candidate.formatted("expected collaboration")))
+            .build();
+
+    assertEquals("expected collaboration", person.collaboration().get("en"));
+
+    var json = OBJECT_MAPPER.valueToTree(person);
+
+    assertThat(json.has(COLLABORATION), equalTo(true));
+    assertEquals("expected collaboration", json.get(COLLABORATION).get("en").asText());
   }
 
   private List<CristinPersonEmployment> generateExpectedEmploymentsMatchingJson() {
