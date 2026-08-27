@@ -27,7 +27,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.adapter.PersonToCristinFormat;
@@ -120,7 +122,18 @@ public record Person(
 
   @Override
   public Map<String, String> collaboration() {
-    return nonEmptyOrDefault(collaboration);
+    return trimCollaboration(nonEmptyOrDefault(collaboration));
+  }
+
+  private Map<String, String> trimCollaboration(Map<String, String> collaboration) {
+    return collaboration.entrySet().stream()
+        .map(Person::trimCollab)
+        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+  }
+
+  private static Entry<String, String> trimCollab(Entry<String, String> stringStringEntry) {
+    var stripped = stringStringEntry.getValue().strip();
+    return Map.entry(stringStringEntry.getKey(), stripped);
   }
 
   @Override
