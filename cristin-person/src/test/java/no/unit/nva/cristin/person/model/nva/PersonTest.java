@@ -112,7 +112,7 @@ public class PersonTest {
     assertEquals("expected collaboration", json.get(COLLABORATION).get("en").asText());
   }
 
-  @ParameterizedTest(name = "Should remove empty values from language map collaboration")
+  @ParameterizedTest(name = "Should remove empty values from collaboration")
   @ValueSource(strings = {"", " "})
   void shouldRemoveEmptyValuesFromCollaboration(String candidate) {
     var person =
