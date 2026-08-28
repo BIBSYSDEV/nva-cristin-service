@@ -112,6 +112,21 @@ public class PersonTest {
     assertEquals("expected collaboration", json.get(COLLABORATION).get("en").asText());
   }
 
+  @ParameterizedTest(name = "Should remove empty values from collaboration")
+  @ValueSource(strings = {"", " "})
+  void shouldRemoveEmptyValuesFromCollaboration(String candidate) {
+    var person =
+        new Person.Builder()
+            .withCollaboration(Map.of("en", candidate, "nb", "expected to remain"))
+            .build();
+
+    var json = OBJECT_MAPPER.valueToTree(person);
+
+    assertThat(json.has(COLLABORATION), equalTo(true));
+    assertThat(json.get(COLLABORATION).has("nb"), equalTo(true));
+    assertThat(json.get(COLLABORATION).has("en"), equalTo(false));
+  }
+
   private List<CristinPersonEmployment> generateExpectedEmploymentsMatchingJson() {
     var cristinEmployment = new CristinPersonEmployment();
     var position = new CristinPositionCode();

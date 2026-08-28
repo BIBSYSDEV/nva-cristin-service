@@ -128,6 +128,7 @@ public record Person(
   private Map<String, String> trimCollaboration(Map<String, String> collaboration) {
     return collaboration.entrySet().stream()
         .map(Person::trimCollab)
+        .filter(collab -> !collab.getValue().isBlank())
         .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
   }
 
