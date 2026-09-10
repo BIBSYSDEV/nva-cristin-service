@@ -6,7 +6,7 @@ dependencies {
     api(nvaCatalog.aws.lambda.core)
     api(nvaCatalog.aws.sdk2.s3)
     api(nvaLibs.core)
-    implementation(nvaCatalog.aws.sdk2.core)
+    implementation(nvaCatalog.aws.sdk2.sdk.core)
     implementation(nvaCatalog.jackson.databind)
     implementation(nvaCatalog.resilience4j.all)
     implementation(nvaCatalog.resilience4j.core)

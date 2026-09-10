@@ -12,6 +12,8 @@ nva {
 dependencies {
     implementation(platform("software.amazon.awssdk:bom:${nvaCatalog.versions.aws.sdk2.asProvider().get()}"))
     testFixturesImplementation(platform("software.amazon.awssdk:bom:${nvaCatalog.versions.aws.sdk2.asProvider().get()}"))
+    // Gradle 9 no longer puts the JUnit Platform launcher on the test classpath by itself
+    testRuntimeOnly(nvaCatalog.junit.platform.launcher)
 }
 
 tasks.named('test', Test) {
