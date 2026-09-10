@@ -21,7 +21,7 @@ dependencies {
     testFixturesImplementation('software.amazon.awssdk:http-client-spi')
     testFixturesImplementation('software.amazon.awssdk:regions')
     testFixturesImplementation('software.amazon.awssdk:url-connection-client')
-    testFixturesImplementation(nvaCatalog.aws.sdk2.core)
+    testFixturesImplementation(nvaCatalog.aws.sdk2.sdk.core)
     testFixturesImplementation(nvaCatalog.jackson.databind)
     testFixturesImplementation(nvaLibs.apigateway)
     testFixturesImplementation(nvaLibs.core)
