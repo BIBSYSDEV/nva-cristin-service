@@ -6,10 +6,13 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FET
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_PERSON_ID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_SERVER_ERROR;
+import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.CRISTIN_API_URL;
+import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.JsonPropertyNames.ID;
 import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.NATIONAL_IDENTITY_NUMBER;
+import static no.unit.nva.exception.TemporaryRedirectException.TEMPORARY_REDIRECT;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
@@ -51,13 +54,16 @@ import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.cristin.person.model.nva.Person;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
+import no.unit.nva.exception.TemporaryRedirectException;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.AccessRight;
 import nva.commons.apigateway.GatewayResponse;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
+import nva.commons.logutils.LogRecorder;
 import org.apache.hc.core5.http.HttpHeaders;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -72,11 +78,11 @@ public class FetchCristinPersonHandlerTest {
   private static final String NVA_API_GET_PERSON_RESPONSE_JSON = "nvaApiGetPersonResponse.json";
   private static final Map<String, String> ILLEGAL_PATH_PARAM = Map.of(ID, "string");
   private static final Map<String, String> ILLEGAL_QUERY_PARAMS = Map.of("somekey", "somevalue");
-  private static final Map<String, String> VALID_PATH_PARAM = Map.of(ID, "12345");
+  private static final Map<String, String> VALID_PATH_PARAM = Map.of(ID, "359084");
   private static final Map<String, String> ZERO_QUERY_PARAMS = Collections.emptyMap();
   private static final String EMPTY_STRING = "";
   private static final String EXPECTED_CRISTIN_URI_WITH_IDENTIFIER =
-      "https://api.cristin-test.uio.no/v2/persons/12345";
+      "https://api.cristin-test.uio.no/v2/persons/359084";
   private static final Map<String, String> VALID_ORCID_PATH_PARAM =
       Map.of(ID, "1234-1234-1234-1234");
   private static final String EXPECTED_CRISTIN_URI_WITH_ORCID_IDENTIFIER =
@@ -89,6 +95,12 @@ public class FetchCristinPersonHandlerTest {
   public static final String CRISTIN_PERSON_NVI_VERIFIED_JSON = "cristinPersonNviVerified.json";
   public static final String NVA_API_GET_PERSON_NVI_VERIFIED_JSON =
       "nvaApiGetPersonNviVerified.json";
+  private static final String MERGED_INTO_IDENTIFIER = "5647";
+  private static final String EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON =
+      "https://%s/%s/person/%s".formatted(DOMAIN_NAME, BASE_PATH, MERGED_INTO_IDENTIFIER);
+  private static final Map<String, String> PATH_PARAM_WITH_LEADING_ZEROS = Map.of(ID, "0359084");
+  private static final String EXPECTED_NVA_LOCATION_FOR_CANONICAL_PERSON =
+      "https://%s/%s/person/%s".formatted(DOMAIN_NAME, BASE_PATH, VALID_PATH_PARAM.get(ID));
 
   private CristinPersonApiClient apiClient;
   private final Environment environment = new Environment();
@@ -303,7 +315,7 @@ public class FetchCristinPersonHandlerTest {
     var captor = ArgumentCaptor.forClass(HttpRequest.class);
     verify(mockHttpClient).send(captor.capture(), any());
 
-    var expected = "https://api.cristin-test.uio.no/v2/persons/12345?lang=en%2Cnb%2Cnn";
+    var expected = "https://api.cristin-test.uio.no/v2/persons/359084?lang=en%2Cnb%2Cnn";
     var actual = captor.getValue().uri().toString();
 
     assertThat(actual, equalTo(expected));
@@ -353,6 +365,91 @@ public class FetchCristinPersonHandlerTest {
     var actual = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM).getBodyObject(Person.class);
 
     assertThat(actual.verified(), equalTo(false));
+  }
+
+  @Test
+  void shouldReturnTemporaryRedirectToNewPersonWhenUpstreamRedirectsToPersonMergedInto()
+      throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(new HttpResponseFaker(cristinPersonWithIdentifier(MERGED_INTO_IDENTIFIER)))
+        .when(apiClient)
+        .fetchGetResult(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
+
+    assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
+    assertThat(
+        gatewayResponse.getHeaders().get(HttpHeaders.LOCATION),
+        equalTo(EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON));
+  }
+
+  @Test
+  void shouldReturnTemporaryRedirectToNewPersonWhenUpstreamRedirectsAndClientIsAuthorized()
+      throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(new HttpResponseFaker(cristinPersonWithIdentifier(MERGED_INTO_IDENTIFIER)))
+        .when(apiClient)
+        .fetchGetResultWithAuthentication(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendAuthorizedQuery(MANAGE_OWN_AFFILIATION);
+
+    assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
+    assertThat(
+        gatewayResponse.getHeaders().get(HttpHeaders.LOCATION),
+        equalTo(EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON));
+  }
+
+  @Test
+  void shouldReturnPersonDataWhenLookingUpByOrcidEvenThoughUpstreamRedirectsToCristinIdentifier()
+      throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(new HttpResponseFaker(cristinPersonWithIdentifier(MERGED_INTO_IDENTIFIER)))
+        .when(apiClient)
+        .fetchGetResult(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_ORCID_PATH_PARAM);
+
+    assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+  }
+
+  @Test
+  void shouldNotLogStackTraceWhenPersonIsMergedIntoAnother() throws Exception {
+    final var logRecorder = LogRecorder.forRoot(FetchCristinPersonHandler.class);
+    apiClient = spy(apiClient);
+    doReturn(new HttpResponseFaker(cristinPersonWithIdentifier(MERGED_INTO_IDENTIFIER)))
+        .when(apiClient)
+        .fetchGetResult(any(URI.class));
+    handler = new FetchCristinPersonHandler(apiClient, environment);
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
+
+    assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
+    Assertions.assertThat(logRecorder.messages())
+        .noneMatch(message -> message.contains(TemporaryRedirectException.class.getName()));
+    Assertions.assertThat(logRecorder.messages())
+        .anyMatch(message -> message.contains(EXPECTED_NVA_LOCATION_FOR_MERGED_PERSON));
+  }
+
+  @Test
+  void shouldRedirectToCanonicalPersonWhenRequestedIdentifierIsZeroPadded() throws Exception {
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, PATH_PARAM_WITH_LEADING_ZEROS);
+
+    assertEquals(TEMPORARY_REDIRECT, gatewayResponse.getStatusCode());
+    assertThat(
+        gatewayResponse.getHeaders().get(HttpHeaders.LOCATION),
+        equalTo(EXPECTED_NVA_LOCATION_FOR_CANONICAL_PERSON));
+  }
+
+  @Test
+  void shouldNotRedirectWhenRequestedIdentifierIsAlreadyCanonical() throws Exception {
+    var gatewayResponse = sendQuery(ZERO_QUERY_PARAMS, VALID_PATH_PARAM);
+
+    assertEquals(HTTP_OK, gatewayResponse.getStatusCode());
+  }
+
+  private String cristinPersonWithIdentifier(String identifier) {
+    var cristinPerson = randomCristinPerson();
+    cristinPerson.setCristinPersonId(identifier);
+    return cristinPerson.toString();
   }
 
   private Optional<TypedValue> extractNinObjectFromIdentifiers(Person responseBody) {

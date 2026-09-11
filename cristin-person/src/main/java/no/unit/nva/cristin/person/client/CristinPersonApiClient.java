@@ -3,6 +3,7 @@ package no.unit.nva.cristin.person.client;
 import static java.util.Arrays.asList;
 import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.common.Utils.isOrcid;
+import static no.unit.nva.cristin.common.Utils.isPositiveInteger;
 import static no.unit.nva.cristin.model.Constants.BASE_PATH;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -18,6 +19,7 @@ import static no.unit.nva.cristin.person.model.nva.JsonPropertyNames.VERIFIED;
 import static no.unit.nva.utils.UriUtils.PERSON;
 import static no.unit.nva.utils.UriUtils.createIdUriFromParams;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
+import static nva.commons.core.StringUtils.isNotBlank;
 import static nva.commons.core.attempt.Try.attempt;
 
 import java.net.HttpURLConnection;
@@ -35,10 +37,13 @@ import no.unit.nva.cristin.common.client.CristinAuthorizedQueryClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.exception.TemporaryRedirectException;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Try;
 import nva.commons.core.paths.UriWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CristinPersonApiClient extends ApiClient
     implements ClientVersion, CristinAuthorizedQueryClient<Map<String, String>, Person> {
@@ -47,6 +52,10 @@ public class CristinPersonApiClient extends ApiClient
   public static final String ERROR_MESSAGE_NO_MATCH_FOUND_FOR_SUPPLIED_PAYLOAD =
       "No match found for supplied " + "payload";
   public static final String VERSION_ONE = "1";
+
+  private static final Logger logger = LoggerFactory.getLogger(CristinPersonApiClient.class);
+  private static final String LOG_REDIRECTING_TO_CANONICAL_PERSON =
+      "Redirecting requested person {} to canonical person {}";
 
   /** Create CristinPersonApiClient with default HTTP client. */
   public CristinPersonApiClient() {
@@ -278,16 +287,12 @@ public class CristinPersonApiClient extends ApiClient
   protected CristinPerson getCristinPersonWithAuthentication(String identifier)
       throws ApiGatewayException {
     var uri = getCorrectUriForIdentifier(identifier);
-    var response = fetchGetResultWithAuthentication(uri);
-    checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
-    return getDeserializedResponse(response, CristinPerson.class);
+    return toCristinPerson(identifier, fetchGetResultWithAuthentication(uri));
   }
 
   protected CristinPerson getCristinPerson(String identifier) throws ApiGatewayException {
     var uri = getCorrectUriForIdentifier(identifier);
-    var response = fetchGetResult(uri);
-    checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
-    return getDeserializedResponse(response, CristinPerson.class);
+    return toCristinPerson(identifier, fetchGetResult(uri));
   }
 
   private URI getCorrectUriForIdentifier(String identifier) {
@@ -345,6 +350,30 @@ public class CristinPersonApiClient extends ApiClient
         .map(CristinPerson::getCristinPersonId)
         .map(CristinPersonQuery::fromId)
         .orElseThrow();
+  }
+
+  private CristinPerson toCristinPerson(String identifier, HttpResponse<String> response)
+      throws ApiGatewayException {
+    checkHttpStatusCode(getNvaApiId(identifier, PERSON), response.statusCode(), response.body());
+    var cristinPerson = getDeserializedResponse(response, CristinPerson.class);
+    throwRedirectWhenIdentifierIsNotCanonical(identifier, cristinPerson);
+    return cristinPerson;
+  }
+
+  private void throwRedirectWhenIdentifierIsNotCanonical(
+      String requestedIdentifier, CristinPerson cristinPerson) throws TemporaryRedirectException {
+
+    var canonicalIdentifier = cristinPerson.getCristinPersonId();
+    if (identifierIsNotCanonical(requestedIdentifier, canonicalIdentifier)) {
+      logger.info(LOG_REDIRECTING_TO_CANONICAL_PERSON, requestedIdentifier, canonicalIdentifier);
+      throw new TemporaryRedirectException(getNvaApiId(canonicalIdentifier, PERSON));
+    }
+  }
+
+  private boolean identifierIsNotCanonical(String requestedIdentifier, String canonicalIdentifier) {
+    return isPositiveInteger(requestedIdentifier)
+        && isNotBlank(canonicalIdentifier)
+        && !requestedIdentifier.equals(canonicalIdentifier);
   }
 
   private URI idUriForIdentityNumber() {

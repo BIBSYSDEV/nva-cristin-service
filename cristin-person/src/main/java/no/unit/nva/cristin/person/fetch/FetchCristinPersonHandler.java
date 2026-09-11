@@ -12,6 +12,7 @@ import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
 import no.unit.nva.cristin.common.Utils;
@@ -22,6 +23,7 @@ import nva.commons.apigateway.MediaType;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
+import nva.commons.apigateway.exceptions.RedirectException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 import org.slf4j.Logger;
@@ -70,6 +72,18 @@ public class FetchCristinPersonHandler extends ApiGatewayHandler<Void, Person> {
   @Override
   protected Integer getSuccessStatusCode(Void input, Person output) {
     return HttpURLConnection.HTTP_OK;
+  }
+
+  @Override
+  protected void handleExpectedException(Context context, Void input, ApiGatewayException exception)
+      throws IOException {
+
+    if (exception instanceof RedirectException) {
+      logger.info(exception.getMessage());
+      writeExpectedFailure(input, exception, context.getAwsRequestId());
+    } else {
+      super.handleExpectedException(context, input, exception);
+    }
   }
 
   @Override
