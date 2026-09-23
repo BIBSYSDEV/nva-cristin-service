@@ -78,8 +78,7 @@ public class OAuthLogin {
             + "&response_type=code"
             + "&scope="
             + URLEncoder.encode(
-                "aws.cognito.signin.user.admin email https://api.nva.unit.no/scopes/frontend openid"
-                    + " phone profile",
+                "email https://api.nva.unit.no/scopes/frontend openid phone profile",
                 StandardCharsets.UTF_8)
             + "&redirect_uri="
             + URLEncoder.encode(redirectUri.toString(), StandardCharsets.UTF_8);
