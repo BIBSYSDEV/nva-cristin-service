@@ -1413,6 +1413,17 @@ paths:
               examples:
                 objectExample:
                   $ref: "#/components/examples/PersonExample"
+        "307":
+          description: >-
+            Temporary Redirect. The requested person has been merged into another person and
+            the Location header points to the person to use instead
+          headers:
+            Location:
+              description: Uri of the person the requested person has been merged into
+              schema:
+                type: string
+                format: uri
+              example: "https://api.nva.unit.no/cristin/person/5647"
         "400":
           $ref: "#/components/responses/400"
         "401":
