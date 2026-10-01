@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.picture.fetch;
 
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.client.HttpClientProvider.defaultHttpClient;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
@@ -43,6 +44,6 @@ public class FetchPictureHandler extends ApiGatewayHandler<Void, Binary> {
 
   @Override
   protected Integer getSuccessStatusCode(Void input, Binary output) {
-    return HTTP_OK;
+    return output.isEmpty() ? HTTP_NO_CONTENT : HTTP_OK;
   }
 }
