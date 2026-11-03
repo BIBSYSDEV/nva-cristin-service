@@ -5,9 +5,10 @@ import static nva.commons.core.attempt.Try.attempt;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.github.resilience4j.core.IntervalFunction;
-import io.github.resilience4j.decorators.Decorators;
+import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryRegistry;
 import io.vavr.control.Try;
@@ -107,10 +108,9 @@ public class CristinUnitsUtil {
     var retryWithDefaultConfig = retryRegistry.retry("executeRequest");
 
     Supplier<String> decoratedSupplier =
-        Decorators.ofSupplier(() -> executeRequest(requestUri))
-            .withRateLimiter(rateLimiter)
-            .withRetry(retryWithDefaultConfig)
-            .decorate();
+        Retry.decorateSupplier(
+            retryWithDefaultConfig,
+            RateLimiter.decorateSupplier(rateLimiter, () -> executeRequest(requestUri)));
 
     return Try.ofSupplier(decoratedSupplier).get();
   }
