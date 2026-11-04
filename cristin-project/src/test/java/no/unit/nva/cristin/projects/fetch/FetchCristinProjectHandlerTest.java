@@ -293,7 +293,7 @@ public class FetchCristinProjectHandlerTest {
 
     var gatewayResponse = GatewayResponse.fromOutputStream(output, Problem.class);
 
-    assertEquals(HttpURLConnection.HTTP_UNSUPPORTED_TYPE, gatewayResponse.getStatusCode());
+    assertEquals(HttpURLConnection.HTTP_NOT_ACCEPTABLE, gatewayResponse.getStatusCode());
     assertThat(
         gatewayResponse.getBodyObject(Problem.class).getDetail(),
         containsString(
