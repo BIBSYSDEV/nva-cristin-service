@@ -68,7 +68,7 @@ public final class UserUtils {
         JsonUtils.dtoObjectMapper.writeValueAsString(
             Map.of("type", "NationalIdentificationNumber", "value", nationalIdentityNumber));
     var lookupRequest =
-        HttpRequest.newBuilder(lookupUri)
+        newBuilder(lookupUri)
             .header(AUTHORIZATION, BEARER + AccessUtils.getBackendAccessToken())
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(lookupBody))
