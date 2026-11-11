@@ -7,14 +7,13 @@ import static no.unit.nva.cristin.model.JsonPropertyNames.NAME;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.net.URI;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
-@JsonSubTypes({@Type(NvaFacet.class)})
+@JsonSubTypes({@JsonSubTypes.Type(NvaFacet.class)})
 public interface Facet {
 
   String COUNT = "count";
