@@ -7,6 +7,7 @@ import no.unit.nva.cristin.person.employment.ClearCristinTestPersonEmployment;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.Tag;
 
 @Tag("karateTest")
@@ -31,7 +32,7 @@ public class CreatePersonEmploymentKarateRunner {
   }
 
   @Karate.Test
-  Karate runKarateFeatures() {
+  Iterable<DynamicNode> runKarateFeatures() {
     return Karate.run().relativeTo(getClass());
   }
 }
