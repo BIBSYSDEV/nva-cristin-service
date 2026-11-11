@@ -38,7 +38,7 @@ public class SubTreeMapper {
 
     var results =
         allSubUnits.stream()
-            .filter(hasParentUnit())
+            .filter(SubTreeMapper::hasParentUnit)
             .filter(hasMatch(unitDto))
             .collect(Collectors.toList());
 
@@ -47,8 +47,8 @@ public class SubTreeMapper {
     results.forEach(result -> calculate(result, traversals + 1));
   }
 
-  private Predicate<UnitDto> hasParentUnit() {
-    return subUnit -> nonNull(subUnit.getParentUnit()) && nonNull(subUnit.getParentUnit().getId());
+  private static boolean hasParentUnit(UnitDto subUnit) {
+    return nonNull(subUnit.getParentUnit()) && nonNull(subUnit.getParentUnit().getId());
   }
 
   private Predicate<UnitDto> hasMatch(UnitDto unitDto) {
