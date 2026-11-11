@@ -38,10 +38,9 @@ public class CristinTypedLabel implements JsonSerializable {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof CristinTypedLabel)) {
+    if (!(o instanceof CristinTypedLabel that)) {
       return false;
     }
-    CristinTypedLabel that = (CristinTypedLabel) o;
     return Objects.equals(getCode(), that.getCode()) && Objects.equals(getName(), that.getName());
   }
 

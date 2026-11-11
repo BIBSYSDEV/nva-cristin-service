@@ -90,10 +90,9 @@ public class CristinApproval implements JsonSerializable {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof CristinApproval)) {
+    if (!(o instanceof CristinApproval that)) {
       return false;
     }
-    CristinApproval that = (CristinApproval) o;
     return Objects.equals(getApprovedDate(), that.getApprovedDate())
         && Objects.equals(getApprovedBy(), that.getApprovedBy())
         && Objects.equals(getApprovalStatus(), that.getApprovalStatus())

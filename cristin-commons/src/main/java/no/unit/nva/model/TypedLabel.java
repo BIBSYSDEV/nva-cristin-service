@@ -40,10 +40,9 @@ public class TypedLabel implements JsonSerializable {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof TypedLabel)) {
+    if (!(o instanceof TypedLabel that)) {
       return false;
     }
-    TypedLabel that = (TypedLabel) o;
     return Objects.equals(getType(), that.getType()) && Objects.equals(getLabel(), that.getLabel());
   }
 
