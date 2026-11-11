@@ -4,7 +4,6 @@ import static java.net.http.HttpRequest.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
-import static no.unit.nva.utils.AccessUtils.BASIC;
 import static org.apache.hc.core5.http.HttpHeaders.AUTHORIZATION;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,6 +13,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import no.unit.nva.commons.json.JsonUtils;
@@ -26,6 +26,8 @@ public final class UserUtils {
   private static final Logger logger = LoggerFactory.getLogger(UserUtils.class);
   public static final String RESPONSE_FROM_USER_CREATE = "Response from user create={}";
   public static final String USER_CREATED_WITH_ROLES = "User {} created with role(s) '{}'";
+  private static final String RESPONSE_FROM_PERSON_LOOKUP = "Response from person lookup={}";
+  private static final String BEARER = "Bearer ";
 
   private UserUtils() {
     // NO-OP
@@ -44,12 +46,38 @@ public final class UserUtils {
     final String appClientClientId = AccessUtils.getTestClientAppId();
 
     createNvaUserWithRoles(nationalIdentityNumber, customerId, roles);
+    var personId = fetchPersonId(nationalIdentityNumber);
 
     CognitoUtil.deleteUser(username, poolId);
     CognitoUtil.adminCreateUser(
-        username, password, nationalIdentityNumber, poolId, appClientClientId);
+        username, password, nationalIdentityNumber, personId, poolId, appClientClientId);
 
     logger.info(USER_CREATED_WITH_ROLES, username, roles);
+  }
+
+  /** Looks up the person URI that identity service needs on a password user to let it log in. */
+  private static URI fetchPersonId(String nationalIdentityNumber)
+      throws IOException, InterruptedException {
+    var lookupUri =
+        new UriWrapper(HTTPS, DOMAIN_NAME)
+            .addChild("cristin")
+            .addChild("person")
+            .addChild("identityNumber")
+            .getUri();
+    var lookupBody =
+        JsonUtils.dtoObjectMapper.writeValueAsString(
+            Map.of("type", "NationalIdentificationNumber", "value", nationalIdentityNumber));
+    var lookupRequest =
+        HttpRequest.newBuilder(lookupUri)
+            .header(AUTHORIZATION, BEARER + AccessUtils.getBackendAccessToken())
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(lookupBody))
+            .build();
+    try (var client = createHttpClient()) {
+      var response = client.send(lookupRequest, ofString(StandardCharsets.UTF_8));
+      logger.info(RESPONSE_FROM_PERSON_LOOKUP, response);
+      return URI.create(JsonUtils.dtoObjectMapper.readTree(response.body()).get("id").asText());
+    }
   }
 
   private static void createNvaUserWithRoles(
@@ -77,7 +105,7 @@ public final class UserUtils {
     final var userRoles = new UserRoles(nationalIdentityNumber, customerId, roles);
     final var body = JsonUtils.dtoObjectMapper.writeValueAsString(userRoles);
     return newBuilder(createUserServiceUri())
-        .header(AUTHORIZATION, BASIC + AccessUtils.getBackendAccessToken())
+        .header(AUTHORIZATION, BEARER + AccessUtils.getBackendAccessToken())
         .POST(HttpRequest.BodyPublishers.ofString(body))
         .build();
   }
