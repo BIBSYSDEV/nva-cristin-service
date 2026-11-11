@@ -12,12 +12,14 @@ public class ApprovalTest {
   @Test
   void shouldDeserializeEnumsWithPartialMissingValues() throws JsonProcessingException {
     String approvalString =
-        "{\n"
-            + "\"type\" : \"Approval\",\n"
-            + "\"date\" : \"2009-03-13T09:17:50.326Z\",\n"
-            + "\"authority\" : \"NorwegianDirectorateOfHealth\",\n"
-            + "\"identifier\" : \"lwV7zz35TaM75kn\"\n"
-            + "}";
+        """
+        {
+        "type" : "Approval",
+        "date" : "2009-03-13T09:17:50.326Z",
+        "authority" : "NorwegianDirectorateOfHealth",
+        "identifier" : "lwV7zz35TaM75kn"
+        }\
+        """;
 
     Approval approval = OBJECT_MAPPER.readValue(approvalString, Approval.class);
 
