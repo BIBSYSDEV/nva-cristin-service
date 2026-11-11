@@ -93,7 +93,7 @@ public class PersonTest {
 
     var verified = JsonUtils.dtoObjectMapper.readTree(json).get("verified").asText();
 
-    assertEquals(Boolean.FALSE.toString(), verified);
+    assertEquals("false", verified);
   }
 
   @ParameterizedTest(name = "Should strip whitespace from language map collaboration values")

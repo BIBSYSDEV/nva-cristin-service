@@ -102,7 +102,7 @@ public class QueryCristinOrganizationHandler
   }
 
   private static String getFullTreeParam(RequestInfo requestInfo) {
-    return requestInfo.getQueryParameterOpt(FULL_TREE).orElse(Boolean.FALSE.toString());
+    return requestInfo.getQueryParameterOpt(FULL_TREE).orElse("false");
   }
 
   private String getApiVersion(RequestInfo requestInfo) {
