@@ -1,6 +1,10 @@
 name: Karate API tests
 
 on: [push]
+# The test users have fixed names in a shared user pool, so two runs at once delete each other's users
+concurrency:
+  group: karate-api-tests
+  cancel-in-progress: false
 env:
   BASE_NAME: cristin-$GITHUB_REF_NAME
   DOMAIN_NAME: "api.dev.nva.aws.unit.no"
@@ -66,17 +70,27 @@ jobs:
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest --info
+      # A Gradle task that finds no tests still succeeds, so count what actually ran
+      - name: Verify that Karate tests ran
+        run: |
+          SCENARIO_COUNT=$(cat */build/test-results/karateTest/TEST-*.xml | grep -o '<testsuite [^>]*' | grep -o ' tests="[0-9]*"' | grep -o '[0-9]*' | paste -sd+ - | bc)
+          echo "Karate scenarios executed: ${SCENARIO_COUNT}"
+          test "${SCENARIO_COUNT}" -gt 0
         # Delete tests users after tests have run
       - name: Delete karate test users
+        if: always()
         run: BASE_PATH=${{env.BASE_PATH}} ./gradlew deleteTestUsers --info
       - name: Get NvaCristinIntermediateStorageBucket name
+        if: always()
         id: intermediate-bucket-name
         run: |
           BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name ${{env.STACK_NAME}} --query "Stacks[0].Outputs[?OutputKey=='NvaCristinIntermediateStorageBucketName'].OutputValue" --output text)
           echo "NvaCristinIntermediateStorageBucketName=$BUCKET_NAME" >> $GITHUB_ENV
       - name: Empty S3 NvaCristinIntermediateStorageBucket
+        if: always()
         run: |
           aws s3 rm s3://$NvaCristinIntermediateStorageBucketName --recursive
         # Delete stack after running tests
       - name: Delete stack after running tests
+        if: always()
         run: sam delete --no-prompts --region eu-west-1 --stack-name ${{env.STACK_NAME}}
