@@ -142,10 +142,9 @@ public class CristinProjectPatchJsonCreator {
   private void addCoordinatingInstitutionIfPresent() {
     if (input.has(COORDINATING_INSTITUTION)) {
       var coordinatingInstitution =
-          attempt(
-                  () ->
-                      OBJECT_MAPPER.readValue(
-                          input.get(COORDINATING_INSTITUTION).toString(), Organization.class))
+          attempt(() ->
+                  OBJECT_MAPPER.readValue(
+                      input.get(COORDINATING_INSTITUTION).toString(), Organization.class))
               .orElseThrow();
 
       var cristinOrganization = extractCristinOrganization(coordinatingInstitution);

@@ -120,14 +120,13 @@ public class CognitoUtil {
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static void deleteUser(String userName, String poolId) {
     getUsername(userName, poolId)
-        .ifPresent(
-            username -> {
-              try {
-                deleteUserCognito(username, poolId);
-              } catch (Exception e) {
-                logger.warn("Error deleting user:{}, {}", username, e.getMessage());
-              }
-            });
+        .ifPresent(username -> {
+          try {
+            deleteUserCognito(username, poolId);
+          } catch (Exception e) {
+            logger.warn("Error deleting user:{}, {}", username, e.getMessage());
+          }
+        });
   }
 
   private static String constructAccessRights() {

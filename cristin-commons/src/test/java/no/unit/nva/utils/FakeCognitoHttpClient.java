@@ -111,12 +111,11 @@ public class FakeCognitoHttpClient extends HttpClient {
       var mockTokenResponse = mock(HttpResponse.class);
       when(mockTokenResponse.statusCode()).thenReturn(200);
       when(mockTokenResponse.body()).thenReturn("{\"access_token\": \"test_token\"}");
-      attempt(
-              () ->
-                  when(client.send(
-                          argThat(new TokenResponseMatcher()),
-                          eq(HttpResponse.BodyHandlers.ofString())))
-                      .thenReturn(mockTokenResponse))
+      attempt(() ->
+              when(client.send(
+                      argThat(new TokenResponseMatcher()),
+                      eq(HttpResponse.BodyHandlers.ofString())))
+                  .thenReturn(mockTokenResponse))
           .orElseThrow();
       return this;
     }
@@ -128,12 +127,10 @@ public class FakeCognitoHttpClient extends HttpClient {
           HttpHeaders.of(
               Map.of("Location", List.of("http://localhost:3000?code=test_code")), (a, b) -> true);
       when(mockCodeResponse.headers()).thenReturn(headers);
-      attempt(
-              () ->
-                  when(client.send(
-                          argThat(new CodeResponseMatcher()),
-                          eq(HttpResponse.BodyHandlers.ofString())))
-                      .thenReturn(mockCodeResponse))
+      attempt(() ->
+              when(client.send(
+                      argThat(new CodeResponseMatcher()), eq(HttpResponse.BodyHandlers.ofString())))
+                  .thenReturn(mockCodeResponse))
           .orElseThrow();
       return this;
     }

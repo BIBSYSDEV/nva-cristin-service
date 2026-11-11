@@ -295,9 +295,8 @@ public class CristinOrganizationApiClient extends ApiClient
     SubSubUnitDto subsubUnitDto =
         of(subunitUri)
             .flatMap(this::sendRequestMultipleTimes)
-            .map(
-                (HttpResponse<String> response) ->
-                    throwExceptionIfNotSuccessful(response, subunitUri))
+            .map((HttpResponse<String> response) ->
+                throwExceptionIfNotSuccessful(response, subunitUri))
             .map(HttpResponse::body)
             .map(SubSubUnitDto::fromJson)
             .orElseThrow(this::handleError);

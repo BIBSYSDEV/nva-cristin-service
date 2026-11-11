@@ -21,14 +21,13 @@ public class QueryBuilderBiobank extends QueryBuilder<ParameterKeyBiobank> {
   @Override
   protected void assignDefaultValues() {
     requiredMissing()
-        .forEach(
-            key -> {
-              switch (key) {
-                case PAGE_CURRENT -> query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
-                case PAGE_ITEMS_PER_PAGE -> query.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
-                default -> {}
-              }
-            });
+        .forEach(key -> {
+          switch (key) {
+            case PAGE_CURRENT -> query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
+            case PAGE_ITEMS_PER_PAGE -> query.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
+            default -> {}
+          }
+        });
   }
 
   @Override

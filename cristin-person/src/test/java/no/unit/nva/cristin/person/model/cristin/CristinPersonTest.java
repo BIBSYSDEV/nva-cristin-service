@@ -102,10 +102,9 @@ public class CristinPersonTest {
   @Test
   void shouldMapAllSupportedFieldsFoundInCristinJsonToCorrectNvaJson() throws Exception {
     var cristinPerson =
-        attempt(
-                () ->
-                    OBJECT_MAPPER.readValue(
-                        fromResources(CRISTIN_GET_PERSON_JSON), CristinPerson.class))
+        attempt(() ->
+                OBJECT_MAPPER.readValue(
+                    fromResources(CRISTIN_GET_PERSON_JSON), CristinPerson.class))
             .get();
     var nvaPerson = cristinPerson.toPersonBuilder().withContext(PERSON_CONTEXT).build();
 
