@@ -40,7 +40,7 @@ public class RetryConfigProvider {
   private static Predicate<HttpResponse> resultStatusIsServerError() {
     return httpResponse ->
         isNull(httpResponse)
-            || httpResponse.statusCode() >= 500 && httpResponse.statusCode() <= 599;
+            || (httpResponse.statusCode() >= 500 && httpResponse.statusCode() <= 599);
   }
 
   private static RetryConfig defaultRetryConfigFactoryAsync() {
@@ -56,7 +56,7 @@ public class RetryConfigProvider {
     return httpResponse -> {
       try {
         return isNull(httpResponse)
-            || httpResponse.get().statusCode() >= 500 && httpResponse.get().statusCode() <= 599;
+            || (httpResponse.get().statusCode() >= 500 && httpResponse.get().statusCode() <= 599);
       } catch (Exception e) {
         return true;
       }
