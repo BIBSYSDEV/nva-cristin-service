@@ -157,12 +157,10 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
         errorMessage =
             invalidQueryParametersMessageWithRange(
                 key.getKey(), Arrays.toString(ProjectStatus.values()));
+      } else if (nonNull(key.getErrorMessage())) {
+        errorMessage = String.format(key.getErrorMessage(), keyName);
       } else {
-        if (nonNull(key.getErrorMessage())) {
-          errorMessage = String.format(key.getErrorMessage(), keyName);
-        } else {
-          errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
-        }
+        errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
       }
       throw new BadRequestException(errorMessage);
     }
