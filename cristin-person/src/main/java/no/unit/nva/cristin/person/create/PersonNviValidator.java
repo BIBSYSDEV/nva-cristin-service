@@ -17,13 +17,15 @@ public class PersonNviValidator implements Validator<PersonNvi> {
 
   @Override
   public void validate(PersonNvi personNvi) throws ApiGatewayException {
-    Optional.ofNullable(personNvi)
-        .map(PersonNvi::verifiedBy)
-        .map(PersonSummary::id)
-        .orElseThrow(() -> new BadRequestException(INVALID_PERSON_ID));
-    Optional.of(personNvi)
-        .map(PersonNvi::verifiedAt)
-        .map(Organization::getId)
-        .orElseThrow(() -> new BadRequestException(INVALID_ORG_ID));
+    var verifiedByPersonId =
+        Optional.ofNullable(personNvi).map(PersonNvi::verifiedBy).map(PersonSummary::id);
+    if (verifiedByPersonId.isEmpty()) {
+      throw new BadRequestException(INVALID_PERSON_ID);
+    }
+    var verifiedAtOrganizationId =
+        Optional.of(personNvi).map(PersonNvi::verifiedAt).map(Organization::getId);
+    if (verifiedAtOrganizationId.isEmpty()) {
+      throw new BadRequestException(INVALID_ORG_ID);
+    }
   }
 }
