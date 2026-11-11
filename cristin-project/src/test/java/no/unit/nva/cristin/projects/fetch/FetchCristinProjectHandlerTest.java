@@ -3,7 +3,6 @@ package no.unit.nva.cristin.projects.fetch;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
-import static java.util.Map.of;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_BACKEND_FETCH_FAILED;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_CRISTIN_PROJECT_MATCHING_ID_IS_NOT_VALID;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER;
@@ -246,8 +245,8 @@ public class FetchCristinProjectHandlerTest {
     try (var input =
         new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
-            .withHeaders(of(HttpHeaders.ACCEPT, contentTypeRequested))
+            .withPathParameters(Map.of(IDENTIFIER, DEFAULT_IDENTIFIER))
+            .withHeaders(Map.of(HttpHeaders.ACCEPT, contentTypeRequested))
             .build()) {
       handler.handleRequest(input, output, context);
     }
@@ -263,8 +262,8 @@ public class FetchCristinProjectHandlerTest {
     try (var input =
         new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
-            .withHeaders(of(HttpHeaders.ACCEPT, DEFAULT_ACCEPT_HEADER))
+            .withPathParameters(Map.of(IDENTIFIER, DEFAULT_IDENTIFIER))
+            .withHeaders(Map.of(HttpHeaders.ACCEPT, DEFAULT_ACCEPT_HEADER))
             .build()) {
       handler.handleRequest(input, output, context);
     }
@@ -285,8 +284,8 @@ public class FetchCristinProjectHandlerTest {
     try (var input =
         new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
-            .withHeaders(of(HttpHeaders.ACCEPT, contentTypeRequested))
+            .withPathParameters(Map.of(IDENTIFIER, DEFAULT_IDENTIFIER))
+            .withHeaders(Map.of(HttpHeaders.ACCEPT, contentTypeRequested))
             .build()) {
       handler.handleRequest(input, output, context);
     }
@@ -305,8 +304,8 @@ public class FetchCristinProjectHandlerTest {
     try (var input =
         new HandlerRequestBuilder<Void>(OBJECT_MAPPER)
             .withBody(null)
-            .withQueryParameters(of(INVALID_QUERY_PARAM_KEY, INVALID_QUERY_PARAM_VALUE))
-            .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
+            .withQueryParameters(Map.of(INVALID_QUERY_PARAM_KEY, INVALID_QUERY_PARAM_VALUE))
+            .withPathParameters(Map.of(IDENTIFIER, DEFAULT_IDENTIFIER))
             .build()) {
       handler.handleRequest(input, output, context);
     }
@@ -338,7 +337,7 @@ public class FetchCristinProjectHandlerTest {
     final var expectedSummary = Map.of(summaryLanguage, summary);
     final var cristinApiClient =
         createCristinApiClientWithAcademicSummary(summaryLanguage, summary);
-    try (InputStream input = requestWithIdentifier(of(IDENTIFIER, DEFAULT_IDENTIFIER))) {
+    try (InputStream input = requestWithIdentifier(Map.of(IDENTIFIER, DEFAULT_IDENTIFIER))) {
       var outputStream = new ByteArrayOutputStream();
       new FetchCristinProjectHandler(cristinApiClient, environment)
           .handleRequest(input, outputStream, mock(Context.class));
@@ -432,7 +431,7 @@ public class FetchCristinProjectHandlerTest {
   }
 
   private GatewayResponse<NvaProject> sendQueryWithId(String identifier) throws IOException {
-    try (var input = requestWithIdentifier(of(IDENTIFIER, identifier))) {
+    try (var input = requestWithIdentifier(Map.of(IDENTIFIER, identifier))) {
       handler.handleRequest(input, output, context);
     }
     return GatewayResponse.fromOutputStream(output, NvaProject.class);
@@ -469,7 +468,7 @@ public class FetchCristinProjectHandlerTest {
         .withPersonCristinId(personIdUri)
         .withCurrentCustomer(customerId)
         .withAccessRights(customerId, accessRight)
-        .withPathParameters(of(IDENTIFIER, DEFAULT_IDENTIFIER))
+        .withPathParameters(Map.of(IDENTIFIER, DEFAULT_IDENTIFIER))
         .build();
   }
 
