@@ -1,6 +1,5 @@
 package no.unit.nva.utils;
 
-import static java.net.http.HttpRequest.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -68,7 +67,7 @@ public final class UserUtils {
         JsonUtils.dtoObjectMapper.writeValueAsString(
             Map.of("type", "NationalIdentificationNumber", "value", nationalIdentityNumber));
     var lookupRequest =
-        newBuilder(lookupUri)
+        HttpRequest.newBuilder(lookupUri)
             .header(AUTHORIZATION, BEARER + AccessUtils.getBackendAccessToken())
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(lookupBody))
@@ -104,7 +103,7 @@ public final class UserUtils {
       throws IOException, InterruptedException {
     final var userRoles = new UserRoles(nationalIdentityNumber, customerId, roles);
     final var body = JsonUtils.dtoObjectMapper.writeValueAsString(userRoles);
-    return newBuilder(createUserServiceUri())
+    return HttpRequest.newBuilder(createUserServiceUri())
         .header(AUTHORIZATION, BEARER + AccessUtils.getBackendAccessToken())
         .POST(HttpRequest.BodyPublishers.ofString(body))
         .build();

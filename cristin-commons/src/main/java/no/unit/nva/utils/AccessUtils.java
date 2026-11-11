@@ -1,6 +1,5 @@
 package no.unit.nva.utils;
 
-import static java.net.http.HttpRequest.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static nva.commons.apigateway.AccessRight.MANAGE_CUSTOMERS;
 import static nva.commons.apigateway.AccessRight.MANAGE_OWN_AFFILIATION;
@@ -96,7 +95,7 @@ public class AccessUtils {
   }
 
   private static HttpRequest createTokenRequest() {
-    return newBuilder(getCognitoTokenUrl())
+    return HttpRequest.newBuilder(getCognitoTokenUrl())
         .POST(HttpRequest.BodyPublishers.ofString(GRANT_TYPE_PAYLOAD))
         .header(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED)
         .header(AUTHORIZATION, basicAuthHeader())

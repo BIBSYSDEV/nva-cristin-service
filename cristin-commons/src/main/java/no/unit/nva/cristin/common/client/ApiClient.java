@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.common.client;
 
-import static io.vavr.control.Try.of;
 import static io.vavr.control.Try.ofSupplier;
 import static java.net.HttpURLConnection.HTTP_MULT_CHOICE;
 import static java.net.HttpURLConnection.HTTP_OK;
@@ -115,7 +114,8 @@ public class ApiClient {
   }
 
   private CompletableFuture<HttpResponse<String>> executeRequestAsync(HttpRequest httpRequest) {
-    return of(() -> client.sendAsync(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8)))
+    return io.vavr.control.Try.of(
+            () -> client.sendAsync(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8)))
         .get();
   }
 
@@ -184,7 +184,8 @@ public class ApiClient {
   }
 
   private HttpResponse<String> executeRequest(HttpRequest httpRequest) {
-    return of(() -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8)))
+    return io.vavr.control.Try.of(
+            () -> client.send(httpRequest, BodyHandlers.ofString(StandardCharsets.UTF_8)))
         .getOrElseThrow(throwable -> new RuntimeException(throwable.getMessage()));
   }
 

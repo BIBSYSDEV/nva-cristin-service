@@ -39,7 +39,6 @@ import no.unit.nva.cristin.person.model.cristin.CristinNviInstitutionUnit;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonNvi;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonSummary;
-import no.unit.nva.cristin.person.model.cristin.CristinPersonSummary.Builder;
 import no.unit.nva.cristin.person.model.nva.Award;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.person.model.nva.PersonNvi;
@@ -270,7 +269,7 @@ public class CristinPersonPatchJsonCreator {
     var person =
         personId
             .map(id -> CristinPersonSummary.builder().withCristinPersonId(id))
-            .map(Builder::build);
+            .map(CristinPersonSummary.Builder::build);
 
     return new CristinPersonNvi(person.orElse(null), unit.orElse(null), null);
   }
