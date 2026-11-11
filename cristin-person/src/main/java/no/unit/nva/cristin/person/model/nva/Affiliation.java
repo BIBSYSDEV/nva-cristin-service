@@ -54,7 +54,7 @@ public class Affiliation {
       return false;
     }
     return Objects.equals(getOrganization(), that.getOrganization())
-        && Objects.equals(isActive(), that.isActive())
+        && isActive() == that.isActive()
         && Objects.equals(getRole(), that.getRole());
   }
 
