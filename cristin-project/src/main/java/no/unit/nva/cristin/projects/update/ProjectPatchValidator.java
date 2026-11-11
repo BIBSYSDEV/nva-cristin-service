@@ -189,7 +189,6 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     }
   }
 
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private void validateResearchResponsibleOrganizationsIfPresent(ObjectNode input)
       throws BadRequestException {
     if (input.has(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)
