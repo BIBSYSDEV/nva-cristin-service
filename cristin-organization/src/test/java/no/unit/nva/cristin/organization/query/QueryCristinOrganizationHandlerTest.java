@@ -473,9 +473,7 @@ class QueryCristinOrganizationHandlerTest {
       verify(cristinApiClientVersionOne).sendRequestMultipleTimes(captor.capture());
     }
 
-    var sortTemplate = "sort=%s";
-
-    assertThat(captor.getValue().getQuery(), containsString(format(sortTemplate, cristinSort)));
+    assertThat(captor.getValue().getQuery(), containsString(format("sort=%s", cristinSort)));
     assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
   }
 

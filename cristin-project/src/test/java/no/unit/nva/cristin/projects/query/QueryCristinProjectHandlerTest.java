@@ -71,7 +71,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.common.ErrorMessages;
 import no.unit.nva.cristin.common.client.ApiClient;
@@ -951,7 +950,7 @@ class QueryCristinProjectHandlerTest {
     var body = gatewayResponse.getBodyObject(Problem.class);
 
     Stream.of(CristinFacetParamKey.values())
-        .dropWhile(hasUnsupportedFacet())
+        .dropWhile(QueryCristinProjectHandlerTest::hasUnsupportedFacet)
         .forEach(facetKey -> assertThat(body.getDetail(), containsString(facetKey.getNvaKey())));
   }
 
@@ -1119,8 +1118,9 @@ class QueryCristinProjectHandlerTest {
   }
 
   private static String exampleUriFromPageAndResults(String page, String results) {
-    var url = "https://api.dev.nva.aws.unit.no/cristin/project?page=%s&title=reindeer&results=%s";
-    return String.format(url, page, results);
+    return String.format(
+        "https://api.dev.nva.aws.unit.no/cristin/project?page=%s&title=reindeer&results=%s",
+        page, results);
   }
 
   private void fakeAnEmptyResponseFromQueryAndEnrichment() throws ApiGatewayException {
@@ -1212,8 +1212,8 @@ class QueryCristinProjectHandlerTest {
     return GatewayResponse.fromOutputStream(output, SearchResponse.class);
   }
 
-  private static Predicate<CristinFacetParamKey> hasUnsupportedFacet() {
-    return facetKey -> facetKey.equals(CristinFacetParamKey.INSTITUTION_PARAM);
+  private static boolean hasUnsupportedFacet(CristinFacetParamKey facetKey) {
+    return facetKey.equals(CristinFacetParamKey.INSTITUTION_PARAM);
   }
 
   private static ConcurrentHashMap<String, String> createQueryParams() {

@@ -42,8 +42,6 @@ import org.zalando.problem.Problem;
 
 public class PositionCodesHandlerTest {
 
-  private static final String EMPTY_STRING = "";
-
   private final HttpClient mockHttpClient = mock(HttpClient.class);
   private final Environment environment = new Environment();
   private CristinPositionCodesClient apiClient;
@@ -64,8 +62,7 @@ public class PositionCodesHandlerTest {
   @Test
   void shouldReturnBadGatewayWhenUpstreamReturnsInvalidDataButStatusOk()
       throws IOException, InterruptedException {
-    when(mockHttpClient.<String>send(any(), any()))
-        .thenReturn(new HttpResponseFaker(EMPTY_STRING, 200));
+    when(mockHttpClient.<String>send(any(), any())).thenReturn(new HttpResponseFaker("", 200));
     apiClient = new CristinPositionCodesClient(mockHttpClient);
     handler = new PositionCodesHandler(apiClient, environment);
     var gatewayResponse = sendQuery(null);
