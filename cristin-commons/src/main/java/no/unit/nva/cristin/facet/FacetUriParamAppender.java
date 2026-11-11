@@ -145,13 +145,9 @@ public class FacetUriParamAppender {
 
   private UriWrapper uriWithNewParams(Map<String, String> params) {
     var newUri =
-        attempt(
-                () ->
-                    new URI(
-                        nvaUri.getScheme(),
-                        nvaUri.getHost(),
-                        nvaUri.getPath(),
-                        nvaUri.getFragment()))
+        attempt(() ->
+                new URI(
+                    nvaUri.getScheme(), nvaUri.getHost(), nvaUri.getPath(), nvaUri.getFragment()))
             .orElseThrow();
 
     return UriWrapper.fromUri(newUri).addQueryParameters(params);

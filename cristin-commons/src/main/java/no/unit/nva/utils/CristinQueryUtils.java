@@ -23,26 +23,25 @@ public class CristinQueryUtils {
 
     paramKeys
         .keySet()
-        .forEach(
-            key -> {
-              switch (key) {
-                case CATEGORY -> {
-                  resultsWithConvertedKeys.put(CATEGORY_FACET, paramKeys.get(key));
-                  resultsWithConvertedKeys.remove(key);
-                }
-                case FUNDING_SOURCE -> {
-                  resultsWithConvertedKeys.put(FUNDING_SOURCE_FACET, paramKeys.get(key));
-                  resultsWithConvertedKeys.remove(key);
-                }
-                case PARTICIPANT -> {
-                  resultsWithConvertedKeys.put(PARTICIPANT_FACET, paramKeys.get(key));
-                  resultsWithConvertedKeys.remove(key);
-                }
-                default -> {
-                  // do nothing
-                }
-              }
-            });
+        .forEach(key -> {
+          switch (key) {
+            case CATEGORY -> {
+              resultsWithConvertedKeys.put(CATEGORY_FACET, paramKeys.get(key));
+              resultsWithConvertedKeys.remove(key);
+            }
+            case FUNDING_SOURCE -> {
+              resultsWithConvertedKeys.put(FUNDING_SOURCE_FACET, paramKeys.get(key));
+              resultsWithConvertedKeys.remove(key);
+            }
+            case PARTICIPANT -> {
+              resultsWithConvertedKeys.put(PARTICIPANT_FACET, paramKeys.get(key));
+              resultsWithConvertedKeys.remove(key);
+            }
+            default -> {
+              // do nothing
+            }
+          }
+        });
 
     return resultsWithConvertedKeys;
   }

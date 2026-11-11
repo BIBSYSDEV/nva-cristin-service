@@ -133,12 +133,11 @@ public class OAuthLogin {
       logger.info("Successfully exchanged authorization code for access token.");
       var responseBody = response.body();
 
-      return attempt(
-              () ->
-                  JsonUtils.dtoObjectMapper
-                      .readValue(responseBody, Map.class)
-                      .get("access_token")
-                      .toString())
+      return attempt(() ->
+              JsonUtils.dtoObjectMapper
+                  .readValue(responseBody, Map.class)
+                  .get("access_token")
+                  .toString())
           .orElseThrow();
     } else {
       logger.error(

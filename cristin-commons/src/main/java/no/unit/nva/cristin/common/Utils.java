@@ -192,9 +192,8 @@ public final class Utils {
    */
   public static String getValidIdentifier(RequestInfo requestInfo) throws BadRequestException {
     attempt(() -> Integer.parseInt(requestInfo.getPathParameter(IDENTIFIER)))
-        .orElseThrow(
-            failure ->
-                new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER));
+        .orElseThrow(failure ->
+            new BadRequestException(ERROR_MESSAGE_INVALID_PATH_PARAMETER_FOR_IDENTIFIER));
 
     return requestInfo.getPathParameter(IDENTIFIER);
   }
