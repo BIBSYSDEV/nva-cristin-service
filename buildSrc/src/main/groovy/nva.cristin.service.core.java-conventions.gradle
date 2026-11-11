@@ -42,6 +42,24 @@ tasks.named('test', Test) {
     environment "CRISTIN_BOT_FILTER_BYPASS_HEADER_VALUE", "World"
 }
 
+// Karate looks up the feature files next to the runner classes
+sourceSets {
+    test {
+        resources {
+            srcDir file('src/test/java')
+            exclude '**/*.java'
+        }
+    }
+}
+
+// Gradle 9 gives custom Test tasks no test classes or classpath by default
+def apiTestTaskNames = ['createTestUsers', 'deleteTestUsers', 'karateTest']
+tasks.withType(Test).matching { it.name in apiTestTaskNames }.configureEach {
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    failOnNoDiscoveredTests = false
+}
+
 tasks.register('createTestUsers', Test) {
     useJUnitPlatform {
         includeTags('createTestUsers')

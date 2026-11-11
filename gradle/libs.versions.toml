@@ -1,11 +1,11 @@
 [versions]
 bekkopen-nocommons = { strictly = '0.17.0' }
 json-assert = { strictly = '2.0-rc1' }
-karate-core = { strictly = '1.4.1' }
-karate-junit5 = { strictly = '1.4.1' }
+karate-core = { strictly = '1.5.2' }
+karate-junit5 = { strictly = '1.5.2' }
 
 [libraries]
 bekkopen-nocommons = { group = 'no.bekk.bekkopen', name =  'nocommons', version.ref =  'bekkopen-nocommons' }
 json-assert = { group = 'org.skyscreamer', name = 'jsonassert', version.ref = 'json-assert'}
-karate-core = { group = 'com.intuit.karate', name = 'karate-core', version.ref = 'karate-core'}
-karate-junit5 = { group = 'com.intuit.karate', name = 'karate-junit5', version.ref = 'karate-junit5'}
+karate-core = { group = 'io.karatelabs', name = 'karate-core', version.ref = 'karate-core'}
+karate-junit5 = { group = 'io.karatelabs', name = 'karate-junit5', version.ref = 'karate-junit5'}
