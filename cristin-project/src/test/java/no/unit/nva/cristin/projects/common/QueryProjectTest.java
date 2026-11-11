@@ -35,7 +35,7 @@ public class QueryProjectTest {
   private static final String SAMPLE_PROJECT_MANAGER = "st";
   private static final String SAMPLE_SORT = "start_date";
   private static final String SAMPLE_UNIT = "184.12.60.0";
-  public static final ParameterKeyProject[] QUERY_PARAMETER_KEYS = {
+  private static final ParameterKeyProject[] QUERY_PARAMETER_KEYS = {
     PAGE_CURRENT, PAGE_ITEMS_PER_PAGE
   };
   public static final String QUERY_WITH_MULTIPLE_OF_SAME_PARAMETERS =
