@@ -1,7 +1,5 @@
 package no.unit.nva.cristin.person.affiliations;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import static no.unit.nva.cristin.common.ErrorMessages.ONLY_SUPPORT_BOOLEAN_VALUES;
 import static no.unit.nva.cristin.common.ErrorMessages.invalidQueryParametersMessage;
 
@@ -69,8 +67,8 @@ public class PositionCodesHandler extends ApiGatewayHandler<Void, PositionCodes>
 
   private Boolean validateAndGetPositionCodeStatus(String activeStatusQueryParam)
       throws BadRequestException {
-    if (TRUE.toString().equalsIgnoreCase(activeStatusQueryParam)
-        || FALSE.toString().equalsIgnoreCase(activeStatusQueryParam)) {
+    if ("true".equalsIgnoreCase(activeStatusQueryParam)
+        || "false".equalsIgnoreCase(activeStatusQueryParam)) {
 
       return Boolean.valueOf(activeStatusQueryParam);
     } else {

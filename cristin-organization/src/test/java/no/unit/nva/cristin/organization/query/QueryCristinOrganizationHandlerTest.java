@@ -590,7 +590,7 @@ class QueryCristinOrganizationHandlerTest {
             Map.of(
                 QUERY, MEDICAL_BIOCHEMISTRY,
                 DEPTH, FULL,
-                FULL_TREE, Boolean.TRUE.toString()))
+                FULL_TREE, "true"))
         .build();
   }
 
