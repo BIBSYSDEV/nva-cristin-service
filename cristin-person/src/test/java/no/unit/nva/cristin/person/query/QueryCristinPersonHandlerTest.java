@@ -595,7 +595,7 @@ public class QueryCristinPersonHandlerTest {
             Map.of(
                 NAME, RANDOM_NAME,
                 ORGANIZATION, ORGANIZATION_UIO,
-                VERIFIED, Boolean.TRUE.toString(),
+                VERIFIED, "true",
                 SORT, NAME_DESC))) {
       handler.handleRequest(input, output, context);
     }
