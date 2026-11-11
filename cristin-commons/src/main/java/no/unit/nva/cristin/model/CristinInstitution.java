@@ -86,10 +86,9 @@ public class CristinInstitution {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof CristinInstitution)) {
+    if (!(o instanceof CristinInstitution that)) {
       return false;
     }
-    CristinInstitution that = (CristinInstitution) o;
     return Objects.equals(getCristinInstitutionId(), that.getCristinInstitutionId())
         && Objects.equals(getInstitutionName(), that.getInstitutionName())
         && Objects.equals(getUrl(), that.getUrl());

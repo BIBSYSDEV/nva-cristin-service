@@ -41,10 +41,9 @@ public class DateInfo implements JsonSerializable {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof DateInfo)) {
+    if (!(o instanceof DateInfo dateInfo)) {
       return false;
     }
-    DateInfo dateInfo = (DateInfo) o;
     return Objects.equals(getSourceShortName(), dateInfo.getSourceShortName())
         && Objects.equals(getDate(), dateInfo.getDate());
   }

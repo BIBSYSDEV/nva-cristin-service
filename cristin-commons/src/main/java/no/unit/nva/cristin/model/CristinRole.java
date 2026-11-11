@@ -47,10 +47,9 @@ public class CristinRole {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof CristinRole)) {
+    if (!(o instanceof CristinRole that)) {
       return false;
     }
-    CristinRole that = (CristinRole) o;
     return Objects.equals(getRoleCode(), that.getRoleCode())
         && Objects.equals(getInstitution(), that.getInstitution())
         && Objects.equals(getInstitutionUnit(), that.getInstitutionUnit());
