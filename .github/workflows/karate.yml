@@ -69,7 +69,7 @@ jobs:
         run: sleep 10
       # Run karate tests on deployed api
       - name: Run karate tests with Gradle
-        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest --info
+        run: BASE_PATH=${{env.BASE_PATH}} ./gradlew karateTest --continue --info
       # A Gradle task that finds no tests still succeeds, so count what actually ran
       - name: Verify that Karate tests ran
         run: |
