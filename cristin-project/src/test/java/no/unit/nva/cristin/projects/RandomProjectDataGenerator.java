@@ -53,7 +53,7 @@ import nva.commons.core.language.LanguageMapper;
 
 public class RandomProjectDataGenerator {
 
-  public static final String[] LANGUAGES = {"en", "nb", "nn"};
+  private static final String[] LANGUAGES = {"en", "nb", "nn"};
   public static final Set<String> IGNORE_LIST =
       Set.of(
           ".context", // Context is not used in searchResponse
