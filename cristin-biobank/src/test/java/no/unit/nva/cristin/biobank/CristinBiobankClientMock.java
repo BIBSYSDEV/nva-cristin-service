@@ -19,10 +19,7 @@ public class CristinBiobankClientMock extends CristinBiobankApiClient {
 
   public static final String CRISTIN_GET_BIOBANK_RESPONSE_JSON_FILE = "cristinBiobank1.json";
   public static final String CRISTIN_GET_BIOBANK_RESPONSE_JSON_FILE2 = "cristinBiobank2.json";
-  public static final String NOT_FOUND_JSON = "notFound.json";
   private final String[] responseBody;
-
-  private final String notfoundBody;
 
   public CristinBiobankClientMock() {
     this(
@@ -33,7 +30,6 @@ public class CristinBiobankClientMock extends CristinBiobankApiClient {
   public CristinBiobankClientMock(String... sampleResponses) {
     super(WiremockHttpClient.create());
     responseBody = sampleResponses;
-    notfoundBody = IoUtils.stringFromResources(Path.of(NOT_FOUND_JSON));
   }
 
   @Override
