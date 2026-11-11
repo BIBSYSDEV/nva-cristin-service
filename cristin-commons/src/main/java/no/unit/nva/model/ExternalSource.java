@@ -37,10 +37,9 @@ public class ExternalSource {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof ExternalSource)) {
+    if (!(o instanceof ExternalSource that)) {
       return false;
     }
-    ExternalSource that = (ExternalSource) o;
     return Objects.equals(getIdentifier(), that.getIdentifier())
         && Objects.equals(getName(), that.getName());
   }

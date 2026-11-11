@@ -102,10 +102,9 @@ public class CristinUnit {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof CristinUnit)) {
+    if (!(o instanceof CristinUnit that)) {
       return false;
     }
-    CristinUnit that = (CristinUnit) o;
     return Objects.equals(getCristinUnitId(), that.getCristinUnitId())
         && Objects.equals(getUnitName(), that.getUnitName())
         && Objects.equals(getUrl(), that.getUrl());

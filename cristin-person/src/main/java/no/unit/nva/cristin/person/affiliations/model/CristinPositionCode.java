@@ -55,10 +55,9 @@ public class CristinPositionCode {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof CristinPositionCode)) {
+    if (!(o instanceof CristinPositionCode that)) {
       return false;
     }
-    CristinPositionCode that = (CristinPositionCode) o;
     return isEnabled() == that.isEnabled()
         && Objects.equals(getCode(), that.getCode())
         && Objects.equals(getName(), that.getName());
