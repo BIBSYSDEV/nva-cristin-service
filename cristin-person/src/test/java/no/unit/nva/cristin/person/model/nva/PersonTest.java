@@ -41,7 +41,6 @@ public class PersonTest {
           new TypedValue(CristinPerson.PREFERRED_LAST_NAME, DUMMY_LAST_NAME_PREFERRED));
   private static final Set<TypedValue> validIdentifiers =
       Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, DUMMY_NATIONAL_IDENTITY_NUMBER));
-  private static final String EMPTY_STRING = "";
   private static final String NVA_API_CREATE_PERSON_REQUEST_JSON_FILE =
       "nvaApiCreatePersonRequest.json";
   private static final String POSITION_CODE_MATCHING_JSON = "1087";
@@ -56,10 +55,8 @@ public class PersonTest {
 
     assertEquals(DUMMY_FIRST_NAME, cristinPersonPost.getFirstName());
     assertEquals(DUMMY_LAST_NAME, cristinPersonPost.getSurname());
-    assertEquals(
-        DUMMY_FIRST_NAME_PREFERRED, cristinPersonPost.getFirstNamePreferred().orElse(EMPTY_STRING));
-    assertEquals(
-        DUMMY_LAST_NAME_PREFERRED, cristinPersonPost.getSurnamePreferred().orElse(EMPTY_STRING));
+    assertEquals(DUMMY_FIRST_NAME_PREFERRED, cristinPersonPost.getFirstNamePreferred().orElse(""));
+    assertEquals(DUMMY_LAST_NAME_PREFERRED, cristinPersonPost.getSurnamePreferred().orElse(""));
     assertEquals(
         DUMMY_NATIONAL_IDENTITY_NUMBER, cristinPersonPost.getNorwegianNationalId().orElseThrow());
   }
@@ -93,7 +90,7 @@ public class PersonTest {
 
     var verified = JsonUtils.dtoObjectMapper.readTree(json).get("verified").asText();
 
-    assertEquals(Boolean.FALSE.toString(), verified);
+    assertEquals("false", verified);
   }
 
   @ParameterizedTest(name = "Should strip whitespace from language map collaboration values")

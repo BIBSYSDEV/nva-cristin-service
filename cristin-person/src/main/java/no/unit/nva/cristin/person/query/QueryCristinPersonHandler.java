@@ -143,8 +143,7 @@ public class QueryCristinPersonHandler extends CristinQueryHandler<Void, SearchR
   }
 
   private boolean hasEitherTrueFalse(String verified) {
-    return Boolean.FALSE.toString().equalsIgnoreCase(verified)
-        || Boolean.TRUE.toString().equalsIgnoreCase(verified);
+    return "false".equalsIgnoreCase(verified) || "true".equalsIgnoreCase(verified);
   }
 
   private static String extractSectorFacet(RequestInfo requestInfo) {

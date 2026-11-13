@@ -1,6 +1,5 @@
 package no.unit.nva.cristin.intermediate.storage;
 
-import static io.vavr.control.Try.of;
 import static nva.commons.core.attempt.Try.attempt;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -117,7 +116,7 @@ public class CristinUnitsUtil {
 
   private String executeRequest(URI requestUri) {
     logger.info("Fetching data from {}", requestUri);
-    return of(() ->
+    return Try.of(() ->
             attempt(() ->
                     httpClient.send(
                         buildHttpRequest(requestUri),

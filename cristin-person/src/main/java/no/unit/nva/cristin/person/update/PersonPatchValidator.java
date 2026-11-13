@@ -168,19 +168,25 @@ public final class PersonPatchValidator {
       try {
         var personNvi = OBJECT_MAPPER.readValue(input.get(NVI).toString(), PersonNvi.class);
 
-        Optional.ofNullable(personNvi)
-            .map(PersonNvi::verifiedAt)
-            .map(CristinUnit::extractUnitIdentifier)
-            .filter(Optional::isPresent)
-            .orElseThrow(() -> invalidIdentifier(MUST_HAVE_A_VALID_ORGANIZATION_IDENTIFIER));
+        var organizationIdentifier =
+            Optional.ofNullable(personNvi)
+                .map(PersonNvi::verifiedAt)
+                .map(CristinUnit::extractUnitIdentifier)
+                .filter(Optional::isPresent);
+        if (organizationIdentifier.isEmpty()) {
+          throw invalidIdentifier(MUST_HAVE_A_VALID_ORGANIZATION_IDENTIFIER);
+        }
 
-        Optional.of(personNvi)
-            .map(PersonNvi::verifiedBy)
-            .map(PersonSummary::id)
-            .filter(uri -> StringUtils.isNotBlank(uri.toString()))
-            .map(UriUtils::extractLastPathElement)
-            .filter(Utils::isPositiveInteger)
-            .orElseThrow(() -> invalidIdentifier(MUST_HAVE_A_VALID_PERSON_IDENTIFIER));
+        var personIdentifier =
+            Optional.of(personNvi)
+                .map(PersonNvi::verifiedBy)
+                .map(PersonSummary::id)
+                .filter(uri -> StringUtils.isNotBlank(uri.toString()))
+                .map(UriUtils::extractLastPathElement)
+                .filter(Utils::isPositiveInteger);
+        if (personIdentifier.isEmpty()) {
+          throw invalidIdentifier(MUST_HAVE_A_VALID_PERSON_IDENTIFIER);
+        }
       } catch (JsonProcessingException e) {
         logger.warn(EXCEPTION_WHEN_VALIDATING_PERSON_NVI, e.getMessage());
         throw new BadRequestException(COULD_NOT_PARSE_NVI_FIELD);

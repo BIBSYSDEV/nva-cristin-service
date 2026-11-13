@@ -15,9 +15,7 @@ import java.io.InputStream;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Scanner;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.core.Environment;
 import nva.commons.core.ioutils.IoUtils;
@@ -33,7 +31,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 public class UpdateUnitsHandlerTest {
   public static final String TEST_BUCKET = "test-bucket";
-  public static final String DELIMITER = "\\A";
   public static final String UNITS_JSON_FILENAME = "units-norway.json";
   private Environment environment;
   private S3Client s3Client;
@@ -58,8 +55,9 @@ public class UpdateUnitsHandlerTest {
                 invocationOnMock -> {
                   HttpRequest request = invocationOnMock.getArgument(0);
                   int lastDigit =
-                      Character.getNumericValue(
-                          request.uri().toString().charAt(request.uri().toString().length() - 1));
+                      Character.digit(
+                          request.uri().toString().charAt(request.uri().toString().length() - 1),
+                          10);
                   var result =
                       IoUtils.stringFromResources(
                           Path.of("cristinUnits/units%d.json".formatted(lastDigit)));
@@ -99,8 +97,6 @@ public class UpdateUnitsHandlerTest {
   }
 
   private static String getFileContent(ContentStreamProvider contentStreamProvider) {
-    return new Scanner(contentStreamProvider.newStream(), StandardCharsets.UTF_8)
-        .useDelimiter(DELIMITER)
-        .next();
+    return IoUtils.streamToString(contentStreamProvider.newStream());
   }
 }

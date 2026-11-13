@@ -473,9 +473,7 @@ class QueryCristinOrganizationHandlerTest {
       verify(cristinApiClientVersionOne).sendRequestMultipleTimes(captor.capture());
     }
 
-    var sortTemplate = "sort=%s";
-
-    assertThat(captor.getValue().getQuery(), containsString(format(sortTemplate, cristinSort)));
+    assertThat(captor.getValue().getQuery(), containsString(format("sort=%s", cristinSort)));
     assertThat(gatewayResponse.getStatusCode(), equalTo(HTTP_OK));
   }
 
@@ -590,7 +588,7 @@ class QueryCristinOrganizationHandlerTest {
             Map.of(
                 QUERY, MEDICAL_BIOCHEMISTRY,
                 DEPTH, FULL,
-                FULL_TREE, Boolean.TRUE.toString()))
+                FULL_TREE, "true"))
         .build();
   }
 

@@ -1,6 +1,5 @@
 package no.unit.nva.utils;
 
-import static java.net.http.HttpRequest.newBuilder;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.HTTPS;
@@ -68,7 +67,7 @@ public final class UserUtils {
         JsonUtils.dtoObjectMapper.writeValueAsString(
             Map.of("type", "NationalIdentificationNumber", "value", nationalIdentityNumber));
     var lookupRequest =
-        newBuilder(lookupUri)
+        HttpRequest.newBuilder(lookupUri)
             .header(AUTHORIZATION, BEARER + AccessUtils.getBackendAccessToken())
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(lookupBody))
@@ -102,9 +101,10 @@ public final class UserUtils {
   private static HttpRequest createHttpRequest(
       String nationalIdentityNumber, URI customerId, Set<String> roles)
       throws IOException, InterruptedException {
-    final var userRoles = new UserRoles(nationalIdentityNumber, customerId, roles);
+    var roleDtos = roles.stream().map(RoleDto::fromRolename).collect(Collectors.toSet());
+    final var userRoles = new UserRoles(nationalIdentityNumber, customerId, roleDtos);
     final var body = JsonUtils.dtoObjectMapper.writeValueAsString(userRoles);
-    return newBuilder(createUserServiceUri())
+    return HttpRequest.newBuilder(createUserServiceUri())
         .header(AUTHORIZATION, BEARER + AccessUtils.getBackendAccessToken())
         .POST(HttpRequest.BodyPublishers.ofString(body))
         .build();
@@ -114,76 +114,18 @@ public final class UserUtils {
     return new UriWrapper(HTTPS, DOMAIN_NAME).addChild("users-roles").addChild("users").getUri();
   }
 
-  @SuppressWarnings("unused")
-  private static class UserRoles {
+  private record UserRoles(
+      @JsonProperty("nationalIdentityNumber") String nationalIdentityNumber,
+      @JsonProperty("customerId") URI customerId,
+      @JsonProperty("roles") Set<RoleDto> roles) {}
 
-    private static final String NATIONAL_IDENTITY_NUMBER_FIELD = "nationalIdentityNumber";
-    private static final String CUSTOMER_ID_FIELD = "customerId";
-    private static final String ROLES_FIELD = "roles";
+  private record RoleDto(
+      @JsonProperty("type") String type, @JsonProperty("rolename") String rolename) {
 
-    @JsonProperty(NATIONAL_IDENTITY_NUMBER_FIELD)
-    public String nationalIdentityNumber;
+    private static final String ROLE_TYPE = "Role";
 
-    @JsonProperty(CUSTOMER_ID_FIELD)
-    public URI customerId;
-
-    @JsonProperty(ROLES_FIELD)
-    public Set<RoleDto> roles;
-
-    public UserRoles(String nationalIdentityNumber, URI customerId, Set<String> roles) {
-      this.nationalIdentityNumber = nationalIdentityNumber;
-      this.customerId = customerId;
-      this.roles = roles.stream().map(RoleDto::new).collect(Collectors.toSet());
-    }
-
-    public String getNationalIdentityNumber() {
-      return nationalIdentityNumber;
-    }
-
-    public URI getCustomerId() {
-      return customerId;
-    }
-
-    public Set<RoleDto> getRoles() {
-      return roles;
-    }
-
-    public void setNationalIdentityNumber(String nationalIdentityNumber) {
-      this.nationalIdentityNumber = nationalIdentityNumber;
-    }
-
-    public void setCustomerId(URI customerId) {
-      this.customerId = customerId;
-    }
-
-    public void setRoles(Set<RoleDto> roles) {
-      this.roles = roles;
-    }
-  }
-
-  @SuppressWarnings("unused")
-  private static class RoleDto {
-
-    @JsonProperty("type")
-    public static final String TYPE = "Role";
-
-    @JsonProperty("rolename")
-    public String rolename;
-
-    public RoleDto(String rolename) {
-      this.rolename = rolename;
-    }
-
-    public String getType() {
-      return TYPE;
-    }
-
-    public void setRolename(String rolename) {
-      this.rolename = rolename;
-    }
-
-    public String getRolename() {
-      return rolename;
+    private static RoleDto fromRolename(String rolename) {
+      return new RoleDto(ROLE_TYPE, rolename);
     }
   }
 }

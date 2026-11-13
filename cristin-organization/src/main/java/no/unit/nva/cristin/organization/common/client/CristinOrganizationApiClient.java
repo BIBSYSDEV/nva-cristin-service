@@ -23,7 +23,6 @@ import static no.unit.nva.utils.UriUtils.getCristinUri;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static no.unit.nva.utils.UriUtils.getNvaApiUri;
 import static nva.commons.core.attempt.Try.attempt;
-import static nva.commons.core.attempt.Try.of;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -49,6 +48,7 @@ import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.attempt.Failure;
+import nva.commons.core.attempt.Try;
 import nva.commons.core.paths.UriWrapper;
 
 @SuppressWarnings("PMD.GodClass")
@@ -295,7 +295,7 @@ public class CristinOrganizationApiClient extends ApiClient
       throws ApiGatewayException {
 
     SubSubUnitDto subsubUnitDto =
-        of(subunitUri)
+        Try.of(subunitUri)
             .flatMap(this::sendRequestMultipleTimes)
             .map((HttpResponse<String> response) ->
                 throwExceptionIfNotSuccessful(response, subunitUri))
