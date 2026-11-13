@@ -162,7 +162,6 @@ public class ApiClient {
     return getSuccessfulResponseOrThrowException(httpRequest);
   }
 
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   protected HttpResponse<String> getSuccessfulResponseOrThrowException(HttpRequest httpRequest)
       throws FailedHttpRequestException {
 
@@ -259,7 +258,6 @@ public class ApiClient {
         .toList();
   }
 
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private boolean isSuccessfulRequest(HttpResponse<String> response) {
     try {
       checkHttpStatusCode(response.uri(), response.statusCode(), response.body());

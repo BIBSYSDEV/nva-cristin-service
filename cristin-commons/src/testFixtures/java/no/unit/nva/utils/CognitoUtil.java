@@ -60,7 +60,6 @@ public class CognitoUtil {
    * @param poolId Identifier for Cognito user pool
    * @return username in cognito for user created from parameters.
    */
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static String adminCreateUser(
       String username, String password, String nvaUserNin, String poolId, String clientId) {
 
@@ -117,17 +116,15 @@ public class CognitoUtil {
    * @param userName Username to use for login
    * @param poolId Cognito userpool id
    */
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   public static void deleteUser(String userName, String poolId) {
     getUsername(userName, poolId)
-        .ifPresent(
-            username -> {
-              try {
-                deleteUserCognito(username, poolId);
-              } catch (Exception e) {
-                logger.warn("Error deleting user:{}, {}", username, e.getMessage());
-              }
-            });
+        .ifPresent(username -> {
+          try {
+            deleteUserCognito(username, poolId);
+          } catch (Exception e) {
+            logger.warn("Error deleting user:{}, {}", username, e.getMessage());
+          }
+        });
   }
 
   private static String constructAccessRights() {
@@ -154,7 +151,6 @@ public class CognitoUtil {
     return getCognitoIdentityProvider().adminDeleteUser(deleteUserRequest);
   }
 
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private static Optional<String> getUsername(String nvaUsername, String poolId) {
     try {
       var listUsersRequest =

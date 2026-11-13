@@ -93,14 +93,12 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
   private static void validateCoordinatingInstitution(ObjectNode input) throws BadRequestException {
     validateNotNullIfPresent(input, COORDINATING_INSTITUTION);
     if (propertyHasValue(input, COORDINATING_INSTITUTION)) {
-      attempt(
-              () ->
-                  OBJECT_MAPPER.readValue(
-                      input.get(COORDINATING_INSTITUTION).toString(), Organization.class))
-          .orElseThrow(
-              fail ->
-                  new BadRequestException(
-                      format(ILLEGAL_VALUE_FOR_PROPERTY, COORDINATING_INSTITUTION)));
+      attempt(() ->
+              OBJECT_MAPPER.readValue(
+                  input.get(COORDINATING_INSTITUTION).toString(), Organization.class))
+          .orElseThrow(fail ->
+              new BadRequestException(
+                  format(ILLEGAL_VALUE_FOR_PROPERTY, COORDINATING_INSTITUTION)));
     }
   }
 
@@ -191,7 +189,6 @@ public class ProjectPatchValidator extends PatchValidator implements Validator<O
     }
   }
 
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private void validateResearchResponsibleOrganizationsIfPresent(ObjectNode input)
       throws BadRequestException {
     if (input.has(NVA_INSTITUTIONS_RESPONSIBLE_FOR_RESEARCH)

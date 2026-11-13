@@ -333,9 +333,8 @@ public class CristinPersonPatchJsonCreator {
       }
 
       var awards =
-          attempt(
-                  () ->
-                      asList(OBJECT_MAPPER.readValue(input.get(AWARDS).toString(), Award[].class)))
+          attempt(() ->
+                  asList(OBJECT_MAPPER.readValue(input.get(AWARDS).toString(), Award[].class)))
               .orElseThrow();
       var cristinAwards =
           awards.stream().map(new AwardToCristinFormat()).collect(Collectors.toSet());

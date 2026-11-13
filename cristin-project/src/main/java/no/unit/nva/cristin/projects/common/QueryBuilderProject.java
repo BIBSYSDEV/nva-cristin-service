@@ -60,21 +60,20 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
   @Override
   protected void assignDefaultValues() {
     requiredMissing()
-        .forEach(
-            key -> {
-              switch (key) {
-                case PATH_ORGANISATION -> {
-                  if (query.containsKey(PATH_IDENTITY)) {
-                    query.setPath(key, query.getValue(PATH_IDENTITY));
-                    query.removeValue(PATH_IDENTITY);
-                  }
-                }
-                case PATH_PROJECT -> query.setPath(key, EMPTY_STRING);
-                case PAGE_CURRENT -> query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
-                case PAGE_ITEMS_PER_PAGE -> query.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
-                default -> {}
+        .forEach(key -> {
+          switch (key) {
+            case PATH_ORGANISATION -> {
+              if (query.containsKey(PATH_IDENTITY)) {
+                query.setPath(key, query.getValue(PATH_IDENTITY));
+                query.removeValue(PATH_IDENTITY);
               }
-            });
+            }
+            case PATH_PROJECT -> query.setPath(key, EMPTY_STRING);
+            case PAGE_CURRENT -> query.setValue(key, PARAMETER_PAGE_DEFAULT_VALUE);
+            case PAGE_ITEMS_PER_PAGE -> query.setValue(key, PARAMETER_PER_PAGE_DEFAULT_VALUE);
+            default -> {}
+          }
+        });
   }
 
   @Override
@@ -158,12 +157,10 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
         errorMessage =
             invalidQueryParametersMessageWithRange(
                 key.getKey(), Arrays.toString(ProjectStatus.values()));
+      } else if (nonNull(key.getErrorMessage())) {
+        errorMessage = String.format(key.getErrorMessage(), keyName);
       } else {
-        if (nonNull(key.getErrorMessage())) {
-          errorMessage = String.format(key.getErrorMessage(), keyName);
-        } else {
-          errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
-        }
+        errorMessage = invalidQueryParametersMessage(keyName, EMPTY_STRING);
       }
       throw new BadRequestException(errorMessage);
     }
@@ -365,7 +362,7 @@ public class QueryBuilderProject extends QueryBuilder<ParameterKeyProject> {
   public QueryBuilderProject withStatus(String status) {
     var statusKind =
         attempt(() -> ProjectStatus.valueOf(status.toUpperCase(Locale.getDefault())).name())
-            .orElse((e) -> EMPTY_STRING);
+            .orElse(e -> EMPTY_STRING);
     query.setValue(STATUS, statusKind);
     return this;
   }

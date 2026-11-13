@@ -85,7 +85,6 @@ public class OAuthLogin {
     return URI.create(baseUrl + "?" + params);
   }
 
-  @SuppressWarnings("PMD.AvoidCatchingGenericException")
   private static String extractCodeFromLocation(String location) {
     try {
       var uri = URI.create(location);
@@ -133,12 +132,11 @@ public class OAuthLogin {
       logger.info("Successfully exchanged authorization code for access token.");
       var responseBody = response.body();
 
-      return attempt(
-              () ->
-                  JsonUtils.dtoObjectMapper
-                      .readValue(responseBody, Map.class)
-                      .get("access_token")
-                      .toString())
+      return attempt(() ->
+              JsonUtils.dtoObjectMapper
+                  .readValue(responseBody, Map.class)
+                  .get("access_token")
+                  .toString())
           .orElseThrow();
     } else {
       logger.error(
