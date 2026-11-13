@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.testing;
 
+import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.model.Constants.LINK;
 import static no.unit.nva.cristin.model.Constants.REL_NEXT;
 import static no.unit.nva.cristin.model.Constants.REL_PREV;
@@ -28,7 +29,7 @@ public class HttpResponseFaker implements HttpResponse<String> {
   private final transient HttpHeaders httpHeaders;
 
   public HttpResponseFaker(String bodyString) {
-    this(bodyString, 200);
+    this(bodyString, HTTP_OK);
   }
 
   public HttpResponseFaker(String bodyString, int status) {
