@@ -120,3 +120,7 @@ Every write also writes one Version item in the same transaction.
 
 - Eligible = the project has an approval and its category is `Drugstudy` or `Otherclin`. Calculated on read, never stored.
 - Inclusions: each institution takes part in the project, at most once, `count` ≥ 0; all in one call. Persisted institution is identifier, not uri.
+- Versions and ETags: every GET returns an `ETag` built from the entity's `version`. Every PUT
+  requires `If-Match` with that ETag (428 if missing) and writes conditionally on
+  `version = :expected` (412 if it does not match), incrementing `version`. POST writes
+  conditionally on `attribute_not_exists` (409 if it exists) and returns the new `ETag`.
