@@ -39,6 +39,9 @@ public final class Utils {
   public static final String COULD_NOT_RETRIEVE_USER_CRISTIN_ORGANIZATION_IDENTIFIER =
       "Could not retrieve user's cristin organization identifier";
   public static final String USER_IS_INTERNAL_BACKEND = "User is internal backend";
+  public static final String USER_IS_THIRD_PARTY =
+      "User is third party with client id {} and institution {}";
+  public static final String UNKNOWN_CLIENT_ID = "unknown";
   public static final String USER_TOP_LEVEL_CRISTIN_ORGANIZATION =
       "User has top level cristin organization {}";
 
@@ -151,7 +154,8 @@ public final class Utils {
    * @param requestInfo information from request used to verify allowed permissions
    * @return String with allowed institution to change. Or constant 'any' if internal backend with
    *     full access
-   * @throws ForbiddenException if user it neither user administrator nor internal backend
+   * @throws ForbiddenException if client is neither internal backend, third party nor user
+   *     administrator
    * @throws BadRequestException if incapable of extracting institution number
    */
   public static String extractCristinInstitutionIdentifier(RequestInfo requestInfo)
@@ -160,6 +164,20 @@ public final class Utils {
       logger.info(USER_IS_INTERNAL_BACKEND);
       return CAN_UPDATE_ANY_INSTITUTION;
     }
+    var institution = extractTopLevelInstitution(requestInfo);
+    if (requestInfo.clientIsThirdParty()) {
+      logger.info(USER_IS_THIRD_PARTY, extractClientId(requestInfo), institution);
+      return institution;
+    }
+    if (AccessUtils.requesterIsUserAdministrator(requestInfo)) {
+      logger.info(USER_TOP_LEVEL_CRISTIN_ORGANIZATION, institution);
+      return institution;
+    }
+    throw new ForbiddenException();
+  }
+
+  private static String extractTopLevelInstitution(RequestInfo requestInfo)
+      throws BadRequestException {
     var institution =
         extractInstitution(
             requestInfo
@@ -167,11 +185,12 @@ public final class Utils {
                 .orElseThrow(Utils::failedToRetrieveTopLevelOrgCristinId));
     attempt(() -> Integer.valueOf(institution))
         .orElseThrow(fail -> failedToRetrieveTopLevelOrgCristinId());
-    logger.info(USER_TOP_LEVEL_CRISTIN_ORGANIZATION, institution);
-    if (AccessUtils.requesterIsUserAdministrator(requestInfo)) {
-      return institution;
-    }
-    throw new ForbiddenException();
+    return institution;
+  }
+
+  private static String extractClientId(RequestInfo requestInfo) {
+    return attempt(() -> requestInfo.getClientId().orElse(UNKNOWN_CLIENT_ID))
+        .orElse(fail -> UNKNOWN_CLIENT_ID);
   }
 
   private static String extractInstitution(URI organization) {
