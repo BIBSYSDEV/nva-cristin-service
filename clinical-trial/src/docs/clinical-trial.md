@@ -15,14 +15,14 @@ as clinical trials, and how many participants each institution has included in e
 
 ## Endpoints
 
-| Method | Body                                                                     | Path                                                      | Handler                     | Service method                                                 |
-| ------ | ------------------------------------------------------------------------ | --------------------------------------------------------- | --------------------------- | -------------------------------------------------------------- |
-| GET    | [response](#clinical-trial-response)                                     | `/project/{identifier}/clinical-trial`                    | `FetchClinicalTrialHandler` | `ClinicalTrialService.fetch(projectIdentifier)`                |
-| POST   | [request](#clinical-trial-request), [response](#clinical-trial-response) | `/project/{identifier}/clinical-trial`                    | `SaveClinicalTrialHandler`  | `ClinicalTrialService.save(clinicalTrialWrite)`            |
-| PUT    | [request](#clinical-trial-request), [response](#clinical-trial-response) | `/project/{identifier}/clinical-trial`                    | `SaveClinicalTrialHandler`  | `ClinicalTrialService.save(clinicalTrialWrite)`            |
-| GET    | [response](#submission-response)                                         | `/project/{identifier}/clinical-trial/{periodIdentifier}` | `FetchSubmissionHandler`    | `SubmissionService.fetch(projectIdentifier, periodIdentifier)` |
-| POST   | [request](#submission-request), [response](#submission-response)         | `/project/{identifier}/clinical-trial/{periodIdentifier}` | `SaveSubmissionHandler`     | `SubmissionService.save(submissionWrite)`                  |
-| PUT    | [request](#submission-request), [response](#submission-response)         | `/project/{identifier}/clinical-trial/{periodIdentifier}` | `SaveSubmissionHandler`     | `SubmissionService.save(submissionWrite)`                  |
+| Method | Body                                                                     | Path                                                      | Handler                     | Service method                                                |
+| ------ | ------------------------------------------------------------------------ | --------------------------------------------------------- | --------------------------- |---------------------------------------------------------------|
+| GET    | [response](#clinical-trial-response)                                     | `/project/{identifier}/clinical-trial`                    | `FetchClinicalTrialHandler` | `ClinicalTrialService.find(projectIdentifier)`                |
+| POST   | [request](#clinical-trial-request), [response](#clinical-trial-response) | `/project/{identifier}/clinical-trial`                    | `SaveClinicalTrialHandler`  | `ClinicalTrialService.save(clinicalTrialWrite)`               |
+| PUT    | [request](#clinical-trial-request), [response](#clinical-trial-response) | `/project/{identifier}/clinical-trial`                    | `SaveClinicalTrialHandler`  | `ClinicalTrialService.save(clinicalTrialWrite)`               |
+| GET    | [response](#submission-response)                                         | `/project/{identifier}/clinical-trial/{periodIdentifier}` | `FetchSubmissionHandler`    | `SubmissionService.find(projectIdentifier, periodIdentifier)` |
+| POST   | [request](#submission-request), [response](#submission-response)         | `/project/{identifier}/clinical-trial/{periodIdentifier}` | `SaveSubmissionHandler`     | `SubmissionService.save(submissionWrite)`                     |
+| PUT    | [request](#submission-request), [response](#submission-response)         | `/project/{identifier}/clinical-trial/{periodIdentifier}` | `SaveSubmissionHandler`     | `SubmissionService.save(submissionWrite)`                     |
 
 A write is one command: `ClinicalTrialWrite` / `SubmissionWrite`, built by the handler from the
 entity, version , action and the caller.
