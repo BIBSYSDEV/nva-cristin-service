@@ -493,13 +493,10 @@ public class CreateCristinPersonHandlerTest {
   }
 
   private Person injectPersonNinIntoInput(String personNin) {
-    var input = dummyPerson();
-    input =
-        dummyPerson()
-            .copy()
-            .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, personNin)))
-            .build();
-    return input;
+    return dummyPerson()
+        .copy()
+        .withIdentifiers(Set.of(new TypedValue(NATIONAL_IDENTITY_NUMBER, personNin)))
+        .build();
   }
 
   private Person getPersonWithRepeatedIdentityNumber() {

@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -508,7 +509,8 @@ class FetchCristinOrganizationHandlerTest {
         restApiMapper
             .getTypeFactory()
             .constructParametricType(GatewayResponse.class, Problem.class);
-    return restApiMapper.readValue(output.toString(), responseWithProblemType);
+    return restApiMapper.readValue(
+        output.toString(StandardCharsets.UTF_8), responseWithProblemType);
   }
 
   private InputStream requestUsingV20230526(Map<String, String> queryParameters)

@@ -210,7 +210,7 @@ public class SearchResponse<E> implements JsonSerializable {
   }
 
   private boolean outOfScope(int currentPage) {
-    return this.size < this.firstRecord || this.size == 0 && currentPage > 1;
+    return this.size < this.firstRecord || (this.size == 0 && currentPage > 1);
   }
 
   private boolean matchesCriteriaForPrevRel(int currentPage) {

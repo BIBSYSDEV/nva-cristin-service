@@ -74,7 +74,6 @@ public class FetchCristinPersonHandlerTest {
   private static final Map<String, String> ILLEGAL_QUERY_PARAMS = Map.of("somekey", "somevalue");
   private static final Map<String, String> VALID_PATH_PARAM = Map.of(ID, "12345");
   private static final Map<String, String> ZERO_QUERY_PARAMS = Collections.emptyMap();
-  private static final String EMPTY_STRING = "";
   private static final String EXPECTED_CRISTIN_URI_WITH_IDENTIFIER =
       "https://api.cristin-test.uio.no/v2/persons/12345";
   private static final Map<String, String> VALID_ORCID_PATH_PARAM =
@@ -141,9 +140,7 @@ public class FetchCristinPersonHandlerTest {
   @Test
   void shouldReturnNotFoundToClientWhenCristinFetchReturnsNotFound() throws Exception {
     apiClient = spy(apiClient);
-    doReturn(new HttpResponseFaker(EMPTY_STRING, 404))
-        .when(apiClient)
-        .fetchGetResult(any(URI.class));
+    doReturn(new HttpResponseFaker("", 404)).when(apiClient).fetchGetResult(any(URI.class));
 
     handler = new FetchCristinPersonHandler(apiClient, environment);
     var gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
@@ -154,9 +151,7 @@ public class FetchCristinPersonHandlerTest {
   @Test
   void shouldReturnBadGatewayWhenStatusCodeFromBackendSignalsError() throws Exception {
     apiClient = spy(apiClient);
-    doReturn(new HttpResponseFaker(EMPTY_STRING, 500))
-        .when(apiClient)
-        .fetchGetResult(any(URI.class));
+    doReturn(new HttpResponseFaker("", 500)).when(apiClient).fetchGetResult(any(URI.class));
 
     handler = new FetchCristinPersonHandler(apiClient, environment);
     var gatewayResponse = sendQuery(null, VALID_PATH_PARAM);
@@ -211,8 +206,7 @@ public class FetchCristinPersonHandlerTest {
   void shouldReturnHttpRequestFailedExceptionWhenFetchFromUpstreamServerTimesOut()
       throws Exception {
     var clientMock = mock(HttpClient.class);
-    when(clientMock.<String>send(any(), any()))
-        .thenThrow(new HttpConnectTimeoutException(EMPTY_STRING));
+    when(clientMock.<String>send(any(), any())).thenThrow(new HttpConnectTimeoutException(""));
     var apiClient = new CristinPersonApiClient(clientMock);
     handler = new FetchCristinPersonHandler(apiClient, environment);
     var gatewayResponse = sendQuery(null, VALID_PATH_PARAM);

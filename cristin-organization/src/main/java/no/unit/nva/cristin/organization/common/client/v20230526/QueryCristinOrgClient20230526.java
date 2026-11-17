@@ -95,6 +95,6 @@ public class QueryCristinOrgClient20230526 extends ApiClient
 
   private boolean wantsFullTree(Map<String, String> params) {
     var includeFullTree = params.get(FULL_TREE);
-    return Boolean.TRUE.toString().equalsIgnoreCase(includeFullTree);
+    return "true".equalsIgnoreCase(includeFullTree);
   }
 }

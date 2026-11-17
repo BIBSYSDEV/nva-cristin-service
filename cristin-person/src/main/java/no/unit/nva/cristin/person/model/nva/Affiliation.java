@@ -50,12 +50,11 @@ public class Affiliation {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof Affiliation)) {
+    if (!(o instanceof Affiliation that)) {
       return false;
     }
-    Affiliation that = (Affiliation) o;
     return Objects.equals(getOrganization(), that.getOrganization())
-        && Objects.equals(isActive(), that.isActive())
+        && isActive() == that.isActive()
         && Objects.equals(getRole(), that.getRole());
   }
 

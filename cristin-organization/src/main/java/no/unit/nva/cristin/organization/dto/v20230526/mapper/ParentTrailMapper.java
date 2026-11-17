@@ -35,7 +35,8 @@ public class ParentTrailMapper {
       return;
     }
 
-    var match = allParents.stream().filter(hasId()).filter(hasMatch(unitDto)).findAny();
+    var match =
+        allParents.stream().filter(ParentTrailMapper::hasId).filter(hasMatch(unitDto)).findAny();
 
     if (match.isPresent()) {
       var presentMatch = match.get();
@@ -49,8 +50,8 @@ public class ParentTrailMapper {
     return nonNull(unitDto.getParentUnit()) && nonNull(unitDto.getParentUnit().getId());
   }
 
-  private Predicate<UnitDto> hasId() {
-    return possibleParent -> nonNull(possibleParent.getId());
+  private static boolean hasId(UnitDto possibleParent) {
+    return nonNull(possibleParent.getId());
   }
 
   private Predicate<UnitDto> hasMatch(UnitDto unitDto) {

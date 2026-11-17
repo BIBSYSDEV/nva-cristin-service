@@ -33,7 +33,7 @@ public class CreateCristinProjectValidator implements Validator<NvaProject> {
       this.label = label;
     }
 
-    protected String getLabel() {
+    String getLabel() {
       return label;
     }
   }
