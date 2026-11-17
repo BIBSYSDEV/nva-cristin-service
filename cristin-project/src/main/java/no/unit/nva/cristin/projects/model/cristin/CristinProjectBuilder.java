@@ -178,7 +178,7 @@ public class CristinProjectBuilder implements Function<NvaProject, CristinProjec
   }
 
   private Map<String, String> extractSummary(Map<String, String> summary) {
-    return summary.isEmpty() ? null : Collections.unmodifiableMap(summary);
+    return Collections.unmodifiableMap(summary);
   }
 
   private String extractStatus(NvaProject project) {

@@ -127,20 +127,18 @@ public abstract class CristinQuery<T extends Enum<T> & IParameterKey> {
   private List<BasicNameValuePair> createMultipleKeyMap(Map<String, String> parameters) {
     var multipleKeyMap = new ArrayList<BasicNameValuePair>();
 
-    parameters.forEach(
-        (key, values) -> {
-          if (nonNull(values)) {
-            if (multiValuedCristinParams().contains(key)) {
-              var value = values.split(COMMA_DELIMITER_REGEX);
-              Arrays.stream(value)
-                  .forEach(
-                      currentValue ->
-                          multipleKeyMap.add(new BasicNameValuePair(key, currentValue)));
-            } else {
-              multipleKeyMap.add(new BasicNameValuePair(key, values));
-            }
-          }
-        });
+    parameters.forEach((key, values) -> {
+      if (nonNull(values)) {
+        if (multiValuedCristinParams().contains(key)) {
+          var value = values.split(COMMA_DELIMITER_REGEX);
+          Arrays.stream(value)
+              .forEach(
+                  currentValue -> multipleKeyMap.add(new BasicNameValuePair(key, currentValue)));
+        } else {
+          multipleKeyMap.add(new BasicNameValuePair(key, values));
+        }
+      }
+    });
 
     return multipleKeyMap;
   }

@@ -5,7 +5,20 @@ plugins {
 
 nva {
     pmd {
-        rulesetFile = rootProject.file('config/pmd/ruleset.xml')
+        analyzeTests = false
+        excludedRules = [
+                'AvoidCatchingGenericException',
+                'AvoidPrintStackTrace',
+                'AvoidThrowingRawExceptionTypes',
+                'ClassNamingConventions',
+                'ConfusingTernary',
+                'CyclomaticComplexity',
+                'DoNotUseThreads',
+                'FieldNamingConventions',
+                'GuardLogStatement',
+                'SystemPrintln',
+                'VariableCanBeInlined'
+        ]
     }
 }
 

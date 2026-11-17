@@ -118,11 +118,10 @@ public class CristinUnitsUtil {
   private String executeRequest(URI requestUri) {
     logger.info("Fetching data from {}", requestUri);
     return of(() ->
-            attempt(
-                    () ->
-                        httpClient.send(
-                            buildHttpRequest(requestUri),
-                            BodyHandlers.ofString(StandardCharsets.UTF_8)))
+            attempt(() ->
+                    httpClient.send(
+                        buildHttpRequest(requestUri),
+                        BodyHandlers.ofString(StandardCharsets.UTF_8)))
                 .map(HttpResponse::body)
                 .toOptional()
                 .orElseThrow())

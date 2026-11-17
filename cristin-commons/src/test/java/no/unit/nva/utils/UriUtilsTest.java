@@ -18,7 +18,7 @@ class UriUtilsTest {
       "https://api.nva.no/?name=t%EF%BF%BDrresen&lang=en%2Cnb%2Cnn";
   public static final String INVALID_ENCODING = "%EF%BF%BD";
 
-  @ParameterizedTest()
+  @ParameterizedTest
   @ValueSource(
       strings = {"https://api.nva.no/?name=tørresen", "https://api.nva.no/?name=t%C3%B8rresen"})
   void shouldNotBreakEncodingWhenAddingLanguagesToUri(String value) {

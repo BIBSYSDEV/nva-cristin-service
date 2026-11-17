@@ -245,21 +245,23 @@ public class CristinOrganizationApiClient extends ApiClient
     return new Organization.Builder()
         .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
         .withPartOf(partOf)
-        .withHasPart(getSubUnits(subSubUnitDto))
+        .withHasPart(getSubUnits(subSubUnitDto).orElse(null))
         .withLabels(subSubUnitDto.getUnitName())
         .withCountry(subSubUnitDto.getCountry())
         .withAcronym(subSubUnitDto.getAcronym())
         .build();
   }
 
-  private Set<Organization> getSubUnits(SubSubUnitDto subSubUnitDto) {
+  private Optional<Set<Organization>> getSubUnits(SubSubUnitDto subSubUnitDto) {
     List<SubUnitDto> subUnits = subSubUnitDto.getSubUnits();
-    return !isNull(subUnits)
-        ? subUnits.stream()
+    if (isNull(subUnits)) {
+      return Optional.empty();
+    }
+    return Optional.of(
+        subUnits.stream()
             .parallel()
             .map((SubUnitDto subUnitDto) -> getSubUnitDto(subUnitDto.getUri()))
-            .collect(Collectors.toSet())
-        : null;
+            .collect(Collectors.toSet()));
   }
 
   private Organization getSubUnitDto(URI cristinUri) {
@@ -273,7 +275,7 @@ public class CristinOrganizationApiClient extends ApiClient
   private Organization getHasParts(SubSubUnitDto subSubUnitDto) {
     return new Organization.Builder()
         .withId(getNvaApiId(subSubUnitDto.getId(), ORGANIZATION_PATH))
-        .withHasPart(getSubUnits(subSubUnitDto))
+        .withHasPart(getSubUnits(subSubUnitDto).orElse(null))
         .withLabels(subSubUnitDto.getUnitName())
         .build();
   }
@@ -295,9 +297,8 @@ public class CristinOrganizationApiClient extends ApiClient
     SubSubUnitDto subsubUnitDto =
         of(subunitUri)
             .flatMap(this::sendRequestMultipleTimes)
-            .map(
-                (HttpResponse<String> response) ->
-                    throwExceptionIfNotSuccessful(response, subunitUri))
+            .map((HttpResponse<String> response) ->
+                throwExceptionIfNotSuccessful(response, subunitUri))
             .map(HttpResponse::body)
             .map(SubSubUnitDto::fromJson)
             .orElseThrow(this::handleError);
