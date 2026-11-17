@@ -17,12 +17,16 @@ Feature: API tests for Cristin Person fetch
       | HEAD    |
       | PUT     |
       | DELETE  |
-      | CONNECT |
 
-  Scenario: Unsupported method TRACE returns 405
+  Scenario Outline: Method <METHOD> is rejected before it reaches the API and returns 405
     Given path '/person/'
-    When method TRACE
+    When method <METHOD>
     Then status 405
+
+    Examples:
+      | METHOD  |
+      | TRACE   |
+      | CONNECT |
 
   Scenario: Supported method POST returns 401 Unauthorized whe no authentication token
     Given path '/person/'

@@ -55,15 +55,15 @@ Feature: API tests for Cristin Project retrieve and search
       | 'application/ld+json' |
       | 'application/json'    |
 
-  Scenario Outline: Fetch with unsupported Accept header returns Unsupported Media Type
+  Scenario Outline: Fetch with unsupported Accept header returns Not Acceptable
     * configure headers = { 'Accept': <UNACCEPTABLE_CONTENT_TYPE> }
     Given path '/project/' + validIdentifier
     When method GET
-    Then status 415
+    Then status 406
     * def contentType = responseHeaders['Content-Type'][0]
     And match contentType == PROBLEM_JSON_MEDIA_TYPE
-    And match response.title == 'Unsupported Media Type'
-    And match response.status == 415
+    And match response.title == 'Not Acceptable'
+    And match response.status == 406
     And match response.detail == <UNACCEPTABLE_CONTENT_TYPE> + ' contains no supported Accept header values. Supported values are: application/json; charset=utf-8, application/ld+json'
     And match response.requestId == '#notnull'
 
