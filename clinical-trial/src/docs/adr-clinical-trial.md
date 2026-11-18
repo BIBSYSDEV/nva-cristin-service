@@ -27,4 +27,4 @@
    `save(SubmissionWrite)`: the expected version is a
    precondition, not state of the entity, and the caller has to reach the Version item for the audit
    to answer "who". `action` field - create and update are the two factories on the command, so
-   the condition expression decides. `User` is a record of this module, built from `RequestInfo` in the handler;
+   the condition expression decides. `User` is a record of this module, built from `RequestInfo` in the handler.
