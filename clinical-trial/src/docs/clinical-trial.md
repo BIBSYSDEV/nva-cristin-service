@@ -5,18 +5,18 @@ as clinical trials, and how many participants each institution has included in e
 
 ## Terms
 
-| Term          | Meaning                                                                                           |
-| ------------- | ------------------------------------------------------------------------------------------------- |
-| ClinicalTrial | The project as a clinical trial. One per project.                                                 |
-| Submission    | Inclusions per institution for one period, with a status. One per project per period.             |
-| Inclusion     | Number of participants included at one institution during one period.                             |
-| Period        | Shared reporting window, such as `2026-H1`. Opened and closed by the admin side, not by this API. |
+| Term          | Meaning                                                                                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ClinicalTrial | The project as a clinical trial. One per project.                                                                                                               |
+| Submission    | Inclusions per institution for one period, with a status. One per project per period.                                                                           |
+| Inclusion     | Number of participants included at one institution during one period.                                                                                           |
+| Period        | Shared reporting window, such as `2026-H1`. Opened and closed by the admin side, not by this API.                                                               |
 | Version       | Counter on a stored entity, raised by every write. Served as `ETag`, required back in `If-Match`. The entity as it was at that count is kept as a Version item. |
 
 ## Endpoints
 
 | Method | Body                                                                     | Path                                                      | Handler                     | Service method                                                |
-| ------ | ------------------------------------------------------------------------ | --------------------------------------------------------- | --------------------------- |---------------------------------------------------------------|
+| ------ | ------------------------------------------------------------------------ | --------------------------------------------------------- | --------------------------- | ------------------------------------------------------------- |
 | GET    | [response](#clinical-trial-response)                                     | `/project/{identifier}/clinical-trial`                    | `FetchClinicalTrialHandler` | `ClinicalTrialService.find(projectIdentifier)`                |
 | POST   | [request](#clinical-trial-request), [response](#clinical-trial-response) | `/project/{identifier}/clinical-trial`                    | `SaveClinicalTrialHandler`  | `ClinicalTrialService.save(clinicalTrialWrite)`               |
 | PUT    | [request](#clinical-trial-request), [response](#clinical-trial-response) | `/project/{identifier}/clinical-trial`                    | `SaveClinicalTrialHandler`  | `ClinicalTrialService.save(clinicalTrialWrite)`               |
@@ -33,10 +33,9 @@ response carries the current version in `ETag`.
 
 ### Changes to existing endpoints
 
-`GET /project/{identifier}` (`FetchCristinProjectHandler`) gains two fields, see
-[GET project](#get-project). Both are derived from the project payload itself, so the project
-lookup reads nothing from this feature's storage and `cristin-project` keeps no dependency on this
-module.
+`GET /project/{identifier}` (`FetchCristinProjectHandler`) and `GET /project`
+(`QueryCristinProjectHandler`) gain one field, see [GET project](#get-project). It is derived from
+the project payload itself.
 
 ## Bodies
 
@@ -127,11 +126,11 @@ Submissions are listed without their inclusions; a submission is read in full th
 
 ## Storage
 
-| Type          | PK               | SK                              | Attributes                          |
-| ------------- | ---------------- | ------------------------------- | ----------------------------------- |
-| ClinicalTrial | `PROJECT#987654` | `CLINICAL_TRIAL`                | `reportable`, `version`             |
-| Submission    | `PROJECT#987654` | `SUBMISSION#2026-H1`            | `status`, `inclusions[]`, `version` |
-| Period        | `PERIOD`         | `2026-H1`                       | `status`                            |
+| Type          | PK               | SK                              | Attributes                                                        |
+| ------------- | ---------------- | ------------------------------- | ----------------------------------------------------------------- |
+| ClinicalTrial | `PROJECT#987654` | `CLINICAL_TRIAL`                | `reportable`, `version`                                           |
+| Submission    | `PROJECT#987654` | `SUBMISSION#2026-H1`            | `status`, `inclusions[]`, `version`                               |
+| Period        | `PERIOD`         | `2026-H1`                       | `status`                                                          |
 | Version       | entity's PK      | `VERSION#<entity SK>#<version>` | the entity item, `modifiedBy`, `modifiedByCustomer`, `modifiedAt` |
 
 Every write raises `version` on the entity and writes one Version item in the same transaction.
@@ -144,7 +143,8 @@ cannot be answered by this key layout and needs an index on `PERIOD#<period>` / 
 ## Rules
 
 - Eligible = the project has an approval with status `Approved` and `healthProjectData.type` is
-  `Drugstudy` or `Otherclin`. Calculated on read, never stored. Only on the single project GET.
+  `Drugstudy` or `Otherclin`. Calculated on read, never stored. On the single project GET and on
+  the hits of the project search.
 - Inclusions: each institution takes part in the project, at most once, `count` >= 0; all in one
   call, replacing the inclusions already saved for the period. An institution left out of the call
   has reported nothing, which is not the same as a `count` of 0. Persisted institution is

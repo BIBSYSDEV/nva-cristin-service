@@ -2,17 +2,28 @@ package no.unit.nva.cristin.projects.model.nva;
 
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
 import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
+import static no.unit.nva.cristin.projects.RandomProjectDataGenerator.randomNamesMap;
+import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.DRUGSTUDY;
+import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.OTHERCLIN;
+import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.OTHERSTUDY;
 import static no.unit.nva.cristin.projects.model.nva.NvaProject.PROJECT_CONTEXT;
+import static no.unit.nva.model.ApprovalStatus.APPLIED;
+import static no.unit.nva.model.ApprovalStatus.APPROVED;
+import static no.unit.nva.testutils.RandomDataGenerator.randomElement;
+import static no.unit.nva.testutils.RandomDataGenerator.randomInstant;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static nva.commons.core.attempt.Try.attempt;
 import static nva.commons.core.ioutils.IoUtils.stringFromResources;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.file.Path;
 import java.util.List;
 import no.unit.nva.cristin.projects.model.cristin.CristinFundingSource;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
+import no.unit.nva.model.ApprovalStatus;
 import org.junit.jupiter.api.Test;
 
 public class NvaProjectBuilderTest {
@@ -72,6 +83,72 @@ public class NvaProjectBuilderTest {
     var actual = nvaProject.getFunding().get(0).getSource().toString();
 
     assertThat(actual, equalTo(URI_ENCODED_FUNDING_SOURCE_URI));
+  }
+
+  @Test
+  void shouldBeClinicalTrialEligibleWhenProjectIsDrugStudyHavingApprovedApproval() {
+    var nvaProject = projectWith(DRUGSTUDY, approvalsWithStatus(APPROVED));
+
+    assertThat(nvaProject.isClinicalTrialEligible(), is(true));
+  }
+
+  @Test
+  void shouldBeClinicalTrialEligibleWhenProjectIsOtherClinicalStudyHavingApprovedApproval() {
+    var nvaProject = projectWith(OTHERCLIN, approvalsWithStatus(APPROVED));
+
+    assertThat(nvaProject.isClinicalTrialEligible(), is(true));
+  }
+
+  @Test
+  void shouldNotBeClinicalTrialEligibleWhenHealthProjectTypeIsNotClinical() {
+    var nvaProject = projectWith(OTHERSTUDY, approvalsWithStatus(APPROVED));
+
+    assertThat(nvaProject.isClinicalTrialEligible(), is(false));
+  }
+
+  @Test
+  void shouldNotBeClinicalTrialEligibleWhenNoApprovalHasStatusApproved() {
+    var nvaProject = projectWith(DRUGSTUDY, approvalsWithStatus(APPLIED));
+
+    assertThat(nvaProject.isClinicalTrialEligible(), is(false));
+  }
+
+  @Test
+  void shouldNotBeClinicalTrialEligibleWhenProjectHasNoApprovals() {
+    var nvaProject =
+        new NvaProject.Builder().withHealthProjectData(healthProjectDataOfType(DRUGSTUDY)).build();
+
+    assertThat(nvaProject.isClinicalTrialEligible(), is(false));
+  }
+
+  @Test
+  void shouldNotBeClinicalTrialEligibleWhenProjectHasNoHealthProjectData() {
+    var nvaProject = new NvaProject.Builder().withApprovals(approvalsWithStatus(APPROVED)).build();
+
+    assertThat(nvaProject.isClinicalTrialEligible(), is(false));
+  }
+
+  private NvaProject projectWith(HealthProjectType healthProjectType, List<Approval> approvals) {
+    return new NvaProject.Builder()
+        .withHealthProjectData(healthProjectDataOfType(healthProjectType))
+        .withApprovals(approvals)
+        .build();
+  }
+
+  private HealthProjectData healthProjectDataOfType(HealthProjectType healthProjectType) {
+    return new HealthProjectData(
+        healthProjectType, randomNamesMap(), randomElement(ClinicalTrialPhase.values()));
+  }
+
+  private List<Approval> approvalsWithStatus(ApprovalStatus approvalStatus) {
+    return List.of(
+        new Approval(
+            randomInstant(),
+            randomElement(ApprovalAuthority.values()),
+            approvalStatus,
+            randomElement(ApplicationCode.values()),
+            randomString(),
+            randomNamesMap()));
   }
 
   private void addRequiredFields(CristinProject cristinProject) {

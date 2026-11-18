@@ -201,5 +201,6 @@
       }
     ]
   },
-  "webPage": "https://www.external.url"
+  "webPage": "https://www.external.url",
+  "clinicalTrialEligible": true
 }

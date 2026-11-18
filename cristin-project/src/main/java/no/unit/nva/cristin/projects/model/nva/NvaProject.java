@@ -5,6 +5,9 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static no.unit.nva.cristin.common.Utils.nonEmptyOrDefault;
 import static no.unit.nva.cristin.model.Constants.PROJECT_LOOKUP_CONTEXT_URL;
 import static no.unit.nva.cristin.model.JsonPropertyNames.CONTEXT;
+import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.DRUGSTUDY;
+import static no.unit.nva.cristin.projects.model.nva.HealthProjectType.OTHERCLIN;
+import static no.unit.nva.model.ApprovalStatus.APPROVED;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,6 +17,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.projects.model.cristin.CristinProject;
 import no.unit.nva.cristin.projects.model.cristin.CristinProjectBuilder;
@@ -34,6 +39,9 @@ public class NvaProject implements JsonSerializable, UriId {
 
   public static final String PROJECT_CONTEXT = PROJECT_LOOKUP_CONTEXT_URL;
   public static final String PROJECT_TYPE = "Project";
+
+  private static final Set<HealthProjectType> CLINICAL_HEALTH_PROJECT_TYPES =
+      Set.of(DRUGSTUDY, OTHERCLIN);
 
   @JsonProperty(CONTEXT)
   @JsonInclude(NON_NULL)
@@ -381,6 +389,22 @@ public class NvaProject implements JsonSerializable, UriId {
 
   public void setWebPage(URI webPage) {
     this.webPage = webPage;
+  }
+
+  @JsonProperty
+  public boolean isClinicalTrialEligible() {
+    return isClinicalHealthProject() && hasApprovedApproval();
+  }
+
+  private boolean isClinicalHealthProject() {
+    return Optional.ofNullable(getHealthProjectData())
+        .map(HealthProjectData::getType)
+        .filter(CLINICAL_HEALTH_PROJECT_TYPES::contains)
+        .isPresent();
+  }
+
+  private boolean hasApprovedApproval() {
+    return getApprovals().stream().anyMatch(approval -> APPROVED == approval.getStatus());
   }
 
   @Override
