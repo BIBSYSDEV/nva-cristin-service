@@ -157,18 +157,15 @@ cannot be answered by this key layout and needs an index on `PERIOD#<period>` / 
   caller's person. User with access right MANAGE_KBS is allowed to write ClinicalTrial and Submission as well. `UpdateProjectResourceAccessCheck` in `cristin-project` already makes that check
   for project update.
 - Only Norwegian institutions report inclusions
+- Project manager submits 0 if there were no inclusion in period. Count can not be null. Not submitted (empty list) is considered as not reported
+- `GET` of clinical trial in a period with no submission: `NOT_SUBMITTED` status in response
 
 ## Open questions
 
-1. `GET` of clinical trial in a period with no submission: `NOT_SUBMITTED` response?
-2. How is "included nobody this period" recorded, so the admin output can tell "reported zero" from
-   "not reported"? A `NO_INCLUSIONS` status on a submission saved with an empty `inclusions[]`, or
-   something else?
-3. May `reportable` change from `YES` to `NO` once a submission carries inclusions, or is that
+1. May `reportable` change from `YES` to `NO` once a submission carries inclusions, or is that
    blocked until the inclusions are cleared?
-4. The admin side closing a period writes `REPORTED` with no user behind it. Does the command take
+2. The admin side closing a period writes `REPORTED` with no user behind it. Does the command take
    a system actor, or does that write go another way?
-5. Does the approval have to come from a particular authority, or does any approval qualify?
-6. The project context is served from `bibsysdev.github.io` today. Is the versioned
+3. The project context is served from `bibsysdev.github.io` today. Is the versioned
    `/cristin/project/context/{version}` plus `/cristin/project/ontology#` hosting landing before this
    feature, and should the examples use it instead?
